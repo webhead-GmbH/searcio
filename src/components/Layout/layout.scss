@@ -1,0 +1,319 @@
+// Webhead scaffold managed file. scaffold:update may refresh this file.
+
+.webhead-layout-grid {
+	--wh-grid-current-template-columns: var(--wh-grid-template-columns, repeat(auto-fit, minmax(min(100%, 18rem), 1fr)));
+	--wh-grid-current-template-rows: var(--wh-grid-template-rows, none);
+	--wh-grid-current-template-areas: var(--wh-grid-template-areas, none);
+	--wh-grid-current-auto-flow: var(--wh-grid-auto-flow, row);
+	--wh-grid-current-auto-rows: var(--wh-grid-auto-rows, auto);
+	--wh-grid-current-auto-columns: var(--wh-grid-auto-columns, auto);
+	--wh-grid-current-gap: var(--wh-grid-gap, 16px);
+	--wh-grid-current-row-gap: var(--wh-grid-row-gap, var(--wh-grid-current-gap));
+	--wh-grid-current-column-gap: var(--wh-grid-column-gap, var(--wh-grid-current-gap));
+	--wh-grid-current-align-items: var(--wh-grid-align-items, stretch);
+	--wh-grid-current-justify-items: var(--wh-grid-justify-items, stretch);
+	--wh-grid-current-align-content: var(--wh-grid-align-content, stretch);
+	--wh-grid-current-justify-content: var(--wh-grid-justify-content, stretch);
+	--wh-grid-current-place-items: var(--wh-grid-place-items, var(--wh-grid-current-align-items) var(--wh-grid-current-justify-items));
+	--wh-grid-current-place-content: var(--wh-grid-place-content, var(--wh-grid-current-align-content) var(--wh-grid-current-justify-content));
+
+	display: grid;
+	grid-template-columns: var(--wh-grid-current-template-columns);
+	grid-template-rows: var(--wh-grid-current-template-rows);
+	grid-template-areas: var(--wh-grid-current-template-areas);
+	grid-auto-flow: var(--wh-grid-current-auto-flow);
+	grid-auto-rows: var(--wh-grid-current-auto-rows);
+	grid-auto-columns: var(--wh-grid-current-auto-columns);
+	gap: var(--wh-grid-current-gap);
+	row-gap: var(--wh-grid-current-row-gap);
+	column-gap: var(--wh-grid-current-column-gap);
+	align-items: var(--wh-grid-current-align-items);
+	justify-items: var(--wh-grid-current-justify-items);
+	align-content: var(--wh-grid-current-align-content);
+	justify-content: var(--wh-grid-current-justify-content);
+	place-items: var(--wh-grid-current-place-items);
+	place-content: var(--wh-grid-current-place-content);
+	min-width: 0;
+
+	&[data-inline='true'] {
+		display: inline-grid;
+	}
+}
+
+.webhead-layout-grid__item {
+	--wh-grid-item-current-column: var(--wh-grid-item-column, auto);
+	--wh-grid-item-current-row: var(--wh-grid-item-row, auto);
+	--wh-grid-item-current-area: var(--wh-grid-item-area, auto);
+	--wh-grid-item-current-order: var(--wh-grid-item-order, initial);
+	--wh-grid-item-current-align-self: var(--wh-grid-item-align-self, auto);
+	--wh-grid-item-current-justify-self: var(--wh-grid-item-justify-self, auto);
+	--wh-grid-item-current-place-self: var(--wh-grid-item-place-self, var(--wh-grid-item-current-align-self) var(--wh-grid-item-current-justify-self));
+
+	min-width: 0;
+	grid-column: var(--wh-grid-item-current-column);
+	grid-row: var(--wh-grid-item-current-row);
+	grid-area: var(--wh-grid-item-current-area);
+	order: var(--wh-grid-item-current-order);
+	align-self: var(--wh-grid-item-current-align-self);
+	justify-self: var(--wh-grid-item-current-justify-self);
+	place-self: var(--wh-grid-item-current-place-self);
+}
+
+.webhead-layout-flex {
+	--wh-flex-current-direction: var(--wh-flex-direction, row);
+	--wh-flex-current-wrap: var(--wh-flex-wrap, wrap);
+	--wh-flex-current-gap: var(--wh-flex-gap, 16px);
+	--wh-flex-current-row-gap: var(--wh-flex-row-gap, var(--wh-flex-current-gap));
+	--wh-flex-current-column-gap: var(--wh-flex-column-gap, var(--wh-flex-current-gap));
+	--wh-flex-current-align-items: var(--wh-flex-align-items, stretch);
+	--wh-flex-current-justify-content: var(--wh-flex-justify-content, flex-start);
+	--wh-flex-current-align-content: var(--wh-flex-align-content, stretch);
+
+	display: flex;
+	flex-direction: var(--wh-flex-current-direction);
+	flex-wrap: var(--wh-flex-current-wrap);
+	gap: var(--wh-flex-current-gap);
+	row-gap: var(--wh-flex-current-row-gap);
+	column-gap: var(--wh-flex-current-column-gap);
+	align-items: var(--wh-flex-current-align-items);
+	justify-content: var(--wh-flex-current-justify-content);
+	align-content: var(--wh-flex-current-align-content);
+	min-width: 0;
+
+	&[data-inline='true'] {
+		display: inline-flex;
+	}
+
+	&[data-full-width='true'] {
+		width: 100%;
+	}
+}
+
+.webhead-layout-flex__item {
+	--wh-flex-item-current-grow: var(--wh-flex-item-grow, 0);
+	--wh-flex-item-current-shrink: var(--wh-flex-item-shrink, 1);
+	--wh-flex-item-current-basis: var(--wh-flex-item-basis, auto);
+	--wh-flex-item-current-order: var(--wh-flex-item-order, initial);
+	--wh-flex-item-current-align-self: var(--wh-flex-item-align-self, auto);
+	--wh-flex-item-current-width: var(--wh-flex-item-width, auto);
+	--wh-flex-item-current-min-width: var(--wh-flex-item-min-width, 0);
+	--wh-flex-item-current-max-width: var(--wh-flex-item-max-width, none);
+
+	min-width: 0;
+	flex-grow: var(--wh-flex-item-current-grow);
+	flex-shrink: var(--wh-flex-item-current-shrink);
+	flex-basis: var(--wh-flex-item-current-basis);
+	order: var(--wh-flex-item-current-order);
+	align-self: var(--wh-flex-item-current-align-self);
+	width: var(--wh-flex-item-current-width);
+	min-width: var(--wh-flex-item-current-min-width);
+	max-width: var(--wh-flex-item-current-max-width);
+}
+
+@media screen and (min-width: 480px) {
+	.webhead-layout-grid {
+		--wh-grid-current-template-columns: var(--wh-grid-template-columns-sm, var(--wh-grid-template-columns, repeat(auto-fit, minmax(min(100%, 18rem), 1fr))));
+		--wh-grid-current-template-rows: var(--wh-grid-template-rows-sm, var(--wh-grid-template-rows, none));
+		--wh-grid-current-template-areas: var(--wh-grid-template-areas-sm, var(--wh-grid-template-areas, none));
+		--wh-grid-current-auto-flow: var(--wh-grid-auto-flow-sm, var(--wh-grid-auto-flow, row));
+		--wh-grid-current-auto-rows: var(--wh-grid-auto-rows-sm, var(--wh-grid-auto-rows, auto));
+		--wh-grid-current-auto-columns: var(--wh-grid-auto-columns-sm, var(--wh-grid-auto-columns, auto));
+		--wh-grid-current-gap: var(--wh-grid-gap-sm, var(--wh-grid-gap, 16px));
+		--wh-grid-current-row-gap: var(--wh-grid-row-gap-sm, var(--wh-grid-row-gap, var(--wh-grid-current-gap)));
+		--wh-grid-current-column-gap: var(--wh-grid-column-gap-sm, var(--wh-grid-column-gap, var(--wh-grid-current-gap)));
+		--wh-grid-current-align-items: var(--wh-grid-align-items-sm, var(--wh-grid-align-items, stretch));
+		--wh-grid-current-justify-items: var(--wh-grid-justify-items-sm, var(--wh-grid-justify-items, stretch));
+		--wh-grid-current-align-content: var(--wh-grid-align-content-sm, var(--wh-grid-align-content, stretch));
+		--wh-grid-current-justify-content: var(--wh-grid-justify-content-sm, var(--wh-grid-justify-content, stretch));
+		--wh-grid-current-place-items: var(--wh-grid-place-items-sm, var(--wh-grid-place-items, var(--wh-grid-current-align-items) var(--wh-grid-current-justify-items)));
+		--wh-grid-current-place-content: var(--wh-grid-place-content-sm, var(--wh-grid-place-content, var(--wh-grid-current-align-content) var(--wh-grid-current-justify-content)));
+	}
+
+	.webhead-layout-grid__item {
+		--wh-grid-item-current-column: var(--wh-grid-item-column-sm, var(--wh-grid-item-column, auto));
+		--wh-grid-item-current-row: var(--wh-grid-item-row-sm, var(--wh-grid-item-row, auto));
+		--wh-grid-item-current-area: var(--wh-grid-item-area-sm, var(--wh-grid-item-area, auto));
+		--wh-grid-item-current-order: var(--wh-grid-item-order-sm, var(--wh-grid-item-order, initial));
+		--wh-grid-item-current-align-self: var(--wh-grid-item-align-self-sm, var(--wh-grid-item-align-self, auto));
+		--wh-grid-item-current-justify-self: var(--wh-grid-item-justify-self-sm, var(--wh-grid-item-justify-self, auto));
+		--wh-grid-item-current-place-self: var(--wh-grid-item-place-self-sm, var(--wh-grid-item-place-self, var(--wh-grid-item-current-align-self) var(--wh-grid-item-current-justify-self)));
+	}
+
+	.webhead-layout-flex {
+		--wh-flex-current-direction: var(--wh-flex-direction-sm, var(--wh-flex-direction, row));
+		--wh-flex-current-wrap: var(--wh-flex-wrap-sm, var(--wh-flex-wrap, wrap));
+		--wh-flex-current-gap: var(--wh-flex-gap-sm, var(--wh-flex-gap, 16px));
+		--wh-flex-current-row-gap: var(--wh-flex-row-gap-sm, var(--wh-flex-row-gap, var(--wh-flex-current-gap)));
+		--wh-flex-current-column-gap: var(--wh-flex-column-gap-sm, var(--wh-flex-column-gap, var(--wh-flex-current-gap)));
+		--wh-flex-current-align-items: var(--wh-flex-align-items-sm, var(--wh-flex-align-items, stretch));
+		--wh-flex-current-justify-content: var(--wh-flex-justify-content-sm, var(--wh-flex-justify-content, flex-start));
+		--wh-flex-current-align-content: var(--wh-flex-align-content-sm, var(--wh-flex-align-content, stretch));
+	}
+
+	.webhead-layout-flex__item {
+		--wh-flex-item-current-grow: var(--wh-flex-item-grow-sm, var(--wh-flex-item-grow, 0));
+		--wh-flex-item-current-shrink: var(--wh-flex-item-shrink-sm, var(--wh-flex-item-shrink, 1));
+		--wh-flex-item-current-basis: var(--wh-flex-item-basis-sm, var(--wh-flex-item-basis, auto));
+		--wh-flex-item-current-order: var(--wh-flex-item-order-sm, var(--wh-flex-item-order, initial));
+		--wh-flex-item-current-align-self: var(--wh-flex-item-align-self-sm, var(--wh-flex-item-align-self, auto));
+		--wh-flex-item-current-width: var(--wh-flex-item-width-sm, var(--wh-flex-item-width, auto));
+		--wh-flex-item-current-min-width: var(--wh-flex-item-min-width-sm, var(--wh-flex-item-min-width, 0));
+		--wh-flex-item-current-max-width: var(--wh-flex-item-max-width-sm, var(--wh-flex-item-max-width, none));
+	}
+}
+
+@media screen and (min-width: 782px) {
+	.webhead-layout-grid {
+		--wh-grid-current-template-columns: var(--wh-grid-template-columns-md, var(--wh-grid-template-columns-sm, var(--wh-grid-template-columns, repeat(auto-fit, minmax(min(100%, 18rem), 1fr)))));
+		--wh-grid-current-template-rows: var(--wh-grid-template-rows-md, var(--wh-grid-template-rows-sm, var(--wh-grid-template-rows, none)));
+		--wh-grid-current-template-areas: var(--wh-grid-template-areas-md, var(--wh-grid-template-areas-sm, var(--wh-grid-template-areas, none)));
+		--wh-grid-current-auto-flow: var(--wh-grid-auto-flow-md, var(--wh-grid-auto-flow-sm, var(--wh-grid-auto-flow, row)));
+		--wh-grid-current-auto-rows: var(--wh-grid-auto-rows-md, var(--wh-grid-auto-rows-sm, var(--wh-grid-auto-rows, auto)));
+		--wh-grid-current-auto-columns: var(--wh-grid-auto-columns-md, var(--wh-grid-auto-columns-sm, var(--wh-grid-auto-columns, auto)));
+		--wh-grid-current-gap: var(--wh-grid-gap-md, var(--wh-grid-gap-sm, var(--wh-grid-gap, 16px)));
+		--wh-grid-current-row-gap: var(--wh-grid-row-gap-md, var(--wh-grid-row-gap-sm, var(--wh-grid-row-gap, var(--wh-grid-current-gap))));
+		--wh-grid-current-column-gap: var(--wh-grid-column-gap-md, var(--wh-grid-column-gap-sm, var(--wh-grid-column-gap, var(--wh-grid-current-gap))));
+		--wh-grid-current-align-items: var(--wh-grid-align-items-md, var(--wh-grid-align-items-sm, var(--wh-grid-align-items, stretch)));
+		--wh-grid-current-justify-items: var(--wh-grid-justify-items-md, var(--wh-grid-justify-items-sm, var(--wh-grid-justify-items, stretch)));
+		--wh-grid-current-align-content: var(--wh-grid-align-content-md, var(--wh-grid-align-content-sm, var(--wh-grid-align-content, stretch)));
+		--wh-grid-current-justify-content: var(--wh-grid-justify-content-md, var(--wh-grid-justify-content-sm, var(--wh-grid-justify-content, stretch)));
+		--wh-grid-current-place-items: var(--wh-grid-place-items-md, var(--wh-grid-place-items-sm, var(--wh-grid-place-items, var(--wh-grid-current-align-items) var(--wh-grid-current-justify-items))));
+		--wh-grid-current-place-content: var(--wh-grid-place-content-md, var(--wh-grid-place-content-sm, var(--wh-grid-place-content, var(--wh-grid-current-align-content) var(--wh-grid-current-justify-content))));
+	}
+
+	.webhead-layout-grid__item {
+		--wh-grid-item-current-column: var(--wh-grid-item-column-md, var(--wh-grid-item-column-sm, var(--wh-grid-item-column, auto)));
+		--wh-grid-item-current-row: var(--wh-grid-item-row-md, var(--wh-grid-item-row-sm, var(--wh-grid-item-row, auto)));
+		--wh-grid-item-current-area: var(--wh-grid-item-area-md, var(--wh-grid-item-area-sm, var(--wh-grid-item-area, auto)));
+		--wh-grid-item-current-order: var(--wh-grid-item-order-md, var(--wh-grid-item-order-sm, var(--wh-grid-item-order, initial)));
+		--wh-grid-item-current-align-self: var(--wh-grid-item-align-self-md, var(--wh-grid-item-align-self-sm, var(--wh-grid-item-align-self, auto)));
+		--wh-grid-item-current-justify-self: var(--wh-grid-item-justify-self-md, var(--wh-grid-item-justify-self-sm, var(--wh-grid-item-justify-self, auto)));
+		--wh-grid-item-current-place-self: var(--wh-grid-item-place-self-md, var(--wh-grid-item-place-self-sm, var(--wh-grid-item-place-self, var(--wh-grid-item-current-align-self) var(--wh-grid-item-current-justify-self))));
+	}
+
+	.webhead-layout-flex {
+		--wh-flex-current-direction: var(--wh-flex-direction-md, var(--wh-flex-direction-sm, var(--wh-flex-direction, row)));
+		--wh-flex-current-wrap: var(--wh-flex-wrap-md, var(--wh-flex-wrap-sm, var(--wh-flex-wrap, wrap)));
+		--wh-flex-current-gap: var(--wh-flex-gap-md, var(--wh-flex-gap-sm, var(--wh-flex-gap, 16px)));
+		--wh-flex-current-row-gap: var(--wh-flex-row-gap-md, var(--wh-flex-row-gap-sm, var(--wh-flex-row-gap, var(--wh-flex-current-gap))));
+		--wh-flex-current-column-gap: var(--wh-flex-column-gap-md, var(--wh-flex-column-gap-sm, var(--wh-flex-column-gap, var(--wh-flex-current-gap))));
+		--wh-flex-current-align-items: var(--wh-flex-align-items-md, var(--wh-flex-align-items-sm, var(--wh-flex-align-items, stretch)));
+		--wh-flex-current-justify-content: var(--wh-flex-justify-content-md, var(--wh-flex-justify-content-sm, var(--wh-flex-justify-content, flex-start)));
+		--wh-flex-current-align-content: var(--wh-flex-align-content-md, var(--wh-flex-align-content-sm, var(--wh-flex-align-content, stretch)));
+	}
+
+	.webhead-layout-flex__item {
+		--wh-flex-item-current-grow: var(--wh-flex-item-grow-md, var(--wh-flex-item-grow-sm, var(--wh-flex-item-grow, 0)));
+		--wh-flex-item-current-shrink: var(--wh-flex-item-shrink-md, var(--wh-flex-item-shrink-sm, var(--wh-flex-item-shrink, 1)));
+		--wh-flex-item-current-basis: var(--wh-flex-item-basis-md, var(--wh-flex-item-basis-sm, var(--wh-flex-item-basis, auto)));
+		--wh-flex-item-current-order: var(--wh-flex-item-order-md, var(--wh-flex-item-order-sm, var(--wh-flex-item-order, initial)));
+		--wh-flex-item-current-align-self: var(--wh-flex-item-align-self-md, var(--wh-flex-item-align-self-sm, var(--wh-flex-item-align-self, auto)));
+		--wh-flex-item-current-width: var(--wh-flex-item-width-md, var(--wh-flex-item-width-sm, var(--wh-flex-item-width, auto)));
+		--wh-flex-item-current-min-width: var(--wh-flex-item-min-width-md, var(--wh-flex-item-min-width-sm, var(--wh-flex-item-min-width, 0)));
+		--wh-flex-item-current-max-width: var(--wh-flex-item-max-width-md, var(--wh-flex-item-max-width-sm, var(--wh-flex-item-max-width, none)));
+	}
+}
+
+@media screen and (min-width: 960px) {
+	.webhead-layout-grid {
+		--wh-grid-current-template-columns: var(--wh-grid-template-columns-lg, var(--wh-grid-template-columns-md, var(--wh-grid-template-columns-sm, var(--wh-grid-template-columns, repeat(auto-fit, minmax(min(100%, 18rem), 1fr))))));
+		--wh-grid-current-template-rows: var(--wh-grid-template-rows-lg, var(--wh-grid-template-rows-md, var(--wh-grid-template-rows-sm, var(--wh-grid-template-rows, none))));
+		--wh-grid-current-template-areas: var(--wh-grid-template-areas-lg, var(--wh-grid-template-areas-md, var(--wh-grid-template-areas-sm, var(--wh-grid-template-areas, none))));
+		--wh-grid-current-auto-flow: var(--wh-grid-auto-flow-lg, var(--wh-grid-auto-flow-md, var(--wh-grid-auto-flow-sm, var(--wh-grid-auto-flow, row))));
+		--wh-grid-current-auto-rows: var(--wh-grid-auto-rows-lg, var(--wh-grid-auto-rows-md, var(--wh-grid-auto-rows-sm, var(--wh-grid-auto-rows, auto))));
+		--wh-grid-current-auto-columns: var(--wh-grid-auto-columns-lg, var(--wh-grid-auto-columns-md, var(--wh-grid-auto-columns-sm, var(--wh-grid-auto-columns, auto))));
+		--wh-grid-current-gap: var(--wh-grid-gap-lg, var(--wh-grid-gap-md, var(--wh-grid-gap-sm, var(--wh-grid-gap, 16px))));
+		--wh-grid-current-row-gap: var(--wh-grid-row-gap-lg, var(--wh-grid-row-gap-md, var(--wh-grid-row-gap-sm, var(--wh-grid-row-gap, var(--wh-grid-current-gap)))));
+		--wh-grid-current-column-gap: var(--wh-grid-column-gap-lg, var(--wh-grid-column-gap-md, var(--wh-grid-column-gap-sm, var(--wh-grid-column-gap, var(--wh-grid-current-gap)))));
+		--wh-grid-current-align-items: var(--wh-grid-align-items-lg, var(--wh-grid-align-items-md, var(--wh-grid-align-items-sm, var(--wh-grid-align-items, stretch))));
+		--wh-grid-current-justify-items: var(--wh-grid-justify-items-lg, var(--wh-grid-justify-items-md, var(--wh-grid-justify-items-sm, var(--wh-grid-justify-items, stretch))));
+		--wh-grid-current-align-content: var(--wh-grid-align-content-lg, var(--wh-grid-align-content-md, var(--wh-grid-align-content-sm, var(--wh-grid-align-content, stretch))));
+		--wh-grid-current-justify-content: var(--wh-grid-justify-content-lg, var(--wh-grid-justify-content-md, var(--wh-grid-justify-content-sm, var(--wh-grid-justify-content, stretch))));
+		--wh-grid-current-place-items: var(--wh-grid-place-items-lg, var(--wh-grid-place-items-md, var(--wh-grid-place-items-sm, var(--wh-grid-place-items, var(--wh-grid-current-align-items) var(--wh-grid-current-justify-items)))));
+		--wh-grid-current-place-content: var(--wh-grid-place-content-lg, var(--wh-grid-place-content-md, var(--wh-grid-place-content-sm, var(--wh-grid-place-content, var(--wh-grid-current-align-content) var(--wh-grid-current-justify-content)))));
+	}
+
+	.webhead-layout-grid__item {
+		--wh-grid-item-current-column: var(--wh-grid-item-column-lg, var(--wh-grid-item-column-md, var(--wh-grid-item-column-sm, var(--wh-grid-item-column, auto))));
+		--wh-grid-item-current-row: var(--wh-grid-item-row-lg, var(--wh-grid-item-row-md, var(--wh-grid-item-row-sm, var(--wh-grid-item-row, auto))));
+		--wh-grid-item-current-area: var(--wh-grid-item-area-lg, var(--wh-grid-item-area-md, var(--wh-grid-item-area-sm, var(--wh-grid-item-area, auto))));
+		--wh-grid-item-current-order: var(--wh-grid-item-order-lg, var(--wh-grid-item-order-md, var(--wh-grid-item-order-sm, var(--wh-grid-item-order, initial))));
+		--wh-grid-item-current-align-self: var(--wh-grid-item-align-self-lg, var(--wh-grid-item-align-self-md, var(--wh-grid-item-align-self-sm, var(--wh-grid-item-align-self, auto))));
+		--wh-grid-item-current-justify-self: var(--wh-grid-item-justify-self-lg, var(--wh-grid-item-justify-self-md, var(--wh-grid-item-justify-self-sm, var(--wh-grid-item-justify-self, auto))));
+		--wh-grid-item-current-place-self: var(--wh-grid-item-place-self-lg, var(--wh-grid-item-place-self-md, var(--wh-grid-item-place-self-sm, var(--wh-grid-item-place-self, var(--wh-grid-item-current-align-self) var(--wh-grid-item-current-justify-self)))));
+	}
+
+	.webhead-layout-flex {
+		--wh-flex-current-direction: var(--wh-flex-direction-lg, var(--wh-flex-direction-md, var(--wh-flex-direction-sm, var(--wh-flex-direction, row))));
+		--wh-flex-current-wrap: var(--wh-flex-wrap-lg, var(--wh-flex-wrap-md, var(--wh-flex-wrap-sm, var(--wh-flex-wrap, wrap))));
+		--wh-flex-current-gap: var(--wh-flex-gap-lg, var(--wh-flex-gap-md, var(--wh-flex-gap-sm, var(--wh-flex-gap, 16px))));
+		--wh-flex-current-row-gap: var(--wh-flex-row-gap-lg, var(--wh-flex-row-gap-md, var(--wh-flex-row-gap-sm, var(--wh-flex-row-gap, var(--wh-flex-current-gap)))));
+		--wh-flex-current-column-gap: var(--wh-flex-column-gap-lg, var(--wh-flex-column-gap-md, var(--wh-flex-column-gap-sm, var(--wh-flex-column-gap, var(--wh-flex-current-gap)))));
+		--wh-flex-current-align-items: var(--wh-flex-align-items-lg, var(--wh-flex-align-items-md, var(--wh-flex-align-items-sm, var(--wh-flex-align-items, stretch))));
+		--wh-flex-current-justify-content: var(--wh-flex-justify-content-lg, var(--wh-flex-justify-content-md, var(--wh-flex-justify-content-sm, var(--wh-flex-justify-content, flex-start))));
+		--wh-flex-current-align-content: var(--wh-flex-align-content-lg, var(--wh-flex-align-content-md, var(--wh-flex-align-content-sm, var(--wh-flex-align-content, stretch))));
+	}
+
+	.webhead-layout-flex__item {
+		--wh-flex-item-current-grow: var(--wh-flex-item-grow-lg, var(--wh-flex-item-grow-md, var(--wh-flex-item-grow-sm, var(--wh-flex-item-grow, 0))));
+		--wh-flex-item-current-shrink: var(--wh-flex-item-shrink-lg, var(--wh-flex-item-shrink-md, var(--wh-flex-item-shrink-sm, var(--wh-flex-item-shrink, 1))));
+		--wh-flex-item-current-basis: var(--wh-flex-item-basis-lg, var(--wh-flex-item-basis-md, var(--wh-flex-item-basis-sm, var(--wh-flex-item-basis, auto))));
+		--wh-flex-item-current-order: var(--wh-flex-item-order-lg, var(--wh-flex-item-order-md, var(--wh-flex-item-order-sm, var(--wh-flex-item-order, initial))));
+		--wh-flex-item-current-align-self: var(--wh-flex-item-align-self-lg, var(--wh-flex-item-align-self-md, var(--wh-flex-item-align-self-sm, var(--wh-flex-item-align-self, auto))));
+		--wh-flex-item-current-width: var(--wh-flex-item-width-lg, var(--wh-flex-item-width-md, var(--wh-flex-item-width-sm, var(--wh-flex-item-width, auto))));
+		--wh-flex-item-current-min-width: var(--wh-flex-item-min-width-lg, var(--wh-flex-item-min-width-md, var(--wh-flex-item-min-width-sm, var(--wh-flex-item-min-width, 0))));
+		--wh-flex-item-current-max-width: var(--wh-flex-item-max-width-lg, var(--wh-flex-item-max-width-md, var(--wh-flex-item-max-width-sm, var(--wh-flex-item-max-width, none))));
+	}
+}
+
+@media screen and (min-width: 1280px) {
+	.webhead-layout-grid {
+		--wh-grid-current-template-columns: var(--wh-grid-template-columns-xl, var(--wh-grid-template-columns-lg, var(--wh-grid-template-columns-md, var(--wh-grid-template-columns-sm, var(--wh-grid-template-columns, repeat(auto-fit, minmax(min(100%, 18rem), 1fr)))))));
+		--wh-grid-current-template-rows: var(--wh-grid-template-rows-xl, var(--wh-grid-template-rows-lg, var(--wh-grid-template-rows-md, var(--wh-grid-template-rows-sm, var(--wh-grid-template-rows, none)))));
+		--wh-grid-current-template-areas: var(--wh-grid-template-areas-xl, var(--wh-grid-template-areas-lg, var(--wh-grid-template-areas-md, var(--wh-grid-template-areas-sm, var(--wh-grid-template-areas, none)))));
+		--wh-grid-current-auto-flow: var(--wh-grid-auto-flow-xl, var(--wh-grid-auto-flow-lg, var(--wh-grid-auto-flow-md, var(--wh-grid-auto-flow-sm, var(--wh-grid-auto-flow, row)))));
+		--wh-grid-current-auto-rows: var(--wh-grid-auto-rows-xl, var(--wh-grid-auto-rows-lg, var(--wh-grid-auto-rows-md, var(--wh-grid-auto-rows-sm, var(--wh-grid-auto-rows, auto)))));
+		--wh-grid-current-auto-columns: var(--wh-grid-auto-columns-xl, var(--wh-grid-auto-columns-lg, var(--wh-grid-auto-columns-md, var(--wh-grid-auto-columns-sm, var(--wh-grid-auto-columns, auto)))));
+		--wh-grid-current-gap: var(--wh-grid-gap-xl, var(--wh-grid-gap-lg, var(--wh-grid-gap-md, var(--wh-grid-gap-sm, var(--wh-grid-gap, 16px)))));
+		--wh-grid-current-row-gap: var(--wh-grid-row-gap-xl, var(--wh-grid-row-gap-lg, var(--wh-grid-row-gap-md, var(--wh-grid-row-gap-sm, var(--wh-grid-row-gap, var(--wh-grid-current-gap))))));
+		--wh-grid-current-column-gap: var(--wh-grid-column-gap-xl, var(--wh-grid-column-gap-lg, var(--wh-grid-column-gap-md, var(--wh-grid-column-gap-sm, var(--wh-grid-column-gap, var(--wh-grid-current-gap))))));
+		--wh-grid-current-align-items: var(--wh-grid-align-items-xl, var(--wh-grid-align-items-lg, var(--wh-grid-align-items-md, var(--wh-grid-align-items-sm, var(--wh-grid-align-items, stretch)))));
+		--wh-grid-current-justify-items: var(--wh-grid-justify-items-xl, var(--wh-grid-justify-items-lg, var(--wh-grid-justify-items-md, var(--wh-grid-justify-items-sm, var(--wh-grid-justify-items, stretch)))));
+		--wh-grid-current-align-content: var(--wh-grid-align-content-xl, var(--wh-grid-align-content-lg, var(--wh-grid-align-content-md, var(--wh-grid-align-content-sm, var(--wh-grid-align-content, stretch)))));
+		--wh-grid-current-justify-content: var(--wh-grid-justify-content-xl, var(--wh-grid-justify-content-lg, var(--wh-grid-justify-content-md, var(--wh-grid-justify-content-sm, var(--wh-grid-justify-content, stretch)))));
+		--wh-grid-current-place-items: var(--wh-grid-place-items-xl, var(--wh-grid-place-items-lg, var(--wh-grid-place-items-md, var(--wh-grid-place-items-sm, var(--wh-grid-place-items, var(--wh-grid-current-align-items) var(--wh-grid-current-justify-items))))));
+		--wh-grid-current-place-content: var(--wh-grid-place-content-xl, var(--wh-grid-place-content-lg, var(--wh-grid-place-content-md, var(--wh-grid-place-content-sm, var(--wh-grid-place-content, var(--wh-grid-current-align-content) var(--wh-grid-current-justify-content))))));
+	}
+
+	.webhead-layout-grid__item {
+		--wh-grid-item-current-column: var(--wh-grid-item-column-xl, var(--wh-grid-item-column-lg, var(--wh-grid-item-column-md, var(--wh-grid-item-column-sm, var(--wh-grid-item-column, auto)))));
+		--wh-grid-item-current-row: var(--wh-grid-item-row-xl, var(--wh-grid-item-row-lg, var(--wh-grid-item-row-md, var(--wh-grid-item-row-sm, var(--wh-grid-item-row, auto)))));
+		--wh-grid-item-current-area: var(--wh-grid-item-area-xl, var(--wh-grid-item-area-lg, var(--wh-grid-item-area-md, var(--wh-grid-item-area-sm, var(--wh-grid-item-area, auto)))));
+		--wh-grid-item-current-order: var(--wh-grid-item-order-xl, var(--wh-grid-item-order-lg, var(--wh-grid-item-order-md, var(--wh-grid-item-order-sm, var(--wh-grid-item-order, initial)))));
+		--wh-grid-item-current-align-self: var(--wh-grid-item-align-self-xl, var(--wh-grid-item-align-self-lg, var(--wh-grid-item-align-self-md, var(--wh-grid-item-align-self-sm, var(--wh-grid-item-align-self, auto)))));
+		--wh-grid-item-current-justify-self: var(--wh-grid-item-justify-self-xl, var(--wh-grid-item-justify-self-lg, var(--wh-grid-item-justify-self-md, var(--wh-grid-item-justify-self-sm, var(--wh-grid-item-justify-self, auto)))));
+		--wh-grid-item-current-place-self: var(--wh-grid-item-place-self-xl, var(--wh-grid-item-place-self-lg, var(--wh-grid-item-place-self-md, var(--wh-grid-item-place-self-sm, var(--wh-grid-item-place-self, var(--wh-grid-item-current-align-self) var(--wh-grid-item-current-justify-self))))));
+	}
+
+	.webhead-layout-flex {
+		--wh-flex-current-direction: var(--wh-flex-direction-xl, var(--wh-flex-direction-lg, var(--wh-flex-direction-md, var(--wh-flex-direction-sm, var(--wh-flex-direction, row)))));
+		--wh-flex-current-wrap: var(--wh-flex-wrap-xl, var(--wh-flex-wrap-lg, var(--wh-flex-wrap-md, var(--wh-flex-wrap-sm, var(--wh-flex-wrap, wrap)))));
+		--wh-flex-current-gap: var(--wh-flex-gap-xl, var(--wh-flex-gap-lg, var(--wh-flex-gap-md, var(--wh-flex-gap-sm, var(--wh-flex-gap, 16px)))));
+		--wh-flex-current-row-gap: var(--wh-flex-row-gap-xl, var(--wh-flex-row-gap-lg, var(--wh-flex-row-gap-md, var(--wh-flex-row-gap-sm, var(--wh-flex-row-gap, var(--wh-flex-current-gap))))));
+		--wh-flex-current-column-gap: var(--wh-flex-column-gap-xl, var(--wh-flex-column-gap-lg, var(--wh-flex-column-gap-md, var(--wh-flex-column-gap-sm, var(--wh-flex-column-gap, var(--wh-flex-current-gap))))));
+		--wh-flex-current-align-items: var(--wh-flex-align-items-xl, var(--wh-flex-align-items-lg, var(--wh-flex-align-items-md, var(--wh-flex-align-items-sm, var(--wh-flex-align-items, stretch)))));
+		--wh-flex-current-justify-content: var(--wh-flex-justify-content-xl, var(--wh-flex-justify-content-lg, var(--wh-flex-justify-content-md, var(--wh-flex-justify-content-sm, var(--wh-flex-justify-content, flex-start)))));
+		--wh-flex-current-align-content: var(--wh-flex-align-content-xl, var(--wh-flex-align-content-lg, var(--wh-flex-align-content-md, var(--wh-flex-align-content-sm, var(--wh-flex-align-content, stretch)))));
+	}
+
+	.webhead-layout-flex__item {
+		--wh-flex-item-current-grow: var(--wh-flex-item-grow-xl, var(--wh-flex-item-grow-lg, var(--wh-flex-item-grow-md, var(--wh-flex-item-grow-sm, var(--wh-flex-item-grow, 0)))));
+		--wh-flex-item-current-shrink: var(--wh-flex-item-shrink-xl, var(--wh-flex-item-shrink-lg, var(--wh-flex-item-shrink-md, var(--wh-flex-item-shrink-sm, var(--wh-flex-item-shrink, 1)))));
+		--wh-flex-item-current-basis: var(--wh-flex-item-basis-xl, var(--wh-flex-item-basis-lg, var(--wh-flex-item-basis-md, var(--wh-flex-item-basis-sm, var(--wh-flex-item-basis, auto)))));
+		--wh-flex-item-current-order: var(--wh-flex-item-order-xl, var(--wh-flex-item-order-lg, var(--wh-flex-item-order-md, var(--wh-flex-item-order-sm, var(--wh-flex-item-order, initial)))));
+		--wh-flex-item-current-align-self: var(--wh-flex-item-align-self-xl, var(--wh-flex-item-align-self-lg, var(--wh-flex-item-align-self-md, var(--wh-flex-item-align-self-sm, var(--wh-flex-item-align-self, auto)))));
+		--wh-flex-item-current-width: var(--wh-flex-item-width-xl, var(--wh-flex-item-width-lg, var(--wh-flex-item-width-md, var(--wh-flex-item-width-sm, var(--wh-flex-item-width, auto)))));
+		--wh-flex-item-current-min-width: var(--wh-flex-item-min-width-xl, var(--wh-flex-item-min-width-lg, var(--wh-flex-item-min-width-md, var(--wh-flex-item-min-width-sm, var(--wh-flex-item-min-width, 0)))));
+		--wh-flex-item-current-max-width: var(--wh-flex-item-max-width-xl, var(--wh-flex-item-max-width-lg, var(--wh-flex-item-max-width-md, var(--wh-flex-item-max-width-sm, var(--wh-flex-item-max-width, none)))));
+	}
+}

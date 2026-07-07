@@ -1,0 +1,74 @@
+{
+    "name": "webhead/webhead-search-cloud",
+    "description": "Connect WordPress and WooCommerce to webhead Search Cloud.",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Webhead\\WP\\SearchCloud\\": "includes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Webhead\\WP\\SearchCloud\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mir Mohammad Hosseini",
+            "email": "mh@webhead.dev"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/webhead-GmbH/webhead-search-cloud/issues",
+        "source": "https://github.com/webhead-GmbH/webhead-search-cloud"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webhead-GmbH/wp-plugin-framework.git"
+        }
+    ],
+    "require": {
+        "php": ">=8.3"
+    },
+    "require-dev": {
+        "coenjacobs/mozart": "^1.2.3",
+        "phpunit/phpunit": "^9.6",
+        "webhead/wp-plugin-framework": "^1.0",
+        "wp-phpunit/wp-phpunit": "^7.0",
+        "yoast/phpunit-polyfills": "^4.0"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.3"
+        },
+        "process-timeout": 0
+    },
+    "extra": {
+        "mozart": {
+            "dep_namespace": "Webhead\\WP\\SearchCloud\\Dependencies\\",
+            "dep_directory": "/includes/Dependencies/",
+            "classmap_directory": "/includes/classes/dependencies/",
+            "classmap_prefix": "SearchCloud_",
+            "packages": [
+                "webhead/wp-plugin-framework"
+            ],
+            "delete_vendor_directories": false
+        }
+    },
+    "scripts": {
+        "test:unit": "./vendor/bin/phpunit tests",
+        "post-install-cmd": [
+            "\"vendor/bin/mozart\" compose",
+            "composer dump-autoload"
+        ],
+        "post-update-cmd": [
+            "\"vendor/bin/mozart\" compose",
+            "composer dump-autoload"
+        ],
+        "framework:update": "\"vendor/bin/webhead\" scaffold:update --path=.",
+        "make-pot": "wp i18n make-pot . languages/webhead-search-cloud.pot --domain=webhead-search-cloud --exclude=.agents,.claude,.codex,tests,docs,node_modules,vendor,public,languages,includes/Dependencies,includes/classes"
+    }
+}

@@ -1,0 +1,514 @@
+@use "./../../../components/Default/default";
+@import "./../../../components/Default/dataviews.css";
+
+.settings-tabs .tab-content {
+  margin-top: var(--wpds-dimension-gap-lg);
+}
+
+.settings-tabs__list {
+  gap: var(--wpds-dimension-gap-sm);
+  flex-wrap: wrap;
+}
+
+.settings-tabs__tab {
+  border-radius: var(--wpds-border-radius-sm);
+}
+
+.webhead-search-cloud-animated-tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-xs);
+  flex-wrap: wrap;
+}
+
+.webhead-search-cloud-animated-tab-suffix {
+  opacity: 0.8;
+}
+
+.whsc-settings-grid {
+  .whsc-settings-card {
+    height: 100%;
+  }
+
+  .whsc-settings-card-header,
+  .whsc-settings-card-content {
+    padding: var(--wpds-dimension-padding-2xl);
+  }
+
+  .whsc-settings-card-header h3 {
+    margin: 0;
+  }
+
+  .whsc-settings-card-header p {
+    margin: 0;
+    color: var(--wpds-color-foreground-content-neutral-weak);
+  }
+
+  .components-base-control,
+  .components-textarea-control__input {
+    margin-bottom: 0;
+  }
+}
+
+.whsc-settings-card-copy {
+  display: grid;
+  gap: var(--wpds-dimension-gap-xs);
+}
+
+.whsc-settings-panel-header-layout {
+  width: 100%;
+}
+
+.whsc-dataviews-field-header-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-xs);
+  min-width: 0;
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * Shared per-tab card shell (Connection / Indexing / Sync / Search UI) —
+ * every self-managed tab wraps its content in one top-level Card so titles
+ * get correct Text-variant sizing and consistent spacing, per the
+ * react-admin skill's card rules.
+ * ---------------------------------------------------------------------- */
+.whsc-tab-card {
+  border: 0;
+  border-radius: 0;
+
+  .whsc-tab-card-header {
+    display: grid;
+    gap: var(--wpds-dimension-gap-xs);
+    padding-inline: 0;
+    padding-top: 0;
+
+    p {
+      margin: 0;
+      color: var(--wpds-color-foreground-content-neutral-weak);
+    }
+  }
+
+  .whsc-tab-card-content {
+    display: grid;
+    gap: var(--wpds-dimension-gap-lg);
+    padding-inline: 0;
+  }
+
+  .components-panel__body>.components-panel__body-title {
+    background: #f0f0f0;
+
+    &:hover {
+      background: #dfdede;
+    }
+  }
+
+  .components-panel__body.is-opened>.components-panel__body-title {
+    margin-bottom: 15px;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * Connection tab
+ * ---------------------------------------------------------------------- */
+.webhead-search-cloud-connection-actions {
+  margin-top: var(--wpds-dimension-gap-lg);
+}
+
+.webhead-search-cloud-connection-hint {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.webhead-search-cloud-indexing {
+  .whsc-intro {
+    margin-bottom: 12px;
+
+    h3 {
+      margin: 0 0 4px;
+    }
+
+    p {
+      margin: 0;
+      color: #646970;
+    }
+  }
+
+  .whsc-searchable-notice {
+    margin: 0 0 20px;
+  }
+
+  .whsc-panel {
+    margin-bottom: 20px;
+  }
+
+  // Each collapsible post-type section.
+  .components-panel__body-title {
+    font-weight: 600;
+  }
+
+  .whsc-enable-toggle {
+    margin-bottom: 4px;
+  }
+
+  .whsc-post-type-body {
+    margin-top: 8px;
+  }
+
+  // Logical sub-sections inside a post type, with clear vertical rhythm.
+  .whsc-section {
+    padding-top: 20px;
+    margin-top: 20px;
+    border-top: 1px solid #f0f0f1;
+
+    &:first-child {
+      padding-top: 0;
+      margin-top: 0;
+      border-top: 0;
+    }
+  }
+
+  .whsc-section-title {
+    margin: 0 0 4px;
+  }
+
+  .whsc-section-description {
+    margin: 0 0 16px;
+    color: #646970;
+  }
+
+  // Recognised-field selects, two-up on wide screens.
+  .whsc-fields-grid {
+    display: grid;
+    gap: 20px 24px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    align-items: start;
+  }
+
+  // Toggle groups laid out in responsive columns to keep height down.
+  .whsc-toggle-grid {
+    display: grid;
+    gap: 12px 32px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    align-items: start;
+  }
+
+  // A lead toggle (e.g. "only visible") sitting above a toggle grid.
+  .components-base-control + .whsc-toggle-grid,
+  .components-toggle-control + .whsc-toggle-grid {
+    margin-top: 16px;
+  }
+
+  // Attribute checkboxes in compact responsive columns.
+  .whsc-attr-grid {
+    display: grid;
+    gap: 8px 24px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    align-items: start;
+  }
+
+  .whsc-custom-fields {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .whsc-custom-field-row {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    align-items: end;
+
+    .components-button.is-destructive {
+      margin-bottom: 2px;
+    }
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .whsc-advanced {
+    padding-top: 16px;
+    margin-top: 20px;
+    border-top: 1px solid #f0f0f1;
+
+    .whsc-section:first-child {
+      padding-top: 20px;
+      margin-top: 16px;
+      border-top: 1px solid #f0f0f1;
+    }
+  }
+
+  .whsc-save-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .whsc-save-summary {
+    color: #646970;
+  }
+}
+
+/* -------------------------------------------------------------------------
+ * Search Config tab
+ * ---------------------------------------------------------------------- */
+.webhead-search-cloud-search-config {
+  .whsc-search-config-repeater {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .whsc-search-config-row {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 2fr 1fr auto;
+    align-items: end;
+
+    &.whsc-search-config-row--boost {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .components-button.is-destructive {
+      margin-bottom: 2px;
+    }
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // A plain label standing in for the read-only "Type" column of a boost
+  // row — deliberately not a disabled TextControl, whose grayed-out
+  // background reads as a broken/unclickable input rather than a caption.
+  .whsc-search-config-type-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 2px;
+
+    &__caption {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: #757575;
+    }
+
+    &__value {
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 0;
+    }
+  }
+
+  .whsc-save-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  // Language checkboxes (PLAN.md §5.2), in compact responsive columns —
+  // same pattern as the Indexing tab's product-attribute checkboxes.
+  .whsc-language-grid {
+    display: grid;
+    gap: 8px 24px;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    align-items: start;
+  }
+}
+
+.panel-container {
+  @media screen and (max-width: 767px) {
+    .whsc-settings-panel-header:has(.header-with-icon) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .whsc-settings-panel-header .header-description {
+      margin-left: 0;
+    }
+  }
+}
+
+.whsc-settings-actions {
+  display: flex;
+  align-items: center;
+}
+
+/* -------------------------------------------------------------------------
+ * Sync tab
+ * ---------------------------------------------------------------------- */
+.webhead-search-cloud-sync {
+  .whsc-intro {
+    margin-bottom: 16px;
+  }
+
+  .whsc-sync-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #fff;
+  }
+
+  .whsc-sync-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .whsc-progress {
+    height: 10px;
+    border-radius: 999px;
+    background: #f0f0f1;
+    overflow: hidden;
+  }
+
+  .whsc-progress-bar {
+    height: 100%;
+    width: 0;
+    background: var(--wp-admin-theme-color, #3858e9);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+
+    &.is-indeterminate {
+      width: 35%;
+      animation: whsc-indeterminate 1.2s infinite ease-in-out;
+    }
+  }
+
+  .whsc-progress-error {
+    margin-bottom: 15px;
+  }
+
+  @keyframes whsc-indeterminate {
+    0% {
+      margin-left: -35%;
+    }
+    100% {
+      margin-left: 100%;
+    }
+  }
+
+  .whsc-progress-label {
+    margin: 8px 0 16px;
+    color: #646970;
+  }
+
+  .whsc-counters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .whsc-counter {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 6px;
+    background: #f6f7f7;
+  }
+
+  .whsc-counter-value {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .whsc-counter-label {
+    color: #646970;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .whsc-sync-start {
+    margin-bottom: 20px;
+  }
+
+  .whsc-retention {
+    margin: 8px 0 24px;
+
+    .components-base-control {
+      max-width: 260px;
+    }
+
+    .components-button {
+      margin-top: 25px;
+    }
+  }
+
+  .whsc-sync-tag {
+    font-size: 12px;
+    color: #646970;
+    background: #f0f0f1;
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+
+  .whsc-sync-history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+
+    h4 {
+      margin: 0;
+    }
+  }
+}
+
+.whsc-status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: #f0f0f1;
+  color: #1d2327;
+
+  &.is-running {
+    background: #e6f0ff;
+    color: #0a4ea2;
+  }
+
+  &.is-paused {
+    background: #fcf3e3;
+    color: #8a6116;
+  }
+
+  &.is-queued {
+    background: #f0f0f1;
+    color: #50575e;
+  }
+
+  &.is-completed {
+    background: #e5f5ea;
+    color: #135e2b;
+  }
+
+  &.is-failed {
+    background: #fce9e9;
+    color: #9a1c1c;
+  }
+
+  &.is-cancelled {
+    background: #f0f0f1;
+    color: #646970;
+  }
+}

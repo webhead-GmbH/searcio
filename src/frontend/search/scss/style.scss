@@ -1,0 +1,1390 @@
+/*
+ * Front-end search modal styles.
+ *
+ * Modal chrome and controls come from `@wordpress/components` (`Modal`,
+ * `Button`) with their base styles loaded via the `wp-components` handle
+ * enqueued alongside this stylesheet (`Frontend_Assets::register()`).
+ * Everything visual below is driven by a comprehensive CSS custom property
+ * set so each placement can be themed independently — set per-placement by
+ * the Gutenberg block (`render.php`) or the Elementor Style tab
+ * (`Search_Widget`), both scoped to the same `.whsc-instance-{id}` class
+ * applied to the trigger AND the portalled modal (the modal is rendered via
+ * `createPortal` to `document.body`, so it is not a DOM descendant of the
+ * trigger and cannot inherit variables through ancestry).
+ *
+ * Hover/active variables always fall back to their normal counterpart —
+ * `var(--x-hover, var(--x, default))` — so a hover state never overrides the
+ * user's configured normal value unless they explicitly set a hover value.
+ */
+
+/*
+ * Imported here (a Sass `@use`, not a JS-level import from `index.js`) so
+ * the shared reset and this file's own rules always compile into a single
+ * CSS module in reset-then-ours order. A JS-level `import` of the reset
+ * alongside `import './style.scss'` made webpack emit *two* separate CSS
+ * chunks for this entry (`bundle.search.css` holding only the reset,
+ * `style-bundle.search.css` holding only these rules) instead of one, which
+ * would have silently dropped half the stylesheet depending on which chunk
+ * `Frontend_Assets` picked.
+ */
+@use '../../../components/Default/frontend-reset';
+
+:root {
+	/* Modal shell */
+	--whsc-bg: #ffffff;
+	--whsc-text: #1e1e1e;
+	--whsc-accent: #319b80;
+	--whsc-radius-panel: 14px;
+	--whsc-gap: 24px;
+	--whsc-padding: 28px;
+	--whsc-anim-duration: 0.3s;
+
+	/* Trigger (icon) */
+	--whsc-trigger-icon: var(--whsc-accent);
+	--whsc-trigger-bg: transparent;
+	--whsc-trigger-radius: 8px;
+
+	/* Search field */
+	--whsc-input-bg: #f4f5f6;
+	--whsc-input-text: #1e1e1e;
+	--whsc-input-icon: #6b7177;
+	--whsc-input-placeholder: #90969c;
+	--whsc-input-border: #e2e4e7;
+	--whsc-input-border-focus: var(--whsc-accent);
+	--whsc-input-radius: 999px;
+
+	/* Submit button */
+	--whsc-btn-bg: var(--whsc-accent);
+	--whsc-btn-text: #ffffff;
+	--whsc-btn-radius: 999px;
+
+	/* Icon buttons — shared defaults; each button can override below. */
+	--whsc-icon-color: #6b7177;
+	--whsc-icon-bg-hover: rgba(0, 0, 0, 0.06);
+
+	/* Voice button (falls back to shared icon vars) */
+	--whsc-voice-color: var(--whsc-icon-color);
+	--whsc-voice-bg: transparent;
+	--whsc-voice-radius: 999px;
+	--whsc-voice-padding: 0px;
+
+	/* Close button */
+	--whsc-close-color: var(--whsc-icon-color);
+	--whsc-close-bg: transparent;
+	--whsc-close-radius: 999px;
+	--whsc-close-padding: 0px;
+
+	/* Clear (input) button */
+	--whsc-clearbtn-color: var(--whsc-icon-color);
+	--whsc-clearbtn-bg: transparent;
+	--whsc-clearbtn-radius: 999px;
+	--whsc-clearbtn-padding: 0px;
+
+	/* Section titles */
+	--whsc-title-color: #1e1e1e;
+
+	/* Suggestions dropdown */
+	--whsc-panel-bg: #ffffff;
+	--whsc-panel-border: #e2e4e7;
+	--whsc-panel-radius: 14px;
+	--whsc-suggestion-text: #1e1e1e;
+	--whsc-suggestion-bg-hover: #f4f5f6;
+
+	/* Recent chips */
+	--whsc-chip-bg: #f4f5f6;
+	--whsc-chip-text: #1e1e1e;
+	--whsc-chip-border: #e2e4e7;
+	--whsc-chip-bg-hover: var(--whsc-chip-bg);
+	--whsc-chip-text-hover: var(--whsc-accent);
+	--whsc-chip-border-hover: var(--whsc-accent);
+	--whsc-chip-radius: 999px;
+
+	/* Clear all */
+	--whsc-clear-text: #6b7177;
+	--whsc-clear-padding: 4px 10px;
+
+	/* Popular list */
+	--whsc-popular-text: #3a3f45;
+	--whsc-popular-bg-hover: #f4f5f6;
+	--whsc-popular-padding: 9px 12px;
+	--whsc-popular-gap: 2px;
+	--whsc-popular-radius: 8px;
+
+	/* Type filters */
+	--whsc-facet-bg: #f0f1f3;
+	--whsc-facet-text: #3a3f45;
+	--whsc-facet-bg-hover: #e4e6e9;
+	--whsc-facet-text-hover: var(--whsc-text);
+	--whsc-facet-bg-active: var(--whsc-accent);
+	--whsc-facet-text-active: #ffffff;
+	--whsc-facet-count: currentColor;
+	--whsc-facet-radius: 999px;
+
+	/* Result cards */
+	--whsc-card-bg: #ffffff;
+	--whsc-card-border: #e8e9eb;
+	--whsc-card-radius: 12px;
+	--whsc-card-padding: 12px;
+	--whsc-card-title: #1e1e1e;
+	--whsc-price-color: #6b7177;
+
+	/* Carousel */
+	--whsc-arrow-color: #1e1e1e;
+	--whsc-arrow-bg: #ffffff;
+	--whsc-dot-color: #d3d6d9;
+	--whsc-dot-color-active: var(--whsc-accent);
+	--whsc-carousel-gap: 14px;
+}
+
+/*
+ * Everything below is wrapped in this tripled attribute selector so it
+ * reliably outranks the shared reset's own boosted rules
+ * (`src/components/Default/frontend-reset.scss` uses up to
+ * `[data-webhead-frontend-root]` repeated 3 times itself). Adopting that
+ * reset exposed real conflicts: several of the reset's generic rules match
+ * our own markup too (our type-filter/dot pills use `role="tab"`; our
+ * buttons use `.components-button`; several controls are plain `<button>`
+ * elements matched by `:is(button, input, ...)`), and those reset rules'
+ * specificity — boosted the same way, sometimes with an extra bare-element
+ * match inside `:is(...)` — was beating plain 2–3 class selectors like
+ * `.whsc-modal .whsc-facet` or ties that lost once cascade order didn't
+ * save us. Wrapping here fixes every one of those conflicts at once instead
+ * of chasing them selector-by-selector, without editing the reset itself
+ * (framework-owned, overwritten on `scaffold:update`).
+ */
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] {
+
+/* Screen-reader-only status text (search progress / result-count announcements). */
+.whsc-visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Trigger
+ * ---------------------------------------------------------------------- */
+.webhead-search-cloud-trigger {
+	display: inline-flex;
+	color: inherit;
+	font: inherit;
+
+	&.whsc-trigger--box {
+		width: 100%;
+	}
+}
+
+.whsc-trigger-icon-button.components-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--whsc-trigger-size, 44px);
+	height: var(--whsc-trigger-size, 44px);
+	padding: 0;
+	color: var(--whsc-trigger-icon);
+	background: var(--whsc-trigger-bg);
+	border-radius: var(--whsc-trigger-radius);
+	box-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	svg {
+		width: var(--whsc-trigger-icon-size, 24px);
+		height: var(--whsc-trigger-icon-size, 24px);
+		fill: currentColor;
+	}
+
+	/*
+	 * Custom icon chosen in the editor (Font Awesome <i> or inline SVG).
+	 * Sized from the same `--whsc-trigger-icon-size` the default glyph uses
+	 * (via `font-size`, since an `<i>` glyph has no width/height to set) so
+	 * the "Icon size" control affects both consistently instead of only the
+	 * default `@wordpress/icons` glyph.
+	 */
+	.whsc-trigger-custom-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: var(--whsc-trigger-icon-size, 24px);
+		line-height: 1;
+
+		svg {
+			width: 1em;
+			height: 1em;
+		}
+
+		i {
+			font-size: inherit;
+		}
+	}
+
+	/*
+	 * Keep the user's configured normal color/background on hover and focus
+	 * unless a hover value is explicitly set, and neutralise the
+	 * `@wordpress/components` Button defaults (admin-blue hover text, focus
+	 * box-shadow ring) that would otherwise flash a different color.
+	 */
+	&:hover:not(:disabled),
+	&:focus:not(:disabled),
+	&:active:not(:disabled) {
+		color: var(--whsc-trigger-icon-hover, var(--whsc-trigger-icon));
+		background: var(--whsc-trigger-bg-hover, var(--whsc-trigger-bg));
+		box-shadow: none;
+	}
+}
+
+/*
+ * Dedicated `--whsc-trigger-box-*` vars (falling back to the shared
+ * `--whsc-input-*` ones the modal's own search field uses) rather than
+ * reading `--whsc-input-*` directly: the Elementor widget's Trigger section
+ * and its Search field (modal) section are separate Style-tab sections, and
+ * reading the same variable from both would mean setting one silently
+ * overwrites the other's default instead of layering as two independent
+ * overrides of a shared baseline.
+ */
+.whsc-trigger-box.components-search-control {
+	width: 100%;
+
+	/*
+	 * `@wordpress/components`' `SearchControl` wraps the icon and the
+	 * `<input>` in a shared `.components-input-control__container` — that
+	 * container, not the `<input>` itself, is the actual visual "box" (it
+	 * draws the border/radius around both the icon and the field). Styling
+	 * only the `<input>` left the icon sitting on the container's own
+	 * default white background, visibly mismatched from the input's custom
+	 * color right next to it.
+	 */
+	.components-input-control__container {
+		background: var(--whsc-trigger-box-bg, var(--whsc-input-bg));
+		border-color: var(--whsc-trigger-box-border, var(--whsc-input-border));
+		border-radius: var(--whsc-trigger-box-radius, var(--whsc-input-radius));
+	}
+
+	input {
+		background: transparent;
+		color: var(--whsc-trigger-box-text, var(--whsc-input-text));
+	}
+
+	/*
+	 * The leading search icon paints via `fill="currentColor"`, inheriting
+	 * `color` from wherever it sits — with no color of its own set, it just
+	 * inherited the input's text color, so there was no way to style it
+	 * independently.
+	 */
+	svg {
+		color: var(--whsc-trigger-box-icon, var(--whsc-input-icon));
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Modal shell — full-width, top-docked, height fits content (never full).
+ * ---------------------------------------------------------------------- */
+.whsc-modal.components-modal__frame {
+	align-self: flex-start;
+	width: 100%;
+	max-width: 100%;
+	height: auto;
+	max-height: 92vh;
+	margin: 0;
+	background: var(--whsc-bg);
+	color: var(--whsc-text);
+	border-radius: 0 0 var(--whsc-radius-panel) var(--whsc-radius-panel);
+}
+
+.whsc-modal .components-modal__content {
+	padding: 0;
+	max-height: 92vh;
+	overflow-y: auto;
+	overflow-x: hidden;
+	margin-top: 0;
+}
+
+.whsc-modal .components-modal__content::before {
+	content: none;
+}
+
+/*
+ * Every element in the flex column needs `min-width: 0` so an oversized
+ * descendant (the results carousel) can never force the column — and with
+ * it the whole modal — wider than the viewport.
+ */
+.whsc-modal-body {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	gap: var(--whsc-gap);
+	width: 100%;
+	max-width: 100%;
+	overflow-x: hidden;
+	margin: 0 auto;
+	padding: var(--whsc-padding);
+
+	> * {
+		min-width: 0;
+	}
+
+	@media screen and (max-width: 600px) {
+		padding: 16px;
+		gap: 18px;
+	}
+}
+
+.whsc-modal-header {
+	position: relative;
+}
+
+.whsc-input-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: nowrap;
+
+	/*
+	 * Keep the input and its buttons on a single row at every width — the
+	 * input shrinks (min-width: 0) instead of the buttons wrapping to a second
+	 * line under the field (which looked broken on phones).
+	 */
+	@media screen and (max-width: 480px) {
+		gap: 4px;
+
+		.whsc-submit-btn.components-button {
+			height: 44px;
+			padding-inline: 14px;
+		}
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Search field
+ * ---------------------------------------------------------------------- */
+.whsc-search-input {
+	position: relative;
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	background: var(--whsc-input-bg);
+	border: 1px solid var(--whsc-input-border);
+	border-radius: var(--whsc-input-radius);
+	padding-inline: 16px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+	&:focus-within {
+		border-color: var(--whsc-input-border-focus);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--whsc-accent) 18%, transparent);
+	}
+}
+
+.whsc-search-input__icon {
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	fill: var(--whsc-input-icon);
+}
+
+/*
+ * Nested under `.whsc-modal` and forced transparent so the field always shows
+ * the wrapper's `--whsc-input-bg` (which is the themeable surface) rather than
+ * a theme's own `input { background: #fff }` reset.
+ */
+.whsc-modal .whsc-search-input__field {
+	flex: 1;
+	border: none;
+	/* `!important` deliberately neutralises theme `input`/`input[type=search]`
+	 * backgrounds so the field always shows the wrapper's themeable
+	 * `--whsc-input-bg` rather than the theme's own opaque field color. */
+	background: transparent !important;
+	box-shadow: none;
+	/* `!important` on both `color` and the WebKit fill so a themed input color
+	 * (e.g. white) always wins over the theme's own `input { color }` rule.
+	 * WebKit renders `<input>` text via `-webkit-text-fill-color`, which
+	 * overrides `color`, so both are set. */
+	color: var(--whsc-input-text) !important;
+	-webkit-text-fill-color: var(--whsc-input-text);
+	font-size: 16px;
+	line-height: 1.4;
+	padding-block: 13px;
+	padding-inline: 12px;
+	min-width: 0;
+
+	&::placeholder {
+		color: var(--whsc-input-placeholder);
+		opacity: 1;
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+
+	&::-webkit-search-cancel-button {
+		display: none;
+	}
+}
+
+.whsc-modal .whsc-search-input__clear.components-button {
+	flex-shrink: 0;
+	min-width: 30px;
+	min-height: 30px;
+	padding: var(--whsc-clearbtn-padding);
+	color: var(--whsc-clearbtn-color);
+	background: var(--whsc-clearbtn-bg);
+	border-radius: var(--whsc-clearbtn-radius);
+	box-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-clearbtn-color-hover, var(--whsc-clearbtn-color));
+		background: var(--whsc-clearbtn-bg-hover, var(--whsc-icon-bg-hover));
+		box-shadow: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Submit + icon buttons in the header row
+ * ---------------------------------------------------------------------- */
+.whsc-modal .whsc-submit-btn.components-button {
+	flex-shrink: 0;
+	height: 48px;
+	padding-inline: 22px;
+	background: var(--whsc-btn-bg);
+	color: var(--whsc-btn-text);
+	border-radius: var(--whsc-btn-radius);
+	box-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		background: var(--whsc-btn-bg-hover, var(--whsc-btn-bg));
+		color: var(--whsc-btn-text-hover, var(--whsc-btn-text));
+		box-shadow: none;
+	}
+}
+
+.whsc-modal .whsc-voice-btn.components-button,
+.whsc-modal .whsc-modal-close.components-button {
+	flex-shrink: 0;
+	min-width: 44px;
+	min-height: 44px;
+	box-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.whsc-modal .whsc-voice-btn.components-button {
+	padding: var(--whsc-voice-padding);
+	color: var(--whsc-voice-color);
+	background: var(--whsc-voice-bg);
+	border-radius: var(--whsc-voice-radius);
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-voice-color-hover, var(--whsc-voice-color));
+		background: var(--whsc-voice-bg-hover, var(--whsc-icon-bg-hover));
+		box-shadow: none;
+	}
+}
+
+.whsc-modal .whsc-modal-close.components-button {
+	padding: var(--whsc-close-padding);
+	color: var(--whsc-close-color);
+	background: var(--whsc-close-bg);
+	border-radius: var(--whsc-close-radius);
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-close-color-hover, var(--whsc-close-color));
+		background: var(--whsc-close-bg-hover, var(--whsc-icon-bg-hover));
+		box-shadow: none;
+	}
+}
+
+.whsc-voice-btn.is-pressed {
+	color: var(--whsc-accent);
+}
+
+/*
+ * The mic glyph (`icons.js`) is a stroke-only outline (`fill="none"`,
+ * `stroke="currentColor"`). `fill="none"` is only a presentation attribute,
+ * which core's `.components-button svg { fill: currentColor }` overrides and
+ * fills into a solid blob — force it back. Scoped to the built-in mic glyph
+ * specifically (`.whsc-default-voice-icon`, set only when no custom icon is
+ * chosen) so a custom SVG selected via the Elementor icon picker — which may
+ * legitimately need its own fill — is never forced to `fill: none`.
+ *
+ * Targets the `svg` itself, not just the wrapping span: `fill`/`stroke` are
+ * inherited properties, and an inherited value always loses to any rule that
+ * matches the element directly (regardless of specificity) — so setting
+ * `fill: none` on `.whsc-default-voice-icon` alone never wins against the
+ * reset's `.components-button svg { fill: currentColor }`, which targets the
+ * `svg` node explicitly.
+ */
+.whsc-voice-btn .whsc-default-voice-icon svg {
+	fill: none;
+	stroke: currentColor;
+}
+
+/*
+ * The built-in mic glyph (`icons.js`) carries fixed `width="24" height="24"`
+ * attributes on its own `<svg>`, so it's always 24px regardless of CSS. A
+ * custom icon from Elementor's `Icons_Manager` has neither: an inline SVG
+ * (e.g. an uploaded/FA6 icon) has no width/height at all, so with no CSS
+ * constraint either it falls back to stretching to fill the button's flex
+ * width (rendering far larger than the default glyph, distorted since it
+ * ignores its own aspect ratio in the process); a Font Awesome `<i>` glyph
+ * sizes from `font-size`, which the button doesn't otherwise constrain.
+ * Mirrors `.whsc-trigger-custom-icon` in the trigger below: fix the
+ * wrapper's font-size to the same 24px the default glyph renders at, and
+ * size the inner icon relative to it.
+ */
+.whsc-custom-voice-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 24px;
+	line-height: 1;
+
+	svg {
+		width: 1em;
+		height: 1em;
+	}
+
+	i {
+		font-size: inherit;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Floating autocomplete suggestions
+ * ---------------------------------------------------------------------- */
+.whsc-suggestions {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 0;
+	right: 0;
+	z-index: 10;
+	background: var(--whsc-panel-bg);
+	border: 1px solid var(--whsc-panel-border);
+	border-radius: var(--whsc-panel-radius);
+	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+	padding: 8px;
+	max-height: 340px;
+	overflow-y: auto;
+}
+
+.whsc-suggestions__close.components-button {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	color: var(--whsc-icon-color);
+	background: transparent;
+	border-radius: 999px;
+	box-shadow: none;
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-icon-color-hover, var(--whsc-icon-color));
+		background: var(--whsc-icon-bg-hover);
+		box-shadow: none;
+	}
+}
+
+.whsc-suggestions__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	padding-right: 28px;
+}
+
+/*
+ * Plain `<button>` hit targets (suggestions, chip labels, popular items) that
+ * intentionally skip `@wordpress/components`. Themes commonly style the bare
+ * `button` element (WooCommerce/Hello Elementor's dark reset), so nest under
+ * `.whsc-modal` for the extra specificity and reset font/text properties.
+ */
+.whsc-modal .whsc-suggestion {
+	display: block;
+	width: 100%;
+	text-align: left;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
+	padding: 11px 12px;
+	margin: 0;
+	font: inherit;
+	font-size: 15px;
+	line-height: 1.4;
+	text-transform: none;
+	letter-spacing: normal;
+	color: var(--whsc-suggestion-text);
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	&:hover,
+	&:focus-visible {
+		color: var(--whsc-suggestion-text-hover, var(--whsc-suggestion-text));
+		background: var(--whsc-suggestion-bg-hover);
+		outline: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Type filters (facets)
+ * ---------------------------------------------------------------------- */
+.whsc-facets {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+/*
+ * Box-model properties (radius, padding, border, margin, sizing) are declared
+ * once and never re-declared per state, so a theme's `button:hover` reset
+ * can't distort the pill shape on hover — only colors change between states.
+ * These pills carry `role="tab"`, which the shared reset also resets
+ * (background/border/box-shadow/color/cursor) at the same boosted
+ * specificity this file now uses throughout, so every property the reset
+ * touches is re-declared here too, not just the ones that visibly differ.
+ */
+.whsc-modal .whsc-facet,
+.whsc-modal .whsc-facet:hover,
+.whsc-modal .whsc-facet:focus,
+.whsc-modal .whsc-facet.is-active {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	border: none;
+	border-radius: var(--whsc-facet-radius);
+	padding: 8px 16px;
+	margin: 0;
+	box-shadow: none;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.2;
+	text-transform: none;
+	letter-spacing: normal;
+	cursor: pointer;
+}
+
+.whsc-modal .whsc-facet {
+	background: var(--whsc-facet-bg);
+	color: var(--whsc-facet-text);
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	&:hover:not(.is-active) {
+		background: var(--whsc-facet-bg-hover);
+		color: var(--whsc-facet-text-hover);
+	}
+
+	&.is-active {
+		background: var(--whsc-facet-bg-active);
+		color: var(--whsc-facet-text-active);
+	}
+
+	/*
+	 * The shared reset deliberately strips the default outline from
+	 * `[role="tab"]:focus-visible` (it assumes a DataViews-style tab strip
+	 * supplies its own focus treatment elsewhere), which left keyboard users
+	 * with no visible focus indicator here at all — restore one.
+	 */
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+.whsc-facet__count {
+	color: var(--whsc-facet-count);
+	opacity: 0.65;
+}
+
+/*
+ * Dynamic field facet groups (PLAN.md §3.1) — one per configured facet field
+ * other than the built-in type filters above. Reuses the same `.whsc-facets`
+ * / `.whsc-facet` chip styling; only the group label + stacking is new here.
+ */
+.whsc-facet-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.whsc-facet-group__label {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: var(--whsc-title-color);
+	opacity: 0.7;
+}
+
+/* -------------------------------------------------------------------------
+ * Browse (empty / results) layout — recent row on top, popular aside + main.
+ * ---------------------------------------------------------------------- */
+.whsc-browse {
+	display: flex;
+	flex-direction: column;
+	gap: var(--whsc-gap);
+	min-width: 0;
+}
+
+.whsc-browse__columns {
+	display: grid;
+	grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
+	gap: var(--whsc-gap);
+	min-width: 0;
+
+	&.whsc-browse__columns--single {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	@media screen and (max-width: 782px) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.whsc-browse__aside,
+.whsc-browse__main {
+	min-width: 0;
+}
+
+/*
+ * Nested under `.whsc-modal` and with `font-family: inherit` so themes that
+ * style `h3` with a decorative heading font (e.g. Cinzel at 38px) can't bleed
+ * into these small UI labels.
+ */
+.whsc-modal .whsc-section-title {
+	margin: 0 0 12px;
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--whsc-title-color);
+}
+
+/* -------------------------------------------------------------------------
+ * Recent searches
+ * ---------------------------------------------------------------------- */
+.whsc-recent__head {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-bottom: 12px;
+
+	.whsc-section-title {
+		margin: 0;
+	}
+}
+
+.whsc-modal .whsc-clear-all {
+	background: transparent;
+	border: none;
+	border-radius: 999px;
+	padding: var(--whsc-clear-padding, 4px 10px);
+	margin: 0;
+	font: inherit;
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: none;
+	letter-spacing: normal;
+	color: var(--whsc-clear-text);
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	&:hover {
+		color: var(--whsc-clear-text-hover, var(--whsc-clear-text));
+		background: var(--whsc-clear-bg-hover, var(--whsc-icon-bg-hover));
+	}
+
+	&:active {
+		color: var(--whsc-clear-text-active, var(--whsc-accent));
+	}
+}
+
+.whsc-chip-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.whsc-chip {
+	display: inline-flex;
+	align-items: center;
+	background: var(--whsc-chip-bg);
+	border: 1px solid var(--whsc-chip-border);
+	border-radius: var(--whsc-chip-radius);
+	padding: 0 6px 0 4px;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+
+	&:hover {
+		background: var(--whsc-chip-bg-hover, var(--whsc-chip-bg));
+		border-color: var(--whsc-chip-border-hover, var(--whsc-chip-border));
+	}
+}
+
+/*
+ * Every property is pinned across every state (incl. `:active`) so a theme's
+ * `button` / `button:hover` / `button:active` reset (background, font,
+ * letter-spacing, color) can't distort the chip — only the text color changes,
+ * and only to our configured hover/active value.
+ */
+.whsc-modal .whsc-chip__label,
+.whsc-modal .whsc-chip__label:hover,
+.whsc-modal .whsc-chip__label:focus,
+.whsc-modal .whsc-chip__label:active {
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	margin: 0;
+	padding: 7px 6px 7px 12px;
+	max-width: 240px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font: inherit;
+	font-size: 13px;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	cursor: pointer;
+}
+
+.whsc-modal .whsc-chip__label {
+	color: var(--whsc-chip-text);
+	transition: color 0.15s ease;
+}
+
+.whsc-modal .whsc-chip__label:hover,
+.whsc-modal .whsc-chip__label:focus-visible,
+.whsc-modal .whsc-chip__label:active {
+	color: var(--whsc-chip-text-hover, var(--whsc-accent));
+	outline: none;
+}
+
+.whsc-modal .whsc-chip__label:disabled {
+	cursor: default;
+	opacity: 0.55;
+}
+
+.whsc-modal .whsc-chip__remove.components-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
+	padding: 0;
+	color: var(--whsc-icon-color);
+	background: transparent;
+	border-radius: 999px;
+	box-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-icon-color-hover, var(--whsc-icon-color));
+		background: var(--whsc-icon-bg-hover);
+		box-shadow: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Popular searches
+ * ---------------------------------------------------------------------- */
+.whsc-popular-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--whsc-popular-gap, 2px);
+	/* Cap the height so a long curated list scrolls inside itself instead of
+	 * stretching the whole modal into a tall vertical scroll. */
+	max-height: 340px;
+	overflow-y: auto;
+}
+
+/*
+ * Box props pinned across every state (incl. `:active`) so a theme's
+ * `button:active` reset can't flip the background/border/radius; long terms
+ * truncate to one line with an ellipsis (full text via the `title` tooltip).
+ *
+ * Typography is intentionally NOT pinned here. Doing so on `:hover` (a
+ * higher-specificity selector than the theme's normal-state typography) made
+ * the text case/weight change only on hover. Leaving font, text-transform,
+ * letter-spacing to the theme keeps every state visually identical.
+ */
+.whsc-modal .whsc-popular-item,
+.whsc-modal .whsc-popular-item:hover,
+.whsc-modal .whsc-popular-item:focus,
+.whsc-modal .whsc-popular-item:active {
+	display: block;
+	width: 100%;
+	border: none;
+	margin: 0;
+	text-align: left;
+	padding: var(--whsc-popular-padding, 9px 12px);
+	border-radius: var(--whsc-popular-radius, 8px);
+	box-shadow: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.whsc-modal .whsc-popular-item {
+	/* Base selector (no pseudo) applies to every state at the same specificity,
+	 * so font-size never differs between normal and hover. */
+	background: transparent;
+	color: var(--whsc-popular-text);
+	font-size: 14px;
+	line-height: 1.3;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.whsc-modal .whsc-popular-item:hover,
+.whsc-modal .whsc-popular-item:focus-visible,
+.whsc-modal .whsc-popular-item:active {
+	color: var(--whsc-popular-text-hover, var(--whsc-accent));
+	background: var(--whsc-popular-bg-hover);
+	outline: none;
+}
+
+.whsc-modal .whsc-popular-item:disabled,
+.whsc-modal .whsc-chip__remove.components-button:disabled,
+.whsc-modal .whsc-clear-all:disabled {
+	cursor: default;
+	opacity: 0.55;
+}
+
+/*
+ * When the two columns collapse (tablet/phone), a tall vertical popular list
+ * forces the modal to scroll. Lay the items out as a compact wrapping chip
+ * row instead so the modal stays short. Declared after the base rule so it
+ * wins inside the breakpoint.
+ */
+@media screen and (max-width: 782px) {
+	.whsc-popular-list {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 8px;
+		max-height: 168px;
+	}
+
+	.whsc-modal .whsc-popular-item,
+	.whsc-modal .whsc-popular-item:hover,
+	.whsc-modal .whsc-popular-item:focus,
+	.whsc-modal .whsc-popular-item:active {
+		width: auto;
+		max-width: 100%;
+		padding: 7px 14px;
+		background: var(--whsc-chip-bg);
+		border: 1px solid var(--whsc-chip-border);
+		border-radius: 999px;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Carousel — draggable, hidden scrollbar, overlay arrows, dot pagination.
+ * ---------------------------------------------------------------------- */
+.whsc-carousel {
+	position: relative;
+	min-width: 0;
+	max-width: 100%;
+}
+
+.whsc-carousel-track {
+	display: flex;
+	gap: var(--whsc-carousel-gap, 14px);
+	min-width: 0;
+	overflow-x: auto;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	padding-block: 2px;
+	cursor: grab;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	&.is-dragging {
+		cursor: grabbing;
+		scroll-behavior: auto;
+		user-select: none;
+	}
+}
+
+.whsc-carousel-item {
+	flex: 0 0 auto;
+	width: 200px;
+
+	@media screen and (max-width: 600px) {
+		width: 150px;
+	}
+}
+
+/* Kill native link/image dragging so the pointer drag scrolls the track even
+ * when the gesture starts on a card. */
+.whsc-carousel-track a,
+.whsc-carousel-track img,
+.whsc-carousel-track .whsc-card__image {
+	-webkit-user-drag: none;
+}
+
+.whsc-carousel-arrow.components-button {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	min-width: 40px;
+	padding: 0;
+	color: var(--whsc-arrow-color);
+	background: var(--whsc-arrow-bg);
+	border-radius: 999px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+	transition: opacity 0.15s ease, background-color 0.15s ease;
+
+	&.whsc-carousel-arrow--prev {
+		left: -6px;
+	}
+
+	&.whsc-carousel-arrow--next {
+		right: -6px;
+	}
+
+	/* Re-pin colour, radius and shadow across every interactive state. The
+	 * theme's `.elementor-kit-* button:hover` is more specific than the base
+	 * rule above, so without this the icon colour and pill radius break on
+	 * hover/focus. */
+	&:hover:not(:disabled),
+	&:focus:not(:disabled),
+	&:active:not(:disabled) {
+		color: var(--whsc-arrow-color);
+		background: var(--whsc-arrow-bg);
+		border-radius: 999px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+	}
+
+	&:disabled {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	svg {
+		fill: currentColor;
+	}
+
+	@media (hover: none) {
+		display: none;
+	}
+}
+
+.whsc-carousel-dots {
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+/*
+ * Fixed 8px round dots with box properties pinned across every state so a
+ * theme `button`/`button:hover` reset (padding, border, radius) can't turn
+ * them square on hover/focus. These also carry `role="tab"` (facets do too,
+ * see above), so the same reset conflict applies here.
+ */
+.whsc-modal .whsc-carousel-dot,
+.whsc-modal .whsc-carousel-dot:hover,
+.whsc-modal .whsc-carousel-dot:focus,
+.whsc-modal .whsc-carousel-dot.is-active {
+	appearance: none;
+	width: 8px;
+	height: 8px;
+	min-width: 0;
+	padding: 0;
+	margin: 0;
+	border: none;
+	border-radius: 999px;
+	box-shadow: none;
+	cursor: pointer;
+}
+
+.whsc-modal .whsc-carousel-dot {
+	background: var(--whsc-dot-color);
+	transition: background-color 0.15s ease, transform 0.15s ease;
+
+	&:hover {
+		background: var(--whsc-dot-color-active);
+	}
+
+	&.is-active {
+		background: var(--whsc-dot-color-active);
+		transform: scale(1.3);
+	}
+
+	/* Same reset-strips-outline gap as `.whsc-facet` above — restore one. */
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * Result / highlight cards
+ * ---------------------------------------------------------------------- */
+.whsc-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	height: 100%;
+	padding: var(--whsc-card-padding);
+	background: var(--whsc-card-bg);
+	border: 1px solid var(--whsc-card-border);
+	border-radius: var(--whsc-card-radius);
+	text-decoration: none;
+	color: var(--whsc-text);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+	&:hover,
+	&:focus-visible {
+		border-color: var(--whsc-card-border-hover, var(--whsc-accent));
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+.whsc-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.whsc-card__media {
+	position: relative;
+	display: block;
+}
+
+.whsc-card__image {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	border-radius: calc(var(--whsc-card-radius) - 3px);
+	background: #f1f2f4;
+	-webkit-user-drag: none;
+	user-select: none;
+}
+
+/* Neutral placeholder shown for results with no image, so cards stay uniform. */
+.whsc-card__image--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #c2c6cb;
+}
+
+/* "Sale" flash, mirroring WooCommerce's product badge. */
+.whsc-card__badge {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	z-index: 1;
+	padding: 3px 9px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: #fff;
+	background: var(--whsc-accent);
+	border-radius: 999px;
+}
+
+.whsc-card__title {
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 1.3;
+	color: var(--whsc-card-title);
+	/* Clamp long product names to two lines with an ellipsis so cards stay a
+	 * uniform height; the full name is available via the `title` tooltip. */
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	overflow-wrap: anywhere;
+}
+
+.whsc-card__meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	color: var(--whsc-price-color);
+}
+
+/* Price line: current price + optional strikethrough regular + small suffix. */
+.whsc-card__price {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 6px;
+	font-size: 14px;
+	color: var(--whsc-price-color);
+}
+
+.whsc-card__price-current {
+	font-weight: 600;
+	color: var(--whsc-card-title);
+	text-decoration: none;
+	background: none;
+}
+
+.whsc-card__price-regular {
+	color: var(--whsc-price-color);
+	text-decoration: line-through;
+	opacity: 0.75;
+}
+
+.whsc-card__price-from {
+	font-size: 0.8em;
+	color: var(--whsc-price-color);
+}
+
+.whsc-card__price-suffix {
+	flex-basis: 100%;
+	font-size: 0.72em;
+	line-height: 1.3;
+	color: var(--whsc-price-color);
+	opacity: 0.85;
+}
+
+.whsc-card__stock {
+	font-size: 12px;
+	font-weight: 600;
+
+	&.is-in-stock {
+		color: #2a7d4f;
+	}
+
+	&.is-out-of-stock {
+		color: #b02a37;
+	}
+}
+
+.whsc-card__excerpt {
+	font-size: 13px;
+	line-height: 1.4;
+	color: var(--whsc-price-color);
+}
+
+.whsc-no-results {
+	color: var(--whsc-price-color);
+	text-align: center;
+	padding: 24px 0;
+}
+
+/* Skeleton row mirrors the real carousel track: fixed-width cards clipped by
+ * overflow so it shows ≈the same number of cards as results at any width. */
+.whsc-skeleton-row {
+	display: flex;
+	gap: var(--whsc-carousel-gap, 14px);
+	overflow: hidden;
+	padding-block: 2px;
+}
+
+.whsc-skeleton-card {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* -------------------------------------------------------------------------
+ * Error notice
+ * ---------------------------------------------------------------------- */
+.whsc-modal .components-notice {
+	margin: 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Modal entrance animation (per-instance, chosen in the editor).
+ * The overlay fades in for every variant; the frame gets the chosen motion.
+ * ---------------------------------------------------------------------- */
+.whsc-modal-overlay {
+	animation: whsc-overlay-in 0.25s ease both;
+}
+
+.whsc-modal.components-modal__frame {
+	animation-duration: var(--whsc-anim-duration, 0.3s);
+	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+	animation-fill-mode: both;
+}
+
+.whsc-anim-none.components-modal__frame { animation: none; }
+.whsc-anim-fade.components-modal__frame { animation-name: whsc-fade-in; }
+.whsc-anim-slide-down.components-modal__frame { animation-name: whsc-slide-down; }
+.whsc-anim-slide-up.components-modal__frame { animation-name: whsc-slide-up; }
+.whsc-anim-zoom.components-modal__frame { animation-name: whsc-zoom-in; }
+
+@media (prefers-reduced-motion: reduce) {
+	.whsc-modal-overlay,
+	.whsc-modal.components-modal__frame {
+		animation: none;
+	}
+}
+
+}
+
+/*
+ * `@keyframes` can't be nested inside a selector block, so these stay at the
+ * top level — referencing them by name from inside the wrapper above works
+ * regardless of where they're defined.
+ */
+@keyframes whsc-overlay-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes whsc-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+@keyframes whsc-slide-down {
+	from { opacity: 0; transform: translateY(-24px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes whsc-slide-up {
+	from { opacity: 0; transform: translateY(24px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes whsc-zoom-in {
+	from { opacity: 0; transform: scale(0.96); }
+	to { opacity: 1; transform: scale(1); }
+}
+/* cache-bust-test */

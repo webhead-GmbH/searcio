@@ -1,0 +1,943 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: webhead Search Cloud\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-06T07:55:02+00:00\n"
+"PO-Revision-Date: 2026-07-06\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: webhead-search-cloud\n"
+
+#. Plugin Name of the plugin
+#: webhead-search-cloud.php
+#: includes/Admin/Settings_Page.php:35
+#: includes/Admin/Settings_Page.php:93
+#: src/admin/settings/components/SettingsPanel.js:151
+msgid "webhead Search Cloud"
+msgstr "webhead Search Cloud"
+
+#. Plugin URI of the plugin
+#: webhead-search-cloud.php
+msgid "https://github.com/webhead-GmbH/webhead-search-cloud"
+msgstr "https://github.com/webhead-GmbH/webhead-search-cloud"
+
+#. Description of the plugin
+#: webhead-search-cloud.php
+#: includes/Admin/Settings_Page.php:94
+msgid "Connect WordPress and WooCommerce to webhead Search Cloud."
+msgstr "Verbindet WordPress und WooCommerce mit webhead Search Cloud."
+
+#. Author of the plugin
+#: webhead-search-cloud.php
+msgid "webhead GmbH"
+msgstr "webhead GmbH"
+
+#. Author URI of the plugin
+#: webhead-search-cloud.php
+msgid "https://webhead.at"
+msgstr "https://webhead.at"
+
+#: includes/Admin/Settings_Page.php:31
+#: includes/Frontend/Elementor/Search_Widget.php:53
+msgid "Search Cloud"
+msgstr "Search Cloud"
+
+#. translators: 1: detected WooCommerce version, 2: required minimum version.
+#: includes/Compatibility/Woo_Compatibility.php:58
+#, php-format
+msgid "webhead Search Cloud: WooCommerce %1$s is below the supported minimum %2$s. Product indexing is disabled until WooCommerce is updated; other content indexing still works."
+msgstr "webhead Search Cloud: WooCommerce %1$s liegt unter dem unterstützten Mindestwert %2$s. Die Produktindexierung ist deaktiviert, bis WooCommerce aktualisiert wird; die Indexierung anderer Inhalte funktioniert weiterhin."
+
+#: includes/Compatibility/Woo_Compatibility.php:59
+#: src/admin/settings/components/tabs/IndexingTab.js:194
+msgid "(unknown)"
+msgstr "(unbekannt)"
+
+#: includes/Frontend/Elementor/Search_Widget.php:108
+#: src/frontend/search/components/SearchInput.js:31
+#: src/frontend/search/components/SearchModal.js:574
+#: src/frontend/search/components/SearchModal.js:594
+msgid "Search"
+msgstr "Suche"
+
+#: includes/Frontend/Elementor/Search_Widget.php:114
+#: src/blocks/search/edit.js:81
+msgid "Trigger style"
+msgstr "Trigger-Stil"
+
+#: includes/Frontend/Elementor/Search_Widget.php:118
+#: src/blocks/search/edit.js:84
+msgid "Search box"
+msgstr "Suchfeld"
+
+#: includes/Frontend/Elementor/Search_Widget.php:119
+#: src/blocks/search/edit.js:85
+msgid "Icon button"
+msgstr "Icon-Schaltfläche"
+
+#: includes/Frontend/Elementor/Search_Widget.php:127
+#: src/blocks/search/edit.js:218
+msgid "Icon"
+msgstr "Symbol"
+
+#: includes/Frontend/Elementor/Search_Widget.php:130
+msgid "Leave empty to use the default search icon."
+msgstr "Leer lassen, um das Standard-Suchsymbol zu verwenden."
+
+#: includes/Frontend/Elementor/Search_Widget.php:137
+#: src/blocks/search/edit.js:92
+msgid "Restrict to type"
+msgstr "Auf Typ beschränken"
+
+#: includes/Frontend/Elementor/Search_Widget.php:147
+#: src/blocks/search/edit.js:100
+msgid "Card source"
+msgstr "Kartenquelle"
+
+#: includes/Frontend/Elementor/Search_Widget.php:151
+#: src/blocks/search/edit.js:104
+msgid "Plugin templates"
+msgstr "Plugin-Vorlagen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:152
+#: src/blocks/search/edit.js:105
+msgid "Search Cloud templates"
+msgstr "Search Cloud-Vorlagen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:154
+#: src/blocks/search/edit.js:101
+msgid "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card."
+msgstr "Gestalte Vorlagen pro Inhaltstyp im Card-Builder des Search Cloud-Panels. Jeder Typ ohne veröffentlichte Vorlage dort verwendet stattdessen die eigene Karte dieses Plugins."
+
+#: includes/Frontend/Elementor/Search_Widget.php:161
+#: src/blocks/search/edit.js:112
+msgid "Highlights source"
+msgstr "Highlights-Quelle"
+
+#: includes/Frontend/Elementor/Search_Widget.php:165
+#: src/blocks/search/edit.js:116
+msgid "Newest"
+msgstr "Neueste"
+
+#: includes/Frontend/Elementor/Search_Widget.php:166
+#: src/admin/settings/components/tabs/IndexingTab.js:213
+#: src/blocks/search/edit.js:117
+msgid "Featured"
+msgstr "Hervorgehoben"
+
+#: includes/Frontend/Elementor/Search_Widget.php:168
+#: src/blocks/search/edit.js:113
+msgid "What the empty-query \"highlights\" carousel shows. \"Featured\" only works once a boolean \"featured\" custom field is pushed for this type (Indexing tab)."
+msgstr "Was das \"Highlights\"-Karussell bei leerer Suchanfrage zeigt. \"Hervorgehoben\" funktioniert erst, wenn für diesen Typ ein boolesches Custom Field \"featured\" übertragen wird (Tab \"Indexierung\")."
+
+#: includes/Frontend/Elementor/Search_Widget.php:175
+#: src/blocks/search/edit.js:124
+msgid "Placeholder text"
+msgstr "Platzhaltertext"
+
+#: includes/Frontend/Elementor/Search_Widget.php:178
+#: includes/Frontend/Frontend_Assets.php:198
+#: src/blocks/search/edit.js:126
+msgid "Search…"
+msgstr "Suchen …"
+
+#: includes/Frontend/Elementor/Search_Widget.php:185
+#: src/blocks/search/edit.js:131
+msgid "Enable voice search"
+msgstr "Sprachsuche aktivieren"
+
+#: includes/Frontend/Elementor/Search_Widget.php:188
+msgid "On"
+msgstr "Ein"
+
+#: includes/Frontend/Elementor/Search_Widget.php:189
+msgid "Off"
+msgstr "Aus"
+
+#: includes/Frontend/Elementor/Search_Widget.php:197
+#: src/blocks/search/edit.js:238
+msgid "Voice icon"
+msgstr "Mikrofonsymbol"
+
+#: includes/Frontend/Elementor/Search_Widget.php:200
+msgid "Leave empty to use the default microphone icon."
+msgstr "Leer lassen, um das Standard-Mikrofonsymbol zu verwenden."
+
+#: includes/Frontend/Elementor/Search_Widget.php:207
+#: src/blocks/search/edit.js:137
+msgid "When to search"
+msgstr "Wann gesucht wird"
+
+#: includes/Frontend/Elementor/Search_Widget.php:211
+#: src/blocks/search/edit.js:141
+msgid "On submit (Enter / button)"
+msgstr "Beim Absenden (Eingabetaste / Schaltfläche)"
+
+#: includes/Frontend/Elementor/Search_Widget.php:212
+#: src/blocks/search/edit.js:142
+msgid "While typing"
+msgstr "Während der Eingabe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:214
+msgid "'While typing' searches automatically after 3 characters."
+msgstr "\"Während der Eingabe\" sucht automatisch ab 3 Zeichen."
+
+#: includes/Frontend/Elementor/Search_Widget.php:221
+#: src/blocks/search/edit.js:148
+msgid "Show result count on filters"
+msgstr "Ergebnisanzahl bei Filtern anzeigen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:224
+msgid "Show"
+msgstr "Anzeigen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:225
+msgid "Hide"
+msgstr "Ausblenden"
+
+#: includes/Frontend/Elementor/Search_Widget.php:233
+#: src/blocks/search/edit.js:155
+msgid "Open animation"
+msgstr "Öffnungsanimation"
+
+#: includes/Frontend/Elementor/Search_Widget.php:237
+#: src/blocks/search/edit.js:158
+msgid "None"
+msgstr "Keine"
+
+#: includes/Frontend/Elementor/Search_Widget.php:238
+#: src/blocks/search/edit.js:159
+msgid "Fade"
+msgstr "Einblenden"
+
+#: includes/Frontend/Elementor/Search_Widget.php:239
+#: src/blocks/search/edit.js:160
+msgid "Slide down"
+msgstr "Nach unten einschieben"
+
+#: includes/Frontend/Elementor/Search_Widget.php:240
+#: src/blocks/search/edit.js:161
+msgid "Slide up"
+msgstr "Nach oben einschieben"
+
+#: includes/Frontend/Elementor/Search_Widget.php:241
+#: src/blocks/search/edit.js:162
+msgid "Zoom"
+msgstr "Zoom"
+
+#: includes/Frontend/Elementor/Search_Widget.php:249
+#: src/blocks/search/edit.js:170
+msgid "Animation duration (ms)"
+msgstr "Animationsdauer (ms)"
+
+#: includes/Frontend/Elementor/Search_Widget.php:270
+#: src/blocks/search/edit.js:53
+msgid "All types"
+msgstr "Alle Typen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:300
+#: src/admin/settings/components/tabs/SyncHistory.js:194
+#: src/blocks/search/edit.js:184
+msgid "Trigger"
+msgstr "Trigger"
+
+#: includes/Frontend/Elementor/Search_Widget.php:322
+#: src/blocks/search/edit.js:193
+msgid "Icon size"
+msgstr "Symbolgröße"
+
+#: includes/Frontend/Elementor/Search_Widget.php:335
+#: src/blocks/search/edit.js:194
+msgid "Button size"
+msgstr "Schaltflächengröße"
+
+#: includes/Frontend/Elementor/Search_Widget.php:348
+#: includes/Frontend/Elementor/Search_Widget.php:459
+#: includes/Frontend/Elementor/Search_Widget.php:526
+#: includes/Frontend/Elementor/Search_Widget.php:571
+#: includes/Frontend/Elementor/Search_Widget.php:602
+#: includes/Frontend/Elementor/Search_Widget.php:775
+#: includes/Frontend/Elementor/Search_Widget.php:826
+#: src/blocks/search/edit.js:195
+#: src/blocks/search/edit.js:224
+#: src/blocks/search/edit.js:306
+#: src/blocks/search/edit.js:320
+msgid "Border radius"
+msgstr "Randradius"
+
+#: includes/Frontend/Elementor/Search_Widget.php:361
+#: includes/Frontend/Elementor/Search_Widget.php:518
+#: includes/Frontend/Elementor/Search_Widget.php:561
+#: includes/Frontend/Elementor/Search_Widget.php:592
+#: includes/Frontend/Elementor/Search_Widget.php:634
+#: includes/Frontend/Elementor/Search_Widget.php:673
+#: includes/Frontend/Elementor/Search_Widget.php:691
+#: includes/Frontend/Elementor/Search_Widget.php:717
+#: includes/Frontend/Elementor/Search_Widget.php:761
+#: includes/Frontend/Elementor/Search_Widget.php:818
+msgid "Normal"
+msgstr "Normal"
+
+#: includes/Frontend/Elementor/Search_Widget.php:365
+#: includes/Frontend/Elementor/Search_Widget.php:384
+#: includes/Frontend/Elementor/Search_Widget.php:422
+#: includes/Frontend/Elementor/Search_Widget.php:515
+#: includes/Frontend/Elementor/Search_Widget.php:593
+#: includes/Frontend/Elementor/Search_Widget.php:597
+#: src/blocks/search/edit.js:187
+msgid "Icon color"
+msgstr "Symbolfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:373
+#: includes/Frontend/Elementor/Search_Widget.php:392
+#: includes/Frontend/Elementor/Search_Widget.php:490
+#: includes/Frontend/Elementor/Search_Widget.php:512
+#: includes/Frontend/Elementor/Search_Widget.php:562
+#: includes/Frontend/Elementor/Search_Widget.php:566
+#: includes/Frontend/Elementor/Search_Widget.php:594
+#: includes/Frontend/Elementor/Search_Widget.php:598
+#: includes/Frontend/Elementor/Search_Widget.php:674
+#: includes/Frontend/Elementor/Search_Widget.php:679
+#: includes/Frontend/Elementor/Search_Widget.php:696
+#: includes/Frontend/Elementor/Search_Widget.php:722
+#: includes/Frontend/Elementor/Search_Widget.php:762
+#: includes/Frontend/Elementor/Search_Widget.php:766
+#: includes/Frontend/Elementor/Search_Widget.php:770
+#: includes/Frontend/Elementor/Search_Widget.php:815
+#: src/blocks/search/edit.js:189
+#: src/blocks/search/edit.js:202
+#: src/blocks/search/edit.js:216
+#: src/blocks/search/edit.js:297
+#: src/blocks/search/edit.js:313
+msgid "Background"
+msgstr "Hintergrund"
+
+#: includes/Frontend/Elementor/Search_Widget.php:380
+#: includes/Frontend/Elementor/Search_Widget.php:565
+#: includes/Frontend/Elementor/Search_Widget.php:596
+#: includes/Frontend/Elementor/Search_Widget.php:637
+#: includes/Frontend/Elementor/Search_Widget.php:678
+#: includes/Frontend/Elementor/Search_Widget.php:694
+#: includes/Frontend/Elementor/Search_Widget.php:720
+#: includes/Frontend/Elementor/Search_Widget.php:765
+#: includes/Frontend/Elementor/Search_Widget.php:821
+msgid "Hover"
+msgstr "Hover"
+
+#: includes/Frontend/Elementor/Search_Widget.php:412
+#: includes/Frontend/Elementor/Search_Widget.php:491
+#: includes/Frontend/Elementor/Search_Widget.php:513
+msgid "Text color"
+msgstr "Textfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:431
+msgid "Background color"
+msgstr "Hintergrundfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:485
+#: src/blocks/search/edit.js:199
+msgid "Modal"
+msgstr "Modal"
+
+#: includes/Frontend/Elementor/Search_Widget.php:492
+msgid "Accent color"
+msgstr "Akzentfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:493
+#: src/blocks/search/edit.js:207
+msgid "Corner radius"
+msgstr "Eckenradius"
+
+#: includes/Frontend/Elementor/Search_Widget.php:494
+#: includes/Frontend/Elementor/Search_Widget.php:607
+#: includes/Frontend/Elementor/Search_Widget.php:705
+#: includes/Frontend/Elementor/Search_Widget.php:827
+#: src/blocks/search/edit.js:208
+#: src/blocks/search/edit.js:321
+msgid "Padding"
+msgstr "Innenabstand"
+
+#: includes/Frontend/Elementor/Search_Widget.php:495
+#: src/blocks/search/edit.js:209
+msgid "Section spacing"
+msgstr "Abschnittsabstand"
+
+#: includes/Frontend/Elementor/Search_Widget.php:507
+#: src/blocks/search/edit.js:213
+msgid "Search field"
+msgstr "Suchfeld"
+
+#: includes/Frontend/Elementor/Search_Widget.php:514
+msgid "Placeholder color"
+msgstr "Platzhalterfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:519
+#: includes/Frontend/Elementor/Search_Widget.php:522
+msgid "Border color"
+msgstr "Randfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:521
+msgid "Focus"
+msgstr "Fokus"
+
+#: includes/Frontend/Elementor/Search_Widget.php:550
+#: src/blocks/search/edit.js:228
+msgid "Buttons"
+msgstr "Schaltflächen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:557
+msgid "Search button"
+msgstr "Such-Schaltfläche"
+
+#: includes/Frontend/Elementor/Search_Widget.php:563
+#: includes/Frontend/Elementor/Search_Widget.php:567
+#: includes/Frontend/Elementor/Search_Widget.php:675
+#: includes/Frontend/Elementor/Search_Widget.php:680
+#: includes/Frontend/Elementor/Search_Widget.php:692
+#: includes/Frontend/Elementor/Search_Widget.php:695
+#: includes/Frontend/Elementor/Search_Widget.php:699
+#: includes/Frontend/Elementor/Search_Widget.php:718
+#: includes/Frontend/Elementor/Search_Widget.php:721
+#: includes/Frontend/Elementor/Search_Widget.php:763
+#: includes/Frontend/Elementor/Search_Widget.php:767
+#: includes/Frontend/Elementor/Search_Widget.php:771
+#: src/blocks/search/edit.js:203
+#: src/blocks/search/edit.js:217
+#: src/blocks/search/edit.js:298
+msgid "Text"
+msgstr "Text"
+
+#: includes/Frontend/Elementor/Search_Widget.php:573
+msgid "Voice button"
+msgstr "Mikrofon-Schaltfläche"
+
+#: includes/Frontend/Elementor/Search_Widget.php:574
+msgid "Close button"
+msgstr "Schließen-Schaltfläche"
+
+#: includes/Frontend/Elementor/Search_Widget.php:575
+msgid "Clear button"
+msgstr "Löschen-Schaltfläche"
+
+#: includes/Frontend/Elementor/Search_Widget.php:624
+#: src/blocks/search/edit.js:256
+msgid "Suggestions"
+msgstr "Vorschläge"
+
+#: includes/Frontend/Elementor/Search_Widget.php:629
+#: src/blocks/search/edit.js:259
+msgid "Panel background"
+msgstr "Panel-Hintergrund"
+
+#: includes/Frontend/Elementor/Search_Widget.php:630
+#: src/blocks/search/edit.js:260
+msgid "Panel border"
+msgstr "Panel-Rand"
+
+#: includes/Frontend/Elementor/Search_Widget.php:631
+#: src/blocks/search/edit.js:266
+msgid "Panel radius"
+msgstr "Panel-Radius"
+
+#: includes/Frontend/Elementor/Search_Widget.php:635
+#: includes/Frontend/Elementor/Search_Widget.php:638
+#: src/blocks/search/edit.js:261
+msgid "Item text"
+msgstr "Eintragstext"
+
+#: includes/Frontend/Elementor/Search_Widget.php:639
+msgid "Item background"
+msgstr "Eintragshintergrund"
+
+#: includes/Frontend/Elementor/Search_Widget.php:653
+#: src/blocks/search/edit.js:270
+msgid "Recent & popular"
+msgstr "Kürzlich & beliebt"
+
+#: includes/Frontend/Elementor/Search_Widget.php:658
+msgid "Section title color"
+msgstr "Abschnittstitel-Farbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:663
+msgid "Section title typography"
+msgstr "Abschnittstitel-Typografie"
+
+#: includes/Frontend/Elementor/Search_Widget.php:670
+msgid "Recent chips"
+msgstr "Verlaufs-Chips"
+
+#: includes/Frontend/Elementor/Search_Widget.php:676
+#: includes/Frontend/Elementor/Search_Widget.php:681
+#: includes/Frontend/Elementor/Search_Widget.php:819
+#: includes/Frontend/Elementor/Search_Widget.php:822
+#: src/blocks/search/edit.js:220
+#: src/blocks/search/edit.js:314
+msgid "Border"
+msgstr "Rand"
+
+#: includes/Frontend/Elementor/Search_Widget.php:684
+msgid "Radius"
+msgstr "Radius"
+
+#: includes/Frontend/Elementor/Search_Widget.php:688
+msgid "\"Clear all\" link"
+msgstr "Link \"Alle löschen\""
+
+#: includes/Frontend/Elementor/Search_Widget.php:698
+#: includes/Frontend/Elementor/Search_Widget.php:769
+msgid "Active"
+msgstr "Aktiv"
+
+#: includes/Frontend/Elementor/Search_Widget.php:714
+msgid "Popular items"
+msgstr "Beliebte Einträge"
+
+#: includes/Frontend/Elementor/Search_Widget.php:725
+#: includes/Frontend/Elementor/Search_Widget.php:871
+#: src/blocks/search/edit.js:334
+msgid "Spacing between items"
+msgstr "Abstand zwischen Einträgen"
+
+#: includes/Frontend/Elementor/Search_Widget.php:726
+msgid "Item radius"
+msgstr "Eintragsradius"
+
+#: includes/Frontend/Elementor/Search_Widget.php:730
+msgid "Item padding"
+msgstr "Eintrags-Innenabstand"
+
+#: includes/Frontend/Elementor/Search_Widget.php:740
+msgid "Popular typography"
+msgstr "Typografie \"Beliebt\""
+
+#: includes/Frontend/Elementor/Search_Widget.php:755
+#: src/blocks/search/edit.js:294
+msgid "Type filters"
+msgstr "Typfilter"
+
+#: includes/Frontend/Elementor/Search_Widget.php:781
+msgid "Label typography"
+msgstr "Beschriftungs-Typografie"
+
+#: includes/Frontend/Elementor/Search_Widget.php:788
+msgid "Result count"
+msgstr "Ergebnisanzahl"
+
+#: includes/Frontend/Elementor/Search_Widget.php:790
+msgid "Count color"
+msgstr "Farbe der Anzahl"
+
+#: includes/Frontend/Elementor/Search_Widget.php:795
+msgid "Count typography"
+msgstr "Typografie der Anzahl"
+
+#: includes/Frontend/Elementor/Search_Widget.php:810
+#: src/blocks/search/edit.js:310
+msgid "Result cards"
+msgstr "Ergebniskarten"
+
+#: includes/Frontend/Elementor/Search_Widget.php:829
+msgid "Title color"
+msgstr "Titelfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:834
+msgid "Title typography"
+msgstr "Titel-Typografie"
+
+#: includes/Frontend/Elementor/Search_Widget.php:838
+msgid "Price / meta color"
+msgstr "Farbe für Preis / Meta"
+
+#: includes/Frontend/Elementor/Search_Widget.php:843
+msgid "Price typography"
+msgstr "Preis-Typografie"
+
+#: includes/Frontend/Elementor/Search_Widget.php:851
+msgid "Price suffix / \"from\" typography"
+msgstr "Typografie für Preiszusatz / \"ab\""
+
+#: includes/Frontend/Elementor/Search_Widget.php:866
+#: src/blocks/search/edit.js:325
+msgid "Carousel"
+msgstr "Karussell"
+
+#: includes/Frontend/Elementor/Search_Widget.php:872
+#: src/blocks/search/edit.js:328
+msgid "Arrow color"
+msgstr "Pfeilfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:873
+#: src/blocks/search/edit.js:329
+msgid "Arrow background"
+msgstr "Pfeilhintergrund"
+
+#: includes/Frontend/Elementor/Search_Widget.php:874
+#: src/blocks/search/edit.js:330
+msgid "Dot color"
+msgstr "Punktfarbe"
+
+#: includes/Frontend/Elementor/Search_Widget.php:875
+#: src/blocks/search/edit.js:331
+msgid "Dot color (active)"
+msgstr "Punktfarbe (aktiv)"
+
+#: includes/Frontend/Frontend_Assets.php:199
+#: src/frontend/search/components/SearchModal.js:560
+#: src/frontend/search/components/SearchModal.js:715
+msgid "No results found."
+msgstr "Keine Ergebnisse gefunden."
+
+#: includes/Frontend/Frontend_Assets.php:200
+#: src/frontend/search/components/SearchModal.js:707
+msgid "Searching…"
+msgstr "Suche läuft …"
+
+#. translators: shown before a variable product's lowest price, e.g. "from €42".
+#: includes/Frontend/Frontend_Assets.php:202
+msgctxt "variable product price prefix"
+msgid "from"
+msgstr "ab"
+
+#: includes/Frontend/Frontend_Assets.php:203
+#: src/frontend/search/components/templates.js:115
+msgid "Sale"
+msgstr "Sale"
+
+#: includes/Frontend/Frontend_Assets.php:204
+#: src/frontend/search/components/SearchModal.js:406
+msgid "Search is unavailable right now."
+msgstr "Die Suche ist derzeit nicht verfügbar."
+
+#: includes/Frontend/Frontend_Assets.php:205
+#: src/frontend/search/components/Browse.js:42
+msgid "Recent searches"
+msgstr "Letzte Suchanfragen"
+
+#: includes/Frontend/Frontend_Assets.php:206
+#: src/admin/settings/components/tabs/SearchConfigTab.js:160
+#: src/admin/settings/components/tabs/SearchConfigTab.js:171
+#: src/frontend/search/components/Browse.js:76
+msgid "Popular searches"
+msgstr "Beliebte Suchanfragen"
+
+#: includes/Frontend/Frontend_Assets.php:207
+#: src/frontend/search/components/SearchInput.js:45
+msgid "Clear"
+msgstr "Löschen"
+
+#: includes/Frontend/Frontend_Assets.php:208
+#: src/frontend/search/components/SearchModal.js:624
+msgid "Close search"
+msgstr "Suche schließen"
+
+#: includes/Frontend/Frontend_Assets.php:209
+#: src/frontend/search/components/SearchModal.js:615
+msgid "Search by voice"
+msgstr "Per Sprache suchen"
+
+#: includes/Frontend/Frontend_Assets.php:210
+#: src/frontend/search/components/SearchModal.js:652
+msgid "All"
+msgstr "Alle"
+
+#: includes/Indexing/Index_Config.php:295
+msgid "Post title"
+msgstr "Beitragstitel"
+
+#: includes/Indexing/Index_Config.php:299
+msgid "Post content"
+msgstr "Beitragsinhalt"
+
+#: includes/Indexing/Index_Config.php:303
+#: src/admin/settings/components/tabs/IndexingTab.js:35
+msgid "Excerpt"
+msgstr "Auszug"
+
+#: includes/Indexing/Index_Config.php:307
+msgid "Permalink (URL)"
+msgstr "Permalink (URL)"
+
+#: includes/Indexing/Index_Config.php:311
+msgid "Featured image"
+msgstr "Beitragsbild"
+
+#: includes/Indexing/Index_Config.php:315
+#: src/admin/settings/components/tabs/IndexingTab.js:33
+msgid "Published date"
+msgstr "Veröffentlichungsdatum"
+
+#: includes/Indexing/Index_Config.php:319
+#: src/admin/settings/components/tabs/IndexingTab.js:32
+msgid "Author"
+msgstr "Autor"
+
+#: includes/Plugin.php:414
+msgid "webhead Search Cloud connection"
+msgstr "webhead Search Cloud-Verbindung"
+
+#: includes/Plugin.php:419
+#: includes/Plugin.php:443
+msgid "webhead Search Cloud is not connected yet"
+msgstr "webhead Search Cloud ist noch nicht verbunden"
+
+#: includes/Plugin.php:421
+msgid "Add your site ID, write key, and write secret on the Connection tab before syncing content."
+msgstr "Trage Website-ID, Write Key und Write Secret im Tab \"Verbindung\" ein, bevor du Inhalte synchronisierst."
+
+#: includes/Plugin.php:427
+msgid "webhead Search Cloud connection is configured"
+msgstr "webhead Search Cloud-Verbindung ist eingerichtet"
+
+#: includes/Plugin.php:429
+msgid "Connection credentials are saved."
+msgstr "Verbindungsdaten sind gespeichert."
+
+#: includes/Plugin.php:436
+msgid "webhead Search Cloud reachability"
+msgstr "Erreichbarkeit von webhead Search Cloud"
+
+#: includes/Plugin.php:445
+msgid "Connect the plugin on the Connection tab, then re-run this check."
+msgstr "Verbinde das Plugin im Tab \"Verbindung\" und führe diese Prüfung dann erneut aus."
+
+#: includes/Plugin.php:454
+msgid "webhead Search Cloud could not be reached"
+msgstr "webhead Search Cloud konnte nicht erreicht werden"
+
+#: includes/Plugin.php:456
+msgid "The health check to Search Cloud failed. Check the Connection tab and verify your credentials."
+msgstr "Der Health-Check zu Search Cloud ist fehlgeschlagen. Prüfe den Tab \"Verbindung\" und deine Zugangsdaten."
+
+#: includes/Plugin.php:462
+msgid "webhead Search Cloud is reachable"
+msgstr "webhead Search Cloud ist erreichbar"
+
+#: includes/Plugin.php:464
+msgid "The last health check succeeded."
+msgstr "Der letzte Health-Check war erfolgreich."
+
+#: includes/Plugin.php:471
+msgid "webhead Search Cloud indexing"
+msgstr "webhead Search Cloud-Indexierung"
+
+#: includes/Plugin.php:478
+msgid "No content types are enabled for indexing"
+msgstr "Keine Inhaltstypen sind für die Indexierung aktiviert"
+
+#: includes/Plugin.php:480
+msgid "Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send."
+msgstr "Aktiviere mindestens einen Beitragstyp oder WooCommerce-Produkte im Tab \"Indexierung\", damit die Synchronisierung etwas zu senden hat."
+
+#: includes/Plugin.php:486
+msgid "Content types are enabled for indexing"
+msgstr "Inhaltstypen sind für die Indexierung aktiviert"
+
+#. translators: %d: number of enabled content types.
+#: includes/Plugin.php:490
+#, php-format
+msgid "%d content type(s) are enabled for indexing."
+msgstr "%d Inhaltstyp(en) sind für die Indexierung aktiviert."
+
+#: includes/Plugin.php:502
+msgid "webhead Search Cloud language coverage"
+msgstr "Sprachabdeckung von webhead Search Cloud"
+
+#. translators: %d: number of posts skipped.
+#: includes/Plugin.php:514
+#, php-format
+msgid "%d post(s) were skipped from the last sync due to language"
+msgstr "%d Beitrag/Beiträge wurden bei der letzten Synchronisierung aufgrund der Sprache übersprungen"
+
+#: includes/Plugin.php:518
+msgid "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally."
+msgstr "Diese Beiträge sind in einer Sprache verfasst, die im Tab \"Sucheinstellungen\" nicht aktiviert ist. Aktiviere dort ihre Sprache, oder lasse sie absichtlich aus der Suche heraus."
+
+#: includes/Plugin.php:524
+msgid "No content was skipped due to language"
+msgstr "Es wurden keine Inhalte aufgrund der Sprache übersprungen"
+
+#: includes/Plugin.php:526
+msgid "Every indexable post is in an enabled language, or the site has not restricted languages."
+msgstr "Jeder indexierbare Beitrag ist in einer aktivierten Sprache, oder die Website hat keine Sprachen eingeschränkt."
+
+#: includes/Plugin.php:541
+msgid "webhead Search Cloud runtime"
+msgstr "webhead Search Cloud-Laufzeit"
+
+#: includes/Plugin.php:542
+msgid "Connection, indexing, and sync state for support and debugging. Credentials are never included."
+msgstr "Verbindungs-, Indexierungs- und Synchronisierungsstatus für Support und Fehlersuche. Zugangsdaten sind nie enthalten."
+
+#: includes/Plugin.php:552
+msgid "Connection configured"
+msgstr "Verbindung eingerichtet"
+
+#: includes/Plugin.php:553
+msgid "Indexable content types"
+msgstr "Indexierbare Inhaltstypen"
+
+#: includes/Plugin.php:554
+msgid "Sync history retention (days)"
+msgstr "Aufbewahrung des Sync-Verlaufs (Tage)"
+
+#: includes/Plugin.php:555
+msgid "Active sync run status"
+msgstr "Status des aktiven Sync-Laufs"
+
+#: includes/Plugin.php:556
+msgid "Delete data on uninstall"
+msgstr "Daten bei Deinstallation löschen"
+
+#: includes/Plugin.php:560
+msgid "WPML/Polylang active"
+msgstr "WPML/Polylang aktiv"
+
+#: includes/Plugin.php:561
+msgid "Enabled languages"
+msgstr "Aktivierte Sprachen"
+
+#: includes/Routing/Connection_Endpoint.php:61
+#: includes/Routing/Search_Config_Endpoint.php:74
+msgid "Could not reach Search Cloud."
+msgstr "Search Cloud konnte nicht erreicht werden."
+
+#: includes/Routing/Connection_Endpoint.php:104
+msgid "Invalid write credentials. Check the write key and secret."
+msgstr "Ungültige Write-Zugangsdaten. Prüfe Write Key und Write Secret."
+
+#: includes/Routing/Connection_Endpoint.php:105
+msgid "Site is disabled in Search Cloud."
+msgstr "Die Website ist in Search Cloud deaktiviert."
+
+#: includes/Routing/Connection_Endpoint.php:106
+msgid "No site found for these credentials."
+msgstr "Für diese Zugangsdaten wurde keine Website gefunden."
+
+#: includes/Routing/Connection_Endpoint.php:107
+#: src/admin/settings/components/tabs/ConnectionTab.js:112
+msgid "Connection failed."
+msgstr "Verbindung fehlgeschlagen."
+
+#: includes/Routing/Indexing_Endpoint.php:52
+msgid "Invalid indexing configuration payload."
+msgstr "Ungültige Nutzdaten für die Indexierungskonfiguration."
+
+#: includes/Routing/Search_Config_Endpoint.php:55
+msgid "Invalid search configuration payload."
+msgstr "Ungültige Nutzdaten für die Sucheinstellungen."
+
+#: includes/Routing/Settings_Endpoint.php:53
+msgid "Invalid settings payload."
+msgstr "Ungültige Nutzdaten für die Einstellungen."
+
+#: includes/Routing/Sync_Endpoint.php:99
+msgid "That run could not be deleted. The active run is protected."
+msgstr "Dieser Lauf konnte nicht gelöscht werden. Der aktive Lauf ist geschützt."
+
+#: includes/Routing/Sync_Endpoint.php:137
+#: includes/WP_CLI/Sync_Command.php:201
+msgid "That action is not available for the current run state."
+msgstr "Diese Aktion ist im aktuellen Status des Laufs nicht verfügbar."
+
+#: includes/Sync/Incremental_Service.php:186
+msgid "Incremental sync paused: your Search Cloud plan limit was reached."
+msgstr "Inkrementelle Synchronisierung pausiert: Dein Search Cloud-Tariflimit wurde erreicht."
+
+#: includes/Sync/Sync_Service.php:65
+msgid "Add and save your Search Cloud credentials before syncing."
+msgstr "Trage deine Search Cloud-Zugangsdaten ein und speichere sie, bevor du synchronisierst."
+
+#: includes/Sync/Sync_Service.php:74
+#: src/admin/settings/components/tabs/SyncTab.js:206
+msgid "No content types are enabled for indexing yet."
+msgstr "Es sind noch keine Inhaltstypen für die Indexierung aktiviert."
+
+#: includes/Sync/Sync_Service.php:81
+msgid "A sync is already in progress."
+msgstr "Es läuft bereits eine Synchronisierung."
+
+#: includes/Sync/Sync_Service.php:99
+msgid "Could not start the sync run."
+msgstr "Der Sync-Lauf konnte nicht gestartet werden."
+
+#. translators: 1: plan metric name, 2: plan limit.
+#: includes/Sync/Sync_Service.php:592
+#, php-format
+msgid "Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync."
+msgstr "Tariflimit für %1$s erreicht (Limit %2$s). Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
+
+#: includes/Sync/Sync_Service.php:598
+msgid "Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
+msgstr "Dein Search Cloud-Tariflimit wurde erreicht. Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
+
+#: includes/Sync/Sync_Service.php:603
+msgid "Could not reach Search Cloud. The sync is paused and will retry."
+msgstr "Search Cloud konnte nicht erreicht werden. Die Synchronisierung ist pausiert und wird erneut versucht."
+
+#. translators: %d: HTTP status code.
+#: includes/Sync/Sync_Service.php:608
+#, php-format
+msgid "Search Cloud returned an error (HTTP %d). The sync is paused and will retry."
+msgstr "Search Cloud hat einen Fehler zurückgegeben (HTTP %d). Die Synchronisierung ist pausiert und wird erneut versucht."
+
+#: includes/WP_CLI/Sync_Command.php:107
+#: includes/WP_CLI/Sync_Command.php:151
+msgid "Could not start the sync."
+msgstr "Die Synchronisierung konnte nicht gestartet werden."
+
+#: includes/WP_CLI/Sync_Command.php:131
+msgid "Sync completed."
+msgstr "Synchronisierung abgeschlossen."
+
+#: includes/WP_CLI/Sync_Command.php:154
+#: src/admin/settings/components/tabs/SyncTab.js:158
+msgid "Sync started."
+msgstr "Synchronisierung gestartet."
+
+#: includes/WP_CLI/Sync_Command.php:166
+msgid "Sync paused."
+msgstr "Synchronisierung pausiert."
+
+#: includes/WP_CLI/Sync_Command.php:178
+msgid "Sync resumed."
+msgstr "Synchronisierung fortgesetzt."
+
+#: includes/WP_CLI/Sync_Command.php:190
+msgid "Sync cancelled."
+msgstr "Synchronisierung abgebrochen."
+
+#: includes/WP_CLI/Sync_Command.php:197
+msgid "There is no active sync."
+msgstr "Es gibt keine aktive Synchronisierung."
+
+#: blocks/search/block.json
+msgctxt "block title"
+msgid "Search Cloud"
+msgstr "Search Cloud"
+
+#: blocks/search/block.json
+msgctxt "block description"
+msgid "A full-screen search box or icon powered by webhead Search Cloud."
+msgstr "Ein Vollbild-Suchfeld oder -Symbol, angetrieben von webhead Search Cloud."
+
+#: includes/Settings/Plugin_Settings.php:177
+msgid "Keep history for (days)"
+msgstr "Sync-Verlauf aufbewahren für (Tage)"
+
+#: includes/Settings/Plugin_Settings.php:178
+msgid "How long finished sync runs are kept. Use 0 to keep them forever."
+msgstr "Wie lange abgeschlossene Sync-Läufe aufbewahrt werden. 0 verwenden, um sie dauerhaft zu behalten."
+
+#: includes/Settings/Plugin_Settings.php:181
+msgid "Delete plugin data on uninstall"
+msgstr "Plugin-Daten bei Deinstallation löschen"
+
+#: includes/Settings/Plugin_Settings.php:182
+msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud."
+msgstr "Wenn aktiviert, entfernt das Löschen dieses Plugins auch dessen Einstellungen, Sync-Tabellen und Beitrags-Sync-Metadaten von dieser Website. Bereits an Search Cloud gesendete Dokumente werden dabei nie gelöscht."

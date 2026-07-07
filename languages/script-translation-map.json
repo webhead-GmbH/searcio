@@ -1,0 +1,50 @@
+{
+    "src/admin/settings/components/SettingsPanel.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/CacheClearCard.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/ConnectionTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/IndexingTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/SearchConfigTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/SettingsGroupTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/SyncHistory.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/SyncTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/settings/store/provider.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/blocks/search/edit.js": [
+        "public/bundle.search-block-editor.js"
+    ],
+    "src/frontend/search/components/Browse.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/Carousel.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/SearchInput.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/SearchModal.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/Suggestions.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/templates.js": [
+        "public/bundle.search.js"
+    ]
+}

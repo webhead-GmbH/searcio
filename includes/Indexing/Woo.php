@@ -1,0 +1,289 @@
+<?php
+/**
+ * WooCommerce indexing helper.
+ *
+ * WooCommerce is a *soft* dependency: every entry point is guarded so the plugin
+ * never fatals when WooCommerce is inactive or below the minimum version. All
+ * product data is read through `wc_get_product()` (not raw meta). Variable
+ * products are indexed as the parent only — price becomes a range and the
+ * variation SKUs are collected into a searchable `skus` array.
+ *
+ * @author    Mir Mohammad Hosseini <mh@webhead.dev>
+ * @copyright 2026 webhead GmbH
+ */
+
+declare( strict_types=1 );
+
+namespace Webhead\WP\SearchCloud\Indexing;
+
+use WP_Post;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * @since 1.0.0
+ */
+final class Woo {
+	public const MIN_VERSION = '8.0';
+	public const POST_TYPE   = 'product';
+
+	public function is_active(): bool {
+		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
+	}
+
+	public function version(): string {
+		if ( defined( 'WC_VERSION' ) ) {
+			return (string) WC_VERSION;
+		}
+
+		return '';
+	}
+
+	public function meets_minimum(): bool {
+		$version = $this->version();
+
+		return '' !== $version && version_compare( $version, self::MIN_VERSION, '>=' );
+	}
+
+	/**
+	 * Global `pa_*` taxonomies and their WC labels, so the admin can choose
+	 * which to push as `attr_{slug}` fields.
+	 *
+	 * @return array<int,array{slug:string,label:string}>
+	 */
+	public function attributes(): array {
+		if ( ! $this->is_active() || ! function_exists( 'wc_get_attribute_taxonomies' ) ) {
+			return [];
+		}
+
+		$out = [];
+
+		foreach ( wc_get_attribute_taxonomies() as $attribute ) {
+			$name = isset( $attribute->attribute_name ) ? (string) $attribute->attribute_name : '';
+
+			if ( '' === $name ) {
+				continue;
+			}
+
+			$slug  = function_exists( 'wc_attribute_taxonomy_name' ) ? wc_attribute_taxonomy_name( $name ) : 'pa_' . $name;
+			$label = isset( $attribute->attribute_label ) && '' !== $attribute->attribute_label
+				? (string) $attribute->attribute_label
+				: $name;
+
+			$out[] = [
+				'slug'  => $slug,
+				'label' => $label,
+			];
+		}
+
+		return $out;
+	}
+
+	public function is_visible_product( WP_Post $post ): bool {
+		if ( ! $this->is_active() ) {
+			return false;
+		}
+
+		$product = wc_get_product( $post->ID );
+
+		if ( ! $product ) {
+			return false;
+		}
+
+		return $product->is_visible();
+	}
+
+	/**
+	 * Returns an empty array when WooCommerce is inactive.
+	 *
+	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
+	 * @return array<string,mixed>
+	 */
+	public function product_fields( WP_Post $post, array $woo ): array {
+		if ( ! $this->is_active() ) {
+			return [];
+		}
+
+		$product = wc_get_product( $post->ID );
+
+		if ( ! $product ) {
+			return [];
+		}
+
+		$is_variable = $product->is_type( 'variable' );
+		$fields      = [];
+
+		if ( ! empty( $woo['price'] ) ) {
+			$fields += $this->price_fields( $product, $is_variable, ! empty( $woo['regular_sale'] ) );
+		}
+
+		if ( ! empty( $woo['sku'] ) ) {
+			$sku = (string) $product->get_sku();
+
+			if ( '' !== $sku ) {
+				$fields['sku'] = $sku;
+			}
+		}
+
+		if ( ! empty( $woo['skus'] ) && $is_variable ) {
+			$skus = $this->variation_skus( $product );
+
+			if ( [] !== $skus ) {
+				$fields['skus'] = $skus;
+			}
+		}
+
+		if ( ! empty( $woo['stock_status'] ) ) {
+			$fields['stock_status'] = (string) $product->get_stock_status();
+			$fields['in_stock']     = $product->is_in_stock();
+		}
+
+		if ( ! empty( $woo['categories'] ) ) {
+			$categories = $this->term_names( $post, 'product_cat' );
+
+			if ( [] !== $categories ) {
+				$fields['categories'] = $categories;
+			}
+		}
+
+		if ( ! empty( $woo['tags'] ) ) {
+			$tags = $this->term_names( $post, 'product_tag' );
+
+			if ( [] !== $tags ) {
+				$fields['product_tags'] = $tags;
+			}
+		}
+
+		if ( ! empty( $woo['featured'] ) ) {
+			$fields['featured'] = $product->is_featured();
+		}
+
+		if ( ! empty( $woo['rating'] ) ) {
+			$fields['rating'] = (float) $product->get_average_rating();
+		}
+
+		if ( ! empty( $woo['review_count'] ) ) {
+			$fields['review_count'] = (int) $product->get_review_count();
+		}
+
+		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
+
+		foreach ( $attributes as $taxonomy ) {
+			$taxonomy = (string) $taxonomy;
+			$values   = $this->term_names( $post, $taxonomy );
+
+			if ( [] !== $values ) {
+				$fields[ 'attr_' . $this->attribute_key( $taxonomy ) ] = $values;
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * @return array<string,mixed>
+	 */
+	private function price_fields( $product, bool $is_variable, bool $with_regular_sale ): array {
+		if ( $is_variable && method_exists( $product, 'get_variation_prices' ) ) {
+			$prices = $product->get_variation_prices( true );
+			$active = is_array( $prices['price'] ?? null ) ? array_map( 'floatval', $prices['price'] ) : [];
+
+			if ( [] === $active ) {
+				return [];
+			}
+
+			return [
+				'price'        => min( $active ),
+				'price_min'    => min( $active ),
+				'price_max'    => max( $active ),
+				'product_type' => 'variable',
+				// A variable product is "on sale" if any variation is.
+				'on_sale'      => $product->is_on_sale(),
+			];
+		}
+
+		$price = $product->get_price();
+
+		if ( '' === $price || null === $price ) {
+			return [];
+		}
+
+		$fields = [
+			'price'        => (float) $price,
+			'product_type' => 'simple',
+			'on_sale'      => $product->is_on_sale(),
+		];
+
+		if ( $with_regular_sale ) {
+			$regular = $product->get_regular_price();
+			$sale    = $product->get_sale_price();
+
+			if ( '' !== $regular && null !== $regular ) {
+				$fields['regular_price'] = (float) $regular;
+			}
+
+			if ( '' !== $sale && null !== $sale ) {
+				$fields['sale_price'] = (float) $sale;
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * @return array<int,string>
+	 */
+	private function variation_skus( $product ): array {
+		$skus = [];
+
+		foreach ( $product->get_children() as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+
+			if ( ! $variation ) {
+				continue;
+			}
+
+			$sku = (string) $variation->get_sku();
+
+			if ( '' !== $sku ) {
+				$skus[] = $sku;
+			}
+		}
+
+		return array_values( array_unique( $skus ) );
+	}
+
+	/**
+	 * @return array<int,string>
+	 */
+	private function term_names( WP_Post $post, string $taxonomy ): array {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return [];
+		}
+
+		$terms = get_the_terms( $post, $taxonomy );
+
+		if ( ! is_array( $terms ) ) {
+			return [];
+		}
+
+		return array_values(
+			array_filter(
+				array_map(
+					static fn( $term ): string => isset( $term->name ) ? (string) $term->name : '',
+					$terms
+				),
+				static fn( string $name ): bool => '' !== $name
+			)
+		);
+	}
+
+	/**
+	 * Reduce a `pa_color` taxonomy to a stable `color` field-name fragment.
+	 */
+	private function attribute_key( string $taxonomy ): string {
+		$key = str_starts_with( $taxonomy, 'pa_' ) ? substr( $taxonomy, 3 ) : $taxonomy;
+
+		return sanitize_key( $key );
+	}
+}

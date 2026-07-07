@@ -1,0 +1,189 @@
+/**
+ * Per-type result card renderers, shared by the highlights and search-results
+ * carousels. `window.webheadSearchCloudSearch.registerTemplate` lets a theme
+ * or plugin override or add a per-type template client-side.
+ */
+import { __ } from '@wordpress/i18n';
+
+import { getConfig } from '../../../utils/api';
+import { formatPrice } from '../../../utils/currency';
+import { matchTemplate, ServerCard } from './serverCards';
+
+/**
+ * The price line for a product card: strikethrough regular + sale price when
+ * on sale, a compact "from {min}" for variable products (the full range would
+ * overflow a card), otherwise the single price — each followed by the store's
+ * small price suffix (e.g. "inkl. MwSt. zzgl. Versandkosten"). All formatting
+ * comes from indexed structured fields + the localized currency config, so
+ * card prices track the store without embedding server HTML.
+ *
+ * @param {Object} props
+ * @param {Object} props.source
+ */
+const PriceLine = ( { source } ) => {
+	const config = getConfig();
+	const i18n = config.i18n || {};
+	const suffix = config.currency?.suffix || '';
+	const isVariable = 'variable' === source.product_type || ( source.price_min !== undefined && source.price_min !== source.price_max );
+	const onSale = Boolean( source.on_sale ) && source.regular_price !== undefined && source.sale_price !== undefined;
+
+	let body;
+
+	if ( isVariable ) {
+		const min = formatPrice( source.price_min ?? source.price );
+
+		if ( '' === min ) {
+			return null;
+		}
+
+		body = (
+			<>
+				<span className="whsc-card__price-from">{ i18n.priceFrom || __( 'from', 'webhead-search-cloud' ) }</span>{ ' ' }
+				<span className="whsc-card__price-current">{ min }</span>
+			</>
+		);
+	} else if ( onSale ) {
+		body = (
+			<>
+				<del className="whsc-card__price-regular">{ formatPrice( source.regular_price ) }</del>{ ' ' }
+				<ins className="whsc-card__price-current">{ formatPrice( source.sale_price ) }</ins>
+			</>
+		);
+	} else {
+		const current = formatPrice( source.price );
+
+		if ( '' === current ) {
+			return null;
+		}
+
+		body = <span className="whsc-card__price-current">{ current }</span>;
+	}
+
+	return (
+		<span className="whsc-card__price">
+			{ body }
+			{ suffix && <small className="whsc-card__price-suffix">{ suffix }</small> }
+		</span>
+	);
+};
+
+/**
+ * Image, or a neutral placeholder with an image glyph so image-less products
+ * don't leave a ragged, uneven card layout.
+ *
+ * @param {Object} props
+ * @param {string} [props.src]
+ */
+const CardImage = ( { src } ) => {
+	if ( src ) {
+		return <img className="whsc-card__image" src={ src } alt="" loading="lazy" draggable="false" />;
+	}
+
+	return (
+		<span className="whsc-card__image whsc-card__image--placeholder" aria-hidden="true">
+			<svg viewBox="0 0 24 24" width="32" height="32" focusable="false">
+				<path
+					fill="currentColor"
+					d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"
+				/>
+			</svg>
+		</span>
+	);
+};
+
+const StockStatus = ( { inStock } ) => {
+	if ( undefined === inStock ) {
+		return null;
+	}
+
+	return (
+		<span className={ `whsc-card__stock ${ inStock ? 'is-in-stock' : 'is-out-of-stock' }` }>
+			{ inStock ? __( 'In stock', 'webhead-search-cloud' ) : __( 'Out of stock', 'webhead-search-cloud' ) }
+		</span>
+	);
+};
+
+const ProductCard = ( { hit } ) => {
+	const source = hit.source || {};
+	const i18n = getConfig().i18n || {};
+
+	return (
+		<a className="whsc-card whsc-card--product" href={ source.url || '#' }>
+			<span className="whsc-card__media">
+				<CardImage src={ source.image } />
+				{ Boolean( source.on_sale ) && (
+					<span className="whsc-card__badge">{ i18n.onSale || __( 'Sale', 'webhead-search-cloud' ) }</span>
+				) }
+			</span>
+			<span className="whsc-card__body">
+				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
+				<PriceLine source={ source } />
+				<StockStatus inStock={ source.in_stock } />
+			</span>
+		</a>
+	);
+};
+
+const PostCard = ( { hit } ) => {
+	const source = hit.source || {};
+
+	return (
+		<a className="whsc-card whsc-card--post" href={ source.url || '#' }>
+			<CardImage src={ source.image } />
+			<span className="whsc-card__body">
+				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
+				{ source.content && (
+					<span className="whsc-card__excerpt">{ String( source.content ).slice( 0, 120 ) }</span>
+				) }
+				{ source.date && <span className="whsc-card__date">{ source.date }</span> }
+			</span>
+		</a>
+	);
+};
+
+const GenericCard = ( { hit } ) => {
+	const source = hit.source || {};
+
+	return (
+		<a className="whsc-card whsc-card--generic" href={ source.url || '#' }>
+			<CardImage src={ source.image } />
+			<span className="whsc-card__body">
+				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
+			</span>
+		</a>
+	);
+};
+
+const templates = {
+	product: ProductCard,
+	post: PostCard,
+};
+
+export const registerTemplate = ( type, Component ) => {
+	if ( typeof type === 'string' && typeof Component === 'function' ) {
+		templates[ type ] = Component;
+	}
+};
+
+/**
+ * @param {Object}         props
+ * @param {Object}         props.hit
+ * @param {string}         [props.cardSource]      'server' to prefer a Search
+ *                                                  Cloud-designed template.
+ * @param {Array<Object>}  [props.serverTemplates]  Fetched once per modal
+ *                                                   session by the caller.
+ */
+export const ResultCard = ( { hit, cardSource, serverTemplates } ) => {
+	if ( 'server' === cardSource && Array.isArray( serverTemplates ) && serverTemplates.length > 0 ) {
+		const template = matchTemplate( serverTemplates, hit );
+
+		if ( template ) {
+			return <ServerCard hit={ hit } template={ template } />;
+		}
+	}
+
+	const type = hit?.source?.type;
+	const Template = ( type && templates[ type ] ) || GenericCard;
+
+	return <Template hit={ hit } />;
+};

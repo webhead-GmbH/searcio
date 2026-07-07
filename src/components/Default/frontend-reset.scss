@@ -1,0 +1,523 @@
+// Webhead scaffold managed file. scaffold:update may refresh this file.
+//
+// Import this file from frontend-only React entrypoints that render WordPress
+// components outside wp-admin. Do not import it from unrelated pages.
+//
+// Keep this reset unlayered. Elementor, themes, and page builders usually emit
+// unlayered CSS, and unlayered declarations outrank normal declarations inside
+// @layer even when the layered CSS is loaded later.
+
+[data-webhead-frontend-root],
+body:has([data-webhead-frontend-root]) {
+	--wp-admin-theme-color: #319b80;
+	--wp-admin-theme-color--rgb: 49, 155, 128;
+	--wp-admin-theme-color-darker-10: #1d594a;
+	--wp-admin-theme-color-darker-10--rgb: 29, 89, 74;
+	--wp-admin-theme-color-darker-20: #16483c;
+	--wp-admin-theme-color-darker-20--rgb: 22, 72, 60;
+	--wp-components-color-accent: var(--wp-admin-theme-color);
+	--wp-components-color-accent-darker-10: var(--wp-admin-theme-color-darker-10);
+	--wp-components-color-accent-darker-20: var(--wp-admin-theme-color-darker-20);
+	--wpds-color-stroke-focus: var(--wp-admin-theme-color);
+	--wpds-color-stroke-surface-brand: color-mix(in oklch,var(--wp-admin-theme-color,#319b80) 40%,#fff);
+	--wpds-color-background-interactive-brand-weak-active: color-mix(in oklch,var(--wp-admin-theme-color,#319b80) 12%,#fff);
+}
+
+[data-webhead-frontend-root] {
+	box-sizing: border-box;
+	color: var(--wpds-color-foreground-content-neutral);
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-md);
+	min-width: 0;
+	text-size-adjust: 100%;
+}
+
+[data-webhead-frontend-root],
+[data-webhead-frontend-root] *,
+[data-webhead-frontend-root] *::before,
+[data-webhead-frontend-root] *::after {
+	box-sizing: border-box;
+}
+
+[data-webhead-frontend-root] :is(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+	margin-block: 0;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(button, input, optgroup, select, textarea) {
+	color: inherit;
+	font: inherit;
+	letter-spacing: inherit;
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(button, [role='button'], [role='tab'], a) {
+	touch-action: manipulation;
+}
+
+[data-webhead-frontend-root] :is(img, video, canvas) {
+	display: block;
+	max-width: 100%;
+}
+
+[data-webhead-frontend-root] svg {
+	max-width: 100%;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(.components-button, [role='tab']) {
+	appearance: none;
+	font-family: var(--wpds-typography-font-family-body);
+	text-decoration: none;
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button {
+	border: 0;
+	border-color: transparent;
+	border-radius: var(--wpds-border-radius-sm);
+	background: transparent;
+	box-shadow: none;
+	color: var(--wpds-color-foreground-interactive-neutral);
+	text-shadow: none;
+	transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button svg {
+	fill: currentColor;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button:hover:not(:disabled, [aria-disabled='true']) {
+	color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button:active:not(:disabled, [aria-disabled='true']) {
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
+	color: var(--wpds-color-foreground-interactive-neutral-active);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button:focus:not(:active) {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent);
+	outline: 2px solid transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary {
+	background: var(--wp-components-color-accent);
+	color: var(--wpds-color-foreground-interactive-brand-strong);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary:hover:not(:disabled, [aria-disabled='true']) {
+	background: var(--wp-components-color-accent-darker-10);
+	color: var(--wpds-color-foreground-interactive-brand-strong);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary:active:not(:disabled, [aria-disabled='true']) {
+	background: var(--wp-components-color-accent-darker-20);
+	color: var(--wpds-color-foreground-interactive-brand-strong-active);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary {
+	background: transparent;
+	box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wp-components-color-accent);
+	color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary:hover:not(:disabled, [aria-disabled='true']) {
+	background: color-mix(in srgb, var(--wp-components-color-accent) 4%, transparent);
+	box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wp-components-color-accent-darker-20);
+	color: var(--wp-components-color-accent-darker-20);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link {
+	background: transparent;
+	color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary:hover:not(:disabled, [aria-disabled='true']),
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link:hover:not(:disabled, [aria-disabled='true']) {
+	background: color-mix(in srgb, var(--wp-components-color-accent) 4%, transparent);
+	color: var(--wp-components-color-accent-darker-20);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-pressed:not(:disabled, [aria-disabled='true']) {
+	background: var(--wpds-color-background-interactive-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] [role='tab'] {
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	color: inherit;
+	cursor: var(--wpds-cursor-control);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] [role='tab'] > svg[class*='tab-chevron'] {
+	display: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] [role='tab']:focus-visible {
+	outline: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.components-search-control input[type='search'],
+	.dataviews-search input[type='search'],
+	.dataviews-filters__search-widget-filter-combobox__input
+) {
+	appearance: none;
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	box-shadow: 0 0 0 transparent;
+	color: var(--wpds-color-foreground-content-neutral);
+	outline: 2px solid transparent;
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.components-search-control input[type='search'],
+	.dataviews-search input[type='search'],
+	.dataviews-filters__search-widget-filter-combobox__input
+):focus {
+	border-color: var(--wp-admin-theme-color);
+	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
+	outline: 2px solid transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.components-text-control__input,
+	.components-textarea-control__input,
+	.components-input-control__input,
+	.components-select-control__input
+) {
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: 0 0 0 transparent;
+	color: var(--wpds-color-foreground-content-neutral);
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.components-text-control__input,
+	.components-textarea-control__input,
+	.components-input-control__input,
+	.components-select-control__input
+):focus {
+	border-color: var(--wp-components-color-accent);
+	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent);
+	outline: 2px solid transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__backdrop {
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	box-shadow: 0 0 0 transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container:focus-within .components-input-control__backdrop {
+	border-color: var(--wp-components-color-accent);
+	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	input.components-text-control__input,
+	textarea.components-textarea-control__input,
+	select.components-select-control__input
+) {
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: 0 0 0 transparent;
+	color: var(--wpds-color-foreground-content-neutral);
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	input.components-text-control__input,
+	input.components-input-control__input,
+	textarea.components-textarea-control__input,
+	select.components-select-control__input
+):focus {
+	border-color: var(--wp-components-color-accent);
+	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent);
+	outline: 2px solid transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container .components-input-control__input {
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container:focus-within .components-input-control__input {
+	box-shadow: none;
+	outline: 0;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] input.components-range-control__slider[type='range'] {
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	accent-color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control .components-h-stack {
+	align-items: center;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input-container {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--checkbox-input-size, 16px);
+	height: var(--wpds-typography-line-height-sm);
+	margin: 0 var(--wpds-dimension-gap-sm) 0 0;
+	line-height: 0;
+	vertical-align: middle;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'] {
+	appearance: none;
+	display: inline-block;
+	position: relative;
+	flex-shrink: 0;
+	width: var(--checkbox-input-size, 16px);
+	height: var(--checkbox-input-size, 16px);
+	min-width: var(--checkbox-input-size, 16px);
+	max-width: var(--checkbox-input-size, 16px);
+	margin: 0;
+	padding: 0;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: 0 0 0 transparent;
+	clear: none;
+	color: var(--wpds-color-foreground-content-neutral);
+	line-height: normal;
+	vertical-align: middle;
+	accent-color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__label {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--wpds-typography-line-height-sm);
+	line-height: var(--wpds-typography-line-height-sm);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']::before {
+	content: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:hover:not(:disabled) {
+	border-color: var(--wpds-color-stroke-interactive-neutral-active);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:focus {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-components-color-accent);
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:checked,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'][aria-checked='mixed'] {
+	background: var(--wp-components-color-accent);
+	border-color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-selection-checkbox .components-checkbox-control__input[type='checkbox'] {
+	margin: 0;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__option {
+	display: inline-flex;
+	align-items: center;
+	min-height: var(--wpds-typography-line-height-sm);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio'] {
+	appearance: none;
+	position: relative;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	min-width: 16px;
+	margin: 0 var(--wpds-dimension-gap-sm) 0 0;
+	padding: 0;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+	border-radius: 50%;
+	background: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: 0 0 0 transparent;
+	accent-color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:checked {
+	border-color: var(--wp-components-color-accent);
+	background: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:checked::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 6px;
+	height: 6px;
+	margin: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--wpds-color-foreground-interactive-brand-strong);
+	transform: translate(-50%, -50%);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:focus {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-components-color-accent);
+	outline: 2px solid transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.dataviews-filters__search-widget-listitem-single-selection,
+	.dataviews-filters__search-widget-listitem-multi-selection
+) {
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	box-shadow: 0 0 0 transparent;
+	accent-color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.dataviews-filters__search-widget-listitem-single-selection,
+	.dataviews-filters__search-widget-listitem-multi-selection
+):is(:hover, :focus) {
+	border-color: var(--wp-components-color-accent);
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-components-color-accent);
+	outline: 2px solid transparent;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+	.dataviews-filters__search-widget-listitem-single-selection,
+	.dataviews-filters__search-widget-listitem-multi-selection
+):is(:checked, .is-selected, [aria-checked='true']) {
+	background: var(--wp-components-color-accent);
+	border-color: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-list .dataviews-view-list__item {
+	appearance: none;
+	border: 0;
+	border-radius: var(--wpds-border-radius-sm);
+	background: none;
+	box-shadow: none;
+	color: inherit;
+	padding: 0;
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-list .dataviews-view-list__item:is(:hover, :focus, :active) {
+	background: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table {
+	border: 0;
+	border-collapse: collapse;
+	background: inherit;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table :is(th, td) {
+	border: 0;
+	background: inherit;
+	box-shadow: none;
+	padding: var(--wpds-dimension-padding-md);
+	text-transform: none;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table tr :is(th, td):first-child {
+	padding-left: var(--wpds-dimension-padding-2xl);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table tr :is(th, td):last-child {
+	padding-right: var(--wpds-dimension-padding-2xl);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table :is(th, td).dataviews-view-table__checkbox-column {
+	padding-right: 0;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table tbody :is(th, td) {
+	background: transparent;
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) {
+	color: var(--wpds-color-foreground-content-neutral);
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
+	text-transform: none;
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item) {
+	appearance: none;
+	border-radius: var(--wpds-border-radius-sm);
+	box-shadow: none;
+	font: inherit;
+	letter-spacing: 0;
+	text-shadow: none;
+	text-transform: none;
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], .components-button, .components-item, .components-toggle-group-control-option-base) {
+	background: transparent;
+	border-color: transparent;
+	color: var(--wpds-color-foreground-interactive-neutral);
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) .components-toggle-group-control-option-base {
+	min-height: var(--wpds-dimension-size-md);
+	padding: 0 var(--wpds-dimension-padding-md);
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) button[class*='isIconStyles'] {
+	min-width: var(--wpds-dimension-size-md);
+	padding: 0;
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) .components-item {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	min-height: var(--wpds-dimension-size-md);
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item):hover {
+	background: var(--wpds-color-background-interactive-neutral-weak-active);
+	color: var(--wpds-color-foreground-interactive-neutral-active);
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is([aria-pressed='true'], [aria-checked='true'], [data-active-item='true'], [class*='pressed-buttonView']) {
+	background: var(--wpds-color-background-interactive-neutral-strong);
+	border-color: var(--wpds-color-background-interactive-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}
+
+body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item):focus-visible {
+	outline: 2px solid transparent;
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-base-control {
+	margin-block-end: 0;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-base-control__help {
+	margin-block-end: 0;
+}
+
+[data-webhead-frontend-root] :focus-visible {
+	outline: var(--wpds-border-width-sm) solid var(--wp-admin-theme-color);
+	outline-offset: var(--wpds-dimension-padding-xs);
+}
