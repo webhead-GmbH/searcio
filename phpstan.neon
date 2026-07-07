@@ -1,6 +1,20 @@
 parameters:
-    level: 5
+    level: max
     paths:
-        - includes
-    scanDirectories:
-        - vendor
+        - .
+    excludePaths:
+        - ./includes/Dependencies/*
+        - ./includes/classes/*
+        - ./languages/*
+        - ./node_modules/*
+        - ./phpcs-sniffs/*
+        - ./public/*
+        - ./src/*
+        - ./tests/*
+        - ./vendor/*
+    fileExtensions:
+        - php
+    ignoreErrors:
+        - identifier: constant.notFound
+    dynamicConstantNames:
+        - WEBHEADSEARCHCLOUDE_PLATFORM
