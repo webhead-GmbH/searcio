@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        bootstrap="tests/Integration/bootstrap.php"
+        backupGlobals="false"
+        colors="true"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd">
+    <!--
+        WordPress + database integration suite. Boots a real WordPress through
+        wp-phpunit and is meant to run inside the wp-env `tests-cli` container:
+
+            npm run test:integration
+
+        The fast, DB-free unit suite lives in tests/Unit (phpunit.xml.dist).
+    -->
+    <testsuites>
+        <testsuite name="integration">
+            <directory suffix="Test.php">tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
