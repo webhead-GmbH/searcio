@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- Fixed a sync that could stay stuck on "Running" when its background worker stopped (WP-Cron disabled, no site traffic, or a tick killed mid-run). Pause, resume, and cancel now detect a dead worker and act on the run directly instead of parking a control signal no live tick will ever read; cancelling also clears any stray scheduled tick and frees the active slot so a new sync can start.
+- Added a wp-env integration test suite (activation, the sync REST endpoint, and the full start/tick/complete and dead-worker recovery workflows) alongside the existing unit tests.
+
 ## 1.0.0
 
 Initial release.

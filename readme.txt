@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -49,6 +49,10 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
    anywhere on your site.
 
 == Changelog ==
+
+= 1.0.1 =
+
+- Fixed a sync that could stay stuck on "Running" when its background worker stopped (WP-Cron disabled, no site traffic, or a tick killed mid-run). Pause, resume, and cancel now recover the run directly instead of waiting on a worker that will never respond, so a new sync can be started again.
 
 = 1.0.0 =
 

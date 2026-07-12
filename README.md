@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-    <img alt="Plugin version" src="https://img.shields.io/badge/plugin-v1.0.0-blue?style=for-the-badge">
+    <img alt="Plugin version" src="https://img.shields.io/badge/plugin-v1.0.1-blue?style=for-the-badge">
     <img alt="Required PHP version" src="https://img.shields.io/badge/php-%3E%3D8.3-blue?style=for-the-badge&logo=php&logoColor=white">
     <img alt="WordPress tested up version" src="https://img.shields.io/badge/wordpress-v7.0.0_tested-green?style=for-the-badge&logo=wordpress&logoColor=white">
 </p>
