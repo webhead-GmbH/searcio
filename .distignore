@@ -21,6 +21,8 @@ composer.lock
 package.json
 package-lock.json
 phpunit.xml
+phpunit.xml.dist
+phpunit-integration.xml.dist
 phpstan.neon
 phpcs.xml
 webpack.config.js
