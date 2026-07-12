@@ -43,6 +43,16 @@ final class Sync_Service {
 	private const BACKOFF_DELAY        = 60;
 	private const PRUNE_PER_TICK       = 100;
 
+	/**
+	 * How long a scheduled tick may be overdue before the worker is treated as
+	 * dead. A healthy run reschedules itself within {@see self::BACKOFF_DELAY}
+	 * seconds, so anything past that plus a margin means WP-Cron is not firing
+	 * (DISABLE_WP_CRON, no site traffic) or a fatal killed the tick. Operator
+	 * control actions must then act directly instead of parking a between-batch
+	 * signal that no live tick will ever read.
+	 */
+	private const STALE_TICK_GRACE = 120;
+
 	public function __construct(
 		private Index_Config $config,
 		private Document_Builder $builder,
@@ -225,7 +235,15 @@ final class Sync_Service {
 			return false;
 		}
 
-		$this->state->request_control( $id, Sync_Control::Pause );
+		// A live tick honours the signal cleanly at the next batch boundary. If
+		// the worker is dead (cron not firing, or a fatal killed the tick) no
+		// tick will ever read that signal, so pause the run directly — the cursor
+		// is already persisted, so a later resume continues where it left off.
+		if ( $this->worker_alive() ) {
+			$this->state->request_control( $id, Sync_Control::Pause );
+		} else {
+			$this->state->set_status( $id, Sync_Status::Paused );
+		}
 
 		return true;
 	}
@@ -252,16 +270,32 @@ final class Sync_Service {
 			return false;
 		}
 
-		// A paused/queued run has no tick in flight to honour the signal, so finish
-		// it directly; a running run stops cleanly at the next batch boundary.
-		if ( Sync_Status::Running === $status ) {
+		// A running run with a live tick stops cleanly at the next batch boundary
+		// via the control signal. A paused/queued run — or a running run whose
+		// tick worker is dead (cron not firing, a fatal killed it) — has no tick
+		// in flight to honour that signal, so finish it directly: clear any stray
+		// scheduled tick and free the single active slot so a new sync can start.
+		if ( Sync_Status::Running === $status && $this->worker_alive() ) {
 			$this->state->request_control( $id, Sync_Control::Cancel );
 		} else {
+			$this->jobs->unschedule( Sync_Keys::HOOK_TICK );
 			$this->cleanup_options();
 			$this->state->finish( $id, Sync_Status::Cancelled );
 		}
 
 		return true;
+	}
+
+	/**
+	 * Is a tick worker demonstrably advancing the active run? True only when a
+	 * tick is scheduled and not badly overdue. A scheduled-but-long-overdue tick
+	 * means WP-Cron is not firing, so the run is effectively stuck and control
+	 * actions must act directly rather than wait for a between-batch signal.
+	 */
+	private function worker_alive(): bool {
+		$next = $this->jobs->next_run( Sync_Keys::HOOK_TICK );
+
+		return false !== $next && $next > time() - self::STALE_TICK_GRACE;
 	}
 
 	public function apply_retention(): void {
