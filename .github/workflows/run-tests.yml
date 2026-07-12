@@ -10,6 +10,10 @@ jobs:
     name: Execute Unit Tests (PHP ${{ matrix.php }}, WP ${{ matrix.wp }})
     runs-on: ubuntu-latest
 
+    # Needed by `composer install` to pull the private wp-plugin-framework via VCS.
+    env:
+      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
     strategy:
       matrix:
         php: [ "8.4", "8.3" ]
