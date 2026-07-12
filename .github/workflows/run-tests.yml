@@ -82,29 +82,18 @@ jobs:
 
       -   name: Wait for tests-cli and database to be ready
           run: |
-            set -euo pipefail
-            ready=false
-            wp_env_path="$(npm run wp-env --silent -- install-path | head -n 1)"
-            compose_file="${wp_env_path}/docker-compose.yml"
-
-            for i in {1..30}; do
-              if docker compose -f "${compose_file}" ps --status running --services tests-cli | grep -qx tests-cli \
-                && npm run wp-env -- run tests-cli wp db check; then
-                ready=true
-                break
+            set -uo pipefail
+            for i in $(seq 1 30); do
+              if npm run wp-env -- run tests-cli wp db check; then
+                echo "tests-cli and MySQL are ready."
+                exit 0
               fi
-
               echo "Waiting for tests-cli and MySQL… ($i/30)"
-              docker compose -f "${compose_file}" ps
               sleep 5
             done
-
-            if [ "${ready}" != "true" ]; then
-              echo "::error::tests-cli or MySQL did not become ready."
-              docker compose -f "${compose_file}" ps
-              docker compose -f "${compose_file}" logs --tail=100 tests-cli tests-wordpress tests-mysql || true
-              exit 1
-            fi
+            echo "::error::tests-cli or MySQL did not become ready."
+            npm run wp-env -- run tests-cli wp db check || true
+            exit 1
 
       -   name: Run PHPUnit unit suite
           run: npm run test:unit
