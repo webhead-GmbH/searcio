@@ -102,8 +102,15 @@ jobs:
               exit 1
             fi
 
-      -   name: Run PHPUnit
+      -   name: Run PHPUnit unit suite
           run: npm run test:unit
+
+      # The wp-phpunit test framework targets current WordPress, so the
+      # integration suite runs on WP "latest" across both PHP versions. The unit
+      # suite above still covers the full PHP x WP (incl. 6.0) compatibility matrix.
+      -   name: Run PHPUnit integration suite (wp-env)
+          if: matrix.wp == 'latest'
+          run: npm run test:integration
 
       -   name: Stop wp-env
           if: always()
