@@ -88,14 +88,24 @@ The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Frontend/
 
 ## Testing
 
+There are two PHP suites plus the JS suite:
+
 ```bash
-composer test:unit   # PHPUnit — pure-logic PHP classes
-npm run test:js      # Jest — pure-logic JS utilities
+composer test:unit          # PHPUnit — fast, DB-free pure-logic classes (tests/Unit)
+npm run test:integration    # PHPUnit — real WordPress + database via wp-env (tests/Integration)
+npm run test:js             # Jest — pure-logic JS utilities
 ```
 
-Both suites are intentionally scoped to pure logic — enums, DTOs, response/state normalization, dirty-tracking, multilingual provider resolution, currency/facet/language helpers, card-template evaluation, the request cache, and local-storage-backed recent searches. REST endpoints, WordPress-runtime-dependent classes (activation, full sync execution, WooCommerce integration), and React components are exercised through manual/browser verification rather than PHPUnit, per `tests/bootstrap.php`'s own scope note — a full wp-env integration suite for that layer doesn't exist yet and would be a reasonable next investment.
+The **unit suite** (`tests/Unit`, `phpunit.xml.dist`) is intentionally scoped to pure logic — enums, DTOs, response/state normalization, dirty-tracking, multilingual provider resolution, currency/facet/language helpers, card-template evaluation, the request cache, and local-storage-backed recent searches. `tests/bootstrap.php` polyfills a small, explicit set of WordPress functions (translation no-ops, post-meta as an in-memory store, a minimal filter registry, `WP_Post`/`WP_Error` stand-ins) rather than loading all of WordPress, so it stays fast and needs no database.
 
-`tests/bootstrap.php` polyfills a small, explicit set of WordPress functions (translation no-ops, post-meta as an in-memory store, a minimal filter registry, `WP_Post`/`WP_Error` stand-ins) rather than loading all of WordPress, so the suite stays fast and DB-free.
+The **integration suite** (`tests/Integration`, `phpunit-integration.xml.dist`) boots a real WordPress and database through `wp-phpunit` and runs inside the wp-env `tests-cli` container. It covers the WordPress-runtime layer the unit suite can't reach: activation and custom-table creation (`Activation_Test`), the resumable full-sync engine start→tick→complete/pause/cancel workflow with the Search Cloud HTTP layer faked out (`Sync_Workflow_Test`), the sync control surface — including the "stuck in Running" recovery when the tick worker is dead (`Sync_Control_Test`) — and the `sync/*` REST routes' capability split and payloads (`Sync_Endpoint_Test`).
+
+```bash
+npm run wp-env -- start     # boot the Docker environment first
+npm run test:integration    # unit + integration together: npm run test:php
+```
+
+Both PHP suites run in CI (`.github/workflows/run-tests.yml`): the unit suite across the full PHP × WordPress compatibility matrix (8.3/8.4 × latest/6.0), and the integration suite on WordPress `latest` (the `wp-phpunit` test framework targets current WordPress).
 
 Add or update the narrowest useful test for every behavior change. `npm run build` after any JavaScript, block, or admin UI change, followed by a manual check in a real browser (desktop and mobile widths, keyboard focus, no horizontal overflow).
 
