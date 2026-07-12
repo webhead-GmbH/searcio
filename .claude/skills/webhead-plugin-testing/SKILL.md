@@ -21,6 +21,12 @@ Every behavior change needs a test change in the same task. Manual verification 
 - Database tables: test schema registration, table version changes, casts, query helpers, truncate/drop helpers, metadata cleanup helpers, uninstall cleanup, and blog-switch behavior where relevant.
 - DTOs, value objects, and enums: test construction, normalization, invalid inputs, and exported array shapes when applicable.
 
+## Test Suites
+
+- Unit suite: `tests/Unit`, config `phpunit.xml.dist`, bootstrap `tests/bootstrap.php`. Fast, DB-free, no WordPress. Run with `composer test:unit`.
+- Integration suite: `tests/Integration`, config `phpunit-integration.xml.dist`, bootstrap `tests/Integration/bootstrap.php`. Boots a real WordPress + database through `wp-phpunit` and runs inside the wp-env `tests-cli` container. Run with `npm run test:integration` (start the environment first with `npm run wp-env -- start`); `npm run test:php` runs both.
+- New `Test.php` files are collected by suffix — do not prefix them with `test-`. Put pure-logic tests under `tests/Unit`; put anything that needs activation, custom tables, cron/jobs, REST routing, or multisite timing under `tests/Integration` extending `Integration_Test_Case`.
+
 ## Running Tests
 
 - Run the narrowest useful test first.
