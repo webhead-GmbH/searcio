@@ -42,15 +42,17 @@ jobs:
       -   name: Install NPM dependencies
           run: npm ci
 
+      # Only the plugin under test is installed. Elementor/WooCommerce are not
+      # needed by the test suites and their latest releases require newer
+      # WordPress than the 6.0 matrix leg (Elementor needs WP 6.8+), which would
+      # abort `wp-env start` on activation.
       -   name: Generate .wp-env.json for WP ${{ matrix.wp }}
           run: |
             cat > .wp-env.json <<EOF
             {
               "core": "https://wordpress.org/wordpress-${{ matrix.wp }}.zip",
               "plugins": [
-                ".",
-                "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip",
-                "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
+                "."
               ],
               "env": {
                 "tests": {
