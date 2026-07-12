@@ -10,7 +10,9 @@
 		"wp-env": "wp-env",
 		"composer": "wp-env run cli --env-cwd=wp-content/plugins/webhead-search-cloud composer",
 		"composer:tests-cli": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud composer",
-		"test:unit": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud ./vendor/bin/phpunit"
+		"test:unit": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud ./vendor/bin/phpunit --configuration phpunit.xml.dist",
+		"test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud ./vendor/bin/phpunit --configuration phpunit-integration.xml.dist",
+		"test:php": "npm run test:unit && npm run test:integration"
 	},
 	"author": "Mir Mohammad Hosseini <mh@webhead.dev>",
 	"license": "GPL-3.0-or-later",

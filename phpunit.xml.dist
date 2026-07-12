@@ -4,13 +4,18 @@
         bootstrap="tests/bootstrap.php"
         backupGlobals="false"
         colors="true"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd">
     <php>
         <env name="WORDPRESS_TABLE_PREFIX" value="wp_"/>
     </php>
     <testsuites>
-        <testsuite name="default">
-            <directory prefix="test-" suffix=".php">tests/</directory>
+        <!--
+            Pure-PHP unit tests only (no WordPress, no database). The full
+            WordPress + database integration suite lives in tests/Integration
+            and runs through phpunit-integration.xml.dist under wp-env.
+        -->
+        <testsuite name="unit">
+            <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
     </testsuites>
 </phpunit>
