@@ -59,7 +59,8 @@
         }
     },
     "scripts": {
-        "test:unit": "./vendor/bin/phpunit tests",
+        "test:unit": "\"vendor/bin/phpunit\" --configuration phpunit.xml.dist",
+        "test:integration": "\"vendor/bin/phpunit\" --configuration phpunit-integration.xml.dist",
         "post-install-cmd": [
             "\"vendor/bin/mozart\" compose",
             "composer dump-autoload"
