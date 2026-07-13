@@ -5,23 +5,46 @@
   margin-top: var(--wpds-dimension-gap-lg);
 }
 
+.settings-tabs {
+  min-width: 0;
+}
+
 .settings-tabs__list {
   gap: var(--wpds-dimension-gap-sm);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block-end: var(--wpds-dimension-padding-xs);
+  scroll-padding-inline: var(--wpds-dimension-padding-md);
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 .settings-tabs__tab {
+  flex: 0 0 auto;
+  max-width: min(220px, 72vw);
   border-radius: var(--wpds-border-radius-sm);
+  scroll-snap-align: start;
+  white-space: nowrap;
 }
 
 .webhead-search-cloud-animated-tab-label {
   display: inline-flex;
   align-items: center;
   gap: var(--wpds-dimension-gap-xs);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .webhead-search-cloud-animated-tab-suffix {
+  flex: 0 0 auto;
   opacity: 0.8;
 }
 
@@ -113,6 +136,28 @@
 }
 
 /* -------------------------------------------------------------------------
+ * Shared "advanced options" reveal (Indexing + Connection tabs): a link
+ * toggle separated from the content above by a hairline, revealing a
+ * left-aligned, full-width block underneath.
+ * ---------------------------------------------------------------------- */
+.whsc-advanced {
+  width: 100%;
+  padding-top: 16px;
+  margin-top: 20px;
+  border-top: 1px solid #f0f0f1;
+
+  .whsc-section:first-child {
+    padding-top: 20px;
+    margin-top: 16px;
+    border-top: 1px solid #f0f0f1;
+  }
+
+  > .whsc-card {
+    margin-top: 16px;
+  }
+}
+
+/* -------------------------------------------------------------------------
  * Connection tab
  * ---------------------------------------------------------------------- */
 .webhead-search-cloud-connection-actions {
@@ -120,30 +165,34 @@
 }
 
 .webhead-search-cloud-connection-hint {
+  margin: 0;
   color: var(--wpds-color-foreground-content-neutral-weak);
+
+  /* "Learn more" reads as part of the sentence, not a standalone control. */
+  .webhead-search-cloud-connection-explainer-link.components-button {
+    display: inline;
+    height: auto;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+  }
 }
 
-.webhead-search-cloud-connection-explainer-trigger {
-  flex-shrink: 0;
-}
-
-/* Centered "connect" hero: everything reads centered by default; the form
- * fields nested inside it (email override, manual key entry) opt back out
- * to a normal left-aligned, full-width block. */
+/* Compact centered hero for the connect moment only (CTA, consents, hint);
+ * every progressive-disclosure block (email override, manual key entry)
+ * lives OUTSIDE it, full-width and left-aligned. */
 .webhead-search-cloud-connect-hero {
   width: 100%;
   max-width: 30rem;
   margin-inline: auto;
   padding-block: var(--wpds-dimension-gap-lg) 0;
   text-align: center;
-
-  .components-notice {
-    width: 100%;
-    text-align: left;
-  }
 }
 
 .webhead-search-cloud-connect-cta {
+  height: auto;
+  min-height: 3rem;
   padding-block: var(--wpds-dimension-padding-lg);
   padding-inline: var(--wpds-dimension-padding-3xl);
 }
@@ -267,18 +316,6 @@
 
     @media screen and (max-width: 600px) {
       grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .whsc-advanced {
-    padding-top: 16px;
-    margin-top: 20px;
-    border-top: 1px solid #f0f0f1;
-
-    .whsc-section:first-child {
-      padding-top: 20px;
-      margin-top: 16px;
-      border-top: 1px solid #f0f0f1;
     }
   }
 

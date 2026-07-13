@@ -2,12 +2,11 @@ import {useState} from '@wordpress/element';
 import {Button, Modal} from '@wordpress/components';
 import {Text} from '@wordpress/ui';
 import {__} from '@wordpress/i18n';
-import {info} from '@wordpress/icons';
 
 /**
- * Short explanation lives in the info icon's built-in tooltip; the full
- * account-creation-vs-linking behavior (long enough to need paragraphs) lives
- * behind "Learn more" in a modal instead of cramming it into the tooltip.
+ * A small inline "Learn more" link that sits inside the connection hint
+ * sentence and opens the full account-creation-vs-linking explanation
+ * (long enough to need paragraphs) in a modal.
  *
  * @param {Object} props
  * @param {{termsUrl: string, privacyUrl: string, dpaUrl: string}} props.legal Live-or-fallback legal links, owned by the parent Connection tab.
@@ -18,18 +17,8 @@ const ConnectionExplainer = ({legal}) => {
 	return (
 		<>
 			<Button
-				icon={info}
-				variant="tertiary"
-				size="small"
-				label={__(
-					'Creates a new Search Cloud account for this email, or connects this site to an existing one.',
-					'webhead-search-cloud'
-				)}
-				showTooltip
-				className="webhead-search-cloud-connection-explainer-trigger"
-			/>
-			<Button
 				variant="link"
+				className="webhead-search-cloud-connection-explainer-link"
 				onClick={() => setIsModalOpen(true)}
 			>
 				{__('Learn more', 'webhead-search-cloud')}
@@ -38,6 +27,7 @@ const ConnectionExplainer = ({legal}) => {
 			{isModalOpen && (
 				<Modal
 					title={__('How connecting to Search Cloud works', 'webhead-search-cloud')}
+					size="medium"
 					onRequestClose={() => setIsModalOpen(false)}
 					className="webhead-search-cloud-connection-explainer-modal"
 				>

@@ -11,7 +11,7 @@ import {__, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
-import {Flex} from '../../../../components/Layout';
+import {Flex, Grid} from '../../../../components/Layout';
 import {showToast} from '../../../../toast';
 import ConnectionExplainer from './ConnectionExplainer';
 import ConnectionResultNotice from './ConnectionResultNotice';
@@ -238,21 +238,25 @@ const ConnectionTab = () => {
 							>
 								{__('Disconnect', 'webhead-search-cloud')}
 							</Button>
+						</Flex>
+
+						<div className="whsc-advanced">
 							<Button
-								variant="tertiary"
+								variant="link"
+								aria-expanded={manualEntryExpanded}
 								onClick={() => setManualEntryExpanded((expanded) => !expanded)}
 							>
 								{manualEntryExpanded
-									? __('Hide advanced: manual key entry', 'webhead-search-cloud')
+									? __('Hide advanced options', 'webhead-search-cloud')
 									: __('Advanced: manual key entry / rotate keys', 'webhead-search-cloud')}
 							</Button>
-						</Flex>
 
-						{manualEntryExpanded && (
-							<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
-								<ManualConnectionEntry pendingClaim={false}/>
-							</div>
-						)}
+							{manualEntryExpanded && (
+								<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
+									<ManualConnectionEntry pendingClaim={false}/>
+								</div>
+							)}
+						</div>
 
 						<ConfirmDialog
 							isOpen={disconnectConfirmOpen}
@@ -267,7 +271,7 @@ const ConnectionTab = () => {
 						</ConfirmDialog>
 					</Flex>
 				) : (
-					<Flex direction="column" align="center" gap={20} className="webhead-search-cloud-connect-hero">
+					<Flex direction="column" gap={20} className="webhead-search-cloud-connect">
 						{pendingClaim && (
 							<Notice status="info" isDismissible={false}>
 								<p>
@@ -289,55 +293,55 @@ const ConnectionTab = () => {
 							</Notice>
 						)}
 
-						<Button
-							__next40pxDefaultSize
-							accessibleWhenDisabled
-							variant="primary"
-							isBusy={isConnecting}
-							disabled={connectDisabled}
-							description={
-								!termsPrivacy
-									? __('Accept the Terms of Service and Privacy Policy to continue.', 'webhead-search-cloud')
-									: undefined
-							}
-							showTooltip={!termsPrivacy}
-							onClick={onConnect}
-							className="webhead-search-cloud-connect-cta"
-						>
-							{connectLabel}
-						</Button>
-
-						<Flex direction="column" align="center" gap={8} className="webhead-search-cloud-connect-consents">
-							<CheckboxControl
-								__nextHasNoMarginBottom
-								checked={termsPrivacy}
-								onChange={setTermsPrivacy}
-								label={
-									<>
-										{__('I accept the', 'webhead-search-cloud')}{' '}
-										{legalLink(legalLinks.termsUrl, __('Terms of Service', 'webhead-search-cloud'))}
-										{' '}{__('and', 'webhead-search-cloud')}{' '}
-										{legalLink(legalLinks.privacyUrl, __('Privacy Policy', 'webhead-search-cloud'))}.
-										{' '}{__('(required)', 'webhead-search-cloud')}
-									</>
+						<Flex direction="column" align="center" gap={16} className="webhead-search-cloud-connect-hero">
+							<Button
+								__next40pxDefaultSize
+								accessibleWhenDisabled
+								variant="primary"
+								isBusy={isConnecting}
+								disabled={connectDisabled}
+								description={
+									!termsPrivacy
+										? __('Accept the Terms of Service and Privacy Policy to continue.', 'webhead-search-cloud')
+										: undefined
 								}
-							/>
-							<CheckboxControl
-								__nextHasNoMarginBottom
-								checked={dpa}
-								onChange={setDpa}
-								label={
-									<>
-										{__('I accept the', 'webhead-search-cloud')}{' '}
-										{legalLink(legalLinks.dpaUrl, __('Data Processing Agreement', 'webhead-search-cloud'))}.
-										{' '}{__('(optional)', 'webhead-search-cloud')}
-									</>
-								}
-							/>
-						</Flex>
+								showTooltip={!termsPrivacy}
+								onClick={onConnect}
+								className="webhead-search-cloud-connect-cta"
+							>
+								{connectLabel}
+							</Button>
 
-						<Flex align="center" justify="center" gap={4} wrap>
-							<Text render={<span/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
+							<Flex direction="column" align="center" gap={8} className="webhead-search-cloud-connect-consents">
+								<CheckboxControl
+									__nextHasNoMarginBottom
+									checked={termsPrivacy}
+									onChange={setTermsPrivacy}
+									label={
+										<>
+											{__('I accept the', 'webhead-search-cloud')}{' '}
+											{legalLink(legalLinks.termsUrl, __('Terms of Service', 'webhead-search-cloud'))}
+											{' '}{__('and', 'webhead-search-cloud')}{' '}
+											{legalLink(legalLinks.privacyUrl, __('Privacy Policy', 'webhead-search-cloud'))}.
+											{' '}{__('(required)', 'webhead-search-cloud')}
+										</>
+									}
+								/>
+								<CheckboxControl
+									__nextHasNoMarginBottom
+									checked={dpa}
+									onChange={setDpa}
+									label={
+										<>
+											{__('I accept the', 'webhead-search-cloud')}{' '}
+											{legalLink(legalLinks.dpaUrl, __('Data Processing Agreement', 'webhead-search-cloud'))}.
+											{' '}{__('(optional)', 'webhead-search-cloud')}
+										</>
+									}
+								/>
+							</Flex>
+
+							<Text render={<p/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
 								{effectiveEmail
 									? sprintf(
 										/* translators: %s: the email address used to connect. */
@@ -345,58 +349,69 @@ const ConnectionTab = () => {
 										effectiveEmail
 									)
 									: __('An admin email is required to connect.', 'webhead-search-cloud')}
+								{' '}
+								<ConnectionExplainer legal={legalLinks}/>
 							</Text>
-							<ConnectionExplainer legal={legalLinks}/>
+
+							<Button
+								variant="link"
+								className="webhead-search-cloud-email-override-toggle"
+								aria-expanded={showEmailOverride}
+								onClick={() => setShowEmailOverride((open) => !open)}
+							>
+								{showEmailOverride
+									? __('Use the default email instead', 'webhead-search-cloud')
+									: __('Not this email?', 'webhead-search-cloud')}
+							</Button>
 						</Flex>
 
-						<Button
-							variant="link"
-							onClick={() => setShowEmailOverride((open) => !open)}
-						>
-							{showEmailOverride
-								? __('Use the default email instead', 'webhead-search-cloud')
-								: __('Not this email?', 'webhead-search-cloud')}
-						</Button>
-
 						{showEmailOverride && (
-							<Flex direction="column" gap={12} className="webhead-search-cloud-email-override">
-								<TextControl
-									__next40pxDefaultSize
-									type="email"
-									label={__('Email', 'webhead-search-cloud')}
-									value={overrideEmail}
-									onChange={setOverrideEmail}
-								/>
-								<TextControl
-									__next40pxDefaultSize
-									label={__('Your name (optional)', 'webhead-search-cloud')}
-									value={overrideAdminName}
-									onChange={setOverrideAdminName}
-								/>
-								<TextControl
-									__next40pxDefaultSize
-									label={__('Company name (optional)', 'webhead-search-cloud')}
-									help={__('Used as the Search Cloud account name.', 'webhead-search-cloud')}
-									value={overrideCompanyName}
-									onChange={setOverrideCompanyName}
-								/>
-							</Flex>
-						)}
-
-						<Button
-							variant="tertiary"
-							onClick={() => setManualEntryExpanded((expanded) => !expanded)}
-						>
-							{manualEntryExpanded
-								? __('Hide advanced: manual key entry', 'webhead-search-cloud')
-								: __('Advanced: manual key entry', 'webhead-search-cloud')}
-						</Button>
-
-						{manualEntryExpanded && (
-							<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
-								<ManualConnectionEntry pendingClaim={pendingClaim}/>
+							<div className="whsc-card whsc-card--dotted webhead-search-cloud-email-override">
+								<Grid minColumnWidth={{base: 200, md: 220}} gap={12} align="start">
+									<TextControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										type="email"
+										label={__('Email', 'webhead-search-cloud')}
+										value={overrideEmail}
+										onChange={setOverrideEmail}
+									/>
+									<TextControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={__('Your name (optional)', 'webhead-search-cloud')}
+										value={overrideAdminName}
+										onChange={setOverrideAdminName}
+									/>
+									<TextControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={__('Company name (optional)', 'webhead-search-cloud')}
+										help={__('Used as the Search Cloud account name.', 'webhead-search-cloud')}
+										value={overrideCompanyName}
+										onChange={setOverrideCompanyName}
+									/>
+								</Grid>
 							</div>
 						)}
+
+						<div className="whsc-advanced">
+							<Button
+								variant="link"
+								aria-expanded={manualEntryExpanded}
+								onClick={() => setManualEntryExpanded((expanded) => !expanded)}
+							>
+								{manualEntryExpanded
+									? __('Hide advanced options', 'webhead-search-cloud')
+									: __('Advanced: manual key entry', 'webhead-search-cloud')}
+							</Button>
+
+							{manualEntryExpanded && (
+								<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
+									<ManualConnectionEntry pendingClaim={pendingClaim}/>
+								</div>
+							)}
+						</div>
 					</Flex>
 				)}
 			</Card.Content>
