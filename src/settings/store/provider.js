@@ -45,23 +45,37 @@ const SettingsProvider = ( { children } ) => {
 		[ settings, persistedSettings ]
 	);
 
+	const loadSettings = async () => {
+		try {
+			const response = await apiFetch( {
+				path: pluginData?.api?.settingsPath || '/webhead-search-cloud/v1/settings',
+			} );
+
+			setSchema( response.schema || {} );
+			setSettings( response.settings || {} );
+			setPersistedSettings( response.settings || {} );
+		} finally {
+			setIsLoading( false );
+		}
+	};
+
 	useEffect( () => {
-		const loadSettings = async () => {
-			try {
-				const response = await apiFetch( {
-					path: pluginData?.api?.settingsPath || '/webhead-search-cloud/v1/settings',
-				} );
-
-				setSchema( response.schema || {} );
-				setSettings( response.settings || {} );
-				setPersistedSettings( response.settings || {} );
-			} finally {
-				setIsLoading( false );
-			}
-		};
-
 		void loadSettings();
 	}, [] );
+
+	// Re-fetches without the loading skeleton — used after actions that change
+	// settings server-side outside the normal save flow (e.g. the Connect /
+	// Disconnect actions on the Connection tab, which write credentials and
+	// pending-claim state directly through PHP).
+	const reloadSettings = async () => {
+		const response = await apiFetch( {
+			path: pluginData?.api?.settingsPath || '/webhead-search-cloud/v1/settings',
+		} );
+
+		setSchema( response.schema || {} );
+		setSettings( response.settings || {} );
+		setPersistedSettings( response.settings || {} );
+	};
 
 	const updateSetting = ( key, value ) => {
 		setSettings( ( currentSettings ) => ( {
@@ -105,6 +119,7 @@ const SettingsProvider = ( { children } ) => {
 				settingGroups: groupSettings( schema ),
 				saveSettings,
 				updateSetting,
+				reloadSettings,
 			} }
 		>
 			{ children }

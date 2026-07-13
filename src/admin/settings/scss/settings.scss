@@ -123,6 +123,45 @@
   color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
+.webhead-search-cloud-connection-explainer-trigger {
+  flex-shrink: 0;
+}
+
+/* Centered "connect" hero: everything reads centered by default; the form
+ * fields nested inside it (email override, manual key entry) opt back out
+ * to a normal left-aligned, full-width block. */
+.webhead-search-cloud-connect-hero {
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+  padding-block: var(--wpds-dimension-gap-lg) 0;
+  text-align: center;
+
+  .components-notice {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+.webhead-search-cloud-connect-cta {
+  padding-block: var(--wpds-dimension-padding-lg);
+  padding-inline: var(--wpds-dimension-padding-3xl);
+}
+
+.webhead-search-cloud-connect-consents {
+  .components-checkbox-control__label {
+    text-align: left;
+  }
+}
+
+.webhead-search-cloud-email-override,
+.webhead-search-cloud-manual-entry-card {
+  width: 100%;
+  padding: var(--wpds-dimension-padding-2xl);
+  border-radius: var(--wpds-border-radius-lg);
+  text-align: left;
+}
+
 .webhead-search-cloud-indexing {
   .whsc-intro {
     margin-bottom: 12px;

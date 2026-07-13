@@ -17,6 +17,7 @@ namespace Webhead\WP\SearchCloud\Connection;
 
 use WP_Error;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Cache\Cache_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 
 defined( 'ABSPATH' ) || exit;
@@ -25,11 +26,15 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Search_Cloud_Client {
-	private const MAX_ATTEMPTS = 3;
-	private const TIMEOUT      = 15;
-	private const MAX_BACKOFF  = 8;
+	private const MAX_ATTEMPTS    = 3;
+	private const TIMEOUT         = 15;
+	private const MAX_BACKOFF     = 8;
+	private const LEGAL_LINKS_TTL = 6 * HOUR_IN_SECONDS;
 
-	public function __construct( private Settings_Manager $settings ) {}
+	public function __construct(
+		private Settings_Manager $settings,
+		private Cache_Manager $cache_manager
+	) {}
 
 	public function is_configured(): bool {
 		[ $write_key, $write_secret ] = $this->credentials();
@@ -37,8 +42,86 @@ final class Search_Cloud_Client {
 		return '' !== $write_key && '' !== $write_secret;
 	}
 
+	/**
+	 * The write key alone, decrypted, for contexts that must never see the
+	 * secret half (e.g. the public domain-ownership {@see \Webhead\WP\SearchCloud\Routing\Verify_Endpoint}).
+	 */
+	public function write_key(): string {
+		[ $write_key ] = $this->credentials();
+
+		return $write_key;
+	}
+
 	public function health(): Api_Response {
 		return $this->request( 'GET', '/health' );
+	}
+
+	/**
+	 * `POST /connect` — the only endpoint with no key at all (see
+	 * docs/api/authentication-and-security.md "Connect credentials"). Uses the
+	 * same retry/backoff policy as every other call, just without the
+	 * write-key/secret headers.
+	 *
+	 * @param  array<string,mixed>  $payload
+	 */
+	public function connect( array $payload ): Api_Response {
+		return $this->request( 'POST', '/connect', $payload, authenticated: false );
+	}
+
+	/**
+	 * `DELETE /disconnect` — the mirror of {@see self::connect()}. Permanently
+	 * deletes the site and its index on Search Cloud's side; the caller is
+	 * responsible for clearing local credentials once this succeeds (see
+	 * docs/api/building-a-plugin.md "Disconnecting").
+	 */
+	public function disconnect(): Api_Response {
+		return $this->request( 'DELETE', '/disconnect' );
+	}
+
+	/**
+	 * `GET /connect` — consent-screen metadata (legal-document links), no auth
+	 * required. Separate from {@see self::legal_links()} so callers that want
+	 * the raw response (status, errors) can still get it.
+	 */
+	public function connect_metadata(): Api_Response {
+		return $this->request( 'GET', '/connect', authenticated: false );
+	}
+
+	/**
+	 * Cached, always-present shape for the consent checkboxes' links. Falls
+	 * back to the plugin's own placeholder constants when Search Cloud is
+	 * unreachable or hasn't configured a given document - "fail safe" per
+	 * docs/api/authentication-and-security.md "Best practices for integrators".
+	 *
+	 * @return array{terms:string,privacy:string,dpa:string}
+	 */
+	public function legal_links(): array {
+		$cache_key = $this->cache_manager->key( 'connect_legal_links' );
+
+		return $this->cache_manager->object_cache()->remember(
+			$cache_key,
+			self::LEGAL_LINKS_TTL,
+			function (): array {
+				$response = $this->connect_metadata();
+				$legal    = $response->ok() ? ( $response->body()['legal'] ?? [] ) : [];
+				$legal    = is_array( $legal ) ? $legal : [];
+
+				return [
+					'terms'   => $this->legal_url( $legal, 'terms', \Webhead\WP\SearchCloud\LEGAL_TERMS_URL ),
+					'privacy' => $this->legal_url( $legal, 'privacy', \Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL ),
+					'dpa'     => $this->legal_url( $legal, 'dpa', \Webhead\WP\SearchCloud\LEGAL_DPA_URL ),
+				];
+			}
+		);
+	}
+
+	/**
+	 * @param  array<string,mixed>  $legal
+	 */
+	private function legal_url( array $legal, string $key, string $fallback ): string {
+		$value = $legal[ $key ] ?? null;
+
+		return is_string( $value ) && '' !== $value ? $value : $fallback;
 	}
 
 	/**
@@ -100,20 +183,23 @@ final class Search_Cloud_Client {
 	/**
 	 * @param  array<string,mixed>|null  $body
 	 */
-	private function request( string $method, string $path, ?array $body = null ): Api_Response {
-		[ $write_key, $write_secret ] = $this->credentials();
-
+	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true ): Api_Response {
 		$url = $this->base() . $path;
+
+		$headers = [ 'Accept' => 'application/json' ];
+
+		if ( $authenticated ) {
+			[ $write_key, $write_secret ] = $this->credentials();
+
+			$headers['X-Write-Key']    = $write_key;
+			$headers['X-Write-Secret'] = $write_secret;
+		}
 
 		$args = [
 			'method'    => $method,
 			'timeout'   => self::TIMEOUT,
 			'sslverify' => ! $this->is_development(),
-			'headers'   => [
-				'X-Write-Key'    => $write_key,
-				'X-Write-Secret' => $write_secret,
-				'Accept'         => 'application/json',
-			],
+			'headers'   => $headers,
 		];
 
 		if ( null !== $body ) {

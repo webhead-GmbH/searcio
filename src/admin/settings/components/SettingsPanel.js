@@ -29,15 +29,24 @@ const CONNECTION_KEYS = pluginData.connectionKeys || [
 	'search_key',
 	'write_key',
 	'write_secret',
+	'connect_pending_claim',
+	'connect_pending_email',
 ];
 const POPULAR_SEARCHES_KEYS = pluginData.popularSearchesKeys || [
 	'popular_searches',
 ];
 
+// Defaults to the Connection tab whenever the site isn't connected yet, so a
+// fresh install lands on "Connect" instead of an empty Sync tab.
 const getInitialTabName = () => {
 	const params = new URL(window.location.href).searchParams;
+	const requestedTab = params.get('tab');
 
-	return params.get('tab') || SYNC_TAB;
+	if (requestedTab) {
+		return requestedTab;
+	}
+
+	return pluginData?.connection?.isConnected === false ? CONNECTION_TAB : SYNC_TAB;
 };
 
 const SettingsPanel = () => {

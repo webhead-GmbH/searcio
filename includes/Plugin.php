@@ -37,12 +37,14 @@ use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Database\Tables\Sync_Runs_Table;
 use Webhead\WP\SearchCloud\Database\Tables\Change_Queue_Table;
 use Webhead\WP\SearchCloud\Routing\Connection_Endpoint;
+use Webhead\WP\SearchCloud\Routing\Verify_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Indexing_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Sync_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Settings_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Cache_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Search_Config_Endpoint;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Indexing\Field_Source_Resolver;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
@@ -111,7 +113,15 @@ final class Plugin extends Base_Plugin {
 	}
 
 	protected function register_service_providers( Container $container ): void {
-		$container->add( 'settings_page', Settings_Page::class );
+		$container->add(
+			'settings_page',
+			static function () use ( $container ): Settings_Page {
+				return new Settings_Page(
+					$container->get( 'search_cloud_client' ),
+					$container->get( 'connection_state' )
+				);
+			}
+		);
 		$container->add(
 			'settings_endpoint',
 			static function () use ( $container ): Settings_Endpoint {
@@ -121,16 +131,35 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'search_cloud_client',
 			static function () use ( $container ): Search_Cloud_Client {
-				return new Search_Cloud_Client( $container->get( Settings_Manager::class ) );
+				return new Search_Cloud_Client(
+					$container->get( Settings_Manager::class ),
+					$container->get( Cache_Manager::class )
+				);
 			}
 		);
 		$container->add(
-			'connection_endpoint',
-			static function () use ( $container ): Connection_Endpoint {
-				return new Connection_Endpoint( $container->get( 'search_cloud_client' ) );
+			'connection_state',
+			static function () use ( $container ): Connection_State {
+				return new Connection_State( $container->get( Settings_Manager::class ) );
 			}
 		);
 		$container->add( 'woo', Woo::class );
+		$container->add(
+			'connection_endpoint',
+			static function () use ( $container ): Connection_Endpoint {
+				return new Connection_Endpoint(
+					$container->get( 'search_cloud_client' ),
+					$container->get( 'connection_state' ),
+					$container->get( 'woo' )
+				);
+			}
+		);
+		$container->add(
+			'verify_endpoint',
+			static function () use ( $container ): Verify_Endpoint {
+				return new Verify_Endpoint( $container->get( 'search_cloud_client' ) );
+			}
+		);
 		$container->add( 'field_source_resolver', Field_Source_Resolver::class );
 		$container->add(
 			'multilingual_support',
@@ -300,6 +329,7 @@ final class Plugin extends Base_Plugin {
 	protected function register_hooks( Hooks_Manager $hooks_manager, Container $container ): void {
 		$hooks_manager->register( $container->get( 'settings_endpoint' ) );
 		$hooks_manager->register( $container->get( 'connection_endpoint' ) );
+		$hooks_manager->register( $container->get( 'verify_endpoint' ) );
 		$hooks_manager->register( $container->get( 'indexing_endpoint' ) );
 		$hooks_manager->register( $container->get( 'woo_compatibility' ) );
 		$hooks_manager->register( $container->get( 'sync_endpoint' ) );

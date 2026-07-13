@@ -8,6 +8,7 @@ const SettingsContext = createContext( {
 	settingGroups: [],
 	saveSettings: async () => false,
 	updateSetting: () => {},
+	reloadSettings: async () => {},
 } );
 
 export default SettingsContext;

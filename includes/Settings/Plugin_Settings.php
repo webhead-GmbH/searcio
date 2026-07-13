@@ -61,6 +61,53 @@ final class Plugin_Settings {
 	public const WRITE_SECRET = 'write_secret';
 
 	/**
+	 * Persisted once per site the first time the zero-friction connect flow
+	 * runs (see {@see \Webhead\WP\SearchCloud\Connection\Connection_State}) and
+	 * reused on every retry, per docs/api/building-a-plugin.md: "Generate
+	 * idempotency_key once per site and store it alongside the keys." Kept out
+	 * of REST — it is never read or written by the browser.
+	 */
+	#[Setting(
+		type: 'string',
+		default: '',
+		option_key: 'webhead_search_cloud_connect_idempotency_key',
+		show_in_rest: false,
+		label: 'Connect idempotency key',
+		description: 'UUID generated once and replayed on every /connect retry for this site.'
+	)]
+	public const CONNECT_IDEMPOTENCY_KEY = 'connect_idempotency_key';
+
+	/**
+	 * Set when `/connect` returns `pending_claim` (the admin email already has a
+	 * Search Cloud account) so the Connection tab can keep showing the
+	 * "check your inbox" notice across page reloads. Cleared once working
+	 * credentials are saved and pass a health check.
+	 */
+	#[Setting(
+		type: 'boolean',
+		default: false,
+		option_key: 'webhead_search_cloud_connect_pending_claim',
+		show_in_rest: true,
+		label: 'Connect pending claim',
+		description: 'Whether a /connect attempt is waiting on the owner to claim an existing account by email.'
+	)]
+	public const CONNECT_PENDING_CLAIM = 'connect_pending_claim';
+
+	/**
+	 * The email address a pending claim notice was sent to, so the reloaded
+	 * notice can name the inbox to check instead of a generic message.
+	 */
+	#[Setting(
+		type: 'string',
+		default: '',
+		option_key: 'webhead_search_cloud_connect_pending_email',
+		show_in_rest: true,
+		label: 'Connect pending claim email',
+		description: 'The email address the pending-claim confirmation link was sent to.'
+	)]
+	public const CONNECT_PENDING_EMAIL = 'connect_pending_email';
+
+	/**
 	 * Per-post-type indexing configuration (see {@see \Webhead\WP\SearchCloud\Indexing\Index_Config}).
 	 * Kept out of REST (`show_in_rest: false`) because it is read/written through
 	 * the dedicated Indexing endpoint, not the generic settings screen.

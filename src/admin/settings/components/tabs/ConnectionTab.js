@@ -1,5 +1,11 @@
-import {useContext, useState} from '@wordpress/element';
-import {Button, Notice, TextControl,} from '@wordpress/components';
+import {useContext, useEffect, useState} from '@wordpress/element';
+import {
+	__experimentalConfirmDialog as ConfirmDialog,
+	Button,
+	CheckboxControl,
+	Notice,
+	TextControl,
+} from '@wordpress/components';
 import {Card, Text} from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
@@ -7,117 +13,201 @@ import apiFetch from '@wordpress/api-fetch';
 import SettingsContext from '../../../../settings/store/context';
 import {Flex} from '../../../../components/Layout';
 import {showToast} from '../../../../toast';
+import ConnectionExplainer from './ConnectionExplainer';
+import ConnectionResultNotice from './ConnectionResultNotice';
+import ManualConnectionEntry from './ManualConnectionEntry';
 
 const pluginData = window.webhead_search_cloudData || {};
-const SECRET_PLACEHOLDER = '••••••••••••';
+const CONNECT_PATH = pluginData?.api?.connectPath || '/webhead-search-cloud/v1/connection/connect';
+const DISCONNECT_PATH = pluginData?.api?.disconnectPath || '/webhead-search-cloud/v1/connection/disconnect';
+const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
+const CONNECTION_LEGAL_PATH = pluginData?.api?.connectionLegalPath || '/webhead-search-cloud/v1/connection/legal';
+const CONNECTION_DEFAULTS = pluginData?.connection?.defaults || {};
+const FALLBACK_LEGAL_LINKS = {
+	termsUrl: pluginData?.legal?.termsUrl || '',
+	privacyUrl: pluginData?.legal?.privacyUrl || '',
+	dpaUrl: pluginData?.legal?.dpaUrl || '',
+};
+
+const GENERIC_CONNECT_ERROR = __('The connection request failed.', 'webhead-search-cloud');
+
+/** Wraps `text` in a link when `url` is present; a plain string otherwise. `stopPropagation` keeps a click from also toggling the checkbox the link's label belongs to. */
+const legalLink = (url, text) => (url
+	? <a href={url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>{text}</a>
+	: text);
 
 /**
- * The service host is hard-coded server-side (not user-editable). Write
- * key/secret are masked: their stored (encrypted) value is never shown, the
- * inputs start blank, and typing a new value is what overwrites the stored
- * one. A saved value is signalled with a dotted placeholder.
+ * Connection tab: zero-friction Connect (docs/api/building-a-plugin.md
+ * "Zero-friction connect") as the primary path, with manual key entry
+ * collapsed underneath for the `pending_claim` follow-up and key rotation.
  */
 const ConnectionTab = () => {
-	const {settings, updateSetting, saveSettings, isSaving, isLoading, hasUnsavedChanges} =
-		useContext(SettingsContext);
+	const {settings, isLoading, reloadSettings} = useContext(SettingsContext);
 
-	const [writeKey, setWriteKey] = useState('');
-	const [writeSecret, setWriteSecret] = useState('');
-	const [isTesting, setIsTesting] = useState(false);
-	const [result, setResult] = useState(null);
+	const [termsPrivacy, setTermsPrivacy] = useState(false);
+	const [dpa, setDpa] = useState(false);
+	const [showEmailOverride, setShowEmailOverride] = useState(false);
+	const [overrideEmail, setOverrideEmail] = useState('');
+	const [overrideAdminName, setOverrideAdminName] = useState('');
+	const [overrideCompanyName, setOverrideCompanyName] = useState('');
+	const [isConnecting, setIsConnecting] = useState(false);
+	const [connectError, setConnectError] = useState(null);
+	const [connectedResult, setConnectedResult] = useState(null);
+	const [manualEntryExpanded, setManualEntryExpanded] = useState(false);
+	const [isDisconnecting, setIsDisconnecting] = useState(false);
+	const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false);
+	const [legalLinks, setLegalLinks] = useState(FALLBACK_LEGAL_LINKS);
 
-	const hasStored = (key) => Boolean(settings[key]);
+	const isConnected = Boolean(settings.write_key) && Boolean(settings.write_secret);
+	const pendingClaim = Boolean(settings.connect_pending_claim);
+	const pendingClaimEmail = settings.connect_pending_email || '';
+	const effectiveEmail = showEmailOverride && overrideEmail
+		? overrideEmail
+		: (CONNECTION_DEFAULTS.email || '');
 
-	const onSave = async () => {
-		const success = await saveSettings();
-
-		if (success) {
-			setWriteKey('');
-			setWriteSecret('');
+	// Auto-run the health check the moment credentials exist - freshly
+	// connected or from a prior session - so the Connected card shows without
+	// a manual "Test connection" click.
+	useEffect(() => {
+		if (isLoading || connectedResult || !isConnected) {
+			return undefined;
 		}
 
-		showToast(
-			success
-				? __('Connection settings saved.', 'webhead-search-cloud')
-				: __('Could not save the connection settings.', 'webhead-search-cloud'),
-			success ? 'success' : 'error'
-		);
+		let cancelled = false;
+
+		(async () => {
+			try {
+				const response = await apiFetch({path: TEST_CONNECTION_PATH, method: 'POST'});
+
+				if (!cancelled) {
+					setConnectedResult(response);
+				}
+			} catch (error) {
+				if (!cancelled) {
+					setConnectedResult({
+						ok: false,
+						message: error?.message || __('The test request failed.', 'webhead-search-cloud'),
+					});
+				}
+			}
+		})();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [isLoading, isConnected, connectedResult]);
+
+	// A pending claim always needs the pasted-keys path to finish.
+	useEffect(() => {
+		if (pendingClaim) {
+			setManualEntryExpanded(true);
+		}
+	}, [pendingClaim]);
+
+	// Live Search Cloud-configured legal links (GET /connect), fetched here
+	// rather than localized on page load so an unreachable Search Cloud never
+	// delays opening any other settings tab. The plugin's own placeholder
+	// constants keep the checkboxes/tooltip usable in the meantime.
+	useEffect(() => {
+		let cancelled = false;
+
+		(async () => {
+			try {
+				const response = await apiFetch({path: CONNECTION_LEGAL_PATH});
+
+				if (!cancelled && response) {
+					setLegalLinks({
+						termsUrl: response.terms || FALLBACK_LEGAL_LINKS.termsUrl,
+						privacyUrl: response.privacy || FALLBACK_LEGAL_LINKS.privacyUrl,
+						dpaUrl: response.dpa || FALLBACK_LEGAL_LINKS.dpaUrl,
+					});
+				}
+			} catch (error) {
+				// Keep the fallback links - non-fatal.
+			}
+		})();
+
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
+	const handleConnectOutcome = async (outcome) => {
+		if ('pending_claim' === outcome?.flow) {
+			setManualEntryExpanded(true);
+			await reloadSettings();
+
+			return;
+		}
+
+		if ('connected' === outcome?.flow) {
+			setConnectedResult(outcome);
+			await reloadSettings();
+
+			return;
+		}
+
+		setConnectError(outcome?.message || GENERIC_CONNECT_ERROR);
+
+		if (outcome?.reveal_manual_entry) {
+			setManualEntryExpanded(true);
+		}
 	};
 
-	const onTest = async () => {
-		setIsTesting(true);
-		setResult(null);
+	const onConnect = async () => {
+		setIsConnecting(true);
+		setConnectError(null);
 
 		try {
 			const response = await apiFetch({
-				path:
-					pluginData?.api?.testConnectionPath ||
-					'/webhead-search-cloud/v1/connection/test',
+				path: CONNECT_PATH,
 				method: 'POST',
+				data: {
+					email: showEmailOverride ? overrideEmail : '',
+					admin_name: showEmailOverride ? overrideAdminName : '',
+					site_name: showEmailOverride ? overrideCompanyName : '',
+					terms_privacy: termsPrivacy,
+					dpa,
+				},
 			});
 
-			setResult(response);
+			await handleConnectOutcome(response);
 		} catch (error) {
-			setResult({
-				ok: false,
-				message:
-					error?.message ||
-					__('The test request failed.', 'webhead-search-cloud'),
-			});
+			await handleConnectOutcome(error);
 		} finally {
-			setIsTesting(false);
+			setIsConnecting(false);
 		}
 	};
 
-	const renderResult = () => {
-		if (!result) {
-			return null;
-		}
+	const onDisconnect = async () => {
+		setDisconnectConfirmOpen(false);
+		setIsDisconnecting(true);
 
-		if (result.ok) {
-			const docs = result.documents || {};
-			const detail =
-				docs.used !== null && docs.used !== undefined
-					? sprintf(
-						/* translators: 1: used documents, 2: document limit. */
-						__('Connected - %1$s / %2$s documents indexed.', 'webhead-search-cloud'),
-						Number(docs.used).toLocaleString(),
-						docs.limit === null || docs.limit === undefined
-							? __('unlimited', 'webhead-search-cloud')
-							: Number(docs.limit).toLocaleString()
-					)
-					: __('Connected.', 'webhead-search-cloud');
-			// Site id is resolved server-side from the write key/secret and
-			// only known once a test succeeds.
-			const siteIdSuffix = result.site_id
-				? sprintf(
-					/* translators: %d: the Search Cloud site id. */
-					__(' (site #%d)', 'webhead-search-cloud'),
-					result.site_id
-				)
-				: '';
+		try {
+			await apiFetch({path: DISCONNECT_PATH, method: 'POST'});
+			await reloadSettings();
 
-			return (
-				<Notice status="success" isDismissible={false}>
-					<p>{detail}{siteIdSuffix}</p>
-				</Notice>
+			setConnectedResult(null);
+			setManualEntryExpanded(false);
+			setTermsPrivacy(false);
+			setDpa(false);
+			setShowEmailOverride(false);
+
+			showToast(__('Disconnected from Search Cloud.', 'webhead-search-cloud'), 'success');
+		} catch (error) {
+			showToast(
+				error?.message || __('Could not disconnect.', 'webhead-search-cloud'),
+				'error'
 			);
+		} finally {
+			setIsDisconnecting(false);
 		}
-
-		return (
-			<Notice status="error" isDismissible={false}>
-				<p>{result.message || __('Connection failed.', 'webhead-search-cloud')}</p>
-			</Notice>
-		);
 	};
 
-	const connectionSaveDisabled = isSaving || isLoading || !hasUnsavedChanges;
-	const connectionSaveLabel = isSaving
-		? __('Saving…', 'webhead-search-cloud')
-		: __('Save connection', 'webhead-search-cloud');
-	const connectionSaveDescription = !isLoading && !isSaving && !hasUnsavedChanges
-		? __('No unsaved changes.', 'webhead-search-cloud')
-		: undefined;
+	const connectDisabled = isConnecting || !termsPrivacy;
+	const connectLabel = isConnecting
+		? __('Connecting…', 'webhead-search-cloud')
+		: __('Connect to Search Cloud', 'webhead-search-cloud');
 
 	return (
 		<Card.Root className="whsc-tab-card">
@@ -127,90 +217,188 @@ const ConnectionTab = () => {
 				</Card.Title>
 				<Text render={<p/>} variant="body-sm">
 					{__(
-						'Enter the credentials from your site page in the Search Cloud app. The write key and secret are stored encrypted and never sent to the browser in clear text.',
+						'Connect this site to webhead Search Cloud to start syncing content and enable search.',
 						'webhead-search-cloud'
 					)}
 				</Text>
 			</Card.Header>
 			<Card.Content className="whsc-tab-card-content">
-				<TextControl
-					__next40pxDefaultSize
-					label={__('Search key', 'webhead-search-cloud')}
-					help={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'webhead-search-cloud')}
-					value={settings.search_key ?? ''}
-					onChange={(value) => updateSetting('search_key', value)}
-				/>
-				<TextControl
-					__next40pxDefaultSize
-					type="password"
-					autoComplete="off"
-					label={__('Write key', 'webhead-search-cloud')}
-					placeholder={hasStored('write_key') ? SECRET_PLACEHOLDER : ''}
-					help={
-						hasStored('write_key')
-							? __('A write key is saved. Leave blank to keep it, or enter a new one to rotate.', 'webhead-search-cloud')
-							: __('Server-side write key (wk_...).', 'webhead-search-cloud')
-					}
-					value={writeKey}
-					onChange={(value) => {
-						setWriteKey(value);
-						updateSetting('write_key', value);
-					}}
-				/>
-				<TextControl
-					__next40pxDefaultSize
-					type="password"
-					autoComplete="off"
-					label={__('Write secret', 'webhead-search-cloud')}
-					placeholder={hasStored('write_secret') ? SECRET_PLACEHOLDER : ''}
-					help={
-						hasStored('write_secret')
-							? __('A write secret is saved. Leave blank to keep it, or enter a new one to rotate.', 'webhead-search-cloud')
-							: __('Server-side write secret.', 'webhead-search-cloud')
-					}
-					value={writeSecret}
-					onChange={(value) => {
-						setWriteSecret(value);
-						updateSetting('write_secret', value);
-					}}
-				/>
+				{isConnected ? (
+					<Flex direction="column" gap={16}>
+						<ConnectionResultNotice result={connectedResult}/>
 
-				{renderResult()}
+						<Flex align="center" gap={12} wrap>
+							<Button
+								__next40pxDefaultSize
+								variant="secondary"
+								isDestructive
+								isBusy={isDisconnecting}
+								disabled={isDisconnecting}
+								onClick={() => setDisconnectConfirmOpen(true)}
+							>
+								{__('Disconnect', 'webhead-search-cloud')}
+							</Button>
+							<Button
+								variant="tertiary"
+								onClick={() => setManualEntryExpanded((expanded) => !expanded)}
+							>
+								{manualEntryExpanded
+									? __('Hide advanced: manual key entry', 'webhead-search-cloud')
+									: __('Advanced: manual key entry / rotate keys', 'webhead-search-cloud')}
+							</Button>
+						</Flex>
 
-				<Flex
-					className="webhead-search-cloud-connection-actions"
-					align="center"
-					gap={12}
-					wrap
-				>
-					<Button
-						__next40pxDefaultSize
-						accessibleWhenDisabled
-						variant="primary"
-						isBusy={isSaving}
-						disabled={connectionSaveDisabled}
-						description={connectionSaveDescription}
-						label={connectionSaveLabel}
-						onClick={onSave}
-						showTooltip={!!connectionSaveDescription}
-					>
-						{connectionSaveLabel}
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						isBusy={isTesting}
-						disabled={isTesting || isSaving || isLoading}
-						onClick={onTest}
-					>
-						{isTesting
-							? __('Testing…', 'webhead-search-cloud')
-							: __('Test connection', 'webhead-search-cloud')}
-					</Button>
-					<Text render={<span/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
-						{__('Test uses your saved credentials - save first.', 'webhead-search-cloud')}
-					</Text>
-				</Flex>
+						{manualEntryExpanded && (
+							<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
+								<ManualConnectionEntry pendingClaim={false}/>
+							</div>
+						)}
+
+						<ConfirmDialog
+							isOpen={disconnectConfirmOpen}
+							onConfirm={onDisconnect}
+							onCancel={() => setDisconnectConfirmOpen(false)}
+							confirmButtonText={__('Disconnect', 'webhead-search-cloud')}
+						>
+							{__(
+								'This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account.',
+								'webhead-search-cloud'
+							)}
+						</ConfirmDialog>
+					</Flex>
+				) : (
+					<Flex direction="column" align="center" gap={20} className="webhead-search-cloud-connect-hero">
+						{pendingClaim && (
+							<Notice status="info" isDismissible={false}>
+								<p>
+									{sprintf(
+										/* translators: %s: the email address a confirmation link was sent to. */
+										__(
+											'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below.',
+											'webhead-search-cloud'
+										),
+										pendingClaimEmail
+									)}
+								</p>
+							</Notice>
+						)}
+
+						{connectError && (
+							<Notice status="error" isDismissible={false}>
+								<p>{connectError}</p>
+							</Notice>
+						)}
+
+						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+							variant="primary"
+							isBusy={isConnecting}
+							disabled={connectDisabled}
+							description={
+								!termsPrivacy
+									? __('Accept the Terms of Service and Privacy Policy to continue.', 'webhead-search-cloud')
+									: undefined
+							}
+							showTooltip={!termsPrivacy}
+							onClick={onConnect}
+							className="webhead-search-cloud-connect-cta"
+						>
+							{connectLabel}
+						</Button>
+
+						<Flex direction="column" align="center" gap={8} className="webhead-search-cloud-connect-consents">
+							<CheckboxControl
+								__nextHasNoMarginBottom
+								checked={termsPrivacy}
+								onChange={setTermsPrivacy}
+								label={
+									<>
+										{__('I accept the', 'webhead-search-cloud')}{' '}
+										{legalLink(legalLinks.termsUrl, __('Terms of Service', 'webhead-search-cloud'))}
+										{' '}{__('and', 'webhead-search-cloud')}{' '}
+										{legalLink(legalLinks.privacyUrl, __('Privacy Policy', 'webhead-search-cloud'))}.
+										{' '}{__('(required)', 'webhead-search-cloud')}
+									</>
+								}
+							/>
+							<CheckboxControl
+								__nextHasNoMarginBottom
+								checked={dpa}
+								onChange={setDpa}
+								label={
+									<>
+										{__('I accept the', 'webhead-search-cloud')}{' '}
+										{legalLink(legalLinks.dpaUrl, __('Data Processing Agreement', 'webhead-search-cloud'))}.
+										{' '}{__('(optional)', 'webhead-search-cloud')}
+									</>
+								}
+							/>
+						</Flex>
+
+						<Flex align="center" justify="center" gap={4} wrap>
+							<Text render={<span/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
+								{effectiveEmail
+									? sprintf(
+										/* translators: %s: the email address used to connect. */
+										__("You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'webhead-search-cloud'),
+										effectiveEmail
+									)
+									: __('An admin email is required to connect.', 'webhead-search-cloud')}
+							</Text>
+							<ConnectionExplainer legal={legalLinks}/>
+						</Flex>
+
+						<Button
+							variant="link"
+							onClick={() => setShowEmailOverride((open) => !open)}
+						>
+							{showEmailOverride
+								? __('Use the default email instead', 'webhead-search-cloud')
+								: __('Not this email?', 'webhead-search-cloud')}
+						</Button>
+
+						{showEmailOverride && (
+							<Flex direction="column" gap={12} className="webhead-search-cloud-email-override">
+								<TextControl
+									__next40pxDefaultSize
+									type="email"
+									label={__('Email', 'webhead-search-cloud')}
+									value={overrideEmail}
+									onChange={setOverrideEmail}
+								/>
+								<TextControl
+									__next40pxDefaultSize
+									label={__('Your name (optional)', 'webhead-search-cloud')}
+									value={overrideAdminName}
+									onChange={setOverrideAdminName}
+								/>
+								<TextControl
+									__next40pxDefaultSize
+									label={__('Company name (optional)', 'webhead-search-cloud')}
+									help={__('Used as the Search Cloud account name.', 'webhead-search-cloud')}
+									value={overrideCompanyName}
+									onChange={setOverrideCompanyName}
+								/>
+							</Flex>
+						)}
+
+						<Button
+							variant="tertiary"
+							onClick={() => setManualEntryExpanded((expanded) => !expanded)}
+						>
+							{manualEntryExpanded
+								? __('Hide advanced: manual key entry', 'webhead-search-cloud')
+								: __('Advanced: manual key entry', 'webhead-search-cloud')}
+						</Button>
+
+						{manualEntryExpanded && (
+							<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
+								<ManualConnectionEntry pendingClaim={pendingClaim}/>
+							</div>
+						)}
+					</Flex>
+				)}
 			</Card.Content>
 		</Card.Root>
 	);

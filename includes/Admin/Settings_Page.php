@@ -9,6 +9,8 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Admin;
 
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
+use Webhead\WP\SearchCloud\Connection\Connection_State;
+use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Page;
 
 defined( 'ABSPATH' ) || exit;
@@ -17,6 +19,10 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Settings_Page extends Page {
+	public function __construct(
+		private Search_Cloud_Client $client,
+		private Connection_State $connection_state
+	) {}
 	protected function get_menu_slug(): string {
 		return 'webhead-search-cloud';
 	}
@@ -70,26 +76,59 @@ final class Settings_Page extends Page {
 	}
 
 	protected function get_localize_script_data(): array {
+		$current_user = wp_get_current_user();
+		$pending      = $this->connection_state->pending_claim();
+
 		return [
 			'api' => [
-				'settingsPath'       => '/webhead-search-cloud/v1/settings',
-				'testConnectionPath' => '/webhead-search-cloud/v1/connection/test',
-				'indexingConfigPath' => '/webhead-search-cloud/v1/indexing/config',
-				'syncBase'           => '/webhead-search-cloud/v1/sync',
-				'cacheClearPath'     => '/webhead-search-cloud/v1/cache/clear',
-				'searchConfigPath'   => '/webhead-search-cloud/v1/search-config',
-				'nonce'              => wp_create_nonce( 'wp_rest' ),
+				'settingsPath'        => '/webhead-search-cloud/v1/settings',
+				'testConnectionPath'  => '/webhead-search-cloud/v1/connection/test',
+				'connectPath'         => '/webhead-search-cloud/v1/connection/connect',
+				'disconnectPath'      => '/webhead-search-cloud/v1/connection/disconnect',
+				'connectionLegalPath' => '/webhead-search-cloud/v1/connection/legal',
+				'indexingConfigPath'  => '/webhead-search-cloud/v1/indexing/config',
+				'syncBase'            => '/webhead-search-cloud/v1/sync',
+				'cacheClearPath'      => '/webhead-search-cloud/v1/cache/clear',
+				'searchConfigPath'    => '/webhead-search-cloud/v1/search-config',
+				'nonce'               => wp_create_nonce( 'wp_rest' ),
 			],
 			'caps' => [
 				'view'           => current_user_can( Plugin_Capabilities::VIEW ),
 				'runSync'        => current_user_can( Plugin_Capabilities::RUN_SYNC ),
 				'manageSettings' => current_user_can( Plugin_Capabilities::MANAGE_SETTINGS ),
 			],
-			'connectionKeys' => [ 'search_key', 'write_key', 'write_secret' ],
+			'connectionKeys' => [
+				'search_key',
+				'write_key',
+				'write_secret',
+				'connect_pending_claim',
+				'connect_pending_email',
+			],
 			'popularSearchesKeys' => [ 'popular_searches' ],
 			'plugin' => [
 				'name'        => __( 'webhead Search Cloud', 'webhead-search-cloud' ),
 				'description' => __( 'Connect WordPress and WooCommerce to webhead Search Cloud.', 'webhead-search-cloud' ),
+			],
+			// Drives the Connection tab's default-open behavior and its initial
+			// state before the settings/health REST calls resolve.
+			'connection' => [
+				'isConnected'  => $this->client->is_configured(),
+				'pendingClaim' => $pending,
+				'defaults'     => [
+					'email'     => (string) get_option( 'admin_email' ),
+					'adminName' => (string) $current_user->display_name,
+					'siteName'  => (string) get_bloginfo( 'name' ),
+				],
+			],
+			// Synchronous, no-network fallback shown until the Connection tab's
+			// own GET /connection/legal call resolves with Search Cloud's live
+			// links (see Search_Cloud_Client::legal_links()) - kept a plain
+			// constant here, like Site Health's reachability test, so opening
+			// *any* settings tab never blocks on an outbound HTTP call.
+			'legal' => [
+				'termsUrl'   => defined( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL' ) ? \Webhead\WP\SearchCloud\LEGAL_TERMS_URL : '',
+				'privacyUrl' => defined( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL' ) ? \Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL : '',
+				'dpaUrl'     => defined( 'Webhead\WP\SearchCloud\LEGAL_DPA_URL' ) ? \Webhead\WP\SearchCloud\LEGAL_DPA_URL : '',
 			],
 		];
 	}
