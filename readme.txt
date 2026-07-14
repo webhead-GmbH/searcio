@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -49,6 +49,12 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
    anywhere on your site.
 
 == Changelog ==
+
+= 1.0.2 =
+
+- Security: hardened the server-designed result card renderer so an indexed field value can no longer break out of an HTML attribute or inject a `javascript:`/`data:` link. Values are fully escaped and unsafe URL schemes are stripped before rendering.
+- Security: the public domain-ownership verification endpoint now requires the token the Search Cloud ping always sends before returning the write key.
+- Security: WordPress protected meta (keys starting with an underscore) is no longer indexed through a custom-field mapping by default, preventing accidental exposure of internal data in public search. A new filter lets you opt a specific key back in.
 
 = 1.0.1 =
 

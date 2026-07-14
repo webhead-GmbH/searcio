@@ -11,6 +11,7 @@
 .distignore
 .editorconfig
 .wp-env.json
+.wp-env.override.json
 node_modules
 tests
 docs

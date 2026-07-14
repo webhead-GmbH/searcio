@@ -55,7 +55,7 @@ final class Field_Source_Resolver {
 	}
 
 	private function resolve_meta( string $key, WP_Post $post ): mixed {
-		if ( '' === $key ) {
+		if ( '' === $key || $this->is_protected_meta_key( $key, $post ) ) {
 			return null;
 		}
 
@@ -66,6 +66,26 @@ final class Field_Source_Resolver {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * WordPress treats `_`-prefixed keys as protected meta: internal values
+	 * hidden from the custom-fields UI (order internals, plugin bookkeeping,
+	 * transient handshakes). They are never pushed to Search Cloud by default so
+	 * an over-broad mapping cannot silently leak internal data into public
+	 * search. A site that deliberately needs one indexed can allow it per key
+	 * through the `webhead_search_cloud/index/allow_protected_meta` filter.
+	 */
+	private function is_protected_meta_key( string $key, WP_Post $post ): bool {
+		$protected = function_exists( 'is_protected_meta' )
+			? is_protected_meta( $key, 'post' )
+			: str_starts_with( $key, '_' );
+
+		if ( ! $protected ) {
+			return false;
+		}
+
+		return ! (bool) apply_filters( 'webhead_search_cloud/index/allow_protected_meta', false, $key, $post );
 	}
 
 	/**

@@ -71,6 +71,7 @@ jobs:
             --exclude ".phpunit.result.cache" \
             --exclude ".travis.yml" \
             --exclude ".wp-env.json" \
+            --exclude ".wp-env.override.json" \
             --exclude "AGENTS.md" \
             --exclude "CHANGELOG.md" \
             --exclude "CLAUDE.md" \
