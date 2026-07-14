@@ -88,6 +88,16 @@ Both tables are managed through `Database_Manager` and registered `Table` classe
 
 The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Frontend/Elementor/Search_Widget.php`) share the same rendering, styling, and runtime bundle (`Trigger_Markup`, `Frontend_Assets`) so the two embed points can't drift apart. The search modal is portalled to `document.body` at runtime in both cases, with per-instance CSS custom properties applied to both the trigger and the modal root.
 
+### Filters
+
+- **`webhead_search_cloud/index/allow_protected_meta`** — `(bool $allow, string $meta_key, WP_Post $post)`. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
+
+  ```php
+  add_filter( 'webhead_search_cloud/index/allow_protected_meta', function ( $allow, $key ) {
+      return '_my_public_field' === $key ? true : $allow;
+  }, 10, 2 );
+  ```
+
 ## Testing
 
 There are two PHP suites plus the JS suite:

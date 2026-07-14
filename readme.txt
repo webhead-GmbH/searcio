@@ -54,6 +54,7 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 
 - Security: hardened the server-designed result card renderer so an indexed field value can no longer break out of an HTML attribute or inject a `javascript:`/`data:` link. Values are fully escaped and unsafe URL schemes are stripped before rendering.
 - Security: the public domain-ownership verification endpoint now requires the token the Search Cloud ping always sends before returning the write key.
+- Security: WordPress protected meta (keys starting with an underscore) is no longer indexed through a custom-field mapping by default, preventing accidental exposure of internal data in public search. A new filter lets you opt a specific key back in.
 
 = 1.0.1 =
 
