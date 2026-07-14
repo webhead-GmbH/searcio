@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Security: hardened the server-designed result card renderer so a value from an indexed document can no longer break out of an HTML attribute or smuggle a `javascript:`/`data:` URL into a link. Field values are now fully escaped (quotes included) and script-bearing URL schemes are stripped before the card markup reaches the page.
+
 ## 1.0.1
 
 - Fixed a sync that could stay stuck on "Running" when its background worker stopped (WP-Cron disabled, no site traffic, or a tick killed mid-run). Pause, resume, and cancel now detect a dead worker and act on the run directly instead of parking a control signal no live tick will ever read; cancelling also clears any stray scheduled tick and frees the active slot so a new sync can start.

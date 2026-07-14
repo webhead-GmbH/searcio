@@ -50,6 +50,10 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 
 == Changelog ==
 
+= 1.0.2 =
+
+- Security: hardened the server-designed result card renderer so an indexed field value can no longer break out of an HTML attribute or inject a `javascript:`/`data:` link. Values are fully escaped and unsafe URL schemes are stripped before rendering.
+
 = 1.0.1 =
 
 - Fixed a sync that could stay stuck on "Running" when its background worker stopped (WP-Cron disabled, no site traffic, or a tick killed mid-run). Pause, resume, and cancel now recover the run directly instead of waiting on a worker that will never respond, so a new sync can be started again.

@@ -27,6 +27,71 @@ describe( 'escapeHtml', () => {
 	it( 'stringifies non-string values', () => {
 		expect( escapeHtml( 42 ) ).toBe( '42' );
 	} );
+
+	it( 'escapes double and single quotes so a value cannot break out of an attribute', () => {
+		expect( escapeHtml( 'x" onerror="alert(1)' ) ).toBe( 'x&quot; onerror=&quot;alert(1)' );
+		expect( escapeHtml( "x' onerror='alert(1)" ) ).toBe( 'x&#39; onerror=&#39;alert(1)' );
+	} );
+
+	it( 'escapes ampersands', () => {
+		expect( escapeHtml( 'a & b' ) ).toBe( 'a &amp; b' );
+	} );
+} );
+
+describe( 'server card XSS hardening', () => {
+	it( 'a quote-carrying field value cannot inject an onerror handler through an attribute', () => {
+		const hit = { source: { image: 'x" onerror="alert(document.cookie)' } };
+		const html = '<img src="{{image}}">';
+
+		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
+
+		// The quote must be escaped so the payload stays trapped inside the src
+		// value instead of becoming a live event-handler attribute.
+		expect( result ).toContain( '&quot;' );
+
+		const img = new window.DOMParser()
+			.parseFromString( result, 'text/html' )
+			.querySelector( 'img' );
+
+		expect( img.hasAttribute( 'onerror' ) ).toBe( false );
+	} );
+
+	it( 'strips a javascript: scheme from a templated href', () => {
+		const hit = { source: { url: 'javascript:alert(1)' } };
+		const html = '<a href="{{url}}">Buy</a>';
+
+		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
+
+		expect( result ).not.toContain( 'javascript:' );
+		expect( result ).toContain( 'Buy' );
+	} );
+
+	it( 'strips a non-image data: URI from a templated href', () => {
+		const hit = { source: { url: 'data:text/html,<script>alert(1)</script>' } };
+		const html = '<a href="{{url}}">Open</a>';
+
+		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
+
+		expect( result ).not.toContain( 'data:text/html' );
+	} );
+
+	it( 'keeps an ordinary relative href untouched', () => {
+		const hit = { source: { url: '/products/red-shoes' } };
+		const html = '<a href="{{url}}">Shoes</a>';
+
+		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
+
+		expect( result ).toContain( 'href="/products/red-shoes"' );
+	} );
+
+	it( 'keeps an http(s) image src untouched', () => {
+		const hit = { source: { image: 'https://cdn.example.com/p.jpg' } };
+		const html = '<img src="{{image}}">';
+
+		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
+
+		expect( result ).toContain( 'src="https://cdn.example.com/p.jpg"' );
+	} );
 } );
 
 describe( 'evaluateCondition', () => {

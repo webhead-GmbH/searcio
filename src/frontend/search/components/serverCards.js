@@ -39,17 +39,64 @@ const fieldValue = ( hit, field ) => {
 	return hit?.[ field ];
 };
 
+const HTML_ESCAPES = {
+	'&': '&amp;',
+	'<': '&lt;',
+	'>': '&gt;',
+	'"': '&quot;',
+	"'": '&#39;',
+};
+
 /**
  * @param {*} value
  * @return {string} HTML-escaped string (safe for both text and attribute
  *                  contexts), '' for null/undefined.
+ *
+ * Escapes quotes as well as `<`/`>`/`&`. The substituted value lands inside
+ * double-quoted attributes too (`src`/`href` — see `substitutePlaceholders`),
+ * so a value carrying a `"` would otherwise break out of the attribute and
+ * inject arbitrary markup (e.g. an `onerror` handler). A `textContent` round
+ * trip escapes only `<`/`>`/`&`, never quotes, so it is deliberately not used
+ * here.
  */
 export const escapeHtml = ( value ) => {
-	const div = document.createElement( 'div' );
+	const string = null === value || undefined === value ? '' : String( value );
 
-	div.textContent = null === value || undefined === value ? '' : String( value );
+	return string.replace( /[&<>"']/g, ( char ) => HTML_ESCAPES[ char ] );
+};
 
-	return div.innerHTML;
+// URL-bearing attributes whose value can execute script via a `javascript:`
+// (or `vbscript:`/`data:`) scheme even after HTML-escaping — escaping quotes
+// stops attribute breakout, but not a scheme sitting inside a legitimately
+// quoted `href`/`src`.
+const URL_ATTRIBUTES = [ 'href', 'src', 'xlink:href' ];
+
+// Anything but a plain, safe scheme (or a scheme-less relative URL) is dropped.
+// `data:image/` is kept so the empty-image placeholder data URI and legitimate
+// inline images in a template still resolve.
+const DANGEROUS_URL_RE = /^\s*(?:javascript|vbscript|data|file):/i;
+
+/**
+ * Neutralise script-bearing URL schemes in a parsed template fragment. Card
+ * templates are server-designed and trusted, but the `{{field}}` values spliced
+ * into their `href`/`src` attributes come from indexed documents (post/product
+ * content, custom fields) that lower-privileged users can influence, so a value
+ * like `javascript:alert(1)` in an `href` must not survive to the live DOM.
+ *
+ * @param {Element} root
+ */
+const sanitizeUrls = ( root ) => {
+	URL_ATTRIBUTES.forEach( ( attribute ) => {
+		root.querySelectorAll( `[${ attribute }]` ).forEach( ( el ) => {
+			const value = el.getAttribute( attribute ) || '';
+
+			// Allow inline images (`data:image/...`); block every other data: URI
+			// and all javascript:/vbscript:/file: schemes.
+			if ( DANGEROUS_URL_RE.test( value ) && ! /^\s*data:image\//i.test( value ) ) {
+				el.removeAttribute( attribute );
+			}
+		} );
+	} );
 };
 
 const toLooseBoolean = ( value ) => true === value || 'true' === value || 1 === value || '1' === value;
@@ -243,6 +290,9 @@ const applyPriceComponents = ( root, hit ) => {
  *   fully match the hit.
  * - Set `--sc-rating-percent` on `data-sc-rating-field` elements.
  * - Compute and fill in `data-sc-price` price components.
+ * - Strip script-bearing URL schemes from `href`/`src` attributes (see
+ *   `sanitizeUrls`) so an indexed field value can't smuggle `javascript:` into
+ *   a link before the markup reaches the live DOM.
  * - Point any `<img>` with an empty/missing `src` (a `{{image}}` placeholder
  *   with nothing to substitute) at a neutral placeholder graphic instead of
  *   a broken-image icon — kept as a real `<img>` (a data URI, so this adds
@@ -289,6 +339,8 @@ export const postProcessMarkup = ( html, hit ) => {
 	} );
 
 	applyPriceComponents( root, hit );
+
+	sanitizeUrls( root );
 
 	root.querySelectorAll( 'img' ).forEach( ( img ) => {
 		if ( '' === ( img.getAttribute( 'src' ) || '' ).trim() ) {
