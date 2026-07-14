@@ -53,6 +53,7 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 = 1.0.2 =
 
 - Security: hardened the server-designed result card renderer so an indexed field value can no longer break out of an HTML attribute or inject a `javascript:`/`data:` link. Values are fully escaped and unsafe URL schemes are stripped before rendering.
+- Security: the public domain-ownership verification endpoint now requires the token the Search Cloud ping always sends before returning the write key.
 
 = 1.0.1 =
 

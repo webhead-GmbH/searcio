@@ -48,6 +48,8 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 | `/sync/history` | DELETE | run_sync | Clear all finished history |
 | `/cache/clear` | POST | manage_settings | Reset OPcache |
 
+One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret) and only when the site is connected. It requires the `?token=` query parameter the ping always sends — a tokenless request is rejected with `400` so the write key is never handed to an unauthenticated scanner. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
+
 ### WP-CLI
 
 ```bash

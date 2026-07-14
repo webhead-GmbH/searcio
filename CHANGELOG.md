@@ -3,6 +3,7 @@
 ## 1.0.2
 
 - Security: hardened the server-designed result card renderer so a value from an indexed document can no longer break out of an HTML attribute or smuggle a `javascript:`/`data:` URL into a link. Field values are now fully escaped (quotes included) and script-bearing URL schemes are stripped before the card markup reaches the page.
+- Security: the public domain-ownership `verify` endpoint now requires the verification token the Search Cloud ping always sends, so a tokenless request can no longer read the write key.
 
 ## 1.0.1
 
