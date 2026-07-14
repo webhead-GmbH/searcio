@@ -12,7 +12,7 @@ use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
-final class Connection_StateTest extends Integration_Test_Case {
+final class Connection_State_Test extends Integration_Test_Case {
 	private function state(): Connection_State {
 		return $this->service( 'connection_state' );
 	}

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Webhead\WP\SearchCloud\DTO\Queued_Change;
 use Webhead\WP\SearchCloud\Enums\Change_Action;
 
-final class Queued_ChangeTest extends TestCase {
+final class Queued_Change_Test extends TestCase {
 	public function test_from_row_builds_a_fully_populated_change(): void {
 		$change = Queued_Change::from_row(
 			[

@@ -23,7 +23,7 @@ use Webhead\WP\SearchCloud\Tests\Unit\Resets_Wp_Test_State;
  * end-to-end — see the class docblock for the live incident that motivated
  * checking Polylang before WPML.
  */
-final class Multilingual_SupportTest extends TestCase {
+final class Multilingual_Support_Test extends TestCase {
 	use Resets_Wp_Test_State;
 
 	private function support(): Multilingual_Support {

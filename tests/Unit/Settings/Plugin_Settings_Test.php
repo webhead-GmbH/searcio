@@ -13,7 +13,7 @@ use ReflectionClassConstant;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Setting;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 
-final class Plugin_SettingsTest extends TestCase {
+final class Plugin_Settings_Test extends TestCase {
 	public function test_encrypt_secret_round_trips_through_decrypt_secret(): void {
 		$encrypted = Plugin_Settings::encrypt_secret( 'wk_live_super_secret' );
 

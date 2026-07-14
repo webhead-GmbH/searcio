@@ -21,7 +21,7 @@ use Webhead\WP\SearchCloud\Sync\Sync_State;
  * `Sync_State` via reflection instead of a real/fake table collaborator,
  * since `present()` never touches `$this->table`.
  */
-final class Sync_StateTest extends TestCase {
+final class Sync_State_Test extends TestCase {
 	private function state(): Sync_State {
 		return ( new ReflectionClass( Sync_State::class ) )->newInstanceWithoutConstructor();
 	}

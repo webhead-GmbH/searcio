@@ -11,7 +11,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit\Enums;
 use PHPUnit\Framework\TestCase;
 use Webhead\WP\SearchCloud\Enums\Sync_Status;
 
-final class Sync_StatusTest extends TestCase {
+final class Sync_Status_Test extends TestCase {
 	public function test_is_active_is_true_for_queued_running_and_paused(): void {
 		$this->assertTrue( Sync_Status::Queued->is_active() );
 		$this->assertTrue( Sync_Status::Running->is_active() );

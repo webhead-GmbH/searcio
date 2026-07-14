@@ -13,7 +13,7 @@ use WP_Post;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Tests\Unit\Resets_Wp_Test_State;
 
-final class Dirty_TrackerTest extends TestCase {
+final class Dirty_Tracker_Test extends TestCase {
 	use Resets_Wp_Test_State;
 
 	private Dirty_Tracker $tracker;

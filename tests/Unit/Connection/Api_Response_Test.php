@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use WP_Error;
 use Webhead\WP\SearchCloud\Connection\Api_Response;
 
-final class Api_ResponseTest extends TestCase {
+final class Api_Response_Test extends TestCase {
 	public function test_ok_is_true_only_for_2xx_status(): void {
 		$this->assertTrue( Api_Response::from_http( 200, [ 'body' => '{}' ] )->ok() );
 		$this->assertTrue( Api_Response::from_http( 299, [ 'body' => '{}' ] )->ok() );

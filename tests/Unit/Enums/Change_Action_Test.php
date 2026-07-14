@@ -11,7 +11,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit\Enums;
 use PHPUnit\Framework\TestCase;
 use Webhead\WP\SearchCloud\Enums\Change_Action;
 
-final class Change_ActionTest extends TestCase {
+final class Change_Action_Test extends TestCase {
 	public function test_from_storage_resolves_known_values(): void {
 		$this->assertSame( Change_Action::Upsert, Change_Action::from_storage( 'upsert' ) );
 		$this->assertSame( Change_Action::Delete, Change_Action::from_storage( 'delete' ) );
