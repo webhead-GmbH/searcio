@@ -84,6 +84,8 @@ jobs:
             --exclude "phpstan.neon" \
             --exclude "phpunit.xml.dist" \
             --exclude "phpunit-integration.xml.dist" \
+            --exclude "playwright.config.js" \
+            --exclude "artifacts/" \
             --exclude "webpack.config.js" \
             --exclude "README.md" \
             --exclude "icon.png" \

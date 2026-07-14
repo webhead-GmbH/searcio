@@ -26,6 +26,8 @@ phpunit.xml.dist
 phpunit-integration.xml.dist
 phpstan.neon
 phpcs.xml
+playwright.config.js
+artifacts
 webpack.config.js
 AGENTS.md
 CLAUDE.md

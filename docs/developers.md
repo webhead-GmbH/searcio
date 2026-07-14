@@ -100,12 +100,13 @@ The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Frontend/
 
 ## Testing
 
-There are two PHP suites plus the JS suite:
+There are two PHP suites, the JS unit suite, and a Playwright end-to-end suite:
 
 ```bash
 composer test:unit          # PHPUnit — fast, DB-free pure-logic classes (tests/Unit)
 npm run test:integration    # PHPUnit — real WordPress + database via wp-env (tests/Integration)
 npm run test:js             # Jest — pure-logic JS utilities
+npm run test:e2e            # Playwright — real browser, desktop + mobile (tests/e2e)
 ```
 
 The **unit suite** (`tests/Unit`, `phpunit.xml.dist`) is intentionally scoped to pure logic — enums, DTOs, response/state normalization, dirty-tracking, multilingual provider resolution, currency/facet/language helpers, card-template evaluation, the request cache, and local-storage-backed recent searches. `tests/bootstrap.php` polyfills a small, explicit set of WordPress functions (translation no-ops, post-meta as an in-memory store, a minimal filter registry, `WP_Post`/`WP_Error` stand-ins) rather than loading all of WordPress, so it stays fast and needs no database.
@@ -120,6 +121,16 @@ npm run test:integration    # unit + integration together: npm run test:php
 ```
 
 Both PHP suites run in CI (`.github/workflows/run-tests.yml`): the unit suite across the full PHP × WordPress compatibility matrix (8.3/8.4 × latest/6.0), and the integration suite on WordPress `latest` only — the `wp-phpunit` test framework targets current WordPress, and the WP 6.0 test framework is not PHP 8.4-safe. Because of that gating, the CI "latest" leg installs current Elementor + WooCommerce while the "6.0" leg installs the plugin alone (current Elementor needs WP 6.8+, WooCommerce needs WP 6.9+, and neither is exercised on that leg). If the integration suite is ever extended to run on WP 6.0, pin Elementor 3.23.x there — 3.24.0 raised Elementor's minimum to WP 6.3.
+
+The **end-to-end suite** (`tests/e2e`, `playwright.config.js`) drives the real, built front-end in a browser via Playwright and `@wordpress/scripts test-playwright`. Every spec runs twice — a desktop and a mobile (`Pixel 5`) project — so the search modal is proven in both layouts. The hosted Search Cloud API is never contacted: `mockSearchCloud()` (`tests/e2e/utils.js`) intercepts every `…/api/v1/*` request with deterministic, CORS-headed responses, and `configureSearchKey()` sets the plugin's public key so the front end runs a real query instead of degrading to native `?s=` search. Coverage spans opening the modal from both trigger styles, running a query and rendering result cards, the no-results and API-error fallback, type facets, the pre-query browse state (highlights / popular / recent), focus and keyboard behaviour, responsive layout, the unconfigured fallback, and an Elementor smoke test that skips when Elementor is not active.
+
+```bash
+npm run build               # E2E drives the built bundle, so build first
+npm run wp-env -- start
+npm run test:e2e            # both projects; test:e2e:desktop for desktop only
+```
+
+E2E needs a browser (`npx playwright install chromium`) and the built assets, and runs on WordPress `latest` with Elementor + WooCommerce in its own CI job. It targets the wp-env tests site (`http://localhost:8889`); set `WP_BASE_URL` to point it elsewhere (e.g. the dev site on `:8888`).
 
 Add or update the narrowest useful test for every behavior change. `npm run build` after any JavaScript, block, or admin UI change, followed by a manual check in a real browser (desktop and mobile widths, keyboard focus, no horizontal overflow).
 
