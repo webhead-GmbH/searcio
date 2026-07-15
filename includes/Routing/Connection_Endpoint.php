@@ -178,7 +178,8 @@ final class Connection_Endpoint extends Rest_API {
 		$body      = $response->body();
 		$documents = is_array( $body['usage']['documents'] ?? null ) ? $body['usage']['documents'] : [];
 
-		$languages = is_array( $body['plan']['languages'] ?? null ) ? $body['plan']['languages'] : [];
+		$plan      = is_array( $body['plan'] ?? null ) ? $body['plan'] : [];
+		$languages = is_array( $plan['languages'] ?? null ) ? $plan['languages'] : [];
 
 		return [
 			'ok'               => true,
@@ -198,6 +199,13 @@ final class Connection_Endpoint extends Rest_API {
 			'languages'        => [
 				'limit'   => isset( $languages['limit'] ) ? ( null === $languages['limit'] ? null : (int) $languages['limit'] ) : null,
 				'allowed' => is_array( $languages['allowed'] ?? null ) ? array_values( $languages['allowed'] ) : [],
+			],
+			// Plan tier, so the admin header can surface an "Upgrade plan" CTA on
+			// Free accounts (docs/api/health.md `plan.is_free` / `plan.upgrade_url`).
+			'plan'             => [
+				'is_free'     => (bool) ( $plan['is_free'] ?? false ),
+				'name'        => isset( $plan['name'] ) ? (string) $plan['name'] : '',
+				'upgrade_url' => isset( $plan['upgrade_url'] ) && is_string( $plan['upgrade_url'] ) ? esc_url_raw( $plan['upgrade_url'] ) : '',
 			],
 		];
 	}

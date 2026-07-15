@@ -11,6 +11,7 @@ import {Flex} from '../../../components/Layout';
 import {animateText, fadeInUpProps, renderAnimatedTabTitle} from '../../../utils/animation';
 import SettingsContext from '../../../settings/store/context';
 import SettingsSkeleton from './SettingsSkeleton';
+import UpgradeButton from './UpgradeButton';
 import SettingsGroupTab from './tabs/SettingsGroupTab';
 import CacheClearCard from './tabs/CacheClearCard';
 import ConnectionTab from './tabs/ConnectionTab';
@@ -165,6 +166,7 @@ const SettingsPanel = () => {
 								</Text>
 							</div>
 						</Flex.Block>
+						<UpgradeButton/>
 					</Flex>
 				</Card.Header>
 				<Card.Content className="whsc-settings-tabs-content">

@@ -146,16 +146,22 @@ export async function isPluginActive( requestUtils, plugin ) {
  *
  * @param {string} mode Trigger mode: 'icon' or 'box'.
  */
-export function createElementorPost( mode = 'icon' ) {
-	// Seed on the same wp-env site the browser targets: the tests site (`tests-cli`,
-	// :8889 — the default) or the dev site (`cli`, :8888) when WP_BASE_URL points there.
+// Run a seed script (tests/e2e/*.php) through WP-CLI on the same wp-env site the
+// browser targets: the tests site (`tests-cli`, :8889 — the default) or the dev
+// site (`cli`, :8888) when WP_BASE_URL points there.
+function wpEvalFile( file, ...args ) {
 	const port = new URL( process.env.WP_BASE_URL || 'http://localhost:8889' ).port;
 	const container = '8888' === port ? 'cli' : 'tests-cli';
-	const seed = 'wp-content/plugins/webhead-search-cloud/tests/e2e/seed-elementor.php';
-	const output = execSync(
-		`npx wp-env run ${ container } wp eval-file ${ seed } ${ mode }`,
+	const seed = `wp-content/plugins/webhead-search-cloud/tests/e2e/${ file }`;
+
+	return execSync(
+		`npx wp-env run ${ container } wp eval-file ${ seed } ${ args.join( ' ' ) }`.trim(),
 		{ encoding: 'utf-8', stdio: [ 'ignore', 'pipe', 'ignore' ] }
 	);
+}
+
+export function createElementorPost( mode = 'icon' ) {
+	const output = wpEvalFile( 'seed-elementor.php', mode );
 
 	// Restrict to URL-safe characters so WP-CLI's trailing status glyph (printed
 	// right after the URL) can't be captured as part of it.
@@ -166,6 +172,17 @@ export function createElementorPost( mode = 'icon' ) {
 	}
 
 	return match[ 1 ];
+}
+
+/**
+ * Store (or clear) dummy connection credentials so the settings page reports the
+ * site as connected — the gate the header upgrade CTA checks before its health
+ * request. See `seed-connection.php`.
+ *
+ * @param {boolean} connected
+ */
+export function setConnected( connected = true ) {
+	wpEvalFile( 'seed-connection.php', connected ? 'set' : 'clear' );
 }
 
 /**
