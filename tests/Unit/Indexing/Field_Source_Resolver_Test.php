@@ -13,7 +13,7 @@ use WP_Post;
 use Webhead\WP\SearchCloud\Indexing\Field_Source_Resolver;
 use Webhead\WP\SearchCloud\Tests\Unit\Resets_Wp_Test_State;
 
-final class Field_Source_ResolverTest extends TestCase {
+final class Field_Source_Resolver_Test extends TestCase {
 	use Resets_Wp_Test_State;
 
 	private Field_Source_Resolver $resolver;

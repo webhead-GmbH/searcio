@@ -13,7 +13,7 @@ use ReflectionClassConstant;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Capability;
 
-final class Plugin_CapabilitiesTest extends TestCase {
+final class Plugin_Capabilities_Test extends TestCase {
 	public function test_view_run_sync_and_manage_settings_are_distinct_capability_strings(): void {
 		$capabilities = [
 			Plugin_Capabilities::VIEW,

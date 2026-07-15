@@ -11,7 +11,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Connection;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
-final class Search_Cloud_ClientTest extends Integration_Test_Case {
+final class Search_Cloud_Client_Test extends Integration_Test_Case {
 	private function client(): Search_Cloud_Client {
 		return $this->service( 'search_cloud_client' );
 	}

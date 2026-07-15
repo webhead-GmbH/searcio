@@ -42,17 +42,26 @@ jobs:
       -   name: Install NPM dependencies
           run: npm ci
 
-      # Only the plugin under test is installed. Elementor/WooCommerce are not
-      # needed by the test suites and their latest releases require newer
-      # WordPress than the 6.0 matrix leg (Elementor needs WP 6.8+), which would
-      # abort `wp-env start` on activation.
+      # The integration suite (which is the only thing that exercises Elementor
+      # and WooCommerce) runs on WP "latest" only — wp-phpunit targets current
+      # WordPress and the old WP 6.0 test framework is not PHP 8.4-safe. So the
+      # "latest" leg installs current Elementor + WooCommerce, while the "6.0"
+      # leg installs the plugin alone: it runs unit tests only, and current
+      # Elementor (needs WP 6.8+) / WooCommerce (needs WP 6.9+) would abort
+      # `wp-env start` there. If integration is ever extended to the 6.0 leg,
+      # pin Elementor 3.23.x (3.24.0 raised its minimum to WP 6.3) instead.
       -   name: Generate .wp-env.json for WP ${{ matrix.wp }}
           run: |
+            if [ "${{ matrix.wp }}" = "latest" ]; then
+              PLUGINS='".", "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip", "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"'
+            else
+              PLUGINS='"."'
+            fi
             cat > .wp-env.json <<EOF
             {
               "core": "https://wordpress.org/wordpress-${{ matrix.wp }}.zip",
               "plugins": [
-                "."
+                ${PLUGINS}
               ],
               "env": {
                 "tests": {
@@ -106,6 +115,98 @@ jobs:
       -   name: Run PHPUnit integration suite (wp-env)
           if: matrix.wp == 'latest'
           run: npm run test:integration
+
+      -   name: Stop wp-env
+          if: always()
+          run: npm run wp-env -- stop
+
+  e2e-tests:
+    name: Playwright E2E (WP latest)
+    runs-on: ubuntu-latest
+
+    # Needed by `composer install` to pull the private wp-plugin-framework via VCS.
+    env:
+      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+
+    steps:
+      -   name: Checkout repository
+          uses: actions/checkout@v3
+
+      -   name: Setup Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: '20'
+
+      -   name: Setup PHP
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: '8.3'
+            extensions: mbstring, intl
+            coverage: none
+
+      -   name: Install Composer dependencies
+          run: composer install --no-progress --no-suggest --prefer-dist
+
+      -   name: Install NPM dependencies
+          run: npm ci
+
+      # E2E drives the real built front-end bundle in a browser, so it must be
+      # built before wp-env serves the plugin.
+      -   name: Build assets
+          run: npm run build
+
+      # Runs on WP latest with Elementor + WooCommerce so both embed points are
+      # exercised (current Elementor needs WP 6.8+, WooCommerce needs WP 6.9+).
+      -   name: Generate .wp-env.json (WP latest + Elementor + WooCommerce)
+          run: |
+            cat > .wp-env.json <<'EOF'
+            {
+              "core": "https://wordpress.org/wordpress-latest.zip",
+              "plugins": [
+                ".",
+                "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip",
+                "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
+              ],
+              "env": {
+                "tests": {
+                  "phpVersion": "8.3"
+                }
+              }
+            }
+            EOF
+
+      -   name: Start wp-env
+          run: |
+            set -euo pipefail
+            started=false
+            for i in {1..3}; do
+              echo "🟢 wp-env start attempt #$i"
+              if npm run wp-env -- start; then
+                started=true
+                break
+              fi
+              echo "❌ wp-env start failed, stopping containers and retrying..."
+              npm run wp-env -- stop || true
+              sleep 10
+            done
+            if [ "${started}" != "true" ]; then
+              echo "::error::wp-env did not start after 3 attempts."
+              exit 1
+            fi
+
+      -   name: Install Playwright browser
+          run: npx playwright install chromium --with-deps
+
+      -   name: Run Playwright E2E suite
+          run: npm run test:e2e
+
+      -   name: Upload Playwright artifacts
+          if: ${{ failure() }}
+          uses: actions/upload-artifact@v4
+          with:
+            name: playwright-artifacts
+            path: artifacts/
+            retention-days: 7
 
       -   name: Stop wp-env
           if: always()

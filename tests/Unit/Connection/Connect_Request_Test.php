@@ -11,7 +11,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit\Connection;
 use PHPUnit\Framework\TestCase;
 use Webhead\WP\SearchCloud\Connection\Connect_Request;
 
-final class Connect_RequestTest extends TestCase {
+final class Connect_Request_Test extends TestCase {
 	public function test_to_payload_contains_the_documented_shape(): void {
 		$request = Connect_Request::create(
 			platform: 'wordpress',

@@ -11,7 +11,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit\Frontend;
 use PHPUnit\Framework\TestCase;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
 
-final class Trigger_MarkupTest extends TestCase {
+final class Trigger_Markup_Test extends TestCase {
 	public function test_defaults_to_icon_mode_when_mode_is_missing(): void {
 		$html = Trigger_Markup::render( [] );
 
