@@ -82,6 +82,35 @@
   width: 100%;
 }
 
+// "Upgrade plan" CTA shown in the header on Free accounts. Deliberately purple
+// (not the theme's green primary) so it reads as a distinct, promotional action.
+.whsc-upgrade-cta {
+  flex-shrink: 0;
+
+  .whsc-upgrade-button.components-button.is-primary {
+    background: #7c3aed;
+    color: #fff;
+
+    &:hover:not(:disabled):not([aria-disabled='true']),
+    &:active:not(:disabled):not([aria-disabled='true']) {
+      background: #6d28d9;
+      color: #fff;
+    }
+
+    &:focus:not(:disabled):not([aria-disabled='true']) {
+      box-shadow: 0 0 0 1px #fff, 0 0 0 3px #7c3aed;
+      outline: 2px solid transparent;
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .whsc-upgrade-cta .whsc-upgrade-button.components-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .whsc-dataviews-field-header-with-icon {
   display: inline-flex;
   align-items: center;

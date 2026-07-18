@@ -51,6 +51,48 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 403, $response->get_status() );
 	}
 
+	public function test_test_connection_surfaces_the_plan_tier_and_upgrade_url(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok(
+			[
+				'site'  => [ 'id' => 4821, 'status' => 'connected', 'last_synced_at' => null ],
+				'usage' => [ 'documents' => [ 'used' => 10, 'limit' => 1000 ] ],
+				'plan'  => [
+					'id'          => 1,
+					'slug'        => 'free',
+					'name'        => 'Free',
+					'is_free'     => true,
+					'upgrade_url' => 'https://search.example.com/acme/billing',
+					'languages'   => [ 'limit' => 1, 'allowed' => [] ],
+				],
+			]
+		) );
+
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertTrue( $data['plan']['is_free'] );
+		$this->assertSame( 'Free', $data['plan']['name'] );
+		$this->assertSame( 'https://search.example.com/acme/billing', $data['plan']['upgrade_url'] );
+	}
+
+	public function test_test_connection_defaults_plan_to_not_free_when_absent(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok(
+			[
+				'site'  => [ 'id' => 1, 'status' => 'connected' ],
+				'usage' => [ 'documents' => [ 'used' => 0, 'limit' => 1000 ] ],
+			]
+		) );
+
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$data     = $response->get_data();
+
+		$this->assertFalse( $data['plan']['is_free'] );
+		$this->assertSame( '', $data['plan']['upgrade_url'] );
+	}
+
 	public function test_connect_rejects_a_missing_terms_privacy_consent_without_calling_the_api(): void {
 		$this->login_admin();
 
