@@ -153,6 +153,40 @@ export const fetchPopularSearches = ( options = {} ) => request(
 	options.signal
 );
 
+/**
+ * Fire-and-forget click beacon: tells Search Cloud that a visitor opened a
+ * result, so the click-through rate can be attributed to the search that
+ * produced it (see docs/api/search.md `POST /search/click`). Uses
+ * `navigator.sendBeacon` so it survives the navigation the click triggers and
+ * never blocks it. Best-effort — any failure is swallowed.
+ *
+ * @param {string}        searchId   The `search_id` from the search response.
+ * @param {string}        documentId The clicked hit's id.
+ * @param {number}        position   1-based position in the list the visitor saw.
+ */
+export const trackClick = ( searchId, documentId, position ) => {
+	if (
+		! searchId ||
+		! documentId ||
+		! isConfigured() ||
+		'undefined' === typeof navigator ||
+		'function' !== typeof navigator.sendBeacon
+	) {
+		return;
+	}
+
+	try {
+		const body = new Blob(
+			[ JSON.stringify( { search_id: searchId, document_id: documentId, position } ) ],
+			{ type: 'application/json' }
+		);
+
+		navigator.sendBeacon( buildUrl( '/search/click', {} ), body );
+	} catch ( e ) {
+		// Analytics must never affect the visitor.
+	}
+};
+
 export const isConfigured = () => Boolean( config.endpoint && config.searchKey );
 
 // Decision logic lives in `language.js`; this just supplies live config values.

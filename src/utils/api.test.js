@@ -36,6 +36,7 @@ beforeEach( () => {
 afterEach( () => {
 	jest.useRealTimers();
 	delete global.fetch;
+	delete global.navigator.sendBeacon;
 	delete window.webheadSearchCloudFrontend;
 } );
 
@@ -149,5 +150,62 @@ describe( 'suggest / fetchCardTemplates / fetchPopularSearches', () => {
 		expect( urls[ 0 ] ).toContain( '/search/suggest?' );
 		expect( urls[ 1 ] ).toContain( '/card-templates?' );
 		expect( urls[ 2 ] ).toContain( '/search/popular?' );
+	} );
+} );
+
+describe( 'trackClick', () => {
+	it( 'beacons the click endpoint with the search id, document id and position', () => {
+		const sendBeacon = jest.fn().mockReturnValue( true );
+		global.navigator.sendBeacon = sendBeacon;
+
+		// Capture what goes into the Blob (jsdom's Blob has no readable .text()).
+		const RealBlob = global.Blob;
+		const captured = [];
+		global.Blob = jest.fn( ( parts ) => {
+			captured.push( parts );
+			return { parts };
+		} );
+
+		try {
+			const api = loadApi();
+
+			api.trackClick( 'search-123', 'p-1', 3 );
+
+			expect( sendBeacon ).toHaveBeenCalledTimes( 1 );
+
+			const [ url ] = sendBeacon.mock.calls[ 0 ];
+
+			expect( url ).toContain( '/search/click?' );
+			expect( url ).toContain( 'key=sk_test' );
+			expect( JSON.parse( captured[ 0 ][ 0 ] ) ).toEqual( {
+				search_id: 'search-123',
+				document_id: 'p-1',
+				position: 3,
+			} );
+		} finally {
+			global.Blob = RealBlob;
+		}
+	} );
+
+	it( 'does nothing without a search id or document id', () => {
+		const sendBeacon = jest.fn();
+		global.navigator.sendBeacon = sendBeacon;
+		const api = loadApi();
+
+		api.trackClick( '', 'p-1', 1 );
+		api.trackClick( 'search-123', '', 1 );
+
+		expect( sendBeacon ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing when the plugin is not configured', () => {
+		const sendBeacon = jest.fn();
+		global.navigator.sendBeacon = sendBeacon;
+		setConfig( { searchKey: '' } );
+		const api = loadApi();
+
+		api.trackClick( 'search-123', 'p-1', 1 );
+
+		expect( sendBeacon ).not.toHaveBeenCalled();
 	} );
 } );

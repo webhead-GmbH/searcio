@@ -56,6 +56,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		popular = [],
 		templates = [],
 		searchStatus = 200,
+		searchId = 'search-e2e',
 		onSearch,
 	} = options;
 
@@ -72,7 +73,10 @@ export async function mockSearchCloud( page, options = {} ) {
 				return json( {}, searchStatus );
 			}
 			const list = 'function' === typeof hits ? hits( url ) : hits;
-			return json( { hits: list, total: list.length, facets } );
+			return json( { search_id: searchId, hits: list, total: list.length, facets } );
+		}
+		if ( '/search/click' === path ) {
+			return json( { recorded: true }, 202 );
 		}
 		if ( '/search/suggest' === path ) {
 			return json( { suggestions } );

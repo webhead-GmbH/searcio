@@ -3,7 +3,7 @@ import {Button, Modal, Notice} from '@wordpress/components';
 import {closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
-import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, getConfig, isConfigured, isLanguageSupported, search, suggest} from '../../../utils/api';
+import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
 import {buildFilterParams, buildTypeParam, extractFieldFacets, humanizeFieldLabel, mergeFieldFacets, toggleSelection} from '../../../utils/facets';
 import {ResultCard} from './templates';
@@ -106,6 +106,9 @@ const SearchModal = ({
 	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 	const [results, setResults] = useState(null);
 	const [highlights, setHighlights] = useState([]);
+	// The search_id of the highlights carousel, so clicks on it attribute to the
+	// same search the way result clicks attribute to `results.search_id`.
+	const [highlightsSearchId, setHighlightsSearchId] = useState('');
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -265,6 +268,7 @@ const SearchModal = ({
 			const response = await search('', {type, filters, perPage: 12});
 
 			setHighlights(response.hits || []);
+			setHighlightsSearchId(response.search_id || '');
 			// Only refresh the type chip list when this request had no type
 			// filter applied — confirmed live that this API's `facets.types`
 			// collapses to just the active selection otherwise, which would
@@ -529,7 +533,14 @@ const SearchModal = ({
 			<Carousel
 				items={highlights}
 				getKey={(hit) => hit.id}
-				renderItem={(hit) => <ResultCard hit={hit} cardSource={cardSource} serverTemplates={serverTemplates}/>}
+				renderItem={(hit, index) => (
+					<ResultCard
+						hit={hit}
+						cardSource={cardSource}
+						serverTemplates={serverTemplates}
+						onClick={() => trackClick(highlightsSearchId, hit.id, index + 1)}
+					/>
+				)}
 				ariaLabel={__('Current highlights', 'webhead-search-cloud')}
 			/>
 		);
@@ -548,7 +559,14 @@ const SearchModal = ({
 			<Carousel
 				items={resultsHits}
 				getKey={(hit) => hit.id}
-				renderItem={(hit) => <ResultCard hit={hit} cardSource={cardSource} serverTemplates={serverTemplates}/>}
+				renderItem={(hit, index) => (
+					<ResultCard
+						hit={hit}
+						cardSource={cardSource}
+						serverTemplates={serverTemplates}
+						onClick={() => trackClick(results?.search_id, hit.id, index + 1)}
+					/>
+				)}
 				ariaLabel={__('Search results', 'webhead-search-cloud')}
 			/>
 		) : (

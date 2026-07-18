@@ -391,7 +391,7 @@ export const ensureTemplateCss = ( id, css ) => {
  * @param {Object} props.hit
  * @param {Object} props.template
  */
-export const ServerCard = ( { hit, template } ) => {
+export const ServerCard = ( { hit, template, onClick } ) => {
 	useEffect( () => {
 		ensureTemplateCss( template.id, template.css );
 	}, [ template.id, template.css ] );
@@ -399,6 +399,7 @@ export const ServerCard = ( { hit, template } ) => {
 	return (
 		<div
 			className={ `whsc-card whsc-card--server sct-${ template.id }` }
+			onClick={ onClick }
 			// eslint-disable-next-line react/no-danger -- server-designed, trusted HTML; field values are escaped in buildServerCardHtml().
 			dangerouslySetInnerHTML={ { __html: buildServerCardHtml( template, hit ) } }
 		/>

@@ -96,6 +96,29 @@ test.describe( 'Search modal', () => {
 		await expect( widget.modal ).toBeHidden();
 	} );
 
+	test( 'reports a result click to the analytics beacon', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			hits: [ postHit( { title: 'Clickable' } ) ],
+			searchId: 'search-e2e-1',
+		} );
+		// Resolve the card's navigation locally instead of hitting example.test.
+		await page.route( 'https://example.test/**', ( route ) => route.fulfill( { status: 200, body: 'ok' } ) );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'shoes' );
+		await expect( widget.cards.first() ).toBeVisible();
+
+		const beacon = page.waitForRequest(
+			( request ) => request.url().includes( '/search/click' ) && 'POST' === request.method()
+		);
+		await widget.cards.first().click();
+		const payload = JSON.parse( ( await beacon ).postData() );
+
+		expect( payload ).toMatchObject( { search_id: 'search-e2e-1', document_id: 'post-1', position: 1 } );
+	} );
+
 	test( 'falls back to native search when the API errors', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, { searchStatus: 500 } );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
