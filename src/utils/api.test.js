@@ -209,3 +209,44 @@ describe( 'trackClick', () => {
 		expect( sendBeacon ).not.toHaveBeenCalled();
 	} );
 } );
+
+describe( 'fetchStorefrontConfig', () => {
+	it( 'requests the storefront-config endpoint with the key and returns capabilities', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { capabilities: { assistant: true } } ) );
+		const api = loadApi();
+
+		const config = await api.fetchStorefrontConfig();
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/storefront-config?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( config.capabilities.assistant ).toBe( true );
+	} );
+} );
+
+describe( 'askAssistant', () => {
+	it( 'POSTs the message and history to the assistant endpoint and returns the reply and products', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { reply: 'Here you go', products: [ { id: 'p-1' } ] } ) );
+		const api = loadApi();
+
+		const result = await api.askAssistant( 'a warm jacket', [ { role: 'user', content: 'hi' } ] );
+
+		const [ url, options ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/assistant?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( options.method ).toBe( 'POST' );
+		expect( JSON.parse( options.body ) ).toEqual( {
+			message: 'a warm jacket',
+			history: [ { role: 'user', content: 'hi' } ],
+		} );
+		expect( result.reply ).toBe( 'Here you go' );
+		expect( result.products ).toHaveLength( 1 );
+	} );
+
+	it( 'throws an error carrying the HTTP status so callers can branch on 403/429/502', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( {}, false, 429 ) );
+		const api = loadApi();
+
+		await expect( api.askAssistant( 'x' ) ).rejects.toMatchObject( { status: 429 } );
+	} );
+} );
