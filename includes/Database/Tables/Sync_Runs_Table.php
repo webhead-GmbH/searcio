@@ -199,22 +199,38 @@ final class Sync_Runs_Table extends Table {
 	 * inherently excluded because only finished statuses are matched.
 	 */
 	public function purge_older_than( string $cutoff_gmt ): int {
-		$deleted = 0;
+		$statuses = Sync_Status::finished_values();
 
-		foreach ( Sync_Status::finished_values() as $status ) {
-			$result = $this->delete(
-				[
-					'status'       => $status,
-					'created_at <' => $cutoff_gmt,
-				]
-			);
-
-			if ( false !== $result ) {
-				$deleted += (int) $result;
-			}
+		if ( [] === $statuses ) {
+			return 0;
 		}
 
-		return $deleted;
+		/*
+		 * Written out rather than passed to `delete()` with a `'created_at <'`
+		 * operator key: that routes into the query builder, whose bindings reach
+		 * `wpdb::prepare()` in a form it rejects ("must have a placeholder"), so
+		 * the DELETE never ran and history grew without bound. Comparison
+		 * operators here stay on an explicitly prepared statement.
+		 */
+		$connection   = $this->get_connection();
+		$placeholders = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
+		$table        = $this->get_table_name_with_prefix();
+
+		$result = $connection->query(
+			$connection->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and placeholder list are built from trusted values.
+				"DELETE FROM `{$table}` WHERE `status` IN ({$placeholders}) AND `created_at` < %s",
+				[ ...$statuses, $cutoff_gmt ]
+			)
+		);
+
+		if ( false === $result ) {
+			return 0;
+		}
+
+		$this->cache_manager?->invalidate_group( $this->cache_group );
+
+		return (int) $result;
 	}
 
 	/**
