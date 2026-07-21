@@ -4,7 +4,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { askAssistant } from '../../../utils/api';
 import CompareTable from './CompareTable';
-import { sendIcon, sparkleIcon } from './icons';
+import { compareIcon, gridIcon, sendIcon, sparkleIcon } from './icons';
 import { ResultCard } from './templates';
 
 // Matches the API's history/message caps (docs/api/search.md POST /assistant).
@@ -58,8 +58,16 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	);
 	const products = withProducts?.products || [];
 
-	const send = useCallback( async () => {
-		const trimmed = input.trim().slice( 0, MESSAGE_MAX );
+	// Store-agnostic openers for the empty state. Kept short so all three sit on
+	// one row rather than wrapping into a lopsided 2 + 1.
+	const STARTERS = [
+		__( "What's popular?", 'webhead-search-cloud' ),
+		__( 'Help me find a gift', 'webhead-search-cloud' ),
+		__( "What's on sale?", 'webhead-search-cloud' ),
+	];
+
+	const send = useCallback( async ( preset ) => {
+		const trimmed = ( 'string' === typeof preset ? preset : input ).trim().slice( 0, MESSAGE_MAX );
 
 		if ( '' === trimmed || isSending ) {
 			return;
@@ -106,7 +114,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	};
 
 	return (
-		<div className="whsc-assistant">
+		<div className={ `whsc-assistant${ products.length > 0 ? ' whsc-assistant--split' : '' }` }>
 			<div className="whsc-assistant__chat">
 				<div className="whsc-assistant__thread" ref={ threadRef }>
 					{ 0 === messages.length && (
@@ -114,12 +122,26 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 							<span className="whsc-assistant__avatar whsc-assistant__avatar--lg" aria-hidden="true">
 								{ sparkleIcon }
 							</span>
-							<p>
+							<p className="whsc-assistant__intro-text">
 								{ __(
 									"Describe what you're looking for and I'll find it in this store.",
 									'webhead-search-cloud'
 								) }
 							</p>
+							{ /* A blank chat box gives no clue what it can do, so offer
+							     store-agnostic openers that fill and send the message. */ }
+							<div className="whsc-assistant__starters">
+								{ STARTERS.map( ( starter ) => (
+									<button
+										key={ starter }
+										type="button"
+										className="whsc-assistant__starter"
+										onClick={ () => send( starter ) }
+									>
+										{ starter }
+									</button>
+								) ) }
+							</div>
 						</div>
 					) }
 
@@ -166,22 +188,32 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 				<div className="whsc-assistant__results">
 					<div className="whsc-assistant__results-head">
 						<span className="whsc-assistant__results-count">
-							{ sprintf(
-								/* translators: %d: number of products. */
-								_n( '%d result', '%d results', products.length, 'webhead-search-cloud' ),
-								products.length
-							) }
+							{ compare
+								? sprintf(
+									/* translators: %d: number of products being compared. */
+									_n( 'Comparing %d product', 'Comparing %d products', products.length, 'webhead-search-cloud' ),
+									products.length
+								)
+								: sprintf(
+									/* translators: %d: number of products. */
+									_n( '%d result', '%d results', products.length, 'webhead-search-cloud' ),
+									products.length
+								) }
 						</span>
 						{ products.length >= 2 && (
-							<Button
-								variant="secondary"
+							<button
+								type="button"
 								className="whsc-assistant__compare-toggle"
+								aria-pressed={ compare }
 								onClick={ () => setCompare( ( value ) => ! value ) }
 							>
+								<span className="whsc-assistant__compare-icon" aria-hidden="true">
+									{ compare ? gridIcon : compareIcon }
+								</span>
 								{ compare
 									? __( 'Back to list', 'webhead-search-cloud' )
 									: __( 'Compare', 'webhead-search-cloud' ) }
-							</Button>
+							</button>
 						) }
 					</div>
 

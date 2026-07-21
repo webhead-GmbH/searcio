@@ -134,6 +134,13 @@
 	--whsc-dot-color: #d3d6d9;
 	--whsc-dot-color-active: var(--whsc-accent);
 	--whsc-carousel-gap: 14px;
+
+	/* AI assistant */
+	--whsc-assistant-muted: #6b7177;
+	--whsc-assistant-divider: #e8e9eb;
+	--whsc-assistant-user-bg: var(--whsc-accent);
+	--whsc-assistant-user-text: #ffffff;
+	--whsc-assistant-row-bg: #fafafb;
 }
 
 /*
@@ -1388,6 +1395,14 @@
 	to { opacity: 1; transform: scale(1); }
 }
 
+/*
+ * The tab bar and the assistant sit after the top-level `@keyframes` above,
+ * so they need their own copy of the specificity wrapper — without it these
+ * rules lose to the shared frontend reset (which is why the compare toggle
+ * rendered as bare text and the tabs took the theme's body type).
+ */
+[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] {
+
 /* --------------------------------------------------------------------------
  * Search / AI Assistant tab bar
  * ------------------------------------------------------------------------ */
@@ -1406,6 +1421,10 @@
 	margin-bottom: -1px;
 	padding: 10px 14px;
 	font: inherit;
+	/* Explicit, so the tabs don't inherit the theme's (much larger) body type
+	 * and end up outweighing everything inside the modal. */
+	font-size: 15px;
+	line-height: 1.4;
 	font-weight: 600;
 	color: var(--whsc-text, inherit);
 	opacity: 0.6;
@@ -1441,25 +1460,46 @@
 .whsc-assistant {
 	display: flex;
 	gap: 20px;
-	height: 66vh;
-	min-height: 0;
+	/* Sized by its content between these bounds rather than pinned to a tall
+	 * fixed height, which left a large empty area under short answers. */
+	min-height: 300px;
+	max-height: 70vh;
+	/* The modal inherits the theme's body type, which is far larger than the
+	 * result cards use; the assistant sets its own scale so both agree. */
+	font-size: 14px;
+	line-height: 1.55;
 
 	@media screen and (max-width: 782px) {
 		flex-direction: column;
-		height: auto;
+		gap: 16px;
+		min-height: 0;
+		max-height: none;
 	}
 }
 
 .whsc-assistant__chat {
 	display: flex;
 	flex-direction: column;
-	flex: 0 0 40%;
 	min-width: 0;
 	min-height: 0;
+	/* Until there are products there is nothing to sit beside the chat, so it
+	 * centers instead of leaving the other half of the modal blank. */
+	flex: 1 1 auto;
+	width: 100%;
+	max-width: 640px;
+	margin: 0 auto;
 
 	@media screen and (max-width: 782px) {
-		flex: 1 1 auto;
+		/* Lets the thread, results and composer order themselves in one column
+		 * so the composer stays last (see the `order`s below). */
+		display: contents;
 	}
+}
+
+.whsc-assistant--split .whsc-assistant__chat {
+	flex: 0 0 38%;
+	max-width: none;
+	margin: 0;
 }
 
 .whsc-assistant__thread {
@@ -1468,11 +1508,13 @@
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: 16px;
 	padding-right: 6px;
 
 	@media screen and (max-width: 782px) {
-		max-height: 38vh;
+		order: 1;
+		max-height: 30vh;
+		padding-right: 0;
 	}
 }
 
@@ -1481,23 +1523,62 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 10px;
+	gap: 14px;
+	max-width: 420px;
 	text-align: center;
-	opacity: 0.7;
+	padding: 8px 0;
+}
+
+.whsc-assistant__intro-text {
+	margin: 0;
+	font-size: 15px;
+	color: var(--whsc-assistant-muted, #6b7177);
+}
+
+.whsc-assistant__starters {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px;
+}
+
+.whsc-modal .whsc-assistant__starter {
+	appearance: none;
+	font: inherit;
+	font-size: 13px;
+	line-height: 1.3;
+	cursor: pointer;
+	padding: 8px 14px;
+	border-radius: var(--whsc-chip-radius, 999px);
+	border: 1px solid var(--whsc-chip-border, #e2e4e7);
+	background: var(--whsc-chip-bg, #f4f5f6);
+	color: var(--whsc-chip-text, inherit);
+	transition: border-color 0.15s ease, color 0.15s ease;
+
+	&:hover {
+		border-color: var(--whsc-chip-border-hover, var(--whsc-accent));
+		color: var(--whsc-chip-text-hover, var(--whsc-accent));
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: 2px;
+	}
 }
 
 .whsc-assistant__msg {
 	display: flex;
 	align-items: flex-start;
-	gap: 8px;
+	gap: 10px;
 
 	&--user { justify-content: flex-end; }
 }
 
 .whsc-assistant__avatar {
 	flex: 0 0 auto;
-	width: 26px;
-	height: 26px;
+	width: 24px;
+	height: 24px;
+	margin-top: 1px;
 	border-radius: 50%;
 	background: var(--whsc-accent, #2563eb);
 	color: #fff;
@@ -1505,51 +1586,81 @@
 	align-items: center;
 	justify-content: center;
 
-	svg { width: 15px; height: 15px; }
+	svg { width: 14px; height: 14px; }
 
 	&--lg {
 		width: 40px;
 		height: 40px;
+		margin-top: 0;
 
 		svg { width: 22px; height: 22px; }
 	}
 }
 
 .whsc-assistant__bubble {
-	max-width: 85%;
-	padding: 10px 14px;
-	border-radius: 14px;
-	line-height: 1.5;
+	max-width: 78%;
+	padding: 9px 14px;
+	border-radius: 16px;
+	line-height: 1.55;
 	white-space: pre-wrap;
 	word-break: break-word;
-	background: var(--whsc-panel-bg, rgba(0, 0, 0, 0.05));
+	background: var(--whsc-chip-bg, #f4f5f6);
 	color: var(--whsc-text, inherit);
 
-	.whsc-assistant__msg--user & {
-		background: var(--whsc-accent, #2563eb);
-		color: #fff;
+	&--typing {
+		display: inline-flex;
+		padding: 0;
 	}
+}
 
-	&--typing { display: inline-flex; }
+/* These are written flat rather than nested with a parent suffix (`.x &`):
+ * inside the wrapper above, `&` carries the `[data-webhead-frontend-root]`
+ * prefix with it, so `.x &` would compile to `.x [root] .whsc-…` and never
+ * match. */
+.whsc-assistant__msg--user .whsc-assistant__bubble {
+	background: var(--whsc-assistant-user-bg, var(--whsc-accent, #2563eb));
+	color: var(--whsc-assistant-user-text, #fff);
+	/* Flattened corner points the bubble at its own side of the thread. */
+	border-bottom-right-radius: 5px;
+}
+
+/* The assistant's answer is the main body copy of this pane, so it reads as
+ * text rather than as a chat bubble competing with the user's. */
+.whsc-assistant__msg--assistant .whsc-assistant__bubble {
+	max-width: 100%;
+	padding: 1px 0 0;
+	background: none;
 }
 
 .whsc-assistant__error {
 	color: #b91c1c;
-	font-size: 0.9em;
+	font-size: 13px;
 }
 
 .whsc-assistant__composer {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	margin-top: 12px;
-	padding: 5px 5px 5px 14px;
+	gap: 6px;
+	margin-top: 14px;
+	padding: 5px 5px 5px 16px;
 	border: 1px solid var(--whsc-input-border, rgba(0, 0, 0, 0.2));
 	border-radius: 999px;
 	background: var(--whsc-input-bg, #fff);
+	transition: border-color 0.15s ease;
 
 	&:focus-within {
 		border-color: var(--whsc-input-border-focus, var(--whsc-accent, #2563eb));
+	}
+
+	@media screen and (max-width: 782px) {
+		/* Last in the column, but pinned to the bottom of the scrollport so it
+		 * stays reachable while scrolling the results above it. */
+		order: 3;
+		position: sticky;
+		bottom: 0;
+		z-index: 2;
+		margin-top: 0;
+		box-shadow: 0 6px 0 6px var(--whsc-bg, #fff);
 	}
 }
 
@@ -1560,29 +1671,54 @@
 	background: none;
 	outline: none;
 	font: inherit;
+	font-size: 14px;
 	color: var(--whsc-input-text, inherit);
 
 	&::placeholder { color: var(--whsc-input-placeholder, rgba(0, 0, 0, 0.5)); }
 }
 
+/* Filled circle: a bare glyph read as decoration rather than the send control. */
 .whsc-modal .whsc-assistant__send.components-button {
 	flex: 0 0 auto;
-	min-width: 40px;
-	min-height: 40px;
-	color: var(--whsc-accent, #2563eb);
+	width: 36px;
+	height: 36px;
+	min-width: 36px;
+	min-height: 36px;
+	border-radius: 50%;
+	background: var(--whsc-btn-bg, var(--whsc-accent, #2563eb));
+	color: var(--whsc-btn-text, #fff);
 
-	svg { width: 20px; height: 20px; }
+	svg { width: 17px; height: 17px; }
+
+	&:disabled,
+	&[aria-disabled='true'] {
+		background: var(--whsc-chip-bg, #f4f5f6);
+		color: var(--whsc-assistant-muted, #6b7177);
+	}
 }
 
 /* Results pane */
 .whsc-assistant__results {
-	flex: 1 1 60%;
+	flex: 1 1 62%;
 	min-width: 0;
 	min-height: 0;
 	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding-left: 20px;
+	border-left: 1px solid var(--whsc-assistant-divider, #e8e9eb);
 
 	@media screen and (max-width: 782px) {
+		order: 2;
 		flex: 1 1 auto;
+		/* Capped so the thread, the results and the composer all stay within
+		 * roughly one screen — otherwise four full-width cards push the input
+		 * far below the fold. */
+		max-height: 48vh;
+		padding: 16px 0 0;
+		border-left: 0;
+		border-top: 1px solid var(--whsc-assistant-divider, #e8e9eb);
 	}
 }
 
@@ -1590,63 +1726,178 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 8px;
-	margin-bottom: 12px;
+	gap: 12px;
 }
 
-.whsc-assistant__results-count { font-weight: 600; }
+.whsc-assistant__results-count {
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--whsc-assistant-muted, #6b7177);
+}
+
+.whsc-modal .whsc-assistant__compare-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	appearance: none;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.2;
+	cursor: pointer;
+	padding: 7px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--whsc-card-border, rgba(0, 0, 0, 0.15));
+	background: var(--whsc-card-bg, #fff);
+	color: var(--whsc-text, inherit);
+	transition: border-color 0.15s ease, color 0.15s ease;
+
+	&:hover {
+		border-color: var(--whsc-accent, #2563eb);
+		color: var(--whsc-accent, #2563eb);
+	}
+
+	svg { width: 15px; height: 15px; }
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: 2px;
+	}
+}
+
+.whsc-assistant__compare-icon {
+	display: inline-flex;
+	color: var(--whsc-accent, #2563eb);
+}
 
 .whsc-assistant__grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
 	gap: var(--whsc-carousel-gap, 14px);
+	align-content: start;
 
 	.whsc-card { width: 100%; }
+
+	/* Pin the price to the bottom of each card so a one-line and a two-line
+	 * product name still line their prices up across a row. */
+	.whsc-card__price { margin-top: auto; }
+
+	@media screen and (max-width: 782px) {
+		/* Fixed pair rather than auto-fill: at phone widths auto-fill drops to a
+		 * single full-bleed card per row, which turns four results into four
+		 * screens of scrolling. */
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 }
 
 /* Compare table */
-.whsc-compare { overflow-x: auto; }
+.whsc-compare {
+	overflow-x: auto;
+	min-height: 0;
+}
 
 .whsc-compare__table {
 	border-collapse: collapse;
 	width: 100%;
-	font-size: 0.92em;
+	font-size: 13px;
 
 	th,
 	td {
-		padding: 10px 12px;
+		padding: 9px 14px;
 		text-align: left;
 		vertical-align: top;
-		border-bottom: 1px solid var(--whsc-card-border, rgba(0, 0, 0, 0.1));
+		border-bottom: 1px solid var(--whsc-assistant-divider, #e8e9eb);
 	}
+
+	/* Zebra rows: with four value columns the eye needs a horizontal guide.
+	 * Even rows, so the band never lands directly under the header or on the
+	 * final row against the pane's edge. */
+	tbody tr:nth-child(even) {
+		background: var(--whsc-assistant-row-bg, #fafafb);
+	}
+
+	tbody tr:last-child > * {
+		border-bottom: 0;
+	}
+}
+
+/* The attribute list is long enough to scroll, so the products it describes
+ * stay pinned while it does. */
+.whsc-compare__table thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	vertical-align: bottom;
+	padding-top: 0;
+	background: var(--whsc-bg, #fff);
+	border-bottom-width: 2px;
+}
+
+/* The row labels stay put while the product columns scroll sideways — on a
+ * phone the table is always wider than the pane, and without this you lose
+ * track of which attribute you are reading. */
+.whsc-compare__corner,
+.whsc-compare__label {
+	width: 1%;
+	white-space: nowrap;
+	position: sticky;
+	left: 0;
+	background: var(--whsc-bg, #fff);
+	box-shadow: 1px 0 0 var(--whsc-assistant-divider, #e8e9eb);
+}
+
+.whsc-compare__corner {
+	z-index: 2;
 }
 
 .whsc-compare__label {
 	font-weight: 600;
-	white-space: nowrap;
 	color: var(--whsc-text, inherit);
+}
+
+/* The sticky cell paints over the row, so it has to carry the row's own
+ * banding. */
+.whsc-compare__table tbody tr:nth-child(even) .whsc-compare__label {
+	background: var(--whsc-assistant-row-bg, #fafafb);
 }
 
 .whsc-compare__product {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 4px;
+	gap: 6px;
 	text-decoration: none;
 	color: inherit;
+
+	&:hover .whsc-compare__title { color: var(--whsc-accent, #2563eb); }
 }
 
 .whsc-compare__image {
-	width: 64px;
-	height: 64px;
+	width: 72px;
+	height: 72px;
 	object-fit: cover;
-	border-radius: 8px;
+	border-radius: 10px;
+	background: var(--whsc-chip-bg, #f4f5f6);
 }
 
-.whsc-compare__title { font-weight: 600; }
+.whsc-compare__title {
+	font-weight: 600;
+	line-height: 1.3;
+	/* Two lines whatever the name length, so every column's price sits on the
+	 * same baseline instead of stepping down column by column. */
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	min-height: 2.6em;
+	transition: color 0.15s ease;
+}
 
 .whsc-compare__price {
 	font-weight: 600;
-	color: var(--whsc-price-color, var(--whsc-accent, #2563eb));
+	color: var(--whsc-price-color, #6b7177);
 }
-/* cache-bust-test */
+
+}
