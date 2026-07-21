@@ -1428,6 +1428,16 @@
 /* --------------------------------------------------------------------------
  * AI Assistant: chat pane (left) + results pane (right)
  * ------------------------------------------------------------------------ */
+/* The assistant stays mounted while the Search tab is shown, so the wrapper has
+ * to disappear from layout entirely — both when hidden and when visible. */
+.whsc-assistant-pane {
+	display: contents;
+
+	&[hidden] {
+		display: none;
+	}
+}
+
 .whsc-assistant {
 	display: flex;
 	gap: 20px;

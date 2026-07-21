@@ -114,6 +114,7 @@ const SearchModal = ({
 	// /storefront-config so an upgrade flips it on with no code change.
 	const [assistantEnabled, setAssistantEnabled] = useState(false);
 	const [activeTab, setActiveTab] = useState('search');
+	const [assistantOpened, setAssistantOpened] = useState(false);
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -631,7 +632,10 @@ const SearchModal = ({
 							role="tab"
 							aria-selected={'assistant' === activeTab}
 							className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
-							onClick={() => setActiveTab('assistant')}
+							onClick={() => {
+								setAssistantOpened(true);
+								setActiveTab('assistant');
+							}}
 						>
 							{__('AI Assistant', 'webhead-search-cloud')}
 						</button>
@@ -792,8 +796,11 @@ const SearchModal = ({
 					</>
 				)}
 
-				{assistantEnabled && 'assistant' === activeTab && (
-					<AiAssistant cardSource={cardSource} serverTemplates={serverTemplates} />
+				{/* Kept mounted once opened so switching to Search and back doesn't drop the conversation. */}
+				{assistantEnabled && assistantOpened && (
+					<div className="whsc-assistant-pane" hidden={'assistant' !== activeTab}>
+						<AiAssistant cardSource={cardSource} serverTemplates={serverTemplates} />
+					</div>
 				)}
 			</div>
 		</Modal>
