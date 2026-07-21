@@ -103,12 +103,12 @@ const StockStatus = ( { inStock } ) => {
 	);
 };
 
-const ProductCard = ( { hit } ) => {
+const ProductCard = ( { hit, onClick } ) => {
 	const source = hit.source || {};
 	const i18n = getConfig().i18n || {};
 
 	return (
-		<a className="whsc-card whsc-card--product" href={ source.url || '#' }>
+		<a className="whsc-card whsc-card--product" href={ source.url || '#' } onClick={ onClick }>
 			<span className="whsc-card__media">
 				<CardImage src={ source.image } />
 				{ Boolean( source.on_sale ) && (
@@ -124,11 +124,11 @@ const ProductCard = ( { hit } ) => {
 	);
 };
 
-const PostCard = ( { hit } ) => {
+const PostCard = ( { hit, onClick } ) => {
 	const source = hit.source || {};
 
 	return (
-		<a className="whsc-card whsc-card--post" href={ source.url || '#' }>
+		<a className="whsc-card whsc-card--post" href={ source.url || '#' } onClick={ onClick }>
 			<CardImage src={ source.image } />
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
@@ -141,11 +141,11 @@ const PostCard = ( { hit } ) => {
 	);
 };
 
-const GenericCard = ( { hit } ) => {
+const GenericCard = ( { hit, onClick } ) => {
 	const source = hit.source || {};
 
 	return (
-		<a className="whsc-card whsc-card--generic" href={ source.url || '#' }>
+		<a className="whsc-card whsc-card--generic" href={ source.url || '#' } onClick={ onClick }>
 			<CardImage src={ source.image } />
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
@@ -172,18 +172,20 @@ export const registerTemplate = ( type, Component ) => {
  *                                                  Cloud-designed template.
  * @param {Array<Object>}  [props.serverTemplates]  Fetched once per modal
  *                                                   session by the caller.
+ * @param {Function}       [props.onClick]          Fired when the card is opened,
+ *                                                   for click-through tracking.
  */
-export const ResultCard = ( { hit, cardSource, serverTemplates } ) => {
+export const ResultCard = ( { hit, cardSource, serverTemplates, onClick } ) => {
 	if ( 'server' === cardSource && Array.isArray( serverTemplates ) && serverTemplates.length > 0 ) {
 		const template = matchTemplate( serverTemplates, hit );
 
 		if ( template ) {
-			return <ServerCard hit={ hit } template={ template } />;
+			return <ServerCard hit={ hit } template={ template } onClick={ onClick } />;
 		}
 	}
 
 	const type = hit?.source?.type;
 	const Template = ( type && templates[ type ] ) || GenericCard;
 
-	return <Template hit={ hit } />;
+	return <Template hit={ hit } onClick={ onClick } />;
 };

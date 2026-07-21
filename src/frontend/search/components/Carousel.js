@@ -11,11 +11,11 @@ const DRAG_THRESHOLD = 6;
  * native scrollbar hidden (see `style.scss`). Reused for the empty-state
  * highlights and for search results.
  *
- * @param {Object}                props
- * @param {Array}                 props.items
- * @param {(item) => any}         props.getKey
- * @param {(item) => JSX.Element} props.renderItem
- * @param {string}                [props.ariaLabel]
+ * @param {Object}                       props
+ * @param {Array}                        props.items
+ * @param {(item) => any}                props.getKey
+ * @param {(item, index) => JSX.Element} props.renderItem
+ * @param {string}                       [props.ariaLabel]
  */
 const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 	const trackRef = useRef( null );
@@ -170,9 +170,9 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 				onDragStart={ onDragStart }
 				onClickCapture={ onClickCapture }
 			>
-				{ items.map( ( item ) => (
+				{ items.map( ( item, index ) => (
 					<div className="whsc-carousel-item" key={ getKey( item ) }>
-						{ renderItem( item ) }
+						{ renderItem( item, index ) }
 					</div>
 				) ) }
 			</div>

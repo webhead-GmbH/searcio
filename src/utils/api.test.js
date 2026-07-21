@@ -36,6 +36,7 @@ beforeEach( () => {
 afterEach( () => {
 	jest.useRealTimers();
 	delete global.fetch;
+	delete global.navigator.sendBeacon;
 	delete window.webheadSearchCloudFrontend;
 } );
 
@@ -149,5 +150,103 @@ describe( 'suggest / fetchCardTemplates / fetchPopularSearches', () => {
 		expect( urls[ 0 ] ).toContain( '/search/suggest?' );
 		expect( urls[ 1 ] ).toContain( '/card-templates?' );
 		expect( urls[ 2 ] ).toContain( '/search/popular?' );
+	} );
+} );
+
+describe( 'trackClick', () => {
+	it( 'beacons the click endpoint with the search id, document id and position', () => {
+		const sendBeacon = jest.fn().mockReturnValue( true );
+		global.navigator.sendBeacon = sendBeacon;
+
+		// Capture what goes into the Blob (jsdom's Blob has no readable .text()).
+		const RealBlob = global.Blob;
+		const captured = [];
+		global.Blob = jest.fn( ( parts ) => {
+			captured.push( parts );
+			return { parts };
+		} );
+
+		try {
+			const api = loadApi();
+
+			api.trackClick( 'search-123', 'p-1', 3 );
+
+			expect( sendBeacon ).toHaveBeenCalledTimes( 1 );
+
+			const [ url ] = sendBeacon.mock.calls[ 0 ];
+
+			expect( url ).toContain( '/search/click?' );
+			expect( url ).toContain( 'key=sk_test' );
+			expect( JSON.parse( captured[ 0 ][ 0 ] ) ).toEqual( {
+				search_id: 'search-123',
+				document_id: 'p-1',
+				position: 3,
+			} );
+		} finally {
+			global.Blob = RealBlob;
+		}
+	} );
+
+	it( 'does nothing without a search id or document id', () => {
+		const sendBeacon = jest.fn();
+		global.navigator.sendBeacon = sendBeacon;
+		const api = loadApi();
+
+		api.trackClick( '', 'p-1', 1 );
+		api.trackClick( 'search-123', '', 1 );
+
+		expect( sendBeacon ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does nothing when the plugin is not configured', () => {
+		const sendBeacon = jest.fn();
+		global.navigator.sendBeacon = sendBeacon;
+		setConfig( { searchKey: '' } );
+		const api = loadApi();
+
+		api.trackClick( 'search-123', 'p-1', 1 );
+
+		expect( sendBeacon ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'fetchStorefrontConfig', () => {
+	it( 'requests the storefront-config endpoint with the key and returns capabilities', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { capabilities: { assistant: true } } ) );
+		const api = loadApi();
+
+		const config = await api.fetchStorefrontConfig();
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/storefront-config?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( config.capabilities.assistant ).toBe( true );
+	} );
+} );
+
+describe( 'askAssistant', () => {
+	it( 'POSTs the message and history to the assistant endpoint and returns the reply and products', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { reply: 'Here you go', products: [ { id: 'p-1' } ] } ) );
+		const api = loadApi();
+
+		const result = await api.askAssistant( 'a warm jacket', [ { role: 'user', content: 'hi' } ] );
+
+		const [ url, options ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/assistant?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( options.method ).toBe( 'POST' );
+		expect( JSON.parse( options.body ) ).toEqual( {
+			message: 'a warm jacket',
+			history: [ { role: 'user', content: 'hi' } ],
+		} );
+		expect( result.reply ).toBe( 'Here you go' );
+		expect( result.products ).toHaveLength( 1 );
+	} );
+
+	it( 'throws an error carrying the HTTP status so callers can branch on 403/429/502', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( {}, false, 429 ) );
+		const api = loadApi();
+
+		await expect( api.askAssistant( 'x' ) ).rejects.toMatchObject( { status: 429 } );
 	} );
 } );

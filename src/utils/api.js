@@ -28,6 +28,9 @@ const CARD_TEMPLATES_TTL = 600000; // 10 minutes.
 // queries shift slowly over a 30-day window, so there's no reason to poll
 // more often than the data itself can actually change.
 const POPULAR_TTL = 900000; // 15 minutes.
+// Plan capabilities (whether the AI assistant tab may be shown) change only when
+// the account's plan does — cache generously for the page view.
+const STOREFRONT_CONFIG_TTL = 600000; // 10 minutes.
 const CACHE_MAX = 60;
 
 const cache = new Map();
@@ -152,6 +155,81 @@ export const fetchPopularSearches = ( options = {} ) => request(
 	POPULAR_TTL,
 	options.signal
 );
+
+/**
+ * What this site's plan and setup allow (see docs/api/search.md
+ * `GET /storefront-config`). Read `capabilities.assistant` to decide whether to
+ * render the AI chat tab at all.
+ *
+ * @param {{signal?: AbortSignal}} [options]
+ */
+export const fetchStorefrontConfig = ( options = {} ) =>
+	request( '/storefront-config', {}, STOREFRONT_CONFIG_TTL, options.signal );
+
+/**
+ * The conversational shopping assistant (see docs/api/search.md `POST
+ * /assistant`). Stateless: pass recent turns back as `history` to continue a
+ * conversation. Resolves to `{ reply, products }`; on a non-2xx it throws an
+ * Error whose `status` lets the caller branch on 403 (not on plan), 429 (AI cap
+ * reached) and 502 (provider down → fall back to search).
+ *
+ * @param {string}                                                  message
+ * @param {Array<{role: string, content: string}>}                  [history]
+ * @param {{signal?: AbortSignal}}                                   [options]
+ * @return {Promise<{reply: string, products: Array<Object>}>}
+ */
+export const askAssistant = async ( message, history = [], options = {} ) => {
+	const response = await fetch( buildUrl( '/assistant', {} ), {
+		method: 'POST',
+		credentials: 'omit',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify( { message, history } ),
+		signal: options.signal,
+	} );
+
+	if ( ! response.ok ) {
+		const error = new Error( `webhead-search-cloud: /assistant responded ${ response.status }` );
+		error.status = response.status;
+
+		throw error;
+	}
+
+	return response.json();
+};
+
+/**
+ * Fire-and-forget click beacon: tells Search Cloud that a visitor opened a
+ * result, so the click-through rate can be attributed to the search that
+ * produced it (see docs/api/search.md `POST /search/click`). Uses
+ * `navigator.sendBeacon` so it survives the navigation the click triggers and
+ * never blocks it. Best-effort — any failure is swallowed.
+ *
+ * @param {string}        searchId   The `search_id` from the search response.
+ * @param {string}        documentId The clicked hit's id.
+ * @param {number}        position   1-based position in the list the visitor saw.
+ */
+export const trackClick = ( searchId, documentId, position ) => {
+	if (
+		! searchId ||
+		! documentId ||
+		! isConfigured() ||
+		'undefined' === typeof navigator ||
+		'function' !== typeof navigator.sendBeacon
+	) {
+		return;
+	}
+
+	try {
+		const body = new Blob(
+			[ JSON.stringify( { search_id: searchId, document_id: documentId, position } ) ],
+			{ type: 'application/json' }
+		);
+
+		navigator.sendBeacon( buildUrl( '/search/click', {} ), body );
+	} catch ( e ) {
+		// Analytics must never affect the visitor.
+	}
+};
 
 export const isConfigured = () => Boolean( config.endpoint && config.searchKey );
 

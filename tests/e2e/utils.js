@@ -19,6 +19,11 @@ export { expect };
 export const test = base;
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+const PREFLIGHT_CORS = {
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+	'Access-Control-Allow-Headers': 'Content-Type',
+};
 
 export const SEARCH_KEY = 'sk_e2e_test_key';
 
@@ -56,14 +61,33 @@ export async function mockSearchCloud( page, options = {} ) {
 		popular = [],
 		templates = [],
 		searchStatus = 200,
+		searchId = 'search-e2e',
+		assistant = false,
+		assistantReply = 'Here are a few options.',
+		assistantProducts = [],
+		assistantStatus = 200,
 		onSearch,
 	} = options;
 
 	await page.route( '**/api/v1/**', async ( route ) => {
+		// Cross-origin JSON POSTs (the assistant) trigger a CORS preflight.
+		if ( 'OPTIONS' === route.request().method() ) {
+			return route.fulfill( { status: 204, headers: PREFLIGHT_CORS } );
+		}
+
 		const url = new URL( route.request().url() );
 		const path = url.pathname.replace( /.*\/api\/v1/, '' );
 		const json = ( body, status = 200 ) => route.fulfill( { status, headers: CORS, body: JSON.stringify( body ) } );
 
+		if ( '/storefront-config' === path ) {
+			return json( { capabilities: { assistant, semantic_search: false }, facets: [], languages: [] } );
+		}
+		if ( '/assistant' === path ) {
+			if ( 200 !== assistantStatus ) {
+				return json( {}, assistantStatus );
+			}
+			return json( { reply: assistantReply, products: assistantProducts } );
+		}
 		if ( '/search' === path ) {
 			if ( onSearch ) {
 				onSearch( url );
@@ -72,7 +96,10 @@ export async function mockSearchCloud( page, options = {} ) {
 				return json( {}, searchStatus );
 			}
 			const list = 'function' === typeof hits ? hits( url ) : hits;
-			return json( { hits: list, total: list.length, facets } );
+			return json( { search_id: searchId, hits: list, total: list.length, facets } );
+		}
+		if ( '/search/click' === path ) {
+			return json( { recorded: true }, 202 );
 		}
 		if ( '/search/suggest' === path ) {
 			return json( { suggestions } );

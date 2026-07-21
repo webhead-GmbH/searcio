@@ -3,11 +3,12 @@ import {Button, Modal, Notice} from '@wordpress/components';
 import {closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
-import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, getConfig, isConfigured, isLanguageSupported, search, suggest} from '../../../utils/api';
+import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
 import {buildFilterParams, buildTypeParam, extractFieldFacets, humanizeFieldLabel, mergeFieldFacets, toggleSelection} from '../../../utils/facets';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
+import AiAssistant from './AiAssistant';
 import SearchInput from './SearchInput';
 import Suggestions from './Suggestions';
 import Browse from './Browse';
@@ -106,6 +107,14 @@ const SearchModal = ({
 	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 	const [results, setResults] = useState(null);
 	const [highlights, setHighlights] = useState([]);
+	// The search_id of the highlights carousel, so clicks on it attribute to the
+	// same search the way result clicks attribute to `results.search_id`.
+	const [highlightsSearchId, setHighlightsSearchId] = useState('');
+	// The AI assistant tab is offered only when the plan includes it — read from
+	// /storefront-config so an upgrade flips it on with no code change.
+	const [assistantEnabled, setAssistantEnabled] = useState(false);
+	const [activeTab, setActiveTab] = useState('search');
+	const [assistantOpened, setAssistantOpened] = useState(false);
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -212,6 +221,28 @@ const SearchModal = ({
 		};
 	}, [cardSource]);
 
+	// Whether the plan includes the AI assistant. Fetched once so the tab only
+	// appears when the account can actually use it; a failure just hides it.
+	useEffect(() => {
+		if (!isConfigured()) {
+			return undefined;
+		}
+
+		let cancelled = false;
+
+		fetchStorefrontConfig()
+			.then((response) => {
+				if (!cancelled) {
+					setAssistantEnabled(Boolean(response?.capabilities?.assistant));
+				}
+			})
+			.catch(() => {});
+
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
 	// The curated `popular_searches` setting is only a fallback for when this
 	// fetch returns nothing or fails — `popularSearches` above starts on the
 	// curated list and only stays there if the live list ends up empty.
@@ -265,6 +296,7 @@ const SearchModal = ({
 			const response = await search('', {type, filters, perPage: 12});
 
 			setHighlights(response.hits || []);
+			setHighlightsSearchId(response.search_id || '');
 			// Only refresh the type chip list when this request had no type
 			// filter applied — confirmed live that this API's `facets.types`
 			// collapses to just the active selection otherwise, which would
@@ -529,7 +561,14 @@ const SearchModal = ({
 			<Carousel
 				items={highlights}
 				getKey={(hit) => hit.id}
-				renderItem={(hit) => <ResultCard hit={hit} cardSource={cardSource} serverTemplates={serverTemplates}/>}
+				renderItem={(hit, index) => (
+					<ResultCard
+						hit={hit}
+						cardSource={cardSource}
+						serverTemplates={serverTemplates}
+						onClick={() => trackClick(highlightsSearchId, hit.id, index + 1)}
+					/>
+				)}
 				ariaLabel={__('Current highlights', 'webhead-search-cloud')}
 			/>
 		);
@@ -548,7 +587,14 @@ const SearchModal = ({
 			<Carousel
 				items={resultsHits}
 				getKey={(hit) => hit.id}
-				renderItem={(hit) => <ResultCard hit={hit} cardSource={cardSource} serverTemplates={serverTemplates}/>}
+				renderItem={(hit, index) => (
+					<ResultCard
+						hit={hit}
+						cardSource={cardSource}
+						serverTemplates={serverTemplates}
+						onClick={() => trackClick(results?.search_id, hit.id, index + 1)}
+					/>
+				)}
 				ariaLabel={__('Search results', 'webhead-search-cloud')}
 			/>
 		) : (
@@ -570,6 +616,41 @@ const SearchModal = ({
 			contentLabel={i18n.placeholder || __('Search', 'webhead-search-cloud')}
 		>
 			<div className="whsc-modal-body">
+				{assistantEnabled && (
+					<div className="whsc-modal-tabs" role="tablist" aria-label={__('Search modes', 'webhead-search-cloud')}>
+						<button
+							type="button"
+							role="tab"
+							aria-selected={'search' === activeTab}
+							className={`whsc-modal-tab${'search' === activeTab ? ' is-active' : ''}`}
+							onClick={() => setActiveTab('search')}
+						>
+							{__('Search', 'webhead-search-cloud')}
+						</button>
+						<button
+							type="button"
+							role="tab"
+							aria-selected={'assistant' === activeTab}
+							className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
+							onClick={() => {
+								setAssistantOpened(true);
+								setActiveTab('assistant');
+							}}
+						>
+							{__('AI Assistant', 'webhead-search-cloud')}
+						</button>
+						<Button
+							className="whsc-modal-close whsc-modal-close--tabbed"
+							icon={closeSmall}
+							label={i18n.close || __('Close search', 'webhead-search-cloud')}
+							showTooltip={false}
+							onClick={onRequestClose}
+						/>
+					</div>
+				)}
+
+				{(!assistantEnabled || 'search' === activeTab) && (
+					<>
 				<div className="whsc-modal-header">
 					<div className="whsc-input-row">
 						<SearchInput
@@ -614,13 +695,15 @@ const SearchModal = ({
 								onClick={onVoiceClick}
 							/>
 						)}
-						<Button
-							className="whsc-modal-close"
-							icon={closeSmall}
-							label={i18n.close || __('Close search', 'webhead-search-cloud')}
-							showTooltip={false}
-							onClick={onRequestClose}
-						/>
+						{!assistantEnabled && (
+							<Button
+								className="whsc-modal-close"
+								icon={closeSmall}
+								label={i18n.close || __('Close search', 'webhead-search-cloud')}
+								showTooltip={false}
+								onClick={onRequestClose}
+							/>
+						)}
 					</div>
 
 					{!suggestionsDismissed && suggestions.length > 0 && (
@@ -710,6 +793,15 @@ const SearchModal = ({
 							: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))
 					)}
 				</p>
+					</>
+				)}
+
+				{/* Kept mounted once opened so switching to Search and back doesn't drop the conversation. */}
+				{assistantEnabled && assistantOpened && (
+					<div className="whsc-assistant-pane" hidden={'assistant' !== activeTab}>
+						<AiAssistant cardSource={cardSource} serverTemplates={serverTemplates} />
+					</div>
+				)}
 			</div>
 		</Modal>
 	);
