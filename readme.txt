@@ -56,6 +56,7 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 - Sync ticks are now time-boxed as well as batch-bounded, so a large clean-up against a slow index can no longer run past PHP's execution limit.
 - Documents the index refuses to delete are counted and reported on the run instead of being dropped in silence.
 - Incremental syncs now record why they failed instead of showing an unexplained failure (or none at all) in the sync history.
+- Removed a leftover site-id option that nothing reads any more and that could go stale after reconnecting to a different site.
 - Fixed sync history retention never deleting anything, so the runs table no longer grows without bound.
 
 = 1.0.2 =

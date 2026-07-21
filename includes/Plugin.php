@@ -27,6 +27,7 @@ use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Lifecycle\Upgrade_R
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Cache\Cache_Manager;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
+use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Site_Id_Option;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Resync_Capabilities;
 use Webhead\WP\SearchCloud\Jobs\Scheduled_Sync_Job;
 use Webhead\WP\SearchCloud\Jobs\Sync_Tick_Job;
@@ -85,6 +86,7 @@ final class Plugin extends Base_Plugin {
 	 */
 	protected function register_upgrade_steps( Upgrade_Runner $upgrade_runner, Container $container ): void {
 		$upgrade_runner->register( new Resync_Capabilities( $container->get( 'capability_manager' ) ) );
+		$upgrade_runner->register( new Delete_Legacy_Site_Id_Option() );
 	}
 
 	protected function register_jobs( Jobs_Manager $jobs_manager, Container $container ): void {
