@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.3
+
+- Fixed a sync that could stop dead with no way back: the follow-up worker tick was only scheduled at the very end of a tick, so a tick killed part-way through (a slow API against PHP's `max_execution_time`, an out-of-memory, a restarted worker) left the run on "Running" with nothing left to advance it — and because a run in that state holds the single active slot, every later scheduled sync silently did nothing. A tick now arms its successor before it starts working, and the scheduled sync revives a run whose worker has died instead of skipping it.
+- Ticks are now time-boxed (20 seconds by default, filterable with `webhead_search_cloud/sync/tick_budget`) rather than bounded only by a batch count. Removing stale documents costs one request each, so a large clean-up could previously run hundreds of blocking requests in a single tick and be killed part-way through.
+- Documents the index refuses to delete are now counted and reported on the sync run instead of being dropped from the queue in silence — a failing delete endpoint used to look exactly like a healthy clean-up, with "deleted 0" and no explanation.
+- Incremental syncs now say why they failed. A failed incremental run was written to the history with no reason at all, and a rejected push that wasn't a plan-limit recorded nothing whatsoever, so the dashboard showed either an unexplained failure or no sign of a problem at all.
+- Removed the leftover `webhead_search_cloud_site_id` option on upgrade. Nothing has read it since the connection moved to key-relative endpoints — the connection screen reads the id straight from the API — so all it did was go quietly stale and mislead anyone inspecting the options table (one site still held `5` while the API reported `4`).
+- Fixed sync history retention never deleting anything: the purge built a comparison query the database layer then rejected, so the runs table grew without bound however the retention setting was configured.
+
 ## 1.0.2
 
 - Security: hardened the server-designed result card renderer so a value from an indexed document can no longer break out of an HTML attribute or smuggle a `javascript:`/`data:` URL into a link. Field values are now fully escaped (quotes included) and script-bearing URL schemes are stripped before the card markup reaches the page.

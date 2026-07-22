@@ -44,6 +44,21 @@ final class Sync_Service {
 	private const PRUNE_PER_TICK       = 100;
 
 	/**
+	 * Wall-clock budget for one tick. A prune batch costs one HTTP round trip
+	 * per document (the API has no bulk delete), so a batch count alone can't
+	 * keep a tick inside PHP's execution limit — a large prune queue would run
+	 * hundreds of blocking requests in a single invocation and get killed.
+	 */
+	private const TICK_BUDGET = 20;
+
+	/**
+	 * When the next tick is re-armed *before* the work starts, so a tick that
+	 * dies mid-batch still leaves a scheduled successor. Comfortably longer than
+	 * {@see self::TICK_BUDGET} so it never races a healthy tick.
+	 */
+	private const WATCHDOG_DELAY = 180;
+
+	/**
 	 * How long a scheduled tick may be overdue before the worker is treated as
 	 * dead. A healthy run reschedules itself within {@see self::BACKOFF_DELAY}
 	 * seconds, so anything past that plus a margin means WP-Cron is not firing
@@ -122,6 +137,8 @@ final class Sync_Service {
 		$run = $this->state->active();
 
 		if ( null === $run ) {
+			$this->clear_tick();
+
 			return;
 		}
 
@@ -133,18 +150,37 @@ final class Sync_Service {
 			return;
 		}
 
+		/*
+		 * Dead man's switch. Every clean exit below either reschedules or clears
+		 * this, so it only ever fires when the tick itself died — PHP's
+		 * max_execution_time, an OOM, or the worker being killed mid-batch. That
+		 * used to orphan the run: the follow-up tick was scheduled at the very
+		 * end of this method, so a tick that never reached the end left a run
+		 * Running with no worker, which also blocked every future scheduled sync.
+		 */
+		$this->schedule_tick( self::WATCHDOG_DELAY );
+
 		$cursor   = $this->cursor( $run );
 		$counters = $this->counters( $run );
 		$force    = ! empty( $run['is_force'] );
 		$types    = $this->config->indexable_post_types();
 		$cv       = $this->config->config_version();
+		// Wall-clock budget, checked between batches: batch sizes alone are a
+		// poor proxy for how long a tick takes, since a prune batch is one HTTP
+		// round trip *per document*.
+		$deadline = time() + $this->tick_budget();
 
 		for ( $batch = 0; $batch < self::MAX_BATCHES_PER_TICK; $batch++ ) {
+			if ( $batch > 0 && time() >= $deadline ) {
+				break;
+			}
+
 			$signal = $this->state->control_signal( $id );
 
 			if ( Sync_Control::Cancel === $signal ) {
 				$this->cleanup_options();
 				$this->state->finish( $id, Sync_Status::Cancelled );
+				$this->clear_tick();
 
 				return;
 			}
@@ -152,13 +188,19 @@ final class Sync_Service {
 			if ( Sync_Control::Pause === $signal ) {
 				$this->persist( $id, $cursor, $counters );
 				$this->state->set_status( $id, Sync_Status::Paused );
+				$this->clear_tick();
 
 				return;
 			}
 
 			if ( 'prune' === $cursor['phase'] ) {
-				$done = $this->prune_step( $counters );
+				$prune_error = null;
+				$done        = $this->prune_step( $counters, $deadline, $prune_error );
 				$this->persist( $id, $cursor, $counters );
+
+				if ( null !== $prune_error ) {
+					$this->state->save( $id, [ 'last_error' => $prune_error ] );
+				}
 
 				if ( $done ) {
 					$this->complete( $id );
@@ -183,6 +225,7 @@ final class Sync_Service {
 
 			if ( 'plan_limit' === $result['outcome'] ) {
 				$this->state->finish( $id, Sync_Status::Failed, $result['message'] );
+				$this->clear_tick();
 
 				return;
 			}
@@ -217,7 +260,24 @@ final class Sync_Service {
 	public function run_scheduled(): void {
 		$this->apply_retention();
 
-		if ( null !== $this->state->active() || ! $this->client->is_configured() ) {
+		$active = $this->state->active();
+
+		if ( null !== $active ) {
+			/*
+			 * An interrupted run holds the active slot, so without this every
+			 * later scheduled sync is a silent no-op and the run sits at
+			 * Running forever. If nothing is coming to advance it, re-arm the
+			 * worker: the cursor is already persisted, so the run picks up
+			 * exactly where the dead tick left off.
+			 */
+			if ( Sync_Status::Running->value === (string) $active['status'] && ! $this->worker_alive() ) {
+				$this->schedule_tick( self::TICK_DELAY );
+			}
+
+			return;
+		}
+
+		if ( ! $this->client->is_configured() ) {
 			return;
 		}
 
@@ -468,8 +528,10 @@ final class Sync_Service {
 
 	/**
 	 * @param  array<string,int>  $counters
+	 * @param  int                $deadline Unix time this tick must stop by.
+	 * @param  string|null        $error    First failure seen, for the run's last_error.
 	 */
-	private function prune_step( array &$counters ): bool {
+	private function prune_step( array &$counters, int $deadline, ?string &$error = null ): bool {
 		$queue = $this->read_ids( Sync_Keys::OPTION_PRUNE );
 
 		if ( [] === $queue ) {
@@ -478,13 +540,45 @@ final class Sync_Service {
 
 		$slice     = array_slice( $queue, 0, self::PRUNE_PER_TICK );
 		$remaining = array_slice( $queue, count( $slice ) );
+		$done      = 0;
 
 		foreach ( $slice as $doc_id ) {
+			// Each delete is its own request, so the deadline is checked per
+			// document rather than per batch: one slice against a slow API can
+			// outlast the whole tick on its own.
+			if ( $done > 0 && time() >= $deadline ) {
+				$remaining = array_merge( array_slice( $slice, $done ), $remaining );
+
+				break;
+			}
+
 			$response = $this->client->delete( $doc_id );
+			$done++;
 
 			if ( $response->ok() || 404 === $response->status ) {
 				$counters['deleted']++;
 				$this->dirty->clear_for_document( $doc_id );
+
+				continue;
+			}
+
+			/*
+			 * The document stays in the remote index. Counting it (rather than
+			 * dropping it silently, as this used to) is what makes a broken
+			 * delete endpoint visible: the dashboard otherwise showed a prune
+			 * running for hours with "deleted 0" and no error to explain it.
+			 * The queue still advances — one unusable document must not wedge
+			 * the run behind it forever.
+			 */
+			$counters['failed_count']++;
+
+			if ( null === $error ) {
+				$error = sprintf(
+					/* translators: 1: document id, 2: HTTP status code. */
+					__( 'Could not remove %1$s from the index (HTTP %2$d).', 'webhead-search-cloud' ),
+					$doc_id,
+					$response->status
+				);
 			}
 		}
 
@@ -496,7 +590,15 @@ final class Sync_Service {
 	private function complete( int $id ): void {
 		update_option( Sync_Keys::OPTION_SNAPSHOT, $this->read_ids( Sync_Keys::OPTION_SEEN ), false );
 		$this->cleanup_options();
-		$this->state->finish( $id, Sync_Status::Completed );
+
+		// `finish()` writes `last_error` unconditionally, so carry forward what
+		// the run already recorded — a completed run that could not remove some
+		// documents still has to say why.
+		$run   = $this->state->find( $id );
+		$error = isset( $run['last_error'] ) ? (string) $run['last_error'] : '';
+
+		$this->state->finish( $id, Sync_Status::Completed, '' === $error ? null : $error );
+		$this->clear_tick();
 	}
 
 	private function cleanup_options(): void {
@@ -509,12 +611,41 @@ final class Sync_Service {
 	/* --------------------------------------------------------------------- */
 
 	private function schedule_tick( int $delay ): void {
+		// Replace rather than add: WP-Cron refuses a duplicate of the same hook
+		// within ten minutes, so the watchdog armed at the top of a tick would
+		// otherwise swallow the real (much sooner) follow-up scheduled at the
+		// end of it.
+		$this->jobs->unschedule( Sync_Keys::HOOK_TICK );
 		$this->jobs->schedule_single( Sync_Keys::HOOK_TICK, time() + max( 1, $delay ) );
 
 		// Nudge WP-Cron so the dashboard feels live without waiting for traffic.
 		if ( function_exists( 'spawn_cron' ) ) {
 			spawn_cron();
 		}
+	}
+
+	/** No more work is coming for this run, so the armed watchdog must go too. */
+	private function clear_tick(): void {
+		$this->jobs->unschedule( Sync_Keys::HOOK_TICK );
+	}
+
+	/**
+	 * Seconds of wall clock one tick may spend. Filterable because the safe
+	 * value is a property of the host, not of this plugin: shared hosting with
+	 * a 30-second `max_execution_time` wants less, a WP-CLI or system-cron
+	 * driven site can afford much more.
+	 */
+	private function tick_budget(): int {
+		/**
+		 * Filters the per-tick wall-clock budget, in seconds.
+		 *
+		 * @since 1.0.3
+		 *
+		 * @param  int  $budget  Default {@see self::TICK_BUDGET}.
+		 */
+		$budget = (int) apply_filters( 'webhead_search_cloud/sync/tick_budget', self::TICK_BUDGET );
+
+		return max( 0, $budget );
 	}
 
 	/**
