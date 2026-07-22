@@ -44,6 +44,13 @@ const buildUrl = ( path, params ) => {
 		}
 	} );
 
+	/*
+	 * The search key travels in the query string, never as an `X-Search-Key`
+	 * header. A custom header would make every request non-simple, so the
+	 * browser would preflight it — and a preflight carries no custom headers,
+	 * leaving the API with no credential to resolve the site from and no way to
+	 * allow the request. The query parameter survives the preflight.
+	 */
 	url.searchParams.set( 'key', config.searchKey || '' );
 
 	return url.toString();
