@@ -2,6 +2,7 @@
 
 ## 1.0.3
 
+- Fixed click-through tracking never recording anything. The beacon sent a JSON body, which is not a CORS-safelisted content type, so the browser had to preflight it — and the API answers preflight requests without any CORS headers, so every click was blocked before it left the page. The beacon is now form-encoded, which needs no preflight and which the API reads identically.
 - Fixed a sync that could stop dead with no way back: the follow-up worker tick was only scheduled at the very end of a tick, so a tick killed part-way through (a slow API against PHP's `max_execution_time`, an out-of-memory, a restarted worker) left the run on "Running" with nothing left to advance it — and because a run in that state holds the single active slot, every later scheduled sync silently did nothing. A tick now arms its successor before it starts working, and the scheduled sync revives a run whose worker has died instead of skipping it.
 - Ticks are now time-boxed (20 seconds by default, filterable with `webhead_search_cloud/sync/tick_budget`) rather than bounded only by a batch count. Removing stale documents costs one request each, so a large clean-up could previously run hundreds of blocking requests in a single tick and be killed part-way through.
 - Documents the index refuses to delete are now counted and reported on the sync run instead of being dropped from the queue in silence — a failing delete endpoint used to look exactly like a healthy clean-up, with "deleted 0" and no explanation.

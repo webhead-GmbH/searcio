@@ -158,33 +158,39 @@ describe( 'trackClick', () => {
 		const sendBeacon = jest.fn().mockReturnValue( true );
 		global.navigator.sendBeacon = sendBeacon;
 
-		// Capture what goes into the Blob (jsdom's Blob has no readable .text()).
-		const RealBlob = global.Blob;
-		const captured = [];
-		global.Blob = jest.fn( ( parts ) => {
-			captured.push( parts );
-			return { parts };
+		const api = loadApi();
+
+		api.trackClick( 'search-123', 'p-1', 3 );
+
+		expect( sendBeacon ).toHaveBeenCalledTimes( 1 );
+
+		const [ url, body ] = sendBeacon.mock.calls[ 0 ];
+
+		expect( url ).toContain( '/search/click?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( Object.fromEntries( body ) ).toEqual( {
+			search_id: 'search-123',
+			document_id: 'p-1',
+			position: '3',
 		} );
+	} );
 
-		try {
-			const api = loadApi();
+	/**
+	 * A JSON body would make this a non-safelisted request, so the browser would
+	 * preflight it — and the API answers preflights without CORS headers, which
+	 * silently dropped every click. Form encoding keeps the beacon safelisted.
+	 */
+	it( 'sends a form-encoded body so the beacon never needs a CORS preflight', () => {
+		const sendBeacon = jest.fn().mockReturnValue( true );
+		global.navigator.sendBeacon = sendBeacon;
 
-			api.trackClick( 'search-123', 'p-1', 3 );
+		const api = loadApi();
 
-			expect( sendBeacon ).toHaveBeenCalledTimes( 1 );
+		api.trackClick( 'search-123', 'p-1', 1 );
 
-			const [ url ] = sendBeacon.mock.calls[ 0 ];
+		const [ , body ] = sendBeacon.mock.calls[ 0 ];
 
-			expect( url ).toContain( '/search/click?' );
-			expect( url ).toContain( 'key=sk_test' );
-			expect( JSON.parse( captured[ 0 ][ 0 ] ) ).toEqual( {
-				search_id: 'search-123',
-				document_id: 'p-1',
-				position: 3,
-			} );
-		} finally {
-			global.Blob = RealBlob;
-		}
+		expect( body ).toBeInstanceOf( URLSearchParams );
 	} );
 
 	it( 'does nothing without a search id or document id', () => {

@@ -114,9 +114,15 @@ test.describe( 'Search modal', () => {
 			( request ) => request.url().includes( '/search/click' ) && 'POST' === request.method()
 		);
 		await widget.cards.first().click();
-		const payload = JSON.parse( ( await beacon ).postData() );
+		const request = await beacon;
+		const payload = Object.fromEntries( new URLSearchParams( request.postData() ) );
 
-		expect( payload ).toMatchObject( { search_id: 'search-e2e-1', document_id: 'post-1', position: 1 } );
+		expect( payload ).toMatchObject( { search_id: 'search-e2e-1', document_id: 'post-1', position: '1' } );
+
+		// Form-encoded keeps the beacon a CORS-safelisted request. As JSON the
+		// browser preflights it, and the API answers preflights without CORS
+		// headers, so the click never left the page.
+		expect( request.headers()[ 'content-type' ] ).toContain( 'application/x-www-form-urlencoded' );
 	} );
 
 	test( 'falls back to native search when the API errors', async ( { page, requestUtils } ) => {

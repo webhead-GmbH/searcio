@@ -220,10 +220,21 @@ export const trackClick = ( searchId, documentId, position ) => {
 	}
 
 	try {
-		const body = new Blob(
-			[ JSON.stringify( { search_id: searchId, document_id: documentId, position } ) ],
-			{ type: 'application/json' }
-		);
+		/*
+		 * Form-encoded, not JSON. `application/json` is not a CORS-safelisted
+		 * content type, so the browser has to preflight the beacon with an
+		 * OPTIONS request — and the API answers preflights without any CORS
+		 * headers (it emits them per site from the search-key middleware, which
+		 * a preflight never reaches). The beacon was therefore blocked before it
+		 * was ever sent and no click was ever recorded. A `URLSearchParams` body
+		 * is safelisted, needs no preflight, and Laravel reads it exactly the
+		 * same way.
+		 */
+		const body = new URLSearchParams( {
+			search_id: searchId,
+			document_id: documentId,
+			position: String( position ),
+		} );
 
 		navigator.sendBeacon( buildUrl( '/search/click', {} ), body );
 	} catch ( e ) {
