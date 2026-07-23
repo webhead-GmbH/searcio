@@ -388,13 +388,21 @@ final class Plugin extends Base_Plugin {
 			Uninstall_Manager::GROUP_DATA
 		);
 
-		// `Plugin_Settings::SITE_ID` was removed when the connection switched to
-		// key-relative API endpoints; framework settings cleanup no longer knows
-		// about it, so sites that saved it under the old flow need this explicit delete.
+		/*
+		 * Options the plugin no longer reads but that older installs still
+		 * carry: the pre-key-relative `SITE_ID`, and the standalone sync and
+		 * onboarding progress keys the current engine replaced. Upgrade steps
+		 * remove these, but a site uninstalled without ever reactivating never
+		 * runs an upgrade step — so the opt-in "delete my data" path clears them
+		 * too. Framework settings cleanup doesn't know about them.
+		 */
 		$uninstall_manager->register_cleanup(
 			'webhead_search_cloud_legacy_options',
 			static function (): void {
 				delete_option( 'webhead_search_cloud_site_id' );
+				delete_option( 'webhead_search_cloud_site_id_metadata' );
+
+				Delete_Legacy_Sync_Options::delete();
 			},
 			Uninstall_Manager::GROUP_DATA
 		);
