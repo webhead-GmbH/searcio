@@ -35,9 +35,6 @@
     "src/admin/settings/components/tabs/SyncTab.js": [
         "public/bundle.settings.js"
     ],
-    "src/blocks/search/ColorHoverControl.js": [
-        "public/bundle.search-block-editor.js"
-    ],
     "src/blocks/search/edit.js": [
         "public/bundle.search-block-editor.js"
     ],
