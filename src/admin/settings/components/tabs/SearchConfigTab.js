@@ -13,6 +13,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
+import {
+	idsToText,
+	listError,
+	normalizeConfig,
+	textToIds,
+	toPayload,
+} from '../../searchConfig';
 import { Grid } from '../../../../components/Layout';
 import { showToast } from '../../../../toast';
 import IndexingSkeleton from './IndexingSkeleton';
@@ -40,25 +47,6 @@ const WOO_FIELD_SUGGESTIONS = [
 	'rating',
 	'review_count',
 ];
-
-const normalizeConfig = ( raw ) => ( {
-	searchable_fields: Array.isArray( raw?.searchable_fields )
-		? raw.searchable_fields.map( ( row ) => ( {
-			field: typeof row?.field === 'string' ? row.field : '',
-			weight: Number.isFinite( Number( row?.weight ) ) ? Number( row.weight ) : 1,
-		} ) )
-		: [],
-	type_boosts: Array.isArray( raw?.type_boosts )
-		? raw.type_boosts.map( ( row ) => ( {
-			type: typeof row?.type === 'string' ? row.type : '',
-			boost: Number.isFinite( Number( row?.boost ) ) ? Number( row.boost ) : 1,
-		} ) )
-		: [],
-	facet_fields: Array.isArray( raw?.facet_fields ) ? raw.facet_fields : [],
-	suggest_fields: Array.isArray( raw?.suggest_fields ) ? raw.suggest_fields : [],
-	synonyms: Array.isArray( raw?.synonyms ) ? raw.synonyms : [],
-	languages: Array.isArray( raw?.languages ) ? raw.languages : [],
-} );
 
 /** Keep exactly one boost row per currently-enabled content type, preserving any already-configured value. */
 const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
@@ -121,6 +109,20 @@ const rowError = ( errors, section, index, column ) => {
 	return Array.isArray( messages ) ? messages.join( ' ' ) : undefined;
 };
 
+/** Feature errors come back as `features.ai_search.enabled`. */
+const featureError = ( errors, key ) => {
+	const messages = errors?.[ `features.${ key }.enabled` ];
+
+	return Array.isArray( messages ) ? messages.join( ' ' ) : undefined;
+};
+
+const AI_STATUS_LABELS = () => ( {
+	pending: __( 'Preparing…', 'webhead-search-cloud' ),
+	indexing: __( 'Indexing…', 'webhead-search-cloud' ),
+	ready: __( 'Ready', 'webhead-search-cloud' ),
+	failed: __( 'Failed', 'webhead-search-cloud' ),
+} );
+
 const toPopularSearchesText = ( value ) => ( Array.isArray( value ) ? value.join( '\n' ) : '' );
 
 const fromPopularSearchesText = ( text ) => text
@@ -177,6 +179,188 @@ const PopularSearchesCard = () => {
 						updateSetting( 'popular_searches', fromPopularSearchesText( value ) );
 					} }
 				/>
+			</Card.Content>
+		</Card.Root>
+	);
+};
+
+/**
+ * The three site-level switches Search Cloud reports under `features`. Each one
+ * is only offered when the plan and platform allow it — the API rejects
+ * enabling an unavailable feature with a field error, so the checkbox says why
+ * up front rather than letting the save fail.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.features
+ * @param {Object}   props.errors
+ * @param {Function} props.onChange Called with (key, enabled).
+ */
+const FeaturesCard = ( { features, errors, onChange } ) => {
+	const statusLabels = AI_STATUS_LABELS();
+	const ai = features.ai_search;
+	const unavailable = __( 'Your plan does not include this.', 'webhead-search-cloud' );
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
+			<Card.Header className="whsc-settings-card-header">
+				<div className="whsc-settings-card-copy">
+					<Card.Title render={ <h3 /> }>{ __( 'AI & ranking', 'webhead-search-cloud' ) }</Card.Title>
+					<Text render={ <p /> } variant="body-sm">
+						{ __(
+							'Site-level switches that change how results are found and ordered. These are the same switches as in the Search Cloud panel.',
+							'webhead-search-cloud'
+						) }
+					</Text>
+				</div>
+			</Card.Header>
+			<Card.Content className="whsc-settings-card-content whsc-feature-switches">
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'AI search', 'webhead-search-cloud' ) }
+					help={
+						featureError( errors, 'ai_search' )
+						|| ( ai.available
+							? __(
+								'Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working.',
+								'webhead-search-cloud'
+							)
+							: unavailable )
+					}
+					checked={ ai.enabled }
+					disabled={ ! ai.available && ! ai.enabled }
+					onChange={ ( enabled ) => onChange( 'ai_search', enabled ) }
+				/>
+
+				{ ai.enabled && '' !== ai.status && (
+					<Text render={ <p /> } variant="body-sm" className="whsc-search-config-status">
+						{ sprintf(
+							/* translators: %s: index status, e.g. "Ready". */
+							__( 'Index status: %s', 'webhead-search-cloud' ),
+							statusLabels[ ai.status ] || ai.status
+						) }
+					</Text>
+				) }
+
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'AI visual tagging', 'webhead-search-cloud' ) }
+					help={
+						featureError( errors, 'visual_tagging' )
+						|| ( features.visual_tagging.available
+							? __(
+								'A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync — re-sync to tag products already indexed.',
+								'webhead-search-cloud'
+							)
+							: unavailable )
+					}
+					checked={ features.visual_tagging.enabled }
+					disabled={ ! features.visual_tagging.available && ! features.visual_tagging.enabled }
+					onChange={ ( enabled ) => onChange( 'visual_tagging', enabled ) }
+				/>
+
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'Rank results by what visitors click', 'webhead-search-cloud' ) }
+					help={
+						featureError( errors, 'personalization' )
+						|| __(
+							'Results people click most for a search rise for everyone searching it. Relevance still leads — popular results are only nudged up.',
+							'webhead-search-cloud'
+						)
+					}
+					checked={ features.personalization.enabled }
+					disabled={ ! features.personalization.available && ! features.personalization.enabled }
+					onChange={ ( enabled ) => onChange( 'personalization', enabled ) }
+				/>
+			</Card.Content>
+		</Card.Root>
+	);
+};
+
+/**
+ * Per-search curation: pin products to the top, keep products out, and show a
+ * banner. An empty trigger applies the rule to every search, which is how a
+ * product is hidden site-wide.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.rules
+ * @param {Function} props.onChange Called with the full replacement list.
+ */
+const MerchandisingCard = ( { rules, errors, onChange } ) => {
+	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
+	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
+	const add = () => onChange( [ ...rules, { query: '', pinned: [], hidden: [], banner: '' } ] );
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
+			<Card.Header className="whsc-settings-card-header">
+				<div className="whsc-settings-card-copy">
+					<Card.Title render={ <h3 /> }>{ __( 'Merchandising rules', 'webhead-search-cloud' ) }</Card.Title>
+					<Text render={ <p /> } variant="body-sm">
+						{ __(
+							'Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search — that is how you keep a product out of search everywhere.',
+							'webhead-search-cloud'
+						) }
+					</Text>
+				</div>
+			</Card.Header>
+			<Card.Content className="whsc-settings-card-content">
+				{ rules.map( ( rule, index ) => (
+					<div className="whsc-merchandising-rule" key={ index }>
+						<div className="whsc-merchandising-rule__head">
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Trigger (search term contains)', 'webhead-search-cloud' ) }
+								help={ rowError( errors, 'merchandising', index, 'query' )
+									|| ( '' === rule.query
+										? __( 'Empty: this rule applies to every search on the site.', 'webhead-search-cloud' )
+										: undefined ) }
+								value={ rule.query }
+								onChange={ ( query ) => update( index, { ...rule, query } ) }
+							/>
+							<Button
+								icon="trash"
+								isDestructive
+								variant="tertiary"
+								label={ __( 'Remove rule', 'webhead-search-cloud' ) }
+								onClick={ () => remove( index ) }
+							/>
+						</div>
+						<div className="whsc-merchandising-rule__ids">
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Pin to top (document ids)', 'webhead-search-cloud' ) }
+								help={ listError( errors, 'merchandising', index, 'pinned' )
+									|| __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
+								value={ idsToText( rule.pinned ) }
+								onChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
+							/>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Hide (document ids)', 'webhead-search-cloud' ) }
+								help={ listError( errors, 'merchandising', index, 'hidden' )
+									|| __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
+								value={ idsToText( rule.hidden ) }
+								onChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
+							/>
+						</div>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Promotional banner', 'webhead-search-cloud' ) }
+							help={ rowError( errors, 'merchandising', index, 'banner' )
+								|| __( 'Optional message returned with the results for this search.', 'webhead-search-cloud' ) }
+							value={ rule.banner }
+							onChange={ ( banner ) => update( index, { ...rule, banner } ) }
+						/>
+					</div>
+				) ) }
+				<Button variant="secondary" onClick={ add }>
+					{ __( 'Add a rule', 'webhead-search-cloud' ) }
+				</Button>
 			</Card.Content>
 		</Card.Root>
 	);
@@ -298,7 +482,7 @@ const SearchConfigTab = () => {
 				const response = await apiFetch( {
 					path: SEARCH_CONFIG_PATH,
 					method: 'PUT',
-					data: config,
+					data: toPayload( config ),
 				} );
 
 				const normalized = normalizeConfig( response );
@@ -368,6 +552,17 @@ const SearchConfigTab = () => {
 				) }
 
 				<Grid className="whsc-settings-grid" columns={ { base: 1, md: 2 } } gap={ { base: 16, md: 20 } } align="start">
+					<FeaturesCard
+						features={ config.features }
+						errors={ fieldErrors }
+						onChange={ ( key, enabled ) =>
+							set( 'features', {
+								...config.features,
+								[ key ]: { ...config.features[ key ], enabled },
+							} )
+						}
+					/>
+
 					<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 						<Card.Header className="whsc-settings-card-header">
 							<div className="whsc-settings-card-copy">
@@ -612,6 +807,12 @@ const SearchConfigTab = () => {
 					</Card.Root>
 
 					<PopularSearchesCard />
+
+					<MerchandisingCard
+						rules={ config.merchandising }
+						errors={ fieldErrors }
+						onChange={ ( rules ) => set( 'merchandising', rules ) }
+					/>
 				</Grid>
 
 				<div className="whsc-save-bar">

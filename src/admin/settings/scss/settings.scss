@@ -428,6 +428,58 @@
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     align-items: start;
   }
+
+  // These checkboxes carry multi-line help text and use
+  // `__nextHasNoMarginBottom`, so without an explicit gap each one's help runs
+  // straight into the next checkbox's label.
+  .whsc-feature-switches {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  // The AI index status, reported under its checkbox rather than as help text
+  // so it reads as live state instead of a description of the setting.
+  .whsc-search-config-status {
+    margin: -12px 0 0 32px;
+    color: #757575;
+  }
+
+  // A merchandising rule holds four inputs, so it spans the settings grid
+  // rather than being squeezed into one column.
+  .whsc-settings-card--wide {
+    grid-column: 1 / -1;
+  }
+
+  .whsc-merchandising-rule {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+
+    &__head {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+
+      .components-button.is-destructive {
+        margin-top: 22px;
+      }
+    }
+
+    &__ids {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+
+      @media screen and (max-width: 600px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
 }
 
 .panel-container {
