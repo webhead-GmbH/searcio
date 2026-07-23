@@ -119,6 +119,7 @@
 	--whsc-facet-text-active: #ffffff;
 	--whsc-facet-count: currentColor;
 	--whsc-facet-radius: 999px;
+	--whsc-facets-max-height: 132px;
 
 	/* Result cards */
 	--whsc-card-bg: #ffffff;
@@ -135,7 +136,15 @@
 	--whsc-dot-color-active: var(--whsc-accent);
 	--whsc-carousel-gap: 14px;
 
+	/* Search / AI Assistant tab bar */
+	--whsc-tab-text: var(--whsc-text);
+	--whsc-tab-text-active: var(--whsc-accent);
+	--whsc-tab-indicator: var(--whsc-accent);
+	--whsc-tab-border: var(--whsc-panel-border);
+
 	/* AI assistant */
+	--whsc-assistant-accent: var(--whsc-accent);
+	--whsc-assistant-text: var(--whsc-text);
 	--whsc-assistant-muted: #6b7177;
 	--whsc-assistant-divider: #e8e9eb;
 	--whsc-assistant-user-bg: var(--whsc-accent);
@@ -650,6 +659,11 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
+	/* A field with many values (dozens of brands, colours…) would otherwise
+	 * grow this chip row tall enough to push the results far down the modal.
+	 * Cap it and let it scroll; themeable per placement. */
+	max-height: var(--whsc-facets-max-height, 132px);
+	overflow-y: auto;
 }
 
 /*
@@ -1430,7 +1444,7 @@
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	border-bottom: 1px solid var(--whsc-panel-border, rgba(0, 0, 0, 0.12));
+	border-bottom: 1px solid var(--whsc-tab-border, var(--whsc-panel-border, rgba(0, 0, 0, 0.12)));
 }
 
 .whsc-modal-tab {
@@ -1446,7 +1460,7 @@
 	font-size: 15px;
 	line-height: 1.4;
 	font-weight: 600;
-	color: var(--whsc-text, inherit);
+	color: var(--whsc-tab-text, var(--whsc-text, inherit));
 	opacity: 0.6;
 	cursor: pointer;
 	transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -1455,8 +1469,8 @@
 
 	&.is-active {
 		opacity: 1;
-		color: var(--whsc-accent, #2563eb);
-		border-bottom-color: var(--whsc-accent, #2563eb);
+		color: var(--whsc-tab-text-active, var(--whsc-accent, #2563eb));
+		border-bottom-color: var(--whsc-tab-indicator, var(--whsc-accent, #2563eb));
 	}
 }
 
@@ -1604,7 +1618,7 @@
 	height: 24px;
 	margin-top: 1px;
 	border-radius: 50%;
-	background: var(--whsc-accent, #2563eb);
+	background: var(--whsc-assistant-accent, var(--whsc-accent, #2563eb));
 	color: #fff;
 	display: inline-flex;
 	align-items: center;
@@ -1658,7 +1672,7 @@
 	background-image: linear-gradient(
 		100deg,
 		var(--whsc-assistant-muted, #6b7177) 30%,
-		var(--whsc-accent, #2563eb) 50%,
+		var(--whsc-assistant-accent, var(--whsc-accent, #2563eb)) 50%,
 		var(--whsc-assistant-muted, #6b7177) 70%
 	);
 	background-size: 220% 100%;
@@ -1680,7 +1694,7 @@
 		width: 4px;
 		height: 4px;
 		border-radius: 50%;
-		background: var(--whsc-accent, #2563eb);
+		background: var(--whsc-assistant-accent, var(--whsc-accent, #2563eb));
 		animation: whsc-thinking-dot 1.4s ease-in-out infinite;
 
 		&:nth-child(2) { animation-delay: 0.18s; }
@@ -1724,6 +1738,7 @@
 	max-width: 100%;
 	padding: 1px 0 0;
 	background: none;
+	color: var(--whsc-assistant-text, var(--whsc-text, inherit));
 }
 
 /* A tinted block rather than loose red text, so a failure reads as a message

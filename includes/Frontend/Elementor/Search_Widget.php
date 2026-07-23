@@ -95,6 +95,7 @@ final class Search_Widget extends Widget_Base {
 		$this->register_suggestion_style_controls();
 		$this->register_browse_style_controls();
 		$this->register_facet_style_controls();
+		$this->register_assistant_style_controls();
 		$this->register_card_style_controls();
 		$this->register_carousel_style_controls();
 	}
@@ -773,6 +774,7 @@ final class Search_Widget extends Widget_Base {
 		$this->end_controls_tabs();
 
 		$this->var_slider( 'facet_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-facet-radius', 0, 999, false, [ 'separator' => 'before' ] );
+		$this->var_slider( 'facets_max_height', __( 'Max height', 'webhead-search-cloud' ), '--whsc-facets-max-height', 60, 400, false, [ 'description' => __( 'Caps a long filter list and lets it scroll instead of stretching the modal.', 'webhead-search-cloud' ) ] );
 
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
@@ -796,6 +798,51 @@ final class Search_Widget extends Widget_Base {
 				'selector' => '.whsc-instance-{{ID}} .whsc-facet__count',
 			]
 		);
+
+		$this->end_controls_section();
+	}
+
+	/* ---------------------------------------------------------------------
+	 * Style — Search / AI Assistant tabs and the assistant pane. Shown only
+	 * when the plan includes the assistant, but the controls are always
+	 * available so a site can theme it ahead of enabling it.
+	 * ------------------------------------------------------------------ */
+	private function register_assistant_style_controls(): void {
+		$this->start_controls_section(
+			'style_assistant',
+			[
+				'label' => __( 'AI Assistant', 'webhead-search-cloud' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'tab_heading',
+			[ 'label' => __( 'Search / AI tabs', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
+		);
+
+		$this->start_controls_tabs( 'tab_state_tabs' );
+		$this->start_controls_tab( 'tab_state_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'tab_text', __( 'Tab text', 'webhead-search-cloud' ), '--whsc-tab-text' );
+		$this->end_controls_tab();
+		$this->start_controls_tab( 'tab_state_active', [ 'label' => __( 'Active', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'tab_text_active', __( 'Tab text', 'webhead-search-cloud' ), '--whsc-tab-text-active' );
+		$this->var_color( 'tab_indicator', __( 'Underline', 'webhead-search-cloud' ), '--whsc-tab-indicator' );
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->var_color( 'tab_border', __( 'Divider', 'webhead-search-cloud' ), '--whsc-tab-border', [ 'separator' => 'before' ] );
+
+		$this->add_control(
+			'assistant_heading',
+			[ 'label' => __( 'Assistant', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+
+		$this->var_color( 'assistant_accent', __( 'Accent (avatar, dots)', 'webhead-search-cloud' ), '--whsc-assistant-accent' );
+		$this->var_color( 'assistant_text', __( 'Reply text', 'webhead-search-cloud' ), '--whsc-assistant-text' );
+		$this->var_color( 'assistant_user_bg', __( 'Your message background', 'webhead-search-cloud' ), '--whsc-assistant-user-bg' );
+		$this->var_color( 'assistant_user_text', __( 'Your message text', 'webhead-search-cloud' ), '--whsc-assistant-user-text' );
+		$this->var_color( 'assistant_row_bg', __( 'Compare row shading', 'webhead-search-cloud' ), '--whsc-assistant-row-bg' );
 
 		$this->end_controls_section();
 	}
