@@ -2,6 +2,7 @@
 
 ## 1.0.3
 
+- Fixed the storefront search and AI assistant showing English on a translated site. Every source file has to be listed in the script translation map for its strings to reach the browser, and the files added by recent features never were — so the whole assistant surface stayed English no matter how complete the translation was. All six missing files are mapped, the German translation is filled in for all 36 storefront strings, and a test now fails if a file with translatable strings is left out of the map.
 - Reworked the assistant's waiting state. A bare spinner said only "something is loading"; it now says **Thinking**, with a shine travelling through the word and three dots rising in turn, so a wait of several seconds looks alive. Both stop for visitors who prefer reduced motion.
 - The send button's arrow was sitting high and right of centre, and when disabled it was filled the same colour as the composer, so it vanished and left a grey arrow floating in the field. The glyph is redrawn centred and the disabled state is now a visible button.
 - The conversation is anchored to the bottom of the pane, like every messenger, instead of clinging to the top with a large empty gap above the input.
