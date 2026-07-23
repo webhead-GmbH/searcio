@@ -5,6 +5,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { askAssistant } from '../../../utils/api';
 import CompareTable from './CompareTable';
 import { compareIcon, gridIcon, sendIcon, sparkleIcon } from './icons';
+import Markdown from './markdown';
 import { ResultCard } from './templates';
 
 // Matches the API's history/message caps (docs/api/search.md POST /assistant).
@@ -23,14 +24,22 @@ const errorFor = ( status ) => {
 	return __( 'The assistant is unavailable right now. Try searching instead.', 'webhead-search-cloud' );
 };
 
-const Message = ( { role, content } ) => (
-	<div className={ `whsc-assistant__msg whsc-assistant__msg--${ 'assistant' === role ? 'assistant' : 'user' }` }>
-		{ 'assistant' === role && (
-			<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
-		) }
-		<div className="whsc-assistant__bubble">{ content }</div>
-	</div>
-);
+const Message = ( { role, content } ) => {
+	const isAssistant = 'assistant' === role;
+
+	return (
+		<div className={ `whsc-assistant__msg whsc-assistant__msg--${ isAssistant ? 'assistant' : 'user' }` }>
+			{ isAssistant && (
+				<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
+			) }
+			<div className="whsc-assistant__bubble">
+				{ /* The assistant answers in Markdown; the visitor's own message is
+				     literal text and must never be reinterpreted as formatting. */ }
+				{ isAssistant ? <Markdown content={ content } /> : content }
+			</div>
+		</div>
+	);
+};
 
 /**
  * The conversational shopping assistant tab: a chat thread on the left and the
@@ -50,6 +59,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	const [ error, setError ] = useState( '' );
 	const [ compare, setCompare ] = useState( false );
 	const threadRef = useRef( null );
+	// What "Try again" resends after a failure.
+	const lastMessageRef = useRef( '' );
 	const abortRef = useRef( null );
 
 	// The most recent assistant turn that returned products drives the right pane.
@@ -77,7 +88,17 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 			.map( ( { role, content } ) => ( { role, content } ) )
 			.slice( -HISTORY_LIMIT );
 
-		setMessages( ( current ) => [ ...current, { role: 'user', content: trimmed } ] );
+		lastMessageRef.current = trimmed;
+		// A retry replaces the failed attempt rather than stacking a second
+		// copy of the same question under it.
+		setMessages( ( current ) => {
+			const isRetry = 'string' === typeof preset
+				&& current.length > 0
+				&& 'user' === current[ current.length - 1 ].role
+				&& current[ current.length - 1 ].content === trimmed;
+
+			return isRetry ? current : [ ...current, { role: 'user', content: trimmed } ];
+		} );
 		setInput( '' );
 		setError( '' );
 		setCompare( false );
@@ -158,8 +179,25 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 						</div>
 					) }
 
+					{ /* Shaped like an assistant turn rather than loose red text: it
+					     is the answer to the message the visitor just sent, so it
+					     belongs in the thread where that answer would have been. */ }
 					{ '' !== error && (
-						<div className="whsc-assistant__error" role="alert">{ error }</div>
+						<div className="whsc-assistant__msg whsc-assistant__msg--assistant">
+							<span className="whsc-assistant__avatar whsc-assistant__avatar--error" aria-hidden="true">
+								{ sparkleIcon }
+							</span>
+							<div className="whsc-assistant__error" role="alert">
+								<p className="whsc-assistant__error-text">{ error }</p>
+								<button
+									type="button"
+									className="whsc-assistant__retry"
+									onClick={ () => send( lastMessageRef.current ) }
+								>
+									{ __( 'Try again', 'webhead-search-cloud' ) }
+								</button>
+							</div>
+						</div>
 					) }
 				</div>
 

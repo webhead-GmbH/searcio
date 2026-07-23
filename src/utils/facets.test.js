@@ -108,3 +108,37 @@ describe( 'humanizeFieldLabel', () => {
 		expect( humanizeFieldLabel( '' ) ).toBe( '' );
 	} );
 } );
+
+describe( 'humanizeFieldLabel prefixes', () => {
+	/**
+	 * WooCommerce attributes reach the index prefixed. Showing "Attr color" as a
+	 * comparison-table row label is how this surfaced.
+	 */
+	it( 'strips the indexer prefixes off an attribute field', () => {
+		expect( humanizeFieldLabel( 'attr_color' ) ).toBe( 'Color' );
+		expect( humanizeFieldLabel( 'pa_size' ) ).toBe( 'Size' );
+		expect( humanizeFieldLabel( 'meta_brand' ) ).toBe( 'Brand' );
+	} );
+
+	it( 'leaves a plain field alone', () => {
+		expect( humanizeFieldLabel( 'stock_status' ) ).toBe( 'Stock status' );
+		expect( humanizeFieldLabel( 'brand' ) ).toBe( 'Brand' );
+	} );
+
+	/** A shopper reads these as acronyms, not as sentence-cased words. */
+	it( 'uppercases a whole-word acronym', () => {
+		expect( humanizeFieldLabel( 'sku' ) ).toBe( 'SKU' );
+		expect( humanizeFieldLabel( 'product_id' ) ).toBe( 'Product ID' );
+	} );
+
+	it( 'leaves a word that merely contains an acronym alone', () => {
+		expect( humanizeFieldLabel( 'idea' ) ).toBe( 'Idea' );
+		expect( humanizeFieldLabel( 'skudo_rating' ) ).toBe( 'Skudo rating' );
+	} );
+
+	/** Only a real prefix is stripped — not a word that merely starts with it. */
+	it( 'does not eat a field whose name begins with the prefix letters', () => {
+		expect( humanizeFieldLabel( 'attributes' ) ).toBe( 'Attributes' );
+		expect( humanizeFieldLabel( 'package_size' ) ).toBe( 'Package size' );
+	} );
+} );

@@ -1632,9 +1632,81 @@
 	background: none;
 }
 
+/* Markdown inside an assistant answer. The reply is prose, so these stay tight
+ * — a list in a chat bubble should not read like a document. */
+.whsc-md__p {
+	margin: 0 0 8px;
+
+	&:last-child { margin-bottom: 0; }
+}
+
+.whsc-md__heading {
+	margin: 10px 0 6px;
+	font-weight: 600;
+
+	&:first-child { margin-top: 0; }
+}
+
+.whsc-md__list {
+	margin: 0 0 8px;
+	padding-left: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	&:last-child { margin-bottom: 0; }
+
+	li {
+		margin: 0;
+		/* Sub-details are folded into their parent item with a newline. */
+		white-space: pre-line;
+	}
+}
+
+.whsc-assistant__bubble code {
+	padding: 1px 5px;
+	border-radius: 4px;
+	font-size: 0.92em;
+	background: var(--whsc-chip-bg, #f4f5f6);
+}
+
+/* An assistant turn that failed: same shape as a real answer, so the thread
+ * doesn't break into loose red text floating in the pane. */
 .whsc-assistant__error {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	padding: 10px 14px;
+	border-radius: 16px;
+	border: 1px solid #f3d2d2;
+	background: #fdf4f4;
+}
+
+.whsc-assistant__error-text {
+	margin: 0;
 	color: #b91c1c;
-	font-size: 13px;
+}
+
+.whsc-modal .whsc-assistant__retry {
+	appearance: none;
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	font-weight: 600;
+	color: #b91c1c;
+	cursor: pointer;
+	text-decoration: underline;
+
+	&:focus-visible {
+		outline: 2px solid #b91c1c;
+		outline-offset: 2px;
+	}
+}
+
+.whsc-assistant__avatar--error {
+	background: #b91c1c;
 }
 
 .whsc-assistant__composer {
@@ -1898,6 +1970,26 @@
 .whsc-compare__price {
 	font-weight: 600;
 	color: var(--whsc-price-color, #6b7177);
+	/* "95,35 €" must never break between the amount and its symbol. */
+	white-space: nowrap;
+}
+
+/* Narrow screens scroll this table sideways, so the columns keep a readable
+ * width instead of being squeezed until titles truncate and prices wrap. */
+@media screen and (max-width: 782px) {
+	.whsc-compare__table {
+		th:not(.whsc-compare__corner):not(.whsc-compare__label),
+		td {
+			min-width: 132px;
+		}
+
+		.whsc-compare__corner,
+		.whsc-compare__label {
+			min-width: 104px;
+			max-width: 104px;
+			white-space: normal;
+		}
+	}
 }
 
 }

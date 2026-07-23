@@ -52,9 +52,22 @@ export const buildFilterParams = ( activeFacets, extra = {} ) => {
  * thing available for a chip group's heading.
  */
 export const humanizeFieldLabel = ( field ) => {
-	const text = String( field || '' ).replace( /[_-]+/g, ' ' ).trim();
+	// WooCommerce product attributes reach the index prefixed (`attr_color`,
+	// `pa_size`). The prefix is an indexing detail, not something to show a
+	// shopper — "Attr color" is not a label anyone would write.
+	const text = String( field || '' )
+		.replace( /^(attr|pa|meta|tax)[_-]+/i, '' )
+		.replace( /[_-]+/g, ' ' )
+		.trim();
 
-	return text.charAt( 0 ).toUpperCase() + text.slice( 1 );
+	const label = text.charAt( 0 ).toUpperCase() + text.slice( 1 );
+
+	// Acronyms a shopper reads as words, not as sentence-cased text ("Sku").
+	// Whole words only, so "Idea" or "Urlaub" are never mangled into "IDea".
+	return label.replace(
+		/(^|\s)(sku|id|url|upc|ean|isbn|gtin)(?=\s|$)/gi,
+		( match, before, word ) => before + word.toUpperCase()
+	);
 };
 
 /**

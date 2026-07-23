@@ -52,6 +52,7 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 
 = 1.0.3 =
 
+- Fixed the AI Assistant front end: translations, Markdown formatting in answers, and a comparison table that no longer exposes indexing internals.
 - Removed leftover sync/onboarding options that nothing reads any more and that could be mistaken for live state.
 - Search Config now also manages merchandising rules and the AI search, visual tagging and click-ranking switches.
 - Fixed click-through tracking never recording anything: the analytics beacon was blocked by the browser before it was sent.
