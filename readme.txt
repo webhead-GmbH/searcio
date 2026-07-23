@@ -52,6 +52,8 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 
 = 1.0.3 =
 
+- Fixed the search modal and AI assistant showing English on translated sites.
+- The AI assistant now shows an animated "Thinking" state, keeps the conversation next to the input, offers Try again when an answer fails, and has a properly centred send button.
 - Search Config now also manages merchandising rules and the AI search, visual tagging and click-ranking switches.
 - Fixed click-through tracking never recording anything: the analytics beacon was blocked by the browser before it was sent.
 - Fixed a sync that could stop dead with no way back: a worker tick killed part-way through left the run on "Running" with nothing to advance it, which also blocked every later scheduled sync. Ticks now arm their successor up front, and the scheduled sync revives a run whose worker has died.

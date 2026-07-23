@@ -420,6 +420,15 @@
     flex-wrap: wrap;
   }
 
+  // A site with many indexed fields turns these token lists into a tall block
+  // that stretches its card far past the one beside it and breaks the two-column
+  // grid. Cap the token area and let it scroll instead; the input itself stays
+  // in view because it sits inside the same scrolling container.
+  .whsc-token-field .components-form-token-field__input-container {
+    max-height: 130px;
+    overflow-y: auto;
+  }
+
   // Language checkboxes (PLAN.md §5.2), in compact responsive columns —
   // same pattern as the Indexing tab's product-attribute checkboxes.
   .whsc-language-grid {

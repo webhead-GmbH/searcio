@@ -108,4 +108,63 @@ test.describe( 'AI Assistant tab', () => {
 
 		await expect( page.locator( '.whsc-assistant__error' ) ).toBeVisible();
 	} );
+
+	/**
+	 * A failure is the assistant answering, so it gets the same avatar and row
+	 * as a reply — and offers to re-send rather than making the visitor retype.
+	 */
+	test( 'a failed turn can be retried without retyping', async ( { page, requestUtils } ) => {
+		let attempts = 0;
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantReply: 'Here it is.',
+			// Fail the first attempt, answer the second.
+			onAssistant: () => {
+				attempts++;
+
+				return 1 === attempts ? 502 : 200;
+			},
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await page.getByRole( 'tab', { name: /assistant/i } ).click();
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'a warm jacket' );
+		await input.press( 'Enter' );
+
+		await expect( page.locator( '.whsc-assistant__error' ) ).toBeVisible();
+
+		await page.getByRole( 'button', { name: /try again/i } ).click();
+
+		await expect( page.locator( '.whsc-assistant__bubble', { hasText: 'Here it is.' } ) ).toBeVisible();
+		await expect( page.locator( '.whsc-assistant__error' ) ).toHaveCount( 0 );
+		// The turn must not be duplicated by the retry.
+		await expect( page.locator( '.whsc-assistant__msg--user' ) ).toHaveCount( 1 );
+	} );
+
+	/** The wait says what is happening rather than showing a bare spinner. */
+	test( 'shows an animated "Thinking" state while the reply is in flight', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { assistant: true, assistantReply: 'Done.', assistantDelay: 2500 } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await page.getByRole( 'tab', { name: /assistant/i } ).click();
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'anything' );
+		await input.press( 'Enter' );
+
+		const thinking = page.locator( '.whsc-assistant__thinking' );
+		await expect( thinking ).toBeVisible();
+		await expect( thinking ).toContainText( /thinking/i );
+		await expect( page.locator( '.whsc-assistant__dots i' ) ).toHaveCount( 3 );
+
+		// It is replaced by the answer, not left behind.
+		await expect( page.locator( '.whsc-assistant__bubble', { hasText: 'Done.' } ) ).toBeVisible();
+		await expect( thinking ).toHaveCount( 0 );
+	} );
 } );
