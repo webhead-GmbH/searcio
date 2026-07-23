@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-23T16:04:05+00:00\n"
+"POT-Creation-Date: 2026-07-23T17:08:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -2537,7 +2537,7 @@ msgstr ""
 
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:250
-msgid "A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync — re-sync to tag products already indexed."
+msgid "A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync - re-sync to tag products already indexed."
 msgstr ""
 
 #: public/bundle.settings.js:166
@@ -2547,7 +2547,7 @@ msgstr ""
 
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:266
-msgid "Results people click most for a search rise for everyone searching it. Relevance still leads — popular results are only nudged up."
+msgid "Results people click most for a search rise for everyone searching it. Relevance still leads - popular results are only nudged up."
 msgstr ""
 
 #: public/bundle.settings.js:166
@@ -2557,7 +2557,7 @@ msgstr ""
 
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:300
-msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search — that is how you keep a product out of search everywhere."
+msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
 msgstr ""
 
 #: public/bundle.settings.js:166
@@ -2637,7 +2637,7 @@ msgstr ""
 
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:571
-msgid "Which fields full-text search matches, and how much each one counts (1–100). A higher weight on \"title\" makes title matches outrank body-text matches, for example."
+msgid "Which fields full-text search matches, and how much each one counts (1-100). A higher weight on \"title\" makes title matches outrank body-text matches, for example."
 msgstr ""
 
 #: public/bundle.settings.js:166
@@ -2657,7 +2657,7 @@ msgstr ""
 
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:626
-msgid "Ranking boost per content type (0.1–100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing."
+msgid "Ranking boost per content type (0.1-100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing."
 msgstr ""
 
 #: public/bundle.settings.js:166

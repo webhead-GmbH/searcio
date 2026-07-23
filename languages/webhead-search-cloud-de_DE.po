@@ -1322,7 +1322,7 @@ msgstr "Was ist im Angebot?"
 
 #: public/bundle.search.js:1 src/frontend/search/components/AiAssistant.js:164
 msgid "Describe what you're looking for and I'll find it in this store."
-msgstr "Beschreibe, was du suchst – ich finde es in diesem Shop."
+msgstr "Beschreibe, was du suchst - ich finde es in diesem Shop."
 
 #: public/bundle.search.js:1 src/frontend/search/components/AiAssistant.js:203
 msgid "Thinking"
@@ -2471,7 +2471,7 @@ msgstr ""
 msgid ""
 "A vision model describes each product image and adds the tags to the "
 "document, so sparsely-described products still turn up. Applied as you sync "
-"— re-sync to tag products already indexed."
+"- re-sync to tag products already indexed."
 msgstr ""
 
 #: public/bundle.settings.js:166
@@ -2483,7 +2483,7 @@ msgstr ""
 #: src/admin/settings/components/tabs/SearchConfigTab.js:266
 msgid ""
 "Results people click most for a search rise for everyone searching it. "
-"Relevance still leads — popular results are only nudged up."
+"Relevance still leads - popular results are only nudged up."
 msgstr ""
 
 #: public/bundle.settings.js:166
@@ -2495,7 +2495,7 @@ msgstr ""
 #: src/admin/settings/components/tabs/SearchConfigTab.js:300
 msgid ""
 "Curate the results of chosen searches. Leave the trigger empty to apply a "
-"rule to every search — that is how you keep a product out of search "
+"rule to every search - that is how you keep a product out of search "
 "everywhere."
 msgstr ""
 
@@ -2582,7 +2582,7 @@ msgstr ""
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:571
 msgid ""
-"Which fields full-text search matches, and how much each one counts (1–100)."
+"Which fields full-text search matches, and how much each one counts (1-100)."
 " A higher weight on \"title\" makes title matches outrank body-text matches,"
 " for example."
 msgstr ""
@@ -2605,7 +2605,7 @@ msgstr ""
 #: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/SearchConfigTab.js:626
 msgid ""
-"Ranking boost per content type (0.1–100). Above 1 ranks that type higher "
+"Ranking boost per content type (0.1-100). Above 1 ranks that type higher "
 "overall; below 1 ranks it lower. One row per content type currently enabled "
 "in Indexing."
 msgstr ""
