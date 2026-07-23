@@ -15,6 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
 import SettingsContext from '../../../../settings/store/context';
 import {
 	idsToText,
+	listError,
 	normalizeConfig,
 	textToIds,
 	toPayload,
@@ -212,7 +213,7 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 					</Text>
 				</div>
 			</Card.Header>
-			<Card.Content className="whsc-settings-card-content">
+			<Card.Content className="whsc-settings-card-content whsc-feature-switches">
 				<CheckboxControl
 					__nextHasNoMarginBottom
 					label={ __( 'AI search', 'webhead-search-cloud' ) }
@@ -285,7 +286,7 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
  * @param {Array}    props.rules
  * @param {Function} props.onChange Called with the full replacement list.
  */
-const MerchandisingCard = ( { rules, onChange } ) => {
+const MerchandisingCard = ( { rules, errors, onChange } ) => {
 	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
 	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
 	const add = () => onChange( [ ...rules, { query: '', pinned: [], hidden: [], banner: '' } ] );
@@ -311,9 +312,10 @@ const MerchandisingCard = ( { rules, onChange } ) => {
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Trigger (search term contains)', 'webhead-search-cloud' ) }
-								help={ '' === rule.query
-									? __( 'Empty: this rule applies to every search on the site.', 'webhead-search-cloud' )
-									: undefined }
+								help={ rowError( errors, 'merchandising', index, 'query' )
+									|| ( '' === rule.query
+										? __( 'Empty: this rule applies to every search on the site.', 'webhead-search-cloud' )
+										: undefined ) }
 								value={ rule.query }
 								onChange={ ( query ) => update( index, { ...rule, query } ) }
 							/>
@@ -330,7 +332,8 @@ const MerchandisingCard = ( { rules, onChange } ) => {
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Pin to top (document ids)', 'webhead-search-cloud' ) }
-								help={ __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
+								help={ listError( errors, 'merchandising', index, 'pinned' )
+									|| __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
 								value={ idsToText( rule.pinned ) }
 								onChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
 							/>
@@ -338,7 +341,8 @@ const MerchandisingCard = ( { rules, onChange } ) => {
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Hide (document ids)', 'webhead-search-cloud' ) }
-								help={ __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
+								help={ listError( errors, 'merchandising', index, 'hidden' )
+									|| __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
 								value={ idsToText( rule.hidden ) }
 								onChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
 							/>
@@ -347,7 +351,8 @@ const MerchandisingCard = ( { rules, onChange } ) => {
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							label={ __( 'Promotional banner', 'webhead-search-cloud' ) }
-							help={ __( 'Optional message returned with the results for this search.', 'webhead-search-cloud' ) }
+							help={ rowError( errors, 'merchandising', index, 'banner' )
+								|| __( 'Optional message returned with the results for this search.', 'webhead-search-cloud' ) }
 							value={ rule.banner }
 							onChange={ ( banner ) => update( index, { ...rule, banner } ) }
 						/>
@@ -805,6 +810,7 @@ const SearchConfigTab = () => {
 
 					<MerchandisingCard
 						rules={ config.merchandising }
+						errors={ fieldErrors }
 						onChange={ ( rules ) => set( 'merchandising', rules ) }
 					/>
 				</Grid>

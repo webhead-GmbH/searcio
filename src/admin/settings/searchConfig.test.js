@@ -7,6 +7,7 @@
 import {
 	FEATURE_KEYS,
 	idsToText,
+	listError,
 	normalizeConfig,
 	normalizeFeatures,
 	normalizeMerchandising,
@@ -114,6 +115,54 @@ describe( 'toPayload', () => {
 			visual_tagging: { enabled: false },
 			personalization: { enabled: false },
 		} );
+	} );
+} );
+
+describe( 'listError', () => {
+	/**
+	 * The live API rejects an oversized id with the key
+	 * `merchandising.0.pinned.0` — per entry, while the UI edits the whole list
+	 * as one field. Without collecting these the message would never be shown.
+	 */
+	it( 'collects a per-entry error onto the field that owns the list', () => {
+		expect(
+			listError( { 'merchandising.0.pinned.0': [ 'The id is too long.' ] }, 'merchandising', 0, 'pinned' )
+		).toBe( 'The id is too long.' );
+	} );
+
+	it( 'joins errors from several entries of the same list', () => {
+		expect(
+			listError(
+				{
+					'merchandising.1.hidden.0': [ 'First bad.' ],
+					'merchandising.1.hidden.3': [ 'Second bad.' ],
+				},
+				'merchandising',
+				1,
+				'hidden'
+			)
+		).toBe( 'First bad. Second bad.' );
+	} );
+
+	it( 'also reads an error on the list itself', () => {
+		expect(
+			listError( { 'merchandising.0.pinned': [ 'Too many ids.' ] }, 'merchandising', 0, 'pinned' )
+		).toBe( 'Too many ids.' );
+	} );
+
+	/** A neighbouring rule's error must not leak onto this field. */
+	it( 'ignores other rules and other columns', () => {
+		const errors = {
+			'merchandising.1.pinned.0': [ 'Other rule.' ],
+			'merchandising.0.hidden.0': [ 'Other column.' ],
+		};
+
+		expect( listError( errors, 'merchandising', 0, 'pinned' ) ).toBeUndefined();
+	} );
+
+	it( 'is undefined when nothing failed', () => {
+		expect( listError( {}, 'merchandising', 0, 'pinned' ) ).toBeUndefined();
+		expect( listError( undefined, 'merchandising', 0, 'pinned' ) ).toBeUndefined();
 	} );
 } );
 

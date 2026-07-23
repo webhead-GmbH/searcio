@@ -89,3 +89,24 @@ export const textToIds = ( text ) => text
 	.split( ',' )
 	.map( ( id ) => id.trim() )
 	.filter( ( id ) => '' !== id );
+
+/**
+ * A merchandising rule's id lists are validated per entry
+ * (`merchandising.0.pinned.2`), but the UI edits the whole list as one
+ * comma-separated field — so collect every entry's error onto that field
+ * rather than dropping the ones that have no input of their own.
+ *
+ * @param {Object} errors  The API's `errors` envelope.
+ * @param {string} section e.g. `merchandising`.
+ * @param {number} index   Rule index.
+ * @param {string} column  e.g. `pinned`.
+ * @return {string|undefined} Joined messages, or undefined when clean.
+ */
+export const listError = ( errors, section, index, column ) => {
+	const prefix = `${ section }.${ index }.${ column }`;
+	const messages = Object.entries( errors || {} )
+		.filter( ( [ key ] ) => key === prefix || key.startsWith( `${ prefix }.` ) )
+		.flatMap( ( [ , value ] ) => ( Array.isArray( value ) ? value : [] ) );
+
+	return messages.length > 0 ? messages.join( ' ' ) : undefined;
+};
