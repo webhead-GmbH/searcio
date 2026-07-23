@@ -1,5 +1,5 @@
 import { useEffect, useState } from '@wordpress/element';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls, PanelColorSettings, useBlockProps } from '@wordpress/block-editor';
 import {
 	Icon,
 	PanelBody,
@@ -13,145 +13,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { search as SearchIcon } from '@wordpress/icons';
-
-import ColorHoverControl from './ColorHoverControl';
-
-/**
- * The Styles inspector, one section per part of the modal. Each row is either a
- * colour (with an optional `hover` sibling, folded into one Default/Hover
- * control), or a size slider. Driven by this config so a hover colour never
- * needs its own separate row — matching the core File/Button blocks.
- */
-const STYLE_SECTIONS = [
-	{
-		title: __( 'Trigger', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'triggerIconColor', hover: 'triggerIconColorHover', label: __( 'Icon color', 'webhead-search-cloud' ) },
-			{ color: 'triggerBg', hover: 'triggerBgHover', label: __( 'Background', 'webhead-search-cloud' ) },
-			{ size: 'triggerIconSize', label: __( 'Icon size', 'webhead-search-cloud' ), max: 60, min: 12 },
-			{ size: 'triggerBtnSize', label: __( 'Button size', 'webhead-search-cloud' ), max: 96, min: 28 },
-			{ size: 'triggerRadius', label: __( 'Border radius', 'webhead-search-cloud' ), max: 100 },
-		],
-	},
-	{
-		title: __( 'Search & AI tabs', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'tabText', label: __( 'Tab text', 'webhead-search-cloud' ) },
-			{ color: 'tabTextActive', label: __( 'Tab text (active)', 'webhead-search-cloud' ) },
-			{ color: 'tabIndicator', label: __( 'Active indicator', 'webhead-search-cloud' ) },
-			{ color: 'tabBorder', label: __( 'Divider', 'webhead-search-cloud' ) },
-		],
-	},
-	{
-		title: __( 'Modal', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'bgColor', label: __( 'Background', 'webhead-search-cloud' ) },
-			{ color: 'textColor', label: __( 'Text', 'webhead-search-cloud' ) },
-			{ color: 'accentColor', label: __( 'Accent', 'webhead-search-cloud' ) },
-			{ size: 'radiusPanel', label: __( 'Corner radius', 'webhead-search-cloud' ), max: 40 },
-			{ size: 'modalPadding', label: __( 'Padding', 'webhead-search-cloud' ), max: 80 },
-			{ size: 'modalGap', label: __( 'Section spacing', 'webhead-search-cloud' ), max: 80 },
-		],
-	},
-	{
-		title: __( 'Search field', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'inputBgColor', label: __( 'Background', 'webhead-search-cloud' ) },
-			{ color: 'inputTextColor', label: __( 'Text', 'webhead-search-cloud' ) },
-			{ color: 'inputIconColor', label: __( 'Icon', 'webhead-search-cloud' ) },
-			{ color: 'inputPlaceholderColor', label: __( 'Placeholder', 'webhead-search-cloud' ) },
-			{ color: 'inputBorderColor', label: __( 'Border', 'webhead-search-cloud' ) },
-			{ color: 'inputBorderFocusColor', label: __( 'Border (focus)', 'webhead-search-cloud' ) },
-			{ size: 'inputRadius', label: __( 'Border radius', 'webhead-search-cloud' ), max: 999 },
-		],
-	},
-	{
-		title: __( 'Buttons', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'btnBg', hover: 'btnBgHover', label: __( 'Search button bg', 'webhead-search-cloud' ) },
-			{ color: 'btnText', hover: 'btnTextHover', label: __( 'Search button text', 'webhead-search-cloud' ) },
-			{ color: 'iconColor', hover: 'iconColorHover', label: __( 'Icon buttons', 'webhead-search-cloud' ) },
-			{ color: 'iconBgHover', label: __( 'Icon button bg (hover)', 'webhead-search-cloud' ) },
-			{ color: 'voiceColor', hover: 'voiceColorHover', label: __( 'Voice icon', 'webhead-search-cloud' ) },
-			{ color: 'voiceBg', hover: 'voiceBgHover', label: __( 'Voice background', 'webhead-search-cloud' ) },
-			{ color: 'closeColor', hover: 'closeColorHover', label: __( 'Close icon', 'webhead-search-cloud' ) },
-			{ color: 'closeBg', hover: 'closeBgHover', label: __( 'Close background', 'webhead-search-cloud' ) },
-			{ color: 'clearBtnColor', hover: 'clearBtnColorHover', label: __( 'Clear icon', 'webhead-search-cloud' ) },
-			{ color: 'clearBtnBg', hover: 'clearBtnBgHover', label: __( 'Clear background', 'webhead-search-cloud' ) },
-			{ size: 'btnRadius', label: __( 'Search button radius', 'webhead-search-cloud' ), max: 999 },
-		],
-	},
-	{
-		title: __( 'AI Assistant', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'assistantAccent', label: __( 'Accent (avatar, dots)', 'webhead-search-cloud' ) },
-			{ color: 'assistantText', label: __( 'Reply text', 'webhead-search-cloud' ) },
-			{ color: 'assistantUserBg', label: __( 'Your message background', 'webhead-search-cloud' ) },
-			{ color: 'assistantUserText', label: __( 'Your message text', 'webhead-search-cloud' ) },
-			{ color: 'assistantRowBg', label: __( 'Compare row shading', 'webhead-search-cloud' ) },
-		],
-	},
-	{
-		title: __( 'Suggestions', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'panelBg', label: __( 'Panel background', 'webhead-search-cloud' ) },
-			{ color: 'panelBorder', label: __( 'Panel border', 'webhead-search-cloud' ) },
-			{ color: 'suggestionText', hover: 'suggestionTextHover', label: __( 'Item text', 'webhead-search-cloud' ) },
-			{ color: 'suggestionBgHover', label: __( 'Item background (hover)', 'webhead-search-cloud' ) },
-			{ size: 'panelRadius', label: __( 'Panel radius', 'webhead-search-cloud' ), max: 40 },
-		],
-	},
-	{
-		title: __( 'Recent & popular', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'titleColor', label: __( 'Section title', 'webhead-search-cloud' ) },
-			{ color: 'chipBg', hover: 'chipBgHover', label: __( 'Chip background', 'webhead-search-cloud' ) },
-			{ color: 'chipText', hover: 'chipTextHover', label: __( 'Chip text', 'webhead-search-cloud' ) },
-			{ color: 'chipBorder', hover: 'chipBorderHover', label: __( 'Chip border', 'webhead-search-cloud' ) },
-			{ color: 'clearText', hover: 'clearTextHover', label: __( 'Clear all', 'webhead-search-cloud' ) },
-			{ color: 'clearBgHover', label: __( 'Clear all bg (hover)', 'webhead-search-cloud' ) },
-			{ color: 'clearTextActive', label: __( 'Clear all (active)', 'webhead-search-cloud' ) },
-			{ color: 'popularText', hover: 'popularTextHover', label: __( 'Popular text', 'webhead-search-cloud' ) },
-			{ color: 'popularBgHover', label: __( 'Popular bg (hover)', 'webhead-search-cloud' ) },
-			{ size: 'chipRadius', label: __( 'Chip radius', 'webhead-search-cloud' ), max: 999 },
-			{ size: 'popularGap', label: __( 'Popular item spacing', 'webhead-search-cloud' ), max: 24 },
-			{ size: 'popularRadius', label: __( 'Popular item radius', 'webhead-search-cloud' ), max: 40 },
-		],
-	},
-	{
-		title: __( 'Filters', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'facetBg', hover: 'facetBgHover', label: __( 'Background', 'webhead-search-cloud' ) },
-			{ color: 'facetText', hover: 'facetTextHover', label: __( 'Text', 'webhead-search-cloud' ) },
-			{ color: 'facetBgActive', label: __( 'Background (active)', 'webhead-search-cloud' ) },
-			{ color: 'facetTextActive', label: __( 'Text (active)', 'webhead-search-cloud' ) },
-			{ color: 'facetCount', label: __( 'Count', 'webhead-search-cloud' ) },
-			{ size: 'facetRadius', label: __( 'Border radius', 'webhead-search-cloud' ), max: 999 },
-			{ size: 'facetsMaxHeight', label: __( 'Max height (px)', 'webhead-search-cloud' ), max: 400, min: 60 },
-		],
-	},
-	{
-		title: __( 'Result cards', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'cardBg', label: __( 'Background', 'webhead-search-cloud' ) },
-			{ color: 'cardBorder', hover: 'cardBorderHover', label: __( 'Border', 'webhead-search-cloud' ) },
-			{ color: 'cardTitle', label: __( 'Title', 'webhead-search-cloud' ) },
-			{ color: 'priceColor', label: __( 'Price / meta', 'webhead-search-cloud' ) },
-			{ size: 'cardRadius', label: __( 'Border radius', 'webhead-search-cloud' ), max: 40 },
-			{ size: 'cardPadding', label: __( 'Padding', 'webhead-search-cloud' ), max: 40 },
-		],
-	},
-	{
-		title: __( 'Carousel', 'webhead-search-cloud' ),
-		rows: [
-			{ color: 'arrowColor', label: __( 'Arrow color', 'webhead-search-cloud' ) },
-			{ color: 'arrowBg', label: __( 'Arrow background', 'webhead-search-cloud' ) },
-			{ color: 'dotColor', label: __( 'Dot color', 'webhead-search-cloud' ) },
-			{ color: 'dotColorActive', label: __( 'Dot color (active)', 'webhead-search-cloud' ) },
-			{ size: 'carouselGap', label: __( 'Spacing between items', 'webhead-search-cloud' ), max: 48 },
-		],
-	},
-];
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { instanceId, mode, scopeType, cardSource, highlightsSource, placeholder, enableVoice, searchTrigger, showCount, animation } = attributes;
@@ -196,36 +57,21 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	];
 
 	const setColor = ( key ) => ( value ) => setAttributes( { [ key ]: value || '' } );
+	const color = ( key, label ) => ( { value: attributes[ key ], onChange: setColor( key ), label } );
 	const setSize = ( key ) => ( value ) => setAttributes( { [ key ]: undefined === value ? null : value } );
 
-	const renderRow = ( row ) => {
-		if ( row.size ) {
-			return (
-				<RangeControl
-					key={ row.size }
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ row.label }
-					value={ attributes[ row.size ] ?? undefined }
-					onChange={ setSize( row.size ) }
-					min={ row.min ?? 0 }
-					max={ row.max }
-					allowReset
-				/>
-			);
-		}
-
-		return (
-			<ColorHoverControl
-				key={ row.color }
-				label={ row.label }
-				value={ attributes[ row.color ] }
-				onChange={ setColor( row.color ) }
-				hoverValue={ row.hover ? attributes[ row.hover ] : undefined }
-				onHoverChange={ row.hover ? setColor( row.hover ) : undefined }
-			/>
-		);
-	};
+	const sizeControl = ( key, label, max, min = 0 ) => (
+		<RangeControl
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+			label={ label }
+			value={ attributes[ key ] ?? undefined }
+			onChange={ setSize( key ) }
+			min={ min }
+			max={ max }
+			allowReset
+		/>
+	);
 
 	return (
 		<>
@@ -334,13 +180,183 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			</InspectorControls>
 
 			<InspectorControls group="styles">
-				{ STYLE_SECTIONS.map( ( section ) => (
-					<PanelBody key={ section.title } title={ section.title } initialOpen={ false }>
-						<div style={ { display: 'flex', flexDirection: 'column', gap: '4px' } }>
-							{ section.rows.map( renderRow ) }
-						</div>
-					</PanelBody>
-				) ) }
+				<PanelColorSettings
+					title={ __( 'Trigger', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'triggerIconColor', __( 'Icon color', 'webhead-search-cloud' ) ),
+						color( 'triggerIconColorHover', __( 'Icon color (hover)', 'webhead-search-cloud' ) ),
+						color( 'triggerBg', __( 'Background', 'webhead-search-cloud' ) ),
+						color( 'triggerBgHover', __( 'Background (hover)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'triggerIconSize', __( 'Icon size', 'webhead-search-cloud' ), 60, 12 ) }
+					{ sizeControl( 'triggerBtnSize', __( 'Button size', 'webhead-search-cloud' ), 96, 28 ) }
+					{ sizeControl( 'triggerRadius', __( 'Border radius', 'webhead-search-cloud' ), 100 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Modal', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'bgColor', __( 'Background', 'webhead-search-cloud' ) ),
+						color( 'textColor', __( 'Text', 'webhead-search-cloud' ) ),
+						color( 'accentColor', __( 'Accent', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'radiusPanel', __( 'Corner radius', 'webhead-search-cloud' ), 40 ) }
+					{ sizeControl( 'modalPadding', __( 'Padding', 'webhead-search-cloud' ), 80 ) }
+					{ sizeControl( 'modalGap', __( 'Section spacing', 'webhead-search-cloud' ), 80 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Search field', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'inputBgColor', __( 'Background', 'webhead-search-cloud' ) ),
+						color( 'inputTextColor', __( 'Text', 'webhead-search-cloud' ) ),
+						color( 'inputIconColor', __( 'Icon', 'webhead-search-cloud' ) ),
+						color( 'inputPlaceholderColor', __( 'Placeholder', 'webhead-search-cloud' ) ),
+						color( 'inputBorderColor', __( 'Border', 'webhead-search-cloud' ) ),
+						color( 'inputBorderFocusColor', __( 'Border (focus)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'inputRadius', __( 'Border radius', 'webhead-search-cloud' ), 999 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Buttons', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'btnBg', __( 'Search button bg', 'webhead-search-cloud' ) ),
+						color( 'btnBgHover', __( 'Search button bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'btnText', __( 'Search button text', 'webhead-search-cloud' ) ),
+						color( 'btnTextHover', __( 'Search button text (hover)', 'webhead-search-cloud' ) ),
+						color( 'iconColor', __( 'Icon buttons', 'webhead-search-cloud' ) ),
+						color( 'iconColorHover', __( 'Icon buttons (hover)', 'webhead-search-cloud' ) ),
+						color( 'iconBgHover', __( 'Icon button bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'voiceColor', __( 'Voice icon', 'webhead-search-cloud' ) ),
+						color( 'voiceColorHover', __( 'Voice icon (hover)', 'webhead-search-cloud' ) ),
+						color( 'voiceBg', __( 'Voice bg', 'webhead-search-cloud' ) ),
+						color( 'voiceBgHover', __( 'Voice bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'closeColor', __( 'Close icon', 'webhead-search-cloud' ) ),
+						color( 'closeColorHover', __( 'Close icon (hover)', 'webhead-search-cloud' ) ),
+						color( 'closeBg', __( 'Close bg', 'webhead-search-cloud' ) ),
+						color( 'closeBgHover', __( 'Close bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'clearBtnColor', __( 'Clear icon', 'webhead-search-cloud' ) ),
+						color( 'clearBtnColorHover', __( 'Clear icon (hover)', 'webhead-search-cloud' ) ),
+						color( 'clearBtnBg', __( 'Clear bg', 'webhead-search-cloud' ) ),
+						color( 'clearBtnBgHover', __( 'Clear bg (hover)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'btnRadius', __( 'Search button radius', 'webhead-search-cloud' ), 999 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Suggestions', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'panelBg', __( 'Panel background', 'webhead-search-cloud' ) ),
+						color( 'panelBorder', __( 'Panel border', 'webhead-search-cloud' ) ),
+						color( 'suggestionText', __( 'Item text', 'webhead-search-cloud' ) ),
+						color( 'suggestionTextHover', __( 'Item text (hover)', 'webhead-search-cloud' ) ),
+						color( 'suggestionBgHover', __( 'Item background (hover)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'panelRadius', __( 'Panel radius', 'webhead-search-cloud' ), 40 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Recent & popular', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'titleColor', __( 'Section title', 'webhead-search-cloud' ) ),
+						color( 'chipBg', __( 'Chip background', 'webhead-search-cloud' ) ),
+						color( 'chipText', __( 'Chip text', 'webhead-search-cloud' ) ),
+						color( 'chipBorder', __( 'Chip border', 'webhead-search-cloud' ) ),
+						color( 'chipBgHover', __( 'Chip background (hover)', 'webhead-search-cloud' ) ),
+						color( 'chipTextHover', __( 'Chip text (hover)', 'webhead-search-cloud' ) ),
+						color( 'chipBorderHover', __( 'Chip border (hover)', 'webhead-search-cloud' ) ),
+						color( 'clearText', __( 'Clear all', 'webhead-search-cloud' ) ),
+						color( 'clearTextHover', __( 'Clear all (hover)', 'webhead-search-cloud' ) ),
+						color( 'clearTextActive', __( 'Clear all (active)', 'webhead-search-cloud' ) ),
+						color( 'popularText', __( 'Popular text', 'webhead-search-cloud' ) ),
+						color( 'popularTextHover', __( 'Popular text (hover)', 'webhead-search-cloud' ) ),
+						color( 'popularBgHover', __( 'Popular bg (hover)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'chipRadius', __( 'Chip radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'popularGap', __( 'Popular item spacing', 'webhead-search-cloud' ), 24 ) }
+					{ sizeControl( 'popularRadius', __( 'Popular item radius', 'webhead-search-cloud' ), 40 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Type filters', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'facetBg', __( 'Background', 'webhead-search-cloud' ) ),
+						color( 'facetText', __( 'Text', 'webhead-search-cloud' ) ),
+						color( 'facetBgHover', __( 'Background (hover)', 'webhead-search-cloud' ) ),
+						color( 'facetTextHover', __( 'Text (hover)', 'webhead-search-cloud' ) ),
+						color( 'facetBgActive', __( 'Background (active)', 'webhead-search-cloud' ) ),
+						color( 'facetTextActive', __( 'Text (active)', 'webhead-search-cloud' ) ),
+						color( 'facetCount', __( 'Count', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'facetRadius', __( 'Border radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'facetsMaxHeight', __( 'Max height (px)', 'webhead-search-cloud' ), 400, 60 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Search & AI tabs', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'tabText', __( 'Tab text', 'webhead-search-cloud' ) ),
+						color( 'tabTextActive', __( 'Tab text (active)', 'webhead-search-cloud' ) ),
+						color( 'tabIndicator', __( 'Active indicator', 'webhead-search-cloud' ) ),
+						color( 'tabBorder', __( 'Divider', 'webhead-search-cloud' ) ),
+					] }
+				/>
+
+				<PanelColorSettings
+					title={ __( 'AI Assistant', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'assistantAccent', __( 'Accent (avatar, dots)', 'webhead-search-cloud' ) ),
+						color( 'assistantText', __( 'Reply text', 'webhead-search-cloud' ) ),
+						color( 'assistantUserBg', __( 'Your message background', 'webhead-search-cloud' ) ),
+						color( 'assistantUserText', __( 'Your message text', 'webhead-search-cloud' ) ),
+						color( 'assistantRowBg', __( 'Compare row shading', 'webhead-search-cloud' ) ),
+					] }
+				/>
+
+				<PanelColorSettings
+					title={ __( 'Result cards', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'cardBg', __( 'Background', 'webhead-search-cloud' ) ),
+						color( 'cardBorder', __( 'Border', 'webhead-search-cloud' ) ),
+						color( 'cardBorderHover', __( 'Border (hover)', 'webhead-search-cloud' ) ),
+						color( 'cardTitle', __( 'Title', 'webhead-search-cloud' ) ),
+						color( 'priceColor', __( 'Price / meta', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'cardRadius', __( 'Border radius', 'webhead-search-cloud' ), 40 ) }
+					{ sizeControl( 'cardPadding', __( 'Padding', 'webhead-search-cloud' ), 40 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Carousel', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'arrowColor', __( 'Arrow color', 'webhead-search-cloud' ) ),
+						color( 'arrowBg', __( 'Arrow background', 'webhead-search-cloud' ) ),
+						color( 'dotColor', __( 'Dot color', 'webhead-search-cloud' ) ),
+						color( 'dotColorActive', __( 'Dot color (active)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'carouselGap', __( 'Spacing between items', 'webhead-search-cloud' ), 48 ) }
+				</PanelColorSettings>
 			</InspectorControls>
 
 			<div { ...blockProps }>
