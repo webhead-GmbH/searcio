@@ -2,6 +2,9 @@
 
 ## 1.0.3
 
+- The AI Assistant tab and its conversation can now be styled like every other part of the widget, in both the block editor and Elementor: tab colours (text, active, underline, divider), the assistant accent and reply text, and your-message bubble colours. 
+- In the block editor, a colour and its hover are now one field with **Default / Hover** tabs instead of two separate rows, matching the core File and Button blocks.
+- The frontend filter list is capped in height and scrolls instead of stretching the modal when a field has many values; the cap is themeable per placement (default 132px).
 - Fixed the storefront search and AI assistant showing English on a translated site. Every source file has to be listed in the script translation map for its strings to reach the browser, and the files added by recent features never were — so the whole assistant surface stayed English no matter how complete the translation was. All six missing files are mapped, the German translation is filled in for all 36 storefront strings, and a test now fails if a file with translatable strings is left out of the map.
 - Reworked the assistant's waiting state. A bare spinner said only "something is loading"; it now says **Thinking**, with a shine travelling through the word and three dots rising in turn, so a wait of several seconds looks alive. Both stop for visitors who prefer reduced motion.
 - The send button's arrow was sitting high and right of centre, and when disabled it was filled the same colour as the composer, so it vanished and left a grey arrow floating in the field. The glyph is redrawn centred and the disabled state is now a visible button.
