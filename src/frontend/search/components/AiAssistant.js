@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { Button, Spinner } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { askAssistant } from '../../../utils/api';
@@ -51,6 +51,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	const [ compare, setCompare ] = useState( false );
 	const threadRef = useRef( null );
 	const abortRef = useRef( null );
+	const lastAttemptRef = useRef( null );
 
 	// The most recent assistant turn that returned products drives the right pane.
 	const withProducts = [ ...messages ].reverse().find(
@@ -82,6 +83,9 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		setError( '' );
 		setCompare( false );
 		setIsSending( true );
+		// Remembered so a failure can be retried without the visitor having to
+		// retype what they already sent.
+		lastAttemptRef.current = { message: trimmed, history };
 
 		abortRef.current?.abort();
 		const controller = new AbortController();
@@ -102,6 +106,40 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 			setIsSending( false );
 		}
 	}, [ input, isSending, messages ] );
+
+	/**
+	 * Re-send the message that failed. The turn is already in the thread, so
+	 * this replays the request rather than appending the message a second time.
+	 */
+	const retry = useCallback( async () => {
+		const attempt = lastAttemptRef.current;
+
+		if ( ! attempt || isSending ) {
+			return;
+		}
+
+		setError( '' );
+		setIsSending( true );
+
+		abortRef.current?.abort();
+		const controller = new AbortController();
+		abortRef.current = controller;
+
+		try {
+			const response = await askAssistant( attempt.message, attempt.history, { signal: controller.signal } );
+
+			setMessages( ( current ) => [
+				...current,
+				{ role: 'assistant', content: response.reply || '', products: response.products || [] },
+			] );
+		} catch ( e ) {
+			if ( 'AbortError' !== e.name ) {
+				setError( errorFor( e.status ) );
+			}
+		} finally {
+			setIsSending( false );
+		}
+	}, [ isSending ] );
 
 	// Keep the newest turn in view.
 	useEffect( () => {
@@ -149,17 +187,47 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 						<Message key={ index } role={ message.role } content={ message.content } />
 					) ) }
 
+					{ /* A bare spinner reads as "something is loading", not as the
+					     assistant working on an answer — so say so, and animate it
+					     so the wait feels alive rather than frozen. */ }
 					{ isSending && (
 						<div className="whsc-assistant__msg whsc-assistant__msg--assistant">
-							<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
-							<div className="whsc-assistant__bubble whsc-assistant__bubble--typing">
-								<Spinner />
-							</div>
+							<span
+								className="whsc-assistant__avatar whsc-assistant__avatar--thinking"
+								aria-hidden="true"
+							>
+								{ sparkleIcon }
+							</span>
+							<p className="whsc-assistant__thinking" role="status">
+								<span className="whsc-assistant__thinking-text">
+									{ __( 'Thinking', 'webhead-search-cloud' ) }
+								</span>
+								<span className="whsc-assistant__dots" aria-hidden="true">
+									<i /><i /><i />
+								</span>
+							</p>
 						</div>
 					) }
 
+					{ /* Given the same avatar and row as a reply: a failure is the
+					     assistant answering, not a form validation message
+					     floating loose in the thread. */ }
 					{ '' !== error && (
-						<div className="whsc-assistant__error" role="alert">{ error }</div>
+						<div className="whsc-assistant__msg whsc-assistant__msg--assistant">
+							<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
+							<div className="whsc-assistant__error" role="alert">
+								<span>{ error }</span>
+								{ null !== lastAttemptRef.current && (
+									<button
+										type="button"
+										className="whsc-assistant__retry"
+										onClick={ retry }
+									>
+										{ __( 'Try again', 'webhead-search-cloud' ) }
+									</button>
+								) }
+							</div>
+						</div>
 					) }
 				</div>
 
