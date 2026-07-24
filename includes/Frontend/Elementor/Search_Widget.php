@@ -843,6 +843,7 @@ final class Search_Widget extends Widget_Base {
 		$this->var_color( 'assistant_user_bg', __( 'Your message background', 'webhead-search-cloud' ), '--whsc-assistant-user-bg' );
 		$this->var_color( 'assistant_user_text', __( 'Your message text', 'webhead-search-cloud' ), '--whsc-assistant-user-text' );
 		$this->var_color( 'assistant_row_bg', __( 'Compare row shading', 'webhead-search-cloud' ), '--whsc-assistant-row-bg' );
+		$this->var_slider( 'assistant_input_radius', __( 'Message field radius', 'webhead-search-cloud' ), '--whsc-assistant-input-radius', 0, 999, false, [ 'separator' => 'before' ] );
 
 		$this->end_controls_section();
 	}

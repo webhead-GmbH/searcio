@@ -145,6 +145,7 @@
 	/* AI assistant */
 	--whsc-assistant-accent: var(--whsc-accent);
 	--whsc-assistant-text: var(--whsc-text);
+	--whsc-assistant-input-radius: 999px;
 	--whsc-assistant-muted: #6b7177;
 	--whsc-assistant-divider: #e8e9eb;
 	--whsc-assistant-user-bg: var(--whsc-accent);
@@ -1783,7 +1784,9 @@
 	margin-top: 14px;
 	padding: 5px 5px 5px 16px;
 	border: 1px solid var(--whsc-input-border, rgba(0, 0, 0, 0.2));
-	border-radius: 999px;
+	/* Its own radius rather than the search field's: the two sit in different
+	 * tabs and are commonly styled apart. */
+	border-radius: var(--whsc-assistant-input-radius, 999px);
 	background: var(--whsc-input-bg, #fff);
 	transition: border-color 0.15s ease;
 

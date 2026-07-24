@@ -114,6 +114,7 @@
 		"assistantUserBg": { "type": "string", "default": "" },
 		"assistantUserText": { "type": "string", "default": "" },
 		"assistantRowBg": { "type": "string", "default": "" },
+		"assistantInputRadius": { "type": "number", "default": null },
 
 		"cardBg": { "type": "string", "default": "" },
 		"cardBorder": { "type": "string", "default": "" },
