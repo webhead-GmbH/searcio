@@ -118,6 +118,7 @@ $dimension_map = [
 	'chipRadius'      => '--whsc-chip-radius',
 	'facetRadius'     => '--whsc-facet-radius',
 	'facetsMaxHeight' => '--whsc-facets-max-height',
+	'assistantInputRadius' => '--whsc-assistant-input-radius',
 	'cardRadius'      => '--whsc-card-radius',
 	'cardPadding'     => '--whsc-card-padding',
 	'carouselGap'     => '--whsc-carousel-gap',

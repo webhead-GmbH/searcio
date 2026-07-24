@@ -328,7 +328,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'assistantUserText', __( 'Your message text', 'webhead-search-cloud' ) ),
 						color( 'assistantRowBg', __( 'Compare row shading', 'webhead-search-cloud' ) ),
 					] }
-				/>
+				>
+					{ sizeControl( 'assistantInputRadius', __( 'Message field radius', 'webhead-search-cloud' ), 999 ) }
+				</PanelColorSettings>
 
 				<PanelColorSettings
 					title={ __( 'Result cards', 'webhead-search-cloud' ) }

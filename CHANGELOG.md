@@ -2,6 +2,7 @@
 
 ## 1.0.3
 
+- The AI assistant's message field now has its own border-radius control, in both the block editor and Elementor.
 - The AI Assistant tab and its conversation can now be styled like every other part of the widget, in both the block editor and Elementor: tab colours (text, active, underline, divider), the assistant accent and reply text, and your-message bubble colours. 
 - The frontend filter list is capped in height and scrolls instead of stretching the modal when a field has many values; the cap is themeable per placement (default 132px).
 - Fixed the storefront search and AI assistant showing English on a translated site. Every source file has to be listed in the script translation map for its strings to reach the browser, and the files added by recent features never were — so the whole assistant surface stayed English no matter how complete the translation was. All six missing files are mapped, the German translation is filled in for all 36 storefront strings, and a test now fails if a file with translatable strings is left out of the map.
