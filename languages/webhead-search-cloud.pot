@@ -2,23 +2,24 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: webhead Search Cloud 1.0.0\n"
+"Project-Id-Version: webhead Search Cloud 1.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/webhead-search-cloud\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-06T08:28:18+00:00\n"
+"POT-Creation-Date: 2026-07-23T17:08:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
 
 #. Plugin Name of the plugin
 #: webhead-search-cloud.php
-#: includes/Admin/Settings_Page.php:35
-#: includes/Admin/Settings_Page.php:93
-#: src/admin/settings/components/SettingsPanel.js:151
+#: includes/Admin/Settings_Page.php:39
+#: includes/Admin/Settings_Page.php:109
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:158
 msgid "webhead Search Cloud"
 msgstr ""
 
@@ -29,7 +30,7 @@ msgstr ""
 
 #. Description of the plugin
 #: webhead-search-cloud.php
-#: includes/Admin/Settings_Page.php:94
+#: includes/Admin/Settings_Page.php:110
 msgid "Connect WordPress and WooCommerce to webhead Search Cloud."
 msgstr ""
 
@@ -43,7 +44,7 @@ msgstr ""
 msgid "https://webhead.at"
 msgstr ""
 
-#: includes/Admin/Settings_Page.php:31
+#: includes/Admin/Settings_Page.php:35
 #: includes/Frontend/Elementor/Search_Widget.php:53
 msgid "Search Cloud"
 msgstr ""
@@ -55,33 +56,41 @@ msgid "webhead Search Cloud: WooCommerce %1$s is below the supported minimum %2$
 msgstr ""
 
 #: includes/Compatibility/Woo_Compatibility.php:59
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:194
 msgid "(unknown)"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:108
+#: public/bundle.search.js:3
+#: public/bundle.search.js:5
 #: src/frontend/search/components/SearchInput.js:31
-#: src/frontend/search/components/SearchModal.js:574
-#: src/frontend/search/components/SearchModal.js:594
+#: src/frontend/search/components/SearchModal.js:616
+#: src/frontend/search/components/SearchModal.js:628
+#: src/frontend/search/components/SearchModal.js:671
 msgid "Search"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:114
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:81
 msgid "Trigger style"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:118
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:84
 msgid "Search box"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:119
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:85
 msgid "Icon button"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:127
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:218
 msgid "Icon"
 msgstr ""
@@ -91,63 +100,76 @@ msgid "Leave empty to use the default search icon."
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:137
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:92
 msgid "Restrict to type"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:147
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:100
 msgid "Card source"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:151
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:104
 msgid "Plugin templates"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:152
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:105
 msgid "Search Cloud templates"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:154
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:101
 msgid "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card."
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:161
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:112
 msgid "Highlights source"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:165
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:116
 msgid "Newest"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:166
+#: public/bundle.search-block-editor.js:1
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:213
 #: src/blocks/search/edit.js:117
 msgid "Featured"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:168
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:113
 msgid "What the empty-query \"highlights\" carousel shows. \"Featured\" only works once a boolean \"featured\" custom field is pushed for this type (Indexing tab)."
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:175
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:124
 msgid "Placeholder text"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:178
-#: includes/Frontend/Frontend_Assets.php:198
+#: includes/Frontend/Frontend_Assets.php:197
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:126
 msgid "Search…"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:185
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:131
 msgid "Enable voice search"
 msgstr ""
@@ -161,6 +183,7 @@ msgid "Off"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:197
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:238
 msgid "Voice icon"
 msgstr ""
@@ -170,16 +193,19 @@ msgid "Leave empty to use the default microphone icon."
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:207
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:137
 msgid "When to search"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:211
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:141
 msgid "On submit (Enter / button)"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:212
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:142
 msgid "While typing"
 msgstr ""
@@ -189,6 +215,7 @@ msgid "'While typing' searches automatically after 3 characters."
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:221
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:148
 msgid "Show result count on filters"
 msgstr ""
@@ -202,57 +229,69 @@ msgid "Hide"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:233
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:155
 msgid "Open animation"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:237
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:158
 msgid "None"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:238
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:159
 msgid "Fade"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:239
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:160
 msgid "Slide down"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:240
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:161
 msgid "Slide up"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:241
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:162
 msgid "Zoom"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:249
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:170
 msgid "Animation duration (ms)"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:270
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:53
 msgid "All types"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:300
+#: public/bundle.search-block-editor.js:1
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:194
 #: src/blocks/search/edit.js:184
 msgid "Trigger"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:322
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:193
 msgid "Icon size"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:335
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:194
 msgid "Button size"
 msgstr ""
@@ -264,6 +303,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:602
 #: includes/Frontend/Elementor/Search_Widget.php:775
 #: includes/Frontend/Elementor/Search_Widget.php:826
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:195
 #: src/blocks/search/edit.js:224
 #: src/blocks/search/edit.js:306
@@ -290,6 +330,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:515
 #: includes/Frontend/Elementor/Search_Widget.php:593
 #: includes/Frontend/Elementor/Search_Widget.php:597
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:187
 msgid "Icon color"
 msgstr ""
@@ -310,6 +351,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:766
 #: includes/Frontend/Elementor/Search_Widget.php:770
 #: includes/Frontend/Elementor/Search_Widget.php:815
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:189
 #: src/blocks/search/edit.js:202
 #: src/blocks/search/edit.js:216
@@ -341,6 +383,7 @@ msgid "Background color"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:485
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:199
 msgid "Modal"
 msgstr ""
@@ -350,6 +393,7 @@ msgid "Accent color"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:493
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:207
 msgid "Corner radius"
 msgstr ""
@@ -358,17 +402,20 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:607
 #: includes/Frontend/Elementor/Search_Widget.php:705
 #: includes/Frontend/Elementor/Search_Widget.php:827
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:208
 #: src/blocks/search/edit.js:321
 msgid "Padding"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:495
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:209
 msgid "Section spacing"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:507
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:213
 msgid "Search field"
 msgstr ""
@@ -387,6 +434,7 @@ msgid "Focus"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:550
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:228
 msgid "Buttons"
 msgstr ""
@@ -407,6 +455,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:763
 #: includes/Frontend/Elementor/Search_Widget.php:767
 #: includes/Frontend/Elementor/Search_Widget.php:771
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:203
 #: src/blocks/search/edit.js:217
 #: src/blocks/search/edit.js:298
@@ -426,27 +475,32 @@ msgid "Clear button"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:624
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:256
 msgid "Suggestions"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:629
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:259
 msgid "Panel background"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:630
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:260
 msgid "Panel border"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:631
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:266
 msgid "Panel radius"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:635
 #: includes/Frontend/Elementor/Search_Widget.php:638
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:261
 msgid "Item text"
 msgstr ""
@@ -456,6 +510,7 @@ msgid "Item background"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:653
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:270
 msgid "Recent & popular"
 msgstr ""
@@ -476,6 +531,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:681
 #: includes/Frontend/Elementor/Search_Widget.php:819
 #: includes/Frontend/Elementor/Search_Widget.php:822
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:220
 #: src/blocks/search/edit.js:314
 msgid "Border"
@@ -500,6 +556,7 @@ msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:725
 #: includes/Frontend/Elementor/Search_Widget.php:871
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:334
 msgid "Spacing between items"
 msgstr ""
@@ -517,6 +574,7 @@ msgid "Popular typography"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:755
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:294
 msgid "Type filters"
 msgstr ""
@@ -538,6 +596,7 @@ msgid "Count typography"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:810
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:310
 msgid "Result cards"
 msgstr ""
@@ -563,265 +622,313 @@ msgid "Price suffix / \"from\" typography"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:866
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:325
 msgid "Carousel"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:872
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:328
 msgid "Arrow color"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:873
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:329
 msgid "Arrow background"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:874
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:330
 msgid "Dot color"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:875
+#: public/bundle.search-block-editor.js:1
 #: src/blocks/search/edit.js:331
 msgid "Dot color (active)"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:199
-#: src/frontend/search/components/SearchModal.js:560
-#: src/frontend/search/components/SearchModal.js:715
+#: includes/Frontend/Frontend_Assets.php:198
+#: public/bundle.search.js:5
+#: public/bundle.search.js:6
+#: src/frontend/search/components/SearchModal.js:602
+#: src/frontend/search/components/SearchModal.js:793
 msgid "No results found."
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:200
-#: src/frontend/search/components/SearchModal.js:707
+#: includes/Frontend/Frontend_Assets.php:199
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:785
 msgid "Searching…"
 msgstr ""
 
 #. translators: shown before a variable product's lowest price, e.g. "from €42".
-#: includes/Frontend/Frontend_Assets.php:202
+#: includes/Frontend/Frontend_Assets.php:201
 msgctxt "variable product price prefix"
 msgid "from"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:203
+#: includes/Frontend/Frontend_Assets.php:202
+#: public/bundle.search.js:1
 #: src/frontend/search/components/templates.js:115
 msgid "Sale"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:204
-#: src/frontend/search/components/SearchModal.js:406
+#: includes/Frontend/Frontend_Assets.php:203
+#: public/bundle.search.js:4
+#: src/frontend/search/components/SearchModal.js:434
 msgid "Search is unavailable right now."
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:205
-#: src/frontend/search/components/Browse.js:42
+#: includes/Frontend/Frontend_Assets.php:204
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Browse.js:38
 msgid "Recent searches"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:206
-#: src/admin/settings/components/tabs/SearchConfigTab.js:160
-#: src/admin/settings/components/tabs/SearchConfigTab.js:171
-#: src/frontend/search/components/Browse.js:76
+#: includes/Frontend/Frontend_Assets.php:205
+#: public/bundle.search.js:3
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:162
+#: src/admin/settings/components/tabs/SearchConfigTab.js:173
+#: src/frontend/search/components/Browse.js:72
 msgid "Popular searches"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:207
+#: includes/Frontend/Frontend_Assets.php:206
+#: public/bundle.search.js:3
 #: src/frontend/search/components/SearchInput.js:45
 msgid "Clear"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:208
-#: src/frontend/search/components/SearchModal.js:624
+#: includes/Frontend/Frontend_Assets.php:207
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:645
+#: src/frontend/search/components/SearchModal.js:702
 msgid "Close search"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:209
-#: src/frontend/search/components/SearchModal.js:615
+#: includes/Frontend/Frontend_Assets.php:208
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:692
 msgid "Search by voice"
 msgstr ""
 
-#: includes/Frontend/Frontend_Assets.php:210
-#: src/frontend/search/components/SearchModal.js:652
+#: includes/Frontend/Frontend_Assets.php:209
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:730
 msgid "All"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:295
+#: includes/Indexing/Index_Config.php:286
 msgid "Post title"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:299
+#: includes/Indexing/Index_Config.php:290
 msgid "Post content"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:303
+#: includes/Indexing/Index_Config.php:294
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:35
 msgid "Excerpt"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:307
+#: includes/Indexing/Index_Config.php:298
 msgid "Permalink (URL)"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:311
+#: includes/Indexing/Index_Config.php:302
 msgid "Featured image"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:315
+#: includes/Indexing/Index_Config.php:306
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:33
 msgid "Published date"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:319
+#: includes/Indexing/Index_Config.php:310
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:32
 msgid "Author"
 msgstr ""
 
-#: includes/Plugin.php:414
+#: includes/Plugin.php:420
 msgid "webhead Search Cloud connection"
 msgstr ""
 
-#: includes/Plugin.php:419
-#: includes/Plugin.php:443
+#: includes/Plugin.php:425
+#: includes/Plugin.php:449
 msgid "webhead Search Cloud is not connected yet"
 msgstr ""
 
-#: includes/Plugin.php:421
+#: includes/Plugin.php:427
 msgid "Add your site ID, write key, and write secret on the Connection tab before syncing content."
 msgstr ""
 
-#: includes/Plugin.php:427
+#: includes/Plugin.php:433
 msgid "webhead Search Cloud connection is configured"
 msgstr ""
 
-#: includes/Plugin.php:429
+#: includes/Plugin.php:435
 msgid "Connection credentials are saved."
 msgstr ""
 
-#: includes/Plugin.php:436
+#: includes/Plugin.php:442
 msgid "webhead Search Cloud reachability"
 msgstr ""
 
-#: includes/Plugin.php:445
+#: includes/Plugin.php:451
 msgid "Connect the plugin on the Connection tab, then re-run this check."
 msgstr ""
 
-#: includes/Plugin.php:454
+#: includes/Plugin.php:460
 msgid "webhead Search Cloud could not be reached"
 msgstr ""
 
-#: includes/Plugin.php:456
+#: includes/Plugin.php:462
 msgid "The health check to Search Cloud failed. Check the Connection tab and verify your credentials."
 msgstr ""
 
-#: includes/Plugin.php:462
+#: includes/Plugin.php:468
 msgid "webhead Search Cloud is reachable"
 msgstr ""
 
-#: includes/Plugin.php:464
+#: includes/Plugin.php:470
 msgid "The last health check succeeded."
 msgstr ""
 
-#: includes/Plugin.php:471
+#: includes/Plugin.php:477
 msgid "webhead Search Cloud indexing"
 msgstr ""
 
-#: includes/Plugin.php:478
+#: includes/Plugin.php:484
 msgid "No content types are enabled for indexing"
 msgstr ""
 
-#: includes/Plugin.php:480
+#: includes/Plugin.php:486
 msgid "Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send."
 msgstr ""
 
-#: includes/Plugin.php:486
+#: includes/Plugin.php:492
 msgid "Content types are enabled for indexing"
 msgstr ""
 
 #. translators: %d: number of enabled content types.
-#: includes/Plugin.php:490
+#: includes/Plugin.php:496
 #, php-format
 msgid "%d content type(s) are enabled for indexing."
 msgstr ""
 
-#: includes/Plugin.php:502
+#: includes/Plugin.php:507
 msgid "webhead Search Cloud language coverage"
 msgstr ""
 
 #. translators: %d: number of posts skipped.
-#: includes/Plugin.php:514
+#: includes/Plugin.php:519
 #, php-format
 msgid "%d post(s) were skipped from the last sync due to language"
 msgstr ""
 
-#: includes/Plugin.php:518
+#: includes/Plugin.php:523
 msgid "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally."
 msgstr ""
 
-#: includes/Plugin.php:524
+#: includes/Plugin.php:529
 msgid "No content was skipped due to language"
 msgstr ""
 
-#: includes/Plugin.php:526
+#: includes/Plugin.php:531
 msgid "Every indexable post is in an enabled language, or the site has not restricted languages."
 msgstr ""
 
-#: includes/Plugin.php:541
+#: includes/Plugin.php:546
 msgid "webhead Search Cloud runtime"
 msgstr ""
 
-#: includes/Plugin.php:542
+#: includes/Plugin.php:547
 msgid "Connection, indexing, and sync state for support and debugging. Credentials are never included."
 msgstr ""
 
-#: includes/Plugin.php:552
+#: includes/Plugin.php:557
 msgid "Connection configured"
 msgstr ""
 
-#: includes/Plugin.php:553
+#: includes/Plugin.php:558
 msgid "Indexable content types"
 msgstr ""
 
-#: includes/Plugin.php:554
+#: includes/Plugin.php:559
 msgid "Sync history retention (days)"
 msgstr ""
 
-#: includes/Plugin.php:555
+#: includes/Plugin.php:560
 msgid "Active sync run status"
 msgstr ""
 
-#: includes/Plugin.php:556
+#: includes/Plugin.php:561
 msgid "Delete data on uninstall"
 msgstr ""
 
-#: includes/Plugin.php:560
+#: includes/Plugin.php:565
 msgid "WPML/Polylang active"
 msgstr ""
 
-#: includes/Plugin.php:561
+#: includes/Plugin.php:566
 msgid "Enabled languages"
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:61
+#: includes/Routing/Connection_Endpoint.php:83
+msgid "You must accept the Terms of Service and Privacy Policy to connect."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:132
+msgid "Could not reach Search Cloud. Try again."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:139
+msgid "Could not disconnect from Search Cloud. Try again."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:166
+#: includes/Routing/Connection_Endpoint.php:222
 #: includes/Routing/Search_Config_Endpoint.php:74
 msgid "Could not reach Search Cloud."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:104
+#: includes/Routing/Connection_Endpoint.php:272
+msgid "This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:276
+msgid "Too many connect attempts. Wait a while and try again."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:280
+msgid "Search Cloud cannot provision new accounts right now. Try again later."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:288
+#: includes/Routing/Connection_Endpoint.php:296
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:45
+msgid "Connection failed."
+msgstr ""
+
+#: includes/Routing/Connection_Endpoint.php:293
 msgid "Invalid write credentials. Check the write key and secret."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:105
+#: includes/Routing/Connection_Endpoint.php:294
 msgid "Site is disabled in Search Cloud."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:106
+#: includes/Routing/Connection_Endpoint.php:295
 msgid "No site found for these credentials."
-msgstr ""
-
-#: includes/Routing/Connection_Endpoint.php:107
-#: src/admin/settings/components/tabs/ConnectionTab.js:112
-msgid "Connection failed."
 msgstr ""
 
 #: includes/Routing/Indexing_Endpoint.php:52
@@ -836,68 +943,96 @@ msgstr ""
 msgid "Invalid settings payload."
 msgstr ""
 
-#: includes/Routing/Sync_Endpoint.php:99
+#: includes/Routing/Sync_Endpoint.php:96
 msgid "That run could not be deleted. The active run is protected."
 msgstr ""
 
-#: includes/Routing/Sync_Endpoint.php:137
+#: includes/Routing/Sync_Endpoint.php:134
 #: includes/WP_CLI/Sync_Command.php:201
 msgid "That action is not available for the current run state."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:177
+#: includes/Routing/Verify_Endpoint.php:57
+msgid "Missing verification token."
+msgstr ""
+
+#: includes/Routing/Verify_Endpoint.php:61
+msgid "Not connected."
+msgstr ""
+
+#: includes/Settings/Plugin_Settings.php:224
 msgid "Keep history for (days)"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:178
+#: includes/Settings/Plugin_Settings.php:225
 msgid "How long finished sync runs are kept. Use 0 to keep them forever."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:181
+#: includes/Settings/Plugin_Settings.php:228
 msgid "Delete plugin data on uninstall"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:182
+#: includes/Settings/Plugin_Settings.php:229
 msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud."
 msgstr ""
 
-#: includes/Sync/Incremental_Service.php:186
+#: includes/Sync/Incremental_Service.php:192
 msgid "Incremental sync paused: your Search Cloud plan limit was reached."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:65
+#. translators: %s: transport error message.
+#: includes/Sync/Incremental_Service.php:205
+#, php-format
+msgid "Could not reach Search Cloud: %s"
+msgstr ""
+
+#. translators: 1: document id, 2: HTTP status code.
+#: includes/Sync/Incremental_Service.php:213
+#: includes/Sync/Sync_Service.php:578
+#, php-format
+msgid "Could not remove %1$s from the index (HTTP %2$d)."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/Sync/Incremental_Service.php:221
+#, php-format
+msgid "Search Cloud rejected the update (HTTP %d)."
+msgstr ""
+
+#: includes/Sync/Sync_Service.php:88
 msgid "Add and save your Search Cloud credentials before syncing."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:74
+#: includes/Sync/Sync_Service.php:97
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:206
 msgid "No content types are enabled for indexing yet."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:81
+#: includes/Sync/Sync_Service.php:104
 msgid "A sync is already in progress."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:99
+#: includes/Sync/Sync_Service.php:122
 msgid "Could not start the sync run."
 msgstr ""
 
 #. translators: 1: plan metric name, 2: plan limit.
-#: includes/Sync/Sync_Service.php:592
+#: includes/Sync/Sync_Service.php:738
 #, php-format
 msgid "Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:598
+#: includes/Sync/Sync_Service.php:744
 msgid "Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:603
+#: includes/Sync/Sync_Service.php:749
 msgid "Could not reach Search Cloud. The sync is paused and will retry."
 msgstr ""
 
 #. translators: %d: HTTP status code.
-#: includes/Sync/Sync_Service.php:608
+#: includes/Sync/Sync_Service.php:754
 #, php-format
 msgid "Search Cloud returned an error (HTTP %d). The sync is paused and will retry."
 msgstr ""
@@ -912,6 +1047,7 @@ msgid "Sync completed."
 msgstr ""
 
 #: includes/WP_CLI/Sync_Command.php:154
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:158
 msgid "Sync started."
 msgstr ""
@@ -932,431 +1068,1158 @@ msgstr ""
 msgid "There is no active sync."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:78
-#: src/admin/settings/components/tabs/SyncTab.js:184
-msgid "Sync"
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:79
+msgid "Search settings"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:83
-msgid "Indexing"
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:132
+msgid "Shows a microphone button in the modal (browser support required)."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:87
-msgid "Search Config"
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:138
+msgid "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:91
-msgid "Connection"
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:188
+msgid "Icon color (hover)"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:123
-msgid "Settings saved successfully."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:190
+#: src/blocks/search/edit.js:299
+msgid "Background (hover)"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:128
-msgid "Saving..."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:204
+msgid "Accent"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:129
-msgid "Save Settings"
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:219
+msgid "Placeholder"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:131
-#: src/admin/settings/components/tabs/ConnectionTab.js:122
-#: src/admin/settings/components/tabs/IndexingTab.js:524
-#: src/admin/settings/components/tabs/SearchConfigTab.js:353
-msgid "No unsaved changes."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:221
+msgid "Border (focus)"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:156
-msgid "Configure the plugin settings from one shared admin surface."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:231
+msgid "Search button bg"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:257
-msgid "OK"
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:232
+msgid "Search button bg (hover)"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:259
-msgid "The settings could not be saved. Review the fields and try again."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:233
+msgid "Search button text"
 msgstr ""
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:29
-msgid "Cache cleared."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:234
+msgid "Search button text (hover)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:31
-msgid "Could not clear the cache."
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:235
+msgid "Icon buttons"
 msgstr ""
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:42
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:236
+msgid "Icon buttons (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:237
+msgid "Icon button bg (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:239
+msgid "Voice icon (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:240
+msgid "Voice bg"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:241
+msgid "Voice bg (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:242
+msgid "Close icon"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:243
+msgid "Close icon (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:244
+msgid "Close bg"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:245
+msgid "Close bg (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:246
+msgid "Clear icon"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:247
+msgid "Clear icon (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:248
+msgid "Clear bg"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:249
+msgid "Clear bg (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:252
+msgid "Search button radius"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:262
+msgid "Item text (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:263
+msgid "Item background (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:273
+msgid "Section title"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:274
+msgid "Chip background"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:275
+msgid "Chip text"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:276
+msgid "Chip border"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:277
+msgid "Chip background (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:278
+msgid "Chip text (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:279
+msgid "Chip border (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: public/bundle.search.js:3
+#: src/blocks/search/edit.js:280
+#: src/frontend/search/components/Browse.js:40
+msgid "Clear all"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:281
+msgid "Clear all (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:282
+msgid "Clear all (active)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:283
+msgid "Popular text"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:284
+msgid "Popular text (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:285
+msgid "Popular bg (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:288
+msgid "Chip radius"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:289
+msgid "Popular item spacing"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:290
+msgid "Popular item radius"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:300
+msgid "Text (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:301
+msgid "Background (active)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:302
+msgid "Text (active)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:303
+msgid "Count"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:315
+msgid "Border (hover)"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: public/bundle.settings.js:9
+#: src/admin/settings/components/tabs/IndexingTab.js:327
+#: src/blocks/search/edit.js:316
+msgid "Title"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:317
+msgid "Price / meta"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:357
+msgid "Search Cloud - search box"
+msgstr ""
+
+#: public/bundle.search-block-editor.js:1
+#: src/blocks/search/edit.js:358
+msgid "Search Cloud - search icon"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/templates.js:41
+msgid "from"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/templates.js:101
+msgid "In stock"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/templates.js:101
+msgid "Out of stock"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/CompareTable.js:29
+msgid "Yes"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/CompareTable.js:29
+msgid "No"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:16
+msgid "The assistant is not available on this plan."
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:20
+msgid "The assistant has reached its limit for now. Please try again later."
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:23
+msgid "The assistant is unavailable right now. Try searching instead."
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:65
+msgid "What's popular?"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:66
+msgid "Help me find a gift"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:67
+msgid "What's on sale?"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:164
+msgid "Describe what you're looking for and I'll find it in this store."
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:203
+msgid "Thinking"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:226
+msgid "Try again"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:240
+msgid "Write what you need"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:241
+msgid "Message the assistant"
+msgstr ""
+
+#: public/bundle.search.js:1
+#: src/frontend/search/components/AiAssistant.js:249
+msgid "Send"
+msgstr ""
+
+#. translators: %d: number of products being compared.
+#: public/bundle.search.js:2
+#: src/frontend/search/components/AiAssistant.js:262
+#, js-format
+msgid "Comparing %d product"
+msgid_plural "Comparing %d products"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of products.
+#. translators: %d: number of results.
+#: public/bundle.search.js:3
+#: public/bundle.search.js:5
+#: src/frontend/search/components/AiAssistant.js:267
+#: src/frontend/search/components/SearchModal.js:582
+#, js-format
+msgid "%d result"
+msgid_plural "%d results"
+msgstr[0] ""
+msgstr[1] ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/AiAssistant.js:282
+msgid "Back to list"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/AiAssistant.js:283
+msgid "Compare"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Suggestions.js:50
+msgid "Dismiss suggestions"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Suggestions.js:58
+msgid "Search suggestions"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Browse.js:58
+msgid "Remove from recent searches"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Carousel.js:154
+msgid "Previous"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Carousel.js:182
+msgid "Next"
+msgstr ""
+
+#: public/bundle.search.js:3
+#: src/frontend/search/components/Carousel.js:188
+msgid "Pages"
+msgstr ""
+
+#. translators: %d: page number.
+#: public/bundle.search.js:4
+#: src/frontend/search/components/Carousel.js:198
+#, js-format
+msgid "Go to page %d"
+msgstr ""
+
+#: public/bundle.search.js:4
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:557
+#: src/frontend/search/components/SearchModal.js:572
+#: src/frontend/search/components/SearchModal.js:606
+msgid "Current highlights"
+msgstr ""
+
+#: public/bundle.search.js:4
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:576
+#: src/frontend/search/components/SearchModal.js:585
+msgid "Results"
+msgstr ""
+
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:598
+msgid "Search results"
+msgstr ""
+
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:620
+msgid "Search modes"
+msgstr ""
+
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:640
+msgid "AI Assistant"
+msgstr ""
+
+#: public/bundle.search.js:5
+#: src/frontend/search/components/SearchModal.js:723
+msgid "Filter by type"
+msgstr ""
+
+#. translators: %d: number of results found.
+#: public/bundle.search.js:6
+#: src/frontend/search/components/SearchModal.js:790
+#, js-format
+msgid "%d result found."
+msgid_plural "%d results found."
+msgstr[0] ""
+msgstr[1] ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/UpgradeButton.js:65
+msgid "Upgrade your plan on Search Cloud (opens in a new tab)"
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/UpgradeButton.js:67
+msgid "Upgrade plan"
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/SettingsGroupTab.js:60
+msgid "Edit the JSON value for this setting."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/SettingsGroupTab.js:115
+msgid "No settings are registered for this tab yet."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/CacheClearCard.js:40
 msgid "Cache"
 msgstr ""
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:45
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/CacheClearCard.js:43
 msgid "Clears this plugin's own cached data and PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own."
 msgstr ""
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:61
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/CacheClearCard.js:27
+msgid "Cache cleared."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/CacheClearCard.js:29
+msgid "Could not clear the cache."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/CacheClearCard.js:59
 msgid "Clearing…"
 msgstr ""
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:61
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/CacheClearCard.js:59
 msgid "Clear cache"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:43
-msgid "Connection settings saved."
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:24
+msgid "Learn more"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:44
-msgid "Could not save the connection settings."
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:29
+msgid "How connecting to Search Cloud works"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:67
-msgid "The test request failed."
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:35
+msgid "Clicking Connect sends the email address shown below (or the one you enter under \"Use a different email\") to Search Cloud, along with this site's address."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:41
+msgid "If that email has no Search Cloud account yet, one is created automatically and this site is connected right away - no further steps."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:47
+msgid "If that email already has a Search Cloud account, nothing is created or changed yet. Search Cloud emails a confirmation link to that address; once its owner clicks it, they choose which account to connect this site to. Come back here afterwards and paste the resulting keys into \"Advanced: manual key entry\" below."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:53
+msgid "Accepting the Terms of Service and Privacy Policy is required to continue. Accepting the Data Processing Agreement is optional."
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:62
+#: src/admin/settings/components/tabs/ConnectionTab.js:323
+msgid "Terms of Service"
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:69
+#: src/admin/settings/components/tabs/ConnectionTab.js:325
+msgid "Privacy Policy"
+msgstr ""
+
+#: public/bundle.settings.js:1
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionExplainer.js:77
+#: src/admin/settings/components/tabs/ConnectionTab.js:337
+msgid "Data Processing Agreement"
 msgstr ""
 
 #. translators: 1: used documents, 2: document limit.
-#: src/admin/settings/components/tabs/ConnectionTab.js:85
+#: public/bundle.settings.js:2
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:21
 #, js-format
 msgid "Connected - %1$s / %2$s documents indexed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:88
+#: public/bundle.settings.js:2
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:24
 msgid "unlimited"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:91
+#: public/bundle.settings.js:2
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:27
 msgid "Connected."
 msgstr ""
 
 #. translators: %d: the Search Cloud site id.
-#: src/admin/settings/components/tabs/ConnectionTab.js:98
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:31
 #, js-format
 msgid " (site #%d)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:119
+#: public/bundle.settings.js:3
+#: public/bundle.settings.js:9
+#: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/IndexingTab.js:521
-#: src/admin/settings/components/tabs/SearchConfigTab.js:350
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:85
+#: src/admin/settings/components/tabs/SearchConfigTab.js:528
 msgid "Saving…"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:120
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:86
 msgid "Save connection"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:129
-msgid "Search Cloud connection"
+#: public/bundle.settings.js:3
+#: public/bundle.settings.js:9
+#: public/bundle.settings.js:166
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:138
+#: src/admin/settings/components/tabs/IndexingTab.js:524
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:88
+#: src/admin/settings/components/tabs/SearchConfigTab.js:531
+msgid "No unsaved changes."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:132
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:94
 msgid "Enter the credentials from your site page in the Search Cloud app. The write key and secret are stored encrypted and never sent to the browser in clear text."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:141
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:101
 msgid "Search key"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:142
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:102
 msgid "Public key (sk_...) used by the browser, restricted by your domain allowlist."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:150
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:110
 msgid "Write key"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:154
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:114
 msgid "A write key is saved. Leave blank to keep it, or enter a new one to rotate."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:155
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:115
 msgid "Server-side write key (wk_...)."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:167
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:127
 msgid "Write secret"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:171
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:131
 msgid "A write secret is saved. Leave blank to keep it, or enter a new one to rotate."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:172
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:132
 msgid "Server-side write secret."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:210
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:43
+msgid "Connection settings saved."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:44
+msgid "Could not save the connection settings."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:89
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:76
+msgid "The test request failed."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:170
 msgid "Testing…"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:211
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:171
 msgid "Test connection"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:214
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:174
 msgid "Test uses your saved credentials - save first."
 msgstr ""
 
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:32
+msgid "The connection request failed."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:209
+msgid "Connecting…"
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:210
+msgid "Connect to Search Cloud"
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:216
+msgid "Search Cloud connection"
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:219
+msgid "Connect this site to webhead Search Cloud to start syncing content and enable search."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:239
+#: src/admin/settings/components/tabs/ConnectionTab.js:265
+msgid "Disconnect"
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: public/bundle.settings.js:5
+#: public/bundle.settings.js:9
+#: src/admin/settings/components/tabs/ConnectionTab.js:250
+#: src/admin/settings/components/tabs/ConnectionTab.js:405
+#: src/admin/settings/components/tabs/IndexingTab.js:392
+msgid "Hide advanced options"
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:251
+msgid "Advanced: manual key entry / rotate keys"
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:196
+msgid "Disconnected from Search Cloud."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:199
+msgid "Could not disconnect."
+msgstr ""
+
+#: public/bundle.settings.js:3
+#: src/admin/settings/components/tabs/ConnectionTab.js:267
+msgid "This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account."
+msgstr ""
+
+#. translators: %s: the email address a confirmation link was sent to.
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionTab.js:280
+#, js-format
+msgid "An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below."
+msgstr ""
+
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionTab.js:305
+msgid "Accept the Terms of Service and Privacy Policy to continue."
+msgstr ""
+
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionTab.js:322
+#: src/admin/settings/components/tabs/ConnectionTab.js:336
+msgid "I accept the"
+msgstr ""
+
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionTab.js:324
+msgid "and"
+msgstr ""
+
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionTab.js:326
+msgid "(required)"
+msgstr ""
+
+#: public/bundle.settings.js:4
+#: src/admin/settings/components/tabs/ConnectionTab.js:338
+msgid "(optional)"
+msgstr ""
+
+#. translators: %s: the email address used to connect.
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:348
+#, js-format
+msgid "You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account."
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:351
+msgid "An admin email is required to connect."
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:363
+msgid "Use the default email instead"
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:364
+msgid "Not this email?"
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:375
+msgid "Email"
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:382
+msgid "Your name (optional)"
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:389
+msgid "Company name (optional)"
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:390
+msgid "Used as the Search Cloud account name."
+msgstr ""
+
+#: public/bundle.settings.js:5
+#: src/admin/settings/components/tabs/ConnectionTab.js:406
+msgid "Advanced: manual key entry"
+msgstr ""
+
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:26
 msgid "Custom field"
 msgstr ""
 
+#: public/bundle.settings.js:5
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:27
 #: src/admin/settings/components/tabs/IndexingTab.js:117
 msgid "Taxonomy"
 msgstr ""
 
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:28
 msgid "Built-in field"
 msgstr ""
 
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:34
 msgid "Modified date"
 msgstr ""
 
+#: public/bundle.settings.js:5
 #: src/admin/settings/components/tabs/IndexingTab.js:36
 msgid "Slug"
 msgstr ""
 
 #. translators: %s: taxonomy label.
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:51
 #, js-format
 msgid "Taxonomy: %s"
 msgstr ""
 
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:58
 msgid "- Do not send -"
 msgstr ""
 
+#: public/bundle.settings.js:6
+#: src/admin/settings/components/tabs/IndexingTab.js:150
+msgid "Send as"
+msgstr ""
+
+#: public/bundle.settings.js:6
+#: src/admin/settings/components/tabs/IndexingTab.js:158
+msgid "From"
+msgstr ""
+
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:101
 msgid "Value"
 msgstr ""
 
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:104
 #: src/admin/settings/components/tabs/IndexingTab.js:120
 msgid "- Select -"
 msgstr ""
 
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:136
 msgid "Taxonomy slug"
 msgstr ""
 
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:137
 msgid "Meta key"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:150
-msgid "Send as"
-msgstr ""
-
-#: src/admin/settings/components/tabs/IndexingTab.js:158
-msgid "From"
-msgstr ""
-
+#: public/bundle.settings.js:6
+#: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/IndexingTab.js:168
-#: src/admin/settings/components/tabs/SearchConfigTab.js:416
+#: src/admin/settings/components/tabs/SearchConfigTab.js:605
 msgid "Remove field"
 msgstr ""
 
+#: public/bundle.settings.js:6
 #: src/admin/settings/components/tabs/IndexingTab.js:179
 msgid "Activate WooCommerce to index product data."
 msgstr ""
 
 #. translators: 1: current version, 2: minimum version.
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:190
 #, js-format
 msgid "WooCommerce %1$s is below the supported minimum %2$s. Product fields are disabled until WooCommerce is updated."
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:206
 msgid "Price"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:207
 msgid "Regular & sale price"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:208
 msgid "SKU"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:209
 msgid "Variation SKUs"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:210
 msgid "Stock status"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:211
 msgid "Categories"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:212
 msgid "Tags"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:214
 msgid "Average rating"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:215
 msgid "Review count"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:229
 msgid "Product details"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:230
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:237
 msgid "Only index published, visible products"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:238
 msgid "Recommended. Hidden or draft products stay out of search."
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:257
 msgid "Product attributes"
 msgstr ""
 
+#: public/bundle.settings.js:7
 #: src/admin/settings/components/tabs/IndexingTab.js:258
 msgid "Each selected attribute is sent as its own field (attr_{name}) so it can be made searchable."
 msgstr ""
 
 #. translators: %s: post type label.
+#: public/bundle.settings.js:8
 #: src/admin/settings/components/tabs/IndexingTab.js:302
 #, js-format
 msgid "Add %s to search"
 msgstr ""
 
 #. translators: %s: post type label.
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:307
 #, js-format
 msgid "When on, your %s are sent to Search Cloud and appear in search results."
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:317
 msgid "What appears in results"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:318
 msgid "Choose where each part of a search result comes from. The defaults work for most sites."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:327
-#: src/blocks/search/edit.js:316
-msgid "Title"
-msgstr ""
-
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:328
 msgid "The main heading of each result. Required."
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:336
 msgid "Body text"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:337
 msgid "The text Search Cloud looks through for matches."
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:345
 msgid "Result link"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:346
 msgid "Where clicking a result takes the visitor."
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:354
 msgid "Thumbnail image"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:355
 msgid "Image shown next to each result."
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:363
 msgid "Options"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:367
 msgid "Include a short summary (excerpt)"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:373
 msgid "Also index private & password-protected items"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:374
 msgid "Off by default."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:392
-msgid "Hide advanced options"
-msgstr ""
-
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:393
 msgid "Show advanced options"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:399
 msgid "Type label"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:400
 msgid "How this content is grouped and filtered in search. Most sites can leave this as the default."
 msgstr ""
 
+#: public/bundle.settings.js:9
+#: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/IndexingTab.js:408
-#: src/admin/settings/components/tabs/SearchConfigTab.js:451
+#: src/admin/settings/components/tabs/SearchConfigTab.js:640
 msgid "Type"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:415
 msgid "Extra fields"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:416
 msgid "Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose."
 msgstr ""
 
+#: public/bundle.settings.js:9
+#: public/bundle.settings.js:166
 #: src/admin/settings/components/tabs/IndexingTab.js:435
-#: src/admin/settings/components/tabs/SearchConfigTab.js:424
+#: src/admin/settings/components/tabs/SearchConfigTab.js:613
 msgid "Add a field"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:497
-msgid "Indexing configuration saved."
-msgstr ""
-
-#: src/admin/settings/components/tabs/IndexingTab.js:500
-msgid "Could not save the indexing configuration."
-msgstr ""
-
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:522
 msgid "Save indexing configuration"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:531
 msgid "What to index"
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:534
 msgid "Turn on the content you want to be searchable and choose which information is sent for each. Changes take effect after the next sync."
 msgstr ""
 
+#: public/bundle.settings.js:9
 #: src/admin/settings/components/tabs/IndexingTab.js:543
 msgid "Sending a field here makes the data available. To let visitors search by it, also enable that field (with a weight) in the Search Config tab."
 msgstr ""
 
+#: public/bundle.settings.js:9
+#: src/admin/settings/components/tabs/IndexingTab.js:497
+msgid "Indexing configuration saved."
+msgstr ""
+
+#: public/bundle.settings.js:9
+#: src/admin/settings/components/tabs/IndexingTab.js:500
+msgid "Could not save the indexing configuration."
+msgstr ""
+
 #. translators: %d: number of enabled content types.
+#: public/bundle.settings.js:10
 #: src/admin/settings/components/tabs/IndexingTab.js:580
 #, js-format
 msgid "%d content type will be indexed."
@@ -1364,623 +2227,573 @@ msgid_plural "%d content types will be indexed."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:162
-msgid "A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Search Cloud's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:173
-msgid "One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:226
-msgid "Could not load the search configuration."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:318
-#: src/admin/settings/components/tabs/SearchConfigTab.js:333
-msgid "Could not save the search configuration."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:332
-msgid "Search configuration saved."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:351
-msgid "Save search configuration"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:360
-msgid "Search configuration"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:363
-msgid "Controls how Search Cloud itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Search Cloud's side, not in this plugin's own settings, so changes take effect on the very next search."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:380
-msgid "Searchable fields & weights"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:382
-msgid "Which fields full-text search matches, and how much each one counts (1–100). A higher weight on \"title\" makes title matches outrank body-text matches, for example."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:397
-msgid "Field"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:406
-msgid "Weight"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:435
-msgid "Type boosts"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:437
-msgid "Ranking boost per content type (0.1–100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:460
-msgid "Boost"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:474
-msgid "Enable at least one content type in the Indexing tab to set a type boost."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:487
-#: src/admin/settings/components/tabs/SearchConfigTab.js:501
-msgid "Facet fields"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:489
-msgid "Fields returned as facets on search results and allowed as filters. Click the field to browse every available field, or type to search."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:513
-#: src/admin/settings/components/tabs/SearchConfigTab.js:527
-msgid "Suggest fields"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:515
-msgid "Fields queried for search-as-you-type suggestions. Defaults to \"title\" when left empty. Click to browse, or type to search."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:539
-#: src/admin/settings/components/tabs/SearchConfigTab.js:550
-msgid "Synonyms"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:541
-msgid "Treats words as interchangeable during search, even when the exact word a visitor types never appears in a result. For example, a line with \"sneaker, trainer\" means searching \"sneaker\" also matches results that only mention \"trainer\", and vice versa - useful for regional spelling or naming differences."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:552
-msgid "One comma-separated group of interchangeable words per line, e.g. \"sneaker, trainer\"."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:567
-#: src/admin/settings/components/tabs/SearchConfigTab.js:599
-msgid "Languages"
-msgstr ""
-
-#. translators: %d: number of languages the plan allows.
-#: src/admin/settings/components/tabs/SearchConfigTab.js:573
-#, js-format
-msgid "Which of this site's languages to index and search. Your plan allows up to %d."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:576
-msgid "Which of this site's languages to index and search. Leave every language unchecked for unrestricted."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:577
-msgid "No WPML/Polylang installation was detected, so languages can only be entered manually here. Leave empty for unrestricted."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:601
-msgid "Comma-separated ISO language codes, e.g. \"de, en\"."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SettingsGroupTab.js:60
-msgid "Edit the JSON value for this setting."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SettingsGroupTab.js:115
-msgid "No settings are registered for this tab yet."
-msgstr ""
-
+#. translators: 1: Current page number, 2: Total number of pages.
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:40
 #: src/admin/settings/components/tabs/SyncTab.js:20
 msgid "Completed"
 msgstr ""
 
+#: public/bundle.settings.js:163
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:123
 #: src/admin/settings/components/tabs/SyncHistory.js:41
 #: src/admin/settings/components/tabs/SyncTab.js:21
 #: src/admin/settings/components/tabs/SyncTab.js:251
 msgid "Failed"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:42
 #: src/admin/settings/components/tabs/SyncTab.js:22
 msgid "Cancelled"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:43
 #: src/admin/settings/components/tabs/SyncTab.js:18
 msgid "Running"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:44
 #: src/admin/settings/components/tabs/SyncTab.js:19
 msgid "Paused"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:45
 #: src/admin/settings/components/tabs/SyncTab.js:17
 msgid "Queued"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:49
 msgid "Manual"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:50
 msgid "Scheduled"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:51
 msgid "Incremental"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:173
 msgid "Run"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:181
 #: src/admin/settings/components/tabs/SyncHistory.js:182
 msgid "Status"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:204
 msgid "Processed"
 msgstr ""
 
+#: public/bundle.settings.js:163
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncHistory.js:211
 #: src/admin/settings/components/tabs/SyncTab.js:248
 msgid "Pushed"
 msgstr ""
 
+#: public/bundle.settings.js:163
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncHistory.js:218
 #: src/admin/settings/components/tabs/SyncTab.js:250
 msgid "Deleted"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:224
 #: src/admin/settings/components/tabs/SyncHistory.js:225
 msgid "Started"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:238
 msgid "Delete"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:261
-msgid "Finished runs cleared."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SyncHistory.js:265
-msgid "Could not clear the history."
-msgstr ""
-
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:272
 msgid "Sync history"
 msgstr ""
 
+#: public/bundle.settings.js:163
+#: src/admin/settings/components/tabs/SyncHistory.js:261
+msgid "Finished runs cleared."
+msgstr ""
+
+#: public/bundle.settings.js:163
+#: src/admin/settings/components/tabs/SyncHistory.js:265
+msgid "Could not clear the history."
+msgstr ""
+
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncHistory.js:274
 msgid "Clear finished"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:43
 msgid "Start sync?"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:44
 msgid "This sends new and changed content to Search Cloud. Continue?"
 msgstr ""
 
+#: public/bundle.settings.js:163
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:45
 #: src/admin/settings/components/tabs/SyncTab.js:287
 msgid "Start sync"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:48
 msgid "Re-sync everything?"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:49
 msgid "This re-sends your entire catalog to Search Cloud, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?"
 msgstr ""
 
+#: public/bundle.settings.js:163
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:50
 #: src/admin/settings/components/tabs/SyncTab.js:296
 msgid "Re-sync everything"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:53
 msgid "Cancel this sync?"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:54
 msgid "This stops the current run. Progress made so far is kept, and you can start a new sync anytime. Continue?"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:55
 msgid "Cancel sync"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:126
 msgid "That action could not be completed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:157
-msgid "Full re-sync started."
+#: public/bundle.settings.js:163
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:85
+#: src/admin/settings/components/tabs/SyncTab.js:184
+msgid "Sync"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:187
 msgid "Send your content to Search Cloud. Only new and changed items are sent on each run, so repeat syncs are fast."
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:197
 msgid "Add and save your Search Cloud credentials first."
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:198
 msgid "Go to Connection"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:207
 msgid "Go to Indexing"
 msgstr ""
 
+#: public/bundle.settings.js:163
 #: src/admin/settings/components/tabs/SyncTab.js:219
 msgid "Full re-sync"
 msgstr ""
 
 #. translators: %d: processed item count.
+#: public/bundle.settings.js:164
 #: src/admin/settings/components/tabs/SyncTab.js:235
 #, js-format
 msgid "%d items processed…"
 msgstr ""
 
 #. translators: 1: processed, 2: estimated total, 3: percentage.
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:240
 #, js-format
 msgid "%1$s of ~%2$s processed (%3$d%%)"
 msgstr ""
 
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:249
 msgid "Skipped"
 msgstr ""
 
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:263
 msgid "Pause"
 msgstr ""
 
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:268
 msgid "Resume"
 msgstr ""
 
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:273
 msgid "Cancel"
 msgstr ""
 
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SyncTab.js:157
+msgid "Full re-sync started."
+msgstr ""
+
+#: public/bundle.settings.js:165
 #: src/admin/settings/components/tabs/SyncTab.js:312
 msgid "Not now"
 msgstr ""
 
-#: src/blocks/search/edit.js:79
-msgid "Search settings"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:164
+msgid "A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Search Cloud's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails."
 msgstr ""
 
-#: src/blocks/search/edit.js:132
-msgid "Shows a microphone button in the modal (browser support required)."
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:175
+msgid "One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty."
 msgstr ""
 
-#: src/blocks/search/edit.js:138
-msgid "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button."
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:120
+msgid "Preparing…"
 msgstr ""
 
-#: src/blocks/search/edit.js:188
-msgid "Icon color (hover)"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:121
+msgid "Indexing…"
 msgstr ""
 
-#: src/blocks/search/edit.js:190
-#: src/blocks/search/edit.js:299
-msgid "Background (hover)"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:122
+msgid "Ready"
 msgstr ""
 
-#: src/blocks/search/edit.js:204
-msgid "Accent"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:201
+msgid "Your plan does not include this."
 msgstr ""
 
-#: src/blocks/search/edit.js:219
-msgid "Placeholder"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:207
+msgid "AI & ranking"
 msgstr ""
 
-#: src/blocks/search/edit.js:221
-msgid "Border (focus)"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:209
+msgid "Site-level switches that change how results are found and ordered. These are the same switches as in the Search Cloud panel."
 msgstr ""
 
-#: src/blocks/search/edit.js:231
-msgid "Search button bg"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:219
+msgid "AI search"
 msgstr ""
 
-#: src/blocks/search/edit.js:232
-msgid "Search button bg (hover)"
+#: public/bundle.settings.js:165
+#: src/admin/settings/components/tabs/SearchConfigTab.js:223
+msgid "Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working."
 msgstr ""
 
-#: src/blocks/search/edit.js:233
-msgid "Search button text"
-msgstr ""
-
-#: src/blocks/search/edit.js:234
-msgid "Search button text (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:235
-msgid "Icon buttons"
-msgstr ""
-
-#: src/blocks/search/edit.js:236
-msgid "Icon buttons (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:237
-msgid "Icon button bg (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:239
-msgid "Voice icon (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:240
-msgid "Voice bg"
-msgstr ""
-
-#: src/blocks/search/edit.js:241
-msgid "Voice bg (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:242
-msgid "Close icon"
-msgstr ""
-
-#: src/blocks/search/edit.js:243
-msgid "Close icon (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:244
-msgid "Close bg"
-msgstr ""
-
-#: src/blocks/search/edit.js:245
-msgid "Close bg (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:246
-msgid "Clear icon"
-msgstr ""
-
-#: src/blocks/search/edit.js:247
-msgid "Clear icon (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:248
-msgid "Clear bg"
-msgstr ""
-
-#: src/blocks/search/edit.js:249
-msgid "Clear bg (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:252
-msgid "Search button radius"
-msgstr ""
-
-#: src/blocks/search/edit.js:262
-msgid "Item text (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:263
-msgid "Item background (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:273
-msgid "Section title"
-msgstr ""
-
-#: src/blocks/search/edit.js:274
-msgid "Chip background"
-msgstr ""
-
-#: src/blocks/search/edit.js:275
-msgid "Chip text"
-msgstr ""
-
-#: src/blocks/search/edit.js:276
-msgid "Chip border"
-msgstr ""
-
-#: src/blocks/search/edit.js:277
-msgid "Chip background (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:278
-msgid "Chip text (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:279
-msgid "Chip border (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:280
-#: src/frontend/search/components/Browse.js:44
-msgid "Clear all"
-msgstr ""
-
-#: src/blocks/search/edit.js:281
-msgid "Clear all (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:282
-msgid "Clear all (active)"
-msgstr ""
-
-#: src/blocks/search/edit.js:283
-msgid "Popular text"
-msgstr ""
-
-#: src/blocks/search/edit.js:284
-msgid "Popular text (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:285
-msgid "Popular bg (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:288
-msgid "Chip radius"
-msgstr ""
-
-#: src/blocks/search/edit.js:289
-msgid "Popular item spacing"
-msgstr ""
-
-#: src/blocks/search/edit.js:290
-msgid "Popular item radius"
-msgstr ""
-
-#: src/blocks/search/edit.js:300
-msgid "Text (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:301
-msgid "Background (active)"
-msgstr ""
-
-#: src/blocks/search/edit.js:302
-msgid "Text (active)"
-msgstr ""
-
-#: src/blocks/search/edit.js:303
-msgid "Count"
-msgstr ""
-
-#: src/blocks/search/edit.js:315
-msgid "Border (hover)"
-msgstr ""
-
-#: src/blocks/search/edit.js:317
-msgid "Price / meta"
-msgstr ""
-
-#: src/blocks/search/edit.js:357
-msgid "Search Cloud - search box"
-msgstr ""
-
-#: src/blocks/search/edit.js:358
-msgid "Search Cloud - search icon"
-msgstr ""
-
-#: src/frontend/search/components/Browse.js:62
-msgid "Remove from recent searches"
-msgstr ""
-
-#: src/frontend/search/components/Carousel.js:154
-msgid "Previous"
-msgstr ""
-
-#: src/frontend/search/components/Carousel.js:182
-msgid "Next"
-msgstr ""
-
-#: src/frontend/search/components/Carousel.js:188
-msgid "Pages"
-msgstr ""
-
-#. translators: %d: page number.
-#: src/frontend/search/components/Carousel.js:198
+#. translators: %s: index status, e.g. "Ready".
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:238
 #, js-format
-msgid "Go to page %d"
+msgid "Index status: %s"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:529
-#: src/frontend/search/components/SearchModal.js:537
-#: src/frontend/search/components/SearchModal.js:564
-msgid "Current highlights"
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:246
+msgid "AI visual tagging"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:541
-#: src/frontend/search/components/SearchModal.js:550
-msgid "Results"
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:250
+msgid "A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync - re-sync to tag products already indexed."
 msgstr ""
 
-#. translators: %d: number of results.
-#: src/frontend/search/components/SearchModal.js:547
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:263
+msgid "Rank results by what visitors click"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:266
+msgid "Results people click most for a search rise for everyone searching it. Relevance still leads - popular results are only nudged up."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:298
+msgid "Merchandising rules"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:300
+msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:314
+msgid "Trigger (search term contains)"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:317
+msgid "Empty: this rule applies to every search on the site."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:326
+msgid "Remove rule"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:334
+msgid "Pin to top (document ids)"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:336
+msgid "Comma-separated, in the order they should appear."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:343
+msgid "Hide (document ids)"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:345
+msgid "Comma-separated. Kept out of the results entirely."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:353
+msgid "Promotional banner"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:355
+msgid "Optional message returned with the results for this search."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:362
+msgid "Add a rule"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:409
+msgid "Could not load the search configuration."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:529
+msgid "Save search configuration"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:538
+msgid "Search configuration"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:541
+msgid "Controls how Search Cloud itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Search Cloud's side, not in this plugin's own settings, so changes take effect on the very next search."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:569
+msgid "Searchable fields & weights"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:571
+msgid "Which fields full-text search matches, and how much each one counts (1-100). A higher weight on \"title\" makes title matches outrank body-text matches, for example."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:586
+msgid "Field"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:595
+msgid "Weight"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:624
+msgid "Type boosts"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:626
+msgid "Ranking boost per content type (0.1-100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:649
+msgid "Boost"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:663
+msgid "Enable at least one content type in the Indexing tab to set a type boost."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:676
+#: src/admin/settings/components/tabs/SearchConfigTab.js:690
+msgid "Facet fields"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:678
+msgid "Fields returned as facets on search results and allowed as filters. Click the field to browse every available field, or type to search."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:702
+#: src/admin/settings/components/tabs/SearchConfigTab.js:716
+msgid "Suggest fields"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:704
+msgid "Fields queried for search-as-you-type suggestions. Defaults to \"title\" when left empty. Click to browse, or type to search."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:728
+#: src/admin/settings/components/tabs/SearchConfigTab.js:739
+msgid "Synonyms"
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:730
+msgid "Treats words as interchangeable during search, even when the exact word a visitor types never appears in a result. For example, a line with \"sneaker, trainer\" means searching \"sneaker\" also matches results that only mention \"trainer\", and vice versa - useful for regional spelling or naming differences."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: src/admin/settings/components/tabs/SearchConfigTab.js:741
+msgid "One comma-separated group of interchangeable words per line, e.g. \"sneaker, trainer\"."
+msgstr ""
+
+#: public/bundle.settings.js:166
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:756
+#: src/admin/settings/components/tabs/SearchConfigTab.js:788
+msgid "Languages"
+msgstr ""
+
+#. translators: %d: number of languages the plan allows.
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:762
 #, js-format
-msgid "%d result"
-msgid_plural "%d results"
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/frontend/search/components/SearchModal.js:556
-msgid "Search results"
+msgid "Which of this site's languages to index and search. Your plan allows up to %d."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:645
-msgid "Filter by type"
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:765
+msgid "Which of this site's languages to index and search. Leave every language unchecked for unrestricted."
 msgstr ""
 
-#. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:712
-#, js-format
-msgid "%d result found."
-msgid_plural "%d results found."
-msgstr[0] ""
-msgstr[1] ""
-
-#: src/frontend/search/components/Suggestions.js:50
-msgid "Dismiss suggestions"
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:766
+msgid "No WPML/Polylang installation was detected, so languages can only be entered manually here. Leave empty for unrestricted."
 msgstr ""
 
-#: src/frontend/search/components/Suggestions.js:58
-msgid "Search suggestions"
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:790
+msgid "Comma-separated ISO language codes, e.g. \"de, en\"."
 msgstr ""
 
-#: src/frontend/search/components/templates.js:41
-msgid "from"
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:496
+#: src/admin/settings/components/tabs/SearchConfigTab.js:511
+msgid "Could not save the search configuration."
 msgstr ""
 
-#: src/frontend/search/components/templates.js:101
-msgid "In stock"
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/tabs/SearchConfigTab.js:510
+msgid "Search configuration saved."
 msgstr ""
 
-#: src/frontend/search/components/templates.js:101
-msgid "Out of stock"
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:90
+msgid "Indexing"
 msgstr ""
 
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:94
+msgid "Search Config"
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:98
+msgid "Connection"
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:135
+msgid "Saving..."
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:136
+msgid "Save Settings"
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:163
+msgid "Configure the plugin settings from one shared admin surface."
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:130
+msgid "Settings saved successfully."
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:265
+msgid "OK"
+msgstr ""
+
+#: public/bundle.settings.js:167
+#: src/admin/settings/components/SettingsPanel.js:267
+msgid "The settings could not be saved. Review the fields and try again."
+msgstr ""
+
+#: public/bundle.settings.js:167
 #: src/settings/store/provider.js:18
 msgid "General"
-msgstr ""
-
-#: blocks/search/block.json
-msgctxt "block title"
-msgid "Search Cloud"
-msgstr ""
-
-#: blocks/search/block.json
-msgctxt "block description"
-msgid "A full-screen search box or icon powered by webhead Search Cloud."
 msgstr ""

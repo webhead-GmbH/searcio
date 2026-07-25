@@ -75,19 +75,21 @@ export const gridIcon = (
 	</svg>
 );
 
+/*
+ * Drawn symmetrically about the viewBox's vertical centre (y=12) and spanning
+ * x 2.5–21.5, so it sits centred in the round send button. The previous glyph
+ * was a stroked outline whose bounding box was offset within the viewBox, which
+ * left it visibly high and right of centre.
+ */
 export const sendIcon = (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		width="24"
 		height="24"
 		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="2"
-		strokeLinecap="round"
-		strokeLinejoin="round"
+		fill="currentColor"
 		aria-hidden="true"
 	>
-		<path d="M3.4 20.4l17.5-8.4a1 1 0 0 0 0-1.8L3.4 1.8a1 1 0 0 0-1.4 1.2l2.4 6.7a1 1 0 0 0 .8.7l8.8 1.6-8.8 1.6a1 1 0 0 0-.8.7l-2.4 6.7a1 1 0 0 0 1.4 1.1z" />
+		<path d="M2.5 3.2 21.5 12 2.5 20.8l0-6.9L15 12 2.5 10.1z" />
 	</svg>
 );

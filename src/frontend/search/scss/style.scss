@@ -119,6 +119,7 @@
 	--whsc-facet-text-active: #ffffff;
 	--whsc-facet-count: currentColor;
 	--whsc-facet-radius: 999px;
+	--whsc-facets-max-height: 132px;
 
 	/* Result cards */
 	--whsc-card-bg: #ffffff;
@@ -135,12 +136,24 @@
 	--whsc-dot-color-active: var(--whsc-accent);
 	--whsc-carousel-gap: 14px;
 
+	/* Search / AI Assistant tab bar */
+	--whsc-tab-text: var(--whsc-text);
+	--whsc-tab-text-active: var(--whsc-accent);
+	--whsc-tab-indicator: var(--whsc-accent);
+	--whsc-tab-border: var(--whsc-panel-border);
+
 	/* AI assistant */
+	--whsc-assistant-accent: var(--whsc-accent);
+	--whsc-assistant-text: var(--whsc-text);
+	--whsc-assistant-input-radius: 999px;
 	--whsc-assistant-muted: #6b7177;
 	--whsc-assistant-divider: #e8e9eb;
 	--whsc-assistant-user-bg: var(--whsc-accent);
 	--whsc-assistant-user-text: #ffffff;
 	--whsc-assistant-row-bg: #fafafb;
+	--whsc-assistant-send-disabled: #d7dade;
+	--whsc-assistant-error-bg: #fdf2f2;
+	--whsc-assistant-error-text: #b3261e;
 }
 
 /*
@@ -647,6 +660,11 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
+	/* A field with many values (dozens of brands, colours…) would otherwise
+	 * grow this chip row tall enough to push the results far down the modal.
+	 * Cap it and let it scroll; themeable per placement. */
+	max-height: var(--whsc-facets-max-height, 132px);
+	overflow-y: auto;
 }
 
 /*
@@ -1395,6 +1413,23 @@
 	to { opacity: 1; transform: scale(1); }
 }
 
+/* Assistant "thinking" indicator. Starts off-screen right and sweeps left so
+ * the highlight enters the word rather than appearing inside it. */
+@keyframes whsc-thinking-shine {
+	from { background-position: 160% 0; }
+	to { background-position: -60% 0; }
+}
+
+@keyframes whsc-thinking-dot {
+	0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+	30% { transform: translateY(-4px); opacity: 1; }
+}
+
+@keyframes whsc-thinking-pulse {
+	0%, 100% { box-shadow: 0 0 0 0 rgba(49, 155, 128, 0.45); }
+	50% { box-shadow: 0 0 0 5px rgba(49, 155, 128, 0); }
+}
+
 /*
  * The tab bar and the assistant sit after the top-level `@keyframes` above,
  * so they need their own copy of the specificity wrapper — without it these
@@ -1410,7 +1445,7 @@
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	border-bottom: 1px solid var(--whsc-panel-border, rgba(0, 0, 0, 0.12));
+	border-bottom: 1px solid var(--whsc-tab-border, var(--whsc-panel-border, rgba(0, 0, 0, 0.12)));
 }
 
 .whsc-modal-tab {
@@ -1426,7 +1461,7 @@
 	font-size: 15px;
 	line-height: 1.4;
 	font-weight: 600;
-	color: var(--whsc-text, inherit);
+	color: var(--whsc-tab-text, var(--whsc-text, inherit));
 	opacity: 0.6;
 	cursor: pointer;
 	transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -1435,8 +1470,8 @@
 
 	&.is-active {
 		opacity: 1;
-		color: var(--whsc-accent, #2563eb);
-		border-bottom-color: var(--whsc-accent, #2563eb);
+		color: var(--whsc-tab-text-active, var(--whsc-accent, #2563eb));
+		border-bottom-color: var(--whsc-tab-indicator, var(--whsc-accent, #2563eb));
 	}
 }
 
@@ -1508,6 +1543,10 @@
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
+	/* Bottom-anchored, like every messenger: with only a turn or two on screen
+	 * the conversation sits just above the composer instead of clinging to the
+	 * top with a large void beneath it. */
+	justify-content: flex-end;
 	gap: 16px;
 	padding-right: 6px;
 
@@ -1580,7 +1619,7 @@
 	height: 24px;
 	margin-top: 1px;
 	border-radius: 50%;
-	background: var(--whsc-accent, #2563eb);
+	background: var(--whsc-assistant-accent, var(--whsc-accent, #2563eb));
 	color: #fff;
 	display: inline-flex;
 	align-items: center;
@@ -1607,9 +1646,79 @@
 	background: var(--whsc-chip-bg, #f4f5f6);
 	color: var(--whsc-text, inherit);
 
-	&--typing {
-		display: inline-flex;
-		padding: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * "Thinking" indicator
+ *
+ * Replaces a bare spinner, which said "something is loading" rather than "the
+ * assistant is working on your answer". The word carries a slow shine sweeping
+ * across it and three dots rise in sequence, so a wait of several seconds still
+ * looks alive. Both stop under `prefers-reduced-motion`.
+ * ------------------------------------------------------------------------ */
+.whsc-assistant__thinking {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	margin: 0;
+	padding: 1px 0 0;
+	line-height: 1.55;
+}
+
+.whsc-assistant__thinking-text {
+	font-weight: 500;
+	color: var(--whsc-assistant-muted, #6b7177);
+	/* The shine is a highlight travelling through the text itself, so it needs
+	 * the gradient clipped to the glyphs. */
+	background-image: linear-gradient(
+		100deg,
+		var(--whsc-assistant-muted, #6b7177) 30%,
+		var(--whsc-assistant-accent, var(--whsc-accent, #2563eb)) 50%,
+		var(--whsc-assistant-muted, #6b7177) 70%
+	);
+	background-size: 220% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: whsc-thinking-shine 2.4s ease-in-out infinite;
+}
+
+.whsc-assistant__dots {
+	display: inline-flex;
+	align-items: flex-end;
+	gap: 3px;
+	/* Sits on the text baseline rather than the flex centre, so the dots read
+	 * as an ellipsis continuing the word. */
+	padding-bottom: 3px;
+
+	i {
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--whsc-assistant-accent, var(--whsc-accent, #2563eb));
+		animation: whsc-thinking-dot 1.4s ease-in-out infinite;
+
+		&:nth-child(2) { animation-delay: 0.18s; }
+		&:nth-child(3) { animation-delay: 0.36s; }
+	}
+}
+
+/* A soft halo on the avatar ties the animation to the assistant rather than
+ * leaving it as a detached label. */
+.whsc-assistant__avatar--thinking {
+	animation: whsc-thinking-pulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.whsc-assistant__thinking-text {
+		animation: none;
+		background: none;
+		-webkit-text-fill-color: currentColor;
+	}
+
+	.whsc-assistant__dots i,
+	.whsc-assistant__avatar--thinking {
+		animation: none;
 	}
 }
 
@@ -1630,11 +1739,42 @@
 	max-width: 100%;
 	padding: 1px 0 0;
 	background: none;
+	color: var(--whsc-assistant-text, var(--whsc-text, inherit));
 }
 
+/* A tinted block rather than loose red text, so a failure reads as a message
+ * in the conversation instead of a form-validation warning. */
 .whsc-assistant__error {
-	color: #b91c1c;
-	font-size: 13px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 10px;
+	max-width: 100%;
+	padding: 9px 14px;
+	border-radius: 16px;
+	background: var(--whsc-assistant-error-bg, #fdf2f2);
+	color: var(--whsc-assistant-error-text, #b3261e);
+	line-height: 1.55;
+}
+
+.whsc-modal .whsc-assistant__retry {
+	appearance: none;
+	border: 0;
+	padding: 0;
+	background: none;
+	font: inherit;
+	font-weight: 600;
+	color: inherit;
+	text-decoration: underline;
+	cursor: pointer;
+
+	&:hover { text-decoration: none; }
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+		border-radius: 3px;
+	}
 }
 
 .whsc-assistant__composer {
@@ -1644,7 +1784,9 @@
 	margin-top: 14px;
 	padding: 5px 5px 5px 16px;
 	border: 1px solid var(--whsc-input-border, rgba(0, 0, 0, 0.2));
-	border-radius: 999px;
+	/* Its own radius rather than the search field's: the two sit in different
+	 * tabs and are commonly styled apart. */
+	border-radius: var(--whsc-assistant-input-radius, 999px);
 	background: var(--whsc-input-bg, #fff);
 	transition: border-color 0.15s ease;
 
@@ -1679,21 +1821,40 @@
 
 /* Filled circle: a bare glyph read as decoration rather than the send control. */
 .whsc-modal .whsc-assistant__send.components-button {
+	/* `display: flex` + centring explicitly: the button's own padding would
+	 * otherwise leave the glyph off-centre inside the circle. */
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	flex: 0 0 auto;
 	width: 36px;
 	height: 36px;
 	min-width: 36px;
 	min-height: 36px;
+	padding: 0;
 	border-radius: 50%;
 	background: var(--whsc-btn-bg, var(--whsc-accent, #2563eb));
 	color: var(--whsc-btn-text, #fff);
+	transition: background-color 0.15s ease, transform 0.15s ease;
 
-	svg { width: 17px; height: 17px; }
+	svg {
+		width: 16px;
+		height: 16px;
+		display: block;
+		/* Optical, not geometric: a right-pointing arrow carries its mass on
+		 * the left, so dead-centre reads as sitting too far left. */
+		transform: translateX(0.5px);
+	}
 
+	&:hover:not( :disabled ) { transform: scale(1.05); }
+
+	/* The disabled fill used to be `--whsc-chip-bg`, the same colour as the
+	 * composer itself, so the button vanished and left a floating grey arrow. */
 	&:disabled,
 	&[aria-disabled='true'] {
-		background: var(--whsc-chip-bg, #f4f5f6);
-		color: var(--whsc-assistant-muted, #6b7177);
+		background: var(--whsc-assistant-send-disabled, #d7dade);
+		color: #fff;
+		transform: none;
 	}
 }
 

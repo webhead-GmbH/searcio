@@ -8,11 +8,11 @@ Stable tag: 1.0.3
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Connect WordPress and WooCommerce to **webhead Search Cloud** - a fast, hosted search service — and give visitors an instant, full-screen search experience for your posts, pages, and products.
+Instant full-screen search for your posts, pages and products, powered by the hosted webhead Search Cloud service.
 
 == Description ==
 
-Connect WordPress and WooCommerce to `webhead Search Cloud` - a fast, hosted search service — and give visitors an instant, full-screen search experience for your posts, pages, and products.
+Connect WordPress and WooCommerce to `webhead Search Cloud` - a fast, hosted search service - and give visitors an instant, full-screen search experience for your posts, pages, and products.
 
 The plugin indexes your content into Search Cloud, keeps it in sync as content changes, and renders a client-side search modal (via a Gutenberg block or an Elementor widget) that searches, filters, and displays results without a page reload.
 
@@ -48,10 +48,27 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 6. Add the **Search Cloud** block to a page (or the **Search Cloud** widget in Elementor) to place the search trigger
    anywhere on your site.
 
+== External services ==
+
+This plugin sends data to webhead Search Cloud, the hosted service that powers the search. Search does not work without it.
+
+* **When you sync:** the content you chose to index - for example a post's title, text and link.
+* **When a visitor searches:** the search term, and which result they open. Their browser contacts the service directly, so their IP address is visible to it.
+* **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
+
+Nothing else is sent, and no visitor accounts are created.
+
+Service: https://search.webhead.dev - Privacy policy: https://search.webhead.dev/datenschutz
+
 == Changelog ==
 
 = 1.0.3 =
 
+- Smaller download and a faster front end: removed ~2.4 MB of bundled developer tooling that was never used at runtime, and stopped scanning the plugins directory on front-end requests.
+- Added a border-radius control for the AI assistant's message field.
+- The AI assistant tab is now themeable in the block editor and Elementor; block-editor hover colours moved into Default/Hover tabs; long filter lists scroll instead of stretching the modal.
+- Fixed the search modal and AI assistant showing English on translated sites.
+- The AI assistant now shows an animated "Thinking" state, keeps the conversation next to the input, offers Try again when an answer fails, and has a properly centred send button.
 - Removed leftover sync/onboarding options that nothing reads any more and that could be mistaken for live state.
 - Search Config now also manages merchandising rules and the AI search, visual tagging and click-ranking switches.
 - Fixed click-through tracking never recording anything: the analytics beacon was blocked by the browser before it was sent.

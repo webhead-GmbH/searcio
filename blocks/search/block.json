@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "webhead-search-cloud/search",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"title": "Search Cloud",
 	"category": "widgets",
 	"icon": "search",
@@ -102,6 +102,19 @@
 		"facetTextActive": { "type": "string", "default": "" },
 		"facetCount": { "type": "string", "default": "" },
 		"facetRadius": { "type": "number", "default": null },
+		"facetsMaxHeight": { "type": "number", "default": null },
+
+		"tabText": { "type": "string", "default": "" },
+		"tabTextActive": { "type": "string", "default": "" },
+		"tabIndicator": { "type": "string", "default": "" },
+		"tabBorder": { "type": "string", "default": "" },
+
+		"assistantAccent": { "type": "string", "default": "" },
+		"assistantText": { "type": "string", "default": "" },
+		"assistantUserBg": { "type": "string", "default": "" },
+		"assistantUserText": { "type": "string", "default": "" },
+		"assistantRowBg": { "type": "string", "default": "" },
+		"assistantInputRadius": { "type": "number", "default": null },
 
 		"cardBg": { "type": "string", "default": "" },
 		"cardBorder": { "type": "string", "default": "" },

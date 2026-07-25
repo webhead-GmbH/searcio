@@ -66,6 +66,8 @@ export async function mockSearchCloud( page, options = {} ) {
 		assistantReply = 'Here are a few options.',
 		assistantProducts = [],
 		assistantStatus = 200,
+		assistantDelay = 0,
+		onAssistant,
 		onSearch,
 	} = options;
 
@@ -83,9 +85,18 @@ export async function mockSearchCloud( page, options = {} ) {
 			return json( { capabilities: { assistant, semantic_search: false }, facets: [], languages: [] } );
 		}
 		if ( '/assistant' === path ) {
-			if ( 200 !== assistantStatus ) {
-				return json( {}, assistantStatus );
+			// `onAssistant` returns the status for this call, so a spec can fail
+			// the first attempt and answer the retry.
+			const status = onAssistant ? onAssistant() : assistantStatus;
+
+			if ( assistantDelay > 0 ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, assistantDelay ) );
 			}
+
+			if ( 200 !== status ) {
+				return json( {}, status );
+			}
+
 			return json( { reply: assistantReply, products: assistantProducts } );
 		}
 		if ( '/search' === path ) {

@@ -304,6 +304,32 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					] }
 				>
 					{ sizeControl( 'facetRadius', __( 'Border radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'facetsMaxHeight', __( 'Max height (px)', 'webhead-search-cloud' ), 400, 60 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Search & AI tabs', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'tabText', __( 'Tab text', 'webhead-search-cloud' ) ),
+						color( 'tabTextActive', __( 'Tab text (active)', 'webhead-search-cloud' ) ),
+						color( 'tabIndicator', __( 'Active indicator', 'webhead-search-cloud' ) ),
+						color( 'tabBorder', __( 'Divider', 'webhead-search-cloud' ) ),
+					] }
+				/>
+
+				<PanelColorSettings
+					title={ __( 'AI Assistant', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'assistantAccent', __( 'Accent (avatar, dots)', 'webhead-search-cloud' ) ),
+						color( 'assistantText', __( 'Reply text', 'webhead-search-cloud' ) ),
+						color( 'assistantUserBg', __( 'Your message background', 'webhead-search-cloud' ) ),
+						color( 'assistantUserText', __( 'Your message text', 'webhead-search-cloud' ) ),
+						color( 'assistantRowBg', __( 'Compare row shading', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'assistantInputRadius', __( 'Message field radius', 'webhead-search-cloud' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings

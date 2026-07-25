@@ -38,6 +38,8 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - At the start of every task, read the active top-level guide file and the relevant skill files under `.agents/skills/`.
 - Read `.agents/skills/webhead-plugin-architecture/SKILL.md` before changing PHP services, hooks, database code, or plugin bootstrap behavior.
 - Read `.agents/skills/webhead-plugin-testing/SKILL.md` before changing behavior or finalizing verification.
+- Read `.agents/skills/webhead-wp-env-testing/SKILL.md` before writing or debugging tests under `tests/Integration`, the wp-env bootstrap, or `.wp-env.json`.
+- Read `.agents/skills/webhead-e2e-testing/SKILL.md` before writing or debugging Playwright specs under `tests/e2e`.
 - Read `.agents/skills/webhead-plugin-quality/SKILL.md` before changing WordPress runtime behavior, translations, releases, or security-sensitive surfaces.
 - Read `.agents/skills/webhead-scaffold-maintenance/SKILL.md` before changing generated files, package manifests, or framework update flows.
 - Read `.agents/skills/webhead-react-admin/SKILL.md` before changing admin UI, asset loading, DataViews tables, or REST/UI integration.
@@ -63,7 +65,10 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - `includes/Capabilities/Plugin_Capabilities.php` is the default capability map for admin, REST, and optional network-admin guards.
 - `includes/Settings/Plugin_Settings.php` is the single source of truth for settings metadata, defaults, schema, and REST exposure.
 - `.agents/skills/webhead-plugin-architecture/SKILL.md` is the high-level architecture and container guide.
-- `.agents/skills/webhead-plugin-testing/SKILL.md` defines required test coverage for plugin changes.
+- `.agents/skills/webhead-plugin-testing/SKILL.md` routes a change to the right test tier and defines required coverage.
+- `.agents/skills/webhead-wp-env-testing/SKILL.md` covers the wp-env integration suite, its bootstrap, transactions, and multisite runs.
+- `.agents/skills/webhead-e2e-testing/SKILL.md` covers Playwright specs, fixtures, seeding, and flake control.
+- `tests/Unit`, `tests/Integration`, and `tests/e2e/specs` hold the three test tiers.
 - `.agents/skills/webhead-react-admin/SKILL.md` covers React, DataViews, block-editor, asset loading, and REST/UI contracts.
 - `.agents/skills/webhead-frontend/SKILL.md` covers frontend React surfaces, scoped reset CSS, conditional asset loading, responsiveness, and accessibility.
 - `.agents/skills/webhead-elementor-widgets/SKILL.md` covers Elementor widget controls, live previews, style tabs, responsive controls, and widget-specific asset loading.
@@ -144,6 +149,9 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Do not hardcode environment-specific absolute paths, URLs, or credentials into the plugin.
 - Do not edit generated or built assets without updating the source that owns them.
 - Do not skip tests when PHPUnit, wp-env, JavaScript tests, or scaffold-output assertions can cover the change.
+- Do not edit files carrying the `Webhead scaffold managed file` marker; `scaffold:update` overwrites them. Use `tests/Integration/bootstrap-extra.php` and `Integration_Test_Case` instead.
+- Do not add WordPress function polyfills to `tests/bootstrap.php` to force a test into the unit tier; move the test to `tests/Integration`.
+- Do not ship the test harness: keep `tests`, `phpunit*.xml.dist`, `playwright.config.js`, and `.wp-env.json` listed in `.distignore`.
 - Do not use `Heading`, `Card`, or `TabPanel` from `@wordpress/components` in new WordPress 7+ React admin code when recommended `@wordpress/ui` replacements exist.
 - Do not fix wp-admin typography drift by adding arbitrary CSS `font-size` values to generated admin styles.
 
@@ -152,11 +160,14 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Run `composer install` on a fresh checkout before testing runtime behavior.
 - Run `composer dump-autoload` after file moves, namespace changes, or new classes.
 - Add or update the narrowest useful automated test for each changed behavior.
-- Run affected PHPUnit, wp-env, or JavaScript tests first; run a broader suite when shared framework or scaffold behavior changed.
+- Run `composer test:unit` for WordPress-free logic; it needs no Docker.
+- Run `npm run env:start` then `npm run test:integration` for activation, options, capabilities, REST, cron, tables, or hook timing.
+- Run `npm run test:integration:multisite` when the change touches options, tables, activation, blog switching, or capability sync.
+- Run `npm run test:e2e` for admin screens, block rendering, or anything only a browser can observe.
 - Lint changed PHP files with `php -l` and include `webhead-search-cloud.php` and `includes/Plugin.php` in that pass.
 - Confirm the plugin header still reflects minimum WordPress, minimum PHP, and required-plugin slugs.
 - Confirm Site Health and admin notices report unmet requirements when a required plugin is missing or inactive.
 - Validate multisite behavior when changes touch options, database tables, activation, blog switching, or capability sync.
-- Run `npm install` and `npm run build` after JavaScript, block-editor, or admin UI changes.
+- Run `npm install` and `npm run build` after JavaScript, block-editor, or admin UI changes, and before the end-to-end suite.
 - Open the settings UI in a browser and verify card title sizing, nested card variants, keyboard focus, and responsive wrapping.
 - Verify REST routes still use `webhead-search-cloud/v1` and permission callbacks remain explicit.

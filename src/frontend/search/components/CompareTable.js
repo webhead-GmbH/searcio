@@ -18,11 +18,11 @@ const HEADER_OR_INTERNAL = new Set( [
  */
 const formatValue = ( value ) => {
 	if ( null === value || undefined === value || '' === value ) {
-		return '—';
+		return '-';
 	}
 
 	if ( Array.isArray( value ) ) {
-		return value.length > 0 ? value.join( ', ' ) : '—';
+		return value.length > 0 ? value.join( ', ' ) : '-';
 	}
 
 	if ( 'boolean' === typeof value ) {

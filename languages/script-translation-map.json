@@ -2,13 +2,25 @@
     "src/admin/settings/components/SettingsPanel.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/UpgradeButton.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/tabs/CacheClearCard.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/ConnectionExplainer.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/ConnectionResultNotice.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/ConnectionTab.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/IndexingTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/ManualConnectionEntry.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/SearchConfigTab.js": [
@@ -23,16 +35,19 @@
     "src/admin/settings/components/tabs/SyncTab.js": [
         "public/bundle.settings.js"
     ],
-    "src/settings/store/provider.js": [
-        "public/bundle.settings.js"
-    ],
     "src/blocks/search/edit.js": [
         "public/bundle.search-block-editor.js"
+    ],
+    "src/frontend/search/components/AiAssistant.js": [
+        "public/bundle.search.js"
     ],
     "src/frontend/search/components/Browse.js": [
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/Carousel.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/CompareTable.js": [
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/SearchInput.js": [
@@ -46,5 +61,8 @@
     ],
     "src/frontend/search/components/templates.js": [
         "public/bundle.search.js"
+    ],
+    "src/settings/store/provider.js": [
+        "public/bundle.settings.js"
     ]
 }

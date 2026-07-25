@@ -248,7 +248,7 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 						featureError( errors, 'visual_tagging' )
 						|| ( features.visual_tagging.available
 							? __(
-								'A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync — re-sync to tag products already indexed.',
+								'A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync - re-sync to tag products already indexed.',
 								'webhead-search-cloud'
 							)
 							: unavailable )
@@ -264,7 +264,7 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 					help={
 						featureError( errors, 'personalization' )
 						|| __(
-							'Results people click most for a search rise for everyone searching it. Relevance still leads — popular results are only nudged up.',
+							'Results people click most for a search rise for everyone searching it. Relevance still leads - popular results are only nudged up.',
 							'webhead-search-cloud'
 						)
 					}
@@ -298,7 +298,7 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 					<Card.Title render={ <h3 /> }>{ __( 'Merchandising rules', 'webhead-search-cloud' ) }</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
-							'Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search — that is how you keep a product out of search everywhere.',
+							'Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere.',
 							'webhead-search-cloud'
 						) }
 					</Text>
@@ -569,7 +569,7 @@ const SearchConfigTab = () => {
 								<Card.Title render={ <h3 /> }>{ __( 'Searchable fields & weights', 'webhead-search-cloud' ) }</Card.Title>
 								<Text render={ <p /> } variant="body-sm">
 									{ __(
-										'Which fields full-text search matches, and how much each one counts (1–100). A higher weight on "title" makes title matches outrank body-text matches, for example.',
+										'Which fields full-text search matches, and how much each one counts (1-100). A higher weight on "title" makes title matches outrank body-text matches, for example.',
 										'webhead-search-cloud'
 									) }
 								</Text>
@@ -624,7 +624,7 @@ const SearchConfigTab = () => {
 								<Card.Title render={ <h3 /> }>{ __( 'Type boosts', 'webhead-search-cloud' ) }</Card.Title>
 								<Text render={ <p /> } variant="body-sm">
 									{ __(
-										'Ranking boost per content type (0.1–100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing.',
+										'Ranking boost per content type (0.1-100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing.',
 										'webhead-search-cloud'
 									) }
 								</Text>
@@ -682,7 +682,7 @@ const SearchConfigTab = () => {
 								</Text>
 							</div>
 						</Card.Header>
-						<Card.Content className="whsc-settings-card-content">
+						<Card.Content className="whsc-settings-card-content whsc-token-field">
 							<FormTokenField
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
@@ -708,7 +708,7 @@ const SearchConfigTab = () => {
 								</Text>
 							</div>
 						</Card.Header>
-						<Card.Content className="whsc-settings-card-content">
+						<Card.Content className="whsc-settings-card-content whsc-token-field">
 							<FormTokenField
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
