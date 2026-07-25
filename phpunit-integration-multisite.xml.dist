@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Webhead scaffold managed file. scaffold:update may refresh this file. -->
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+        bootstrap="tests/Integration/bootstrap.php"
+        backupGlobals="false"
+        colors="true">
+    <!--
+        The integration suite again, this time on a multisite network:
+
+            npm run test:integration:multisite
+
+        WP_MULTISITE is set here rather than on the command line because PHPUnit
+        applies <env> through putenv() before it loads the bootstrap, which is
+        exactly when wp-phpunit reads it — and because an inline environment
+        variable is not portable to PowerShell.
+
+        Use skip_if_multisite() / skip_unless_multisite() from Framework_Test_Case
+        when a test's expectations genuinely differ between the two runs.
+    -->
+    <php>
+        <env name="WP_MULTISITE" value="1"/>
+    </php>
+    <testsuites>
+        <testsuite name="integration-multisite">
+            <directory suffix="Test.php">tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

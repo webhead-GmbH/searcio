@@ -31,5 +31,6 @@ Use this before finalizing changes that affect WordPress runtime behavior, relea
 ## Release Checks
 
 - Release packages should ship `includes/Dependencies`, not `vendor/webhead/wp-plugin-framework`.
+- `includes/Dependencies` must contain runtime code only. It should hold `Webhead`, `League`, `Psr`, and the prefixed `composer` autoloader — and nothing else. A `Symfony` directory, a `Console` directory, or any `.stub` file means the Mozart configuration in `composer.json` lost its `excluded_packages` or `override_autoload` entries; restore them with `composer framework:update`. Shipping them adds megabytes of development tooling and produces a large number of Plugin Check findings unrelated to this plugin.
 - Do not ship `node_modules`, tests, local agent guidance folders, or generated development caches.
 - Run Plugin Check before release when scaffolded plugin code or runtime behavior changed.

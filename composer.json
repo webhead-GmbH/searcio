@@ -55,7 +55,27 @@
             "packages": [
                 "webhead/wp-plugin-framework"
             ],
-            "delete_vendor_directories": false
+            "delete_vendor_directories": false,
+            "excluded_packages": [
+                "symfony/console",
+                "symfony/deprecation-contracts",
+                "symfony/polyfill-ctype",
+                "symfony/polyfill-intl-grapheme",
+                "symfony/polyfill-intl-normalizer",
+                "symfony/polyfill-mbstring",
+                "symfony/service-contracts",
+                "symfony/string"
+            ],
+            "override_autoload": {
+                "webhead/wp-plugin-framework": {
+                    "files": [
+                        "src/Support/helpers.php"
+                    ],
+                    "psr-4": {
+                        "Webhead\\WP\\Framework\\": "src/"
+                    }
+                }
+            }
         }
     },
     "scripts": {

@@ -2,6 +2,9 @@
 
 ## 1.0.3
 
+- Updated the webhead plugin framework to 1.2.0. The distributed package no longer carries development tooling: `symfony/console` (~1.7 MB) and the framework's scaffolding CLI (~590 KB across 61 template files) were bundled but never loaded at runtime. The prefixed dependency bundle drops from 3.7 MB to 1.3 MB.
+- Front-end requests no longer scan the plugins directory. The framework resolved declared plugin dependencies on every request to build admin notices and a Site Health field, which outside wp-admin means globbing the plugins directory once per dependency; notices are now built only in wp-admin and the diagnostics field is deferred.
+- Fixed the bundled WP-CLI commands (`cache`, `capabilities`, `jobs`, `upgrades`) declaring `--yes` as a required flag, which made WP-CLI reject the very flag it told you to re-run with — leaving those commands impossible to run.
 - The AI assistant's message field now has its own border-radius control, in both the block editor and Elementor.
 - The AI Assistant tab and its conversation can now be styled like every other part of the widget, in both the block editor and Elementor: tab colours (text, active, underline, divider), the assistant accent and reply text, and your-message bubble colours. 
 - The frontend filter list is capped in height and scrolls instead of stretching the modal when a field has many values; the cap is themeable per placement (default 132px).
