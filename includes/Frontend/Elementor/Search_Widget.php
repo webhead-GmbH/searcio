@@ -1004,7 +1004,12 @@ final class Search_Widget extends Widget_Base {
 
 		Frontend_Assets::enqueue();
 
-		echo Trigger_Markup::render( // phpcs:ignore -- markup is escaped inside Trigger_Markup::render().
+		// Every value is escaped inside Trigger_Markup::render(), which returns a
+		// finished attribute-escaped element. The disable/enable pair spans the
+		// whole call: a single-line phpcs:ignore only covers the `echo` itself, so
+		// each array element was still reported.
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo Trigger_Markup::render(
 			[
 				'mode'          => (string) ( $settings['mode'] ?? 'icon' ),
 				'scopeType'     => (string) ( $settings['scope_type'] ?? '' ),
@@ -1020,5 +1025,6 @@ final class Search_Widget extends Widget_Base {
 				'showCount'     => 'yes' === ( $settings['show_count'] ?? 'yes' ),
 			]
 		);
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 }

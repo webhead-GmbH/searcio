@@ -12,10 +12,12 @@
 .editorconfig
 .wp-env.json
 .wp-env.override.json
+.wp-env.override.json.example
 node_modules
 tests
 docs
-src
+# src/ is intentionally shipped: it is the human-readable source for the
+# minified bundles in public/, which wordpress.org requires us to provide.
 vendor/webhead/wp-plugin-framework
 composer.json
 composer.lock
@@ -24,6 +26,7 @@ package-lock.json
 phpunit.xml
 phpunit.xml.dist
 phpunit-integration.xml.dist
+phpunit-integration-multisite.xml.dist
 phpstan.neon
 phpcs.xml
 playwright.config.js

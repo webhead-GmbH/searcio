@@ -62,7 +62,6 @@ jobs:
             --exclude ".github/" \
             --exclude "docs/" \
             --exclude "node_modules/" \
-            --exclude "src/" \
             --exclude "tests/" \
             --exclude ".distignore" \
             --exclude ".editorconfig" \
@@ -72,6 +71,7 @@ jobs:
             --exclude ".travis.yml" \
             --exclude ".wp-env.json" \
             --exclude ".wp-env.override.json" \
+            --exclude ".wp-env.override.json.example" \
             --exclude "AGENTS.md" \
             --exclude "CHANGELOG.md" \
             --exclude "CLAUDE.md" \
@@ -84,6 +84,7 @@ jobs:
             --exclude "phpstan.neon" \
             --exclude "phpunit.xml.dist" \
             --exclude "phpunit-integration.xml.dist" \
+            --exclude "phpunit-integration-multisite.xml.dist" \
             --exclude "playwright.config.js" \
             --exclude "artifacts/" \
             --exclude "webpack.config.js" \
