@@ -69,6 +69,7 @@ Service: https://search.webhead.dev - Privacy policy: https://search.webhead.dev
 - The AI assistant tab is now themeable in the block editor and Elementor; block-editor hover colours moved into Default/Hover tabs; long filter lists scroll instead of stretching the modal.
 - Fixed the search modal and AI assistant showing English on translated sites.
 - The AI assistant now shows an animated "Thinking" state, keeps the conversation next to the input, offers Try again when an answer fails, and has a properly centred send button.
+- Removed leftover sync/onboarding options that nothing reads any more and that could be mistaken for live state.
 - Search Config now also manages merchandising rules and the AI search, visual tagging and click-ranking switches.
 - Fixed click-through tracking never recording anything: the analytics beacon was blocked by the browser before it was sent.
 - Fixed a sync that could stop dead with no way back: a worker tick killed part-way through left the run on "Running" with nothing to advance it, which also blocked every later scheduled sync. Ticks now arm their successor up front, and the scheduled sync revives a run whose worker has died.
