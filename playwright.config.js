@@ -14,17 +14,32 @@ const { devices } = require( '@playwright/test' );
 
 const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
 
+/*
+ * Playwright merges the top-level `use` into each project at run time, but
+ * `global-setup` reads `config.projects[ 0 ].use` directly — before that merge.
+ * Because this config replaces `projects` wholesale, the inherited `baseURL`
+ * and `storageState` never reached the setup step, which then fell back to
+ * whatever `WP_BASE_URL` happened to be in the environment. Carry them onto
+ * every project explicitly so the target site is always the one wp-env
+ * actually started.
+ */
+const baseUse = baseConfig.use || {};
+
 module.exports = {
 	...baseConfig,
 	testDir: path.join( __dirname, 'tests/e2e/specs' ),
 	projects: [
 		{
 			name: 'desktop-chrome',
-			use: { ...devices[ 'Desktop Chrome' ], viewport: { width: 1280, height: 900 } },
+			use: {
+				...baseUse,
+				...devices[ 'Desktop Chrome' ],
+				viewport: { width: 1280, height: 900 },
+			},
 		},
 		{
 			name: 'mobile-chrome',
-			use: { ...devices[ 'Pixel 5' ] },
+			use: { ...baseUse, ...devices[ 'Pixel 5' ] },
 		},
 	],
 };

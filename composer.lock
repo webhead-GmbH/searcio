@@ -3193,16 +3193,16 @@
         },
         {
             "name": "webhead/wp-plugin-framework",
-            "version": "1.1.6",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "git@github.com:webhead-GmbH/wp-plugin-framework.git",
-                "reference": "45f77f092268f5e1736f3001acc1c218d9710053"
+                "reference": "41849a774c0a4bce219ce3033c463fa8aa8965f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webhead-GmbH/wp-plugin-framework/zipball/45f77f092268f5e1736f3001acc1c218d9710053",
-                "reference": "45f77f092268f5e1736f3001acc1c218d9710053",
+                "url": "https://api.github.com/repos/webhead-GmbH/wp-plugin-framework/zipball/41849a774c0a4bce219ce3033c463fa8aa8965f4",
+                "reference": "41849a774c0a4bce219ce3033c463fa8aa8965f4",
                 "shasum": ""
             },
             "require": {
@@ -3224,7 +3224,8 @@
                     "src/Support/helpers.php"
                 ],
                 "psr-4": {
-                    "Webhead\\WP\\Framework\\": "src/"
+                    "Webhead\\WP\\Framework\\": "src/",
+                    "Webhead\\WP\\Framework\\Console\\": "console/"
                 }
             },
             "autoload-dev": {
@@ -3251,10 +3252,10 @@
             ],
             "description": "Reusable WordPress plugin framework with Database ORM, Hooks Manager, Options abstraction, REST API routing, and Scaffolding CLI.",
             "support": {
-                "source": "https://github.com/webhead-GmbH/wp-plugin-framework/tree/1.1.6",
+                "source": "https://github.com/webhead-GmbH/wp-plugin-framework/tree/1.2.0",
                 "issues": "https://github.com/webhead-GmbH/wp-plugin-framework/issues"
             },
-            "time": "2026-07-06T07:23:30+00:00"
+            "time": "2026-07-25T15:44:58+00:00"
         },
         {
             "name": "wp-phpunit/wp-phpunit",

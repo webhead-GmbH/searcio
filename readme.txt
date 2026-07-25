@@ -52,6 +52,7 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 
 = 1.0.3 =
 
+- Smaller download and a faster front end: removed ~2.4 MB of bundled developer tooling that was never used at runtime, and stopped scanning the plugins directory on front-end requests.
 - Added a border-radius control for the AI assistant's message field.
 - The AI assistant tab is now themeable in the block editor and Elementor; block-editor hover colours moved into Default/Hover tabs; long filter lists scroll instead of stretching the modal.
 - Fixed the search modal and AI assistant showing English on translated sites.
