@@ -89,8 +89,8 @@ final class Search_Cloud_Client {
 
 	/**
 	 * Cached, always-present shape for the consent checkboxes' links. Falls
-	 * back to the plugin's own placeholder constants when Search Cloud is
-	 * unreachable or hasn't configured a given document - "fail safe" per
+	 * back to the plugin's own constants when Search Cloud is unreachable or
+	 * hasn't configured a given document - "fail safe" per
 	 * docs/api/authentication-and-security.md "Best practices for integrators".
 	 *
 	 * @return array{terms:string,privacy:string,dpa:string}

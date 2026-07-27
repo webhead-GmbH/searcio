@@ -61,11 +61,7 @@ defined( 'Webhead\WP\SearchCloud\CACHE_GROUP' )
 defined( 'Webhead\WP\SearchCloud\SERVICE_URL' )
 || define( 'Webhead\WP\SearchCloud\SERVICE_URL', 'https://search.webhead.dev' );
 
-/**
- * TODO(tech debt): the Search Cloud API does not expose these URLs anywhere
- * yet (checked every file under docs/api/). Placeholders until the API
- * returns real Terms/Privacy/DPA links for the connect-consent checkboxes.
- */
+/** Linked from the consent checkboxes on the Connection tab. */
 defined( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL' )
 || define( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL', 'https://webhead.dev/legal/terms' );
 

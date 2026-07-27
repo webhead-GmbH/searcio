@@ -106,8 +106,8 @@ const ConnectionTab = () => {
 
 	// Live Search Cloud-configured legal links (GET /connect), fetched here
 	// rather than localized on page load so an unreachable Search Cloud never
-	// delays opening any other settings tab. The plugin's own placeholder
-	// constants keep the checkboxes/tooltip usable in the meantime.
+	// delays opening any other settings tab. The plugin's own constants keep
+	// the checkboxes/tooltip usable in the meantime.
 	useEffect(() => {
 		let cancelled = false;
 
