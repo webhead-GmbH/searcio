@@ -60,6 +60,16 @@ Nothing else is sent, and no visitor accounts are created.
 
 Service: https://search.webhead.dev - Privacy policy: https://search.webhead.dev/datenschutz
 
+== Source code ==
+
+The JavaScript in `public/` is built with webpack. The unminified source it is
+built from lives in `src/` in the plugin's repository:
+
+https://github.com/webhead-GmbH/webhead-search-cloud
+
+To rebuild it, check the repository out and run `npm install` followed by
+`npm run build`.
+
 == Changelog ==
 
 = 1.0.4 =

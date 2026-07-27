@@ -17,8 +17,11 @@ node_modules
 tests
 *.test.js
 docs
-# src/ is intentionally shipped: it is the human-readable source for the
-# minified bundles in public/, which wordpress.org requires us to provide.
+# wordpress.org requires the human-readable source for the minified bundles in
+# public/. It is provided the other way the guideline allows - a link to the
+# repository and the build command, in readme.txt - so src/ stays out of the
+# package rather than adding 130 KB nobody installing the plugin will read.
+src
 vendor/webhead/wp-plugin-framework
 composer.json
 composer.lock
