@@ -15,6 +15,7 @@
 .wp-env.override.json.example
 node_modules
 tests
+*.test.js
 docs
 # src/ is intentionally shipped: it is the human-readable source for the
 # minified bundles in public/, which wordpress.org requires us to provide.

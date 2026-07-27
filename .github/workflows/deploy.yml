@@ -63,6 +63,7 @@ jobs:
             --exclude "docs/" \
             --exclude "node_modules/" \
             --exclude "tests/" \
+            --exclude "*.test.js" \
             --exclude ".distignore" \
             --exclude ".editorconfig" \
             --exclude ".eslintrc.js" \
