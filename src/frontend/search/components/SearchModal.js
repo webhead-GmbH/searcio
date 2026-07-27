@@ -639,13 +639,18 @@ const SearchModal = ({
 						>
 							{__('AI Assistant', 'webhead-search-cloud')}
 						</button>
-						<Button
-							className="whsc-modal-close whsc-modal-close--tabbed"
-							icon={closeSmall}
-							label={i18n.close || __('Close search', 'webhead-search-cloud')}
-							showTooltip={false}
-							onClick={onRequestClose}
-						/>
+						{/* Only the assistant tab needs a close control here; the search
+						    tab keeps its own inside the input row, so enabling the
+						    assistant never restyles the search tab. */}
+						{'assistant' === activeTab && (
+							<Button
+								className="whsc-modal-close whsc-modal-close--tabbed"
+								icon={closeSmall}
+								label={i18n.close || __('Close search', 'webhead-search-cloud')}
+								showTooltip={false}
+								onClick={onRequestClose}
+							/>
+						)}
 					</div>
 				)}
 
@@ -695,15 +700,13 @@ const SearchModal = ({
 								onClick={onVoiceClick}
 							/>
 						)}
-						{!assistantEnabled && (
-							<Button
-								className="whsc-modal-close"
-								icon={closeSmall}
-								label={i18n.close || __('Close search', 'webhead-search-cloud')}
-								showTooltip={false}
-								onClick={onRequestClose}
-							/>
-						)}
+						<Button
+							className="whsc-modal-close"
+							icon={closeSmall}
+							label={i18n.close || __('Close search', 'webhead-search-cloud')}
+							showTooltip={false}
+							onClick={onRequestClose}
+						/>
 					</div>
 
 					{!suggestionsDismissed && suggestions.length > 0 && (

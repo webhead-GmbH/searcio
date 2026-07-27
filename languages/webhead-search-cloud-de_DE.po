@@ -2773,3 +2773,7 @@ msgctxt "block description"
 msgid "A full-screen search box or icon powered by webhead Search Cloud."
 msgstr ""
 "Ein Vollbild-Suchfeld oder -Symbol, angetrieben von webhead Search Cloud."
+
+#: public/bundle.search.js:1 src/frontend/search/components/CompareTable.js:45
+msgid "On backorder"
+msgstr "Im Rückstand"
