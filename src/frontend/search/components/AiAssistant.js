@@ -4,6 +4,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { askAssistant } from '../../../utils/api';
 import CompareTable from './CompareTable';
+import Markdown from './markdown';
 import { compareIcon, gridIcon, sendIcon, sparkleIcon } from './icons';
 import { ResultCard } from './templates';
 
@@ -23,14 +24,22 @@ const errorFor = ( status ) => {
 	return __( 'The assistant is unavailable right now. Try searching instead.', 'webhead-search-cloud' );
 };
 
-const Message = ( { role, content } ) => (
-	<div className={ `whsc-assistant__msg whsc-assistant__msg--${ 'assistant' === role ? 'assistant' : 'user' }` }>
-		{ 'assistant' === role && (
-			<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
-		) }
-		<div className="whsc-assistant__bubble">{ content }</div>
-	</div>
-);
+const Message = ( { role, content } ) => {
+	const isAssistant = 'assistant' === role;
+
+	return (
+		<div className={ `whsc-assistant__msg whsc-assistant__msg--${ isAssistant ? 'assistant' : 'user' }` }>
+			{ isAssistant && (
+				<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
+			) }
+			<div className="whsc-assistant__bubble">
+				{ /* The assistant answers in Markdown; the visitor's own message is
+				     literal text and must never be reinterpreted as formatting. */ }
+				{ isAssistant ? <Markdown content={ content } /> : content }
+			</div>
+		</div>
+	);
+};
 
 /**
  * The conversational shopping assistant tab: a chat thread on the left and the

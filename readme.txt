@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,11 @@ Nothing else is sent, and no visitor accounts are created.
 Service: https://search.webhead.dev - Privacy policy: https://search.webhead.dev/datenschutz
 
 == Changelog ==
+
+= 1.0.4 =
+- The AI assistant's answers now render properly instead of showing raw Markdown.
+- The comparison table no longer shows internal indexing fields, duplicate rows or raw values, and reads better on a phone.
+- Turning on the AI assistant no longer restyles the Search tab.
 
 = 1.0.3 =
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4
+
+- The assistant's answers are rendered properly. It is an LLM and replies in Markdown, so a reply literally read "**Price:** 19,99 EUR" on the storefront. Answers now render as real text, lists and emphasis. The reply is third-party text, so it is turned into elements directly and never passed through as HTML.
+- The comparison table no longer shows indexing internals. WooCommerce attributes arrive prefixed, so a row read "Attr color"; the indexing timestamp appeared as if it were a product attribute; the same attribute could produce two identical rows; and values showed raw ("instock"). Prefixes are stripped, acronyms like SKU read correctly, internals are excluded, duplicates merge, values are humanized, and rows that actually differ between products sort to the top - a row where every product says the same thing helps nobody choose.
+- Comparison columns keep a readable width on a phone instead of squeezing until titles truncate.
+- Turning on the AI assistant no longer restyles the Search tab. The close button used to move out of the search input row into the tab bar; the search tab keeps its own again.
+
 ## 1.0.3
 
 - Documented the external service the plugin talks to, as wordpress.org requires: what is sent when you sync, when a visitor searches, and when the AI assistant is used, with a link to the privacy policy.
