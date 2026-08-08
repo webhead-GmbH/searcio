@@ -4,7 +4,7 @@
 
 - WordPress 6.0 or later
 - PHP 8.3 or later
-- A [webhead Search Cloud](https://webhead.at) account with a site created
+- A [webhead Search Cloud](https://searcio.com) account with a site created
 - WooCommerce 8.0 or later (optional, only needed to index and search products)
 - WPML or Polylang (optional, only needed for multilingual search scoping — see [`multilingual.md`](multilingual.md))
 

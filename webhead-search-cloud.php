@@ -3,7 +3,7 @@
  * Plugin Name: webhead Search Cloud
  * Plugin URI: https://github.com/webhead-GmbH/webhead-search-cloud
  * Description: Connect WordPress and WooCommerce to webhead Search Cloud.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: webhead GmbH
  * Author URI: https://webhead.at
  * Text Domain: webhead-search-cloud
@@ -33,7 +33,7 @@ if ( is_readable( $webhead_search_cloud_prefixed_autoload_file ) ) {
 
 defined( 'Webhead\WP\SearchCloud\VERSION' ) || define(
 	'Webhead\WP\SearchCloud\VERSION',
-	'1.0.4'
+	'1.0.5'
 );
 defined( 'Webhead\WP\SearchCloud\PLUGIN_FILE' ) || define(
 	'Webhead\WP\SearchCloud\PLUGIN_FILE',
@@ -59,7 +59,7 @@ defined( 'Webhead\WP\SearchCloud\CACHE_GROUP' )
 || define( 'Webhead\WP\SearchCloud\CACHE_GROUP', 'webhead_search_cloud' );
 
 defined( 'Webhead\WP\SearchCloud\SERVICE_URL' )
-|| define( 'Webhead\WP\SearchCloud\SERVICE_URL', 'https://search.webhead.dev' );
+|| define( 'Webhead\WP\SearchCloud\SERVICE_URL', 'https://searcio.com' );
 
 /** Linked from the consent checkboxes on the Connection tab. */
 defined( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL' )

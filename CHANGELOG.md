@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- The search service moved from `search.webhead.dev` to `https://searcio.com`. The address lives in a single constant, so every request the plugin makes - server-side syncing and the search, assistant and click tracking a visitor's browser sends - follows it. The wordpress.org external-services disclosure and the docs name the new address. Nothing is stored per host, so existing keys keep working and no rebuild of the JavaScript is needed.
+
 ## 1.0.4
 
 - The assistant's answers are rendered properly. It is an LLM and replies in Markdown, so a reply literally read "**Price:** 19,99 EUR" on the storefront. Answers now render as real text, lists and emphasis. The reply is third-party text, so it is turned into elements directly and never passed through as HTML.

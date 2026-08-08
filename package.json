@@ -1,6 +1,6 @@
 {
     "name": "webhead-search-cloud",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Connect WordPress and WooCommerce to webhead Search Cloud.",
     "main": "src/admin/settings/index.js",
     "scripts": {

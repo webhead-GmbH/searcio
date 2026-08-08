@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -58,7 +58,7 @@ This plugin sends data to webhead Search Cloud, the hosted service that powers t
 
 Nothing else is sent, and no visitor accounts are created.
 
-Service: https://search.webhead.dev - Privacy policy: https://search.webhead.dev/datenschutz
+Service: https://searcio.com - Privacy policy: https://searcio.com/datenschutz
 
 == Source code ==
 
@@ -71,6 +71,9 @@ To rebuild it, check the repository out and run `npm install` followed by
 `npm run build`.
 
 == Changelog ==
+
+= 1.0.5 =
+- The search service moved to a new address, https://searcio.com. Nothing to do on your side; your existing keys keep working.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.
