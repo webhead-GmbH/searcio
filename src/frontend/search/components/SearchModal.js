@@ -533,9 +533,13 @@ const SearchModal = ({
 		setVisualTags([]);
 		setResults(null);
 		// A photo search takes no filters, and its response carries no facets to
-		// re-render the chips from — so a selection left over from a typed search
-		// would sit invisible and silently narrow the next one.
+		// re-render the chips from. Anything left over from a typed search would
+		// be describing results that are no longer on screen — the type chip
+		// still reading "product 4" over three photo matches — and a field
+		// selection would sit invisible and silently narrow the next search.
 		setActiveFacets({});
+		setActiveTypes([]);
+		setFacets([]);
 
 		try {
 			const response = await visualSearch(file, {signal: controller.signal});
@@ -734,9 +738,10 @@ const SearchModal = ({
 			</p>
 		);
 	} else if (visualActive) {
-		// A photo search that failed: the error notice above says what happened,
-		// so this slot must not sit on a skeleton that will never resolve.
-		mainTitle = __('Results', 'webhead-search-cloud');
+		// A photo search that failed: the error notice above already says what
+		// happened, so this slot stays empty — a skeleton would never resolve,
+		// and a "Results" heading over nothing reads as a broken page.
+		mainTitle = '';
 		mainContent = null;
 	} else {
 		mainTitle = __('Current highlights', 'webhead-search-cloud');

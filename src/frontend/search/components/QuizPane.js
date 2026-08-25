@@ -33,6 +33,10 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	// "Back" restores the previous step exactly rather than restarting.
 	const [ history, setHistory ] = useState( [] );
 	const [ tags, setTags ] = useState( {} );
+	// The wording the visitor picked, per field. The tag value is a catalogue
+	// value ("m"); showing that back reads as an internal code, not as the
+	// answer they gave ("Medium").
+	const [ answerLabels, setAnswerLabels ] = useState( {} );
 	const [ results, setResults ] = useState( null );
 	const [ isSearching, setIsSearching ] = useState( false );
 	const [ error, setError ] = useState( '' );
@@ -111,8 +115,17 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		const visited = [ ...history.map( ( step ) => step.question.id ), question.id ];
 		const upcoming = nextQuestion( quiz, option, visited );
 
-		setHistory( ( current ) => [ ...current, { question, tags } ] );
+		setHistory( ( current ) => [ ...current, { question, tags, answerLabels } ] );
 		setTags( nextTags );
+		setAnswerLabels( ( current ) => {
+			const next = { ...current };
+
+			( option.tags_matched || [] ).forEach( ( tag ) => {
+				next[ tag.field ] = option.label;
+			} );
+
+			return next;
+		} );
 
 		if ( null === upcoming ) {
 			setQuestion( null );
@@ -135,6 +148,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setHistory( ( current ) => current.slice( 0, -1 ) );
 		setQuestion( previous.question );
 		setTags( previous.tags );
+		setAnswerLabels( previous.answerLabels );
 		setResults( null );
 		setError( '' );
 		setIsSearching( false );
@@ -144,6 +158,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		abortRef.current?.abort();
 		setHistory( [] );
 		setTags( {} );
+		setAnswerLabels( {} );
 		setResults( null );
 		setError( '' );
 		setIsSearching( false );
@@ -155,6 +170,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setQuestion( firstQuestion( chosen ) );
 		setHistory( [] );
 		setTags( {} );
+		setAnswerLabels( {} );
 		setResults( null );
 	};
 
@@ -265,7 +281,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 							{ answers.map( ( [ field, value ] ) => (
 								<li className="whsc-quiz__answer" key={ field }>
 									<span className="whsc-quiz__answer-field">{ humanizeFieldLabel( field ) }</span>
-									<span className="whsc-quiz__answer-value">{ value }</span>
+									<span className="whsc-quiz__answer-value">{ answerLabels[ field ] || value }</span>
 								</li>
 							) ) }
 						</ul>
