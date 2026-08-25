@@ -63,6 +63,12 @@
 	--whsc-icon-bg-hover: rgba(0, 0, 0, 0.06);
 
 	/* Voice button (falls back to shared icon vars) */
+	/* Photo search: its own family so it can be themed apart from the mic,
+	 * defaulting to the same neutral icon treatment. */
+	--whsc-visual-color: var(--whsc-icon-color);
+	--whsc-visual-bg: transparent;
+	--whsc-visual-radius: 999px;
+
 	--whsc-voice-color: var(--whsc-icon-color);
 	--whsc-voice-bg: transparent;
 	--whsc-voice-radius: 999px;
@@ -154,6 +160,19 @@
 	--whsc-assistant-send-disabled: #d7dade;
 	--whsc-assistant-error-bg: #fdf2f2;
 	--whsc-assistant-error-text: #b3261e;
+
+	/* Merchandising banner. Tinted from the accent by default so it reads as the
+	 * store talking, not as an error. */
+	--whsc-banner-bg: rgba(49, 155, 128, 0.1);
+	--whsc-banner-text: var(--whsc-text);
+
+	/* Guided quiz. Defaults borrow the chip family so an unstyled quiz already
+	 * matches the rest of the modal. */
+	--whsc-quiz-question: var(--whsc-text);
+	--whsc-quiz-option-bg: var(--whsc-chip-bg);
+	--whsc-quiz-option-text: var(--whsc-chip-text);
+	--whsc-quiz-option-border: var(--whsc-chip-border);
+	--whsc-quiz-option-radius: var(--whsc-chip-radius);
 }
 
 /*
@@ -526,6 +545,54 @@
 
 .whsc-voice-btn.is-pressed {
 	color: var(--whsc-accent);
+}
+
+/* The photo-search control: same footprint and behaviour as the mic, so the
+ * input row reads as one set of controls rather than two designs. */
+.whsc-modal .whsc-visual-btn.components-button {
+	flex-shrink: 0;
+	min-width: 44px;
+	min-height: 44px;
+	padding: 0;
+	color: var(--whsc-visual-color);
+	background: var(--whsc-visual-bg);
+	border-radius: var(--whsc-visual-radius);
+	box-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-visual-color-hover, var(--whsc-visual-color));
+		background: var(--whsc-visual-bg-hover, var(--whsc-icon-bg-hover));
+		box-shadow: none;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+	}
+}
+
+/* Same reasoning as the mic glyph above: the camera is a stroke-only outline,
+ * and core's `.components-button svg { fill: currentColor }` would fill it
+ * into a solid blob unless the `svg` itself is targeted. */
+.whsc-visual-btn .whsc-visual-icon svg {
+	fill: none;
+	stroke: currentColor;
+}
+
+/* The real control is the button; the input only exists to open the picker.
+ * Hidden by clipping rather than `display: none` so browsers that ignore a
+ * programmatic click on an undisplayed input still open it. */
+.whsc-visual-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
 }
 
 /*
@@ -2118,6 +2185,263 @@
 			white-space: normal;
 		}
 	}
+}
+
+
+/* --------------------------------------------------------------------------
+ * Merchandising banner
+ * ------------------------------------------------------------------------ */
+.whsc-banner {
+	margin: 0;
+	padding: 12px 16px;
+	font-size: 14px;
+	line-height: 1.4;
+	font-weight: 600;
+	border-radius: var(--whsc-card-radius, 10px);
+	background: var(--whsc-banner-bg);
+	color: var(--whsc-banner-text, var(--whsc-text, inherit));
+}
+
+/* --------------------------------------------------------------------------
+ * What the vision model saw in an uploaded photo
+ * ------------------------------------------------------------------------ */
+.whsc-visual-tags {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.whsc-visual-tags__label {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	opacity: 0.6;
+	color: var(--whsc-text, inherit);
+}
+
+.whsc-visual-tags__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.whsc-visual-tag {
+	padding: 4px 10px;
+	font-size: 13px;
+	line-height: 1.3;
+	border-radius: var(--whsc-chip-radius, 999px);
+	border: 1px solid var(--whsc-chip-border, #e2e4e7);
+	background: var(--whsc-chip-bg, #f4f5f6);
+	color: var(--whsc-chip-text, inherit);
+}
+
+/* --------------------------------------------------------------------------
+ * Guided quiz
+ * ------------------------------------------------------------------------ */
+/* Like the assistant pane: it has to leave layout entirely while the Search
+ * tab is showing, since it stays mounted to keep the visitor's answers. */
+.whsc-quiz-pane {
+	display: contents;
+
+	&[hidden] { display: none; }
+}
+
+.whsc-quiz {
+	display: flex;
+	flex-direction: column;
+	min-height: 300px;
+}
+
+/* A question is a single decision, so it is centred and given room rather than
+ * laid out edge to edge like a results list. */
+.whsc-quiz__stage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 18px;
+	margin: auto;
+	padding: 8px 0 24px;
+	max-width: 560px;
+	text-align: center;
+}
+
+.whsc-quiz__meta {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 13px;
+	color: var(--whsc-assistant-muted, #6b7177);
+}
+
+.whsc-quiz__progress {
+	font-variant-numeric: tabular-nums;
+}
+
+.whsc-quiz__back,
+.whsc-quiz__restart {
+	appearance: none;
+	border: 0;
+	background: none;
+	padding: 0;
+	font: inherit;
+	font-size: 13px;
+	color: var(--whsc-accent, #2563eb);
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+
+	&:hover { opacity: 0.8; }
+}
+
+.whsc-quiz__image {
+	max-width: 100%;
+	max-height: 220px;
+	width: auto;
+	border-radius: var(--whsc-card-radius, 10px);
+	object-fit: cover;
+}
+
+.whsc-quiz__question {
+	margin: 0;
+	font-size: 20px;
+	line-height: 1.35;
+	font-weight: 600;
+	color: var(--whsc-quiz-question, var(--whsc-text, inherit));
+}
+
+.whsc-quiz__options {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	width: 100%;
+}
+
+/* Sized for a thumb, not for a link: an answer is the only thing to do on this
+ * screen, so each one is a real target. */
+.whsc-quiz__option {
+	appearance: none;
+	font: inherit;
+	font-size: 15px;
+	line-height: 1.3;
+	cursor: pointer;
+	flex: 1 1 180px;
+	max-width: 100%;
+	min-height: 48px;
+	padding: 12px 20px;
+	border-radius: var(--whsc-quiz-option-radius, var(--whsc-chip-radius, 999px));
+	border: 1px solid var(--whsc-quiz-option-border, var(--whsc-chip-border, #e2e4e7));
+	background: var(--whsc-quiz-option-bg, var(--whsc-chip-bg, #f4f5f6));
+	color: var(--whsc-quiz-option-text, var(--whsc-chip-text, inherit));
+	transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+
+	/* Each hover value falls back to its own normal counterpart, so setting only
+	 * a normal colour never leaves the hover state overriding it. */
+	&:hover {
+		border-color: var(--whsc-quiz-option-border-hover, var(--whsc-chip-border-hover, var(--whsc-accent)));
+		color: var(--whsc-quiz-option-text-hover, var(--whsc-chip-text-hover, var(--whsc-accent)));
+		background: var(--whsc-quiz-option-bg-hover, var(--whsc-quiz-option-bg, var(--whsc-chip-bg, #f4f5f6)));
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: 2px;
+	}
+}
+
+.whsc-quiz__results {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	width: 100%;
+}
+
+.whsc-quiz__results-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.whsc-quiz__results-count {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--whsc-text, inherit);
+}
+
+.whsc-quiz__results-actions {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+/* What the visitor answered, so a thin result set is explainable and they know
+ * which answer to go back and change. */
+.whsc-quiz__answers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.whsc-quiz__answer {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 5px;
+	padding: 4px 10px;
+	font-size: 13px;
+	border-radius: var(--whsc-chip-radius, 999px);
+	border: 1px solid var(--whsc-chip-border, #e2e4e7);
+	background: var(--whsc-chip-bg, #f4f5f6);
+	color: var(--whsc-chip-text, inherit);
+}
+
+.whsc-quiz__answer-field {
+	opacity: 0.6;
+}
+
+.whsc-quiz__answer-value {
+	font-weight: 600;
+}
+
+.whsc-quiz__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+	gap: var(--whsc-carousel-gap, 14px);
+	align-content: start;
+
+	.whsc-card { width: 100%; }
+
+	.whsc-card__price { margin-top: auto; }
+
+	@media screen and (max-width: 782px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.whsc-quiz__empty,
+.whsc-quiz__error {
+	margin: 0;
+	font-size: 14px;
+	color: var(--whsc-assistant-muted, #6b7177);
+}
+
+.whsc-quiz__error {
+	padding: 10px 14px;
+	border-radius: 10px;
+	background: var(--whsc-assistant-error-bg, #fdf2f2);
+	color: var(--whsc-assistant-error-text, #b3261e);
+}
+
+@media screen and (max-width: 782px) {
+	.whsc-quiz__question { font-size: 18px; }
+
+	.whsc-quiz__option { flex-basis: 100%; }
 }
 
 }

@@ -31,6 +31,19 @@ Controls how Search Cloud itself ranks and filters your content. Most of this da
 - **Synonyms** — one comma-separated group of interchangeable words per line (e.g. `sneaker, trainer`). A search for either word also matches results that only contain the other — useful for regional spelling or naming differences.
 - **Languages** — see [`multilingual.md`](multilingual.md).
 - **Popular searches** — a fallback list of queries shown as suggestions before a visitor types anything. Search Cloud's own live popular-searches data is used whenever available; this list only takes over when that request is empty or fails. Leave it empty to always prefer live data.
+- **AI & ranking** — site-level switches: **AI search** (hybrid keyword + semantic results; turning it on starts a background re-index, turning it off is instant and keeps keyword search working), **AI visual tagging** (a vision model describes each product image and adds the tags to the document, applied as you sync), **Search by photo** (see below), and **Rank results by what visitors click**. A switch your plan does not include is shown but disabled, with the reason.
+- **Merchandising rules** — curate the results of chosen searches: pin document ids to the top, keep ids out, and show a banner. Leave the trigger empty to apply a rule to every search, which is how you keep a product out of search site-wide. A rule can also carry a **filter field + value** (e.g. `category` / `shoes`), which makes it fire on that listing page rather than on a typed term — set both halves or neither, since one alone cannot trigger anything.
+- **Search redirects** — send a search straight to a page instead of showing results, for terms where a results list is the wrong answer (a campaign term, a support page). The term must match **exactly**; capitalisation and surrounding spaces are ignored, but `black friday` does not fire on `black friday deals`. The destination is a full URL or a path on this site starting with `/`.
+
+## Storefront modes
+
+What the search modal offers is decided by Search Cloud's `/storefront-config`, not by a plugin setting — each mode appears only when the site's plan and setup allow it, so an upgrade turns it on with no change here and a shopper is never shown a control that would only fail.
+
+- **AI Assistant** — a chat tab that answers in prose and returns the products it is talking about, with a Compare table across their attributes.
+- **Search by photo** — a camera button in the search box. The shopper uploads (or, on a phone, takes) a photo; a vision model describes it as tags and those tags run as an ordinary search. The tags are shown above the results, so an unexpected result set reads as a misread photo rather than as broken search. Turn it on under *AI & ranking* above.
+- **Find your match** — a guided quiz tab: a few questions that narrow the catalogue down for a shopper who knows what they want but not what it is called. The questions are built in the Search Cloud panel; the tab appears once at least one quiz is published. Answers accumulate into filters and run as a single search at the end.
+
+Every mode is themeable from the same place as the rest of the widget — the block editor's Styles sidebar or Elementor's Style tab.
 
 ## Sync
 

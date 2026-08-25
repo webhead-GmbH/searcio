@@ -93,3 +93,23 @@ export const sendIcon = (
 		<path d="M2.5 3.2 21.5 12 2.5 20.8l0-6.9L15 12 2.5 10.1z" />
 	</svg>
 );
+
+// The visual-search upload control (lucide "camera"); `@wordpress/icons` has
+// no camera either.
+export const cameraIcon = (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<path d="M14.5 4h-5L8 6.5H4.5A1.5 1.5 0 0 0 3 8v10a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V8a1.5 1.5 0 0 0-1.5-1.5H16z" />
+		<circle cx="12" cy="12.5" r="3.5" />
+	</svg>
+);

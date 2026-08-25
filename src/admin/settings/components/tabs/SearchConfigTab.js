@@ -260,6 +260,23 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 
 				<CheckboxControl
 					__nextHasNoMarginBottom
+					label={ __( 'Search by photo', 'webhead-search-cloud' ) }
+					help={
+						featureError( errors, 'visual_search' )
+						|| ( features.visual_search.available
+							? __(
+								'Shoppers can upload a photo instead of typing: a vision model describes what it sees and searches for that. A camera button appears in the search box once this is on.',
+								'webhead-search-cloud'
+							)
+							: unavailable )
+					}
+					checked={ features.visual_search.enabled }
+					disabled={ ! features.visual_search.available && ! features.visual_search.enabled }
+					onChange={ ( enabled ) => onChange( 'visual_search', enabled ) }
+				/>
+
+				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Rank results by what visitors click', 'webhead-search-cloud' ) }
 					help={
 						featureError( errors, 'personalization' )
@@ -327,6 +344,32 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 								onClick={ () => remove( index ) }
 							/>
 						</div>
+						{ /* The optional category trigger. Both halves are needed for
+						     either to mean anything, so they sit together and the help
+						     text is on the pair rather than on each input. */ }
+						<div className="whsc-merchandising-rule__ids">
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Also require filter (field)', 'webhead-search-cloud' ) }
+								help={ rowError( errors, 'merchandising', index, 'filter_field' )
+									|| __( 'Optional. A facet field, e.g. "category".', 'webhead-search-cloud' ) }
+								value={ rule.filter_field }
+								onChange={ ( filter_field ) => update( index, { ...rule, filter_field } ) }
+							/>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Filter value', 'webhead-search-cloud' ) }
+								help={ rowError( errors, 'merchandising', index, 'filter_value' )
+									|| __(
+										'With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself.',
+										'webhead-search-cloud'
+									) }
+								value={ rule.filter_value }
+								onChange={ ( filter_value ) => update( index, { ...rule, filter_value } ) }
+							/>
+						</div>
 						<div className="whsc-merchandising-rule__ids">
 							<TextControl
 								__next40pxDefaultSize
@@ -360,6 +403,71 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 				) ) }
 				<Button variant="secondary" onClick={ add }>
 					{ __( 'Add a rule', 'webhead-search-cloud' ) }
+				</Button>
+			</Card.Content>
+		</Card.Root>
+	);
+};
+
+/**
+ * Send a search straight to a page instead of running it. For the lookups
+ * where a results list is the wrong answer - a promo term, a support page, a
+ * campaign landing page.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.rules
+ * @param {Object}   props.errors
+ * @param {Function} props.onChange Called with the full replacement list.
+ */
+const RedirectsCard = ( { rules, errors, onChange } ) => {
+	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
+	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
+	const add = () => onChange( [ ...rules, { query: '', url: '' } ] );
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
+			<Card.Header className="whsc-settings-card-header">
+				<div className="whsc-settings-card-copy">
+					<Card.Title render={ <h3 /> }>{ __( 'Search redirects', 'webhead-search-cloud' ) }</Card.Title>
+					<Text render={ <p /> } variant="body-sm">
+						{ __(
+							'Send a search straight to a page instead of showing results. The term has to match exactly - capitalisation and surrounding spaces are ignored, but "black friday" will not fire on "black friday deals".',
+							'webhead-search-cloud'
+						) }
+					</Text>
+				</div>
+			</Card.Header>
+			<Card.Content className="whsc-settings-card-content">
+				{ rules.map( ( rule, index ) => (
+					<div className="whsc-redirect-rule" key={ index }>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Search term (exact)', 'webhead-search-cloud' ) }
+							help={ rowError( errors, 'redirects', index, 'query' ) }
+							value={ rule.query }
+							onChange={ ( query ) => update( index, { ...rule, query } ) }
+						/>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Send them to', 'webhead-search-cloud' ) }
+							help={ rowError( errors, 'redirects', index, 'url' )
+								|| __( 'A full URL, or a path on this site starting with /.', 'webhead-search-cloud' ) }
+							value={ rule.url }
+							onChange={ ( url ) => update( index, { ...rule, url } ) }
+						/>
+						<Button
+							icon="trash"
+							isDestructive
+							variant="tertiary"
+							label={ __( 'Remove redirect', 'webhead-search-cloud' ) }
+							onClick={ () => remove( index ) }
+						/>
+					</div>
+				) ) }
+				<Button variant="secondary" onClick={ add }>
+					{ __( 'Add a redirect', 'webhead-search-cloud' ) }
 				</Button>
 			</Card.Content>
 		</Card.Root>
@@ -812,6 +920,12 @@ const SearchConfigTab = () => {
 						rules={ config.merchandising }
 						errors={ fieldErrors }
 						onChange={ ( rules ) => set( 'merchandising', rules ) }
+					/>
+
+					<RedirectsCard
+						rules={ config.redirects }
+						errors={ fieldErrors }
+						onChange={ ( rules ) => set( 'redirects', rules ) }
 					/>
 				</Grid>
 

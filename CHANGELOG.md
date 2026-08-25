@@ -1,7 +1,13 @@
 # Changelog
 
-## 1.0.5
+## 1.1.0
 
+- **Search by photo.** A shopper can upload a photo (or take one, on a phone) instead of typing: a vision model describes what it sees and searches for that. The camera button only appears when the site has the feature turned on, and the tags the model read are shown above the results, so an unexpected result set reads as a misread photo rather than as broken search. A rejected image, a spent monthly allowance and a feature that has since been switched off each say what happened instead of failing silently.
+- **A guided quiz.** A new tab walks a shopper through a few questions and turns their answers into a filtered search — for the customer who knows what they want but not what it is called. The whole question graph arrives in one request, so every step after the first is instant and the network is only touched again at the end. Answers can be changed with Back, the quiz can be restarted, and what was answered is listed beside the matches so a thin result set is explainable. The tab appears once at least one quiz is published in the Search Cloud panel.
+- **Search-term redirects.** A search for a term you have configured now sends the visitor straight to a page instead of showing results. Deliberate searches only: in search-as-you-type mode a redirect never fires part-way through a longer query, so typing "sale shoes" on a site that redirects "sale" no longer throws the visitor off the page mid-word. Rules are editable in Search Config, and a destination that is not a plain http(s) or same-site link is refused before the browser is sent anywhere.
+- **Merchandising rules can now curate a category page**, not just a typed search: give a rule a filter field and value (e.g. `category` / `shoes`) and it fires on that listing instead. Existing rules are unaffected.
+- **A merchandising banner now actually appears.** The Search Config tab has always let you attach one to a search, but nothing on the storefront ever rendered it, so the field looked broken. It shows above the results, and is themeable like the rest.
+- The photo button and the quiz are themeable from the block editor and Elementor like every other part of the widget — colours, hover states and radius. Left alone they follow the colours already set for the modal.
 - The search service moved from `search.webhead.dev` to `https://searcio.com`. The address lives in a single constant, so every request the plugin makes - server-side syncing and the search, assistant and click tracking a visitor's browser sends - follows it. The wordpress.org external-services disclosure and the docs name the new address. Nothing is stored per host, so existing keys keep working and no rebuild of the JavaScript is needed.
 
 ## 1.0.4

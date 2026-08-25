@@ -3,17 +3,20 @@ import {Button, Modal, Notice} from '@wordpress/components';
 import {closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
-import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick} from '../../../utils/api';
+import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
 import {buildFilterParams, buildTypeParam, extractFieldFacets, humanizeFieldLabel, mergeFieldFacets, toggleSelection} from '../../../utils/facets';
+import {redirectTarget} from '../../../utils/redirect';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
+import QuizPane from './QuizPane';
 import SearchInput from './SearchInput';
 import Suggestions from './Suggestions';
 import Browse from './Browse';
 import Carousel from './Carousel';
 import SearchResultsSkeleton from './SearchResultsSkeleton';
+import VisualSearchButton from './VisualSearchButton';
 
 const SUGGEST_DEBOUNCE = 200;
 const LIVE_SEARCH_DEBOUNCE = 300;
@@ -110,11 +113,22 @@ const SearchModal = ({
 	// The search_id of the highlights carousel, so clicks on it attribute to the
 	// same search the way result clicks attribute to `results.search_id`.
 	const [highlightsSearchId, setHighlightsSearchId] = useState('');
-	// The AI assistant tab is offered only when the plan includes it — read from
-	// /storefront-config so an upgrade flips it on with no code change.
+	// Which of the extra modes this site may show — all read from
+	// /storefront-config, so an upgrade (or publishing a quiz) flips them on
+	// with no code change and nothing here ever offers a control the API would
+	// only answer 403 to.
 	const [assistantEnabled, setAssistantEnabled] = useState(false);
+	const [quizEnabled, setQuizEnabled] = useState(false);
+	const [visualEnabled, setVisualEnabled] = useState(false);
 	const [activeTab, setActiveTab] = useState('search');
 	const [assistantOpened, setAssistantOpened] = useState(false);
+	const [quizOpened, setQuizOpened] = useState(false);
+	// What the vision model saw in the uploaded photo, shown above the results
+	// so a surprising result set is explained rather than just odd.
+	const [visualTags, setVisualTags] = useState([]);
+	// A photo search owns the results area even though the search box is empty,
+	// which would otherwise read as "idle" and show the highlights carousel.
+	const [visualActive, setVisualActive] = useState(false);
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -158,7 +172,11 @@ const SearchModal = ({
 	// yet, comes back empty, or errors out.
 	const popularSearches = livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches;
 	const trimmedQuery = query.trim();
-	const showEmptyState = '' === trimmedQuery;
+	const showEmptyState = '' === trimmedQuery && !visualActive;
+	// The tab bar exists only if there is a second mode to switch to; with none,
+	// the modal is the plain search box it has always been.
+	const hasTabs = assistantEnabled || quizEnabled;
+	const showSearchPane = !hasTabs || 'search' === activeTab;
 
 	useEffect(() => {
 		onQueryChange?.(query);
@@ -221,8 +239,9 @@ const SearchModal = ({
 		};
 	}, [cardSource]);
 
-	// Whether the plan includes the AI assistant. Fetched once so the tab only
-	// appears when the account can actually use it; a failure just hides it.
+	// What this site's plan and setup allow. Fetched once so each extra mode
+	// only appears when the account can actually use it; a failure leaves them
+	// all off, which degrades to plain search rather than to a broken control.
 	useEffect(() => {
 		if (!isConfigured()) {
 			return undefined;
@@ -233,7 +252,11 @@ const SearchModal = ({
 		fetchStorefrontConfig()
 			.then((response) => {
 				if (!cancelled) {
-					setAssistantEnabled(Boolean(response?.capabilities?.assistant));
+					const capabilities = response?.capabilities || {};
+
+					setAssistantEnabled(Boolean(capabilities.assistant));
+					setQuizEnabled(Boolean(capabilities.quiz));
+					setVisualEnabled(Boolean(capabilities.visual_search));
 				}
 			})
 			.catch(() => {});
@@ -414,7 +437,37 @@ const SearchModal = ({
 				return;
 			}
 
+			/*
+			 * A term the merchant configured as a redirect answers with
+			 * `{query, redirect}` and no results at all, so this has to be
+			 * checked before anything tries to render hits.
+			 *
+			 * Only a committed search navigates. In "search as you type" mode a
+			 * live search fires from the fourth character on, so a visitor
+			 * typing "sale shoes" on a site that redirects "sale" would be
+			 * thrown off the page mid-word. Pressing Enter — or clicking a
+			 * suggestion, chip or popular term — is an explicit "search for
+			 * exactly this", which is when the rule is meant to fire.
+			 */
+			const target = redirectTarget(response);
+
+			if ('' !== target) {
+				if (commit) {
+					setRecent(addRecentSearch(trimmed));
+					window.location.href = target;
+
+					return;
+				}
+
+				// Nothing to show for this keystroke: leave whatever is on
+				// screen alone rather than blanking it out.
+				return;
+			}
+
 			setResults(response);
+			// A typed search replaces whatever a photo put on screen.
+			setVisualTags([]);
+			setVisualActive(false);
 
 			// See the matching comment in `loadHighlights()` — only refresh the
 			// type chip list from an unfiltered-by-type request.
@@ -443,6 +496,80 @@ const SearchModal = ({
 			}
 		}
 	}, [activeTypes, activeFacets, i18n.error, scopeType]);
+
+	/**
+	 * Search by photo. A vision model turns the image into tags and runs those
+	 * as an ordinary search, so the response carries the same hits and facets a
+	 * typed search would (`docs/api/visual-search.md`).
+	 *
+	 * Unlike a failed typed search this does not fall back to native `?s=`
+	 * search: there is no query to hand over, and WordPress cannot search by
+	 * photo. A failure says so and leaves the visitor where they are.
+	 *
+	 * @param {File} file
+	 */
+	const runVisualSearch = useCallback(async (file) => {
+		if (!isConfigured()) {
+			return;
+		}
+
+		// Clear the typed query so the results on screen are unambiguously the
+		// photo's, and stop the live-search effect reacting to that change.
+		skipLiveSearchRef.current = true;
+		skipSuggestRef.current = true;
+		setQuery('');
+		setSuggestions([]);
+		setSuggestionsDismissed(true);
+
+		abortRef.current?.abort();
+		const controller = new AbortController();
+		abortRef.current = controller;
+		const seq = ++searchSeq.current;
+		const isLatest = () => seq === searchSeq.current;
+
+		setIsSearching(true);
+		setError('');
+		setVisualActive(true);
+		setVisualTags([]);
+		setResults(null);
+		// A photo search takes no filters, and its response carries no facets to
+		// re-render the chips from — so a selection left over from a typed search
+		// would sit invisible and silently narrow the next one.
+		setActiveFacets({});
+
+		try {
+			const response = await visualSearch(file, {signal: controller.signal});
+
+			if (!isLatest()) {
+				return;
+			}
+
+			setVisualTags(Array.isArray(response?.tags) ? response.tags : []);
+			setResults(response);
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), {}));
+		} catch (e) {
+			if ('AbortError' === e.name || !isLatest()) {
+				return;
+			}
+
+			if (403 === e.status) {
+				// The capability said yes but the site has since turned it off.
+				setVisualEnabled(false);
+				setVisualActive(false);
+				setError(__('Photo search is not available on this store.', 'webhead-search-cloud'));
+			} else if (422 === e.status) {
+				setError(__('That file is not an image we can read. Try a JPEG or PNG under 8 MB.', 'webhead-search-cloud'));
+			} else if (429 === e.status) {
+				setError(__('Photo search has reached its limit for now. Please try again later.', 'webhead-search-cloud'));
+			} else {
+				setError(__('That photo search failed. Try another photo.', 'webhead-search-cloud'));
+			}
+		} finally {
+			if (isLatest()) {
+				setIsSearching(false);
+			}
+		}
+	}, []);
 
 	// Only in `type` mode does typing itself trigger the metered `/search`
 	// call, and only once the query is long enough to be meaningful.
@@ -599,9 +726,18 @@ const SearchModal = ({
 			/>
 		) : (
 			<p className="whsc-no-results">
-				{i18n.noResults || __('No results found.', 'webhead-search-cloud')}
+				{visualActive
+					// A photo that matched nothing is a photo problem, not a
+					// catalogue problem — say what to do about it.
+					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'webhead-search-cloud')
+					: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))}
 			</p>
 		);
+	} else if (visualActive) {
+		// A photo search that failed: the error notice above says what happened,
+		// so this slot must not sit on a skeleton that will never resolve.
+		mainTitle = __('Results', 'webhead-search-cloud');
+		mainContent = null;
 	} else {
 		mainTitle = __('Current highlights', 'webhead-search-cloud');
 		mainContent = <SearchResultsSkeleton/>;
@@ -616,7 +752,7 @@ const SearchModal = ({
 			contentLabel={i18n.placeholder || __('Search', 'webhead-search-cloud')}
 		>
 			<div className="whsc-modal-body">
-				{assistantEnabled && (
+				{hasTabs && (
 					<div className="whsc-modal-tabs" role="tablist" aria-label={__('Search modes', 'webhead-search-cloud')}>
 						<button
 							type="button"
@@ -627,22 +763,38 @@ const SearchModal = ({
 						>
 							{__('Search', 'webhead-search-cloud')}
 						</button>
-						<button
-							type="button"
-							role="tab"
-							aria-selected={'assistant' === activeTab}
-							className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
-							onClick={() => {
-								setAssistantOpened(true);
-								setActiveTab('assistant');
-							}}
-						>
-							{__('AI Assistant', 'webhead-search-cloud')}
-						</button>
-						{/* Only the assistant tab needs a close control here; the search
-						    tab keeps its own inside the input row, so enabling the
-						    assistant never restyles the search tab. */}
-						{'assistant' === activeTab && (
+						{assistantEnabled && (
+							<button
+								type="button"
+								role="tab"
+								aria-selected={'assistant' === activeTab}
+								className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
+								onClick={() => {
+									setAssistantOpened(true);
+									setActiveTab('assistant');
+								}}
+							>
+								{__('AI Assistant', 'webhead-search-cloud')}
+							</button>
+						)}
+						{quizEnabled && (
+							<button
+								type="button"
+								role="tab"
+								aria-selected={'quiz' === activeTab}
+								className={`whsc-modal-tab${'quiz' === activeTab ? ' is-active' : ''}`}
+								onClick={() => {
+									setQuizOpened(true);
+									setActiveTab('quiz');
+								}}
+							>
+								{__('Product finder', 'webhead-search-cloud')}
+							</button>
+						)}
+						{/* Only the tabs without a search input need a close control
+						    here; the search tab keeps its own inside the input row, so
+						    turning these modes on never restyles the search tab. */}
+						{'search' !== activeTab && (
 							<Button
 								className="whsc-modal-close whsc-modal-close--tabbed"
 								icon={closeSmall}
@@ -654,7 +806,7 @@ const SearchModal = ({
 					</div>
 				)}
 
-				{(!assistantEnabled || 'search' === activeTab) && (
+				{showSearchPane && (
 					<>
 				<div className="whsc-modal-header">
 					<div className="whsc-input-row">
@@ -700,6 +852,9 @@ const SearchModal = ({
 								onClick={onVoiceClick}
 							/>
 						)}
+						{visualEnabled && (
+							<VisualSearchButton busy={isSearching} onSelect={(file) => void runVisualSearch(file)}/>
+						)}
 						<Button
 							className="whsc-modal-close"
 							icon={closeSmall}
@@ -718,6 +873,29 @@ const SearchModal = ({
 						/>
 					)}
 				</div>
+
+				{'string' === typeof results?.banner && '' !== results.banner && (
+					// A merchandising rule can attach a banner to a search (or to a
+					// category listing). The plugin's own Search Config tab writes
+					// these, so not rendering them made the field look broken.
+					// Merchant-authored text, rendered as text — never as markup.
+					<p className="whsc-banner" role="status">{results.banner}</p>
+				)}
+
+				{visualActive && visualTags.length > 0 && (
+					// What the model saw, so an unexpected result set reads as a
+					// misread photo rather than as broken search.
+					<div className="whsc-visual-tags">
+						<span className="whsc-visual-tags__label">
+							{__('From your photo', 'webhead-search-cloud')}
+						</span>
+						<div className="whsc-visual-tags__list">
+							{visualTags.map((tag) => (
+								<span className="whsc-visual-tag" key={tag}>{tag}</span>
+							))}
+						</div>
+					</div>
+				)}
 
 				{showFacets && (
 					// A group of independent toggle buttons, not an ARIA tablist —
@@ -803,6 +981,24 @@ const SearchModal = ({
 				{assistantEnabled && assistantOpened && (
 					<div className="whsc-assistant-pane" hidden={'assistant' !== activeTab}>
 						<AiAssistant cardSource={cardSource} serverTemplates={serverTemplates} />
+					</div>
+				)}
+
+				{/* Same reasoning as the assistant: staying mounted keeps the
+				    visitor's answers if they look something up in Search mid-quiz. */}
+				{quizEnabled && quizOpened && (
+					<div className="whsc-quiz-pane" hidden={'quiz' !== activeTab}>
+						<QuizPane
+							cardSource={cardSource}
+							serverTemplates={serverTemplates}
+							onEmpty={() => {
+								// The capability says a quiz is published but the list
+								// came back empty; take the tab away rather than leave
+								// a door onto nothing.
+								setQuizEnabled(false);
+								setActiveTab('search');
+							}}
+						/>
 					</div>
 				)}
 			</div>

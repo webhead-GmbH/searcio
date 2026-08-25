@@ -243,6 +243,10 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'closeColorHover', __( 'Close icon (hover)', 'webhead-search-cloud' ) ),
 						color( 'closeBg', __( 'Close bg', 'webhead-search-cloud' ) ),
 						color( 'closeBgHover', __( 'Close bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'visualColor', __( 'Photo icon', 'webhead-search-cloud' ) ),
+						color( 'visualColorHover', __( 'Photo icon (hover)', 'webhead-search-cloud' ) ),
+						color( 'visualBg', __( 'Photo bg', 'webhead-search-cloud' ) ),
+						color( 'visualBgHover', __( 'Photo bg (hover)', 'webhead-search-cloud' ) ),
 						color( 'clearBtnColor', __( 'Clear icon', 'webhead-search-cloud' ) ),
 						color( 'clearBtnColorHover', __( 'Clear icon (hover)', 'webhead-search-cloud' ) ),
 						color( 'clearBtnBg', __( 'Clear bg', 'webhead-search-cloud' ) ),
@@ -308,7 +312,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Search & AI tabs', 'webhead-search-cloud' ) }
+					title={ __( 'Modal tabs', 'webhead-search-cloud' ) }
 					initialOpen={ false }
 					colorSettings={ [
 						color( 'tabText', __( 'Tab text', 'webhead-search-cloud' ) ),
@@ -330,6 +334,31 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					] }
 				>
 					{ sizeControl( 'assistantInputRadius', __( 'Message field radius', 'webhead-search-cloud' ), 999 ) }
+				</PanelColorSettings>
+
+				<PanelColorSettings
+					title={ __( 'Promotional banner', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'bannerBg', __( 'Background', 'webhead-search-cloud' ) ),
+						color( 'bannerText', __( 'Text', 'webhead-search-cloud' ) ),
+					] }
+				/>
+
+				<PanelColorSettings
+					title={ __( 'Guided quiz', 'webhead-search-cloud' ) }
+					initialOpen={ false }
+					colorSettings={ [
+						color( 'quizQuestion', __( 'Question text', 'webhead-search-cloud' ) ),
+						color( 'quizOptionBg', __( 'Answer background', 'webhead-search-cloud' ) ),
+						color( 'quizOptionText', __( 'Answer text', 'webhead-search-cloud' ) ),
+						color( 'quizOptionBorder', __( 'Answer border', 'webhead-search-cloud' ) ),
+						color( 'quizOptionBgHover', __( 'Answer background (hover)', 'webhead-search-cloud' ) ),
+						color( 'quizOptionTextHover', __( 'Answer text (hover)', 'webhead-search-cloud' ) ),
+						color( 'quizOptionBorderHover', __( 'Answer border (hover)', 'webhead-search-cloud' ) ),
+					] }
+				>
+					{ sizeControl( 'quizOptionRadius', __( 'Answer radius', 'webhead-search-cloud' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings

@@ -256,3 +256,78 @@ describe( 'askAssistant', () => {
 		await expect( api.askAssistant( 'x' ) ).rejects.toMatchObject( { status: 429 } );
 	} );
 } );
+
+describe( 'visualSearch', () => {
+	it( 'uploads the photo as multipart with the key in the query string', async () => {
+		global.fetch.mockResolvedValue(
+			jsonResponse( { query: 'red silk dress', tags: [ 'red', 'silk' ], total: 1, hits: [ { id: 'p-1' } ] } )
+		);
+		const api = loadApi();
+		const photo = new File( [ 'x' ], 'dress.jpg', { type: 'image/jpeg' } );
+
+		const result = await api.visualSearch( photo );
+
+		const [ url, options ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/search/visual?' );
+		// A preflight carries no custom headers, so the credential has to be in
+		// the URL for the API to resolve the site and answer CORS.
+		expect( url ).toContain( 'key=sk_test' );
+		expect( options.method ).toBe( 'POST' );
+		expect( options.body ).toBeInstanceOf( FormData );
+		expect( options.body.get( 'photo' ) ).toBe( photo );
+		// Never a Content-Type of our own: the boundary is the browser's to set.
+		expect( options.headers ).toBeUndefined();
+		expect( result.tags ).toEqual( [ 'red', 'silk' ] );
+	} );
+
+	it( 'throws an error carrying the HTTP status so callers can tell 403 from 422 from 429', async () => {
+		const api = loadApi();
+
+		for ( const status of [ 403, 422, 429 ] ) {
+			global.fetch.mockResolvedValue( jsonResponse( {}, false, status ) );
+
+			await expect(
+				api.visualSearch( new File( [ 'x' ], 'p.jpg', { type: 'image/jpeg' } ) )
+			).rejects.toMatchObject( { status } );
+		}
+	} );
+
+	/** A photo with nothing recognisable in it is a success, not an error. */
+	it( 'passes an empty result through rather than treating it as a failure', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { query: null, tags: [], total: 0, hits: [], facets: [] } ) );
+		const api = loadApi();
+
+		const result = await api.visualSearch( new File( [ 'x' ], 'blur.jpg', { type: 'image/jpeg' } ) );
+
+		expect( result.hits ).toEqual( [] );
+		expect( result.tags ).toEqual( [] );
+	} );
+} );
+
+describe( 'fetchQuizzes', () => {
+	it( 'requests the quiz list with the search key', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { quizzes: [ { id: 4, questions: [] } ] } ) );
+		const api = loadApi();
+
+		const result = await api.fetchQuizzes();
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/quizzes?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( result.quizzes ).toHaveLength( 1 );
+	} );
+
+	/**
+	 * The whole question graph arrives in one response and is not metered, so
+	 * the widget must not re-fetch it per question.
+	 */
+	it( 'serves a repeat call from the cache instead of hitting the network again', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { quizzes: [] } ) );
+		const api = loadApi();
+
+		await api.fetchQuizzes();
+		await api.fetchQuizzes();
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+} );

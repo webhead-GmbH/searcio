@@ -489,6 +489,27 @@
       }
     }
   }
+
+  /* A redirect is two fields and a delete, so it stays on one row rather than
+     borrowing the merchandising rule's stacked card. */
+  .whsc-redirect-rule {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: start;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+
+    .components-button.is-destructive {
+      margin-top: 22px;
+    }
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: 1fr auto;
+    }
+  }
 }
 
 .panel-container {

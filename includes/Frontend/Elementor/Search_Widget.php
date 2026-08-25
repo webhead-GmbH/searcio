@@ -96,6 +96,8 @@ final class Search_Widget extends Widget_Base {
 		$this->register_browse_style_controls();
 		$this->register_facet_style_controls();
 		$this->register_assistant_style_controls();
+		$this->register_quiz_style_controls();
+		$this->register_banner_style_controls();
 		$this->register_card_style_controls();
 		$this->register_carousel_style_controls();
 	}
@@ -572,6 +574,7 @@ final class Search_Widget extends Widget_Base {
 		$this->var_slider( 'submit_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-btn-radius', 0, 999, false, [ 'separator' => 'before' ] );
 
 		$this->icon_button_controls( 'voice', __( 'Voice button', 'webhead-search-cloud' ), 'voice' );
+		$this->icon_button_controls( 'visual', __( 'Photo search button', 'webhead-search-cloud' ), 'visual' );
 		$this->icon_button_controls( 'close', __( 'Close button', 'webhead-search-cloud' ), 'close' );
 		$this->icon_button_controls( 'clearbtn', __( 'Clear button', 'webhead-search-cloud' ), 'clearbtn' );
 
@@ -818,7 +821,7 @@ final class Search_Widget extends Widget_Base {
 
 		$this->add_control(
 			'tab_heading',
-			[ 'label' => __( 'Search / AI tabs', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
+			[ 'label' => __( 'Modal tabs', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
 		);
 
 		$this->start_controls_tabs( 'tab_state_tabs' );
@@ -844,6 +847,70 @@ final class Search_Widget extends Widget_Base {
 		$this->var_color( 'assistant_user_text', __( 'Your message text', 'webhead-search-cloud' ), '--whsc-assistant-user-text' );
 		$this->var_color( 'assistant_row_bg', __( 'Compare row shading', 'webhead-search-cloud' ), '--whsc-assistant-row-bg' );
 		$this->var_slider( 'assistant_input_radius', __( 'Message field radius', 'webhead-search-cloud' ), '--whsc-assistant-input-radius', 0, 999, false, [ 'separator' => 'before' ] );
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * The guided quiz tab. Its answers are the only thing on screen while a
+	 * question is showing, so they get their own colours rather than borrowing
+	 * the filter chips' - a merchant will usually want them to read as the
+	 * primary action.
+	 */
+	private function register_banner_style_controls(): void {
+		$this->start_controls_section(
+			'style_banner',
+			[
+				'label' => __( 'Promotional banner', 'webhead-search-cloud' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'banner_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'Shown above the results when a merchandising rule attaches a banner to the search.', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
+		);
+
+		$this->var_color( 'banner_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-banner-bg' );
+		$this->var_color( 'banner_text', __( 'Text', 'webhead-search-cloud' ), '--whsc-banner-text' );
+
+		$this->end_controls_section();
+	}
+
+	private function register_quiz_style_controls(): void {
+		$this->start_controls_section(
+			'style_quiz',
+			[
+				'label' => __( 'Guided quiz', 'webhead-search-cloud' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->var_color( 'quiz_question', __( 'Question text', 'webhead-search-cloud' ), '--whsc-quiz-question' );
+
+		$this->add_control(
+			'quiz_option_heading',
+			[ 'label' => __( 'Answers', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+
+		$this->start_controls_tabs( 'quiz_option_tabs' );
+		$this->start_controls_tab( 'quiz_option_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'quiz_option_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-quiz-option-bg' );
+		$this->var_color( 'quiz_option_text', __( 'Text', 'webhead-search-cloud' ), '--whsc-quiz-option-text' );
+		$this->var_color( 'quiz_option_border', __( 'Border', 'webhead-search-cloud' ), '--whsc-quiz-option-border' );
+		$this->end_controls_tab();
+		$this->start_controls_tab( 'quiz_option_hover', [ 'label' => __( 'Hover', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'quiz_option_bg_hover', __( 'Background', 'webhead-search-cloud' ), '--whsc-quiz-option-bg-hover' );
+		$this->var_color( 'quiz_option_text_hover', __( 'Text', 'webhead-search-cloud' ), '--whsc-quiz-option-text-hover' );
+		$this->var_color( 'quiz_option_border_hover', __( 'Border', 'webhead-search-cloud' ), '--whsc-quiz-option-border-hover' );
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->var_slider( 'quiz_option_radius', __( 'Answer radius', 'webhead-search-cloud' ), '--whsc-quiz-option-radius', 0, 999, false, [ 'separator' => 'before' ] );
 
 		$this->end_controls_section();
 	}

@@ -8,7 +8,7 @@
  * Site-level switches reported as `{ available, enabled }` (plus `status` for
  * AI search). `available` and `status` are server-owned and ignored on write.
  */
-export const FEATURE_KEYS = [ 'ai_search', 'visual_tagging', 'personalization' ];
+export const FEATURE_KEYS = [ 'ai_search', 'visual_tagging', 'visual_search', 'personalization' ];
 
 /**
  * @param {Object} raw `features` from the API.
@@ -36,11 +36,32 @@ export const normalizeFeatures = ( raw ) => {
  */
 export const normalizeMerchandising = ( raw ) => ( Array.isArray( raw ) ? raw : [] ).map( ( rule ) => ( {
 	query: 'string' === typeof rule?.query ? rule.query : '',
+	// The optional category trigger: fire the rule when this facet filter is
+	// active, so a category listing page can be curated and not just a typed
+	// search. `null` for every rule that does not use it, and the inputs want
+	// strings.
+	filter_field: 'string' === typeof rule?.filter_field ? rule.filter_field : '',
+	filter_value: 'string' === typeof rule?.filter_value ? rule.filter_value : '',
 	pinned: Array.isArray( rule?.pinned ) ? rule.pinned : [],
 	hidden: Array.isArray( rule?.hidden ) ? rule.hidden : [],
 	// The API stores an empty banner as `null`; the input wants a string.
 	banner: 'string' === typeof rule?.banner ? rule.banner : '',
 } ) );
+
+/**
+ * Search-term redirects: an exact match on `query` sends the visitor to `url`
+ * instead of running a search at all.
+ *
+ * @param {Array} raw `redirects` from the API.
+ * @return {Array} Rules with every field present.
+ */
+export const normalizeRedirects = ( raw ) => ( Array.isArray( raw ) ? raw : [] ).map( ( rule ) => ( {
+	query: 'string' === typeof rule?.query ? rule.query : '',
+	url: 'string' === typeof rule?.url ? rule.url : '',
+} ) );
+
+/** An empty row is dropped server-side rather than rejected, so never send one. */
+export const isBlankRedirect = ( rule ) => '' === ( rule?.query || '' ).trim() && '' === ( rule?.url || '' ).trim();
 
 /**
  * @param {Object} raw The `/search-config` response.
@@ -64,6 +85,7 @@ export const normalizeConfig = ( raw ) => ( {
 	synonyms: Array.isArray( raw?.synonyms ) ? raw.synonyms : [],
 	languages: Array.isArray( raw?.languages ) ? raw.languages : [],
 	merchandising: normalizeMerchandising( raw?.merchandising ),
+	redirects: normalizeRedirects( raw?.redirects ),
 	features: normalizeFeatures( raw?.features ),
 } );
 
@@ -77,6 +99,20 @@ export const normalizeConfig = ( raw ) => ( {
  */
 export const toPayload = ( config ) => ( {
 	...config,
+	// An unset category trigger is `null` on the wire, not the empty string the
+	// text inputs hold - and both halves only mean anything together, so a row
+	// with just one filled in sends neither.
+	merchandising: ( config.merchandising || [] ).map( ( rule ) => {
+		const field = ( rule.filter_field || '' ).trim();
+		const value = ( rule.filter_value || '' ).trim();
+		const paired = '' !== field && '' !== value;
+
+		return { ...rule, filter_field: paired ? field : null, filter_value: paired ? value : null };
+	} ),
+	// A half-filled row is dropped by the API rather than rejected, which would
+	// silently lose it on the next read; drop it here so the form shows what was
+	// actually stored.
+	redirects: ( config.redirects || [] ).filter( ( rule ) => ! isBlankRedirect( rule ) ),
 	features: Object.fromEntries(
 		FEATURE_KEYS.map( ( key ) => [ key, { enabled: Boolean( config.features?.[ key ]?.enabled ) } ] )
 	),

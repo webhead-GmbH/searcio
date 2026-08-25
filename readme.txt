@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.0.5
+Stable tag: 1.1.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -31,6 +31,9 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
   taxonomies, and built-in properties to searchable data.
 - **Search relevance control** - tune searchable fields and weights, per-type ranking boosts, facet and suggestion
   fields, and synonyms - all from Search Cloud's own configuration, editable from the plugin's admin screen.
+- **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
+- **Guided quiz** - a few questions that narrow the catalogue down for shoppers who know what they want but not what it is called.
+- **Search redirects** - send well-known terms straight to a page instead of showing results.
 - **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
   results in their current language.
 - **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental
@@ -55,6 +58,7 @@ This plugin sends data to webhead Search Cloud, the hosted service that powers t
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
 * **When a visitor searches:** the search term, and which result they open. Their browser contacts the service directly, so their IP address is visible to it.
 * **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
+* **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
 
 Nothing else is sent, and no visitor accounts are created.
 
@@ -72,7 +76,13 @@ To rebuild it, check the repository out and run `npm install` followed by
 
 == Changelog ==
 
-= 1.0.5 =
+= 1.1.0 =
+- New: search by photo. Shoppers can upload a photo instead of typing, and see the tags the vision model read.
+- New: a guided quiz tab that turns a few questions into a filtered search.
+- New: search-term redirects - send a search straight to a page instead of showing results.
+- Merchandising rules can now curate a category listing page, not just a typed search.
+- A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.
+- The photo button and the quiz are themeable in the block editor and Elementor like the rest of the widget.
 - The search service moved to a new address, https://searcio.com. Nothing to do on your side; your existing keys keep working.
 
 = 1.0.4 =
