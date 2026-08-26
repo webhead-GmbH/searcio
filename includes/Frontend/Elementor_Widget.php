@@ -17,6 +17,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Frontend;
 
+use Webhead\WP\SearchCloud\Frontend\Elementor\Products_Widget;
 use Webhead\WP\SearchCloud\Frontend\Elementor\Search_Widget;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
 
@@ -33,5 +34,6 @@ final class Elementor_Widget {
 		}
 
 		$widgets_manager->register( new Search_Widget() );
+		$widgets_manager->register( new Products_Widget() );
 	}
 }

@@ -35,6 +35,9 @@
     "src/admin/settings/components/tabs/SyncTab.js": [
         "public/bundle.settings.js"
     ],
+    "src/blocks/products/edit.js": [
+        "public/bundle.products-block-editor.js"
+    ],
     "src/blocks/search/edit.js": [
         "public/bundle.search-block-editor.js"
     ],
@@ -48,6 +51,9 @@
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/CompareTable.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/ProductList.js": [
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/QuizPane.js": [

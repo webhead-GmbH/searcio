@@ -30,6 +30,7 @@ module.exports = {
 		'bundle.settings': path.resolve( process.cwd(), 'src', 'admin', 'settings', 'index.js' ),
 		'bundle.search': path.resolve( process.cwd(), 'src', 'frontend', 'search', 'index.js' ),
 		'bundle.search-block-editor': path.resolve( process.cwd(), 'src', 'blocks', 'search', 'index.js' ),
+		'bundle.products-block-editor': path.resolve( process.cwd(), 'src', 'blocks', 'products', 'index.js' ),
 	},
 	output: {
 		filename: '[name].js',

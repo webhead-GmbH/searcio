@@ -331,3 +331,49 @@ describe( 'fetchQuizzes', () => {
 		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
+
+describe( 'fetchSimilar', () => {
+	it( 'asks for more like a given product, with the search key', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [ { id: 'p-2' } ] } ) );
+		const api = loadApi();
+
+		const result = await api.fetchSimilar( 'product-1', { limit: 4 } );
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/search/similar?' );
+		expect( url ).toContain( 'id=product-1' );
+		expect( url ).toContain( 'limit=4' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( result.similar ).toHaveLength( 1 );
+	} );
+
+	it( 'defaults to six', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await api.fetchSimilar( 'product-1' );
+
+		expect( global.fetch.mock.calls[ 0 ][ 0 ] ).toContain( 'limit=6' );
+	} );
+
+	/**
+	 * A site without AI search answers with an empty list rather than an error,
+	 * so the caller can hide the row instead of handling a failure.
+	 */
+	it( 'passes an empty list through rather than treating it as a failure', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await expect( api.fetchSimilar( 'product-1' ) ).resolves.toEqual( { similar: [] } );
+	} );
+
+	it( 'serves a repeat call from the cache: it is not metered and changes only with the catalogue', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await api.fetchSimilar( 'product-1' );
+		await api.fetchSimilar( 'product-1' );
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+} );

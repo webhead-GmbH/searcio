@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-25T08:58:04+00:00\n"
+"POT-Creation-Date: 2026-08-26T07:27:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -59,11 +59,127 @@ msgstr ""
 msgid "(unknown)"
 msgstr ""
 
+#: includes/Frontend/Elementor/Products_Widget.php:37
+msgid "Search Cloud Products"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:73
+#: src/blocks/products/edit.js:33
+#: src/frontend/search/components/ProductList.js:162
+msgid "Products"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:79
+#: includes/Frontend/Elementor/Search_Widget.php:227
+#: src/blocks/products/edit.js:37
+msgid "Show"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:83
+#: src/blocks/products/edit.js:40
+#: src/blocks/products/edit.js:150
+msgid "Similar products"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:84
+#: src/blocks/products/edit.js:41
+#: src/blocks/products/edit.js:151
+msgid "Category listing"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:92
+#: src/blocks/products/edit.js:58
+msgid "Heading"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:94
+#: src/blocks/products/edit.js:59
+msgid "Optional. Left empty, the row has no title."
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:101
+#: src/blocks/products/edit.js:68
+msgid "Product"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:103
+msgid "Leave empty to use whichever product the visitor is viewing."
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:111
+#: src/blocks/products/edit.js:83
+msgid "Filter field"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:114
+#: src/blocks/products/edit.js:84
+msgid "A facet field. Defaults to \"categories\", which is how product categories are indexed."
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:122
+#: src/admin/settings/components/tabs/SearchConfigTab.js:363
+#: src/blocks/products/edit.js:91
+msgid "Filter value"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:124
+#: src/blocks/products/edit.js:92
+msgid "Leave empty to use whichever category the visitor is browsing."
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:132
+#: src/blocks/products/edit.js:101
+msgid "Show the merchandising banner"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:142
+#: src/blocks/products/edit.js:112
+msgid "Layout"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:146
+#: includes/Frontend/Elementor/Search_Widget.php:981
+#: src/blocks/products/edit.js:115
+#: src/blocks/search/edit.js:380
+msgid "Carousel"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:147
+#: src/blocks/products/edit.js:116
+msgid "Grid"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:155
+#: src/blocks/products/edit.js:124
+msgid "How many products"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:166
+#: includes/Frontend/Elementor/Search_Widget.php:150
+#: src/blocks/products/edit.js:134
+#: src/blocks/search/edit.js:100
+msgid "Card source"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:170
+#: includes/Frontend/Elementor/Search_Widget.php:154
+#: src/blocks/products/edit.js:137
+#: src/blocks/search/edit.js:104
+msgid "Plugin templates"
+msgstr ""
+
+#: includes/Frontend/Elementor/Products_Widget.php:171
+#: includes/Frontend/Elementor/Search_Widget.php:155
+#: src/blocks/products/edit.js:138
+#: src/blocks/search/edit.js:105
+msgid "Search Cloud templates"
+msgstr ""
+
 #: includes/Frontend/Elementor/Search_Widget.php:111
 #: src/frontend/search/components/SearchInput.js:31
-#: src/frontend/search/components/SearchModal.js:752
-#: src/frontend/search/components/SearchModal.js:764
-#: src/frontend/search/components/SearchModal.js:828
+#: src/frontend/search/components/SearchModal.js:757
+#: src/frontend/search/components/SearchModal.js:769
+#: src/frontend/search/components/SearchModal.js:833
 msgid "Search"
 msgstr ""
 
@@ -94,21 +210,6 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:140
 #: src/blocks/search/edit.js:92
 msgid "Restrict to type"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:150
-#: src/blocks/search/edit.js:100
-msgid "Card source"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:154
-#: src/blocks/search/edit.js:104
-msgid "Plugin templates"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:155
-#: src/blocks/search/edit.js:105
-msgid "Search Cloud templates"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:157
@@ -192,10 +293,6 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:224
 #: src/blocks/search/edit.js:148
 msgid "Show result count on filters"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:227
-msgid "Show"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:228
@@ -566,7 +663,7 @@ msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:817
 #: src/blocks/search/edit.js:326
-#: src/frontend/search/components/SearchModal.js:777
+#: src/frontend/search/components/SearchModal.js:782
 msgid "AI Assistant"
 msgstr ""
 
@@ -678,11 +775,6 @@ msgstr ""
 msgid "Price suffix / \"from\" typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:981
-#: src/blocks/search/edit.js:380
-msgid "Carousel"
-msgstr ""
-
 #: includes/Frontend/Elementor/Search_Widget.php:987
 #: src/blocks/search/edit.js:383
 msgid "Arrow color"
@@ -704,13 +796,13 @@ msgid "Dot color (active)"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:198
-#: src/frontend/search/components/SearchModal.js:733
-#: src/frontend/search/components/SearchModal.js:974
+#: src/frontend/search/components/SearchModal.js:737
+#: src/frontend/search/components/SearchModal.js:979
 msgid "No results found."
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:199
-#: src/frontend/search/components/SearchModal.js:966
+#: src/frontend/search/components/SearchModal.js:971
 msgid "Searching…"
 msgstr ""
 
@@ -748,18 +840,18 @@ msgid "Clear"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:207
-#: src/frontend/search/components/SearchModal.js:801
-#: src/frontend/search/components/SearchModal.js:861
+#: src/frontend/search/components/SearchModal.js:806
+#: src/frontend/search/components/SearchModal.js:866
 msgid "Close search"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:208
-#: src/frontend/search/components/SearchModal.js:849
+#: src/frontend/search/components/SearchModal.js:854
 msgid "Search by voice"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:209
-#: src/frontend/search/components/SearchModal.js:911
+#: src/frontend/search/components/SearchModal.js:916
 msgid "All"
 msgstr ""
 
@@ -794,128 +886,128 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
-#: includes/Plugin.php:430
+#: includes/Plugin.php:431
 msgid "webhead Search Cloud connection"
 msgstr ""
 
-#: includes/Plugin.php:435
-#: includes/Plugin.php:459
+#: includes/Plugin.php:436
+#: includes/Plugin.php:460
 msgid "webhead Search Cloud is not connected yet"
 msgstr ""
 
-#: includes/Plugin.php:437
+#: includes/Plugin.php:438
 msgid "Add your site ID, write key, and write secret on the Connection tab before syncing content."
 msgstr ""
 
-#: includes/Plugin.php:443
+#: includes/Plugin.php:444
 msgid "webhead Search Cloud connection is configured"
 msgstr ""
 
-#: includes/Plugin.php:445
+#: includes/Plugin.php:446
 msgid "Connection credentials are saved."
 msgstr ""
 
-#: includes/Plugin.php:452
+#: includes/Plugin.php:453
 msgid "webhead Search Cloud reachability"
 msgstr ""
 
-#: includes/Plugin.php:461
+#: includes/Plugin.php:462
 msgid "Connect the plugin on the Connection tab, then re-run this check."
 msgstr ""
 
-#: includes/Plugin.php:470
+#: includes/Plugin.php:471
 msgid "webhead Search Cloud could not be reached"
 msgstr ""
 
-#: includes/Plugin.php:472
+#: includes/Plugin.php:473
 msgid "The health check to Search Cloud failed. Check the Connection tab and verify your credentials."
 msgstr ""
 
-#: includes/Plugin.php:478
+#: includes/Plugin.php:479
 msgid "webhead Search Cloud is reachable"
 msgstr ""
 
-#: includes/Plugin.php:480
+#: includes/Plugin.php:481
 msgid "The last health check succeeded."
 msgstr ""
 
-#: includes/Plugin.php:487
+#: includes/Plugin.php:488
 msgid "webhead Search Cloud indexing"
 msgstr ""
 
-#: includes/Plugin.php:494
+#: includes/Plugin.php:495
 msgid "No content types are enabled for indexing"
 msgstr ""
 
-#: includes/Plugin.php:496
+#: includes/Plugin.php:497
 msgid "Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send."
 msgstr ""
 
-#: includes/Plugin.php:502
+#: includes/Plugin.php:503
 msgid "Content types are enabled for indexing"
 msgstr ""
 
 #. translators: %d: number of enabled content types.
-#: includes/Plugin.php:506
+#: includes/Plugin.php:507
 #, php-format
 msgid "%d content type(s) are enabled for indexing."
 msgstr ""
 
-#: includes/Plugin.php:517
+#: includes/Plugin.php:518
 msgid "webhead Search Cloud language coverage"
 msgstr ""
 
 #. translators: %d: number of posts skipped.
-#: includes/Plugin.php:529
+#: includes/Plugin.php:530
 #, php-format
 msgid "%d post(s) were skipped from the last sync due to language"
 msgstr ""
 
-#: includes/Plugin.php:533
+#: includes/Plugin.php:534
 msgid "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally."
 msgstr ""
 
-#: includes/Plugin.php:539
+#: includes/Plugin.php:540
 msgid "No content was skipped due to language"
 msgstr ""
 
-#: includes/Plugin.php:541
+#: includes/Plugin.php:542
 msgid "Every indexable post is in an enabled language, or the site has not restricted languages."
 msgstr ""
 
-#: includes/Plugin.php:556
+#: includes/Plugin.php:557
 msgid "webhead Search Cloud runtime"
 msgstr ""
 
-#: includes/Plugin.php:557
+#: includes/Plugin.php:558
 msgid "Connection, indexing, and sync state for support and debugging. Credentials are never included."
 msgstr ""
 
-#: includes/Plugin.php:567
+#: includes/Plugin.php:568
 msgid "Connection configured"
 msgstr ""
 
-#: includes/Plugin.php:568
+#: includes/Plugin.php:569
 msgid "Indexable content types"
 msgstr ""
 
-#: includes/Plugin.php:569
+#: includes/Plugin.php:570
 msgid "Sync history retention (days)"
 msgstr ""
 
-#: includes/Plugin.php:570
+#: includes/Plugin.php:571
 msgid "Active sync run status"
 msgstr ""
 
-#: includes/Plugin.php:571
+#: includes/Plugin.php:572
 msgid "Delete data on uninstall"
 msgstr ""
 
-#: includes/Plugin.php:575
+#: includes/Plugin.php:576
 msgid "WPML/Polylang active"
 msgstr ""
 
-#: includes/Plugin.php:576
+#: includes/Plugin.php:577
 msgid "Enabled languages"
 msgstr ""
 
@@ -1784,10 +1876,6 @@ msgstr ""
 msgid "Optional. A facet field, e.g. \"category\"."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:363
-msgid "Filter value"
-msgstr ""
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:365
 msgid "With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself."
 msgstr ""
@@ -2154,6 +2242,30 @@ msgstr ""
 msgid "Upgrade plan"
 msgstr ""
 
+#: src/blocks/products/edit.js:27
+msgid "the product being viewed"
+msgstr ""
+
+#: src/blocks/products/edit.js:28
+msgid "the category being browsed"
+msgstr ""
+
+#: src/blocks/products/edit.js:44
+msgid "Products close in meaning to the one being viewed. Needs AI search on your plan; without it the row stays hidden."
+msgstr ""
+
+#: src/blocks/products/edit.js:48
+msgid "A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out."
+msgstr ""
+
+#: src/blocks/products/edit.js:69
+msgid "Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
+msgstr ""
+
+#: src/blocks/products/edit.js:102
+msgid "Shown only when a rule for this category actually carries one."
+msgstr ""
+
 #: src/blocks/search/edit.js:79
 msgid "Search settings"
 msgstr ""
@@ -2479,7 +2591,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:276
-#: src/frontend/search/components/SearchModal.js:709
+#: src/frontend/search/components/SearchModal.js:713
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -2540,111 +2652,110 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:73
+#: src/frontend/search/components/QuizPane.js:77
 msgid "The quiz is unavailable right now."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:102
+#: src/frontend/search/components/QuizPane.js:106
 msgid "We could not load your matches. Please try again."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:175
+#: src/frontend/search/components/QuizPane.js:191
 msgid "Which one would you like to take?"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:185
+#: src/frontend/search/components/QuizPane.js:201
 msgid "Start the quiz"
 msgstr ""
 
 #. translators: 1: current question number. 2: total questions in the quiz.
-#: src/frontend/search/components/QuizPane.js:206
+#: src/frontend/search/components/QuizPane.js:222
 #, js-format
 msgid "Question %1$d of %2$d"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:213
-#: src/frontend/search/components/QuizPane.js:254
+#: src/frontend/search/components/QuizPane.js:229
+#: src/frontend/search/components/QuizPane.js:270
 msgid "Back"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:244
+#: src/frontend/search/components/QuizPane.js:260
 msgid "Finding your matches…"
 msgstr ""
 
 #. translators: %d: number of matching products.
-#: src/frontend/search/components/QuizPane.js:247
+#: src/frontend/search/components/QuizPane.js:263
 #, js-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/QuizPane.js:258
+#: src/frontend/search/components/QuizPane.js:274
 msgid "Start over"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:264
+#: src/frontend/search/components/QuizPane.js:280
 msgid "Your answers"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:297
+#: src/frontend/search/components/QuizPane.js:313
 msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:559
+#: src/frontend/search/components/SearchModal.js:563
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:561
+#: src/frontend/search/components/SearchModal.js:565
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:563
+#: src/frontend/search/components/SearchModal.js:567
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:565
+#: src/frontend/search/components/SearchModal.js:569
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:684
-#: src/frontend/search/components/SearchModal.js:699
-#: src/frontend/search/components/SearchModal.js:742
+#: src/frontend/search/components/SearchModal.js:688
+#: src/frontend/search/components/SearchModal.js:703
+#: src/frontend/search/components/SearchModal.js:747
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:703
-#: src/frontend/search/components/SearchModal.js:712
-#: src/frontend/search/components/SearchModal.js:739
+#: src/frontend/search/components/SearchModal.js:707
+#: src/frontend/search/components/SearchModal.js:716
 msgid "Results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:725
+#: src/frontend/search/components/SearchModal.js:729
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:732
+#: src/frontend/search/components/SearchModal.js:736
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:756
+#: src/frontend/search/components/SearchModal.js:761
 msgid "Search modes"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:791
+#: src/frontend/search/components/SearchModal.js:796
 msgid "Product finder"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:890
+#: src/frontend/search/components/SearchModal.js:895
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:904
+#: src/frontend/search/components/SearchModal.js:909
 msgid "Filter by type"
 msgstr ""
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:971
+#: src/frontend/search/components/SearchModal.js:976
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."

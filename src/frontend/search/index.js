@@ -7,6 +7,7 @@ const hydrated = new WeakSet();
 
 let root = null;
 let mountedTriggers = [];
+let mountedLists = [];
 
 const getMountEl = () => {
 	let mountEl = document.getElementById( 'webhead-search-cloud-root' );
@@ -29,7 +30,7 @@ const render = () => {
 		root = createRoot( getMountEl() );
 	}
 
-	root.render( <App triggerElements={ mountedTriggers } /> );
+	root.render( <App triggerElements={ mountedTriggers } listElements={ mountedLists } /> );
 };
 
 /**
@@ -40,17 +41,33 @@ const render = () => {
  * `querySelectorAll` at boot would miss them — a persistent `MutationObserver`
  * keeps hydrating new ones and drops stale references to removed ones.
  */
-const sync = () => {
-	const found = Array.from( document.querySelectorAll( '[data-whsc-trigger]' ) );
-	const stillConnected = mountedTriggers.filter( ( el ) => el.isConnected );
+const collect = ( selector, mounted ) => {
+	const found = Array.from( document.querySelectorAll( selector ) );
+	const stillConnected = mounted.filter( ( el ) => el.isConnected );
 	const newEls = found.filter( ( el ) => ! hydrated.has( el ) );
 
-	if ( 0 === newEls.length && stillConnected.length === mountedTriggers.length ) {
-		return;
+	if ( 0 === newEls.length && stillConnected.length === mounted.length ) {
+		return null;
 	}
 
 	newEls.forEach( ( el ) => hydrated.add( el ) );
-	mountedTriggers = [ ...stillConnected, ...newEls ];
+
+	return [ ...stillConnected, ...newEls ];
+};
+
+const sync = () => {
+	const triggers = collect( '[data-whsc-trigger]', mountedTriggers );
+	// Product rows (similar products, a curated category listing) hydrate the
+	// same way and from the same bundle - they render the same cards, in the
+	// same styles, against the same API client.
+	const lists = collect( '[data-whsc-list]', mountedLists );
+
+	if ( null === triggers && null === lists ) {
+		return;
+	}
+
+	mountedTriggers = triggers || mountedTriggers;
+	mountedLists = lists || mountedLists;
 
 	render();
 };

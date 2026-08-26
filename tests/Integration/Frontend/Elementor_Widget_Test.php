@@ -22,6 +22,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Frontend;
 
 use Webhead\WP\SearchCloud\Frontend\Elementor\Search_Widget;
 use Webhead\WP\SearchCloud\Frontend\Elementor_Widget;
+use Webhead\WP\SearchCloud\Frontend\Elementor\Products_Widget;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
@@ -34,13 +35,33 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		}
 	}
 
-	public function test_registrar_registers_the_search_widget(): void {
+	public function test_registrar_registers_both_widgets(): void {
 		$manager = $this->fake_widgets_manager();
 
 		( new Elementor_Widget() )->register( $manager );
 
-		$this->assertCount( 1, $manager->registered );
+		$this->assertCount( 2, $manager->registered );
 		$this->assertInstanceOf( Search_Widget::class, $manager->registered[0] );
+		$this->assertInstanceOf( Products_Widget::class, $manager->registered[1] );
+	}
+
+	/**
+	 * Both widgets declare the shared runtime bundle, which is what makes them
+	 * hydrate inside the Elementor editor preview rather than only on the front
+	 * end.
+	 */
+	public function test_both_widgets_declare_the_shared_runtime(): void {
+		foreach ( [ new Search_Widget(), new Products_Widget() ] as $widget ) {
+			$this->assertContains( Frontend_Assets::HANDLE, $widget->get_script_depends() );
+			$this->assertContains( Frontend_Assets::HANDLE, $widget->get_style_depends() );
+		}
+	}
+
+	public function test_products_widget_identity(): void {
+		$widget = new Products_Widget();
+
+		$this->assertSame( 'webhead-search-cloud-products', $widget->get_name() );
+		$this->assertNotSame( '', $widget->get_title() );
 	}
 
 	public function test_registrar_is_a_no_op_for_an_object_without_a_register_method(): void {

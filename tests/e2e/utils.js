@@ -53,6 +53,8 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {number}         [options.searchStatus] Force a non-200 `/search` status.
  * @param {Function}       [options.onSearch]    Called with the `/search` request URL.
  * @param {?string}        [options.banner]      Merchandising banner returned with `/search`.
+ * @param {Array}          [options.similar]     `/search/similar` results.
+ * @param {number}         [options.similarStatus] Force a non-200 `/search/similar` status.
  * @param {Object}         [options.redirects]   `{term: url}` - a `/search` for an exact
  *                                               (case-insensitive) match answers with the
  *                                               redirect shape instead of results.
@@ -73,6 +75,8 @@ export async function mockSearchCloud( page, options = {} ) {
 		searchStatus = 200,
 		searchId = 'search-e2e',
 		banner = null,
+		similar = [],
+		similarStatus = 200,
 		assistant = false,
 		assistantReply = 'Here are a few options.',
 		assistantProducts = [],
@@ -105,6 +109,13 @@ export async function mockSearchCloud( page, options = {} ) {
 				facets: [],
 				languages: [],
 			} );
+		}
+		if ( '/search/similar' === path ) {
+			if ( 200 !== similarStatus ) {
+				return json( {}, similarStatus );
+			}
+
+			return json( { similar } );
 		}
 		if ( '/quizzes' === path ) {
 			return json( { quizzes } );

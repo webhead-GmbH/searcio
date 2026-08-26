@@ -35,6 +35,9 @@ const STOREFRONT_CONFIG_TTL = 600000; // 10 minutes.
 // server-side cache and is not metered as a search (quiz.md), so fetch it once
 // per page view rather than per question.
 const QUIZZES_TTL = 600000; // 10 minutes.
+// "More like this" changes only when the catalogue does, and it is not metered
+// as a search — so a visitor browsing several products pays for it once.
+const SIMILAR_TTL = 600000; // 10 minutes.
 const CACHE_MAX = 60;
 
 const cache = new Map();
@@ -188,6 +191,22 @@ export const fetchStorefrontConfig = ( options = {} ) =>
  */
 export const fetchQuizzes = ( options = {} ) =>
 	request( '/quizzes', {}, QUIZZES_TTL, options.signal );
+
+/**
+ * Products similar to a given one, for a "you may also like" row (see
+ * `docs/api/search.md` `GET /search/similar`). Similarity is semantic: it uses
+ * the source product's own embedding, so a site without AI search answers with
+ * an empty list rather than an error and the row simply does not render.
+ *
+ * Not metered as a search, and it changes only when the catalogue does, so it
+ * is cached for the page view like the card templates.
+ *
+ * @param {string}                            id        The source product's document id.
+ * @param {{limit?: number, signal?: AbortSignal}} [options]
+ * @return {Promise<{similar: Array<Object>}>}
+ */
+export const fetchSimilar = ( id, options = {} ) =>
+	request( '/search/similar', { id, limit: options.limit || 6 }, SIMILAR_TTL, options.signal );
 
 /**
  * Search by photo (see `docs/api/visual-search.md`). A vision model describes

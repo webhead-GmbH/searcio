@@ -1,6 +1,7 @@
 import { createPortal, useState } from '@wordpress/element';
 
 import Trigger from './Trigger';
+import ProductList from './ProductList';
 import SearchModal from './SearchModal';
 
 /**
@@ -10,8 +11,10 @@ import SearchModal from './SearchModal';
  *
  * @param {Object}    props
  * @param {Element[]} props.triggerElements
+ * @param {Element[]} [props.listElements] Product-row placeholders (similar
+ *                                         products, a curated category listing).
  */
-const App = ( { triggerElements } ) => {
+const App = ( { triggerElements, listElements = [] } ) => {
 	const [ activeIndex, setActiveIndex ] = useState( null );
 	const [ query, setQuery ] = useState( '' );
 
@@ -51,6 +54,21 @@ const App = ( { triggerElements } ) => {
 				/>,
 				el,
 				index
+			) ) }
+			{ listElements.map( ( el, index ) => createPortal(
+				<ProductList
+					source={ el.dataset.source || 'similar' }
+					documentId={ el.dataset.docId || '' }
+					filterField={ el.dataset.filterField || '' }
+					filterValue={ el.dataset.filterValue || '' }
+					heading={ el.dataset.heading || '' }
+					limit={ Number( el.dataset.limit ) || undefined }
+					layout={ el.dataset.layout || 'carousel' }
+					showBanner={ '0' !== el.dataset.showBanner }
+					cardSource={ el.dataset.cardSource || 'plugin' }
+				/>,
+				el,
+				`list-${ index }`
 			) ) }
 			{ activeEl && (
 				<SearchModal

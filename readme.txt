@@ -34,6 +34,8 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 - **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
 - **Guided quiz** - a few questions that narrow the catalogue down for shoppers who know what they want but not what it is called.
 - **Search redirects** - send well-known terms straight to a page instead of showing results.
+- **Similar products** - a "you may also like" row on product pages, matched by meaning rather than by shared tags.
+- **Category merchandising** - curate a category listing: pin products to the top, keep products out, show a banner.
 - **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
   results in their current language.
 - **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental
@@ -79,6 +81,8 @@ To rebuild it, check the repository out and run `npm install` followed by
 = 1.1.0 =
 - New: search by photo. Shoppers can upload a photo instead of typing, and see the tags the vision model read.
 - New: a guided quiz tab that turns a few questions into a filtered search.
+- New: a "you may also like" row of similar products for your product pages.
+- New: a curated category listing, so your merchandising rules for a category actually apply on that page.
 - New: search-term redirects - send a search straight to a page instead of showing results.
 - Merchandising rules can now curate a category listing page, not just a typed search.
 - A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.

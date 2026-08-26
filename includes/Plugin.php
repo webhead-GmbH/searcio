@@ -353,6 +353,7 @@ final class Plugin extends Base_Plugin {
 
 	protected function register_blocks( Blocks_Manager $blocks_manager, Container $container ): void {
 		$blocks_manager->register_metadata_directory( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'blocks/search' );
+		$blocks_manager->register_metadata_directory( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'blocks/products' );
 	}
 
 	/**
