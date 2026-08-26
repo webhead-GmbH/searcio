@@ -79,22 +79,38 @@ export const findQuestion = ( quiz, id ) =>
 	( quiz?.questions || [] ).find( ( question ) => question.id === String( id ) );
 
 /**
- * Fold an answer's tags into the accumulated filter. A later answer for the
- * same field replaces an earlier one, because the visitor's most recent choice
- * is the one that should count.
+ * Fold an answer's tags into the accumulated filter.
+ *
+ * Two rules, and they are not the same rule (`quiz.md`, "Widget flow
+ * contract" steps 3 and 5):
+ *
+ * - One answer carrying several values for the same field means "any of
+ *   these" — a "Clothing" answer tagging both `clothing` and `tshirts` is
+ *   asking for either. They are comma-joined, which is how `/search` spells
+ *   OR for a filter.
+ * - A *later* answer for a field replaces whatever an earlier one put there,
+ *   because the visitor's most recent choice is the one that counts.
  *
  * @param {Object<string,string>} tags
  * @param {Object}                option
  * @return {Object<string,string>} A new map; the input is left alone.
  */
 export const applyOption = ( tags, option ) => {
-	const next = { ...tags };
+	const fromThisAnswer = {};
 
 	( option?.tags_matched || [] ).forEach( ( tag ) => {
-		next[ tag.field ] = tag.value;
+		const seen = fromThisAnswer[ tag.field ];
+
+		// Skip a repeat of the same value: `red,red` filters no differently
+		// and only makes the URL harder to read.
+		if ( undefined === seen ) {
+			fromThisAnswer[ tag.field ] = tag.value;
+		} else if ( ! seen.split( ',' ).includes( tag.value ) ) {
+			fromThisAnswer[ tag.field ] = `${ seen },${ tag.value }`;
+		}
 	} );
 
-	return next;
+	return { ...tags, ...fromThisAnswer };
 };
 
 /**

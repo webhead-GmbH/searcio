@@ -140,6 +140,48 @@ describe( 'applyOption', () => {
 	it( 'is a no-op for an answer that tags nothing', () => {
 		expect( applyOption( { style: 'casual' }, { label: 'Skip' } ) ).toEqual( { style: 'casual' } );
 	} );
+
+	/**
+	 * One answer meaning "any of these" - a "Clothing" option tagging both
+	 * `clothing` and `tshirts`. Overwriting would silently drop the first and
+	 * search for half of what the merchant asked for.
+	 */
+	it( 'comma-joins several values one answer gives for the same field', () => {
+		const option = {
+			label: 'Clothing',
+			tags_matched: [
+				{ field: 'category', value: 'clothing' },
+				{ field: 'category', value: 'tshirts' },
+			],
+		};
+
+		expect( applyOption( {}, option ) ).toEqual( { category: 'clothing,tshirts' } );
+	} );
+
+	it( 'does not repeat a value an answer lists twice', () => {
+		const option = {
+			tags_matched: [
+				{ field: 'category', value: 'shoes' },
+				{ field: 'category', value: 'shoes' },
+			],
+		};
+
+		expect( applyOption( {}, option ) ).toEqual( { category: 'shoes' } );
+	} );
+
+	/** A later answer still replaces, rather than accumulating forever. */
+	it( 'replaces a multi-value answer wholesale when the field is answered again', () => {
+		const first = applyOption( {}, {
+			tags_matched: [
+				{ field: 'category', value: 'clothing' },
+				{ field: 'category', value: 'tshirts' },
+			],
+		} );
+
+		expect( applyOption( first, { tags_matched: [ { field: 'category', value: 'shoes' } ] } ) ).toEqual( {
+			category: 'shoes',
+		} );
+	} );
 } );
 
 describe( 'quizProgress', () => {
