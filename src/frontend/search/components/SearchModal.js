@@ -740,9 +740,12 @@ const SearchModal = ({
 				setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
 			}
 		} finally {
-			if (seq === searchSeq.current) {
-				setIsLoadingMore(false);
-			}
+			// Released unconditionally, unlike the results above. A new search
+			// starting mid-request is exactly when this must be let go: the
+			// flag only says "a load-more request is in flight", and gating it
+			// on the sequence would leave the next search's button reading
+			// "Loading…" and disabled with nothing left to answer it.
+			setIsLoadingMore(false);
 		}
 	}, [isLoadingMore, results, trimmedQuery, scopeType, activeTypes, activeFacets, activeRanges, i18n.error]);
 

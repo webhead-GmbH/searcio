@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-27T09:26:03+00:00\n"
+"POT-Creation-Date: 2026-08-27T13:43:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -836,7 +836,7 @@ msgid "Popular searches"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:206
-#: src/frontend/search/components/RangeFilters.js:114
+#: src/frontend/search/components/RangeFilters.js:134
 #: src/frontend/search/components/SearchInput.js:45
 msgid "Clear"
 msgstr ""
@@ -2788,8 +2788,20 @@ msgstr ""
 msgid "Maximum %s"
 msgstr ""
 
-#: src/frontend/search/components/RangeFilters.js:102
+#. translators: %s: field name, e.g. "Price".
+#: src/frontend/search/components/RangeFilters.js:112
+#, js-format
+msgid "Apply %s filter"
+msgstr ""
+
+#: src/frontend/search/components/RangeFilters.js:117
 msgid "Apply"
+msgstr ""
+
+#. translators: %s: field name, e.g. "Price".
+#: src/frontend/search/components/RangeFilters.js:125
+#, js-format
+msgid "Clear %s filter"
 msgstr ""
 
 #: src/frontend/search/components/SearchModal.js:591

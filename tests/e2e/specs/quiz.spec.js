@@ -110,7 +110,11 @@ test.describe( 'guided quiz', () => {
 		await widget.answerQuiz( 'Large' );
 
 		await expect( widget.quizAnswers ).toHaveCount( 2 );
-		await expect( widget.quizAnswers.first() ).toContainText( 'formal' );
+		// The chip names the field and echoes the answer as it was written on
+		// the button - "Formal", not the `formal` tag value that goes to the
+		// API. A raw value here is what a shopper cannot make sense of.
+		await expect( widget.quizAnswers.first() ).toContainText( 'Style' );
+		await expect( widget.quizAnswers.first() ).toContainText( 'Formal' );
 	} );
 
 	test( 'lets a visitor go back and change an answer', async ( { page, requestUtils } ) => {

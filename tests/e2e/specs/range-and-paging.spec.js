@@ -57,7 +57,7 @@ test.describe( 'numeric range filters', () => {
 
 		await widget.modal.getByLabel( 'Minimum Price' ).fill( '20' );
 		await widget.modal.getByLabel( 'Maximum Price' ).fill( '45' );
-		await widget.modal.getByRole( 'button', { name: 'Apply' } ).click();
+		await widget.modal.getByRole( 'button', { name: 'Apply Price filter' } ).click();
 
 		await expect
 			.poll( () => requests.some( ( url ) => '20:45' === url.searchParams.get( 'range[price]' ) ) )
@@ -80,7 +80,7 @@ test.describe( 'numeric range filters', () => {
 		await expect( widget.cards.first() ).toBeVisible();
 
 		await widget.modal.getByLabel( 'Minimum Price' ).fill( '30' );
-		await widget.modal.getByRole( 'button', { name: 'Apply' } ).click();
+		await widget.modal.getByRole( 'button', { name: 'Apply Price filter' } ).click();
 
 		await expect
 			.poll( () => requests.some( ( url ) => '30:' === url.searchParams.get( 'range[price]' ) ) )
@@ -103,11 +103,25 @@ test.describe( 'numeric range filters', () => {
 		await expect( widget.cards.first() ).toBeVisible();
 
 		await widget.modal.getByLabel( 'Minimum Price' ).fill( '30' );
-		await widget.modal.getByRole( 'button', { name: 'Apply' } ).click();
-		await expect( widget.modal.getByRole( 'button', { name: 'Clear' } ) ).toBeVisible();
+		await widget.modal.getByRole( 'button', { name: 'Apply Price filter' } ).click();
+
+		// Named for its field rather than just "Clear": the modal also has a
+		// "Clear" on the search box and a "Clear all" over recent searches.
+		const clearPrice = widget.modal.getByRole( 'button', { name: 'Clear Price filter' } );
+
+		await expect( clearPrice ).toBeVisible();
 
 		requests.length = 0;
-		await widget.modal.getByRole( 'button', { name: 'Clear' } ).click();
+		await clearPrice.click();
+
+		// The control goes away with the bound it cleared.
+		await expect( clearPrice ).toBeHidden();
+
+		// Clearing on its own need not hit the network - the unfiltered search
+		// for this term already ran, so the in-page response cache answers it.
+		// Searching for something else is what proves the bound is really gone
+		// rather than just hidden, since that request has to go out.
+		await widget.search( 'stool' );
 
 		await expect.poll( () => requests.length ).toBeGreaterThan( 0 );
 		expect( requests.every( ( url ) => null === url.searchParams.get( 'range[price]' ) ) ).toBe( true );
@@ -207,5 +221,34 @@ test.describe( 'result paging', () => {
 		await widget.loadMore.click();
 		await expect( widget.cards ).toHaveCount( 56 );
 		await expect( widget.loadMore ).toHaveCount( 0 );
+	} );
+
+	test( 'lets go of the load-more button when a new search overtakes it', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			hits: ( url ) => pricedHits( 20, ( Number( url.searchParams.get( 'page' ) || 1 ) - 1 ) * 20 ),
+			total: 60,
+			facets: { types: [] },
+			// Only the second page is held open, so the new search below starts
+			// while the load-more request is still unanswered.
+			searchDelay: ( url ) => ( Number( url.searchParams.get( 'page' ) || 1 ) > 1 ? 2000 : 0 ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+
+		await widget.openModal();
+		await widget.search( 'chair' );
+		await expect( widget.cards.first() ).toBeVisible();
+
+		const loadMore = widget.modal.locator( '.whsc-load-more__button' );
+
+		await loadMore.click();
+		await widget.search( 'stool' );
+		await expect( widget.cards.first() ).toBeVisible();
+
+		// The overtaken request still has to release the button, or the new
+		// search's results end with one reading "Loading…" that never resolves.
+		await expect( loadMore ).toBeEnabled( { timeout: 10000 } );
+		await expect( loadMore ).toHaveText( 'Load more results' );
 	} );
 } );

@@ -98,13 +98,33 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 								onChange={ ( event ) => setBound( field, 'max', event.target.value ) }
 								disabled={ busy }
 							/>
-							<button type="submit" className="whsc-range__apply" disabled={ busy }>
+							{ /* The modal already carries a "Clear" on the search box and a
+							     "Clear all" over recent searches, and a second numeric field
+							     would add a second "Apply" - so the accessible name has to say
+							     which filter this one belongs to. The visible word stays the
+							     first word of that name, which is what voice control matches
+							     on (WCAG 2.5.3). */ }
+							<button
+								type="submit"
+								className="whsc-range__apply"
+								aria-label={ sprintf(
+									/* translators: %s: field name, e.g. "Price". */
+									__( 'Apply %s filter', 'webhead-search-cloud' ),
+									label
+								) }
+								disabled={ busy }
+							>
 								{ __( 'Apply', 'webhead-search-cloud' ) }
 							</button>
 							{ hasApplied && (
 								<button
 									type="button"
 									className="whsc-range__clear"
+									aria-label={ sprintf(
+										/* translators: %s: field name, e.g. "Price". */
+										__( 'Clear %s filter', 'webhead-search-cloud' ),
+										label
+									) }
 									onClick={ () => {
 										setDrafts( ( current ) => ( { ...current, [ field ]: { min: '', max: '' } } ) );
 										onApply( field, { min: '', max: '' } );

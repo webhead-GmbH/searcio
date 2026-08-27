@@ -87,6 +87,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		assistantDelay = 0,
 		onAssistant,
 		onSearch,
+		searchDelay = 0,
 		redirects = {},
 		quiz = false,
 		quizzes = [],
@@ -158,6 +159,13 @@ export async function mockSearchCloud( page, options = {} ) {
 			}
 			if ( 200 !== searchStatus ) {
 				return json( {}, searchStatus );
+			}
+			// Holding one search open is how a spec gets two of them in flight
+			// at once - a function form so it can delay, say, only page two.
+			const held = 'function' === typeof searchDelay ? searchDelay( url ) : searchDelay;
+
+			if ( held > 0 ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, held ) );
 			}
 			// A configured redirect replaces the whole response: no hits, no
 			// total, no facets - matched exactly, ignoring case and padding.

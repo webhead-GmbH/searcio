@@ -653,7 +653,7 @@ msgid "Popular searches"
 msgstr "Beliebte Suchanfragen"
 
 #: includes/Frontend/Frontend_Assets.php:206
-#: src/frontend/search/components/RangeFilters.js:114
+#: src/frontend/search/components/RangeFilters.js:134
 #: src/frontend/search/components/SearchInput.js:45
 msgid "Clear"
 msgstr "Löschen"
@@ -1862,7 +1862,6 @@ msgstr ""
 msgid "Search by photo"
 msgstr "Mit Foto suchen"
 
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:279
 msgid "Shoppers can upload a photo instead of typing: a vision model describes what it sees and searches for that. A camera button appears in the search box once this is on."
 msgstr ""
@@ -2507,7 +2506,6 @@ msgstr ""
 msgid "Clear all"
 msgstr "Alle löschen"
 
-
 #: src/blocks/search/edit.js:285
 msgid "Clear all (hover)"
 msgstr ""
@@ -2612,61 +2610,49 @@ msgstr ""
 msgid "The assistant is not available on this plan."
 msgstr "Der Assistent ist in diesem Tarif nicht enthalten."
 
-
 #: src/frontend/search/components/AiAssistant.js:26
 msgid "The assistant has reached its limit for now. Please try again later."
 msgstr "Der Assistent hat sein Limit vorerst erreicht. Bitte versuche es später noch einmal."
-
 
 #: src/frontend/search/components/AiAssistant.js:29
 msgid "The assistant is unavailable right now. Try searching instead."
 msgstr "Der Assistent ist gerade nicht erreichbar. Nutze so lange die Suche."
 
-
 #: src/frontend/search/components/AiAssistant.js:79
 msgid "What's popular?"
 msgstr "Was ist beliebt?"
-
 
 #: src/frontend/search/components/AiAssistant.js:80
 msgid "Help me find a gift"
 msgstr "Hilf mir, ein Geschenk zu finden"
 
-
 #: src/frontend/search/components/AiAssistant.js:81
 msgid "What's on sale?"
 msgstr "Was ist im Angebot?"
-
 
 #: src/frontend/search/components/AiAssistant.js:179
 msgid "Describe what you're looking for and I'll find it in this store."
 msgstr "Beschreibe, was du suchst - ich finde es in diesem Shop."
 
-
 #: src/frontend/search/components/AiAssistant.js:218
 msgid "Thinking"
 msgstr "Denkt nach"
-
 
 #: src/frontend/search/components/AiAssistant.js:241
 msgid "Try again"
 msgstr "Erneut versuchen"
 
-
 #: src/frontend/search/components/AiAssistant.js:255
 msgid "Write what you need"
 msgstr "Schreib, was du brauchst"
-
 
 #: src/frontend/search/components/AiAssistant.js:256
 msgid "Message the assistant"
 msgstr "Nachricht an den Assistenten"
 
-
 #: src/frontend/search/components/AiAssistant.js:264
 msgid "Send"
 msgstr "Senden"
-
 
 #. translators: %d: number of products being compared.
 #: src/frontend/search/components/AiAssistant.js:277
@@ -2675,7 +2661,6 @@ msgid "Comparing %d product"
 msgid_plural "Comparing %d products"
 msgstr[0] "%d Produkt im Vergleich"
 msgstr[1] "%d Produkte im Vergleich"
-
 
 #. translators: %d: number of products.
 #. translators: %d: number of results.
@@ -2687,36 +2672,29 @@ msgid_plural "%d results"
 msgstr[0] "%d Ergebnis"
 msgstr[1] "%d Ergebnisse"
 
-
 #: src/frontend/search/components/AiAssistant.js:297
 msgid "Back to list"
 msgstr "Zurück zur Liste"
-
 
 #: src/frontend/search/components/AiAssistant.js:298
 msgid "Compare"
 msgstr "Vergleichen"
 
-
 #: src/frontend/search/components/Browse.js:58
 msgid "Remove from recent searches"
 msgstr "Aus den letzten Suchen entfernen"
-
 
 #: src/frontend/search/components/Carousel.js:154
 msgid "Previous"
 msgstr "Zurück"
 
-
 #: src/frontend/search/components/Carousel.js:182
 msgid "Next"
 msgstr "Weiter"
 
-
 #: src/frontend/search/components/Carousel.js:188
 msgid "Pages"
 msgstr "Seiten"
-
 
 #. translators: %d: page number.
 #: src/frontend/search/components/Carousel.js:198
@@ -2724,45 +2702,37 @@ msgstr "Seiten"
 msgid "Go to page %d"
 msgstr "Zu Seite %d"
 
-
 #: src/frontend/search/components/CompareTable.js:43
 #: src/frontend/search/components/templates.js:101
 msgid "In stock"
 msgstr "Auf Lager"
-
 
 #: src/frontend/search/components/CompareTable.js:44
 #: src/frontend/search/components/templates.js:101
 msgid "Out of stock"
 msgstr "Nicht auf Lager"
 
-
 #: src/frontend/search/components/CompareTable.js:45
 msgid "On backorder"
 msgstr "Im Rückstand"
-
 
 #: src/frontend/search/components/CompareTable.js:63
 #: src/frontend/search/components/CompareTable.js:78
 msgid "Yes"
 msgstr "Ja"
 
-
 #: src/frontend/search/components/CompareTable.js:64
 #: src/frontend/search/components/CompareTable.js:78
 msgid "No"
 msgstr "Nein"
 
-
 #: src/frontend/search/components/QuizPane.js:81
 msgid "The quiz is unavailable right now."
 msgstr "Der Produktfinder ist gerade nicht verfügbar."
 
-
 #: src/frontend/search/components/QuizPane.js:112
 msgid "We could not load your matches. Please try again."
 msgstr "Wir konnten deine Treffer nicht laden. Bitte versuch es erneut."
-
 
 #: src/frontend/search/components/QuizPane.js:141
 msgid "We could not load more matches. Please try again."
@@ -2772,11 +2742,9 @@ msgstr "Wir konnten keine weiteren Treffer laden. Bitte versuch es erneut."
 msgid "Which one would you like to take?"
 msgstr "Welchen möchtest du starten?"
 
-
 #: src/frontend/search/components/QuizPane.js:235
 msgid "Start the quiz"
 msgstr "Produktfinder starten"
-
 
 #. translators: 1: current question number. 2: total questions in the quiz.
 #: src/frontend/search/components/QuizPane.js:261
@@ -2784,17 +2752,14 @@ msgstr "Produktfinder starten"
 msgid "Question %1$d of %2$d"
 msgstr "Frage %1$d von %2$d"
 
-
 #: src/frontend/search/components/QuizPane.js:268
 #: src/frontend/search/components/QuizPane.js:316
 msgid "Back"
 msgstr "Zurück"
 
-
 #: src/frontend/search/components/QuizPane.js:299
 msgid "Finding your matches…"
 msgstr "Wir suchen deine Treffer …"
-
 
 #. translators: 1: number of matches loaded so far. 2: total number of matches.
 #: src/frontend/search/components/QuizPane.js:303
@@ -2810,16 +2775,13 @@ msgid_plural "%d matches"
 msgstr[0] "%d Treffer"
 msgstr[1] "%d Treffer"
 
-
 #: src/frontend/search/components/QuizPane.js:320
 msgid "Start over"
 msgstr "Neu starten"
 
-
 #: src/frontend/search/components/QuizPane.js:326
 msgid "Your answers"
 msgstr "Deine Antworten"
-
 
 #: src/frontend/search/components/QuizPane.js:369
 #: src/frontend/search/components/SearchModal.js:871
@@ -2834,7 +2796,6 @@ msgstr "Mehr Treffer laden"
 msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr "Nichts passt zu allen Antworten. Geh einen Schritt zurück und probier eine andere."
 
-
 #. translators: %s: field name, e.g. "Price".
 #: src/frontend/search/components/RangeFilters.js:79
 #, js-format
@@ -2847,7 +2808,7 @@ msgstr "Minimum (%s)"
 msgid "Maximum %s"
 msgstr "Maximum (%s)"
 
-#: src/frontend/search/components/RangeFilters.js:102
+#: src/frontend/search/components/RangeFilters.js:117
 msgid "Apply"
 msgstr "Anwenden"
 
@@ -2855,21 +2816,17 @@ msgstr "Anwenden"
 msgid "Photo search is not available on this store."
 msgstr "Die Fotosuche ist in diesem Shop nicht verfügbar."
 
-
 #: src/frontend/search/components/SearchModal.js:593
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr "Diese Datei können wir nicht als Bild lesen. Versuch ein JPEG oder PNG unter 8 MB."
-
 
 #: src/frontend/search/components/SearchModal.js:595
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr "Die Fotosuche hat ihr Limit vorerst erreicht. Bitte versuch es später noch einmal."
 
-
 #: src/frontend/search/components/SearchModal.js:597
 msgid "That photo search failed. Try another photo."
 msgstr "Diese Fotosuche hat nicht geklappt. Versuch ein anderes Foto."
-
 
 #: src/frontend/search/components/SearchModal.js:811
 #: src/frontend/search/components/SearchModal.js:826
@@ -2877,12 +2834,10 @@ msgstr "Diese Fotosuche hat nicht geklappt. Versuch ein anderes Foto."
 msgid "Current highlights"
 msgstr "Aktuelle Highlights"
 
-
 #: src/frontend/search/components/SearchModal.js:830
 #: src/frontend/search/components/SearchModal.js:846
 msgid "Results"
 msgstr "Ergebnisse"
-
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
 #: src/frontend/search/components/SearchModal.js:837
@@ -2894,7 +2849,6 @@ msgstr "%1$d von %2$d Ergebnissen"
 msgid "Search results"
 msgstr "Suchergebnisse"
 
-
 #: src/frontend/search/components/SearchModal.js:872
 msgid "Load more results"
 msgstr "Mehr Ergebnisse laden"
@@ -2903,26 +2857,21 @@ msgstr "Mehr Ergebnisse laden"
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr "Keine Treffer für dieses Foto. Versuch ein schärferes Bild oder ein einzelnes Produkt."
 
-
 #: src/frontend/search/components/SearchModal.js:907
 msgid "Search modes"
 msgstr "Suchmodi"
-
 
 #: src/frontend/search/components/SearchModal.js:942
 msgid "Product finder"
 msgstr "Produktfinder"
 
-
 #: src/frontend/search/components/SearchModal.js:1041
 msgid "From your photo"
 msgstr "Aus deinem Foto"
 
-
 #: src/frontend/search/components/SearchModal.js:1055
 msgid "Filter by type"
 msgstr "Nach Typ filtern"
-
 
 #. translators: 1: number of results shown. 2: total number of results found.
 #: src/frontend/search/components/SearchModal.js:1132
@@ -2938,22 +2887,30 @@ msgid_plural "%d results found."
 msgstr[0] "%d Ergebnis gefunden."
 msgstr[1] "%d Ergebnisse gefunden."
 
-
 #: src/frontend/search/components/Suggestions.js:50
 msgid "Dismiss suggestions"
 msgstr "Vorschläge ausblenden"
-
 
 #: src/frontend/search/components/Suggestions.js:58
 msgid "Search suggestions"
 msgstr "Suchvorschläge"
 
-
 #: src/frontend/search/components/templates.js:41
 msgid "from"
 msgstr "ab"
 
-
 #: src/settings/store/provider.js:18
 msgid "General"
 msgstr ""
+
+#. translators: %s: field name, e.g. "Price".
+#: src/frontend/search/components/RangeFilters.js:112
+#, js-format
+msgid "Apply %s filter"
+msgstr "%s-Filter anwenden"
+
+#. translators: %s: field name, e.g. "Price".
+#: src/frontend/search/components/RangeFilters.js:125
+#, js-format
+msgid "Clear %s filter"
+msgstr "%s-Filter zurücksetzen"
