@@ -19,8 +19,8 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 ### Key Features:
 - **Full-screen search modal** - a fast, keyboard-friendly overlay with search-as-you-type, autocomplete suggestions,
   recent and popular searches, and an empty-state highlights carousel.
-- **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, price,
-  tags, and so on).
+- **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, tags,
+  and so on), with a minimum/maximum for numeric fields such as price or rating.
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, fully themeable (colors, radius, typography,
@@ -89,6 +89,9 @@ To rebuild it, check the repository out and run `npm install` followed by
 - Fixed a failed search-as-you-type keystroke navigating the shopper away mid-word.
 - Fixed saving Search Config deleting ranking boosts for content types this site does not index.
 - Fixed a switch left on after a plan downgrade blocking every other Search Config save.
+- New: filter results by price (and any other numeric field you use as a facet) with a minimum and a maximum.
+- New: a Load more button. Results were locked to the first page of twenty, with no way to reach the rest.
+- New: the Connection tab shows what your plan has used this month - searches, documents, AI messages, photo searches - and marks anything near or past its limit.
 - Merchandising rules can now curate a category listing page, not just a typed search.
 - A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.
 - The photo button and the quiz are themeable in the block editor and Elementor like the rest of the widget.

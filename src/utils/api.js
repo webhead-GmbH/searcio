@@ -120,7 +120,7 @@ const request = async ( path, params, ttl, signal ) => {
 
 /**
  * @param {string} q
- * @param {{type?: string, filters?: Object<string,string>, page?: number, perPage?: number, signal?: AbortSignal}} [options]
+ * @param {{type?: string, filters?: Object<string,string>, ranges?: Object<string,string>, page?: number, perPage?: number, signal?: AbortSignal}} [options]
  */
 export const search = ( q, options = {} ) => {
 	const params = { q, type: options.type, page: options.page || 1, per_page: options.perPage || 20 };
@@ -132,6 +132,15 @@ export const search = ( q, options = {} ) => {
 	Object.entries( options.filters || {} ).forEach( ( [ field, value ] ) => {
 		if ( value ) {
 			params[ `filter[${ field }]` ] = value;
+		}
+	} );
+
+	// `range[field]=min:max` — the same allow-list applies, so these fields
+	// also only ever come from a facet the response already returned. Either
+	// bound may be blank ("50:" is "at least 50").
+	Object.entries( options.ranges || {} ).forEach( ( [ field, value ] ) => {
+		if ( value ) {
+			params[ `range[${ field }]` ] = value;
 		}
 	} );
 

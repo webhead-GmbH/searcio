@@ -5,12 +5,13 @@ import {__, _n, sprintf} from '@wordpress/i18n';
 
 import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
-import {buildFilterParams, buildTypeParam, extractFieldFacets, humanizeFieldLabel, mergeFieldFacets, toggleSelection} from '../../../utils/facets';
+import {appendHits, buildFilterParams, buildRangeParams, buildTypeParam, extractFieldFacets, extractRangeFields, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, toggleSelection, totalIsExact} from '../../../utils/facets';
 import {redirectTarget} from '../../../utils/redirect';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
 import QuizPane from './QuizPane';
+import RangeFilters from './RangeFilters';
 import SearchInput from './SearchInput';
 import Suggestions from './Suggestions';
 import Browse from './Browse';
@@ -106,6 +107,10 @@ const SearchModal = ({
 	// Every facet key from the last `/search` response other than the
 	// built-in `types`, rendered as its own dynamic chip group.
 	const [facetGroups, setFacetGroups] = useState({});
+	// Numeric facet fields and the span the loaded hits cover, plus the bounds
+	// the visitor has applied to them (`range[field]=min:max`).
+	const [rangeFields, setRangeFields] = useState({});
+	const [activeRanges, setActiveRanges] = useState({});
 	const [suggestions, setSuggestions] = useState([]);
 	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 	const [results, setResults] = useState(null);
@@ -120,6 +125,9 @@ const SearchModal = ({
 	const [assistantEnabled, setAssistantEnabled] = useState(false);
 	const [quizEnabled, setQuizEnabled] = useState(false);
 	const [visualEnabled, setVisualEnabled] = useState(false);
+	// Semantic search changes what `total` in a `/search` response means - see
+	// `totalIsExact()`.
+	const [semanticEnabled, setSemanticEnabled] = useState(false);
 	const [activeTab, setActiveTab] = useState('search');
 	const [assistantOpened, setAssistantOpened] = useState(false);
 	const [quizOpened, setQuizOpened] = useState(false);
@@ -132,6 +140,7 @@ const SearchModal = ({
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
+	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [error, setError] = useState('');
 	const [recent, setRecent] = useState(() => getRecentSearches());
 	const [isListening, setIsListening] = useState(false);
@@ -257,6 +266,7 @@ const SearchModal = ({
 					setAssistantEnabled(Boolean(capabilities.assistant));
 					setQuizEnabled(Boolean(capabilities.quiz));
 					setVisualEnabled(Boolean(capabilities.visual_search));
+					setSemanticEnabled(Boolean(capabilities.semantic_search));
 				}
 			})
 			.catch(() => {});
@@ -296,7 +306,7 @@ const SearchModal = ({
 	// `facetsOverride` lets a field-facet click pass its just-toggled selection
 	// straight through instead of reading `activeFacets` state, which hasn't
 	// re-rendered yet at the point the click handler fires the request.
-	const loadHighlights = useCallback(async (type, facetsOverride) => {
+	const loadHighlights = useCallback(async (type, facetsOverride, rangesOverride) => {
 		if (!isConfigured()) {
 			setIsLoadingHighlights(false);
 
@@ -313,10 +323,12 @@ const SearchModal = ({
 		// (unlike a real committed search below).
 		const forced = {...currentLangFilter(), ...('featured' === highlightsSource ? {featured: 'true'} : {})};
 		const appliedFacets = facetsOverride ?? activeFacets;
+		const appliedRanges = rangesOverride ?? activeRanges;
 		const filters = buildFilterParams(appliedFacets, forced);
+		const ranges = buildRangeParams(appliedRanges);
 
 		try {
-			const response = await search('', {type, filters, perPage: 12});
+			const response = await search('', {type, filters, ranges, perPage: 12});
 
 			setHighlights(response.hits || []);
 			setHighlightsSearchId(response.search_id || '');
@@ -328,13 +340,14 @@ const SearchModal = ({
 				setFacets(response.facets?.types || []);
 			}
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 		} catch (e) {
 			setHighlights([]);
 		} finally {
 			await delay(Math.max(0, MIN_LOADING - (Date.now() - started)));
 			setIsLoadingHighlights(false);
 		}
-	}, [activeFacets, highlightsSource]);
+	}, [activeFacets, activeRanges, highlightsSource]);
 
 	useEffect(() => {
 		void loadHighlights(scopeType || '');
@@ -380,7 +393,7 @@ const SearchModal = ({
 	// `facetsOverride` mirrors `loadHighlights()`'s param — used only by a
 	// field-facet click, which needs its just-toggled selection applied before
 	// `activeFacets` state itself has re-rendered.
-	const runSearch = useCallback(async (q, type = buildTypeParam(scopeType, activeTypes), commit = true, facetsOverride) => {
+	const runSearch = useCallback(async (q, type = buildTypeParam(scopeType, activeTypes), commit = true, facetsOverride, rangesOverride) => {
 		const trimmed = q.trim();
 
 		setQuery(q);
@@ -428,10 +441,12 @@ const SearchModal = ({
 		const started = Date.now();
 
 		const appliedFacets = facetsOverride ?? activeFacets;
+		const appliedRanges = rangesOverride ?? activeRanges;
 		const filters = buildFilterParams(appliedFacets, currentLangFilter());
+		const ranges = buildRangeParams(appliedRanges);
 
 		try {
-			const response = await search(trimmed, {type, filters, signal: controller.signal});
+			const response = await search(trimmed, {type, filters, ranges, signal: controller.signal});
 
 			if (!isLatest()) {
 				return;
@@ -464,7 +479,7 @@ const SearchModal = ({
 				return;
 			}
 
-			setResults(response);
+			setResults({...response, pageCount: (response.hits || []).length});
 			// A typed search replaces whatever a photo put on screen.
 			setVisualTags([]);
 			setVisualActive(false);
@@ -476,6 +491,7 @@ const SearchModal = ({
 			}
 
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 
 			setRecent(addRecentSearch(trimmed));
 		} catch (e) {
@@ -503,7 +519,7 @@ const SearchModal = ({
 				}
 			}
 		}
-	}, [activeTypes, activeFacets, i18n.error, scopeType]);
+	}, [activeTypes, activeFacets, activeRanges, i18n.error, scopeType]);
 
 	/**
 	 * Search by photo. A vision model turns the image into tags and runs those
@@ -548,6 +564,10 @@ const SearchModal = ({
 		setActiveFacets({});
 		setActiveTypes([]);
 		setFacets([]);
+		// `/search/visual` takes no filters at all, so an applied bound would
+		// sit on screen describing a narrowing that is not being applied.
+		setActiveRanges({});
+		setRangeFields({});
 
 		try {
 			const response = await visualSearch(file, {signal: controller.signal});
@@ -637,10 +657,94 @@ const SearchModal = ({
 		}
 	};
 
+	// A bound is applied on submit rather than on every keystroke: a partly
+	// typed number ("1" on the way to "150") is a different, wrong filter, and
+	// searching for it would make the field fight the person typing in it.
+	const onRangeApply = (field, bound) => {
+		const min = String(bound?.min ?? '').trim();
+		const max = String(bound?.max ?? '').trim();
+		const nextRanges = {...activeRanges};
+
+		if ('' === min && '' === max) {
+			delete nextRanges[field];
+		} else {
+			nextRanges[field] = {min, max};
+		}
+
+		setActiveRanges(nextRanges);
+		const typeParam = buildTypeParam(scopeType, activeTypes);
+
+		if ('' === trimmedQuery) {
+			void loadHighlights(typeParam, undefined, nextRanges);
+		} else {
+			void runSearch(query, typeParam, true, undefined, nextRanges);
+		}
+	};
+
 	const onSelectSuggestion = (label) => {
 		setSuggestionsDismissed(true);
 		void runSearch(label);
 	};
+
+	/**
+	 * Append the next page of the search already on screen.
+	 *
+	 * The API has always paged (`page` / `per_page`, with the true `total`
+	 * alongside the hits); the modal only ever asked for page one and reported
+	 * what it had loaded as if that were everything, so on a catalogue of any
+	 * size the other results were unreachable.
+	 *
+	 * Appends rather than replaces: this is one continuous result list a
+	 * visitor scrolls, not a numbered page they navigate away to.
+	 */
+	const loadMore = useCallback(async () => {
+		if (isLoadingMore || !results) {
+			return;
+		}
+
+		// Not a new search, so this must not claim a new sequence id - it only
+		// has to notice if a real search has replaced what it was extending.
+		const seq = searchSeq.current;
+		const nextPage = (Number(results.page) || 1) + 1;
+		const controller = new AbortController();
+
+		abortRef.current = controller;
+		setIsLoadingMore(true);
+
+		try {
+			const response = await search(trimmedQuery, {
+				type: buildTypeParam(scopeType, activeTypes),
+				filters: buildFilterParams(activeFacets, currentLangFilter()),
+				ranges: buildRangeParams(activeRanges),
+				page: nextPage,
+				signal: controller.signal,
+			});
+
+			if (seq !== searchSeq.current) {
+				return;
+			}
+
+			setResults((current) => ({
+				...response,
+				// Track the page that was asked for, not the one the response
+				// echoes: a response without `page` would otherwise re-request
+				// the same page on every click.
+				page: nextPage,
+				pageCount: (response.hits || []).length,
+				// Clicks on every page attribute to the search that started it.
+				search_id: current?.search_id || response.search_id,
+				hits: appendHits(current?.hits, response.hits),
+			}));
+		} catch (e) {
+			if ('AbortError' !== e.name && seq === searchSeq.current) {
+				setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
+			}
+		} finally {
+			if (seq === searchSeq.current) {
+				setIsLoadingMore(false);
+			}
+		}
+	}, [isLoadingMore, results, trimmedQuery, scopeType, activeTypes, activeFacets, activeRanges, i18n.error]);
 
 	const onRemoveRecent = (label) => setRecent(removeRecentSearch(label));
 	const onClearRecent = () => setRecent(clearRecentSearches());
@@ -686,6 +790,17 @@ const SearchModal = ({
 	};
 
 	const resultsHits = results?.hits || [];
+	// `total` is only a count of matches on the lexical path; a semantic query
+	// reports the size of the window it retrieved. Say "of 137" only when that
+	// number means what it looks like it means.
+	const exactTotal = totalIsExact(semanticEnabled, trimmedQuery);
+	const totalResults = Number.isFinite(Number(results?.total)) ? Number(results.total) : resultsHits.length;
+	// A photo search is a single fixed page server-side - it takes no `page`
+	// parameter - so there is nothing more to load for one.
+	const hasMore = !visualActive && hasMorePages(results, resultsHits.length, exactTotal);
+	// Without an exact total there is only one number that is true: how many
+	// are on screen.
+	const shownTotal = exactTotal ? totalResults : resultsHits.length;
 
 	// The main slot inside the browse layout swaps between highlights (idle),
 	// a skeleton (loading), and the results carousel / empty message.
@@ -716,13 +831,21 @@ const SearchModal = ({
 		mainContent = <SearchResultsSkeleton/>;
 	} else if (results) {
 		mainTitle = resultsHits.length > 0
-			? sprintf(
-				/* translators: %d: number of results. */
-				_n('%d result', '%d results', resultsHits.length, 'webhead-search-cloud'),
-				resultsHits.length
-			)
+			? (exactTotal && hasMore
+				? sprintf(
+					/* translators: 1: number of results loaded so far. 2: total number of results. */
+					__('%1$d of %2$d results', 'webhead-search-cloud'),
+					resultsHits.length,
+					totalResults
+				)
+				: sprintf(
+					/* translators: %d: number of results. */
+					_n('%d result', '%d results', shownTotal, 'webhead-search-cloud'),
+					shownTotal
+				))
 			: __('Results', 'webhead-search-cloud');
 		mainContent = resultsHits.length > 0 ? (
+			<>
 			<Carousel
 				items={resultsHits}
 				getKey={(hit) => hit.id}
@@ -736,6 +859,21 @@ const SearchModal = ({
 				)}
 				ariaLabel={__('Search results', 'webhead-search-cloud')}
 			/>
+			{hasMore && (
+				<div className="whsc-load-more">
+					<button
+						type="button"
+						className="whsc-load-more__button"
+						onClick={() => void loadMore()}
+						disabled={isLoadingMore}
+					>
+						{isLoadingMore
+							? __('Loading…', 'webhead-search-cloud')
+							: __('Load more results', 'webhead-search-cloud')}
+					</button>
+				</div>
+			)}
+			</>
 		) : (
 			<p className="whsc-no-results">
 				{visualActive
@@ -958,6 +1096,15 @@ const SearchModal = ({
 					</div>
 				))}
 
+				{!visualActive && (
+					<RangeFilters
+						fields={rangeFields}
+						active={activeRanges}
+						onApply={onRangeApply}
+						busy={isSearching}
+					/>
+				)}
+
 				{error && (
 					<Notice status="error" isDismissible={false}>
 						{error}
@@ -979,11 +1126,18 @@ const SearchModal = ({
 					{isSearching && (i18n.searching || __('Searching…', 'webhead-search-cloud'))}
 					{!isSearching && results && (
 						resultsHits.length > 0
-							? sprintf(
-								/* translators: %d: number of results found. */
-								_n('%d result found.', '%d results found.', resultsHits.length, 'webhead-search-cloud'),
-								resultsHits.length
-							)
+							? (exactTotal && hasMore
+								? sprintf(
+									/* translators: 1: number of results shown. 2: total number of results found. */
+									__('Showing %1$d of %2$d results.', 'webhead-search-cloud'),
+									resultsHits.length,
+									totalResults
+								)
+								: sprintf(
+									/* translators: %d: number of results found. */
+									_n('%d result found.', '%d results found.', shownTotal, 'webhead-search-cloud'),
+									shownTotal
+								))
 							: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))
 					)}
 				</p>

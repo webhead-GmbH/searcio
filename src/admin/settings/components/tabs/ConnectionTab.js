@@ -15,6 +15,7 @@ import {Flex, Grid} from '../../../../components/Layout';
 import {showToast} from '../../../../toast';
 import ConnectionExplainer from './ConnectionExplainer';
 import ConnectionResultNotice from './ConnectionResultNotice';
+import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
 
 const pluginData = window.webhead_search_cloudData || {};
@@ -226,6 +227,11 @@ const ConnectionTab = () => {
 				{isConnected ? (
 					<Flex direction="column" gap={16}>
 						<ConnectionResultNotice result={connectedResult}/>
+
+						{/* The same health response the notice above reads. A spent
+						    allowance is why a storefront stops returning results, so it
+						    belongs where an admin looks when search "breaks". */}
+						<UsageCard usage={connectedResult?.usage}/>
 
 						<Flex align="center" gap={12} wrap>
 							<Button

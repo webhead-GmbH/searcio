@@ -35,6 +35,9 @@
     "src/admin/settings/components/tabs/SyncTab.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/tabs/UsageCard.js": [
+        "public/bundle.settings.js"
+    ],
     "src/blocks/products/edit.js": [
         "public/bundle.products-block-editor.js"
     ],
@@ -57,6 +60,9 @@
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/QuizPane.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/RangeFilters.js": [
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/SearchInput.js": [

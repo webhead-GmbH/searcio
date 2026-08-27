@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-27T07:26:28+00:00\n"
+"POT-Creation-Date: 2026-08-27T09:26:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -177,9 +177,9 @@ msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:111
 #: src/frontend/search/components/SearchInput.js:31
-#: src/frontend/search/components/SearchModal.js:765
-#: src/frontend/search/components/SearchModal.js:777
-#: src/frontend/search/components/SearchModal.js:841
+#: src/frontend/search/components/SearchModal.js:903
+#: src/frontend/search/components/SearchModal.js:915
+#: src/frontend/search/components/SearchModal.js:979
 msgid "Search"
 msgstr ""
 
@@ -663,7 +663,7 @@ msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:817
 #: src/blocks/search/edit.js:326
-#: src/frontend/search/components/SearchModal.js:790
+#: src/frontend/search/components/SearchModal.js:928
 msgid "AI Assistant"
 msgstr ""
 
@@ -796,13 +796,13 @@ msgid "Dot color (active)"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:198
-#: src/frontend/search/components/SearchModal.js:745
-#: src/frontend/search/components/SearchModal.js:987
+#: src/frontend/search/components/SearchModal.js:883
+#: src/frontend/search/components/SearchModal.js:1141
 msgid "No results found."
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:199
-#: src/frontend/search/components/SearchModal.js:979
+#: src/frontend/search/components/SearchModal.js:1126
 msgid "Searching…"
 msgstr ""
 
@@ -818,7 +818,8 @@ msgid "Sale"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:203
-#: src/frontend/search/components/SearchModal.js:487
+#: src/frontend/search/components/SearchModal.js:503
+#: src/frontend/search/components/SearchModal.js:740
 msgid "Search is unavailable right now."
 msgstr ""
 
@@ -835,23 +836,24 @@ msgid "Popular searches"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:206
+#: src/frontend/search/components/RangeFilters.js:114
 #: src/frontend/search/components/SearchInput.js:45
 msgid "Clear"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:207
-#: src/frontend/search/components/SearchModal.js:814
-#: src/frontend/search/components/SearchModal.js:874
+#: src/frontend/search/components/SearchModal.js:952
+#: src/frontend/search/components/SearchModal.js:1012
 msgid "Close search"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:208
-#: src/frontend/search/components/SearchModal.js:862
+#: src/frontend/search/components/SearchModal.js:1000
 msgid "Search by voice"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:209
-#: src/frontend/search/components/SearchModal.js:924
+#: src/frontend/search/components/SearchModal.js:1062
 msgid "All"
 msgstr ""
 
@@ -1024,38 +1026,38 @@ msgid "Could not disconnect from Search Cloud. Try again."
 msgstr ""
 
 #: includes/Routing/Connection_Endpoint.php:170
-#: includes/Routing/Connection_Endpoint.php:226
+#: includes/Routing/Connection_Endpoint.php:231
 #: includes/Routing/Search_Config_Endpoint.php:74
 msgid "Could not reach Search Cloud."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:276
+#: includes/Routing/Connection_Endpoint.php:281
 msgid "This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:280
+#: includes/Routing/Connection_Endpoint.php:285
 msgid "Too many connect attempts. Wait a while and try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:284
+#: includes/Routing/Connection_Endpoint.php:289
 msgid "Search Cloud cannot provision new accounts right now. Try again later."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:292
-#: includes/Routing/Connection_Endpoint.php:300
+#: includes/Routing/Connection_Endpoint.php:297
+#: includes/Routing/Connection_Endpoint.php:336
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:45
 msgid "Connection failed."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:297
+#: includes/Routing/Connection_Endpoint.php:333
 msgid "Invalid write credentials. Check the write key and secret."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:298
+#: includes/Routing/Connection_Endpoint.php:334
 msgid "Site is disabled in Search Cloud."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:299
+#: includes/Routing/Connection_Endpoint.php:335
 msgid "No site found for these credentials."
 msgstr ""
 
@@ -1295,17 +1297,17 @@ msgid "Accepting the Terms of Service and Privacy Policy is required to continue
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:62
-#: src/admin/settings/components/tabs/ConnectionTab.js:323
+#: src/admin/settings/components/tabs/ConnectionTab.js:329
 msgid "Terms of Service"
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:69
-#: src/admin/settings/components/tabs/ConnectionTab.js:325
+#: src/admin/settings/components/tabs/ConnectionTab.js:331
 msgid "Privacy Policy"
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:77
-#: src/admin/settings/components/tabs/ConnectionTab.js:337
+#: src/admin/settings/components/tabs/ConnectionTab.js:343
 msgid "Data Processing Agreement"
 msgstr ""
 
@@ -1329,120 +1331,120 @@ msgstr ""
 msgid " (site #%d)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:32
+#: src/admin/settings/components/tabs/ConnectionTab.js:33
 msgid "The connection request failed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:89
+#: src/admin/settings/components/tabs/ConnectionTab.js:90
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:76
 msgid "The test request failed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:196
+#: src/admin/settings/components/tabs/ConnectionTab.js:197
 msgid "Disconnected from Search Cloud."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:199
+#: src/admin/settings/components/tabs/ConnectionTab.js:200
 msgid "Could not disconnect."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:209
+#: src/admin/settings/components/tabs/ConnectionTab.js:210
 msgid "Connecting…"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:210
+#: src/admin/settings/components/tabs/ConnectionTab.js:211
 msgid "Connect to Search Cloud"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:216
+#: src/admin/settings/components/tabs/ConnectionTab.js:217
 msgid "Search Cloud connection"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:219
+#: src/admin/settings/components/tabs/ConnectionTab.js:220
 msgid "Connect this site to webhead Search Cloud to start syncing content and enable search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:239
-#: src/admin/settings/components/tabs/ConnectionTab.js:265
+#: src/admin/settings/components/tabs/ConnectionTab.js:245
+#: src/admin/settings/components/tabs/ConnectionTab.js:271
 msgid "Disconnect"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:250
-#: src/admin/settings/components/tabs/ConnectionTab.js:405
+#: src/admin/settings/components/tabs/ConnectionTab.js:256
+#: src/admin/settings/components/tabs/ConnectionTab.js:411
 #: src/admin/settings/components/tabs/IndexingTab.js:392
 msgid "Hide advanced options"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:251
+#: src/admin/settings/components/tabs/ConnectionTab.js:257
 msgid "Advanced: manual key entry / rotate keys"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:267
+#: src/admin/settings/components/tabs/ConnectionTab.js:273
 msgid "This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account."
 msgstr ""
 
 #. translators: %s: the email address a confirmation link was sent to.
-#: src/admin/settings/components/tabs/ConnectionTab.js:280
+#: src/admin/settings/components/tabs/ConnectionTab.js:286
 #, js-format
 msgid "An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:305
+#: src/admin/settings/components/tabs/ConnectionTab.js:311
 msgid "Accept the Terms of Service and Privacy Policy to continue."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:322
-#: src/admin/settings/components/tabs/ConnectionTab.js:336
+#: src/admin/settings/components/tabs/ConnectionTab.js:328
+#: src/admin/settings/components/tabs/ConnectionTab.js:342
 msgid "I accept the"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:324
+#: src/admin/settings/components/tabs/ConnectionTab.js:330
 msgid "and"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:326
+#: src/admin/settings/components/tabs/ConnectionTab.js:332
 msgid "(required)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:338
+#: src/admin/settings/components/tabs/ConnectionTab.js:344
 msgid "(optional)"
 msgstr ""
 
 #. translators: %s: the email address used to connect.
-#: src/admin/settings/components/tabs/ConnectionTab.js:348
+#: src/admin/settings/components/tabs/ConnectionTab.js:354
 #, js-format
 msgid "You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:351
+#: src/admin/settings/components/tabs/ConnectionTab.js:357
 msgid "An admin email is required to connect."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:363
+#: src/admin/settings/components/tabs/ConnectionTab.js:369
 msgid "Use the default email instead"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:364
+#: src/admin/settings/components/tabs/ConnectionTab.js:370
 msgid "Not this email?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:375
+#: src/admin/settings/components/tabs/ConnectionTab.js:381
 msgid "Email"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:382
+#: src/admin/settings/components/tabs/ConnectionTab.js:388
 msgid "Your name (optional)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:389
+#: src/admin/settings/components/tabs/ConnectionTab.js:395
 msgid "Company name (optional)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:390
+#: src/admin/settings/components/tabs/ConnectionTab.js:396
 msgid "Used as the Search Cloud account name."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:406
+#: src/admin/settings/components/tabs/ConnectionTab.js:412
 msgid "Advanced: manual key entry"
 msgstr ""
 
@@ -2238,6 +2240,54 @@ msgstr ""
 msgid "Not now"
 msgstr ""
 
+#: src/admin/settings/components/tabs/UsageCard.js:22
+msgid "Searches"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:23
+msgid "Indexed documents"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:24
+msgid "AI assistant messages"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:25
+msgid "Photo searches"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:26
+msgid "AI image tagging"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:59
+msgid "This month"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:61
+msgid "What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search."
+msgstr ""
+
+#. translators: 1: amount used. 2: the plan's allowance.
+#: src/admin/settings/components/tabs/UsageCard.js:80
+#, js-format
+msgid "%1$s of %2$s"
+msgstr ""
+
+#. translators: 1: allowance name. 2: percentage used.
+#: src/admin/settings/components/tabs/UsageCard.js:94
+#, js-format
+msgid "%1$s: %2$d%% used"
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:103
+msgid "Spent for this month. Upgrade to keep this working."
+msgstr ""
+
+#: src/admin/settings/components/tabs/UsageCard.js:108
+msgid "Close to the limit."
+msgstr ""
+
 #: src/admin/settings/components/UpgradeButton.js:65
 msgid "Upgrade your plan on Search Cloud (opens in a new tab)"
 msgstr ""
@@ -2595,7 +2645,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:282
-#: src/frontend/search/components/SearchModal.js:721
+#: src/frontend/search/components/SearchModal.js:843
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -2656,110 +2706,161 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:77
+#: src/frontend/search/components/QuizPane.js:81
 msgid "The quiz is unavailable right now."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:106
+#: src/frontend/search/components/QuizPane.js:112
 msgid "We could not load your matches. Please try again."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:191
+#: src/frontend/search/components/QuizPane.js:141
+msgid "We could not load more matches. Please try again."
+msgstr ""
+
+#: src/frontend/search/components/QuizPane.js:225
 msgid "Which one would you like to take?"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:201
+#: src/frontend/search/components/QuizPane.js:235
 msgid "Start the quiz"
 msgstr ""
 
 #. translators: 1: current question number. 2: total questions in the quiz.
-#: src/frontend/search/components/QuizPane.js:222
+#: src/frontend/search/components/QuizPane.js:261
 #, js-format
 msgid "Question %1$d of %2$d"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:229
-#: src/frontend/search/components/QuizPane.js:270
+#: src/frontend/search/components/QuizPane.js:268
+#: src/frontend/search/components/QuizPane.js:316
 msgid "Back"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:260
+#: src/frontend/search/components/QuizPane.js:299
 msgid "Finding your matches…"
 msgstr ""
 
+#. translators: 1: number of matches loaded so far. 2: total number of matches.
+#: src/frontend/search/components/QuizPane.js:303
+#, js-format
+msgid "%1$d of %2$d matches"
+msgstr ""
+
 #. translators: %d: number of matching products.
-#: src/frontend/search/components/QuizPane.js:263
+#: src/frontend/search/components/QuizPane.js:309
 #, js-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/QuizPane.js:274
+#: src/frontend/search/components/QuizPane.js:320
 msgid "Start over"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:280
+#: src/frontend/search/components/QuizPane.js:326
 msgid "Your answers"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:316
+#: src/frontend/search/components/QuizPane.js:369
+#: src/frontend/search/components/SearchModal.js:871
+msgid "Loading…"
+msgstr ""
+
+#: src/frontend/search/components/QuizPane.js:370
+msgid "Load more matches"
+msgstr ""
+
+#: src/frontend/search/components/QuizPane.js:377
 msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:571
+#. translators: %s: field name, e.g. "Price".
+#: src/frontend/search/components/RangeFilters.js:79
+#, js-format
+msgid "Minimum %s"
+msgstr ""
+
+#. translators: %s: field name, e.g. "Price".
+#: src/frontend/search/components/RangeFilters.js:95
+#, js-format
+msgid "Maximum %s"
+msgstr ""
+
+#: src/frontend/search/components/RangeFilters.js:102
+msgid "Apply"
+msgstr ""
+
+#: src/frontend/search/components/SearchModal.js:591
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:573
+#: src/frontend/search/components/SearchModal.js:593
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:575
+#: src/frontend/search/components/SearchModal.js:595
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:577
+#: src/frontend/search/components/SearchModal.js:597
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:696
-#: src/frontend/search/components/SearchModal.js:711
-#: src/frontend/search/components/SearchModal.js:755
+#: src/frontend/search/components/SearchModal.js:811
+#: src/frontend/search/components/SearchModal.js:826
+#: src/frontend/search/components/SearchModal.js:893
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:715
-#: src/frontend/search/components/SearchModal.js:724
+#: src/frontend/search/components/SearchModal.js:830
+#: src/frontend/search/components/SearchModal.js:846
 msgid "Results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:737
+#. translators: 1: number of results loaded so far. 2: total number of results.
+#: src/frontend/search/components/SearchModal.js:837
+#, js-format
+msgid "%1$d of %2$d results"
+msgstr ""
+
+#: src/frontend/search/components/SearchModal.js:860
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:744
+#: src/frontend/search/components/SearchModal.js:872
+msgid "Load more results"
+msgstr ""
+
+#: src/frontend/search/components/SearchModal.js:882
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:769
+#: src/frontend/search/components/SearchModal.js:907
 msgid "Search modes"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:804
+#: src/frontend/search/components/SearchModal.js:942
 msgid "Product finder"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:903
+#: src/frontend/search/components/SearchModal.js:1041
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:917
+#: src/frontend/search/components/SearchModal.js:1055
 msgid "Filter by type"
 msgstr ""
 
+#. translators: 1: number of results shown. 2: total number of results found.
+#: src/frontend/search/components/SearchModal.js:1132
+#, js-format
+msgid "Showing %1$d of %2$d results."
+msgstr ""
+
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:984
+#: src/frontend/search/components/SearchModal.js:1138
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."
@@ -2780,4 +2881,24 @@ msgstr ""
 
 #: src/settings/store/provider.js:18
 msgid "General"
+msgstr ""
+
+#: blocks/products/block.json
+msgctxt "block title"
+msgid "Search Cloud Products"
+msgstr ""
+
+#: blocks/products/block.json
+msgctxt "block description"
+msgid "A row of products from webhead Search Cloud: similar products on a product page, or a curated listing on a category page."
+msgstr ""
+
+#: blocks/search/block.json
+msgctxt "block title"
+msgid "Search Cloud"
+msgstr ""
+
+#: blocks/search/block.json
+msgctxt "block description"
+msgid "A full-screen search box or icon powered by webhead Search Cloud."
 msgstr ""

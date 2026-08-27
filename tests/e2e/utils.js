@@ -51,6 +51,8 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {Array}          [options.popular]     `/search/popular` items ({ query }).
  * @param {Array}          [options.templates]   `/card-templates` templates.
  * @param {number}         [options.searchStatus] Force a non-200 `/search` status.
+ * @param {?number|Function} [options.total]     `/search` total, or a `(URL) => total` function; defaults to the number of hits returned.
+ * @param {boolean}        [options.semanticSearch] Advertise semantic search, which changes what `total` means.
  * @param {Function}       [options.onSearch]    Called with the `/search` request URL.
  * @param {?string}        [options.banner]      Merchandising banner returned with `/search`.
  * @param {Array}          [options.similar]     `/search/similar` results.
@@ -74,6 +76,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		templates = [],
 		searchStatus = 200,
 		searchId = 'search-e2e',
+		total = null,
 		banner = null,
 		similar = [],
 		similarStatus = 200,
@@ -88,6 +91,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		quiz = false,
 		quizzes = [],
 		visualSearch = false,
+		semanticSearch = false,
 		visualTags = [ 'red', 'silk', 'dress' ],
 		visualHits = [ postHit( { title: 'Red Silk Dress', type: 'product' }, 'visual-1' ) ],
 		visualStatus = 200,
@@ -105,7 +109,7 @@ export async function mockSearchCloud( page, options = {} ) {
 
 		if ( '/storefront-config' === path ) {
 			return json( {
-				capabilities: { assistant, semantic_search: false, quiz, visual_search: visualSearch },
+				capabilities: { assistant, semantic_search: semanticSearch, quiz, visual_search: visualSearch },
 				facets: [],
 				languages: [],
 			} );
@@ -164,7 +168,17 @@ export async function mockSearchCloud( page, options = {} ) {
 				return json( { query: term, redirect: target } );
 			}
 			const list = 'function' === typeof hits ? hits( url ) : hits;
-			return json( { search_id: searchId, hits: list, total: list.length, facets, banner } );
+			// A real `total` is what the index matched, which is only the same as
+			// the page's length when everything fits on one page.
+			return json( {
+				search_id: searchId,
+				hits: list,
+				total: null === total ? list.length : ( 'function' === typeof total ? total( url ) : total ),
+				page: Number( url.searchParams.get( 'page' ) || 1 ),
+				per_page: Number( url.searchParams.get( 'per_page' ) || 20 ),
+				facets,
+				banner,
+			} );
 		}
 		if ( '/search/click' === path ) {
 			return json( { recorded: true }, 202 );
@@ -299,6 +313,9 @@ export class SearchWidget {
 		this.quizOptions = this.modal.locator( '.whsc-quiz__option' );
 		this.quizAnswers = this.modal.locator( '.whsc-quiz__answer' );
 		this.quizCards = this.modal.locator( '.whsc-quiz__grid .whsc-card' );
+		this.rangeGroups = this.modal.locator( '.whsc-range' );
+		this.loadMore = this.modal.locator( '.whsc-load-more__button' );
+		this.resultsHeading = this.modal.locator( '.whsc-browse__main .whsc-section-title' );
 	}
 
 	async openModal() {

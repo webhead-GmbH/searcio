@@ -699,3 +699,64 @@
     color: #646970;
   }
 }
+
+/*
+ * Plan allowances on the Connection tab (`UsageCard`). Three states, because
+ * the difference between "fine", "watch this" and "this has stopped working"
+ * is the whole point of showing the numbers at all.
+ */
+.whsc-usage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    --whsc-usage-fill: #2271b1;
+
+    &--near {
+      --whsc-usage-fill: #b26200;
+    }
+
+    &--spent {
+      --whsc-usage-fill: #b32d2e;
+    }
+  }
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  &__label {
+    font-weight: 500;
+  }
+
+  &__count {
+    color: #50575e;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #f0f0f1;
+    overflow: hidden;
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--whsc-usage-fill);
+  }
+
+  &__note {
+    color: var(--whsc-usage-fill);
+    margin: 0;
+  }
+}

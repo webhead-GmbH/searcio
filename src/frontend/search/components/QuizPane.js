@@ -3,7 +3,7 @@ import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { currentLangFilter, fetchQuizzes, search, trackClick } from '../../../utils/api';
-import { buildFilterParams, humanizeFieldLabel } from '../../../utils/facets';
+import { appendHits, buildFilterParams, hasMorePages, humanizeFieldLabel } from '../../../utils/facets';
 import { applyOption, firstQuestion, nextQuestion, normalizeQuizzes, quizProgress } from '../../../utils/quiz';
 import { ResultCard } from './templates';
 import SearchResultsSkeleton from './SearchResultsSkeleton';
@@ -39,9 +39,13 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	const [ answerLabels, setAnswerLabels ] = useState( {} );
 	const [ results, setResults ] = useState( null );
 	const [ isSearching, setIsSearching ] = useState( false );
+	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
 	const [ error, setError ] = useState( '' );
 
 	const abortRef = useRef( null );
+	// The answers the results on screen came from, so another page can be asked
+	// for without walking the quiz again.
+	const appliedTagsRef = useRef( {} );
 
 	// Fetched once when the tab is first opened. An empty list is a normal
 	// answer, not a failure - it means nothing is published yet.
@@ -94,6 +98,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		const controller = new AbortController();
 		abortRef.current = controller;
 
+		appliedTagsRef.current = finalTags;
+
 		try {
 			const response = await search( '', {
 				filters: buildFilterParams( {}, { ...finalTags, ...currentLangFilter() } ),
@@ -109,6 +115,34 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			setIsSearching( false );
 		}
 	}, [] );
+
+	const loadMore = useCallback( async () => {
+		if ( isLoadingMore ) {
+			return;
+		}
+
+		const nextPage = ( Number( results?.page ) || 1 ) + 1;
+
+		setIsLoadingMore( true );
+
+		try {
+			const response = await search( '', {
+				filters: buildFilterParams( {}, { ...appliedTagsRef.current, ...currentLangFilter() } ),
+				page: nextPage,
+			} );
+
+			setResults( ( current ) => ( {
+				...response,
+				page: nextPage,
+				search_id: current?.search_id || response.search_id,
+				hits: appendHits( current?.hits, response.hits ),
+			} ) );
+		} catch ( e ) {
+			setError( __( 'We could not load more matches. Please try again.', 'webhead-search-cloud' ) );
+		} finally {
+			setIsLoadingMore( false );
+		}
+	}, [ isLoadingMore, results ] );
 
 	const answer = ( option ) => {
 		const nextTags = applyOption( tags, option );
@@ -210,6 +244,11 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	const answers = Object.entries( tags );
 	const progress = quizProgress( quiz, history.length );
 	const hits = results?.hits || [];
+	// The quiz always searches with an empty term, which the service answers on
+	// its lexical path - so unlike a typed search, `total` here is a real count
+	// of matches (see `totalIsExact`).
+	const totalMatches = Number.isFinite( Number( results?.total ) ) ? Number( results.total ) : hits.length;
+	const hasMore = hasMorePages( results, hits.length, true );
 
 	return (
 		<div className={ `whsc-quiz${ question ? '' : ' whsc-quiz--results' }` }>
@@ -258,11 +297,18 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 						<span className="whsc-quiz__results-count">
 							{ isSearching
 								? __( 'Finding your matches…', 'webhead-search-cloud' )
-								: sprintf(
-									/* translators: %d: number of matching products. */
-									_n( '%d match', '%d matches', hits.length, 'webhead-search-cloud' ),
-									hits.length
-								) }
+								: ( hasMore
+									? sprintf(
+										/* translators: 1: number of matches loaded so far. 2: total number of matches. */
+										__( '%1$d of %2$d matches', 'webhead-search-cloud' ),
+										hits.length,
+										totalMatches
+									)
+									: sprintf(
+										/* translators: %d: number of matching products. */
+										_n( '%d match', '%d matches', totalMatches, 'webhead-search-cloud' ),
+										totalMatches
+									) ) }
 						</span>
 						<div className="whsc-quiz__results-actions">
 							{ history.length > 0 && (
@@ -308,6 +354,21 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 									onClick={ () => trackClick( results?.search_id, hit.id, index + 1 ) }
 								/>
 							) ) }
+						</div>
+					) }
+
+					{ ! isSearching && hasMore && (
+						<div className="whsc-load-more">
+							<button
+								type="button"
+								className="whsc-load-more__button"
+								onClick={ () => void loadMore() }
+								disabled={ isLoadingMore }
+							>
+								{ isLoadingMore
+									? __( 'Loading…', 'webhead-search-cloud' )
+									: __( 'Load more matches', 'webhead-search-cloud' ) }
+							</button>
 						</div>
 					) }
 

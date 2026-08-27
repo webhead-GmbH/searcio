@@ -101,6 +101,18 @@ describe( 'search', () => {
 		expect( url ).not.toContain( 'filter%5Bcolor%5D' );
 	} );
 
+	it( 'sends numeric bounds the way the API takes them: range[field]=min:max', async () => {
+		const api = loadApi();
+
+		await api.search( 'shirt', { ranges: { price: '10:50', rating: '4:' }, page: 2 } );
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+
+		expect( url ).toContain( 'range%5Bprice%5D=10%3A50' );
+		expect( url ).toContain( 'range%5Brating%5D=4%3A' );
+		expect( url ).toContain( 'page=2' );
+	} );
+
 	it( 'throws when the response is not ok', async () => {
 		global.fetch.mockResolvedValue( jsonResponse( {}, false, 500 ) );
 		const api = loadApi();

@@ -77,6 +77,39 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 'https://search.example.com/acme/billing', $data['plan']['upgrade_url'] );
 	}
 
+	public function test_test_connection_surfaces_every_metered_allowance_not_just_documents(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok(
+			[
+				'site'  => [ 'id' => 4821, 'status' => 'connected' ],
+				'usage' => [
+					'documents'  => [ 'used' => 10, 'limit' => 1000, 'percent' => 1, 'exceeded' => false, 'near_limit' => false ],
+					'searches'   => [ 'used' => 9500, 'limit' => 10000, 'percent' => 95, 'exceeded' => false, 'near_limit' => true ],
+					'sites'      => [ 'used' => 1, 'limit' => 1, 'percent' => 100, 'exceeded' => false, 'near_limit' => true ],
+					// An allowance the plan does not meter at all.
+					'ai_messages' => [ 'used' => 3, 'limit' => null, 'percent' => null, 'exceeded' => false, 'near_limit' => false ],
+				],
+			]
+		) );
+
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 9500, $data['usage']['searches']['used'] );
+		$this->assertSame( 10000, $data['usage']['searches']['limit'] );
+		$this->assertTrue( $data['usage']['searches']['near_limit'] );
+		$this->assertFalse( $data['usage']['searches']['exceeded'] );
+		// An unmetered allowance keeps a null limit rather than being cast to 0,
+		// which the admin would render as a spent allowance.
+		$this->assertNull( $data['usage']['ai_messages']['limit'] );
+		// Account-scoped metrics still come through; the admin decides what to
+		// show rather than the response deciding what exists.
+		$this->assertArrayHasKey( 'sites', $data['usage'] );
+		// The documents figure the sync screens already relied on is unchanged.
+		$this->assertSame( 1000, $data['documents']['limit'] );
+	}
+
 	public function test_test_connection_defaults_plan_to_not_free_when_absent(): void {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok(

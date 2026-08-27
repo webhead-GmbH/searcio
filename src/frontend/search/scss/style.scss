@@ -817,6 +817,92 @@
 	opacity: 0.7;
 }
 
+/*
+ * Numeric facet fields (price, rating, review count) get two bounds instead of
+ * chips — see `RangeFilters`. Reuses the search input's own custom properties
+ * so a themed placement themes these too without another set of variables.
+ */
+.whsc-modal .whsc-range__row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.whsc-modal .whsc-range__input {
+	width: 96px;
+	min-width: 0;
+	padding: 7px 12px;
+	border: 1px solid var(--whsc-input-border);
+	border-radius: var(--whsc-facet-radius);
+	background: var(--whsc-input-bg);
+	color: var(--whsc-input-text);
+	font-size: 13px;
+	line-height: 1.2;
+
+	&::placeholder {
+		color: var(--whsc-input-placeholder);
+	}
+
+	&:focus {
+		border-color: var(--whsc-input-border-focus);
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 1px;
+	}
+}
+
+.whsc-modal .whsc-range__dash {
+	color: var(--whsc-input-placeholder);
+}
+
+.whsc-modal .whsc-range__apply,
+.whsc-modal .whsc-modal-body .whsc-load-more__button {
+	padding: 7px 16px;
+	border: 0;
+	border-radius: var(--whsc-btn-radius);
+	background: var(--whsc-btn-bg);
+	color: var(--whsc-btn-text);
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.2;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+.whsc-modal .whsc-range__clear {
+	padding: var(--whsc-clear-padding);
+	border: 0;
+	background: transparent;
+	color: var(--whsc-clear-text);
+	font-size: 13px;
+	line-height: 1.2;
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+/*
+ * "Load more" under a result list. The API pages; this is how the rest of the
+ * pages are reachable.
+ */
+.whsc-load-more {
+	display: flex;
+	justify-content: center;
+	padding-top: 12px;
+}
+
 /* -------------------------------------------------------------------------
  * Browse (empty / results) layout — recent row on top, popular aside + main.
  * ---------------------------------------------------------------------- */
