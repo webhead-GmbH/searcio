@@ -104,6 +104,10 @@ final class Connection_Endpoint extends Rest_API {
 			dpa: $dpa
 		);
 
+		// The ownership ping follows within minutes; nothing else ever calls
+		// `/verify`, so the route stays shut outside this window.
+		$this->connection_state->open_verification_window();
+
 		$response = $this->client->connect( $connect_request->to_payload() );
 
 		return new WP_REST_Response(

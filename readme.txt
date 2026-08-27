@@ -84,6 +84,11 @@ To rebuild it, check the repository out and run `npm install` followed by
 - New: a "you may also like" row of similar products for your product pages.
 - New: a curated category listing, so your merchandising rules for a category actually apply on that page.
 - New: search-term redirects - send a search straight to a page instead of showing results.
+- Security: the domain-verification endpoint no longer returns the site's write key to unauthenticated callers; it now answers only while a connection attempt is in progress.
+- Fixed the AI assistant breaking permanently after a long reply.
+- Fixed a failed search-as-you-type keystroke navigating the shopper away mid-word.
+- Fixed saving Search Config deleting ranking boosts for content types this site does not index.
+- Fixed a switch left on after a plan downgrade blocking every other Search Config save.
 - Merchandising rules can now curate a category listing page, not just a typed search.
 - A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.
 - The photo button and the quiz are themeable in the block editor and Elementor like the rest of the widget.

@@ -485,7 +485,15 @@ const SearchModal = ({
 			}
 
 			setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
-			window.location.href = nativeSearchUrl(trimmed);
+
+			// Handing the visitor over to native search is right for a search
+			// they asked for. It is wrong for a keystroke: in "search as you
+			// type" mode this fires on every character, so a single 429 or 5xx
+			// mid-word would navigate them away with half a word as their query.
+			// A live search that fails just shows the notice and waits.
+			if (commit) {
+				window.location.href = nativeSearchUrl(trimmed);
+			}
 		} finally {
 			if (isLatest()) {
 				await delay(Math.max(0, MIN_LOADING - (Date.now() - started)));

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { currentLangFilter, fetchSimilar, isConfigured, isLanguageSupported, search } from '../../../utils/api';
+import { currentLangFilter, fetchSimilar, isConfigured, isLanguageSupported, search, trackClick } from '../../../utils/api';
 import { buildFilterParams } from '../../../utils/facets';
 import { ResultCard } from './templates';
 import Carousel from './Carousel';
@@ -51,6 +51,9 @@ const ProductList = ( {
 } ) => {
 	const [ products, setProducts ] = useState( null );
 	const [ banner, setBanner ] = useState( '' );
+	// Only a category row has one: it is a `/search`, and `/search/similar`
+	// returns no `search_id` because it is not a candidate for attribution.
+	const [ searchId, setSearchId ] = useState( '' );
 	const abortRef = useRef( null );
 
 	useEffect( () => {
@@ -98,6 +101,7 @@ const ProductList = ( {
 
 				setProducts( Array.isArray( response?.hits ) ? response.hits : [] );
 				setBanner( 'string' === typeof response?.banner ? response.banner : '' );
+				setSearchId( 'string' === typeof response?.search_id ? response.search_id : '' );
 			} catch ( e ) {
 				if ( 'AbortError' !== e.name ) {
 					// Merchandising is an enhancement, never a blocker: a failure
@@ -139,12 +143,13 @@ const ProductList = ( {
 			{ products.length > 0 && (
 				'grid' === layout ? (
 					<div className="whsc-products__grid">
-						{ products.map( ( hit ) => (
+						{ products.map( ( hit, index ) => (
 							<ResultCard
 								key={ hit.id }
 								hit={ hit }
 								cardSource={ cardSource }
 								serverTemplates={ serverTemplates }
+								onClick={ () => trackClick( searchId, hit.id, index + 1 ) }
 							/>
 						) ) }
 					</div>
@@ -152,11 +157,12 @@ const ProductList = ( {
 					<Carousel
 						items={ products }
 						getKey={ ( hit ) => hit.id }
-						renderItem={ ( hit ) => (
+						renderItem={ ( hit, index ) => (
 							<ResultCard
 								hit={ hit }
 								cardSource={ cardSource }
 								serverTemplates={ serverTemplates }
+								onClick={ () => trackClick( searchId, hit.id, index + 1 ) }
 							/>
 						) }
 						ariaLabel={ heading || __( 'Products', 'webhead-search-cloud' ) }

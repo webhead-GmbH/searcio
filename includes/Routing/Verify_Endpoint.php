@@ -29,6 +29,7 @@ namespace Webhead\WP\SearchCloud\Routing;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -39,7 +40,10 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Verify_Endpoint extends Rest_API {
-	public function __construct( private Search_Cloud_Client $client ) {}
+	public function __construct(
+		private Search_Cloud_Client $client,
+		private Connection_State $connection_state
+	) {}
 
 	protected function get_rest_namespace(): string {
 		return 'search-cloud/v1';
@@ -47,14 +51,27 @@ final class Verify_Endpoint extends Rest_API {
 
 	#[Route( '/verify', methods: 'GET', permission_callback: 'is_public' )]
 	public function verify( WP_REST_Request $request ): WP_REST_Response {
-		// The legitimate caller is Search Cloud's async domain-ownership ping,
-		// which always carries `?token=<hmac>` (see the class docblock). The
-		// token can't be validated locally, but requiring its presence keeps the
-		// write key out of a bare, tokenless `GET /verify` from a scanner or a
-		// curious visitor — the key is treated as a secret everywhere else, so it
-		// should not be handed to arbitrary unauthenticated callers.
+		/*
+		 * The only legitimate caller is Search Cloud's domain-ownership ping,
+		 * which carries `?token=<hmac>`. That HMAC is computed over the
+		 * service's own application key, so no plugin can ever recompute it -
+		 * requiring the parameter proves nothing about who is asking, and on
+		 * its own it handed the write key to anyone who appended `?token=x`.
+		 *
+		 * What can be checked is timing. The ping is dispatched once, minutes
+		 * after this site asked to be connected, and is never repeated - so the
+		 * route answers only while a connection attempt this site started is
+		 * still expecting it, and is closed the rest of the time.
+		 */
 		if ( '' === trim( (string) $request->get_param( 'token' ) ) ) {
 			return new WP_REST_Response( [ 'message' => __( 'Missing verification token.', 'webhead-search-cloud' ) ], 400 );
+		}
+
+		if ( ! $this->connection_state->verification_window_is_open() ) {
+			return new WP_REST_Response(
+				[ 'message' => __( 'No verification is in progress.', 'webhead-search-cloud' ) ],
+				404
+			);
 		}
 
 		if ( ! $this->client->is_configured() ) {

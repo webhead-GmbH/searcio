@@ -99,7 +99,25 @@ final class Product_List_Markup_Test extends Integration_Test_Case {
 		$this->assertStringContainsString( 'data-layout="carousel"', $markup );
 		$this->assertStringContainsString( 'data-card-source="plugin"', $markup );
 		// Capped rather than passed on: the API rejects an oversized limit.
-		$this->assertStringContainsString( 'data-limit="24"', $markup );
+		$this->assertStringContainsString( 'data-limit="20"', $markup );
+	}
+
+	/**
+	 * The two sources call different endpoints with different caps:
+	 * `/search/similar` validates `limit` at 1-20, while a category row is a
+	 * `/search`. Sending 24 to the similar endpoint is a 422, and a 422 makes
+	 * the row disappear with nothing to explain it.
+	 */
+	public function test_the_limit_is_capped_to_whichever_endpoint_the_row_will_call(): void {
+		$similar = Product_List_Markup::render(
+			[ 'source' => 'similar', 'documentId' => 'post-1', 'limit' => 24 ]
+		);
+		$category = Product_List_Markup::render(
+			[ 'source' => 'category', 'filterValue' => 'Shoes', 'limit' => 24 ]
+		);
+
+		$this->assertStringContainsString( 'data-limit="20"', $similar );
+		$this->assertStringContainsString( 'data-limit="24"', $category );
 	}
 
 	public function test_the_banner_is_on_unless_switched_off(): void {

@@ -111,10 +111,17 @@ describe( 'normalizeRedirects', () => {
 		expect( normalizeRedirects( [ { query: 'bf' } ] ) ).toEqual( [ { query: 'bf', url: '' } ] );
 	} );
 
-	it( 'recognises a row the merchant has not filled in at all', () => {
+	/**
+	 * The API drops a rule missing *either* half rather than rejecting it, so a
+	 * half-written row sent anyway would vanish on the next read with nothing
+	 * explaining why. Both halves are required for the row to be worth sending.
+	 */
+	it( 'recognises a row the API would not store', () => {
 		expect( isBlankRedirect( { query: '', url: '' } ) ).toBe( true );
 		expect( isBlankRedirect( { query: '  ', url: '  ' } ) ).toBe( true );
-		expect( isBlankRedirect( { query: 'bf', url: '' } ) ).toBe( false );
+		expect( isBlankRedirect( { query: 'bf', url: '' } ) ).toBe( true );
+		expect( isBlankRedirect( { query: '', url: '/bf' } ) ).toBe( true );
+		expect( isBlankRedirect( { query: 'bf', url: '/bf' } ) ).toBe( false );
 	} );
 } );
 
@@ -219,6 +226,33 @@ describe( 'toPayload', () => {
 
 	it( 'sends an empty redirect list rather than omitting the key, so deleting the last rule sticks', () => {
 		expect( toPayload( { redirects: [] } ).redirects ).toEqual( [] );
+	} );
+
+	it( 'drops a redirect that names a term but no destination', () => {
+		expect( toPayload( { redirects: [ { query: 'bf', url: '' } ] } ).redirects ).toEqual( [] );
+	} );
+
+	/**
+	 * Re-enabling a feature the plan no longer includes is a 422 on that field -
+	 * and since the tab re-sends its whole state, it would reject every
+	 * unrelated edit until someone worked out which switch was at fault.
+	 */
+	it( 'does not try to re-enable a switch the plan no longer includes', () => {
+		const payload = toPayload( {
+			features: {
+				ai_search: { available: false, enabled: true },
+				visual_search: { available: true, enabled: true },
+			},
+		} );
+
+		expect( payload.features.ai_search ).toEqual( { enabled: false } );
+		expect( payload.features.visual_search ).toEqual( { enabled: true } );
+	} );
+
+	/** A feature the server said nothing about is sent as the tab has it. */
+	it( 'still sends a switch whose availability is unknown', () => {
+		expect( toPayload( { features: { personalization: { enabled: true } } } ).features.personalization )
+			.toEqual( { enabled: true } );
 	} );
 } );
 

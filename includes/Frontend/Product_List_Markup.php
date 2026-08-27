@@ -49,6 +49,12 @@ final class Product_List_Markup {
 	 */
 	private const DEFAULT_FILTER_FIELD = 'categories';
 
+	/** `GET /search/similar` validates `limit` as 1-20. */
+	private const SIMILAR_MAX = 20;
+
+	/** A category row is a `GET /search`, whose `per_page` allows up to 100. */
+	private const SEARCH_MAX = 24;
+
 	/**
 	 * @param  array{source?:string,documentId?:string,filterField?:string,filterValue?:string,heading?:string,limit?:int,layout?:string,showBanner?:bool,cardSource?:string,className?:string,instanceClass?:string}  $attributes
 	 */
@@ -86,8 +92,13 @@ final class Product_List_Markup {
 			return '';
 		}
 
-		$limit  = isset( $attributes['limit'] ) && is_numeric( $attributes['limit'] )
-			? max( 1, min( 24, (int) $attributes['limit'] ) )
+		// `/search/similar` validates `limit` at 1-20, while `/search` allows a
+		// per_page of 100 - so the cap depends on which one this row will call.
+		// Sending 24 to the similar endpoint is a 422, and a 422 here means the
+		// row silently disappears.
+		$max_limit = 'similar' === $source ? self::SIMILAR_MAX : self::SEARCH_MAX;
+		$limit     = isset( $attributes['limit'] ) && is_numeric( $attributes['limit'] )
+			? max( 1, min( $max_limit, (int) $attributes['limit'] ) )
 			: ( 'similar' === $source ? 6 : 12 );
 		$layout = in_array( $attributes['layout'] ?? '', self::LAYOUTS, true ) ? (string) $attributes['layout'] : 'carousel';
 		$cards  = in_array( $attributes['cardSource'] ?? '', self::CARD_SOURCES, true ) ? (string) $attributes['cardSource'] : 'plugin';

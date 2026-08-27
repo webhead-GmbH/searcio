@@ -161,7 +161,10 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'verify_endpoint',
 			static function () use ( $container ): Verify_Endpoint {
-				return new Verify_Endpoint( $container->get( 'search_cloud_client' ) );
+				return new Verify_Endpoint(
+					$container->get( 'search_cloud_client' ),
+					$container->get( 'connection_state' )
+				);
 			}
 		);
 		$container->add( 'field_source_resolver', Field_Source_Resolver::class );

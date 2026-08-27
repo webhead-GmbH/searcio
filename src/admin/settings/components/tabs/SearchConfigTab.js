@@ -48,14 +48,26 @@ const WOO_FIELD_SUGGESTIONS = [
 	'review_count',
 ];
 
-/** Keep exactly one boost row per currently-enabled content type, preserving any already-configured value. */
+/**
+ * One editable boost row per content type this site indexes, preserving any
+ * value already configured.
+ *
+ * Boosts for types this WordPress does not index are kept and passed through
+ * untouched. `PUT /search-config` replaces the whole section, so rebuilding the
+ * list from local post types alone would delete a boost set in the panel for a
+ * type that lives somewhere else - another store on the same index, or a type
+ * that was disabled here temporarily.
+ */
 const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 	const existing = new Map( typeBoosts.map( ( row ) => [ row.type, row.boost ] ) );
-
-	return enabledTypes.map( ( type ) => ( {
+	const local = enabledTypes.map( ( type ) => ( {
 		type,
 		boost: existing.has( type ) ? existing.get( type ) : 1,
 	} ) );
+
+	const foreign = typeBoosts.filter( ( row ) => ! enabledTypes.includes( row.type ) );
+
+	return [ ...local, ...foreign ];
 };
 
 const fieldPool = ( catalog ) => {
@@ -306,7 +318,12 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 const MerchandisingCard = ( { rules, errors, onChange } ) => {
 	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
 	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
-	const add = () => onChange( [ ...rules, { query: '', pinned: [], hidden: [], banner: '' } ] );
+	// Every field the normalizer produces, or the new row's category-trigger
+	// inputs are uncontrolled and show whatever the row at this index held.
+	const add = () => onChange( [
+		...rules,
+		{ query: '', filter_field: '', filter_value: '', pinned: [], hidden: [], banner: '' },
+	] );
 
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">

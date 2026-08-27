@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { currentLangFilter, fetchQuizzes, search } from '../../../utils/api';
+import { currentLangFilter, fetchQuizzes, search, trackClick } from '../../../utils/api';
 import { buildFilterParams, humanizeFieldLabel } from '../../../utils/facets';
 import { applyOption, firstQuestion, nextQuestion, normalizeQuizzes, quizProgress } from '../../../utils/quiz';
 import { ResultCard } from './templates';
@@ -297,12 +297,15 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 
 					{ ! isSearching && '' === error && hits.length > 0 && (
 						<div className="whsc-quiz__grid">
-							{ hits.map( ( hit ) => (
+							{ hits.map( ( hit, index ) => (
 								<ResultCard
 									key={ hit.id }
 									hit={ hit }
 									cardSource={ cardSource }
 									serverTemplates={ serverTemplates }
+									// The quiz ends in a real `/search`, so these
+									// clicks feed click-ranking like any other.
+									onClick={ () => trackClick( results?.search_id, hit.id, index + 1 ) }
 								/>
 							) ) }
 						</div>

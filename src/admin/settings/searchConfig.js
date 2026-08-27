@@ -60,8 +60,14 @@ export const normalizeRedirects = ( raw ) => ( Array.isArray( raw ) ? raw : [] )
 	url: 'string' === typeof rule?.url ? rule.url : '',
 } ) );
 
-/** An empty row is dropped server-side rather than rejected, so never send one. */
-export const isBlankRedirect = ( rule ) => '' === ( rule?.query || '' ).trim() && '' === ( rule?.url || '' ).trim();
+/**
+ * A rule the API will not store. It drops a row missing *either* half rather
+ * than rejecting it, so sending one means the merchant watches their row
+ * disappear on the next read with nothing explaining why - better to drop it
+ * here, where the form still shows what they typed.
+ */
+export const isBlankRedirect = ( rule ) =>
+	'' === ( rule?.query || '' ).trim() || '' === ( rule?.url || '' ).trim();
 
 /**
  * @param {Object} raw The `/search-config` response.
@@ -113,8 +119,21 @@ export const toPayload = ( config ) => ( {
 	// silently lose it on the next read; drop it here so the form shows what was
 	// actually stored.
 	redirects: ( config.redirects || [] ).filter( ( rule ) => ! isBlankRedirect( rule ) ),
+	/*
+	 * Only switches this plan can actually carry. Enabling a feature the plan
+	 * does not include is a 422 on `features.<name>.enabled` - and because the
+	 * tab re-sends its whole state on every save, one such switch left on after
+	 * a downgrade would reject every unrelated edit until someone worked out
+	 * which field the error meant. Turning a feature *off* is always allowed,
+	 * so an unavailable-but-enabled switch is still sent as false.
+	 */
 	features: Object.fromEntries(
-		FEATURE_KEYS.map( ( key ) => [ key, { enabled: Boolean( config.features?.[ key ]?.enabled ) } ] )
+		FEATURE_KEYS.map( ( key ) => {
+			const feature = config.features?.[ key ] || {};
+			const enabled = Boolean( feature.enabled ) && false !== feature.available;
+
+			return [ key, { enabled } ];
+		} )
 	),
 } );
 

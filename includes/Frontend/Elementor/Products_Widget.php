@@ -155,6 +155,8 @@ final class Products_Widget extends Widget_Base {
 				'label'   => __( 'How many products', 'webhead-search-cloud' ),
 				'type'    => Controls_Manager::NUMBER,
 				'min'     => 1,
+				// `/search/similar` validates limit at 1-20; a category row is a
+				// `/search`, which allows far more.
 				'max'     => 24,
 				'default' => 6,
 			]

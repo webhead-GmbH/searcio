@@ -124,7 +124,8 @@ const Edit = ( { attributes, setAttributes } ) => {
 						label={ __( 'How many products', 'webhead-search-cloud' ) }
 						value={ limit ?? ( isSimilar ? 6 : 12 ) }
 						min={ 1 }
-						max={ 24 }
+						// `/search/similar` validates limit at 1-20.
+						max={ isSimilar ? 20 : 24 }
 						onChange={ ( value ) => setAttributes( { limit: value } ) }
 					/>
 

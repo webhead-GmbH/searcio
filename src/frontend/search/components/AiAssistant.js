@@ -11,6 +11,11 @@ import { ResultCard } from './templates';
 // Matches the API's history/message caps (docs/api/search.md POST /assistant).
 const HISTORY_LIMIT = 20;
 const MESSAGE_MAX = 2000;
+// Each history entry is validated separately: `required` and `max:4000`. A
+// reply longer than that - or an empty one from a provider hiccup - would make
+// every following turn 422, and because the entry stays in the thread no retry
+// could ever clear it. Trimmed on the way out instead.
+const HISTORY_CONTENT_MAX = 4000;
 
 const errorFor = ( status ) => {
 	if ( 403 === status ) {
@@ -84,7 +89,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		}
 
 		const history = messages
-			.map( ( { role, content } ) => ( { role, content } ) )
+			.map( ( { role, content } ) => ( { role, content: String( content || '' ).slice( 0, HISTORY_CONTENT_MAX ) } ) )
+			.filter( ( turn ) => '' !== turn.content )
 			.slice( -HISTORY_LIMIT );
 
 		setMessages( ( current ) => [ ...current, { role: 'user', content: trimmed } ] );
