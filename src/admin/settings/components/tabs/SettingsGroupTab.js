@@ -1,10 +1,8 @@
 import {
 	Notice,
-	TextControl,
-	TextareaControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { Card, Text } from '@wordpress/ui';
+import { Card, InputControl, Text, TextareaControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 import { Grid } from '../../../../components/Layout';
@@ -27,13 +25,12 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 
 	if ( definition.type === 'integer' || definition.type === 'number' ) {
 		return (
-			<TextControl
-				__next40pxDefaultSize
+			<InputControl
 				type="number"
 				label={ definition.label || key }
 				value={ value ?? '' }
-				help={ help }
-				onChange={ ( nextValue ) => {
+				description={ help }
+				onValueChange={ ( nextValue ) => {
 					if ( nextValue === '' ) {
 						updateSetting( key, definition.default );
 
@@ -57,13 +54,13 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 		return (
 			<TextareaControl
 				label={ definition.label || key }
-				help={ help || __( 'Edit the JSON value for this setting.', 'webhead-search-cloud' ) }
+				description={ help || __( 'Edit the JSON value for this setting.', 'webhead-search-cloud' ) }
 				value={ JSON.stringify(
 					value ?? definition.default ?? ( definition.type === 'array' ? [] : {} ),
 					null,
 					2
 				) }
-				onChange={ ( nextValue ) => {
+				onValueChange={ ( nextValue ) => {
 					try {
 						updateSetting( key, JSON.parse( nextValue ) );
 					} catch ( error ) {
@@ -75,13 +72,12 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 	}
 
 	return (
-		<TextControl
-			__next40pxDefaultSize
+		<InputControl
 			type={ definition.masked ? 'password' : 'text' }
 			label={ definition.label || key }
 			value={ value ?? '' }
-			help={ help }
-			onChange={ ( nextValue ) => updateSetting( key, nextValue ) }
+			description={ help }
+			onValueChange={ ( nextValue ) => updateSetting( key, nextValue ) }
 		/>
 	);
 };

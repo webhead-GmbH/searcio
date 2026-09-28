@@ -5,10 +5,8 @@ import {
 	FormTokenField,
 	Notice,
 	RangeControl,
-	TextareaControl,
-	TextControl,
 } from '@wordpress/components';
-import { Card, Text } from '@wordpress/ui';
+import { Card, InputControl, Text, TextareaControl } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -184,9 +182,9 @@ const PopularSearchesCard = () => {
 				<TextareaControl
 					label={ __( 'Popular searches', 'webhead-search-cloud' ) }
 					hideLabelFromVision
-					help={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'webhead-search-cloud' ) }
+					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'webhead-search-cloud' ) }
 					value={ popularSearchesText }
-					onChange={ ( value ) => {
+					onValueChange={ ( value ) => {
 						setPopularSearchesText( value );
 						updateSetting( 'popular_searches', fromPopularSearchesText( value ) );
 					} }
@@ -342,16 +340,14 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 				{ rules.map( ( rule, index ) => (
 					<div className="whsc-merchandising-rule" key={ index }>
 						<div className="whsc-merchandising-rule__head">
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Trigger (search term contains)', 'webhead-search-cloud' ) }
-								help={ rowError( errors, 'merchandising', index, 'query' )
+								description={ rowError( errors, 'merchandising', index, 'query' )
 									|| ( '' === rule.query
 										? __( 'Empty: this rule applies to every search on the site.', 'webhead-search-cloud' )
 										: undefined ) }
 								value={ rule.query }
-								onChange={ ( query ) => update( index, { ...rule, query } ) }
+								onValueChange={ ( query ) => update( index, { ...rule, query } ) }
 							/>
 							<Button
 								icon="trash"
@@ -365,56 +361,46 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 						     either to mean anything, so they sit together and the help
 						     text is on the pair rather than on each input. */ }
 						<div className="whsc-merchandising-rule__ids">
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Also require filter (field)', 'webhead-search-cloud' ) }
-								help={ rowError( errors, 'merchandising', index, 'filter_field' )
+								description={ rowError( errors, 'merchandising', index, 'filter_field' )
 									|| __( 'Optional. A facet field, e.g. "category".', 'webhead-search-cloud' ) }
 								value={ rule.filter_field }
-								onChange={ ( filter_field ) => update( index, { ...rule, filter_field } ) }
+								onValueChange={ ( filter_field ) => update( index, { ...rule, filter_field } ) }
 							/>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Filter value', 'webhead-search-cloud' ) }
-								help={ rowError( errors, 'merchandising', index, 'filter_value' )
+								description={ rowError( errors, 'merchandising', index, 'filter_value' )
 									|| __(
 										'With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself.',
 										'webhead-search-cloud'
 									) }
 								value={ rule.filter_value }
-								onChange={ ( filter_value ) => update( index, { ...rule, filter_value } ) }
+								onValueChange={ ( filter_value ) => update( index, { ...rule, filter_value } ) }
 							/>
 						</div>
 						<div className="whsc-merchandising-rule__ids">
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Pin to top (document ids)', 'webhead-search-cloud' ) }
-								help={ listError( errors, 'merchandising', index, 'pinned' )
+								description={ listError( errors, 'merchandising', index, 'pinned' )
 									|| __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
 								value={ idsToText( rule.pinned ) }
-								onChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
+								onValueChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
 							/>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Hide (document ids)', 'webhead-search-cloud' ) }
-								help={ listError( errors, 'merchandising', index, 'hidden' )
+								description={ listError( errors, 'merchandising', index, 'hidden' )
 									|| __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
 								value={ idsToText( rule.hidden ) }
-								onChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
+								onValueChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
 							/>
 						</div>
-						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+						<InputControl
 							label={ __( 'Promotional banner', 'webhead-search-cloud' ) }
-							help={ rowError( errors, 'merchandising', index, 'banner' )
+							description={ rowError( errors, 'merchandising', index, 'banner' )
 								|| __( 'Optional message returned with the results for this search.', 'webhead-search-cloud' ) }
 							value={ rule.banner }
-							onChange={ ( banner ) => update( index, { ...rule, banner } ) }
+							onValueChange={ ( banner ) => update( index, { ...rule, banner } ) }
 						/>
 					</div>
 				) ) }
@@ -457,22 +443,18 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 			<Card.Content className="whsc-settings-card-content">
 				{ rules.map( ( rule, index ) => (
 					<div className="whsc-redirect-rule" key={ index }>
-						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+						<InputControl
 							label={ __( 'Search term (exact)', 'webhead-search-cloud' ) }
-							help={ rowError( errors, 'redirects', index, 'query' ) }
+							description={ rowError( errors, 'redirects', index, 'query' ) }
 							value={ rule.query }
-							onChange={ ( query ) => update( index, { ...rule, query } ) }
+							onValueChange={ ( query ) => update( index, { ...rule, query } ) }
 						/>
-						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+						<InputControl
 							label={ __( 'Send them to', 'webhead-search-cloud' ) }
-							help={ rowError( errors, 'redirects', index, 'url' )
+							description={ rowError( errors, 'redirects', index, 'url' )
 								|| __( 'A full URL, or a path on this site starting with /.', 'webhead-search-cloud' ) }
 							value={ rule.url }
-							onChange={ ( url ) => update( index, { ...rule, url } ) }
+							onValueChange={ ( url ) => update( index, { ...rule, url } ) }
 						/>
 						<Button
 							icon="trash"
@@ -705,14 +687,12 @@ const SearchConfigTab = () => {
 								<div className="whsc-search-config-repeater">
 									{ config.searchable_fields.map( ( row, index ) => (
 										<div className="whsc-search-config-row" key={ index }>
-											<TextControl
-												__next40pxDefaultSize
-												__nextHasNoMarginBottom
+											<InputControl
 												label={ __( 'Field', 'webhead-search-cloud' ) }
 												list="whsc-field-suggestions"
 												value={ row.field }
-												help={ rowError( fieldErrors, 'searchable_fields', index, 'field' ) }
-												onChange={ ( field ) => updateSearchableField( index, { ...row, field } ) }
+												description={ rowError( fieldErrors, 'searchable_fields', index, 'field' ) }
+												onValueChange={ ( field ) => updateSearchableField( index, { ...row, field } ) }
 											/>
 											<RangeControl
 												__next40pxDefaultSize
@@ -863,9 +843,9 @@ const SearchConfigTab = () => {
 							<TextareaControl
 								label={ __( 'Synonyms', 'webhead-search-cloud' ) }
 								hideLabelFromVision
-								help={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'webhead-search-cloud' ) }
+								description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'webhead-search-cloud' ) }
 								value={ config.synonyms.join( '\n' ) }
-								onChange={ ( value ) =>
+								onValueChange={ ( value ) =>
 									set(
 										'synonyms',
 										value.split( '\n' ).map( ( line ) => line.trim() ).filter( ( line ) => '' !== line )
@@ -907,14 +887,12 @@ const SearchConfigTab = () => {
 									) ) }
 								</div>
 							) : (
-								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
+								<InputControl
 									label={ __( 'Languages', 'webhead-search-cloud' ) }
 									hideLabelFromVision
-									help={ __( 'Comma-separated ISO language codes, e.g. "de, en".', 'webhead-search-cloud' ) }
+									description={ __( 'Comma-separated ISO language codes, e.g. "de, en".', 'webhead-search-cloud' ) }
 									value={ config.languages.join( ', ' ) }
-									onChange={ ( value ) =>
+									onValueChange={ ( value ) =>
 										set(
 											'languages',
 											value.split( ',' ).map( ( code ) => code.trim() ).filter( ( code ) => '' !== code )

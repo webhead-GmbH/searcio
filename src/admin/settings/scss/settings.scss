@@ -150,18 +150,6 @@
     gap: var(--wpds-dimension-gap-lg);
     padding-inline: 0;
   }
-
-  .components-panel__body>.components-panel__body-title {
-    background: #f0f0f0;
-
-    &:hover {
-      background: #dfdede;
-    }
-  }
-
-  .components-panel__body.is-opened>.components-panel__body-title {
-    margin-bottom: 15px;
-  }
 }
 
 /* -------------------------------------------------------------------------
@@ -258,13 +246,9 @@
     margin: 0 0 20px;
   }
 
-  .whsc-panel {
-    margin-bottom: 20px;
-  }
-
-  // Each collapsible post-type section.
-  .components-panel__body-title {
-    font-weight: 600;
+  .whsc-post-types {
+    display: grid;
+    gap: var(--wh-card-gap);
   }
 
   .whsc-enable-toggle {

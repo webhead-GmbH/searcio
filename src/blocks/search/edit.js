@@ -6,10 +6,9 @@ import {
 	RadioControl,
 	RangeControl,
 	SelectControl,
-	TextControl,
 	ToggleControl,
-	__experimentalText as Text,
 } from '@wordpress/components';
+import { InputControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { search as SearchIcon } from '@wordpress/icons';
@@ -118,13 +117,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						] }
 						onChange={ ( value ) => setAttributes( { highlightsSource: value } ) }
 					/>
-					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+					<InputControl
 						label={ __( 'Placeholder text', 'webhead-search-cloud' ) }
 						value={ placeholder }
 						placeholder={ __( 'Search…', 'webhead-search-cloud' ) }
-						onChange={ ( value ) => setAttributes( { placeholder: value } ) }
+						onValueChange={ ( value ) => setAttributes( { placeholder: value } ) }
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
@@ -407,11 +404,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					} }
 				>
 					<Icon icon={ SearchIcon } size={ 22 } />
-					<Text>
+					<span>
 						{ 'box' === mode
 							? __( 'Search Cloud - search box', 'webhead-search-cloud' )
 							: __( 'Search Cloud - search icon', 'webhead-search-cloud' ) }
-					</Text>
+					</span>
 				</span>
 			</div>
 		</>

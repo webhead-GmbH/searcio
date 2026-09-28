@@ -44,6 +44,9 @@
     "src/blocks/search/edit.js": [
         "public/bundle.search-block-editor.js"
     ],
+    "src/components/Modal.js": [
+        "public/bundle.settings.js"
+    ],
     "src/frontend/search/components/AiAssistant.js": [
         "public/bundle.search.js"
     ],

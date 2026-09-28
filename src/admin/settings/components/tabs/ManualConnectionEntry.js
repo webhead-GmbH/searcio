@@ -1,6 +1,6 @@
 import {useContext, useState} from '@wordpress/element';
-import {Button, TextControl} from '@wordpress/components';
-import {Text} from '@wordpress/ui';
+import { Button } from '@wordpress/components';
+import { InputControl, Text } from '@wordpress/ui';
 import {__} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -96,43 +96,40 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 					'webhead-search-cloud'
 				)}
 			</Text>
-			<TextControl
-				__next40pxDefaultSize
+			<InputControl
 				label={__('Search key', 'webhead-search-cloud')}
-				help={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'webhead-search-cloud')}
+				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'webhead-search-cloud')}
 				value={settings.search_key ?? ''}
-				onChange={(value) => updateSetting('search_key', value)}
+				onValueChange={(value) => updateSetting('search_key', value)}
 			/>
-			<TextControl
-				__next40pxDefaultSize
+			<InputControl
 				type="password"
 				autoComplete="off"
 				label={__('Write key', 'webhead-search-cloud')}
 				placeholder={hasStored('write_key') ? SECRET_PLACEHOLDER : ''}
-				help={
+				description={
 					hasStored('write_key')
 						? __('A write key is saved. Leave blank to keep it, or enter a new one to rotate.', 'webhead-search-cloud')
 						: __('Server-side write key (wk_...).', 'webhead-search-cloud')
 				}
 				value={writeKey}
-				onChange={(value) => {
+				onValueChange={(value) => {
 					setWriteKey(value);
 					updateSetting('write_key', value);
 				}}
 			/>
-			<TextControl
-				__next40pxDefaultSize
+			<InputControl
 				type="password"
 				autoComplete="off"
 				label={__('Write secret', 'webhead-search-cloud')}
 				placeholder={hasStored('write_secret') ? SECRET_PLACEHOLDER : ''}
-				help={
+				description={
 					hasStored('write_secret')
 						? __('A write secret is saved. Leave blank to keep it, or enter a new one to rotate.', 'webhead-search-cloud')
 						: __('Server-side write secret.', 'webhead-search-cloud')
 				}
 				value={writeSecret}
-				onChange={(value) => {
+				onValueChange={(value) => {
 					setWriteSecret(value);
 					updateSetting('write_secret', value);
 				}}

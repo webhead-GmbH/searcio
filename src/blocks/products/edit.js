@@ -4,10 +4,9 @@ import {
 	PanelBody,
 	RangeControl,
 	SelectControl,
-	TextControl,
 	ToggleControl,
-	__experimentalText as Text,
 } from '@wordpress/components';
+import { InputControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { grid as GridIcon } from '@wordpress/icons';
 
@@ -52,49 +51,41 @@ const Edit = ( { attributes, setAttributes } ) => {
 						onChange={ ( value ) => setAttributes( { source: value } ) }
 					/>
 
-					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+					<InputControl
 						label={ __( 'Heading', 'webhead-search-cloud' ) }
-						help={ __( 'Optional. Left empty, the row has no title.', 'webhead-search-cloud' ) }
+						description={ __( 'Optional. Left empty, the row has no title.', 'webhead-search-cloud' ) }
 						value={ heading }
-						onChange={ ( value ) => setAttributes( { heading: value } ) }
+						onValueChange={ ( value ) => setAttributes( { heading: value } ) }
 					/>
 
 					{ isSimilar && (
-						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+						<InputControl
 							label={ __( 'Product', 'webhead-search-cloud' ) }
-							help={ __(
+							description={ __(
 								'Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template.',
 								'webhead-search-cloud'
 							) }
 							value={ documentId }
-							onChange={ ( value ) => setAttributes( { documentId: value } ) }
+							onValueChange={ ( value ) => setAttributes( { documentId: value } ) }
 						/>
 					) }
 
 					{ ! isSimilar && (
 						<>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Filter field', 'webhead-search-cloud' ) }
-								help={ __( 'A facet field. Defaults to "categories", which is how product categories are indexed.', 'webhead-search-cloud' ) }
+								description={ __( 'A facet field. Defaults to "categories", which is how product categories are indexed.', 'webhead-search-cloud' ) }
 								value={ filterField }
-								onChange={ ( value ) => setAttributes( { filterField: value } ) }
+								onValueChange={ ( value ) => setAttributes( { filterField: value } ) }
 							/>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Filter value', 'webhead-search-cloud' ) }
-								help={ __(
+								description={ __(
 									'Leave empty to use whichever category the visitor is browsing.',
 									'webhead-search-cloud'
 								) }
 								value={ filterValue }
-								onChange={ ( value ) => setAttributes( { filterValue: value } ) }
+								onValueChange={ ( value ) => setAttributes( { filterValue: value } ) }
 							/>
 							<ToggleControl
 								__nextHasNoMarginBottom
@@ -146,12 +137,17 @@ const Edit = ( { attributes, setAttributes } ) => {
 			<div { ...blockProps }>
 				<div className="webhead-search-cloud-block-editor__preview">
 					<Icon icon={ GridIcon } />
-					<Text as="p">
+					{ /* Plain elements with literal values, like the search block's
+					     preview: this renders in the editor canvas, which does not
+					     get wp-admin's design-token sheet, so a --wpds-* colour or a
+					     @wordpress/ui component's injected styles cannot be relied on
+					     here. The values reproduce what the muted Text drew. */ }
+					<p style={ { margin: 0 } }>
 						{ isSimilar
 							? __( 'Similar products', 'webhead-search-cloud' )
 							: __( 'Category listing', 'webhead-search-cloud' ) }
-					</Text>
-					<Text as="p" variant="muted">{ subject }</Text>
+					</p>
+					<p style={ { margin: 0, color: '#757575' } }>{ subject }</p>
 				</div>
 			</div>
 		</>

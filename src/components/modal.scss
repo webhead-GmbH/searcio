@@ -1,0 +1,78 @@
+// Webhead scaffold managed file.
+//
+// Styles for the house modal. Everything here is a design token or a value the
+// design system names: no product hex codes, no pixel font sizes.
+//
+// @wordpress/theme removed the --wpds-elevation-* properties, so the shadow
+// comes from the SASS scale in @wordpress/base-styles. Modals are the documented
+// home of the *large* level: "components that confirm an action or require a
+// decision".
+@use "@wordpress/base-styles/variables" as wp-base;
+
+.webhead-search-cloud-modal__backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--wpds-dimension-padding-2xl);
+	background-color: rgba(0, 0, 0, 0.5);
+	// The dialog's entrance rotates in three dimensions; without a perspective
+	// on its container the rotation flattens into nothing.
+	perspective: 1000px;
+}
+
+.webhead-search-cloud-modal {
+	width: 100%;
+	// `lg` is the documented radius for dialogs. The backdrop is not a surface,
+	// so nothing here shares a radius with its parent.
+	border-radius: var(--wpds-border-radius-lg);
+	background: var(--wpds-color-background-surface-neutral);
+	box-shadow: wp-base.$elevation-large;
+	transform-style: preserve-3d;
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100svh - (2 * var(--wpds-dimension-padding-2xl)));
+	overflow: hidden;
+
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+		outline-offset: 2px;
+	}
+}
+
+.webhead-search-cloud-modal__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wpds-dimension-gap-md);
+	padding: var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-2xl);
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.webhead-search-cloud-modal__title {
+	margin: 0;
+	font-family: var(--wpds-typography-font-family-heading);
+	font-size: var(--wpds-typography-font-size-lg);
+	line-height: var(--wpds-typography-line-height-md);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.webhead-search-cloud-modal__body {
+	padding: var(--wpds-dimension-padding-2xl);
+	overflow-y: auto;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.webhead-search-cloud-modal__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: var(--wpds-dimension-gap-md);
+}

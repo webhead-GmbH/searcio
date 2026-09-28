@@ -4,9 +4,8 @@ import {
 	Button,
 	CheckboxControl,
 	Notice,
-	TextControl,
 } from '@wordpress/components';
-import {Card, Text} from '@wordpress/ui';
+import { Card, InputControl, Text } from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -374,28 +373,22 @@ const ConnectionTab = () => {
 						{showEmailOverride && (
 							<div className="whsc-card whsc-card--dotted webhead-search-cloud-email-override">
 								<Grid minColumnWidth={{base: 200, md: 220}} gap={12} align="start">
-									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
+									<InputControl
 										type="email"
 										label={__('Email', 'webhead-search-cloud')}
 										value={overrideEmail}
-										onChange={setOverrideEmail}
+										onValueChange={setOverrideEmail}
 									/>
-									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
+									<InputControl
 										label={__('Your name (optional)', 'webhead-search-cloud')}
 										value={overrideAdminName}
-										onChange={setOverrideAdminName}
+										onValueChange={setOverrideAdminName}
 									/>
-									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
+									<InputControl
 										label={__('Company name (optional)', 'webhead-search-cloud')}
-										help={__('Used as the Search Cloud account name.', 'webhead-search-cloud')}
+										description={__('Used as the Search Cloud account name.', 'webhead-search-cloud')}
 										value={overrideCompanyName}
-										onChange={setOverrideCompanyName}
+										onValueChange={setOverrideCompanyName}
 									/>
 								</Grid>
 							</div>
