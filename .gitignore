@@ -89,3 +89,8 @@ dist
 /includes/Dependencies/
 !/includes/Dependencies/index.php
 !/includes/Dependencies/.gitkeep
+
+# Machine-local: wp-env's per-developer override (core pin, ports) and the
+# Playwright MCP browser tool's session logs.
+/.wp-env.override.json
+/.playwright-mcp/
