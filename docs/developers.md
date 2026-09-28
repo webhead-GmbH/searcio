@@ -36,7 +36,7 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 
 | Route | Method | Capability | Purpose |
 |---|---|---|---|
-| `/settings` | GET / POST | view / manage_settings | Generic REST-exposed settings (schema + values) |
+| `/settings` | GET / POST | view / manage_settings | Generic REST-exposed settings (schema + values). `write_key` and `write_secret` are write-only: a response carries `__stored__` when one is saved and `''` when not, never the value; posting back `__stored__` or an empty string leaves the stored credential untouched |
 | `/connection/test` | POST | view | Verify write credentials; returns site ID and document usage |
 | `/indexing/config` | GET / POST | view / manage_settings | Per-post-type indexing field mapping |
 | `/search-config` | GET / PUT | view / manage_settings | Proxies Search Cloud's own search configuration (fields, weights, boosts, facets, suggestions, synonyms, languages) |
@@ -48,7 +48,7 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 | `/sync/history` | DELETE | run_sync | Clear all finished history |
 | `/cache/clear` | POST | manage_settings | Reset OPcache |
 
-One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret) and only when the site is connected. It requires the `?token=` query parameter the ping always sends — a tokenless request is rejected with `400` so the write key is never handed to an unauthenticated scanner. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
+One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret), and only while a verification this site started is still open: connecting opens a one-hour window, and outside it the route answers `404`. The window is the protection. The ping's `?token=` is an HMAC over Search Cloud's own application key, which the plugin cannot check, so requiring it alone proved nothing — appending `?token=x` used to return the write key. A tokenless request is still rejected with `400`, and a closed window or an unconnected site with `404`. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
 
 ### WP-CLI
 

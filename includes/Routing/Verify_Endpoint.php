@@ -10,10 +10,12 @@
  * The `token` proves itself on Search Cloud's side when it compares our
  * response against its own record of the write key it issued; this plugin
  * has no way to recompute it (it's derived from Search Cloud's own secret)
- * and doesn't need to try. It is still required to be present, though: a
- * tokenless request is rejected so the write key is never handed to a bare
- * `GET /verify` from a scanner. This route only ever echoes the write key
- * already stored locally and never exposes the write secret.
+ * and doesn't need to try - which is also why its presence protects nothing:
+ * `?token=x` passes that check. What keeps the write key from a scanner is the
+ * verification window {@see Connection_State::open_verification_window()}
+ * opens when this site starts a connection; outside it the route answers 404.
+ * This route only ever echoes the write key already stored locally and never
+ * exposes the write secret.
  *
  * Deliberately registered under `search-cloud/v1`, not this plugin's own
  * `webhead-search-cloud/v1` namespace, so the URL sent as `verify_url` stays

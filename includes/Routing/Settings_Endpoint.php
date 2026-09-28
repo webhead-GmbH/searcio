@@ -31,6 +31,23 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Settings_Endpoint extends Rest_API {
+	/**
+	 * Credentials that are written through this endpoint and never read back.
+	 *
+	 * They are REST-exposed only so a pasted key can be saved here. `masked: true`
+	 * does not keep them out of a response - it is a display hint the settings
+	 * export never consults - so without this the stored value reached every
+	 * user with the view capability. Encrypted, but still the secret's only copy
+	 * outside the database, sent to people who have no use for it.
+	 */
+	private const WRITE_ONLY = [ Plugin_Settings::WRITE_KEY, Plugin_Settings::WRITE_SECRET ];
+
+	/**
+	 * What a response carries in place of a stored credential: that one is
+	 * saved, and nothing else. The screen only ever asks whether it is set.
+	 */
+	public const STORED = '__stored__';
+
 	public function __construct(
 		private Settings_Manager $settings
 	) {}
@@ -55,7 +72,7 @@ final class Settings_Endpoint extends Rest_API {
 			);
 		}
 
-		$this->settings->partial_update( $incoming, rest_only: true );
+		$this->settings->partial_update( self::without_unchanged_credentials( $incoming ), rest_only: true );
 
 		return new WP_REST_Response( $this->prepare_for_rest( $this->settings->export_for_rest() ) );
 	}
@@ -73,7 +90,51 @@ final class Settings_Endpoint extends Rest_API {
 	 * @return array<string,mixed>
 	 */
 	private function prepare_for_rest( array $payload ): array {
-		return $this->normalize_boolean_values( $this->translate_schema( $payload ) );
+		return self::redact_credentials( $this->normalize_boolean_values( $this->translate_schema( $payload ) ) );
+	}
+
+	/**
+	 * @param  array<string,mixed>  $payload
+	 * @return array<string,mixed>
+	 */
+	private static function redact_credentials( array $payload ): array {
+		foreach ( self::WRITE_ONLY as $key ) {
+			if ( isset( $payload['settings'] ) && is_array( $payload['settings'] ) && array_key_exists( $key, $payload['settings'] ) ) {
+				$payload['settings'][ $key ] = '' === (string) $payload['settings'][ $key ] ? '' : self::STORED;
+			}
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * The screen saves every setting at once, so a credential it did not touch
+	 * comes back as the marker it was given. Saving that would overwrite the
+	 * real key with the word standing in for it.
+	 *
+	 * An empty value is dropped too. The field says "leave blank to keep it",
+	 * and typing a character and deleting it again used to send an empty
+	 * string that erased the saved key. Disconnecting clears the credentials
+	 * through Connection_State, not through here, so nothing needs an empty
+	 * value to mean "remove".
+	 *
+	 * @param  array<string,mixed>  $incoming
+	 * @return array<string,mixed>
+	 */
+	private static function without_unchanged_credentials( array $incoming ): array {
+		foreach ( self::WRITE_ONLY as $key ) {
+			if ( ! array_key_exists( $key, $incoming ) ) {
+				continue;
+			}
+
+			$value = is_string( $incoming[ $key ] ) ? trim( $incoming[ $key ] ) : $incoming[ $key ];
+
+			if ( '' === $value || self::STORED === $value || null === $value ) {
+				unset( $incoming[ $key ] );
+			}
+		}
+
+		return $incoming;
 	}
 
 	/**
