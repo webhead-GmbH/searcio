@@ -1,23 +1,101 @@
-import {
-	Notice,
-	ToggleControl,
-} from '@wordpress/components';
+// Notice and ToggleControl stay on @wordpress/components: their @wordpress/ui
+// counterparts are marked use-with-caution precisely for being mixed with
+// @wordpress/components, which is what this screen does. InputControl and
+// TextareaControl move, because the @wordpress/components versions are
+// not-recommended and the @wordpress/ui replacements are recommended.
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { Notice, ToggleControl } from '@wordpress/components';
 import { Card, InputControl, Text, TextareaControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 import { Grid } from '../../../../components/Layout';
 
+const serializeJsonValue = ( value, definition ) =>
+	JSON.stringify(
+		value ?? definition.default ?? ( definition.type === 'array' ? [] : {} ),
+		null,
+		2
+	);
+
+/**
+ * A JSON textarea has to hold the text being typed, not a re-serialisation of
+ * it. Driven straight off the setting, storing the raw text whenever
+ * JSON.parse threw, the next render stringified that text: quoting it and
+ * escaping its newlines, then escaping those escapes on the keystroke after.
+ * Every structural edit passes through invalid JSON - `{ "a": 1 }` cannot be
+ * reached without typing `{`, `{"`, `{"a` - so the field corrupted itself as
+ * soon as anyone typed in it.
+ *
+ * The draft also keeps the caret still. Re-serialising with an indent on every
+ * keystroke rewrites the text around the cursor even when the value parses.
+ */
+const JsonFieldControl = ( { settingKey, definition, value, updateSetting } ) => {
+	const serialized = serializeJsonValue( value, definition );
+	const [ draft, setDraft ] = useState( serialized );
+	const [ isInvalid, setIsInvalid ] = useState( false );
+	// The serialization the draft last agreed with. Only a change this field
+	// did not make - a reload, a save response - replaces the draft; comparing
+	// against the incoming value alone would fight the person typing.
+	const agreedValue = useRef( serialized );
+
+	useEffect( () => {
+		if ( serialized === agreedValue.current ) {
+			return;
+		}
+
+		agreedValue.current = serialized;
+		setDraft( serialized );
+		setIsInvalid( false );
+	}, [ serialized ] );
+
+	return (
+		<>
+			<TextareaControl
+				label={ definition.label || settingKey }
+				hideLabelFromVision
+				description={ __( 'Edit the JSON value for this setting.', 'webhead-search-cloud' ) }
+				value={ draft }
+				onValueChange={ ( nextValue ) => {
+					setDraft( nextValue );
+
+					try {
+						const parsedValue = JSON.parse( nextValue );
+
+						agreedValue.current = serializeJsonValue( parsedValue, definition );
+						setIsInvalid( false );
+						updateSetting( settingKey, parsedValue );
+					} catch ( error ) {
+						// The last value that parsed stays put: writing the
+						// half-typed text back is what corrupted the field.
+						setIsInvalid( true );
+					}
+				} }
+			/>
+			{ isInvalid ? (
+				<Notice status="error" isDismissible={ false }>
+					<p>
+						{ __(
+							'This is not valid JSON yet, so the change has not been applied. Finish the value to save it.',
+							'webhead-search-cloud'
+						) }
+					</p>
+				</Notice>
+			) : null }
+		</>
+	);
+};
+
 const renderFieldControl = ( field, settings, updateSetting ) => {
 	const { key, definition } = field;
 	const value = settings[ key ] ?? definition.default;
-	const help = definition.description || undefined;
 
 	if ( definition.type === 'boolean' ) {
 		return (
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ definition.label || key }
+				hideLabelFromVision
 				checked={ Boolean( value ) }
-				help={ help }
 				onChange={ ( nextValue ) => updateSetting( key, nextValue ) }
 			/>
 		);
@@ -28,8 +106,8 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 			<InputControl
 				type="number"
 				label={ definition.label || key }
+				hideLabelFromVision
 				value={ value ?? '' }
-				description={ help }
 				onValueChange={ ( nextValue ) => {
 					if ( nextValue === '' ) {
 						updateSetting( key, definition.default );
@@ -52,21 +130,11 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 
 	if ( definition.type === 'array' || definition.type === 'object' ) {
 		return (
-			<TextareaControl
-				label={ definition.label || key }
-				description={ help || __( 'Edit the JSON value for this setting.', 'webhead-search-cloud' ) }
-				value={ JSON.stringify(
-					value ?? definition.default ?? ( definition.type === 'array' ? [] : {} ),
-					null,
-					2
-				) }
-				onValueChange={ ( nextValue ) => {
-					try {
-						updateSetting( key, JSON.parse( nextValue ) );
-					} catch ( error ) {
-						updateSetting( key, nextValue );
-					}
-				} }
+			<JsonFieldControl
+				settingKey={ key }
+				definition={ definition }
+				value={ value }
+				updateSetting={ updateSetting }
 			/>
 		);
 	}
@@ -75,8 +143,8 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 		<InputControl
 			type={ definition.masked ? 'password' : 'text' }
 			label={ definition.label || key }
+			hideLabelFromVision
 			value={ value ?? '' }
-			description={ help }
 			onValueChange={ ( nextValue ) => updateSetting( key, nextValue ) }
 		/>
 	);
@@ -84,6 +152,7 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 
 const renderFieldCard = ( field, settings, updateSetting ) => {
 	const { key, definition } = field;
+	const isToggle = definition.type === 'boolean';
 
 	return (
 		<Card.Root key={ key } className="whsc-settings-card whsc-card whsc-card--dotted">
@@ -96,10 +165,21 @@ const renderFieldCard = ( field, settings, updateSetting ) => {
 						</Text>
 					) : null }
 				</div>
+				{ /* A switch is the answer to the question its title asks, so it sits on
+				   that row. Everything else gets a row of its own below. Either way the
+				   label and description are written once: the header owns them, and the
+				   control keeps an accessible label only. */ }
+				{ isToggle ? (
+					<div className="whsc-settings-card-switch">
+						{ renderFieldControl( field, settings, updateSetting ) }
+					</div>
+				) : null }
 			</Card.Header>
-			<Card.Content className="whsc-settings-card-content">
-				{ renderFieldControl( field, settings, updateSetting ) }
-			</Card.Content>
+			{ isToggle ? null : (
+				<Card.Content className="whsc-settings-card-content">
+					{ renderFieldControl( field, settings, updateSetting ) }
+				</Card.Content>
+			) }
 		</Card.Root>
 	);
 };
@@ -114,10 +194,12 @@ const SettingsGroupTab = ( { fields, settings, updateSetting, children } ) => {
 	}
 
 	return (
+		// Cards find their own number of columns and never get narrower than they
+		// can carry. The grid owns the gap; no card supplies its own margin.
 		<Grid
 			className="whsc-settings-grid"
 			auto={ { base: 280, md: 320 } }
-			gap={ { base: 16, md: 20 } }
+			gap="var(--wpds-dimension-gap-xl)"
 			align="start"
 		>
 			{ fields.map( ( field ) => renderFieldCard( field, settings, updateSetting ) ) }

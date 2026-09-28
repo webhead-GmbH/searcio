@@ -67,6 +67,40 @@
     color: var(--wpds-color-foreground-content-neutral-weak);
   }
 
+  // A boolean field puts its switch on the title row, so the header is a row
+  // with the copy growing and the switch held to the end.
+  .whsc-settings-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wpds-dimension-gap-lg);
+  }
+
+  .whsc-settings-card-copy {
+    min-width: 0;
+  }
+
+  .whsc-settings-card-switch {
+    flex: 0 0 auto;
+    padding-top: var(--wpds-dimension-padding-xs);
+  }
+
+  // The title beside it already names the switch. ToggleControl renders its own
+  // label rather than BaseControl's, so it ignores hideLabelFromVision and has
+  // to be hidden here - visually only, because that label is still what names
+  // the switch for a screen reader.
+  .whsc-settings-card-switch .components-toggle-control__label {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
   .components-base-control,
   .components-textarea-control__input {
     margin-bottom: 0;

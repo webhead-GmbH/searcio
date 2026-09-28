@@ -108,13 +108,19 @@ const SettingsPanel = () => {
 		})),
 	];
 
+	// A tab built from the settings schema (General, and any group after it)
+	// does not exist until that schema has loaded. Falling back as soon as the
+	// requested tab was missing sent every link to one of them - and every
+	// reload while on one - to Sync before its tab could appear.
+	const isKnownTab = tabs.some((tab) => tab.name === activeTab);
+
 	useEffect(() => {
-		if (tabs.some((tab) => tab.name === activeTab)) {
+		if (isLoading || isKnownTab) {
 			return;
 		}
 
 		setActiveTab(SYNC_TAB);
-	}, [activeTab, tabs]);
+	}, [activeTab, isKnownTab, isLoading]);
 
 	useEffect(() => {
 		const newUrl = addQueryArgs(window.location.href, {tab: activeTab});
@@ -242,6 +248,14 @@ const SettingsPanel = () => {
 								</Tabs.Panel>
 							);
 						})}
+
+						{/* Holds the place of a requested schema tab until the schema
+						    says whether it exists, so the page is not blank meanwhile. */}
+						{isLoading && !isKnownTab && (
+							<Tabs.Panel value={activeTab} className="tab-content">
+								<SettingsSkeleton/>
+							</Tabs.Panel>
+						)}
 					</Tabs.Root>
 				</Card.Content>
 				{!SELF_MANAGED_TABS.includes(activeTab) && (

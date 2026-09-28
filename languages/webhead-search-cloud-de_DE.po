@@ -18,7 +18,7 @@ msgstr ""
 #: webhead-search-cloud.php
 #: includes/Admin/Settings_Page.php:39
 #: includes/Admin/Settings_Page.php:109
-#: src/admin/settings/components/SettingsPanel.js:162
+#: src/admin/settings/components/SettingsPanel.js:168
 msgid "webhead Search Cloud"
 msgstr "webhead Search Cloud"
 
@@ -64,6 +64,7 @@ msgstr "(unbekannt)"
 #: src/frontend/search/components/SearchModal.js:906
 #: src/frontend/search/components/SearchModal.js:918
 #: src/frontend/search/components/SearchModal.js:982
+#: src/frontend/search/components/Trigger.js:22
 msgid "Search"
 msgstr "Suche"
 
@@ -899,11 +900,11 @@ msgstr "Dieser Lauf konnte nicht gelöscht werden. Der aktive Lauf ist geschütz
 msgid "That action is not available for the current run state."
 msgstr "Diese Aktion ist im aktuellen Status des Laufs nicht verfügbar."
 
-#: includes/Routing/Verify_Endpoint.php:67
+#: includes/Routing/Verify_Endpoint.php:69
 msgid "Missing verification token."
 msgstr ""
 
-#: includes/Routing/Verify_Endpoint.php:78
+#: includes/Routing/Verify_Endpoint.php:80
 msgid "Not connected."
 msgstr ""
 
@@ -1196,7 +1197,7 @@ msgstr ""
 msgid "How many products"
 msgstr ""
 
-#: includes/Routing/Verify_Endpoint.php:72
+#: includes/Routing/Verify_Endpoint.php:74
 msgid "No verification is in progress."
 msgstr "Es läuft gerade keine Überprüfung."
 
@@ -1237,34 +1238,34 @@ msgstr ""
 msgid "Connection"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:134
+#: src/admin/settings/components/SettingsPanel.js:140
 msgid "Settings saved successfully."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:139
+#: src/admin/settings/components/SettingsPanel.js:145
 msgid "Saving..."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:140
+#: src/admin/settings/components/SettingsPanel.js:146
 msgid "Save Settings"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:142
+#: src/admin/settings/components/SettingsPanel.js:148
 #: src/admin/settings/components/tabs/IndexingTab.js:521
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:88
 #: src/admin/settings/components/tabs/SearchConfigTab.js:638
 msgid "No unsaved changes."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:167
+#: src/admin/settings/components/SettingsPanel.js:173
 msgid "Configure the plugin settings from one shared admin surface."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:269
+#: src/admin/settings/components/SettingsPanel.js:283
 msgid "OK"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:271
+#: src/admin/settings/components/SettingsPanel.js:285
 msgid "The settings could not be saved. Review the fields and try again."
 msgstr ""
 
@@ -2069,11 +2070,11 @@ msgstr ""
 msgid "Comma-separated ISO language codes, e.g. \"de, en\"."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SettingsGroupTab.js:57
+#: src/admin/settings/components/tabs/SettingsGroupTab.js:56
 msgid "Edit the JSON value for this setting."
-msgstr ""
+msgstr "Bearbeite den JSON-Wert dieser Einstellung."
 
-#: src/admin/settings/components/tabs/SettingsGroupTab.js:111
+#: src/admin/settings/components/tabs/SettingsGroupTab.js:191
 msgid "No settings are registered for this tab yet."
 msgstr ""
 
@@ -2918,3 +2919,7 @@ msgstr "%s-Filter zurücksetzen"
 #: src/components/Modal.js:251
 msgid "Close"
 msgstr "Schließen"
+
+#: src/admin/settings/components/tabs/SettingsGroupTab.js:77
+msgid "This is not valid JSON yet, so the change has not been applied. Finish the value to save it."
+msgstr "Das ist noch kein gültiges JSON, deshalb wurde die Änderung nicht übernommen. Vervollständige den Wert, um ihn zu speichern."
