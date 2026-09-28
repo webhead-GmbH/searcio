@@ -56,7 +56,9 @@ const UsageCard = ( { usage } ) => {
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<Card.Header className="whsc-settings-card-header">
 				<div className="whsc-settings-card-copy">
-					<Card.Title render={ <h3 /> }>{ __( 'This month', 'webhead-search-cloud' ) }</Card.Title>
+					{ /* An h4: the card sits inside the connection card, whose title is
+					     the tab's h3. The same level would make it a sibling section. */ }
+					<Card.Title render={ <h4 /> }>{ __( 'This month', 'webhead-search-cloud' ) }</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
 							'What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search.',
