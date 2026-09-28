@@ -100,6 +100,8 @@ To rebuild it, check the repository out and run `npm install` followed by
 - Fixed clearing the write key field erasing the saved key; leaving it blank now keeps it, as the field says.
 - The admin cards have their shadow back, the Indexing tab's sections are collapsible with headings in order, and the admin's animations respect the reduced-motion setting.
 - The storefront search shows a clearly visible keyboard focus ring, and disabled buttons there look disabled.
+- The search icon is announced as "Search" to screen readers even when no placeholder text is set.
+- A link to the General settings tab now opens it instead of the Sync tab, and each setting there shows its name and description once.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.

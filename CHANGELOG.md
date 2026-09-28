@@ -32,6 +32,10 @@
 - The admin's entrance animations honour `prefers-reduced-motion`. Motion only reads that setting when asked, and nothing asked, so they ran for people who had told their system not to show them.
 - The DataViews stylesheet behind the sync history table is loaded once instead of twice, and now matches the installed package: one copy was current, the other was from a release older than the table it styled.
 - Keyboard focus on the storefront search is a visible 2px ring rather than a sub-pixel hairline against the accent border, and a disabled button there now looks disabled rather than like a live call to action.
+- **The search icon has a name for screen readers.** Its only name was the block's placeholder text, which is optional and empty by default - so the default trigger was a button announced as just "button", on every site that left the placeholder blank. It now falls back to "Search", translated.
+- A link to the General settings tab opens it. The tab is built from the settings schema, which arrives after the page loads, and the screen fell back to Sync the moment the requested tab was missing - before it could exist. Every link to it, and every reload while on it, landed on Sync.
+- Each general setting says its name and description once. The card header already carried both, and the control repeated them beneath it; a switch now sits on its title's row, its own label kept for screen readers only.
+- Fixed a JSON setting corrupting itself as it was typed in. Every edit passes through invalid JSON on its way to valid JSON, and the half-typed text was stored and then re-quoted on the next keystroke. The field now holds what is being typed and only applies it once it parses. No setting of this plugin uses it yet; the next one would have.
 
 ## 1.0.4
 
