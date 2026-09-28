@@ -96,6 +96,10 @@ To rebuild it, check the repository out and run `npm install` followed by
 - A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.
 - The photo button and the quiz are themeable in the block editor and Elementor like the rest of the widget.
 - The search service moved to a new address, https://searcio.com. Nothing to do on your side; your existing keys keep working.
+- Security: the write key and secret are no longer sent to the browser, even encrypted - including to users who can only view the settings.
+- Fixed clearing the write key field erasing the saved key; leaving it blank now keeps it, as the field says.
+- The admin cards have their shadow back, the Indexing tab's sections are collapsible with headings in order, and the admin's animations respect the reduced-motion setting.
+- The storefront search shows a clearly visible keyboard focus ring, and disabled buttons there look disabled.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.
