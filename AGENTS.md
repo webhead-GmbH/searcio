@@ -42,6 +42,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Read `.agents/skills/webhead-e2e-testing/SKILL.md` before writing or debugging Playwright specs under `tests/e2e`.
 - Read `.agents/skills/webhead-plugin-quality/SKILL.md` before changing WordPress runtime behavior, translations, releases, or security-sensitive surfaces.
 - Read `.agents/skills/webhead-scaffold-maintenance/SKILL.md` before changing generated files, package manifests, or framework update flows.
+- Read `.agents/skills/webhead-design-system/SKILL.md` before choosing a WordPress component or writing any admin UI, token, card, tab, form, or saving behaviour. It carries the current status of every component, which moves faster than memory does.
 - Read `.agents/skills/webhead-react-admin/SKILL.md` before changing admin UI, asset loading, DataViews tables, or REST/UI integration.
 - Read `.agents/skills/webhead-frontend/SKILL.md` before changing frontend React UI, frontend reset CSS, conditional frontend asset loading, responsive behavior, or accessibility.
 - When using Codex, also read `.codex/instructions.md` before editing.
@@ -69,6 +70,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - `.agents/skills/webhead-wp-env-testing/SKILL.md` covers the wp-env integration suite, its bootstrap, transactions, and multisite runs.
 - `.agents/skills/webhead-e2e-testing/SKILL.md` covers Playwright specs, fixtures, seeding, and flake control.
 - `tests/Unit`, `tests/Integration`, and `tests/e2e/specs` hold the three test tiers.
+- `.agents/skills/webhead-design-system/SKILL.md` covers component choice, design tokens, cards, tabs, typography, elevation, radius, layout, saving, errors, and destructive actions.
 - `.agents/skills/webhead-react-admin/SKILL.md` covers React, DataViews, block-editor, asset loading, and REST/UI contracts.
 - `.agents/skills/webhead-frontend/SKILL.md` covers frontend React surfaces, scoped reset CSS, conditional asset loading, responsiveness, and accessibility.
 - `.agents/skills/webhead-elementor-widgets/SKILL.md` covers Elementor widget controls, live previews, style tabs, responsive controls, and widget-specific asset loading.

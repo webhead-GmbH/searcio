@@ -15,7 +15,7 @@ Generated files are a framework-owned contract, but product plugins may customiz
 - `composer.json` keeps `webhead/wp-plugin-framework` in `require-dev`.
 - Mozart output lives in `includes/Dependencies` for release builds.
 - `package.json` may include product-specific custom dependencies and scripts.
-- `package.json` includes framework-owned npm overrides for vulnerable `@wordpress/scripts` transitive build tooling; preserve product-specific custom overrides.
+- `package.json` includes framework-owned npm overrides for vulnerable `@wordpress/scripts` transitive build tooling; preserve product-specific custom overrides. `scaffold:update` drops an override the framework has retired, but only when its value is still the one the framework wrote.
 - `composer framework:update` runs `vendor/bin/webhead scaffold:update --path=.`.
 - Older generated plugins may not have that Composer script; use `wh-plugin update --path=.` from the plugin root when the global CLI is installed.
 - Framework-owned config files carry the `Webhead scaffold managed file` marker. Files without that marker are treated as product-owned and must be preserved.
@@ -39,6 +39,6 @@ Generated files are a framework-owned contract, but product plugins may customiz
 - Confirm custom packages and scripts survived the update.
 - Run the affected PHPUnit tests.
 - Build JavaScript assets when package or webpack output changed.
-- Run `npm run test:scaffold-npm-audit` in the framework when generated JavaScript dependencies, npm overrides, or build tooling changed.
-- Run the framework browser smoke for generated React admin UI changes when a test WordPress site is available.
+- Run `npm install`, then `npm audit` and `npm run build`, when the update changed JavaScript dependencies, npm overrides, or build tooling. (The framework repository audits the generated manifest upstream; that script does not exist in this plugin.)
+- Run `npm run test:e2e` for generated React admin UI changes when the wp-env site is running.
 - Keep `README.md` and agent skill guidance aligned with the current generated workflow.

@@ -95,9 +95,17 @@ body:has([data-webhead-frontend-root]) {
 	color: var(--wpds-color-foreground-interactive-neutral-active);
 }
 
+// The package draws focus with an `outline`, offset from the control, and every
+// rule below follows it. This file used to paint `outline: 2px solid transparent`
+// — which paints nothing — and replace the indicator with a box-shadow: 2px on
+// buttons, but only `0 0 0 0.5px` on inputs, a sub-pixel hairline hugging the
+// field. Against an accent-coloured border that is close to invisible, and it is
+// under the 2px a focus indicator is expected to carry. It is a keyboard-only
+// regression, so nothing about it shows in a screenshot of the page at rest.
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-button:focus:not(:active) {
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent);
-	outline: 2px solid transparent;
+	box-shadow: none;
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
+	outline-offset: var(--wpds-border-width-focus, 2px);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary {
@@ -131,6 +139,40 @@ body:has([data-webhead-frontend-root]) {
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link {
 	background: transparent;
 	color: var(--wp-components-color-accent);
+}
+
+// Every rule above states a colour for the enabled state only, and each one
+// outranks the package's disabled rules — so a disabled button on a frontend
+// surface kept its full brand-green label and its full brand-green ring, and
+// the only thing left saying "disabled" was the mouse cursor. The primary shape
+// was worse: the package expresses primary-disabled *only* by fading the label,
+// keeping the accent fill on purpose, so restating `color` erased the whole
+// signal and left a live-looking call to action that does nothing.
+//
+// The package's own disabled border can never reach these buttons either,
+// because this file zeroes `border` on `.components-button` to keep a theme's
+// borders out; the ring here is an inset shadow, so the disabled ring has to be
+// stated as one too.
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary:disabled,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary[aria-disabled='true'] {
+	background: var(--wp-components-color-accent);
+	color: rgba(255, 255, 255, 0.4);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary:disabled,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary[aria-disabled='true'],
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary[aria-disabled='true']:hover {
+	background: transparent;
+	box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-neutral-disabled);
+	color: var(--wpds-color-foreground-interactive-neutral-disabled);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary:disabled,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary[aria-disabled='true'],
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link:disabled,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link[aria-disabled='true'] {
+	background: transparent;
+	color: var(--wpds-color-foreground-interactive-neutral-disabled);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary:hover:not(:disabled, [aria-disabled='true']),
@@ -179,9 +221,10 @@ body:has([data-webhead-frontend-root]) {
 	.dataviews-search input[type='search'],
 	.dataviews-filters__search-widget-filter-combobox__input
 ):focus {
-	border-color: var(--wp-admin-theme-color);
-	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
-	outline: 2px solid transparent;
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	box-shadow: none;
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-admin-theme-color);
+	outline-offset: var(--wpds-border-width-focus, 2px);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] :is(
@@ -204,9 +247,10 @@ body:has([data-webhead-frontend-root]) {
 	.components-input-control__input,
 	.components-select-control__input
 ):focus {
-	border-color: var(--wp-components-color-accent);
-	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent);
-	outline: 2px solid transparent;
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	box-shadow: none;
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
+	outline-offset: var(--wpds-border-width-focus, 2px);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__backdrop {
@@ -216,8 +260,10 @@ body:has([data-webhead-frontend-root]) {
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container:focus-within .components-input-control__backdrop {
-	border-color: var(--wp-components-color-accent);
-	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent);
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	box-shadow: none;
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
+	outline-offset: var(--wpds-border-width-focus, 2px);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] :is(
@@ -239,9 +285,10 @@ body:has([data-webhead-frontend-root]) {
 	textarea.components-textarea-control__input,
 	select.components-select-control__input
 ):focus {
-	border-color: var(--wp-components-color-accent);
-	box-shadow: 0 0 0 0.5px var(--wp-components-color-accent);
-	outline: 2px solid transparent;
+	border-color: var(--wpds-color-stroke-interactive-neutral);
+	box-shadow: none;
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
+	outline-offset: var(--wpds-border-width-focus, 2px);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container .components-input-control__input {
@@ -322,10 +369,30 @@ body:has([data-webhead-frontend-root]) {
 	outline-offset: 2px;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:checked,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'][aria-checked='mixed'] {
+// `:not(:disabled)` is the package's guard, and dropping it was the bug: a
+// checked *disabled* box filled solid brand green exactly like a live one, with
+// only the greyed tick hinting otherwise — which reads as a rendering fault, not
+// as a disabled control.
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:not(:disabled, [aria-disabled='true']):checked,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:not(:disabled, [aria-disabled='true'])[aria-checked='mixed'] {
 	background: var(--wp-components-color-accent);
 	border-color: var(--wp-components-color-accent);
+}
+
+// And the unchecked disabled box: the base rule above states one background and
+// one border for every state, so the package's disabled greys never applied and
+// a disabled box was indistinguishable from an enabled one.
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:disabled,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'][aria-disabled='true'] {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	background: var(--wpds-color-stroke-surface-neutral-weak);
+	cursor: default;
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:disabled:checked,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'][aria-disabled='true'][aria-checked='true'] {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	background: var(--wpds-color-stroke-interactive-neutral-disabled);
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-selection-checkbox .components-checkbox-control__input[type='checkbox'] {
@@ -354,9 +421,16 @@ body:has([data-webhead-frontend-root]) {
 	accent-color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:checked {
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:not(:disabled, [aria-disabled='true']):checked {
 	border-color: var(--wp-components-color-accent);
 	background: var(--wp-components-color-accent);
+}
+
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:disabled,
+[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio'][aria-disabled='true'] {
+	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+	background: var(--wpds-color-stroke-surface-neutral-weak);
+	cursor: default;
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:checked::before {

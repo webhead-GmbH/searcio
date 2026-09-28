@@ -83,7 +83,12 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 
 - Keep multisite behavior explicit and safe.
 - Keep WPML, Polylang, and Wordfence compatibility defensive when those plugins are inactive.
-- Keep REST permission callbacks explicit. Use `__return_true` only for intentionally public routes.
+- Declare a permission callback on every `#[Route]`. This is enforced, not advisory: `Rest_API::resolve_permission_callback()` throws an `InvalidArgumentException` naming the class and method when one is missing, so a route without it fails at boot rather than shipping open. Use `__return_true` only for intentionally public routes.
 - Keep settings schema-driven from `includes/Settings/Plugin_Settings.php`.
 - Keep lifecycle upgrade steps replay-safe and uninstall policy explicit.
 - Do not store secrets in logs, activity events, diagnostics, or REST payloads.
+- `masked: true` on `#[Setting]` is a **display** hint, not a security control. Verified: it makes
+  the generated control render as a password field and makes `wp ... settings` withhold the value
+  without `--reveal-secrets`, but `Settings_Manager::export_values()` never consults `is_masked()`,
+  so the real value is in the REST response like any other. Protect a secret with the capability on
+  the route and by not exposing it at all — `show_in_rest: false` — rather than by marking it masked.

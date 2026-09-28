@@ -1,3 +1,10 @@
+// @wordpress/theme removed the --wpds-elevation-* custom properties, so
+// `var( --wpds-elevation-xs )` resolved to nothing and every card lost its
+// shadow without a warning. @wordpress/base-styles still ships the documented
+// levels as SASS variables, which is where the not-recommended Elevation
+// component itself points.
+@use "@wordpress/base-styles/variables" as wp-base;
+
 :root {
 	--wh-toastify-admin-offset: var(--wpds-dimension-gap-xl);
 	--toastify-toast-top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wh-toastify-admin-offset));
@@ -10,7 +17,10 @@
 	--wh-surface-radius: var(--wpds-border-radius-xl);
 	--wh-card-radius: var(--wpds-border-radius-lg);
 	--wh-control-radius: var(--wpds-border-radius-sm);
-	--wh-card-elevation: var(--wpds-elevation-xs);
+	// Extra small is the documented level for "large sections and containers that
+	// group related content", which is what a card is. Medium and large are
+	// reserved for menus and modals.
+	--wh-card-elevation: #{wp-base.$elevation-x-small};
 	--wh-panel-padding: var(--wpds-dimension-padding-xl);
 	--wh-panel-gap: var(--wpds-dimension-gap-xl);
 	--wh-card-gap: var(--wpds-dimension-gap-lg);
@@ -184,7 +194,7 @@ body .Toastify__toast-container--top-right {
 		border-radius: var(--wh-control-radius);
 		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-sm);
-		font-weight: var(--wpds-typography-font-weight-regular);
+		font-weight: var(--wpds-typography-font-weight-default);
 		line-height: var(--wpds-typography-line-height-sm);
 		display: inline-flex;
 		align-items: center;
