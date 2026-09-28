@@ -21,6 +21,22 @@ test.describe( 'Accessibility', () => {
 		await configureSearchKey( requestUtils );
 	} );
 
+	/**
+	 * The block's placeholder defaults to empty and its mode to "icon", so the
+	 * default trigger was a button with `aria-label=""` and no text: a screen
+	 * reader announced "button", and nothing could find it by name. Found in a
+	 * browser, because every other spec clicks it by CSS selector.
+	 */
+	test( 'names the icon trigger even when no placeholder is set', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page );
+		await page.goto( await createBlockPost( requestUtils ) );
+
+		const widget = new SearchWidget( page );
+		await widget.trigger.waitFor( { state: 'visible' } );
+
+		await expect( widget.trigger.getByRole( 'button', { name: 'Search', exact: true } ) ).toBeVisible();
+	} );
+
 	test( 'moves focus into the modal on open', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );

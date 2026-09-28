@@ -77,6 +77,9 @@
     "src/frontend/search/components/Suggestions.js": [
         "public/bundle.search.js"
     ],
+    "src/frontend/search/components/Trigger.js": [
+        "public/bundle.search.js"
+    ],
     "src/frontend/search/components/VisualSearchButton.js": [
         "public/bundle.search.js"
     ],
