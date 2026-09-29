@@ -48,6 +48,8 @@ What the search modal offers is decided by Search Cloud's `/storefront-config`, 
 - **Search by photo** — a camera button in the search box. The shopper uploads (or, on a phone, takes) a photo; a vision model describes it as tags and those tags run as an ordinary search. The tags are shown above the results, so an unexpected result set reads as a misread photo rather than as broken search. Turn it on under *AI & ranking* above.
 - **Find your match** — a guided quiz tab: a few questions that narrow the catalogue down for a shopper who knows what they want but not what it is called. The questions are built in the Search Cloud panel; the tab appears once at least one quiz is published. Answers accumulate into filters and run as a single search at the end.
 
+Every mode is themeable from the same place as the rest of the widget — the block editor's Styles sidebar or Elementor's Style tab.
+
 ### Product rows
 
 Besides the search modal, the plugin ships a **Search Cloud Products** block (and the matching Elementor widget) for placing a row of products anywhere on the storefront. Two sources:
@@ -57,7 +59,7 @@ Besides the search modal, the plugin ships a **Search Cloud Products** block (an
 
 Leave the product or category empty and the row resolves it from the page it is on, so you place the block once on a product or category template rather than on every product and every category. A row with nothing to show removes itself, and so does a row whose request failed.
 
-Every mode is themeable from the same place as the rest of the widget — the block editor's Styles sidebar or Elementor's Style tab.
+Rows use the same product cards as the search modal, in the plugin's default styling: neither the block nor the Elementor widget has style controls of its own.
 
 ## Sync
 
