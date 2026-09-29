@@ -465,6 +465,12 @@
     gap: 18px;
   }
 
+  // Card content stacks without a gap, so a warning about the fields above
+  // would otherwise touch the token field it is about.
+  .whsc-unindexed-fields {
+    margin: var(--wpds-dimension-gap-md) 0 0;
+  }
+
   // The AI index status, reported under its checkbox rather than as help text
   // so it reads as live state instead of a description of the setting.
   .whsc-search-config-status {

@@ -7,7 +7,7 @@ import {
 	RangeControl,
 } from '@wordpress/components';
 import { Card, InputControl, Text, TextareaControl } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
@@ -18,6 +18,7 @@ import {
 	textToIds,
 	toPayload,
 } from '../../searchConfig';
+import { indexedFields, unindexedFields } from '../../indexedFields';
 import { Grid } from '../../../../components/Layout';
 import { showToast } from '../../../../toast';
 import IndexingSkeleton from './IndexingSkeleton';
@@ -29,22 +30,6 @@ const INDEXING_CONFIG_PATH =
 	pluginData?.api?.indexingConfigPath || '/webhead-search-cloud/v1/indexing/config';
 const TEST_CONNECTION_PATH =
 	pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
-
-// Suggestion-only, not a validation allow-list — the API is the source of
-// truth for what a field name is actually worth. These are the document
-// fields WooCommerce toggles produce when Products indexing is enabled.
-const WOO_FIELD_SUGGESTIONS = [
-	'price',
-	'regular_price',
-	'sale_price',
-	'sku',
-	'stock_status',
-	'categories',
-	'tags',
-	'featured',
-	'rating',
-	'review_count',
-];
 
 /**
  * One editable boost row per content type this site indexes, preserving any
@@ -68,36 +53,50 @@ const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 	return [ ...local, ...foreign ];
 };
 
-const fieldPool = ( catalog ) => {
-	if ( ! catalog ) {
-		return [ 'title', 'content', 'type', 'url' ];
+/**
+ * Warns that configured fields exist on no document from this site. Not a
+ * validation error: the API accepts the names, and another source writing to
+ * the same index could carry them - but from here they silently match nothing.
+ *
+ * @param {Object}        props
+ * @param {Array<string>} props.fields  From `unindexedFields()`.
+ * @param {Function}      props.message Called with (quotedList, count).
+ */
+const UnindexedFieldsNotice = ( { fields, message } ) => {
+	if ( 0 === fields.length ) {
+		return null;
 	}
 
-	const pool = new Set( [ 'title', 'content', 'type', 'url' ] );
-	let hasEnabledProduct = false;
+	const quoted = fields.map( ( field ) => `"${ field }"` ).join( ', ' );
 
-	( catalog.post_types || [] ).forEach( ( postType ) => {
-		if ( ! postType.config?.enabled ) {
-			return;
-		}
-
-		if ( postType.is_product ) {
-			hasEnabledProduct = true;
-		}
-
-		( postType.config.fields || [] ).forEach( ( field ) => {
-			if ( field?.as ) {
-				pool.add( field.as );
-			}
-		} );
-	} );
-
-	if ( hasEnabledProduct && catalog.woo?.active ) {
-		WOO_FIELD_SUGGESTIONS.forEach( ( field ) => pool.add( field ) );
-	}
-
-	return Array.from( pool );
+	return (
+		<Notice status="warning" isDismissible={ false } className="whsc-unindexed-fields">
+			<p>{ message( quoted, fields.length ) }</p>
+		</Notice>
+	);
 };
+
+const unindexedFacetMessage = ( quoted, count ) => sprintf(
+	/* translators: %s: one or more quoted field names, e.g. "category". */
+	_n(
+		'No document on this site has a %s field, so its facet will always be empty. Choose a field from the list, or start indexing it in the Indexing tab.',
+		'No document on this site has the fields %s, so their facets will always be empty. Choose fields from the list, or start indexing them in the Indexing tab.',
+		count,
+		'webhead-search-cloud'
+	),
+	quoted
+);
+
+const unindexedSuggestMessage = ( quoted, count ) => sprintf(
+	/* translators: %s: one or more quoted field names, e.g. "category". */
+	_n(
+		'No document on this site has a %s field, so it will never add a suggestion. Choose a field from the list, or start indexing it in the Indexing tab.',
+		'No document on this site has the fields %s, so they will never add a suggestion. Choose fields from the list, or start indexing them in the Indexing tab.',
+		count,
+		'webhead-search-cloud'
+	),
+	quoted
+);
 
 const enabledTypeLabels = ( catalog ) => {
 	const labels = {};
@@ -363,8 +362,9 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 						<div className="whsc-merchandising-rule__ids">
 							<InputControl
 								label={ __( 'Also require filter (field)', 'webhead-search-cloud' ) }
+								list="whsc-field-suggestions"
 								description={ rowError( errors, 'merchandising', index, 'filter_field' )
-									|| __( 'Optional. A facet field, e.g. "category".', 'webhead-search-cloud' ) }
+									|| __( 'Optional. A facet field, e.g. "categories".', 'webhead-search-cloud' ) }
 								value={ rule.filter_field }
 								onValueChange={ ( filter_field ) => update( index, { ...rule, filter_field } ) }
 							/>
@@ -534,7 +534,8 @@ const SearchConfigTab = () => {
 		void load();
 	}, [] );
 
-	const pool = useMemo( () => fieldPool( catalog ), [ catalog ] );
+	const indexed = useMemo( () => indexedFields( catalog ), [ catalog ] );
+	const pool = indexed ?? [];
 	const typeLabels = useMemo( () => enabledTypeLabels( catalog ), [ catalog ] );
 	const hasSearchConfigChanges = JSON.stringify( config ) !== JSON.stringify( persistedConfig );
 	const hasUnsavedChanges = hasSearchConfigChanges || hasUnsavedPopularSearches;
@@ -798,6 +799,10 @@ const SearchConfigTab = () => {
 								suggestions={ pool }
 								onChange={ ( value ) => set( 'facet_fields', value ) }
 							/>
+							<UnindexedFieldsNotice
+								fields={ unindexedFields( config.facet_fields, indexed ) }
+								message={ unindexedFacetMessage }
+							/>
 						</Card.Content>
 					</Card.Root>
 
@@ -823,6 +828,10 @@ const SearchConfigTab = () => {
 								value={ config.suggest_fields }
 								suggestions={ pool }
 								onChange={ ( value ) => set( 'suggest_fields', value ) }
+							/>
+							<UnindexedFieldsNotice
+								fields={ unindexedFields( config.suggest_fields, indexed ) }
+								message={ unindexedSuggestMessage }
 							/>
 						</Card.Content>
 					</Card.Root>

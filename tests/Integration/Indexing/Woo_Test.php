@@ -25,6 +25,12 @@ use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Woo_Test extends Integration_Test_Case {
+	/**
+	 * A global attribute taxonomy of this suite's own, so no attribute a
+	 * WooCommerce install registers can collide with it.
+	 */
+	private const ATTRIBUTE = 'pa_whsc_finish';
+
 	private Woo $woo;
 
 	public function set_up(): void {
@@ -35,6 +41,172 @@ final class Woo_Test extends Integration_Test_Case {
 		}
 
 		$this->woo = new Woo();
+	}
+
+	public function tear_down(): void {
+		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
+			unregister_taxonomy( self::ATTRIBUTE );
+		}
+
+		parent::tear_down();
+	}
+
+	/**
+	 * Every toggle on, plus one attribute.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function every_toggle(): array {
+		$woo = array_fill_keys( array_keys( Woo::TOGGLE_FIELDS ), true );
+
+		$woo['attributes'] = [ self::ATTRIBUTE ];
+
+		return $woo;
+	}
+
+	/**
+	 * A simple product carrying a value for every field a simple product can
+	 * have: a sale, a SKU, a category, a tag and an attribute term.
+	 */
+	private function make_complete_simple_product(): int {
+		register_taxonomy( self::ATTRIBUTE, 'product' );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Rain Coat' );
+		$product->set_regular_price( '50' );
+		$product->set_sale_price( '35' );
+		$product->set_price( '35' );
+		$product->set_sku( 'COAT-1' );
+		$product->set_featured( true );
+		$product->set_status( 'publish' );
+		$product->save();
+
+		foreach ( [ 'product_cat' => 'Outerwear', 'product_tag' => 'Winter', self::ATTRIBUTE => 'Matte' ] as $taxonomy => $name ) {
+			$term = wp_insert_term( $name, $taxonomy );
+			$this->assertIsArray( $term );
+			wp_set_object_terms( $product->get_id(), [ (int) $term['term_id'] ], $taxonomy );
+		}
+
+		return $product->get_id();
+	}
+
+	/**
+	 * A variable product with two priced, SKU'd variations - the only kind
+	 * that carries a price range and variation SKUs.
+	 */
+	private function make_variable_product(): int {
+		$variable = new WC_Product_Variable();
+		$variable->set_name( 'T-Shirt' );
+		$variable->set_status( 'publish' );
+		$variable->save();
+
+		foreach ( [ [ '10', 'TS-S' ], [ '25', 'TS-L' ] ] as [ $price, $sku ] ) {
+			$variation = new WC_Product_Variation();
+			$variation->set_parent_id( $variable->get_id() );
+			$variation->set_regular_price( $price );
+			$variation->set_price( $price );
+			$variation->set_sku( $sku );
+			$variation->save();
+		}
+
+		// Re-read so the parent sees its freshly saved variations.
+		wc_get_product( $variable->get_id() )->save();
+
+		return $variable->get_id();
+	}
+
+	/**
+	 * The drift guard for the Search Config tab's suggestions: `field_names()`
+	 * must name exactly what `product_fields()` writes across both product
+	 * kinds - nothing missing, and nothing (like `tags`) that no product has.
+	 */
+	public function test_field_names_are_exactly_the_fields_products_are_written_with(): void {
+		$woo = $this->every_toggle();
+
+		$simple   = $this->woo->product_fields( get_post( $this->make_complete_simple_product() ), $woo );
+		$variable = $this->woo->product_fields( get_post( $this->make_variable_product() ), $woo );
+		$written  = array_values( array_unique( array_merge( array_keys( $simple ), array_keys( $variable ) ) ) );
+
+		$this->assertEqualsCanonicalizing( $written, $this->woo->field_names( $woo ) );
+	}
+
+	/**
+	 * The tag toggle is called `tags`, but the field it writes is not.
+	 */
+	public function test_field_names_follow_the_toggles_that_are_on(): void {
+		$names = $this->woo->field_names( [ 'categories' => true, 'tags' => true, 'stock_status' => true ] );
+
+		$this->assertSame( [ 'stock_status', 'in_stock', 'categories', 'product_tags' ], $names );
+		$this->assertNotContains( 'tags', $names );
+	}
+
+	public function test_regular_and_sale_prices_are_not_listed_without_the_price(): void {
+		$this->assertSame( [], $this->woo->field_names( [ 'regular_sale' => true ] ) );
+	}
+
+	public function test_an_attribute_whose_taxonomy_is_gone_is_not_listed(): void {
+		register_taxonomy( self::ATTRIBUTE, 'product' );
+
+		$this->assertSame(
+			[ 'attr_whsc_finish' ],
+			$this->woo->field_names( [ 'attributes' => [ self::ATTRIBUTE, 'pa_whsc_deleted' ] ] )
+		);
+	}
+
+	public function test_indexed_fields_include_the_product_fields_under_their_written_names(): void {
+		register_taxonomy( self::ATTRIBUTE, 'product' );
+
+		$this->service( 'index_config' )->save(
+			[
+				'product' => [
+					'enabled' => true,
+					'woo'     => [
+						'stock_status' => true,
+						'tags'         => true,
+						'attributes'   => [ self::ATTRIBUTE ],
+					],
+				],
+			]
+		);
+
+		$fields = $this->service( 'index_config' )->indexed_fields();
+
+		foreach ( [ 'title', 'type', 'stock_status', 'in_stock', 'product_tags', 'attr_whsc_finish' ] as $field ) {
+			$this->assertContains( $field, $fields );
+		}
+
+		$this->assertNotContains( 'tags', $fields );
+		$this->assertNotContains( 'category', $fields );
+	}
+
+	/**
+	 * A built product document carries nothing the indexed-field list omits.
+	 */
+	public function test_every_field_a_built_product_document_carries_is_listed(): void {
+		$woo                 = $this->every_toggle();
+		$woo['only_visible'] = false;
+
+		$this->service( 'index_config' )->save(
+			[
+				'product' => array_merge(
+					$this->service( 'index_config' )->defaults_for( 'product' ),
+					[
+						'enabled' => true,
+						'woo'     => $woo,
+					]
+				),
+			]
+		);
+
+		/** @var Document_Builder $builder */
+		$builder  = $this->service( 'document_builder' );
+		$document = $builder->build( get_post( $this->make_complete_simple_product() ) );
+
+		$this->assertIsArray( $document );
+
+		$unlisted = array_diff( array_keys( $document ), [ 'id' ], $this->service( 'index_config' )->indexed_fields() );
+
+		$this->assertSame( [], array_values( $unlisted ) );
 	}
 
 	public function test_is_active_and_meets_minimum(): void {

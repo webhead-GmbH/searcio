@@ -31,7 +31,7 @@ Controls how Search Cloud itself ranks and filters your content. Most of this da
 
 - **Searchable fields & weights** — which fields full-text search matches, and how much each counts (1–100). A higher weight on `title` makes title matches outrank body-text matches, for example.
 - **Type boosts** — a ranking multiplier (0.1–100) per content type currently enabled in Indexing. Above 1 ranks that type higher overall; below 1 ranks it lower.
-- **Facet fields** — fields returned as facets on search results and allowed as filters (`filter[field]=value`). Feeds the dynamic filter chips in the search modal.
+- **Facet fields** — fields returned as facets on search results and allowed as filters (`filter[field]=value`). Feeds the dynamic filter chips in the search modal. The field pickers on this tab offer exactly the fields your documents are indexed with under the saved Indexing mapping - note that WooCommerce tags are indexed as `product_tags` and categories as `categories`. A facet or suggest field that no document from this site has is flagged, since a facet on it would always be empty.
 - **Suggest fields** — fields queried for search-as-you-type autocomplete suggestions. Defaults to `title` when left empty.
 - **Synonyms** — one comma-separated group of interchangeable words per line (e.g. `sneaker, trainer`). A search for either word also matches results that only contain the other — useful for regional spelling or naming differences.
 - **Languages** — see [`multilingual.md`](multilingual.md).

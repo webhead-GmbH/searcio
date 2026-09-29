@@ -29,6 +29,28 @@ final class Woo {
 	public const CATEGORY_TAXONOMY = 'product_cat';
 
 	/**
+	 * Each product-mapping toggle and the document fields `product_fields()`
+	 * writes when it is on. The toggle list itself is derived from these keys,
+	 * and the Search Config tab's field suggestions from the values, so a field
+	 * renamed here is renamed everywhere rather than left suggested under its
+	 * old name.
+	 *
+	 * @var array<string,array<int,string>>
+	 */
+	public const TOGGLE_FIELDS = [
+		'price'        => [ 'price', 'price_min', 'price_max', 'product_type', 'on_sale' ],
+		'regular_sale' => [ 'regular_price', 'sale_price' ],
+		'sku'          => [ 'sku' ],
+		'skus'         => [ 'skus' ],
+		'stock_status' => [ 'stock_status', 'in_stock' ],
+		'categories'   => [ 'categories' ],
+		'tags'         => [ 'product_tags' ],
+		'featured'     => [ 'featured' ],
+		'rating'       => [ 'rating' ],
+		'review_count' => [ 'review_count' ],
+	];
+
+	/**
 	 * "Shop and search results" and "Search results only". "Shop only" and
 	 * "Hidden" are excluded from WooCommerce's own search.
 	 */
@@ -214,18 +236,73 @@ final class Woo {
 			$fields['review_count'] = (int) $product->get_review_count();
 		}
 
-		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
-
-		foreach ( $attributes as $taxonomy ) {
-			$taxonomy = (string) $taxonomy;
-			$values   = Term_Names::for_post( $post, $taxonomy );
+		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
+			$values = Term_Names::for_post( $post, $taxonomy );
 
 			if ( [] !== $values ) {
-				$fields[ 'attr_' . $this->attribute_key( $taxonomy ) ] = $values;
+				$fields[ $this->attribute_field( $taxonomy ) ] = $values;
 			}
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Every field `product_fields()` can write for this mapping - the union
+	 * across product kinds, so `price_min` is listed even though only a
+	 * variable product carries it. Empty when WooCommerce is inactive, because
+	 * then no product field is written at all.
+	 *
+	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
+	 * @return array<int,string>
+	 */
+	public function field_names( array $woo ): array {
+		if ( ! $this->is_active() ) {
+			return [];
+		}
+
+		$names = [];
+
+		foreach ( self::TOGGLE_FIELDS as $toggle => $fields ) {
+			if ( empty( $woo[ $toggle ] ) ) {
+				continue;
+			}
+
+			// The regular and sale prices are written beside the price, never
+			// on their own.
+			if ( 'regular_sale' === $toggle && empty( $woo['price'] ) ) {
+				continue;
+			}
+
+			array_push( $names, ...$fields );
+		}
+
+		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
+			// A deleted attribute has no terms to write.
+			if ( taxonomy_exists( $taxonomy ) ) {
+				$names[] = $this->attribute_field( $taxonomy );
+			}
+		}
+
+		return array_values( array_unique( $names ) );
+	}
+
+	/**
+	 * The document field an attribute taxonomy is written to: `pa_color`
+	 * becomes `attr_color`.
+	 */
+	public function attribute_field( string $taxonomy ): string {
+		return 'attr_' . $this->attribute_key( $taxonomy );
+	}
+
+	/**
+	 * @param  array<string,mixed>  $woo
+	 * @return array<int,string>
+	 */
+	private function selected_attributes( array $woo ): array {
+		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
+
+		return array_map( 'strval', $attributes );
 	}
 
 	/**
