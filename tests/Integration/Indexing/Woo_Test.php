@@ -97,6 +97,75 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertContains( 'Outerwear', $fields['categories'] );
 	}
 
+	/**
+	 * A product is filed under its most specific category only. Without the
+	 * ancestors, `filter[categories]=Footwear` - and every quiz answer and
+	 * merchandising rule naming it - matches nothing filed under "Boots".
+	 */
+	public function test_categories_include_every_ancestor_of_the_assigned_category(): void {
+		$footwear = wp_insert_term( 'Footwear', 'product_cat' );
+		$shoes    = wp_insert_term( 'Shoes', 'product_cat', [ 'parent' => (int) $footwear['term_id'] ] );
+		$boots    = wp_insert_term( 'Boots', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Chelsea Boot' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $boots['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		// The assigned category leads, then its ancestors nearest first.
+		$this->assertSame( [ 'Boots', 'Shoes', 'Footwear' ], $fields['categories'] );
+	}
+
+	public function test_a_parent_shared_by_two_assigned_categories_is_listed_once(): void {
+		$shoes   = wp_insert_term( 'Shoes', 'product_cat' );
+		$boots   = wp_insert_term( 'Boots', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+		$sandals = wp_insert_term( 'Sandals', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Convertible Sandal Boot' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $boots['term_id'], (int) $sandals['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		$this->assertEqualsCanonicalizing( [ 'Boots', 'Sandals', 'Shoes' ], $fields['categories'] );
+	}
+
+	/**
+	 * WordPress stores a term name HTML-escaped. Sent as is, a facet chip and
+	 * the compare table read "Vergaser &amp; Ansaugung", and a filter for the
+	 * name as typed matches nothing.
+	 */
+	public function test_category_names_are_indexed_decoded(): void {
+		$parent = wp_insert_term( 'Motorrad & Roller', 'product_cat' );
+		$child  = wp_insert_term( 'Vergaser & Ansaugung', 'product_cat', [ 'parent' => (int) $parent['term_id'] ] );
+
+		// The premise: what WordPress hands back is the escaped form.
+		$this->assertSame( 'Vergaser &amp; Ansaugung', get_term( (int) $child['term_id'], 'product_cat' )->name );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Carburettor' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $child['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		$this->assertSame( [ 'Vergaser & Ansaugung', 'Motorrad & Roller' ], $fields['categories'] );
+	}
+
+	public function test_tag_names_are_indexed_decoded_and_without_parents(): void {
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Scarf' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ 'Black & White' ], 'product_tag' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'tags' => true ] );
+
+		$this->assertSame( [ 'Black & White' ], $fields['product_tags'] );
+	}
+
 	public function test_variable_product_price_range_and_variation_skus(): void {
 		$variable = new WC_Product_Variable();
 		$variable->set_name( 'T-Shirt' );

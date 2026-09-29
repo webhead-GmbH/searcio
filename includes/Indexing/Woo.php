@@ -24,8 +24,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Woo {
-	public const MIN_VERSION = '8.0';
-	public const POST_TYPE   = 'product';
+	public const MIN_VERSION       = '8.0';
+	public const POST_TYPE         = 'product';
+	public const CATEGORY_TAXONOMY = 'product_cat';
 
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
@@ -138,8 +139,12 @@ final class Woo {
 			$fields['in_stock']     = $product->is_in_stock();
 		}
 
+		// A product is usually filed under the most specific category only, so
+		// its ancestors are sent with it: without them a filter, a quiz answer
+		// or a merchandising rule naming "Shoes" matches nothing filed under
+		// "Sneakers", while WooCommerce's own "Shoes" archive lists it.
 		if ( ! empty( $woo['categories'] ) ) {
-			$categories = $this->term_names( $post, 'product_cat' );
+			$categories = Term_Names::for_post( $post, self::CATEGORY_TAXONOMY, true );
 
 			if ( [] !== $categories ) {
 				$fields['categories'] = $categories;
@@ -147,7 +152,7 @@ final class Woo {
 		}
 
 		if ( ! empty( $woo['tags'] ) ) {
-			$tags = $this->term_names( $post, 'product_tag' );
+			$tags = Term_Names::for_post( $post, 'product_tag' );
 
 			if ( [] !== $tags ) {
 				$fields['product_tags'] = $tags;
@@ -170,7 +175,7 @@ final class Woo {
 
 		foreach ( $attributes as $taxonomy ) {
 			$taxonomy = (string) $taxonomy;
-			$values   = $this->term_names( $post, $taxonomy );
+			$values   = Term_Names::for_post( $post, $taxonomy );
 
 			if ( [] !== $values ) {
 				$fields[ 'attr_' . $this->attribute_key( $taxonomy ) ] = $values;
@@ -251,31 +256,6 @@ final class Woo {
 		}
 
 		return array_values( array_unique( $skus ) );
-	}
-
-	/**
-	 * @return array<int,string>
-	 */
-	private function term_names( WP_Post $post, string $taxonomy ): array {
-		if ( ! taxonomy_exists( $taxonomy ) ) {
-			return [];
-		}
-
-		$terms = get_the_terms( $post, $taxonomy );
-
-		if ( ! is_array( $terms ) ) {
-			return [];
-		}
-
-		return array_values(
-			array_filter(
-				array_map(
-					static fn( $term ): string => isset( $term->name ) ? (string) $term->name : '',
-					$terms
-				),
-				static fn( string $name ): bool => '' !== $name
-			)
-		);
 	}
 
 	/**

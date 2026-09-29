@@ -83,6 +83,9 @@ To rebuild it, check the repository out and run `npm install` followed by
 - New: a guided quiz tab that turns a few questions into a filtered search.
 - New: a "you may also like" row of similar products for your product pages.
 - New: a curated category listing, so your merchandising rules for a category actually apply on that page.
+- Products are indexed under their parent categories too, so filtering on "Shoes" - or a quiz answer or merchandising rule naming it - finds products filed under "Sneakers".
+- Category, tag and attribute names no longer show HTML entities such as "&amp;" in filters and the compare table.
+- Renaming, moving or deleting a category now updates the products in it without a manual sync.
 - New: search-term redirects - send a search straight to a page instead of showing results.
 - Security: the domain-verification endpoint no longer returns the site's write key to unauthenticated callers; it now answers only while a connection attempt is in progress.
 - Fixed the AI assistant breaking permanently after a long reply.

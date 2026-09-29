@@ -7,7 +7,8 @@
  * ACF is post meta, so it is covered by `meta:`):
  *
  * - `meta:{key}`        — a single post meta value (custom field).
- * - `taxonomy:{tax}`    — the post's term names for a taxonomy (array of strings).
+ * - `taxonomy:{tax}`    — the post's term names for a taxonomy (array of strings,
+ *                         HTML entities decoded).
  * - `property:{name}`   — an internal object property (`title`, `content`,
  *                         `excerpt`, `permalink`, `thumbnail`, `date`,
  *                         `modified`, `author`, `slug`).
@@ -89,28 +90,14 @@ final class Field_Source_Resolver {
 	}
 
 	/**
+	 * The names of the terms the post is assigned, decoded like every other
+	 * indexed term name (see {@see Term_Names}). Ancestors are not added here:
+	 * a mapped taxonomy sends exactly the terms the post carries.
+	 *
 	 * @return array<int,string>|null
 	 */
 	private function resolve_taxonomy( string $taxonomy, WP_Post $post ): ?array {
-		if ( '' === $taxonomy || ! taxonomy_exists( $taxonomy ) ) {
-			return null;
-		}
-
-		$terms = get_the_terms( $post, $taxonomy );
-
-		if ( ! is_array( $terms ) ) {
-			return null;
-		}
-
-		$names = array_values(
-			array_filter(
-				array_map(
-					static fn( $term ): string => isset( $term->name ) ? (string) $term->name : '',
-					$terms
-				),
-				static fn( string $name ): bool => '' !== $name
-			)
-		);
+		$names = Term_Names::for_post( $post, $taxonomy );
 
 		return [] === $names ? null : $names;
 	}

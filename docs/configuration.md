@@ -14,11 +14,15 @@ Per content type (WordPress post types, and WooCommerce products if active):
 
 - **What to index** — turn a content type on or off.
 - **What appears in results** — choose the source for the title, body text, result link, and thumbnail image (a built-in property, custom field, or taxonomy).
-- **Extra fields** — send additional data under a name you choose, from a custom field, taxonomy, or built-in property.
+- **Extra fields** — send additional data under a name you choose, from a custom field, taxonomy, or built-in property. A taxonomy sends the names of the terms the item is assigned, exactly those.
 - **Options** — include a short excerpt; also index private/password-protected items.
 - For WooCommerce products specifically: price, regular/sale price, SKU, variation SKUs, stock status, categories, tags, average rating, review count, and any selected product attributes (sent as `attr_{name}`).
+  - **Categories** are sent as names under `categories`, and each product carries every parent of its categories too: a product filed under *Shoes › Sneakers* is sent as `["Sneakers", "Shoes"]`. So `filter[categories]=Shoes`, a quiz answer or a merchandising rule naming *Shoes* matches everything under it, as WooCommerce's own category archive does.
+  - Category, tag and attribute names are sent as typed. WordPress stores `&`, `<` and `>` in a term name as HTML entities; they are decoded first, so a filter value is the name a shopper sees (`Vergaser & Ansaugung`, not `Vergaser &amp; Ansaugung`).
 
 Changes here take effect on the next sync, not retroactively — run a sync (or wait for the next scheduled one) after changing indexing configuration.
+
+Renaming, moving or deleting a category (or any other term) needs no sync of its own: the items filed under it or under any of its children are queued automatically, as if each had been edited. Changing only a term's description or slug queues nothing, since neither is indexed.
 
 ## Search Config
 
@@ -48,7 +52,7 @@ What the search modal offers is decided by Search Cloud's `/storefront-config`, 
 Besides the search modal, the plugin ships a **Search Cloud Products** block (and the matching Elementor widget) for placing a row of products anywhere on the storefront. Two sources:
 
 - **Similar products** — "you may also like", matched by the product's own meaning rather than by shared tags. Needs AI search on your plan; without it the row stays hidden rather than showing an empty box.
-- **Category listing** — a listing filtered to one facet value. This is what makes a merchandising rule's *category trigger* apply: a rule fires on a request that carries `filter[field]=value`, so a listing rendered from WordPress's own database can never trigger one. Pinned products come back first, hidden ones are already gone, and the rule's banner is rendered above the row.
+- **Category listing** — a listing filtered to one facet value. This is what makes a merchandising rule's *category trigger* apply: a rule fires on a request that carries `filter[field]=value`, so a listing rendered from WordPress's own database can never trigger one. Pinned products come back first, hidden ones are already gone, and the rule's banner is rendered above the row. Resolved from the page, the value is the category's name, so on a parent category the row also lists the products filed under its children.
 
 Leave the product or category empty and the row resolves it from the page it is on, so you place the block once on a product or category template rather than on every product and every category. A row with nothing to show removes itself, and so does a row whose request failed.
 
