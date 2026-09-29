@@ -40,6 +40,12 @@ final class Sync_Keys {
 	/** Document ids still pending deletion in the prune phase (resumable). */
 	public const OPTION_PRUNE = 'webhead_search_cloud_sync_prune';
 
+	/**
+	 * Document ids a delete could not remove from the index, kept until one
+	 * succeeds. See {@see Failed_Deletes}.
+	 */
+	public const OPTION_FAILED_DELETES = 'webhead_search_cloud_failed_deletes';
+
 	/** Recurring scheduled sync. */
 	public const HOOK_SCHEDULED = 'webhead_search_cloud_scheduled_sync';
 

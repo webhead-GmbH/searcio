@@ -74,6 +74,7 @@ final class Sync_Service {
 		private Search_Cloud_Client $client,
 		private Sync_State $state,
 		private Dirty_Tracker $dirty,
+		private Failed_Deletes $failed_deletes,
 		private Jobs_Manager $jobs,
 		private Settings_Manager $settings
 	) {}
@@ -510,18 +511,25 @@ final class Sync_Service {
 
 	/**
 	 * A document this site put in the index that was not seen this run no
-	 * longer exists, or is no longer indexable. Two records say what was put
+	 * longer exists, or is no longer indexable. Three records say what was put
 	 * there. The sync meta on each post is written by the incremental drain as
 	 * well as by full syncs, so it covers documents no full sync ever pushed,
 	 * which the snapshot does not name. The snapshot of the last completed run
 	 * still names documents whose posts have since been deleted outright,
-	 * taking their meta with them.
+	 * taking their meta with them. {@see Failed_Deletes} names the documents
+	 * whose delete the drain could not complete, which covers a post deleted
+	 * outright that only the drain ever pushed: neither other record names it.
 	 */
 	private function begin_prune(): void {
 		$seen    = array_fill_keys( $this->read_ids( Sync_Keys::OPTION_SEEN ), true );
-		$indexed = array_merge( $this->read_ids( Sync_Keys::OPTION_SNAPSHOT ), $this->dirty->indexed_document_ids() );
+		$refused = $this->failed_deletes->ids();
+		$indexed = array_merge( $this->read_ids( Sync_Keys::OPTION_SNAPSHOT ), $this->dirty->indexed_document_ids(), $refused );
 
 		$to_delete = array_keys( array_diff_key( array_fill_keys( $indexed, true ), $seen ) );
+
+		// A document this run saw belongs in the index again (a trashed post was
+		// restored), so the delete that failed for it is no longer owed.
+		$this->failed_deletes->forget( array_keys( array_intersect_key( array_fill_keys( $refused, true ), $seen ) ) );
 
 		update_option( Sync_Keys::OPTION_PRUNE, $to_delete, false );
 	}
@@ -541,6 +549,7 @@ final class Sync_Service {
 		$slice     = array_slice( $queue, 0, self::PRUNE_PER_TICK );
 		$remaining = array_slice( $queue, count( $slice ) );
 		$done      = 0;
+		$removed   = [];
 
 		foreach ( $slice as $doc_id ) {
 			// Each delete is its own request, so the deadline is checked per
@@ -558,6 +567,7 @@ final class Sync_Service {
 			if ( $response->ok() || 404 === $response->status ) {
 				$counters['deleted']++;
 				$this->dirty->clear_for_document( $doc_id );
+				$removed[] = $doc_id;
 
 				continue;
 			}
@@ -582,6 +592,9 @@ final class Sync_Service {
 			}
 		}
 
+		// Only a removed document leaves the list of refused deletes; one the
+		// index refused again stays on it for the next full sync.
+		$this->failed_deletes->forget( $removed );
 		update_option( Sync_Keys::OPTION_PRUNE, $remaining, false );
 
 		return [] === $remaining;

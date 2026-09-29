@@ -7,7 +7,8 @@
  * completes, a running tick honours pause/cancel signals at the batch
  * boundary, and the prune phase removes every document this site pushed that
  * is no longer indexable, whether a full sync or the incremental drain pushed
- * it. Complements the control-surface tests in {@see Sync_Control_Test}.
+ * it, including the documents of deleted posts whose delete the index refused.
+ * Complements the control-surface tests in {@see Sync_Control_Test}.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -22,6 +23,7 @@ use Webhead\WP\SearchCloud\Enums\Sync_Control;
 use Webhead\WP\SearchCloud\Enums\Sync_Status;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
+use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Sync_Workflow_Test extends Integration_Test_Case {
@@ -35,6 +37,13 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 
 	/** The HTTP status the fake index answers a delete with. */
 	private int $delete_status = 200;
+
+	/**
+	 * Per-document overrides of {@see self::$delete_status}, keyed by document id.
+	 *
+	 * @var array<string,int>
+	 */
+	private array $delete_statuses = [];
 
 	public function test_start_is_refused_without_credentials(): void {
 		$result = $this->sync_service()->start( Sync_Trigger::Manual, 1, false );
@@ -309,6 +318,163 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * A post deleted outright takes its sync meta with it, and a document only
+	 * the drain ever pushed is in no snapshot. When the index refuses the
+	 * drain's delete for such a post, the next full sync still has to remove
+	 * the document, and the run after that must not send the delete again.
+	 */
+	public function test_a_full_sync_removes_a_deleted_post_the_drain_could_not_remove(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		$this->fake_index();
+		$this->run_full_sync();
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->index_through_the_drain( $post_id );
+
+		$this->delete_status = 403;
+		$this->delete_outright_through_the_drain( $post_id );
+		$this->assertSame( [ 'post-' . $post_id ], $this->delete_requests, 'The drain has to try, and fail, to delete the document first.' );
+		$this->assertNull( get_post( $post_id ) );
+
+		$this->delete_status   = 200;
+		$this->delete_requests = [];
+		$run                   = $this->run_full_sync();
+
+		$this->assertSame( [ 'post-' . $post_id ], $this->delete_requests );
+		$this->assertSame( 1, (int) $run['deleted'] );
+
+		$this->delete_requests = [];
+		$next                  = $this->run_full_sync();
+
+		$this->assertSame( [], $this->delete_requests, 'A document the index removed must not be deleted again.' );
+		$this->assertSame( 0, (int) $next['deleted'] );
+	}
+
+	/**
+	 * The prune phase can be refused too. The document is still owed a
+	 * delete, so every full sync tries again until the index accepts it.
+	 */
+	public function test_a_full_sync_keeps_retrying_a_deleted_post_the_index_refuses(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		$this->fake_index();
+		$this->run_full_sync();
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->index_through_the_drain( $post_id );
+
+		$this->delete_status = 403;
+		$this->delete_outright_through_the_drain( $post_id );
+
+		$this->delete_requests = [];
+		$refused               = $this->run_full_sync();
+
+		$this->assertSame( [ 'post-' . $post_id ], $this->delete_requests );
+		$this->assertSame( 1, (int) $refused['failed_count'] );
+		$this->assertStringContainsString( 'post-' . $post_id, (string) $refused['last_error'] );
+
+		$this->delete_status   = 200;
+		$this->delete_requests = [];
+		$accepted              = $this->run_full_sync();
+
+		$this->assertSame( [ 'post-' . $post_id ], $this->delete_requests );
+		$this->assertSame( 1, (int) $accepted['deleted'] );
+		$this->assertSame( [], $this->failed_deletes()->ids() );
+	}
+
+	/**
+	 * One document the index keeps refusing must not hold up the drain: its
+	 * change leaves the queue along with the rest of the batch, and the other
+	 * changes in that batch go through.
+	 */
+	public function test_a_refused_delete_does_not_hold_up_the_change_queue(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		$this->fake_index();
+		$this->run_full_sync();
+
+		$refused  = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$accepted = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->index_through_the_drain( $refused );
+		$this->index_through_the_drain( $accepted );
+
+		// Queued for upsert by the change listener, in the same batch as the deletes.
+		$edited = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+
+		$this->delete_statuses[ 'post-' . $refused ] = 403;
+		wp_delete_post( $refused, true );
+		wp_delete_post( $accepted, true );
+		$this->service( 'incremental_service' )->drain();
+
+		$this->assertEqualsCanonicalizing( [ 'post-' . $refused, 'post-' . $accepted ], $this->delete_requests );
+		$this->assertTrue( $this->dirty_tracker()->was_indexed( $edited ), 'A change queued with a refused delete must still go through.' );
+		$this->assertSame( 0, $this->service( 'change_queue_table' )->pending_count() );
+		$this->assertSame( [ 'post-' . $refused ], $this->failed_deletes()->ids() );
+	}
+
+	/**
+	 * A delete the drain completes on a later attempt is no longer owed, so
+	 * the full sync does not send it again.
+	 */
+	public function test_a_delete_the_drain_completes_later_is_not_repeated_by_a_full_sync(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		$this->fake_index();
+		$this->run_full_sync();
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->index_through_the_drain( $post_id );
+
+		$this->delete_status = 403;
+		wp_trash_post( $post_id );
+		$this->service( 'incremental_service' )->drain();
+
+		$this->delete_status = 200;
+		$this->delete_outright_through_the_drain( $post_id );
+		$this->assertSame( [ 'post-' . $post_id, 'post-' . $post_id ], $this->delete_requests );
+		$this->assertSame( [], $this->failed_deletes()->ids() );
+
+		$this->delete_requests = [];
+		$this->run_full_sync();
+
+		$this->assertSame( [], $this->delete_requests );
+	}
+
+	/**
+	 * A trashed post whose delete the index refused, then restored and
+	 * published again, belongs in the index. The full sync must not remove it
+	 * on the strength of the old failure, and stops holding that failure.
+	 */
+	public function test_a_full_sync_keeps_a_restored_post_whose_delete_was_refused(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		$this->fake_index();
+		$this->run_full_sync();
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->index_through_the_drain( $post_id );
+
+		$this->delete_status = 403;
+		wp_trash_post( $post_id );
+		$this->service( 'incremental_service' )->drain();
+		$this->assertSame( [ 'post-' . $post_id ], $this->failed_deletes()->ids() );
+
+		// WordPress restores a trashed post as a draft.
+		wp_untrash_post( $post_id );
+		wp_publish_post( $post_id );
+		$this->index_through_the_drain( $post_id );
+
+		$this->delete_status   = 200;
+		$this->delete_requests = [];
+		$this->run_full_sync();
+
+		$this->assertSame( [], $this->delete_requests );
+		$this->assertTrue( $this->dirty_tracker()->was_indexed( $post_id ) );
+		$this->assertSame( [], $this->failed_deletes()->ids() );
+	}
+
+	/**
 	 * WooCommerce's "hide out of stock items" is a store option: switching it
 	 * on saves no product, yet takes every out-of-stock product out of the
 	 * catalogue. A product only the drain indexed has to leave the index on the
@@ -388,8 +554,8 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 
 	/**
 	 * Stand in for the index: every request succeeds, except that a delete is
-	 * answered with {@see self::$delete_status} and logged in
-	 * {@see self::$delete_requests}.
+	 * answered with {@see self::$delete_statuses} or {@see self::$delete_status}
+	 * and logged in {@see self::$delete_requests}.
 	 */
 	private function fake_index(): void {
 		$this->fake_http(
@@ -398,14 +564,28 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 					return $this->http_ok( [ 'ok' => true ] );
 				}
 
-				$this->delete_requests[] = rawurldecode( wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
+				$doc_id                  = rawurldecode( wp_basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
+				$this->delete_requests[] = $doc_id;
 
-				return $this->http_ok( [], $this->delete_status );
+				return $this->http_ok( [], $this->delete_statuses[ $doc_id ] ?? $this->delete_status );
 			}
 		);
 	}
 
+	/**
+	 * Delete a post the way the trash's "Delete permanently" does, skipping the
+	 * trash, and let the drain send the delete the change listener queued.
+	 */
+	private function delete_outright_through_the_drain( int $post_id ): void {
+		wp_delete_post( $post_id, true );
+		$this->service( 'incremental_service' )->drain();
+	}
+
 	private function dirty_tracker(): Dirty_Tracker {
 		return $this->service( 'dirty_tracker' );
+	}
+
+	private function failed_deletes(): Failed_Deletes {
+		return $this->service( 'failed_deletes' );
 	}
 }
