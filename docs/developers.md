@@ -38,7 +38,7 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 |---|---|---|---|
 | `/settings` | GET / POST | view / manage_settings | Generic REST-exposed settings (schema + values). `write_key` and `write_secret` are write-only: a response carries `__stored__` when one is saved and `''` when not, never the value; posting back `__stored__` or an empty string leaves the stored credential untouched |
 | `/connection/test` | POST | view | Verify write credentials; returns site ID and document usage |
-| `/indexing/config` | GET / POST | view / manage_settings | Per-post-type indexing field mapping |
+| `/indexing/config` | GET / POST | view / manage_settings | Per-post-type indexing field mapping, plus `indexed_fields`: every field a document can carry under the saved mapping (`Index_Config::indexed_fields()`, with product fields from `Woo::TOGGLE_FIELDS`) |
 | `/search-config` | GET / PUT | view / manage_settings | Proxies Search Cloud's own search configuration (fields, weights, boosts, facets, suggestions, synonyms, languages) |
 | `/sync/status` | GET | view | Current sync state and indexable-type summary |
 | `/sync/start` | POST | run_sync | Start a sync (`?force=true` re-sends everything) |
@@ -101,6 +101,8 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
       return '_my_public_field' === $key ? true : $allow;
   }, 10, 2 );
   ```
+
+- **`woocommerce_product_is_visible`** — WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs — WP-Cron, WP-CLI or REST — so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
 
 ## Testing
 

@@ -24,8 +24,37 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Woo {
-	public const MIN_VERSION = '8.0';
-	public const POST_TYPE   = 'product';
+	public const MIN_VERSION       = '8.0';
+	public const POST_TYPE         = 'product';
+	public const CATEGORY_TAXONOMY = 'product_cat';
+
+	/**
+	 * Each product-mapping toggle and the document fields `product_fields()`
+	 * writes when it is on. The toggle list itself is derived from these keys,
+	 * and the Search Config tab's field suggestions from the values, so a field
+	 * renamed here is renamed everywhere rather than left suggested under its
+	 * old name.
+	 *
+	 * @var array<string,array<int,string>>
+	 */
+	public const TOGGLE_FIELDS = [
+		'price'        => [ 'price', 'price_min', 'price_max', 'product_type', 'on_sale' ],
+		'regular_sale' => [ 'regular_price', 'sale_price' ],
+		'sku'          => [ 'sku' ],
+		'skus'         => [ 'skus' ],
+		'stock_status' => [ 'stock_status', 'in_stock' ],
+		'categories'   => [ 'categories' ],
+		'tags'         => [ 'product_tags' ],
+		'featured'     => [ 'featured' ],
+		'rating'       => [ 'rating' ],
+		'review_count' => [ 'review_count' ],
+	];
+
+	/**
+	 * "Shop and search results" and "Search results only". "Shop only" and
+	 * "Hidden" are excluded from WooCommerce's own search.
+	 */
+	private const SEARCHABLE_VISIBILITIES = [ 'visible', 'search' ];
 
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
@@ -79,6 +108,31 @@ final class Woo {
 		return $out;
 	}
 
+	/**
+	 * Whether a product may appear in search results: the question
+	 * WooCommerce's own search answers, not the one `WC_Product::is_visible()`
+	 * answers.
+	 *
+	 * `is_visible()` settles "Search results only" and "Shop only" with
+	 * `is_search()`, which is always false where a sync runs (WP-Cron, WP-CLI,
+	 * REST), so it would index shop-only products and drop search-only ones.
+	 * Catalog visibility is read directly instead. Of the other checks
+	 * `is_visible()` makes:
+	 *
+	 * - Post status is not checked. Whether a private product is indexed is
+	 *   the mapping's `include_private` decision, made by the caller, and
+	 *   WooCommerce's check also asks whether the current user can edit the
+	 *   product, which would make the answer depend on who triggered the sync.
+	 * - "Hide out of stock items from the catalog" applies, because WooCommerce
+	 *   applies it to its search results too.
+	 * - A product whose parent is not published is left out, as WooCommerce
+	 *   hides it from shoppers. Only variations have a parent, and they reach
+	 *   the index through their parent, so this matters only if one is passed.
+	 * - The `woocommerce_product_is_visible` filter still runs, so an extension
+	 *   that hides products from shoppers keeps them out of search as well.
+	 *   Its callbacks run in the sync's context: there is no search query, and
+	 *   usually no logged-in user.
+	 */
 	public function is_visible_product( WP_Post $post ): bool {
 		if ( ! $this->is_active() ) {
 			return false;
@@ -90,7 +144,19 @@ final class Woo {
 			return false;
 		}
 
-		return $product->is_visible();
+		$visible = in_array( $product->get_catalog_visibility(), self::SEARCHABLE_VISIBILITIES, true );
+
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) && ! $product->is_in_stock() ) {
+			$visible = false;
+		}
+
+		$parent_id = (int) $product->get_parent_id();
+
+		if ( $parent_id > 0 && 'publish' !== get_post_status( $parent_id ) ) {
+			$visible = false;
+		}
+
+		return (bool) apply_filters( 'woocommerce_product_is_visible', $visible, $product->get_id() );
 	}
 
 	/**
@@ -138,8 +204,12 @@ final class Woo {
 			$fields['in_stock']     = $product->is_in_stock();
 		}
 
+		// A product is usually filed under the most specific category only, so
+		// its ancestors are sent with it: without them a filter, a quiz answer
+		// or a merchandising rule naming "Shoes" matches nothing filed under
+		// "Sneakers", while WooCommerce's own "Shoes" archive lists it.
 		if ( ! empty( $woo['categories'] ) ) {
-			$categories = $this->term_names( $post, 'product_cat' );
+			$categories = Term_Names::for_post( $post, self::CATEGORY_TAXONOMY, true );
 
 			if ( [] !== $categories ) {
 				$fields['categories'] = $categories;
@@ -147,7 +217,7 @@ final class Woo {
 		}
 
 		if ( ! empty( $woo['tags'] ) ) {
-			$tags = $this->term_names( $post, 'product_tag' );
+			$tags = Term_Names::for_post( $post, 'product_tag' );
 
 			if ( [] !== $tags ) {
 				$fields['product_tags'] = $tags;
@@ -166,18 +236,73 @@ final class Woo {
 			$fields['review_count'] = (int) $product->get_review_count();
 		}
 
-		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
-
-		foreach ( $attributes as $taxonomy ) {
-			$taxonomy = (string) $taxonomy;
-			$values   = $this->term_names( $post, $taxonomy );
+		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
+			$values = Term_Names::for_post( $post, $taxonomy );
 
 			if ( [] !== $values ) {
-				$fields[ 'attr_' . $this->attribute_key( $taxonomy ) ] = $values;
+				$fields[ $this->attribute_field( $taxonomy ) ] = $values;
 			}
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Every field `product_fields()` can write for this mapping - the union
+	 * across product kinds, so `price_min` is listed even though only a
+	 * variable product carries it. Empty when WooCommerce is inactive, because
+	 * then no product field is written at all.
+	 *
+	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
+	 * @return array<int,string>
+	 */
+	public function field_names( array $woo ): array {
+		if ( ! $this->is_active() ) {
+			return [];
+		}
+
+		$names = [];
+
+		foreach ( self::TOGGLE_FIELDS as $toggle => $fields ) {
+			if ( empty( $woo[ $toggle ] ) ) {
+				continue;
+			}
+
+			// The regular and sale prices are written beside the price, never
+			// on their own.
+			if ( 'regular_sale' === $toggle && empty( $woo['price'] ) ) {
+				continue;
+			}
+
+			array_push( $names, ...$fields );
+		}
+
+		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
+			// A deleted attribute has no terms to write.
+			if ( taxonomy_exists( $taxonomy ) ) {
+				$names[] = $this->attribute_field( $taxonomy );
+			}
+		}
+
+		return array_values( array_unique( $names ) );
+	}
+
+	/**
+	 * The document field an attribute taxonomy is written to: `pa_color`
+	 * becomes `attr_color`.
+	 */
+	public function attribute_field( string $taxonomy ): string {
+		return 'attr_' . $this->attribute_key( $taxonomy );
+	}
+
+	/**
+	 * @param  array<string,mixed>  $woo
+	 * @return array<int,string>
+	 */
+	private function selected_attributes( array $woo ): array {
+		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
+
+		return array_map( 'strval', $attributes );
 	}
 
 	/**
@@ -251,31 +376,6 @@ final class Woo {
 		}
 
 		return array_values( array_unique( $skus ) );
-	}
-
-	/**
-	 * @return array<int,string>
-	 */
-	private function term_names( WP_Post $post, string $taxonomy ): array {
-		if ( ! taxonomy_exists( $taxonomy ) ) {
-			return [];
-		}
-
-		$terms = get_the_terms( $post, $taxonomy );
-
-		if ( ! is_array( $terms ) ) {
-			return [];
-		}
-
-		return array_values(
-			array_filter(
-				array_map(
-					static fn( $term ): string => isset( $term->name ) ? (string) $term->name : '',
-					$terms
-				),
-				static fn( string $name ): bool => '' !== $name
-			)
-		);
 	}
 
 	/**

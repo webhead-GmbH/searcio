@@ -26,24 +26,6 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Index_Config {
-	/**
-	 * WooCommerce toggles, each mapping to a fixed document field.
-	 *
-	 * @var array<int,string>
-	 */
-	private const WOO_TOGGLES = [
-		'price',
-		'regular_sale',
-		'sku',
-		'skus',
-		'stock_status',
-		'categories',
-		'tags',
-		'featured',
-		'rating',
-		'review_count',
-	];
-
 	public function __construct(
 		private Settings_Manager $settings,
 		private Woo $woo,
@@ -117,6 +99,26 @@ final class Index_Config {
 		}
 
 		return $labels;
+	}
+
+	/**
+	 * Every field a document of an enabled post type can carry under the saved
+	 * mapping - what Search Config offers as searchable, facet and suggest
+	 * fields. A field missing from this list is one no document from this site
+	 * has, so a facet on it is always empty.
+	 *
+	 * @return array<int,string>
+	 */
+	public function indexed_fields(): array {
+		$fields = [];
+
+		foreach ( $this->all() as $post_type => $block ) {
+			if ( ! empty( $block['enabled'] ) ) {
+				array_push( $fields, ...$this->document_fields( $post_type, $block ) );
+			}
+		}
+
+		return array_values( array_unique( $fields ) );
 	}
 
 	public function config_version(): int {
@@ -213,7 +215,7 @@ final class Index_Config {
 				'version'        => $this->woo->version(),
 				'minimum'        => Woo::MIN_VERSION,
 				'attributes'     => $this->woo->attributes(),
-				'toggles'        => self::WOO_TOGGLES,
+				'toggles'        => array_keys( Woo::TOGGLE_FIELDS ),
 			],
 			// Which languages WPML/Polylang has configured locally, not the plan
 			// entitlement (that comes from `/health` via Connection_Endpoint).
@@ -221,6 +223,7 @@ final class Index_Config {
 				'active'    => $this->multilingual->is_active(),
 				'available' => $this->multilingual->active_languages(),
 			],
+			'indexed_fields' => $this->indexed_fields(),
 			'config_version' => $this->config_version(),
 		];
 	}
@@ -405,12 +408,56 @@ final class Index_Config {
 	}
 
 	/**
+	 * The fields {@see Document_Builder::build()} can write for one post type's
+	 * block, the ones a merchant most often picks first. `id` is left out: it
+	 * is the document's key, not a field anyone searches or filters by.
+	 *
+	 * @param  array<string,mixed>  $block  A normalized block.
+	 * @return array<int,string>
+	 */
+	private function document_fields( string $post_type, array $block ): array {
+		$fields = [ 'title' ];
+
+		if ( '' !== $block['content_source'] ) {
+			$fields[] = 'content';
+		}
+
+		if ( ! empty( $block['include_excerpt'] ) ) {
+			$fields[] = 'excerpt';
+		}
+
+		$fields[] = 'type';
+
+		if ( '' !== $block['url_source'] ) {
+			$fields[] = 'url';
+		}
+
+		if ( '' !== $block['image_source'] ) {
+			$fields[] = 'image';
+		}
+
+		if ( $this->multilingual->is_active() ) {
+			$fields[] = 'lang';
+		}
+
+		foreach ( $block['fields'] as $field ) {
+			$fields[] = (string) $field['as'];
+		}
+
+		if ( Woo::POST_TYPE === $post_type ) {
+			array_push( $fields, ...$this->woo->field_names( $block['woo'] ?? [] ) );
+		}
+
+		return $fields;
+	}
+
+	/**
 	 * @return array<string,mixed>
 	 */
 	private function default_woo(): array {
 		$woo = [ 'only_visible' => true ];
 
-		foreach ( self::WOO_TOGGLES as $toggle ) {
+		foreach ( array_keys( Woo::TOGGLE_FIELDS ) as $toggle ) {
 			$woo[ $toggle ] = in_array( $toggle, [ 'price', 'sku', 'stock_status', 'categories' ], true );
 		}
 
@@ -427,7 +474,7 @@ final class Index_Config {
 		$woo        = is_array( $woo ) ? $woo : [];
 		$normalized = [ 'only_visible' => ! isset( $woo['only_visible'] ) || ! empty( $woo['only_visible'] ) ];
 
-		foreach ( self::WOO_TOGGLES as $toggle ) {
+		foreach ( array_keys( Woo::TOGGLE_FIELDS ) as $toggle ) {
 			$normalized[ $toggle ] = ! empty( $woo[ $toggle ] );
 		}
 

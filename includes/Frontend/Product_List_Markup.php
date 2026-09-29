@@ -29,6 +29,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Frontend;
 
 use WP_Term;
+use Webhead\WP\SearchCloud\Indexing\Term_Names;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -43,9 +44,10 @@ final class Product_List_Markup {
 	private const CARD_SOURCES = [ 'plugin', 'server' ];
 
 	/**
-	 * WooCommerce product categories reach the index as term *names*, under the
-	 * `categories` field (see `Woo::term_names()`), so that is what a category
-	 * filter has to match by default.
+	 * WooCommerce product categories reach the index as decoded term *names*,
+	 * each with its ancestors, under the `categories` field (see
+	 * {@see \Webhead\WP\SearchCloud\Indexing\Woo::product_fields()}), so that
+	 * is what a category filter has to match by default.
 	 */
 	private const DEFAULT_FILTER_FIELD = 'categories';
 
@@ -156,7 +158,8 @@ final class Product_List_Markup {
 
 	/**
 	 * The name of the term being browsed. Names, not slugs: that is what the
-	 * indexer sends, so it is what `filter[categories]=` has to match.
+	 * indexer sends, so it is what `filter[categories]=` has to match - and
+	 * decoded the same way, since WordPress hands the name back HTML-escaped.
 	 */
 	private static function current_term_name(): string {
 		if ( ! is_category() && ! is_tag() && ! is_tax() ) {
@@ -165,7 +168,7 @@ final class Product_List_Markup {
 
 		$term = get_queried_object();
 
-		return $term instanceof WP_Term ? (string) $term->name : '';
+		return $term instanceof WP_Term ? Term_Names::decode( (string) $term->name ) : '';
 	}
 
 	private static function text( mixed $value ): string {

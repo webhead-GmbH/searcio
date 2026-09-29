@@ -83,12 +83,16 @@ To rebuild it, check the repository out and run `npm install` followed by
 - New: a guided quiz tab that turns a few questions into a filtered search.
 - New: a "you may also like" row of similar products for your product pages.
 - New: a curated category listing, so your merchandising rules for a category actually apply on that page.
+- Products are indexed under their parent categories too, so filtering on "Shoes" - or a quiz answer or merchandising rule naming it - finds products filed under "Sneakers".
+- Category, tag and attribute names no longer show HTML entities such as "&amp;" in filters and the compare table.
+- Renaming, moving or deleting a category now updates the products in it without a manual sync.
 - New: search-term redirects - send a search straight to a page instead of showing results.
 - Security: the domain-verification endpoint no longer returns the site's write key to unauthenticated callers; it now answers only while a connection attempt is in progress.
 - Fixed the AI assistant breaking permanently after a long reply.
 - Fixed a failed search-as-you-type keystroke navigating the shopper away mid-word.
 - Fixed saving Search Config deleting ranking boosts for content types this site does not index.
 - Fixed a switch left on after a plan downgrade blocking every other Search Config save.
+- Fixed WooCommerce products set to "Search results only" being left out of the search index while "Shop only" products were included. Private products are now indexed when the private option is on. The next sync corrects the index; no forced re-sync is needed.
 - New: filter results by price (and any other numeric field you use as a facet) with a minimum and a maximum.
 - New: a Load more button. Results were locked to the first page of twenty, with no way to reach the rest.
 - New: the Connection tab shows what your plan has used this month - searches, documents, AI messages, photo searches - and marks anything near or past its limit.
@@ -115,6 +119,9 @@ To rebuild it, check the repository out and run `npm install` followed by
 - On a phone the search field shows its whole placeholder, and the photo-search row lines up with its tags.
 - Photo search and typed search no longer get mixed up on screen, and a failed photo search restores the filters.
 - Product-row carousels show their page dots.
+- Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
+- Fixed a permanently deleted post staying in search for good when the first attempt to remove it from the index failed. Full syncs now retry the removal until it succeeds.
+- Fixed content staying in search for good when a full sync's attempt to remove it failed, for example after turning a content type off and then permanently deleting its posts. Later full syncs now keep retrying the removal until it succeeds.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.

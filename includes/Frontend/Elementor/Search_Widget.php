@@ -18,8 +18,9 @@
  * higher specificity than a plain `{{WRAPPER}} .whsc-trigger-*` selector would
  * have — a direct property there would lose to this file's own base rule.
  * Only `Group_Control_Border`/`Group_Control_Typography` output (which can't
- * be redirected to a custom property) still uses a direct selector, boosted
- * with a no-op `:not()` pair where it would otherwise lose the same way.
+ * be redirected to a custom property) still uses a direct selector, and every
+ * one of those goes through {@see self::boosted_selector()} so it outranks
+ * the same rules.
  * `get_script_depends()`/`get_style_depends()` declare the shared runtime
  * bundle so Elementor enqueues it in the editor preview too, giving a live,
  * interactive preview like any native widget.
@@ -45,6 +46,21 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Search_Widget extends Widget_Base {
+	/**
+	 * Four no-op `:not()`s, adding (0,4,0) to a selector. The class never
+	 * exists in the markup, so matching is unchanged.
+	 *
+	 * Every rule in `style.scss` carries the tripled
+	 * `[data-webhead-frontend-root]` prefix, and the ones that set type on a
+	 * control's target reach (0,5,0) — `.whsc-modal .whsc-section-title`,
+	 * `.whsc-modal .whsc-popular-item`, `.whsc-modal .whsc-search-input__field`
+	 * — against (0,2,0) for a plain `.whsc-instance-{{ID}} .whsc-card__title`.
+	 * A site's Elementor Kit (Site Settings) styles bare `input` and `button`
+	 * elements too, at up to (0,3,1). Four points lift the lightest selector here to (0,6,0),
+	 * above all of them.
+	 */
+	private const SPECIFICITY_BOOST = ':not(.whsc-specificity-boost):not(.whsc-specificity-boost):not(.whsc-specificity-boost):not(.whsc-specificity-boost)';
+
 	public function get_name(): string {
 		return 'webhead-search-cloud-search';
 	}
@@ -445,15 +461,11 @@ final class Search_Widget extends Widget_Base {
 				// `Group_Control_Border` always emits literal `border-*`
 				// properties (it has no custom-property output mode), so it
 				// can't sidestep the specificity fight the same way the
-				// controls above do. The `:not()` pair is a no-op for
-				// matching (the class never exists in the markup) that
-				// exists purely to add two class-level specificity points,
-				// enough to outrank this file's own
-				// `.whsc-trigger-box .components-input-control__container`
-				// rule. Targets the container, not the `<input>` itself —
+				// controls above do, and is boosted instead. Targets the
+				// container, not the `<input>` itself —
 				// `@wordpress/components`' `SearchControl` draws the visible
 				// border/box around that shared container, not the input.
-				'selector'  => '{{WRAPPER}} .whsc-trigger-box .components-input-control__container:not(.whsc-specificity-boost):not(.whsc-specificity-boost)',
+				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__container' ),
 			]
 		);
 		$this->add_responsive_control(
@@ -471,7 +483,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'      => 'trigger_box_typography',
 				'condition' => [ 'mode' => 'box' ],
-				'selector'  => '{{WRAPPER}} .whsc-trigger-box input',
+				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box input' ),
 			]
 		);
 
@@ -528,15 +540,12 @@ final class Search_Widget extends Widget_Base {
 
 		$this->var_slider( 'field_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-input-radius', 0, 999, false, [ 'separator' => 'before' ] );
 
-		// `.whsc-modal.whsc-instance-{{ID}}` (the modal root carries both classes)
-		// out-specifies the plugin's own `.whsc-modal .whsc-search-input__field`
-		// base rule, so the user's typography reliably wins regardless of
-		// stylesheet load order.
+		// The modal root carries both `.whsc-modal` and the instance class.
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			[
 				'name'     => 'field_typography',
-				'selector' => '.whsc-modal.whsc-instance-{{ID}} .whsc-search-input__field',
+				'selector' => $this->boosted_selector( '.whsc-modal.whsc-instance-{{ID}} .whsc-search-input__field' ),
 			]
 		);
 
@@ -665,7 +674,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'title_typography',
 				'label'    => __( 'Section title typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-section-title',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-section-title' ),
 			]
 		);
 
@@ -742,7 +751,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'popular_typography',
 				'label'    => __( 'Popular typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-popular-item',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-popular-item' ),
 			]
 		);
 
@@ -784,7 +793,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'facet_typography',
 				'label'    => __( 'Label typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-facet__label',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-facet__label' ),
 			]
 		);
 
@@ -798,7 +807,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'facet_count_typography',
 				'label'    => __( 'Count typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-facet__count',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-facet__count' ),
 			]
 		);
 
@@ -947,16 +956,18 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'card_title_typography',
 				'label'    => __( 'Title typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-card__title',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__title' ),
 			]
 		);
 		$this->var_color( 'card_price_color', __( 'Price / meta color', 'webhead-search-cloud' ), '--whsc-price-color' );
+		// The amount itself is `.whsc-card__price-current`, which sets its own
+		// weight, so a weight set on the price line alone never reached it.
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			[
 				'name'     => 'card_price_typography',
 				'label'    => __( 'Price typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-card__price',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__price', '.whsc-instance-{{ID}} .whsc-card__price-current' ),
 			]
 		);
 		$this->add_group_control(
@@ -964,7 +975,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'card_price_suffix_typography',
 				'label'    => __( 'Price suffix / "from" typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-card__price-suffix, .whsc-instance-{{ID}} .whsc-card__price-from',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__price-suffix', '.whsc-instance-{{ID}} .whsc-card__price-from' ),
 			]
 		);
 
@@ -997,6 +1008,19 @@ final class Search_Widget extends Widget_Base {
 		$this->var_color( 'dot_color_active', __( 'Dot color (active)', 'webhead-search-cloud' ), '--whsc-dot-color-active' );
 
 		$this->end_controls_section();
+	}
+
+	/**
+	 * Selector for a group control that writes literal properties rather than
+	 * a custom property: each comma-separated part gets
+	 * {@see self::SPECIFICITY_BOOST}, since the boost only counts on the part
+	 * it is attached to.
+	 */
+	private function boosted_selector( string ...$selectors ): string {
+		return implode(
+			', ',
+			array_map( static fn ( string $selector ): string => $selector . self::SPECIFICITY_BOOST, $selectors )
+		);
 	}
 
 	/* ---------------------------------------------------------------------

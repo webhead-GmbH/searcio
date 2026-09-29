@@ -111,6 +111,38 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * A control writing a literal property (typography, border) rather than a
+	 * `--whsc-*` custom property competes with `style.scss` on specificity,
+	 * and loses to it unless boosted. Checked per comma-separated part, since
+	 * the boost only counts on the part it is attached to.
+	 */
+	public function test_every_literal_style_selector_is_boosted(): void {
+		$boost = str_repeat( ':not(.whsc-specificity-boost)', 4 );
+		// Without Elementor's own Advanced-tab controls, which are not ours.
+		$stack = ( new Search_Widget() )->get_stack( false );
+		// Outside the editor Elementor files style controls separately, and
+		// `get_controls()` leaves them out.
+		$controls = array_merge( $stack['controls'], $stack['style_controls'] ?? [] );
+		$literal  = [];
+
+		foreach ( $controls as $control ) {
+			foreach ( $control['selectors'] ?? [] as $selector => $declaration ) {
+				if ( ! str_starts_with( trim( (string) $declaration ), '--' ) ) {
+					$literal[ $selector ] = true;
+				}
+			}
+		}
+
+		$this->assertContains( '.whsc-instance-{{ID}} .whsc-card__title' . $boost, array_keys( $literal ) );
+
+		foreach ( array_keys( $literal ) as $selector ) {
+			foreach ( explode( ',', $selector ) as $part ) {
+				$this->assertStringEndsWith( $boost, trim( $part ), $selector );
+			}
+		}
+	}
+
+	/**
 	 * A stand-in for Elementor's widgets manager that records what gets
 	 * registered. Matches the `register( $widget )` shape the registrar checks
 	 * for with `method_exists()`.

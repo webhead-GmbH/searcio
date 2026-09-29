@@ -25,6 +25,12 @@ use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Woo_Test extends Integration_Test_Case {
+	/**
+	 * A global attribute taxonomy of this suite's own, so no attribute a
+	 * WooCommerce install registers can collide with it.
+	 */
+	private const ATTRIBUTE = 'pa_whsc_finish';
+
 	private Woo $woo;
 
 	public function set_up(): void {
@@ -35,6 +41,172 @@ final class Woo_Test extends Integration_Test_Case {
 		}
 
 		$this->woo = new Woo();
+	}
+
+	public function tear_down(): void {
+		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
+			unregister_taxonomy( self::ATTRIBUTE );
+		}
+
+		parent::tear_down();
+	}
+
+	/**
+	 * Every toggle on, plus one attribute.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function every_toggle(): array {
+		$woo = array_fill_keys( array_keys( Woo::TOGGLE_FIELDS ), true );
+
+		$woo['attributes'] = [ self::ATTRIBUTE ];
+
+		return $woo;
+	}
+
+	/**
+	 * A simple product carrying a value for every field a simple product can
+	 * have: a sale, a SKU, a category, a tag and an attribute term.
+	 */
+	private function make_complete_simple_product(): int {
+		register_taxonomy( self::ATTRIBUTE, 'product' );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Rain Coat' );
+		$product->set_regular_price( '50' );
+		$product->set_sale_price( '35' );
+		$product->set_price( '35' );
+		$product->set_sku( 'COAT-1' );
+		$product->set_featured( true );
+		$product->set_status( 'publish' );
+		$product->save();
+
+		foreach ( [ 'product_cat' => 'Outerwear', 'product_tag' => 'Winter', self::ATTRIBUTE => 'Matte' ] as $taxonomy => $name ) {
+			$term = wp_insert_term( $name, $taxonomy );
+			$this->assertIsArray( $term );
+			wp_set_object_terms( $product->get_id(), [ (int) $term['term_id'] ], $taxonomy );
+		}
+
+		return $product->get_id();
+	}
+
+	/**
+	 * A variable product with two priced, SKU'd variations - the only kind
+	 * that carries a price range and variation SKUs.
+	 */
+	private function make_variable_product(): int {
+		$variable = new WC_Product_Variable();
+		$variable->set_name( 'T-Shirt' );
+		$variable->set_status( 'publish' );
+		$variable->save();
+
+		foreach ( [ [ '10', 'TS-S' ], [ '25', 'TS-L' ] ] as [ $price, $sku ] ) {
+			$variation = new WC_Product_Variation();
+			$variation->set_parent_id( $variable->get_id() );
+			$variation->set_regular_price( $price );
+			$variation->set_price( $price );
+			$variation->set_sku( $sku );
+			$variation->save();
+		}
+
+		// Re-read so the parent sees its freshly saved variations.
+		wc_get_product( $variable->get_id() )->save();
+
+		return $variable->get_id();
+	}
+
+	/**
+	 * The drift guard for the Search Config tab's suggestions: `field_names()`
+	 * must name exactly what `product_fields()` writes across both product
+	 * kinds - nothing missing, and nothing (like `tags`) that no product has.
+	 */
+	public function test_field_names_are_exactly_the_fields_products_are_written_with(): void {
+		$woo = $this->every_toggle();
+
+		$simple   = $this->woo->product_fields( get_post( $this->make_complete_simple_product() ), $woo );
+		$variable = $this->woo->product_fields( get_post( $this->make_variable_product() ), $woo );
+		$written  = array_values( array_unique( array_merge( array_keys( $simple ), array_keys( $variable ) ) ) );
+
+		$this->assertEqualsCanonicalizing( $written, $this->woo->field_names( $woo ) );
+	}
+
+	/**
+	 * The tag toggle is called `tags`, but the field it writes is not.
+	 */
+	public function test_field_names_follow_the_toggles_that_are_on(): void {
+		$names = $this->woo->field_names( [ 'categories' => true, 'tags' => true, 'stock_status' => true ] );
+
+		$this->assertSame( [ 'stock_status', 'in_stock', 'categories', 'product_tags' ], $names );
+		$this->assertNotContains( 'tags', $names );
+	}
+
+	public function test_regular_and_sale_prices_are_not_listed_without_the_price(): void {
+		$this->assertSame( [], $this->woo->field_names( [ 'regular_sale' => true ] ) );
+	}
+
+	public function test_an_attribute_whose_taxonomy_is_gone_is_not_listed(): void {
+		register_taxonomy( self::ATTRIBUTE, 'product' );
+
+		$this->assertSame(
+			[ 'attr_whsc_finish' ],
+			$this->woo->field_names( [ 'attributes' => [ self::ATTRIBUTE, 'pa_whsc_deleted' ] ] )
+		);
+	}
+
+	public function test_indexed_fields_include_the_product_fields_under_their_written_names(): void {
+		register_taxonomy( self::ATTRIBUTE, 'product' );
+
+		$this->service( 'index_config' )->save(
+			[
+				'product' => [
+					'enabled' => true,
+					'woo'     => [
+						'stock_status' => true,
+						'tags'         => true,
+						'attributes'   => [ self::ATTRIBUTE ],
+					],
+				],
+			]
+		);
+
+		$fields = $this->service( 'index_config' )->indexed_fields();
+
+		foreach ( [ 'title', 'type', 'stock_status', 'in_stock', 'product_tags', 'attr_whsc_finish' ] as $field ) {
+			$this->assertContains( $field, $fields );
+		}
+
+		$this->assertNotContains( 'tags', $fields );
+		$this->assertNotContains( 'category', $fields );
+	}
+
+	/**
+	 * A built product document carries nothing the indexed-field list omits.
+	 */
+	public function test_every_field_a_built_product_document_carries_is_listed(): void {
+		$woo                 = $this->every_toggle();
+		$woo['only_visible'] = false;
+
+		$this->service( 'index_config' )->save(
+			[
+				'product' => array_merge(
+					$this->service( 'index_config' )->defaults_for( 'product' ),
+					[
+						'enabled' => true,
+						'woo'     => $woo,
+					]
+				),
+			]
+		);
+
+		/** @var Document_Builder $builder */
+		$builder  = $this->service( 'document_builder' );
+		$document = $builder->build( get_post( $this->make_complete_simple_product() ) );
+
+		$this->assertIsArray( $document );
+
+		$unlisted = array_diff( array_keys( $document ), [ 'id' ], $this->service( 'index_config' )->indexed_fields() );
+
+		$this->assertSame( [], array_values( $unlisted ) );
 	}
 
 	public function test_is_active_and_meets_minimum(): void {
@@ -97,6 +269,75 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertContains( 'Outerwear', $fields['categories'] );
 	}
 
+	/**
+	 * A product is filed under its most specific category only. Without the
+	 * ancestors, `filter[categories]=Footwear` - and every quiz answer and
+	 * merchandising rule naming it - matches nothing filed under "Boots".
+	 */
+	public function test_categories_include_every_ancestor_of_the_assigned_category(): void {
+		$footwear = wp_insert_term( 'Footwear', 'product_cat' );
+		$shoes    = wp_insert_term( 'Shoes', 'product_cat', [ 'parent' => (int) $footwear['term_id'] ] );
+		$boots    = wp_insert_term( 'Boots', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Chelsea Boot' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $boots['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		// The assigned category leads, then its ancestors nearest first.
+		$this->assertSame( [ 'Boots', 'Shoes', 'Footwear' ], $fields['categories'] );
+	}
+
+	public function test_a_parent_shared_by_two_assigned_categories_is_listed_once(): void {
+		$shoes   = wp_insert_term( 'Shoes', 'product_cat' );
+		$boots   = wp_insert_term( 'Boots', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+		$sandals = wp_insert_term( 'Sandals', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Convertible Sandal Boot' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $boots['term_id'], (int) $sandals['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		$this->assertEqualsCanonicalizing( [ 'Boots', 'Sandals', 'Shoes' ], $fields['categories'] );
+	}
+
+	/**
+	 * WordPress stores a term name HTML-escaped. Sent as is, a facet chip and
+	 * the compare table read "Vergaser &amp; Ansaugung", and a filter for the
+	 * name as typed matches nothing.
+	 */
+	public function test_category_names_are_indexed_decoded(): void {
+		$parent = wp_insert_term( 'Motorrad & Roller', 'product_cat' );
+		$child  = wp_insert_term( 'Vergaser & Ansaugung', 'product_cat', [ 'parent' => (int) $parent['term_id'] ] );
+
+		// The premise: what WordPress hands back is the escaped form.
+		$this->assertSame( 'Vergaser &amp; Ansaugung', get_term( (int) $child['term_id'], 'product_cat' )->name );
+
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Carburettor' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $child['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		$this->assertSame( [ 'Vergaser & Ansaugung', 'Motorrad & Roller' ], $fields['categories'] );
+	}
+
+	public function test_tag_names_are_indexed_decoded_and_without_parents(): void {
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Scarf' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ 'Black & White' ], 'product_tag' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'tags' => true ] );
+
+		$this->assertSame( [ 'Black & White' ], $fields['product_tags'] );
+	}
+
 	public function test_variable_product_price_range_and_variation_skus(): void {
 		$variable = new WC_Product_Variable();
 		$variable->set_name( 'T-Shirt' );
@@ -126,23 +367,121 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertEqualsCanonicalizing( [ 'TS-S', 'TS-L' ], $fields['skus'] );
 	}
 
-	public function test_is_visible_product(): void {
-		$visible = new WC_Product_Simple();
-		$visible->set_name( 'On the shelf' );
-		$visible->set_regular_price( '5' );
-		$visible->set_catalog_visibility( 'visible' );
-		$visible->set_status( 'publish' );
-		$visible->save();
+	/**
+	 * @return array<string,array{0:string,1:bool}>
+	 */
+	public static function catalog_visibility_provider(): array {
+		return [
+			'shop and search results' => [ 'visible', true ],
+			'search results only'     => [ 'search', true ],
+			'shop only'               => [ 'catalog', false ],
+			'hidden'                  => [ 'hidden', false ],
+		];
+	}
 
-		$hidden = new WC_Product_Simple();
-		$hidden->set_name( 'Hidden' );
-		$hidden->set_regular_price( '5' );
-		$hidden->set_catalog_visibility( 'hidden' );
-		$hidden->set_status( 'publish' );
-		$hidden->save();
+	/**
+	 * Sync runs from WP-Cron, WP-CLI and REST, where `is_search()` is false,
+	 * so asking WooCommerce's `is_visible()` would index "Shop only" products
+	 * and drop "Search results only" ones.
+	 *
+	 * @dataProvider catalog_visibility_provider
+	 */
+	public function test_is_visible_product( string $visibility, bool $expected ): void {
+		$this->assertFalse( is_search() );
 
-		$this->assertTrue( $this->woo->is_visible_product( get_post( $visible->get_id() ) ) );
-		$this->assertFalse( $this->woo->is_visible_product( get_post( $hidden->get_id() ) ) );
+		$product = $this->product( $visibility );
+
+		$this->assertSame( $expected, $this->woo->is_visible_product( get_post( $product->get_id() ) ) );
+	}
+
+	public function test_out_of_stock_products_are_not_visible_when_the_store_hides_them(): void {
+		$product = $this->product( 'search', 'outofstock' );
+		$post    = get_post( $product->get_id() );
+
+		update_option( 'woocommerce_hide_out_of_stock_items', 'no' );
+		$this->assertTrue( $this->woo->is_visible_product( $post ) );
+
+		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
+		$this->assertFalse( $this->woo->is_visible_product( $post ) );
+		$this->assertTrue( $this->woo->is_visible_product( get_post( $this->product( 'search' )->get_id() ) ) );
+	}
+
+	public function test_the_woocommerce_visibility_filter_can_hide_a_product(): void {
+		$product = $this->product( 'visible' );
+
+		add_filter(
+			'woocommerce_product_is_visible',
+			static fn( bool $visible, int $id ): bool => $visible && $id !== $product->get_id(),
+			10,
+			2
+		);
+
+		$this->assertFalse( $this->woo->is_visible_product( get_post( $product->get_id() ) ) );
+		$this->assertTrue( $this->woo->is_visible_product( get_post( $this->product( 'visible' )->get_id() ) ) );
+	}
+
+	public function test_a_variation_follows_its_parents_visibility_and_status(): void {
+		$parent = new WC_Product_Variable();
+		$parent->set_name( 'Parent' );
+		$parent->set_catalog_visibility( 'search' );
+		$parent->set_status( 'draft' );
+		$parent->save();
+
+		$variation = new WC_Product_Variation();
+		$variation->set_parent_id( $parent->get_id() );
+		$variation->set_regular_price( '5' );
+		$variation->save();
+
+		$post = get_post( $variation->get_id() );
+
+		$this->assertFalse( $this->woo->is_visible_product( $post ), 'A variation under a draft parent was visible.' );
+
+		$parent->set_status( 'publish' );
+		$parent->save();
+
+		$this->assertTrue( $this->woo->is_visible_product( $post ) );
+	}
+
+	/**
+	 * The default mapping has `only_visible` on, so this is the path every
+	 * product takes during a sync.
+	 */
+	public function test_document_builder_indexes_search_only_products_and_skips_shop_only_ones(): void {
+		$this->enable_indexing( 'product' );
+
+		/** @var Document_Builder $builder */
+		$builder = $this->service( 'document_builder' );
+
+		$this->assertIsArray( $builder->build( get_post( $this->product( 'search' )->get_id() ) ) );
+		$this->assertNull( $builder->build( get_post( $this->product( 'catalog' )->get_id() ) ) );
+	}
+
+	/**
+	 * Whether a private product is indexed is the mapping's call. WooCommerce's
+	 * own check also asks whether the current user can edit the product, which
+	 * would make the answer depend on who happened to trigger the sync.
+	 */
+	public function test_a_private_product_is_indexable_regardless_of_who_runs_the_sync(): void {
+		$this->service( 'index_config' )->save(
+			[
+				'product' => [
+					'enabled'         => true,
+					'include_private' => true,
+				],
+			]
+		);
+
+		$product = $this->product( 'visible', 'instock', 'private' );
+		$post    = get_post( $product->get_id() );
+
+		/** @var Document_Builder $builder */
+		$builder = $this->service( 'document_builder' );
+
+		wp_set_current_user( 0 );
+		$this->assertTrue( $builder->is_indexable( $post ), 'A private product was not indexable from WP-Cron.' );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->assertTrue( $builder->is_indexable( $post ) );
 	}
 
 	public function test_returns_no_fields_for_a_non_product_post(): void {
@@ -178,5 +517,17 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertSame( 'Indexed Product', $document['title'] );
 		$this->assertSame( 42.0, $document['price'] );
 		$this->assertSame( 'IDX-42', $document['sku'] );
+	}
+
+	private function product( string $visibility, string $stock_status = 'instock', string $status = 'publish' ): WC_Product_Simple {
+		$product = new WC_Product_Simple();
+		$product->set_name( ucfirst( $visibility ) . ' product' );
+		$product->set_regular_price( '5' );
+		$product->set_catalog_visibility( $visibility );
+		$product->set_stock_status( $stock_status );
+		$product->set_status( $status );
+		$product->save();
+
+		return $product;
 	}
 }

@@ -23,7 +23,7 @@ const CONFIG = {
 	merchandising: [
 		{
 			query: 'winter',
-			filter_field: 'category',
+			filter_field: 'categories',
 			filter_value: 'shoes',
 			pinned: [ 'p-100' ],
 			hidden: [],
@@ -45,8 +45,81 @@ const CONFIG = {
 // assertion room rather than racing it.
 const LOADED = { timeout: 20000 };
 
-/** Intercept the plugin's own REST proxy, capturing anything it PUTs back. */
-async function mockSearchConfig( page, sent = [] ) {
+/**
+ * The fields a product catalogue with tags, stock, prices and a colour
+ * attribute is indexed with - the names `Woo::TOGGLE_FIELDS` writes, which is
+ * not always the toggle's own name (`tags` writes `product_tags`).
+ */
+const INDEXED_FIELDS = [
+	'title',
+	'content',
+	'type',
+	'url',
+	'price',
+	'price_min',
+	'price_max',
+	'product_type',
+	'on_sale',
+	'stock_status',
+	'in_stock',
+	'categories',
+	'product_tags',
+	'attr_color',
+];
+
+/**
+ * A fixed `/indexing/config` catalogue, so what the tab suggests does not
+ * depend on how the test site's Indexing tab happens to be set up. What the
+ * list contains for a given mapping is the integration suite's to prove
+ * (`Index_Config_Test`, `Woo_Test`); this pins what the tab does with it.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {Array<string>}                   indexedFields The catalogue's `indexed_fields`.
+ */
+async function mockCatalog( page, indexedFields = INDEXED_FIELDS ) {
+	await page.route(
+		( url ) => decodeURIComponent( url.href ).includes( '/indexing/config' ),
+		( route ) =>
+			route.fulfill( {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( {
+					post_types: [
+						{
+							slug: 'product',
+							label: 'Products',
+							is_product: true,
+							taxonomies: [],
+							config: { enabled: true, type: 'product', fields: [] },
+						},
+					],
+					sources: [],
+					woo: { active: true, attributes: [ { slug: 'pa_color', label: 'Color' } ] },
+					languages: { active: false, available: [] },
+					indexed_fields: indexedFields,
+					config_version: 1,
+				} ),
+			} )
+	);
+}
+
+/**
+ * The Search Config card whose title is `title`.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string}                          title The card's heading.
+ */
+const card = ( page, title ) =>
+	page.locator( '.whsc-settings-card' ).filter( { has: page.getByRole( 'heading', { name: title, exact: true } ) } );
+
+/**
+ * Intercept the plugin's own REST proxy, capturing anything it PUTs back.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {Array}                           sent   Receives each write's method and body.
+ * @param {Object}                          config The `/search-config` response.
+ */
+async function mockSearchConfig( page, sent = [], config = CONFIG ) {
 	// Answered locally so the tab is not waiting on a doomed outbound request.
 	await page.route(
 		( url ) => decodeURIComponent( url.href ).includes( '/connection/test' ),
@@ -72,7 +145,7 @@ async function mockSearchConfig( page, sent = [] ) {
 			return route.fulfill( {
 				status: 200,
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify( CONFIG ),
+				body: JSON.stringify( config ),
 			} );
 		}
 	);
@@ -103,7 +176,7 @@ test.describe( 'Search Config tab', () => {
 
 		const rule = page.locator( '.whsc-merchandising-rule' ).first();
 		await expect( rule ).toBeVisible( LOADED );
-		await expect( rule.getByLabel( /Also require filter/i ) ).toHaveValue( 'category' );
+		await expect( rule.getByLabel( /Also require filter/i ) ).toHaveValue( 'categories' );
 		await expect( rule.getByLabel( /Filter value/i ) ).toHaveValue( 'shoes' );
 	} );
 
@@ -145,5 +218,92 @@ test.describe( 'Search Config tab', () => {
 		expect( payload.redirects ).toEqual( [ { query: 'black friday', url: 'https://example.test/bf' } ] );
 		expect( payload.merchandising[ 0 ].filter_field ).toBeNull();
 		expect( payload.merchandising[ 0 ].filter_value ).toBeNull();
+	} );
+
+	/**
+	 * The suggestions used to be a hand-kept list in the tab that offered
+	 * `tags` (never written - the field is `product_tags`) and left out
+	 * `in_stock`, `on_sale`, the price range and every attribute.
+	 */
+	test( 'suggests exactly the fields the site indexes', async ( { page } ) => {
+		await mockSearchConfig( page );
+		await mockCatalog( page );
+		await page.goto( SETTINGS_URL );
+
+		const facets = page.getByRole( 'combobox', { name: 'Facet fields' } );
+		await expect( facets ).toBeVisible( LOADED );
+		await facets.click();
+
+		const options = page.getByRole( 'listbox' ).getByRole( 'option' );
+		await expect( options ).toHaveText( INDEXED_FIELDS );
+		await expect( options.filter( { hasText: /^tags$/ } ) ).toHaveCount( 0 );
+		await expect( options.filter( { hasText: /^category$/ } ) ).toHaveCount( 0 );
+	} );
+
+	/**
+	 * The dev-site failure: a facet on `category` - a field no document has,
+	 * since the indexer writes `categories` - was accepted and stayed empty.
+	 */
+	test( 'warns about a facet field no document has, until it is removed', async ( { page } ) => {
+		await mockSearchConfig( page, [], { ...CONFIG, facet_fields: [ 'categories', 'category' ] } );
+		await mockCatalog( page );
+		await page.goto( SETTINGS_URL );
+
+		const facetCard = card( page, 'Facet fields' );
+		const warning = facetCard.locator( '.whsc-unindexed-fields' );
+
+		await expect( warning ).toBeVisible( LOADED );
+		await expect( warning ).toContainText( 'No document on this site has a "category" field' );
+		await expect( warning ).not.toContainText( '"categories"' );
+
+		// The suggest fields (`title`) are all indexed, so that card stays quiet.
+		await expect( card( page, 'Suggest fields' ).locator( '.whsc-unindexed-fields' ) ).toHaveCount( 0 );
+
+		// Backspace in an empty token input removes the last token.
+		await facetCard.getByRole( 'combobox', { name: 'Facet fields' } ).click();
+		await page.keyboard.press( 'Backspace' );
+
+		await expect( warning ).toHaveCount( 0 );
+	} );
+
+	test( 'warns about every unindexed suggest field at once', async ( { page } ) => {
+		await mockSearchConfig( page, [], { ...CONFIG, suggest_fields: [ 'title', 'tags', 'brand' ] } );
+		await mockCatalog( page );
+		await page.goto( SETTINGS_URL );
+
+		const warning = card( page, 'Suggest fields' ).locator( '.whsc-unindexed-fields' );
+
+		await expect( warning ).toBeVisible( LOADED );
+		await expect( warning ).toContainText( 'No document on this site has the fields "tags", "brand"' );
+	} );
+
+	/**
+	 * Unmocked catalogue: whatever the test site indexes, the tab offers that
+	 * list and nothing else. This is the one place the PHP list and the React
+	 * tab meet, so a renamed key on either side fails here.
+	 */
+	test( 'offers the list the site\'s own catalogue reports', async ( { page } ) => {
+		let reported;
+
+		await mockSearchConfig( page );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/indexing/config' ),
+			async ( route ) => {
+				const response = await route.fetch();
+				reported = ( await response.json() ).indexed_fields;
+
+				await route.fulfill( { response } );
+			}
+		);
+		await page.goto( SETTINGS_URL );
+
+		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
+		expect( Array.isArray( reported ) ).toBe( true );
+
+		const offered = await page
+			.locator( '#whsc-field-suggestions option' )
+			.evaluateAll( ( nodes ) => nodes.map( ( node ) => node.value ) );
+
+		expect( offered ).toEqual( reported );
 	} );
 } );

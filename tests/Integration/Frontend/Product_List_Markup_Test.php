@@ -16,7 +16,10 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Tests\Integration\Frontend;
 
+use WC_Product_Simple;
+use WP_HTML_Tag_Processor;
 use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
+use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Product_List_Markup_Test extends Integration_Test_Case {
@@ -61,10 +64,50 @@ final class Product_List_Markup_Test extends Integration_Test_Case {
 
 		$markup = Product_List_Markup::render( [ 'source' => 'category' ] );
 
-		// Names, not slugs: `Woo::term_names()` indexes the term's name, so a
-		// slug here would filter on a value no document carries.
+		// Names, not slugs: the indexer sends the term's name, so a slug here
+		// would filter on a value no document carries.
 		$this->assertStringContainsString( 'data-filter-value="Winter Jackets"', $markup );
 		$this->assertStringContainsString( 'data-filter-field="categories"', $markup );
+	}
+
+	/**
+	 * WordPress keeps a term name HTML-escaped and the browser reads the
+	 * attribute decoded, so the row asks for "Hats & Scarves". The index has to
+	 * hold that same string, or a row on any category with an "&" in its name
+	 * filters on a value no document carries.
+	 */
+	public function test_a_category_row_filters_on_a_name_the_indexer_sent(): void {
+		$this->require_woocommerce();
+
+		$term    = wp_insert_term( 'Hats & Scarves', 'product_cat' );
+		$product = $this->product_in( (int) $term['term_id'] );
+
+		$this->go_to( (string) get_term_link( (int) $term['term_id'], 'product_cat' ) );
+
+		$filter = $this->filter_value( Product_List_Markup::render( [ 'source' => 'category' ] ) );
+
+		$this->assertSame( 'Hats & Scarves', $filter );
+		$this->assertContains( $filter, $this->indexed_categories( $product ) );
+	}
+
+	/**
+	 * Placed once on the category template, a parent category's row filters on
+	 * the parent's name - which reaches products filed under a child only
+	 * because the indexer sends every ancestor along with the category.
+	 */
+	public function test_a_parent_category_row_reaches_products_filed_under_a_child(): void {
+		$this->require_woocommerce();
+
+		$shoes    = wp_insert_term( 'Shoes', 'product_cat' );
+		$sneakers = wp_insert_term( 'Sneakers', 'product_cat', [ 'parent' => (int) $shoes['term_id'] ] );
+		$product  = $this->product_in( (int) $sneakers['term_id'] );
+
+		$this->go_to( (string) get_term_link( (int) $shoes['term_id'], 'product_cat' ) );
+
+		$filter = $this->filter_value( Product_List_Markup::render( [ 'source' => 'category' ] ) );
+
+		$this->assertSame( 'Shoes', $filter );
+		$this->assertContains( $filter, $this->indexed_categories( $product ) );
 	}
 
 	public function test_category_renders_nothing_off_an_archive(): void {
@@ -152,5 +195,42 @@ final class Product_List_Markup_Test extends Integration_Test_Case {
 
 		$this->assertStringNotContainsString( 'like "these"', $markup );
 		$this->assertStringContainsString( '&amp;', $markup );
+	}
+
+	private function require_woocommerce(): void {
+		if ( ! class_exists( \WooCommerce::class ) || ! function_exists( 'wc_get_product' ) ) {
+			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+	}
+
+	private function product_in( int $term_id ): int {
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Listed product' );
+		$product->set_status( 'publish' );
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ $term_id ], 'product_cat' );
+
+		return $product->get_id();
+	}
+
+	/**
+	 * @return array<int,string>
+	 */
+	private function indexed_categories( int $product_id ): array {
+		$fields = ( new Woo() )->product_fields( get_post( $product_id ), [ 'categories' => true ] );
+
+		return $fields['categories'] ?? [];
+	}
+
+	/**
+	 * `data-filter-value` as the browser reads it - entities decoded - which is
+	 * what the front-end sends as `filter[categories]=`.
+	 */
+	private function filter_value( string $markup ): string {
+		$tags = new WP_HTML_Tag_Processor( $markup );
+
+		$this->assertTrue( $tags->next_tag( 'div' ), 'The row rendered no element.' );
+
+		return (string) $tags->get_attribute( 'data-filter-value' );
 	}
 }

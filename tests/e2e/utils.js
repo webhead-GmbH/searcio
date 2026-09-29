@@ -283,8 +283,20 @@ function wpEvalFile( file, ...args ) {
 }
 
 export function createElementorPost( mode = 'icon' ) {
-	const output = wpEvalFile( 'seed-elementor.php', mode );
+	return seededUrl( wpEvalFile( 'seed-elementor.php', mode ) );
+}
 
+/**
+ * Like `createElementorPost()`, but the widget has its Style-tab controls set,
+ * typography included (see `seed-elementor-themed.php` for the values).
+ *
+ * @param {string} mode Trigger mode: 'icon' or 'box'.
+ */
+export function createThemedElementorPost( mode = 'icon' ) {
+	return seededUrl( wpEvalFile( 'seed-elementor-themed.php', mode ) );
+}
+
+function seededUrl( output ) {
 	// Restrict to URL-safe characters so WP-CLI's trailing status glyph (printed
 	// right after the URL) can't be captured as part of it.
 	const match = output.match( /WHSC_URL:(https?:\/\/[\w./?#&=:%~+-]+)/ );
