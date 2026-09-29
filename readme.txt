@@ -106,6 +106,9 @@ To rebuild it, check the repository out and run `npm install` followed by
 - The storefront search shows a clearly visible keyboard focus ring, and disabled buttons there look disabled.
 - The search icon is announced as "Search" to screen readers even when no placeholder text is set.
 - A link to the General settings tab now opens it instead of the Sync tab, and each setting there shows its name and description once.
+- Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
+- Fixed a permanently deleted post staying in search for good when the first attempt to remove it from the index failed. Full syncs now retry the removal until it succeeds.
+- Fixed content staying in search for good when a full sync's attempt to remove it failed, for example after turning a content type off and then permanently deleting its posts. Later full syncs now keep retrying the removal until it succeeds.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.

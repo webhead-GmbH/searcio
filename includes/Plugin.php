@@ -58,6 +58,7 @@ use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
+use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
 use Webhead\WP\SearchCloud\Sync\Change_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
 use Webhead\WP\SearchCloud\WP_CLI\Sync_Command;
@@ -217,6 +218,7 @@ final class Plugin extends Base_Plugin {
 		$container->add( 'sync_runs_table', Sync_Runs_Table::class );
 		$container->add( 'change_queue_table', Change_Queue_Table::class );
 		$container->add( 'dirty_tracker', Dirty_Tracker::class );
+		$container->add( 'failed_deletes', Failed_Deletes::class );
 		$container->add(
 			'sync_state',
 			static function () use ( $container ): Sync_State {
@@ -232,6 +234,7 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'sync_state' ),
 					$container->get( 'dirty_tracker' ),
+					$container->get( 'failed_deletes' ),
 					$container->get( Jobs_Manager::class ),
 					$container->get( Settings_Manager::class )
 				);
@@ -245,6 +248,7 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'document_builder' ),
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'dirty_tracker' ),
+					$container->get( 'failed_deletes' ),
 					$container->get( 'change_queue_table' ),
 					$container->get( 'sync_state' ),
 					$container->get( Jobs_Manager::class )
@@ -388,6 +392,7 @@ final class Plugin extends Base_Plugin {
 				delete_option( Sync_Keys::OPTION_SNAPSHOT );
 				delete_option( Sync_Keys::OPTION_SEEN );
 				delete_option( Sync_Keys::OPTION_PRUNE );
+				delete_option( Sync_Keys::OPTION_FAILED_DELETES );
 			},
 			Uninstall_Manager::GROUP_DATA
 		);

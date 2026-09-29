@@ -4,10 +4,11 @@
  *
  * Coalesces and processes queued post changes in batches: rebuilds and upserts
  * documents that are still indexable, deletes the rest, and clears the per-post
- * sync meta on delete. Each drain is recorded as a single aggregated sync_runs
- * row (trigger = incremental). Dirty tracking is honoured, so an upsert whose
- * document has not changed is skipped. Reschedules itself while the queue is
- * non-empty, and yields to a full sync if one is running.
+ * sync meta on delete. A delete the index refuses is handed to the full sync's
+ * prune phase through {@see Failed_Deletes}. Each drain is recorded as a single
+ * aggregated sync_runs row (trigger = incremental). Dirty tracking is honoured,
+ * so an upsert whose document has not changed is skipped. Reschedules itself
+ * while the queue is non-empty, and yields to a full sync if one is running.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -42,6 +43,7 @@ final class Incremental_Service {
 		private Document_Builder $builder,
 		private Search_Cloud_Client $client,
 		private Dirty_Tracker $dirty,
+		private Failed_Deletes $failed_deletes,
 		private Change_Queue_Table $queue,
 		private Sync_State $state,
 		private Jobs_Manager $jobs
@@ -133,20 +135,35 @@ final class Incremental_Service {
 
 		// The API has no bulk delete.
 		$delete_error = null;
+		$removed      = [];
+		$refused      = [];
 
 		foreach ( $delete_docs as $doc_id ) {
 			$response = $this->client->delete( $doc_id );
 
 			if ( $response->ok() || 404 === $response->status ) {
 				$this->dirty->clear_for_document( $doc_id );
+				$removed[] = $doc_id;
 				$deleted++;
 
 				continue;
 			}
 
+			$refused[] = $doc_id;
 			$failed++;
 			$delete_error ??= $this->failure_message( $response, $doc_id );
 		}
+
+		/*
+		 * Every change leaves the queue below whatever the answer, so a document
+		 * the index keeps refusing cannot hold up the changes queued behind it;
+		 * the client has already retried the transient failures. The full sync's
+		 * prune phase retries a refused delete instead. It finds most documents
+		 * through the post's sync meta, but a post deleted outright has none
+		 * left, and a document only this drain pushed is in no snapshot.
+		 */
+		$this->failed_deletes->add( $refused );
+		$this->failed_deletes->forget( $removed );
 
 		$this->queue->remove( $processed );
 
