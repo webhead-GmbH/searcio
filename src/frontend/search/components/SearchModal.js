@@ -1,6 +1,6 @@
-import {useCallback, useEffect, useId, useRef, useState} from '@wordpress/element';
-import {Button, Modal, Notice} from '@wordpress/components';
-import {closeSmall} from '@wordpress/icons';
+import {useCallback, useEffect, useId, useLayoutEffect, useRef, useState} from '@wordpress/element';
+import {Button, Icon, Modal, Notice} from '@wordpress/components';
+import {closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
 import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick, visualSearch} from '../../../utils/api';
@@ -59,6 +59,28 @@ const nativeSearchUrl = (query) => {
 	url.searchParams.set('s', query);
 
 	return url.toString();
+};
+
+/**
+ * Scroll one tab fully into the sideways-scrolling tab row, by the least
+ * distance that does it.
+ *
+ * @param {?HTMLElement} list The tablist.
+ * @param {?HTMLElement} tab  One of its tabs.
+ */
+const revealTab = (list, tab) => {
+	if (!list || !tab || !list.contains(tab)) {
+		return;
+	}
+
+	const row = list.getBoundingClientRect();
+	const box = tab.getBoundingClientRect();
+
+	if (box.left < row.left) {
+		list.scrollLeft -= row.left - box.left;
+	} else if (box.right > row.right) {
+		list.scrollLeft += box.right - row.right;
+	}
 };
 
 /**
@@ -131,12 +153,28 @@ const SearchModal = ({
 	const [activeTab, setActiveTab] = useState('search');
 	const [assistantOpened, setAssistantOpened] = useState(false);
 	const [quizOpened, setQuizOpened] = useState(false);
+	const tabListRef = useRef(null);
+
+	// The tab row scrolls sideways once it is too narrow for every label, and
+	// the close button that joins it on the assistant and quiz tabs narrows it
+	// further - at 320px the tab just chosen was the one cut off. Bring the
+	// active tab fully into the row, before paint so it never shows cut.
+	useLayoutEffect(() => {
+		revealTab(tabListRef.current, tabListRef.current?.querySelector('.whsc-modal-tab.is-active'));
+	}, [activeTab]);
 	// What the vision model saw in the uploaded photo, shown above the results
 	// so a surprising result set is explained rather than just odd.
 	const [visualTags, setVisualTags] = useState([]);
 	// A photo search owns the results area even though the search box is empty,
 	// which would otherwise read as "idle" and show the highlights carousel.
 	const [visualActive, setVisualActive] = useState(false);
+	// The photo being searched, shown beside what the model read from it. An
+	// object URL for the visitor's own file - nothing is uploaded to show it.
+	const [visualPreview, setVisualPreview] = useState('');
+	// Which kind of search is in flight, apart from what is on screen: a typed
+	// search run over a photo's results still has the photo's state until its
+	// own answer arrives, and was titled and announced as a photo search.
+	const [pendingKind, setPendingKind] = useState('text');
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -416,6 +454,11 @@ const SearchModal = ({
 
 		if ('' === trimmed) {
 			setResults(null);
+			// An empty search leaves the photo behind too. Kept, the column stayed
+			// in the photo state with nothing left to show in it.
+			setVisualTags([]);
+			setVisualActive(false);
+			setVisualPreview('');
 
 			return;
 		}
@@ -436,6 +479,7 @@ const SearchModal = ({
 		const seq = ++searchSeq.current;
 		const isLatest = () => seq === searchSeq.current;
 
+		setPendingKind('text');
 		setIsSearching(true);
 		setError('');
 		const started = Date.now();
@@ -483,6 +527,7 @@ const SearchModal = ({
 			// A typed search replaces whatever a photo put on screen.
 			setVisualTags([]);
 			setVisualActive(false);
+			setVisualPreview('');
 
 			// See the matching comment in `loadHighlights()` — only refresh the
 			// type chip list from an unfiltered-by-type request.
@@ -532,6 +577,12 @@ const SearchModal = ({
 	 *
 	 * @param {File} file
 	 */
+	useEffect(() => () => {
+		if ('' !== visualPreview) {
+			URL.revokeObjectURL(visualPreview);
+		}
+	}, [visualPreview]);
+
 	const runVisualSearch = useCallback(async (file) => {
 		if (!isConfigured()) {
 			return;
@@ -551,10 +602,12 @@ const SearchModal = ({
 		const seq = ++searchSeq.current;
 		const isLatest = () => seq === searchSeq.current;
 
+		setPendingKind('photo');
 		setIsSearching(true);
 		setError('');
 		setVisualActive(true);
 		setVisualTags([]);
+		setVisualPreview(URL.createObjectURL(file));
 		setResults(null);
 		// A photo search takes no filters, and its response carries no facets to
 		// re-render the chips from. Anything left over from a typed search would
@@ -584,10 +637,18 @@ const SearchModal = ({
 				return;
 			}
 
+			// Back to browsing, with the notice on top. Left in the photo state the
+			// results column stayed empty - nothing a skeleton could resolve to,
+			// and a blank half of the modal read as a broken page. The filters were
+			// cleared for the photo, so the highlights come back unfiltered, with
+			// the type chips and ranges that belong to them.
+			setVisualActive(false);
+			setVisualPreview('');
+			void loadHighlights(scopeType || '', {}, {});
+
 			if (403 === e.status) {
 				// The capability said yes but the site has since turned it off.
 				setVisualEnabled(false);
-				setVisualActive(false);
 				setError(__('Photo search is not available on this store.', 'webhead-search-cloud'));
 			} else if (422 === e.status) {
 				setError(__('That file is not an image we can read. Try a JPEG or PNG under 8 MB.', 'webhead-search-cloud'));
@@ -601,7 +662,7 @@ const SearchModal = ({
 				setIsSearching(false);
 			}
 		}
-	}, []);
+	}, [loadHighlights, scopeType]);
 
 	// Only in `type` mode does typing itself trigger the metered `/search`
 	// call, and only once the query is long enough to be meaningful.
@@ -810,7 +871,42 @@ const SearchModal = ({
 	let mainTitle;
 	let mainContent;
 
-	if (showEmptyState) {
+	// Which photo the results are for, and what the model read from it - so an
+	// unexpected result set reads as a misread photo rather than broken search.
+	const photoQuery = visualActive && '' !== visualPreview ? (
+		<div className="whsc-visual-query">
+			<img
+				// A fresh element per photo: the `hidden` a failed one set is not
+				// something React manages, and would hide every photo after it.
+				key={visualPreview}
+				className="whsc-visual-query__photo"
+				src={visualPreview}
+				alt={__('Your photo', 'webhead-search-cloud')}
+				// A file that is not an image gets as far as the server before it
+				// is refused; until then, no broken-image glyph.
+				onError={(event) => {
+					event.currentTarget.hidden = true;
+				}}
+			/>
+			{!isSearching && visualTags.length > 0 && (
+				<div className="whsc-visual-tags">
+					<span className="whsc-visual-tags__label">
+						{__('From your photo', 'webhead-search-cloud')}
+					</span>
+					<div className="whsc-visual-tags__list">
+						{visualTags.map((tag) => (
+							<span className="whsc-visual-tag" key={tag}>{tag}</span>
+						))}
+					</div>
+				</div>
+			)}
+		</div>
+	) : null;
+
+	// The highlights also stay while a query is typed but not yet searched
+	// (submit mode, before Enter). That state used to show their title over a
+	// skeleton, which looked like a search loading that never finished.
+	if (showEmptyState || (!isSearching && !results)) {
 		mainTitle = __('Current highlights', 'webhead-search-cloud');
 		mainContent = isLoadingHighlights ? (
 			<SearchResultsSkeleton/>
@@ -830,8 +926,15 @@ const SearchModal = ({
 			/>
 		);
 	} else if (isSearching) {
-		mainTitle = __('Results', 'webhead-search-cloud');
-		mainContent = <SearchResultsSkeleton/>;
+		mainTitle = 'photo' === pendingKind
+			? __('Looking at your photo…', 'webhead-search-cloud')
+			: __('Results', 'webhead-search-cloud');
+		mainContent = (
+			<>
+				{'photo' === pendingKind && photoQuery}
+				<SearchResultsSkeleton/>
+			</>
+		);
 	} else if (results) {
 		mainTitle = resultsHits.length > 0
 			? (exactTotal && hasMore
@@ -849,6 +952,7 @@ const SearchModal = ({
 			: __('Results', 'webhead-search-cloud');
 		mainContent = resultsHits.length > 0 ? (
 			<>
+			{photoQuery}
 			<Carousel
 				items={resultsHits}
 				getKey={(hit) => hit.id}
@@ -878,6 +982,8 @@ const SearchModal = ({
 			)}
 			</>
 		) : (
+			<>
+			{photoQuery}
 			<p className="whsc-no-results">
 				{visualActive
 					// A photo that matched nothing is a photo problem, not a
@@ -885,16 +991,8 @@ const SearchModal = ({
 					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'webhead-search-cloud')
 					: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))}
 			</p>
+			</>
 		);
-	} else if (visualActive) {
-		// A photo search that failed: the error notice above already says what
-		// happened, so this slot stays empty — a skeleton would never resolve,
-		// and a "Results" heading over nothing reads as a broken page.
-		mainTitle = '';
-		mainContent = null;
-	} else {
-		mainTitle = __('Current highlights', 'webhead-search-cloud');
-		mainContent = <SearchResultsSkeleton/>;
 	}
 
 	return (
@@ -907,7 +1005,16 @@ const SearchModal = ({
 		>
 			<div className="whsc-modal-body">
 				{hasTabs && (
-					<div className="whsc-modal-tabs" role="tablist" aria-label={__('Search modes', 'webhead-search-cloud')}>
+					<div className="whsc-modal-tabbar">
+					<div
+						className="whsc-modal-tabs"
+						role="tablist"
+						aria-label={__('Search modes', 'webhead-search-cloud')}
+						ref={tabListRef}
+						// Tabbing onto a tab the row cuts off does not scroll it: the
+						// browser leaves a partly visible element where it is.
+						onFocus={(event) => revealTab(tabListRef.current, event.target)}
+					>
 						<button
 							type="button"
 							role="tab"
@@ -945,18 +1052,20 @@ const SearchModal = ({
 								{__('Product finder', 'webhead-search-cloud')}
 							</button>
 						)}
-						{/* Only the tabs without a search input need a close control
-						    here; the search tab keeps its own inside the input row, so
-						    turning these modes on never restyles the search tab. */}
-						{'search' !== activeTab && (
-							<Button
-								className="whsc-modal-close whsc-modal-close--tabbed"
-								icon={closeSmall}
-								label={i18n.close || __('Close search', 'webhead-search-cloud')}
-								showTooltip={false}
-								onClick={onRequestClose}
-							/>
-						)}
+					</div>
+					{/* Only the tabs without a search input need a close control
+					    here; the search tab keeps its own inside the input row, so
+					    turning these modes on never restyles the search tab. It sits
+					    beside the tablist rather than in it: a tablist holds tabs. */}
+					{'search' !== activeTab && (
+						<Button
+							className="whsc-modal-close whsc-modal-close--tabbed"
+							icon={closeSmall}
+							label={i18n.close || __('Close search', 'webhead-search-cloud')}
+							showTooltip={false}
+							onClick={onRequestClose}
+						/>
+					)}
 					</div>
 				)}
 
@@ -979,7 +1088,9 @@ const SearchModal = ({
 								className="whsc-submit-btn"
 								onClick={() => void runSearch(query)}
 							>
-								{__('Search', 'webhead-search-cloud')}
+								{/* On a phone only the icon shows; the label stays the name. */}
+								<Icon icon={searchIcon} className="whsc-submit-btn__icon"/>
+								<span className="whsc-submit-btn__label">{__('Search', 'webhead-search-cloud')}</span>
 							</Button>
 						)}
 						{enableVoice && supportsVoice() && (
@@ -1034,21 +1145,6 @@ const SearchModal = ({
 					// these, so not rendering them made the field look broken.
 					// Merchant-authored text, rendered as text — never as markup.
 					<p className="whsc-banner" role="status">{results.banner}</p>
-				)}
-
-				{visualActive && visualTags.length > 0 && (
-					// What the model saw, so an unexpected result set reads as a
-					// misread photo rather than as broken search.
-					<div className="whsc-visual-tags">
-						<span className="whsc-visual-tags__label">
-							{__('From your photo', 'webhead-search-cloud')}
-						</span>
-						<div className="whsc-visual-tags__list">
-							{visualTags.map((tag) => (
-								<span className="whsc-visual-tag" key={tag}>{tag}</span>
-							))}
-						</div>
-					</div>
 				)}
 
 				{showFacets && (
@@ -1120,13 +1216,18 @@ const SearchModal = ({
 					mainTitle={mainTitle}
 					main={mainContent}
 					busy={isSearching}
+					// Clearing the field keeps the last results in state but puts the
+					// highlights back on screen, so an empty field is never "active".
+					searchActive={!showEmptyState && (isSearching || null !== results)}
 					onSelect={(label) => void runSearch(label)}
 					onRemoveRecent={onRemoveRecent}
 					onClearRecent={onClearRecent}
 				/>
 
 				<p id={statusId} className="whsc-visually-hidden" role="status" aria-live="polite">
-					{isSearching && (i18n.searching || __('Searching…', 'webhead-search-cloud'))}
+					{isSearching && ('photo' === pendingKind
+						? __('Looking at your photo…', 'webhead-search-cloud')
+						: (i18n.searching || __('Searching…', 'webhead-search-cloud')))}
 					{!isSearching && results && (
 						resultsHits.length > 0
 							? (exactTotal && hasMore

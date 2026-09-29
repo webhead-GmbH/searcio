@@ -367,6 +367,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'cardBorderHover', __( 'Border (hover)', 'webhead-search-cloud' ) ),
 						color( 'cardTitle', __( 'Title', 'webhead-search-cloud' ) ),
 						color( 'priceColor', __( 'Price / meta', 'webhead-search-cloud' ) ),
+						color( 'stockInColor', __( 'In stock', 'webhead-search-cloud' ) ),
+						color( 'stockOutColor', __( 'Out of stock', 'webhead-search-cloud' ) ),
 					] }
 				>
 					{ sizeControl( 'cardRadius', __( 'Border radius', 'webhead-search-cloud' ), 40 ) }

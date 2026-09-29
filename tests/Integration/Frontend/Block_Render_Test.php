@@ -89,6 +89,40 @@ final class Block_Render_Test extends Integration_Test_Case {
 		$this->assertStringContainsString( '--whsc-gap:24px', $html );
 	}
 
+	/**
+	 * The stock line was the one text colour on a result card with no token
+	 * behind it: a fixed green and red that no placement could change.
+	 */
+	public function test_emits_the_stock_line_colours_for_a_named_instance(): void {
+		$html = $this->render_search_block(
+			[
+				'instanceId'    => 'stock1',
+				'stockInColor'  => '#1d4ed8',
+				'stockOutColor' => '#7c2d12',
+			]
+		);
+
+		$this->assertStringContainsString( '.whsc-instance-stock1{', $html );
+		$this->assertStringContainsString( '--whsc-stock-in-color:#1d4ed8', $html );
+		$this->assertStringContainsString( '--whsc-stock-out-color:#7c2d12', $html );
+	}
+
+	/** A colour left unset declares nothing, so the stylesheet's default applies. */
+	public function test_an_unset_stock_colour_declares_nothing(): void {
+		$html = $this->render_search_block( [ 'instanceId' => 'stock2', 'stockInColor' => '', 'bgColor' => '#fff' ] );
+
+		$this->assertStringNotContainsString( '--whsc-stock-in-color', $html );
+		$this->assertStringNotContainsString( '--whsc-stock-out-color', $html );
+	}
+
+	public function test_block_metadata_declares_the_stock_colours(): void {
+		$attributes = WP_Block_Type_Registry::get_instance()->get_registered( self::BLOCK )->attributes;
+
+		foreach ( [ 'stockInColor', 'stockOutColor' ] as $name ) {
+			$this->assertSame( [ 'type' => 'string', 'default' => '' ], $attributes[ $name ] ?? null, $name );
+		}
+	}
+
 	public function test_strips_unsafe_characters_from_the_instance_id(): void {
 		$html = $this->render_search_block( [ 'instanceId' => 'a<b>"c', 'bgColor' => '#fff' ] );
 

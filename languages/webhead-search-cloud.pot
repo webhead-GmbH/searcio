@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-28T14:13:38+00:00\n"
+"POT-Creation-Date: 2026-09-29T09:58:55+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -138,9 +138,9 @@ msgid "Layout"
 msgstr ""
 
 #: includes/Frontend/Elementor/Products_Widget.php:146
-#: includes/Frontend/Elementor/Search_Widget.php:981
+#: includes/Frontend/Elementor/Search_Widget.php:988
 #: src/blocks/products/edit.js:106
-#: src/blocks/search/edit.js:377
+#: src/blocks/search/edit.js:379
 msgid "Carousel"
 msgstr ""
 
@@ -177,9 +177,9 @@ msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:111
 #: src/frontend/search/components/SearchInput.js:31
-#: src/frontend/search/components/SearchModal.js:906
-#: src/frontend/search/components/SearchModal.js:918
-#: src/frontend/search/components/SearchModal.js:982
+#: src/frontend/search/components/SearchModal.js:1004
+#: src/frontend/search/components/SearchModal.js:1025
+#: src/frontend/search/components/SearchModal.js:1093
 #: src/frontend/search/components/Trigger.js:22
 msgid "Search"
 msgstr ""
@@ -231,6 +231,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:169
 #: src/admin/settings/components/tabs/IndexingTab.js:206
 #: src/blocks/search/edit.js:116
+#: src/utils/facets.js:68
 msgid "Featured"
 msgstr ""
 
@@ -366,7 +367,7 @@ msgstr ""
 #: src/blocks/search/edit.js:192
 #: src/blocks/search/edit.js:221
 #: src/blocks/search/edit.js:307
-#: src/blocks/search/edit.js:372
+#: src/blocks/search/edit.js:374
 msgid "Border radius"
 msgstr ""
 
@@ -465,7 +466,7 @@ msgstr ""
 #: includes/Frontend/Elementor/Search_Widget.php:709
 #: includes/Frontend/Elementor/Search_Widget.php:942
 #: src/blocks/search/edit.js:205
-#: src/blocks/search/edit.js:373
+#: src/blocks/search/edit.js:375
 msgid "Padding"
 msgstr ""
 
@@ -616,8 +617,8 @@ msgid "Popular items"
 msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:729
-#: includes/Frontend/Elementor/Search_Widget.php:986
-#: src/blocks/search/edit.js:386
+#: includes/Frontend/Elementor/Search_Widget.php:993
+#: src/blocks/search/edit.js:388
 msgid "Spacing between items"
 msgstr ""
 
@@ -664,7 +665,7 @@ msgstr ""
 
 #: includes/Frontend/Elementor/Search_Widget.php:817
 #: src/blocks/search/edit.js:323
-#: src/frontend/search/components/SearchModal.js:931
+#: src/frontend/search/components/SearchModal.js:1038
 msgid "AI Assistant"
 msgstr ""
 
@@ -776,34 +777,55 @@ msgstr ""
 msgid "Price suffix / \"from\" typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:987
-#: src/blocks/search/edit.js:380
+#: includes/Frontend/Elementor/Search_Widget.php:973
+#: src/admin/settings/components/tabs/IndexingTab.js:203
+#: src/utils/facets.js:65
+msgid "Stock status"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:975
+#: src/blocks/search/edit.js:370
+#: src/frontend/search/components/CompareTable.js:46
+#: src/frontend/search/components/templates.js:101
+#: src/utils/facets.js:66
+msgid "In stock"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:976
+#: src/blocks/search/edit.js:371
+#: src/frontend/search/components/CompareTable.js:47
+#: src/frontend/search/components/templates.js:101
+msgid "Out of stock"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:994
+#: src/blocks/search/edit.js:382
 msgid "Arrow color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:988
-#: src/blocks/search/edit.js:381
+#: includes/Frontend/Elementor/Search_Widget.php:995
+#: src/blocks/search/edit.js:383
 msgid "Arrow background"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:989
-#: src/blocks/search/edit.js:382
+#: includes/Frontend/Elementor/Search_Widget.php:996
+#: src/blocks/search/edit.js:384
 msgid "Dot color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:990
-#: src/blocks/search/edit.js:383
+#: includes/Frontend/Elementor/Search_Widget.php:997
+#: src/blocks/search/edit.js:385
 msgid "Dot color (active)"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:198
-#: src/frontend/search/components/SearchModal.js:886
-#: src/frontend/search/components/SearchModal.js:1144
+#: src/frontend/search/components/SearchModal.js:992
+#: src/frontend/search/components/SearchModal.js:1245
 msgid "No results found."
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:199
-#: src/frontend/search/components/SearchModal.js:1129
+#: src/frontend/search/components/SearchModal.js:1230
 msgid "Searching…"
 msgstr ""
 
@@ -819,20 +841,20 @@ msgid "Sale"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:203
-#: src/frontend/search/components/SearchModal.js:503
-#: src/frontend/search/components/SearchModal.js:740
+#: src/frontend/search/components/SearchModal.js:548
+#: src/frontend/search/components/SearchModal.js:801
 msgid "Search is unavailable right now."
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:204
-#: src/frontend/search/components/Browse.js:38
+#: src/frontend/search/components/Browse.js:65
 msgid "Recent searches"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:205
 #: src/admin/settings/components/tabs/SearchConfigTab.js:172
 #: src/admin/settings/components/tabs/SearchConfigTab.js:183
-#: src/frontend/search/components/Browse.js:72
+#: src/frontend/search/components/Browse.js:98
 msgid "Popular searches"
 msgstr ""
 
@@ -843,18 +865,18 @@ msgid "Clear"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:207
-#: src/frontend/search/components/SearchModal.js:955
-#: src/frontend/search/components/SearchModal.js:1015
+#: src/frontend/search/components/SearchModal.js:1064
+#: src/frontend/search/components/SearchModal.js:1126
 msgid "Close search"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:208
-#: src/frontend/search/components/SearchModal.js:1003
+#: src/frontend/search/components/SearchModal.js:1114
 msgid "Search by voice"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:209
-#: src/frontend/search/components/SearchModal.js:1065
+#: src/frontend/search/components/SearchModal.js:1161
 msgid "All"
 msgstr ""
 
@@ -1521,6 +1543,7 @@ msgid "WooCommerce %1$s is below the supported minimum %2$s. Product fields are 
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:199
+#: src/utils/facets.js:71
 msgid "Price"
 msgstr ""
 
@@ -1529,6 +1552,7 @@ msgid "Regular & sale price"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:201
+#: src/utils/facets.js:69
 msgid "SKU"
 msgstr ""
 
@@ -1536,15 +1560,13 @@ msgstr ""
 msgid "Variation SKUs"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:203
-msgid "Stock status"
-msgstr ""
-
 #: src/admin/settings/components/tabs/IndexingTab.js:204
+#: src/utils/facets.js:63
 msgid "Categories"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:205
+#: src/utils/facets.js:64
 msgid "Tags"
 msgstr ""
 
@@ -2265,31 +2287,31 @@ msgstr ""
 msgid "AI image tagging"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:59
+#: src/admin/settings/components/tabs/UsageCard.js:61
 msgid "This month"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:61
+#: src/admin/settings/components/tabs/UsageCard.js:63
 msgid "What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search."
 msgstr ""
 
 #. translators: 1: amount used. 2: the plan's allowance.
-#: src/admin/settings/components/tabs/UsageCard.js:80
+#: src/admin/settings/components/tabs/UsageCard.js:82
 #, js-format
 msgid "%1$s of %2$s"
 msgstr ""
 
 #. translators: 1: allowance name. 2: percentage used.
-#: src/admin/settings/components/tabs/UsageCard.js:94
+#: src/admin/settings/components/tabs/UsageCard.js:96
 #, js-format
 msgid "%1$s: %2$d%% used"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:103
+#: src/admin/settings/components/tabs/UsageCard.js:105
 msgid "Spent for this month. Upgrade to keep this working."
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:108
+#: src/admin/settings/components/tabs/UsageCard.js:110
 msgid "Close to the limit."
 msgstr ""
 
@@ -2487,7 +2509,7 @@ msgid "Chip border (hover)"
 msgstr ""
 
 #: src/blocks/search/edit.js:281
-#: src/frontend/search/components/Browse.js:40
+#: src/frontend/search/components/Browse.js:67
 msgid "Clear all"
 msgstr ""
 
@@ -2583,11 +2605,11 @@ msgstr ""
 msgid "Price / meta"
 msgstr ""
 
-#: src/blocks/search/edit.js:409
+#: src/blocks/search/edit.js:411
 msgid "Search Cloud - search box"
 msgstr ""
 
-#: src/blocks/search/edit.js:410
+#: src/blocks/search/edit.js:412
 msgid "Search Cloud - search icon"
 msgstr ""
 
@@ -2595,56 +2617,56 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:22
+#: src/frontend/search/components/AiAssistant.js:23
 msgid "The assistant is not available on this plan."
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:26
+#: src/frontend/search/components/AiAssistant.js:27
 msgid "The assistant has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:29
+#: src/frontend/search/components/AiAssistant.js:30
 msgid "The assistant is unavailable right now. Try searching instead."
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:79
+#: src/frontend/search/components/AiAssistant.js:112
 msgid "What's popular?"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:80
+#: src/frontend/search/components/AiAssistant.js:113
 msgid "Help me find a gift"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:81
+#: src/frontend/search/components/AiAssistant.js:114
 msgid "What's on sale?"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:179
-msgid "Describe what you're looking for and I'll find it in this store."
-msgstr ""
-
-#: src/frontend/search/components/AiAssistant.js:218
-msgid "Thinking"
-msgstr ""
-
-#: src/frontend/search/components/AiAssistant.js:241
-msgid "Try again"
-msgstr ""
-
-#: src/frontend/search/components/AiAssistant.js:255
+#: src/frontend/search/components/AiAssistant.js:211
 msgid "Write what you need"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:256
+#: src/frontend/search/components/AiAssistant.js:212
 msgid "Message the assistant"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:264
+#: src/frontend/search/components/AiAssistant.js:220
 msgid "Send"
 msgstr ""
 
+#: src/frontend/search/components/AiAssistant.js:236
+msgid "Describe what you're looking for and I'll find it in this store."
+msgstr ""
+
+#: src/frontend/search/components/AiAssistant.js:275
+msgid "Thinking"
+msgstr ""
+
+#: src/frontend/search/components/AiAssistant.js:298
+msgid "Try again"
+msgstr ""
+
 #. translators: %d: number of products being compared.
-#: src/frontend/search/components/AiAssistant.js:277
+#: src/frontend/search/components/AiAssistant.js:316
 #, js-format
 msgid "Comparing %d product"
 msgid_plural "Comparing %d products"
@@ -2653,135 +2675,129 @@ msgstr[1] ""
 
 #. translators: %d: number of products.
 #. translators: %d: number of results.
-#: src/frontend/search/components/AiAssistant.js:282
-#: src/frontend/search/components/SearchModal.js:846
+#: src/frontend/search/components/AiAssistant.js:321
+#: src/frontend/search/components/SearchModal.js:949
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/AiAssistant.js:297
+#: src/frontend/search/components/AiAssistant.js:336
 msgid "Back to list"
 msgstr ""
 
-#: src/frontend/search/components/AiAssistant.js:298
+#: src/frontend/search/components/AiAssistant.js:337
 msgid "Compare"
 msgstr ""
 
-#: src/frontend/search/components/Browse.js:58
+#: src/frontend/search/components/Browse.js:85
 msgid "Remove from recent searches"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:154
+#: src/frontend/search/components/Carousel.js:160
 msgid "Previous"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:182
+#: src/frontend/search/components/Carousel.js:188
 msgid "Next"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:188
+#: src/frontend/search/components/Carousel.js:194
 msgid "Pages"
 msgstr ""
 
 #. translators: %d: page number.
-#: src/frontend/search/components/Carousel.js:198
+#: src/frontend/search/components/Carousel.js:204
 #, js-format
 msgid "Go to page %d"
 msgstr ""
 
-#: src/frontend/search/components/CompareTable.js:43
-#: src/frontend/search/components/templates.js:101
-msgid "In stock"
-msgstr ""
-
-#: src/frontend/search/components/CompareTable.js:44
-#: src/frontend/search/components/templates.js:101
-msgid "Out of stock"
-msgstr ""
-
-#: src/frontend/search/components/CompareTable.js:45
+#: src/frontend/search/components/CompareTable.js:48
 msgid "On backorder"
 msgstr ""
 
-#: src/frontend/search/components/CompareTable.js:63
-#: src/frontend/search/components/CompareTable.js:78
+#: src/frontend/search/components/CompareTable.js:66
+#: src/frontend/search/components/CompareTable.js:81
 msgid "Yes"
 msgstr ""
 
-#: src/frontend/search/components/CompareTable.js:64
-#: src/frontend/search/components/CompareTable.js:78
+#: src/frontend/search/components/CompareTable.js:67
+#: src/frontend/search/components/CompareTable.js:81
 msgid "No"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:81
+#: src/frontend/search/components/QuizPane.js:87
 msgid "The quiz is unavailable right now."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:112
+#: src/frontend/search/components/QuizPane.js:131
 msgid "We could not load your matches. Please try again."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:141
+#: src/frontend/search/components/QuizPane.js:160
 msgid "We could not load more matches. Please try again."
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:225
+#: src/frontend/search/components/QuizPane.js:249
 msgid "Which one would you like to take?"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:235
+#: src/frontend/search/components/QuizPane.js:259
 msgid "Start the quiz"
 msgstr ""
 
 #. translators: 1: current question number. 2: total questions in the quiz.
-#: src/frontend/search/components/QuizPane.js:261
+#: src/frontend/search/components/QuizPane.js:285
 #, js-format
 msgid "Question %1$d of %2$d"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:268
-#: src/frontend/search/components/QuizPane.js:316
+#: src/frontend/search/components/QuizPane.js:292
+#: src/frontend/search/components/QuizPane.js:350
 msgid "Back"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:299
+#: src/frontend/search/components/QuizPane.js:332
 msgid "Finding your matches…"
 msgstr ""
 
+#: src/frontend/search/components/QuizPane.js:333
+msgid "Your matches"
+msgstr ""
+
 #. translators: 1: number of matches loaded so far. 2: total number of matches.
-#: src/frontend/search/components/QuizPane.js:303
+#: src/frontend/search/components/QuizPane.js:337
 #, js-format
 msgid "%1$d of %2$d matches"
 msgstr ""
 
 #. translators: %d: number of matching products.
-#: src/frontend/search/components/QuizPane.js:309
+#: src/frontend/search/components/QuizPane.js:343
 #, js-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/QuizPane.js:320
+#: src/frontend/search/components/QuizPane.js:354
 msgid "Start over"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:326
+#: src/frontend/search/components/QuizPane.js:360
 msgid "Your answers"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:369
-#: src/frontend/search/components/SearchModal.js:874
+#: src/frontend/search/components/QuizPane.js:403
+#: src/frontend/search/components/SearchModal.js:978
 msgid "Loading…"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:370
+#: src/frontend/search/components/QuizPane.js:404
 msgid "Load more matches"
 msgstr ""
 
-#: src/frontend/search/components/QuizPane.js:377
+#: src/frontend/search/components/QuizPane.js:411
 msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr ""
 
@@ -2813,86 +2829,94 @@ msgstr ""
 msgid "Clear %s filter"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:591
+#: src/frontend/search/components/SearchModal.js:652
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:593
+#: src/frontend/search/components/SearchModal.js:654
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:595
+#: src/frontend/search/components/SearchModal.js:656
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:597
+#: src/frontend/search/components/SearchModal.js:658
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:814
-#: src/frontend/search/components/SearchModal.js:829
-#: src/frontend/search/components/SearchModal.js:896
+#: src/frontend/search/components/SearchModal.js:884
+msgid "Your photo"
+msgstr ""
+
+#: src/frontend/search/components/SearchModal.js:894
+msgid "From your photo"
+msgstr ""
+
+#: src/frontend/search/components/SearchModal.js:910
+#: src/frontend/search/components/SearchModal.js:925
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:833
-#: src/frontend/search/components/SearchModal.js:849
+#: src/frontend/search/components/SearchModal.js:930
+#: src/frontend/search/components/SearchModal.js:1229
+msgid "Looking at your photo…"
+msgstr ""
+
+#: src/frontend/search/components/SearchModal.js:931
+#: src/frontend/search/components/SearchModal.js:952
 msgid "Results"
 msgstr ""
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:840
+#: src/frontend/search/components/SearchModal.js:943
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:863
+#: src/frontend/search/components/SearchModal.js:967
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:875
+#: src/frontend/search/components/SearchModal.js:979
 msgid "Load more results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:885
+#: src/frontend/search/components/SearchModal.js:991
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:910
+#: src/frontend/search/components/SearchModal.js:1012
 msgid "Search modes"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:945
+#: src/frontend/search/components/SearchModal.js:1052
 msgid "Product finder"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1044
-msgid "From your photo"
-msgstr ""
-
-#: src/frontend/search/components/SearchModal.js:1058
+#: src/frontend/search/components/SearchModal.js:1154
 msgid "Filter by type"
 msgstr ""
 
 #. translators: 1: number of results shown. 2: total number of results found.
-#: src/frontend/search/components/SearchModal.js:1135
+#: src/frontend/search/components/SearchModal.js:1236
 #, js-format
 msgid "Showing %1$d of %2$d results."
 msgstr ""
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:1141
+#: src/frontend/search/components/SearchModal.js:1242
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/Suggestions.js:50
+#: src/frontend/search/components/Suggestions.js:53
 msgid "Dismiss suggestions"
 msgstr ""
 
-#: src/frontend/search/components/Suggestions.js:58
+#: src/frontend/search/components/Suggestions.js:61
 msgid "Search suggestions"
 msgstr ""
 
@@ -2902,6 +2926,26 @@ msgstr ""
 
 #: src/settings/store/provider.js:18
 msgid "General"
+msgstr ""
+
+#: src/utils/facets.js:67
+msgid "On sale"
+msgstr ""
+
+#: src/utils/facets.js:70
+msgid "SKUs"
+msgstr ""
+
+#: src/utils/facets.js:72
+msgid "Lowest price"
+msgstr ""
+
+#: src/utils/facets.js:73
+msgid "Highest price"
+msgstr ""
+
+#: src/utils/facets.js:74
+msgid "Product type"
 msgstr ""
 
 #: blocks/products/block.json

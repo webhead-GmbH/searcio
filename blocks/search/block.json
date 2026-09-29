@@ -140,6 +140,8 @@
 		"cardPadding": { "type": "number", "default": null },
 		"cardTitle": { "type": "string", "default": "" },
 		"priceColor": { "type": "string", "default": "" },
+		"stockInColor": { "type": "string", "default": "" },
+		"stockOutColor": { "type": "string", "default": "" },
 
 		"arrowColor": { "type": "string", "default": "" },
 		"arrowBg": { "type": "string", "default": "" },

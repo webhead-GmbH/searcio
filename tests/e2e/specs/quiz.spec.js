@@ -142,6 +142,54 @@ test.describe( 'guided quiz', () => {
 	} );
 
 	/**
+	 * Each step replaces the button that was just pressed. Focus used to fall
+	 * back to the page body, so a keyboard or screen-reader user heard nothing
+	 * about the next question and had to find their way back into the modal.
+	 */
+	test( 'moves focus to each new step, which is a heading', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { quiz: true, quizzes: [ QUIZ ] } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( /product finder/i );
+
+		await expect( widget.modal.getByRole( 'heading', { name: "What's your style?" } ) ).toBeVisible();
+
+		await widget.quizOptions.filter( { hasText: 'Casual' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await expect( widget.modal.getByRole( 'heading', { name: 'What size?' } ) ).toBeFocused();
+
+		await widget.quizOptions.filter( { hasText: 'Medium' } ).focus();
+		await page.keyboard.press( 'Enter' );
+		await expect( widget.modal.locator( '.whsc-quiz__results-count' ) ).toBeFocused();
+
+		await widget.modal.locator( '.whsc-quiz__back' ).first().focus();
+		await page.keyboard.press( 'Enter' );
+		await expect( widget.modal.getByRole( 'heading', { name: 'What size?' } ) ).toBeFocused();
+	} );
+
+	/**
+	 * The count heading takes focus and speaks politely; when the final search
+	 * failed it read out "0 matches" for answers that were never searched.
+	 */
+	test( 'a failed final search is not reported as no matches', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { quiz: true, quizzes: [ QUIZ ], searchStatus: 500 } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( /product finder/i );
+		await widget.answerQuiz( 'Casual' );
+		await widget.answerQuiz( 'Medium' );
+
+		const count = widget.modal.locator( '.whsc-quiz__results-count' );
+		await expect( widget.modal.locator( '.whsc-quiz__error' ) ).toBeVisible();
+		await expect( count ).toHaveText( 'Your matches' );
+		await expect( count ).not.toHaveAttribute( 'aria-live', /.+/ );
+	} );
+
+	/**
 	 * The graph is already in memory after the first response; re-fetching it
 	 * per question would be a wasted round trip on every answer.
 	 */

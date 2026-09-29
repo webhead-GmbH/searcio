@@ -66,6 +66,7 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {Array}          [options.visualTags]  Tags the vision model "saw".
  * @param {Array}          [options.visualHits]  `/search/visual` hits.
  * @param {number}         [options.visualStatus] Force a non-200 `/search/visual` status.
+ * @param {number}         [options.visualDelay]  Hold the `/search/visual` answer this many ms.
  */
 export async function mockSearchCloud( page, options = {} ) {
 	const {
@@ -96,6 +97,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		visualTags = [ 'red', 'silk', 'dress' ],
 		visualHits = [ postHit( { title: 'Red Silk Dress', type: 'product' }, 'visual-1' ) ],
 		visualStatus = 200,
+		visualDelay = 0,
 	} = options;
 
 	await page.route( '**/api/v1/**', async ( route ) => {
@@ -126,6 +128,9 @@ export async function mockSearchCloud( page, options = {} ) {
 			return json( { quizzes } );
 		}
 		if ( '/search/visual' === path ) {
+			if ( visualDelay > 0 ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, visualDelay ) );
+			}
 			if ( 200 !== visualStatus ) {
 				return json( {}, visualStatus );
 			}

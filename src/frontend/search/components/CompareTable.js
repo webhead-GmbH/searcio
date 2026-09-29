@@ -9,6 +9,9 @@ import { PLACEHOLDER_IMAGE_DATA_URI } from '../../../utils/placeholderImage';
 const HEADER_OR_INTERNAL = new Set( [
 	'id', 'type', 'title', 'url', 'image', 'content', 'excerpt', 'lang', 'score',
 	'on_sale', 'product_type', 'in_stock',
+	// Every variation's SKU, next to the product's own `sku` row: the same
+	// thing again, as a list only a warehouse reads.
+	'skus',
 	// Bookkeeping the indexer writes. `indexed_at` in particular was showing up
 	// as a comparison row, which tells a shopper nothing about the product.
 	'indexed_at', 'synced_at', 'updated_at', 'created_at', 'modified', 'date',
@@ -82,14 +85,15 @@ const formatValue = ( value, field ) => {
 };
 
 /**
- * Side-by-side attribute comparison of the assistant's products. The rows are
- * the union of the products' own `source` fields (minus the ones shown in the
- * header), so it adapts to whatever the site indexes — no fixed schema.
+ * The fields a comparison of these products has rows for: the union of their
+ * own `source` fields minus the ones the header already shows, one per label,
+ * with the rows that differ first. Empty when the products carry nothing but a
+ * title, a link, an image and a price - there is then nothing to compare.
  *
- * @param {Object}        props
- * @param {Array<Object>} props.products Assistant hits ({ id, source }).
+ * @param {Array<Object>} products Assistant hits ({ id, source }).
+ * @return {string[]} Field keys, in display order.
  */
-const CompareTable = ( { products } ) => {
+export const comparisonRows = ( products ) => {
 	const candidates = [];
 
 	products.forEach( ( product ) => {
@@ -108,11 +112,23 @@ const CompareTable = ( { products } ) => {
 		return values.some( ( value ) => value !== values[ 0 ] );
 	};
 
-	const rows = dedupeByLabel( candidates ).sort( ( a, b ) => {
+	return dedupeByLabel( candidates ).sort( ( a, b ) => {
 		const diff = Number( differs( b ) ) - Number( differs( a ) );
 
 		return 0 !== diff ? diff : humanizeFieldLabel( a ).localeCompare( humanizeFieldLabel( b ) );
 	} );
+};
+
+/**
+ * Side-by-side attribute comparison of the assistant's products. The rows are
+ * the union of the products' own `source` fields (minus the ones shown in the
+ * header), so it adapts to whatever the site indexes — no fixed schema.
+ *
+ * @param {Object}        props
+ * @param {Array<Object>} props.products Assistant hits ({ id, source }).
+ */
+const CompareTable = ( { products } ) => {
+	const rows = comparisonRows( products );
 
 	return (
 		<div className="whsc-compare">

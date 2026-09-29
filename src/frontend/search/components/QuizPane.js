@@ -43,6 +43,12 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	const [ error, setError ] = useState( '' );
 
 	const abortRef = useRef( null );
+	// The heading of whichever step is on screen - the question, or the results.
+	const stepHeadingRef = useRef( null );
+	// Bumped when the visitor moves the quiz on (answers, goes back, starts
+	// over). Opening the tab is not one of those, so focus is never taken from
+	// the tab strip just because the quiz loaded.
+	const [ stepMoves, setStepMoves ] = useState( 0 );
 	// The answers the results on screen came from, so another page can be asked
 	// for without walking the quiz again.
 	const appliedTagsRef = useRef( {} );
@@ -89,6 +95,19 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	}, [] );
 
 	useEffect( () => () => abortRef.current?.abort(), [] );
+
+	/*
+	 * Each answer replaces the button that was pressed, so the focus it held has
+	 * nowhere to go: it fell to <body>, a keyboard user had to find their way
+	 * back into the dialog, and a screen reader said nothing about the next
+	 * question. Moving it to the new step's heading reads that step out and
+	 * puts the next Tab on its first answer.
+	 */
+	useEffect( () => {
+		if ( stepMoves > 0 ) {
+			stepHeadingRef.current?.focus();
+		}
+	}, [ stepMoves ] );
 
 	const runFinalSearch = useCallback( async ( finalTags ) => {
 		setIsSearching( true );
@@ -161,6 +180,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			return next;
 		} );
 
+		setStepMoves( ( n ) => n + 1 );
+
 		if ( null === upcoming ) {
 			setQuestion( null );
 			void runFinalSearch( nextTags );
@@ -186,6 +207,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setResults( null );
 		setError( '' );
 		setIsSearching( false );
+		setStepMoves( ( n ) => n + 1 );
 	};
 
 	const restart = () => {
@@ -197,6 +219,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setError( '' );
 		setIsSearching( false );
 		setQuestion( quiz ? firstQuestion( quiz ) : null );
+		setStepMoves( ( n ) => n + 1 );
 	};
 
 	const chooseQuiz = ( chosen ) => {
@@ -206,6 +229,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setTags( {} );
 		setAnswerLabels( {} );
 		setResults( null );
+		setStepMoves( ( n ) => n + 1 );
 	};
 
 	if ( null === quizzes ) {
@@ -221,9 +245,9 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		return (
 			<div className="whsc-quiz">
 				<div className="whsc-quiz__stage">
-					<p className="whsc-quiz__question">
+					<h3 className="whsc-quiz__question">
 						{ __( 'Which one would you like to take?', 'webhead-search-cloud' ) }
-					</p>
+					</h3>
 					<div className="whsc-quiz__options">
 						{ quizzes.map( ( entry, index ) => (
 							<button
@@ -274,7 +298,9 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 						<img className="whsc-quiz__image" src={ question.image } alt="" loading="lazy" />
 					) }
 
-					<p className="whsc-quiz__question">{ question.text }</p>
+					<h3 className="whsc-quiz__question" ref={ stepHeadingRef } tabIndex={ -1 }>
+						{ question.text }
+					</h3>
 
 					<div className="whsc-quiz__options">
 						{ question.options.map( ( option, index ) => (
@@ -294,10 +320,18 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			{ ! question && (
 				<div className="whsc-quiz__results">
 					<div className="whsc-quiz__results-head">
-						<span className="whsc-quiz__results-count">
-							{ isSearching
-								? __( 'Finding your matches…', 'webhead-search-cloud' )
-								: ( hasMore
+						<h3
+							className="whsc-quiz__results-count"
+							ref={ stepHeadingRef }
+							tabIndex={ -1 }
+							// Silent once a search has failed: the alert below says so,
+							// and a count here read out "0 matches" for answers that
+							// were never searched.
+							aria-live={ '' === error ? 'polite' : undefined }
+						>
+							{ isSearching && __( 'Finding your matches…', 'webhead-search-cloud' ) }
+							{ ! isSearching && ! results && __( 'Your matches', 'webhead-search-cloud' ) }
+							{ ! isSearching && results && ( hasMore
 									? sprintf(
 										/* translators: 1: number of matches loaded so far. 2: total number of matches. */
 										__( '%1$d of %2$d matches', 'webhead-search-cloud' ),
@@ -309,7 +343,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 										_n( '%d match', '%d matches', totalMatches, 'webhead-search-cloud' ),
 										totalMatches
 									) ) }
-						</span>
+						</h3>
 						<div className="whsc-quiz__results-actions">
 							{ history.length > 0 && (
 								<button type="button" className="whsc-quiz__back" onClick={ back }>

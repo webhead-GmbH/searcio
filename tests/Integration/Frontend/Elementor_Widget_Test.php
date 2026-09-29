@@ -85,6 +85,24 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		$this->assertContains( 'search', $widget->get_keywords() );
 	}
 
+	/**
+	 * The stock colours are custom properties on the placement's instance
+	 * class: the modal is portalled out of `{{WRAPPER}}`, and the card rule
+	 * outranks any selector that sets `color` directly.
+	 */
+	public function test_card_section_exposes_the_stock_colours_on_the_instance_class(): void {
+		$widget = new Search_Widget();
+
+		foreach ( [ 'card_stock_in_color' => '--whsc-stock-in-color', 'card_stock_out_color' => '--whsc-stock-out-color' ] as $id => $var ) {
+			$control = $widget->get_controls( $id );
+
+			$this->assertIsArray( $control, $id );
+			$this->assertSame( 'color', $control['type'] );
+			$this->assertSame( 'style_cards', $control['section'] );
+			$this->assertSame( [ '.whsc-instance-{{ID}}' => $var . ': {{VALUE}};' ], $control['selectors'] );
+		}
+	}
+
 	public function test_widget_declares_the_shared_runtime_bundle(): void {
 		$widget = new Search_Widget();
 

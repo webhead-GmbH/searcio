@@ -3,6 +3,8 @@
  * effect free so they're unit-testable without a DOM or a mocked `fetch`.
  */
 
+import { __ } from '@wordpress/i18n';
+
 /** Toggle `value` in `list`: drop it if present, otherwise append it. */
 export const toggleSelection = ( list, value ) =>
 	list.includes( value ) ? list.filter( ( item ) => item !== value ) : [ ...list, value ];
@@ -51,11 +53,40 @@ export const buildFilterParams = ( activeFacets, extra = {} ) => {
 };
 
 /**
+ * The fields this plugin's own indexer writes, named in the shop's language.
+ * Humanized from the key they read as English on a German storefront - the
+ * quiz's answer chips, the facet headings and the compare table all said
+ * "Categories" and "Stock status". A merchant's own attribute or custom field
+ * has no name here and is humanized from its key.
+ */
+const KNOWN_FIELD_LABELS = () => ( {
+	categories: __( 'Categories', 'webhead-search-cloud' ),
+	product_tags: __( 'Tags', 'webhead-search-cloud' ),
+	stock_status: __( 'Stock status', 'webhead-search-cloud' ),
+	in_stock: __( 'In stock', 'webhead-search-cloud' ),
+	on_sale: __( 'On sale', 'webhead-search-cloud' ),
+	featured: __( 'Featured', 'webhead-search-cloud' ),
+	sku: __( 'SKU', 'webhead-search-cloud' ),
+	skus: __( 'SKUs', 'webhead-search-cloud' ),
+	price: __( 'Price', 'webhead-search-cloud' ),
+	price_min: __( 'Lowest price', 'webhead-search-cloud' ),
+	price_max: __( 'Highest price', 'webhead-search-cloud' ),
+	product_type: __( 'Product type', 'webhead-search-cloud' ),
+} );
+
+/**
  * "review_count" -> "Review count". Field facets carry no separate
  * human-readable label from the API, so the field name itself is the only
- * thing available for a chip group's heading.
+ * thing available for a chip group's heading - unless it is one of the
+ * plugin's own fields, which have translated names.
  */
 export const humanizeFieldLabel = ( field ) => {
+	const known = KNOWN_FIELD_LABELS()[ String( field || '' ) ];
+
+	if ( known ) {
+		return known;
+	}
+
 	// WooCommerce product attributes reach the index prefixed (`attr_color`,
 	// `pa_size`). The prefix is an indexing detail, not something to show a
 	// shopper — "Attr color" is not a label anyone would write.

@@ -102,6 +102,19 @@ To rebuild it, check the repository out and run `npm install` followed by
 - The storefront search shows a clearly visible keyboard focus ring, and disabled buttons there look disabled.
 - The search icon is announced as "Search" to screen readers even when no placeholder text is set.
 - A link to the General settings tab now opens it instead of the Sync tab, and each setting there shows its name and description once.
+- A photo search shows the photo it is searching with while it works, and keeps it beside the tags it produced.
+- The quiz moves keyboard and screen-reader focus to each new question, and its Back and Start over links sit next to the results they belong to.
+- On a phone, search results now appear above the recent and popular searches instead of below them.
+- The default accent colour now passes contrast wherever it is used as text (text in the accent uses a darker shade of it), and a placement's own accent reaches every part of its modal.
+- Every control in the search modal shows a visible keyboard focus outline, including the mode tabs, which had none.
+- Escape closes the search suggestions without clearing what you typed.
+- Better on small and touch screens: the mode tabs scroll instead of being cut off, the carousel's page dots are easier to tap, and the assistant and price fields no longer make iOS zoom in.
+- The results carousel respects the reduced-motion setting.
+- The "In stock" / "Out of stock" colours on the search modal's product cards can be set in the search block and the Elementor search widget.
+- The AI assistant on a phone: the message field follows the products and stays in view, Compare only appears when there is something to compare, and field names like "Categories" are translated.
+- On a phone the search field shows its whole placeholder, and the photo-search row lines up with its tags.
+- Photo search and typed search no longer get mixed up on screen, and a failed photo search restores the filters.
+- Product-row carousels show their page dots.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.

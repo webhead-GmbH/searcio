@@ -968,6 +968,13 @@ final class Search_Widget extends Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'card_stock_heading',
+			[ 'label' => __( 'Stock status', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->var_color( 'card_stock_in_color', __( 'In stock', 'webhead-search-cloud' ), '--whsc-stock-in-color' );
+		$this->var_color( 'card_stock_out_color', __( 'Out of stock', 'webhead-search-cloud' ), '--whsc-stock-out-color' );
+
 		$this->end_controls_section();
 	}
 

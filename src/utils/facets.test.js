@@ -121,6 +121,24 @@ describe( 'humanizeFieldLabel', () => {
 	} );
 } );
 
+describe( 'humanizeFieldLabel for the plugin\'s own fields', () => {
+	/**
+	 * These go through the translation functions; under Jest that returns the
+	 * English source. Humanized from the key instead they read as English on a
+	 * German storefront - "Categories" on the quiz's answer chips.
+	 */
+	it( 'names the fields the indexer writes', () => {
+		expect( humanizeFieldLabel( 'categories' ) ).toBe( 'Categories' );
+		expect( humanizeFieldLabel( 'product_tags' ) ).toBe( 'Tags' );
+		expect( humanizeFieldLabel( 'skus' ) ).toBe( 'SKUs' );
+		expect( humanizeFieldLabel( 'price_min' ) ).toBe( 'Lowest price' );
+	} );
+
+	it( 'still humanizes a merchant field it has no name for', () => {
+		expect( humanizeFieldLabel( 'attr_material' ) ).toBe( 'Material' );
+	} );
+} );
+
 describe( 'humanizeFieldLabel prefixes', () => {
 	/**
 	 * WooCommerce attributes reach the index prefixed. Showing "Attr color" as a

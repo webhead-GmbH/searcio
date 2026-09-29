@@ -64,6 +64,12 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 		};
 	}, [ items, measure ] );
 
+	// A page of cards gliding past is the kind of motion a visitor who asked for
+	// less of it means; for them the carousel jumps. `auto` defers to the track's
+	// CSS, which drops its own smooth scrolling under the same preference.
+	const scrollBehavior = () =>
+		window.matchMedia?.( '(prefers-reduced-motion: reduce)' ).matches ? 'auto' : 'smooth';
+
 	const scrollByPage = ( direction ) => {
 		const track = trackRef.current;
 
@@ -71,7 +77,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		track.scrollBy( { left: track.clientWidth * 0.9 * direction, behavior: 'smooth' } );
+		track.scrollBy( { left: track.clientWidth * 0.9 * direction, behavior: scrollBehavior() } );
 	};
 
 	const scrollToPage = ( page ) => {
@@ -81,7 +87,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		track.scrollTo( { left: page * track.clientWidth, behavior: 'smooth' } );
+		track.scrollTo( { left: page * track.clientWidth, behavior: scrollBehavior() } );
 	};
 
 	const onKeyDown = ( event ) => {

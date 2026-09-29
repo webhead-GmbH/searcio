@@ -28,6 +28,9 @@ const Suggestions = ( { id, suggestions, onSelect, onDismiss } ) => {
 
 		const onKeyDown = ( event ) => {
 			if ( 'Escape' === event.key ) {
+				// The field is `type="search"`, whose own Escape empties it: without
+				// this, closing the dropdown also threw away the query and its results.
+				event.preventDefault();
 				event.stopPropagation();
 				onDismiss();
 			}

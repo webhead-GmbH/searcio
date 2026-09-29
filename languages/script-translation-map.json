@@ -88,5 +88,8 @@
     ],
     "src/settings/store/provider.js": [
         "public/bundle.settings.js"
+    ],
+    "src/utils/facets.js": [
+        "public/bundle.search.js"
     ]
 }

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { askAssistant } from '../../../utils/api';
-import CompareTable from './CompareTable';
+import { NARROW, useMediaQuery } from '../../../utils/mediaQuery';
+import CompareTable, { comparisonRows } from './CompareTable';
 import Markdown from './markdown';
 import { compareIcon, gridIcon, sendIcon, sparkleIcon } from './icons';
 import { ResultCard } from './templates';
@@ -53,6 +54,11 @@ const Message = ( { role, content } ) => {
  * turns as history. Rendered only when `/storefront-config` reports the plan
  * includes the assistant (see SearchModal).
  *
+ * On a narrow screen the chat and the products stack in one column, and the
+ * message field goes last, under the products it asks about. That order is the
+ * DOM's, not a CSS `order`: reordered visually, Tab from the field jumped back
+ * up into the products it had just passed.
+ *
  * @param {Object}        props
  * @param {string}        [props.cardSource]       Passed through to ResultCard.
  * @param {Array<Object>} [props.serverTemplates]  Passed through to ResultCard.
@@ -66,12 +72,39 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	const threadRef = useRef( null );
 	const abortRef = useRef( null );
 	const lastAttemptRef = useRef( null );
+	const isNarrow = useMediaQuery( NARROW );
+	const inputRef = useRef( null );
+	// Crossing 782px - a phone turned sideways, a window zoomed - moves the
+	// field to its other place, which means a new element. Whether the old one
+	// had focus, and where the caret was, is read while rendering: the old
+	// element is still in the page then, and gone by the time an effect runs.
+	const refocusRef = useRef( null );
+	const field = inputRef.current;
+
+	refocusRef.current = field && field === field.ownerDocument.activeElement
+		? [ field.selectionStart, field.selectionEnd ]
+		: null;
+
+	useLayoutEffect( () => {
+		const caret = refocusRef.current;
+		const input = inputRef.current;
+
+		if ( caret && input && input !== input.ownerDocument.activeElement ) {
+			input.focus();
+			input.setSelectionRange( caret[ 0 ], caret[ 1 ] );
+		}
+	}, [ isNarrow ] );
 
 	// The most recent assistant turn that returned products drives the right pane.
 	const withProducts = [ ...messages ].reverse().find(
 		( message ) => 'assistant' === message.role && ( message.products || [] ).length > 0
 	);
 	const products = withProducts?.products || [];
+	// Offered only when the table would have a row: products that carry just a
+	// title, link, image and price opened a table with a header and no body.
+	const canCompare = products.length >= 2 && comparisonRows( products ).length > 0;
+	// A new product set can have nothing to compare while the toggle was on.
+	const comparing = compare && canCompare;
 
 	// Store-agnostic openers for the empty state. Kept short so all three sit on
 	// one row rather than wrapping into a lopsided 2 + 1.
@@ -134,6 +167,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		}
 
 		setError( '' );
+		setCompare( false );
 		setIsSending( true );
 
 		abortRef.current?.abort();
@@ -165,6 +199,29 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		event.preventDefault();
 		send();
 	};
+
+	const composer = (
+		<form className="whsc-assistant__composer" onSubmit={ onSubmit }>
+			<input
+				ref={ inputRef }
+				type="text"
+				className="whsc-assistant__input"
+				value={ input }
+				maxLength={ MESSAGE_MAX }
+				placeholder={ __( 'Write what you need', 'webhead-search-cloud' ) }
+				aria-label={ __( 'Message the assistant', 'webhead-search-cloud' ) }
+				onChange={ ( event ) => setInput( event.target.value ) }
+				disabled={ isSending }
+			/>
+			<Button
+				type="submit"
+				className="whsc-assistant__send"
+				icon={ sendIcon }
+				label={ __( 'Send', 'webhead-search-cloud' ) }
+				disabled={ isSending || '' === input.trim() }
+			/>
+		</form>
+	);
 
 	return (
 		<div className={ `whsc-assistant${ products.length > 0 ? ' whsc-assistant--split' : '' }` }>
@@ -246,32 +303,14 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 					) }
 				</div>
 
-				<form className="whsc-assistant__composer" onSubmit={ onSubmit }>
-					<input
-						type="text"
-						className="whsc-assistant__input"
-						value={ input }
-						maxLength={ MESSAGE_MAX }
-						placeholder={ __( 'Write what you need', 'webhead-search-cloud' ) }
-						aria-label={ __( 'Message the assistant', 'webhead-search-cloud' ) }
-						onChange={ ( event ) => setInput( event.target.value ) }
-						disabled={ isSending }
-					/>
-					<Button
-						type="submit"
-						className="whsc-assistant__send"
-						icon={ sendIcon }
-						label={ __( 'Send', 'webhead-search-cloud' ) }
-						disabled={ isSending || '' === input.trim() }
-					/>
-				</form>
+				{ ! isNarrow && composer }
 			</div>
 
 			{ products.length > 0 && (
 				<div className="whsc-assistant__results">
 					<div className="whsc-assistant__results-head">
 						<span className="whsc-assistant__results-count">
-							{ compare
+							{ comparing
 								? sprintf(
 									/* translators: %d: number of products being compared. */
 									_n( 'Comparing %d product', 'Comparing %d products', products.length, 'webhead-search-cloud' ),
@@ -283,24 +322,24 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 									products.length
 								) }
 						</span>
-						{ products.length >= 2 && (
+						{ canCompare && (
 							<button
 								type="button"
 								className="whsc-assistant__compare-toggle"
-								aria-pressed={ compare }
+								aria-pressed={ comparing }
 								onClick={ () => setCompare( ( value ) => ! value ) }
 							>
 								<span className="whsc-assistant__compare-icon" aria-hidden="true">
-									{ compare ? gridIcon : compareIcon }
+									{ comparing ? gridIcon : compareIcon }
 								</span>
-								{ compare
+								{ comparing
 									? __( 'Back to list', 'webhead-search-cloud' )
 									: __( 'Compare', 'webhead-search-cloud' ) }
 							</button>
 						) }
 					</div>
 
-					{ compare ? (
+					{ comparing ? (
 						<CompareTable products={ products } />
 					) : (
 						<div className="whsc-assistant__grid">
@@ -316,6 +355,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 					) }
 				</div>
 			) }
+
+			{ isNarrow && composer }
 		</div>
 	);
 };

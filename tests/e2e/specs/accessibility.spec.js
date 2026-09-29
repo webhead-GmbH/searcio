@@ -67,6 +67,65 @@ test.describe( 'Accessibility', () => {
 		expect( focusOutsideHiddenModal ).toBe( true );
 	} );
 
+	/**
+	 * The shared frontend reset takes the outline off every focused
+	 * `[role="tab"]`, and the mode tabs never put one back: Tab landed on them
+	 * with nothing on screen to say so.
+	 */
+	test( 'the mode tabs show where keyboard focus is', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { assistant: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.input.focus();
+		await page.keyboard.press( 'Shift+Tab' );
+
+		const tab = widget.modal.getByRole( 'tab', { name: 'AI Assistant' } );
+		await expect( tab ).toBeFocused();
+		await expect( tab ).toHaveCSS( 'outline-style', 'solid' );
+		await expect( tab ).toHaveCSS( 'outline-width', '2px' );
+	} );
+
+	/**
+	 * Both text fields showed focus with a colour change on a 1px border - the
+	 * search field added an 18% tint that measured 1.2:1. Each now draws the
+	 * same 2px outline as every other control.
+	 */
+	test( 'the search and assistant fields draw a focus outline', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { assistant: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.input.focus();
+
+		const field = widget.modal.locator( '.whsc-search-input' );
+		await expect( field ).toHaveCSS( 'outline-style', 'solid' );
+		await expect( field ).toHaveCSS( 'outline-width', '2px' );
+
+		await widget.openTab( 'AI Assistant' );
+		await widget.modal.getByRole( 'textbox', { name: /message/i } ).focus();
+
+		const composer = widget.modal.locator( '.whsc-assistant__composer' );
+		await expect( composer ).toHaveCSS( 'outline-style', 'solid' );
+		await expect( composer ).toHaveCSS( 'outline-width', '2px' );
+	} );
+
+	/** A tablist holds tabs; the close control sits beside it, not in it. */
+	test( 'keeps the close control out of the tablist', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { assistant: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( 'AI Assistant' );
+
+		const tablist = widget.modal.getByRole( 'tablist', { name: 'Search modes' } );
+		await expect( tablist.getByRole( 'button' ) ).toHaveCount( 0 );
+		await expect( widget.modal.getByRole( 'button', { name: 'Close search' } ) ).toBeVisible();
+	} );
+
 	test( 'the search field is a labelled combobox', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );

@@ -68,6 +68,176 @@ test.describe( 'search by photo', () => {
 		await expect( widget.modal.getByText( 'Red Silk Dress' ) ).toBeVisible();
 	} );
 
+	/**
+	 * A photo search takes seconds, and before this the column kept its
+	 * "Results" heading over a skeleton with nothing saying which photo it was
+	 * about - or that one had been taken at all.
+	 */
+	test( 'shows the photo it is searching with, and keeps it beside the results', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { visualSearch: true, visualDelay: 1500 } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+
+		const thumbnail = widget.modal.getByRole( 'img', { name: 'Your photo' } );
+
+		await expect( widget.resultsHeading ).toHaveText( 'Looking at your photo…' );
+		await expect( thumbnail ).toBeVisible();
+
+		await expect( widget.cards ).toHaveCount( 1 );
+		await expect( thumbnail ).toBeVisible();
+		// The tags belong to this search, so they sit in its column, beside the
+		// photo they came from - not above the recent searches, pushing them down.
+		await expect( widget.modal.locator( '.whsc-browse__main .whsc-visual-query .whsc-visual-tag' ) ).toHaveText( [ 'red', 'silk', 'dress' ] );
+	} );
+
+	/**
+	 * Centred, the photo floated beside the middle of four wrapped rows of tags
+	 * on a phone. It lines up with the first row; a single row stays centred.
+	 */
+	test( 'lines the photo up with the first row of tags', async ( { page, requestUtils } ) => {
+		await page.setViewportSize( { width: 320, height: 640 } );
+		await mockSearchCloud( page, {
+			visualSearch: true,
+			visualTags: [ 'hoodie', 'light blue', 'cotton', 'graphic print', 'casual', 'youth', 'streetwear', 'daily wear', 'relaxed fit' ],
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+		await expect( widget.photoTags.first() ).toBeVisible();
+
+		const photoBox = await widget.modal.locator( '.whsc-visual-query__photo' ).boundingBox();
+		const tagsBox = await widget.modal.locator( '.whsc-visual-tags' ).boundingBox();
+
+		expect( tagsBox.height ).toBeGreaterThan( photoBox.height );
+		expect( Math.abs( tagsBox.y - photoBox.y ) ).toBeLessThanOrEqual( 2 );
+	} );
+
+	/**
+	 * A file that is not an image can still get a response (the server read it
+	 * differently); the thumbnail then fails to load and hides itself. The
+	 * frontend reset draws every image as a block, which outranked `hidden`.
+	 */
+	test( 'hides a thumbnail the browser cannot draw', async ( { page, requestUtils } ) => {
+		const notAnImage = path.join( path.dirname( photo ), 'not-an-image.png' );
+		fs.writeFileSync( notAnImage, 'this is not an image' );
+
+		await mockSearchCloud( page, { visualSearch: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( notAnImage );
+
+		await expect( widget.photoTags.first() ).toBeVisible();
+		await expect( widget.modal.locator( '.whsc-visual-query__photo' ) ).toBeHidden();
+	} );
+
+	/** The hidden flag a failed thumbnail set stayed on the reused element. */
+	test( 'shows the next photo after one that could not be drawn', async ( { page, requestUtils } ) => {
+		const notAnImage = path.join( path.dirname( photo ), 'not-an-image-2.png' );
+		fs.writeFileSync( notAnImage, 'this is not an image' );
+
+		await mockSearchCloud( page, { visualSearch: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		const thumbnail = widget.modal.locator( '.whsc-visual-query__photo' );
+		await widget.openModal();
+
+		await widget.searchByPhoto( notAnImage );
+		await expect( widget.photoTags.first() ).toBeVisible();
+		await expect( thumbnail ).toBeHidden();
+
+		await widget.searchByPhoto( photo );
+		await expect( widget.photoTags.first() ).toBeVisible();
+		await expect( thumbnail ).toBeVisible();
+	} );
+
+	/**
+	 * A typed search run over a photo's results kept the photo's state until
+	 * its own answer came back, so it was titled, shown and announced as a
+	 * photo search while it ran.
+	 */
+	test( 'a typed search after a photo search is not presented as one', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			visualSearch: true,
+			// Only the typed search is held, so its loading state can be seen.
+			searchDelay: ( url ) => ( url.searchParams.get( 'q' ) ? 1500 : 0 ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+		await expect( widget.photoTags.first() ).toBeVisible();
+
+		await widget.search( 'shoes' );
+
+		await expect( widget.resultsHeading ).toHaveText( 'Results' );
+		await expect( widget.modal.locator( '.whsc-visual-query__photo' ) ).toHaveCount( 0 );
+		await expect( widget.modal.locator( 'p.whsc-visually-hidden[role="status"]' ) ).toHaveText( /^Searching/ );
+	} );
+
+	/**
+	 * The photo search clears the type chips and ranges it cannot use; a failed
+	 * one went back to the highlights without them.
+	 */
+	test( 'a failed photo search brings the type chips back', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			visualSearch: true,
+			visualStatus: 422,
+			facets: { types: [ { value: 'post', count: 3 }, { value: 'page', count: 1 } ] },
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		const chips = widget.modal.locator( '.whsc-facets .whsc-facet' );
+		await widget.openModal();
+		await expect( chips.first() ).toBeVisible();
+
+		await widget.searchByPhoto( photo );
+
+		await expect( widget.modal.locator( '.components-notice' ) ).toBeVisible();
+		await expect( chips.first() ).toBeVisible();
+	} );
+
+	/** An empty submit after a photo search left an empty results column. */
+	test( 'an empty search after a photo search goes back to the highlights', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { visualSearch: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+		await expect( widget.photoTags.first() ).toBeVisible();
+
+		await widget.input.focus();
+		await page.keyboard.press( 'Enter' );
+
+		await expect( widget.resultsHeading ).toHaveText( 'Current highlights' );
+		await expect( widget.modal.locator( '.whsc-visual-query__photo' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'goes back to browsing when the photo cannot be read', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { visualSearch: true, visualStatus: 422 } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+
+		await expect( widget.modal.locator( '.components-notice' ) ).toBeVisible();
+		// No thumbnail of a photo that produced nothing, and no results heading
+		// over an empty column.
+		await expect( widget.modal.getByRole( 'img', { name: 'Your photo' } ) ).toHaveCount( 0 );
+		await expect( widget.resultsHeading ).toHaveText( 'Current highlights' );
+	} );
+
 	test( 'posts the image as multipart with the search key in the query string', async ( { page, requestUtils } ) => {
 		const uploads = [];
 

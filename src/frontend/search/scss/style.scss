@@ -40,7 +40,6 @@
 	--whsc-anim-duration: 0.3s;
 
 	/* Trigger (icon) */
-	--whsc-trigger-icon: var(--whsc-accent);
 	--whsc-trigger-bg: transparent;
 	--whsc-trigger-radius: 8px;
 
@@ -50,11 +49,9 @@
 	--whsc-input-icon: #6b7177;
 	--whsc-input-placeholder: #90969c;
 	--whsc-input-border: #e2e4e7;
-	--whsc-input-border-focus: var(--whsc-accent);
 	--whsc-input-radius: 999px;
 
 	/* Submit button */
-	--whsc-btn-bg: var(--whsc-accent);
 	--whsc-btn-text: #ffffff;
 	--whsc-btn-radius: 999px;
 
@@ -65,23 +62,20 @@
 	/* Voice button (falls back to shared icon vars) */
 	/* Photo search: its own family so it can be themed apart from the mic,
 	 * defaulting to the same neutral icon treatment. */
-	--whsc-visual-color: var(--whsc-icon-color);
 	--whsc-visual-bg: transparent;
 	--whsc-visual-radius: 999px;
+	--whsc-visual-padding: 0px;
 
-	--whsc-voice-color: var(--whsc-icon-color);
 	--whsc-voice-bg: transparent;
 	--whsc-voice-radius: 999px;
 	--whsc-voice-padding: 0px;
 
 	/* Close button */
-	--whsc-close-color: var(--whsc-icon-color);
 	--whsc-close-bg: transparent;
 	--whsc-close-radius: 999px;
 	--whsc-close-padding: 0px;
 
 	/* Clear (input) button */
-	--whsc-clearbtn-color: var(--whsc-icon-color);
 	--whsc-clearbtn-bg: transparent;
 	--whsc-clearbtn-radius: 999px;
 	--whsc-clearbtn-padding: 0px;
@@ -100,9 +94,6 @@
 	--whsc-chip-bg: #f4f5f6;
 	--whsc-chip-text: #1e1e1e;
 	--whsc-chip-border: #e2e4e7;
-	--whsc-chip-bg-hover: var(--whsc-chip-bg);
-	--whsc-chip-text-hover: var(--whsc-accent);
-	--whsc-chip-border-hover: var(--whsc-accent);
 	--whsc-chip-radius: 999px;
 
 	/* Clear all */
@@ -120,8 +111,6 @@
 	--whsc-facet-bg: #f0f1f3;
 	--whsc-facet-text: #3a3f45;
 	--whsc-facet-bg-hover: #e4e6e9;
-	--whsc-facet-text-hover: var(--whsc-text);
-	--whsc-facet-bg-active: var(--whsc-accent);
 	--whsc-facet-text-active: #ffffff;
 	--whsc-facet-count: currentColor;
 	--whsc-facet-radius: 999px;
@@ -134,27 +123,22 @@
 	--whsc-card-padding: 12px;
 	--whsc-card-title: #1e1e1e;
 	--whsc-price-color: #6b7177;
+	/* 5.1:1 and 6.5:1 on the white card. */
+	--whsc-stock-in-color: #2a7d4f;
+	--whsc-stock-out-color: #b02a37;
 
 	/* Carousel */
 	--whsc-arrow-color: #1e1e1e;
 	--whsc-arrow-bg: #ffffff;
 	--whsc-dot-color: #d3d6d9;
-	--whsc-dot-color-active: var(--whsc-accent);
 	--whsc-carousel-gap: 14px;
 
 	/* Search / AI Assistant tab bar */
-	--whsc-tab-text: var(--whsc-text);
-	--whsc-tab-text-active: var(--whsc-accent);
-	--whsc-tab-indicator: var(--whsc-accent);
-	--whsc-tab-border: var(--whsc-panel-border);
 
 	/* AI assistant */
-	--whsc-assistant-accent: var(--whsc-accent);
-	--whsc-assistant-text: var(--whsc-text);
 	--whsc-assistant-input-radius: 999px;
 	--whsc-assistant-muted: #6b7177;
 	--whsc-assistant-divider: #e8e9eb;
-	--whsc-assistant-user-bg: var(--whsc-accent);
 	--whsc-assistant-user-text: #ffffff;
 	--whsc-assistant-row-bg: #fafafb;
 	--whsc-assistant-send-disabled: #d7dade;
@@ -163,16 +147,46 @@
 
 	/* Merchandising banner. Tinted from the accent by default so it reads as the
 	 * store talking, not as an error. */
-	--whsc-banner-bg: rgba(49, 155, 128, 0.1);
-	--whsc-banner-text: var(--whsc-text);
 
 	/* Guided quiz. Defaults borrow the chip family so an unstyled quiz already
 	 * matches the rest of the modal. */
-	--whsc-quiz-question: var(--whsc-text);
-	--whsc-quiz-option-bg: var(--whsc-chip-bg);
-	--whsc-quiz-option-text: var(--whsc-chip-text);
-	--whsc-quiz-option-border: var(--whsc-chip-border);
-	--whsc-quiz-option-radius: var(--whsc-chip-radius);
+}
+
+/*
+ * Tokens that default to another token - the active tab's colour to the
+ * accent, a button's background to its strong shade, an icon button's colour
+ * to the shared icon colour - are not declared anywhere. Each rule that reads
+ * one names the default as its fallback: `var(--whsc-tab-text-active,
+ * var(--whsc-accent-strong))`. A fallback is resolved on the element that uses
+ * it, so it follows that placement's own accent; a value declared on :root
+ * resolves once, there, and was the default green on every placement. A value
+ * someone sets - on the placement, or site-wide on :root or body - is inherited
+ * and wins over the fallback.
+ *
+ * The two shades below are the exception: they are mixed from the accent, so
+ * they are declared on each placement (`:where()` keeps that at zero
+ * specificity) as well as on :root.
+ */
+:root,
+:where([class*='whsc-instance-']) {
+	/* The accent, deepened for text. The accent itself is fine for icons, rings
+	 * and indicators, which need 3:1; as text, or behind white text, the
+	 * default green measured 3.43:1 against the 4.5:1 small text needs. Mixed
+	 * from the accent rather than fixed, so it follows a placement that sets its
+	 * own. */
+	--whsc-accent-strong: var(--whsc-accent);
+	--whsc-assistant-accent-strong: var(--whsc-assistant-accent, var(--whsc-accent));
+}
+
+@supports (color: color-mix(in oklab, red, black)) {
+	:root,
+	:where([class*='whsc-instance-']) {
+		/* 80% keeps it recognisably the accent: the default green lands at
+		 * #22725d, 5.8:1 on white and 5.3:1 on the chip background. */
+		--whsc-accent-strong: color-mix(in oklab, var(--whsc-accent) 80%, #000);
+		/* The same shade of the assistant's own accent, for text drawn in it. */
+		--whsc-assistant-accent-strong: color-mix(in oklab, var(--whsc-assistant-accent, var(--whsc-accent)) 80%, #000);
+	}
 }
 
 /*
@@ -226,7 +240,7 @@
 	width: var(--whsc-trigger-size, 44px);
 	height: var(--whsc-trigger-size, 44px);
 	padding: 0;
-	color: var(--whsc-trigger-icon);
+	color: var(--whsc-trigger-icon, var(--whsc-accent));
 	background: var(--whsc-trigger-bg);
 	border-radius: var(--whsc-trigger-radius);
 	box-shadow: none;
@@ -271,7 +285,7 @@
 	&:hover:not(:disabled),
 	&:focus:not(:disabled),
 	&:active:not(:disabled) {
-		color: var(--whsc-trigger-icon-hover, var(--whsc-trigger-icon));
+		color: var(--whsc-trigger-icon-hover, var(--whsc-trigger-icon, var(--whsc-accent)));
 		background: var(--whsc-trigger-bg-hover, var(--whsc-trigger-bg));
 		box-shadow: none;
 	}
@@ -363,6 +377,15 @@
 	margin: 0 auto;
 	padding: var(--whsc-padding);
 
+	/* `hidden` also makes this box a scroll container, and this box never
+	 * scrolls - the modal's content area does. Anything sticky inside (the
+	 * assistant's message field on a phone) was stuck to this box instead, so
+	 * it sat below the fold rather than pinned to it. `clip` cuts the same
+	 * overflow without becoming a scroll container. */
+	@supports (overflow-x: clip) {
+		overflow-x: clip;
+	}
+
 	> * {
 		min-width: 0;
 	}
@@ -388,12 +411,26 @@
 	 * input shrinks (min-width: 0) instead of the buttons wrapping to a second
 	 * line under the field (which looked broken on phones).
 	 */
+	/* At 320px the field had 64px for text with only the three icon buttons
+	 * beside it - "Suchen ..." did not fit - and with the Search button as
+	 * well it had none at all. The button turns into its icon, a 44px target
+	 * like its neighbours, keeping its name for screen readers. */
 	@media screen and (max-width: 480px) {
 		gap: 4px;
 
-		.whsc-submit-btn.components-button {
-			height: 44px;
-			padding-inline: 14px;
+		// Outranks the hidden default further down, which it precedes.
+		.whsc-submit-btn .whsc-submit-btn__icon {
+			display: block;
+		}
+
+		.whsc-submit-btn__label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
 		}
 	}
 }
@@ -413,9 +450,17 @@
 	padding-inline: 16px;
 	transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
+	@media screen and (max-width: 480px) {
+		padding-inline: 12px;
+	}
+
+	/* An outline, like every other control here: the 18% accent glow this
+	 * used measured 1.2:1 against the modal, leaving a 1px border change as
+	 * the only real signal. */
 	&:focus-within {
-		border-color: var(--whsc-input-border-focus);
-		box-shadow: 0 0 0 3px color-mix(in srgb, var(--whsc-accent) 18%, transparent);
+		border-color: var(--whsc-input-border-focus, var(--whsc-accent));
+		outline: 2px solid var(--whsc-input-border-focus, var(--whsc-accent));
+		outline-offset: 2px;
 	}
 }
 
@@ -424,6 +469,11 @@
 	width: 22px;
 	height: 22px;
 	fill: var(--whsc-input-icon);
+
+	@media screen and (max-width: 480px) {
+		width: 20px;
+		height: 20px;
+	}
 }
 
 /*
@@ -450,6 +500,13 @@
 	padding-block: 13px;
 	padding-inline: 12px;
 	min-width: 0;
+	/* A merchant's placeholder can be longer than any phone row; it ends in
+	 * an ellipsis rather than a hard cut mid-letter. */
+	text-overflow: ellipsis;
+
+	@media screen and (max-width: 480px) {
+		padding-inline: 8px 4px;
+	}
 
 	&::placeholder {
 		color: var(--whsc-input-placeholder);
@@ -471,7 +528,7 @@
 	min-width: 30px;
 	min-height: 30px;
 	padding: var(--whsc-clearbtn-padding);
-	color: var(--whsc-clearbtn-color);
+	color: var(--whsc-clearbtn-color, var(--whsc-icon-color));
 	background: var(--whsc-clearbtn-bg);
 	border-radius: var(--whsc-clearbtn-radius);
 	box-shadow: none;
@@ -479,7 +536,7 @@
 
 	&:hover:not(:disabled),
 	&:focus:not(:disabled) {
-		color: var(--whsc-clearbtn-color-hover, var(--whsc-clearbtn-color));
+		color: var(--whsc-clearbtn-color-hover, var(--whsc-clearbtn-color, var(--whsc-icon-color)));
 		background: var(--whsc-clearbtn-bg-hover, var(--whsc-icon-bg-hover));
 		box-shadow: none;
 	}
@@ -492,18 +549,35 @@
 	flex-shrink: 0;
 	height: 48px;
 	padding-inline: 22px;
-	background: var(--whsc-btn-bg);
+	background: var(--whsc-btn-bg, var(--whsc-accent-strong));
 	color: var(--whsc-btn-text);
 	border-radius: var(--whsc-btn-radius);
 	box-shadow: none;
 	transition: background-color 0.15s ease, color 0.15s ease;
 
+	// Icon-only on a phone (see `.whsc-input-row`): a 44px circle like the
+	// buttons beside it. Here, after the base values, so it wins at the same
+	// specificity - placed in the row's own query it lost to the 48px height.
+	@media screen and (max-width: 480px) {
+		width: 44px;
+		height: 44px;
+		padding: 0;
+		justify-content: center;
+	}
+
 	&:hover:not(:disabled),
 	&:focus:not(:disabled) {
-		background: var(--whsc-btn-bg-hover, var(--whsc-btn-bg));
+		background: var(--whsc-btn-bg-hover, var(--whsc-btn-bg, var(--whsc-accent-strong)));
 		color: var(--whsc-btn-text-hover, var(--whsc-btn-text));
 		box-shadow: none;
 	}
+}
+
+/* Shown only where the button is icon-only (see `.whsc-input-row`). */
+.whsc-modal .whsc-submit-btn__icon {
+	display: none;
+	flex-shrink: 0;
+	fill: currentColor;
 }
 
 .whsc-modal .whsc-voice-btn.components-button,
@@ -517,13 +591,13 @@
 
 .whsc-modal .whsc-voice-btn.components-button {
 	padding: var(--whsc-voice-padding);
-	color: var(--whsc-voice-color);
+	color: var(--whsc-voice-color, var(--whsc-icon-color));
 	background: var(--whsc-voice-bg);
 	border-radius: var(--whsc-voice-radius);
 
 	&:hover:not(:disabled),
 	&:focus:not(:disabled) {
-		color: var(--whsc-voice-color-hover, var(--whsc-voice-color));
+		color: var(--whsc-voice-color-hover, var(--whsc-voice-color, var(--whsc-icon-color)));
 		background: var(--whsc-voice-bg-hover, var(--whsc-icon-bg-hover));
 		box-shadow: none;
 	}
@@ -531,13 +605,13 @@
 
 .whsc-modal .whsc-modal-close.components-button {
 	padding: var(--whsc-close-padding);
-	color: var(--whsc-close-color);
+	color: var(--whsc-close-color, var(--whsc-icon-color));
 	background: var(--whsc-close-bg);
 	border-radius: var(--whsc-close-radius);
 
 	&:hover:not(:disabled),
 	&:focus:not(:disabled) {
-		color: var(--whsc-close-color-hover, var(--whsc-close-color));
+		color: var(--whsc-close-color-hover, var(--whsc-close-color, var(--whsc-icon-color)));
 		background: var(--whsc-close-bg-hover, var(--whsc-icon-bg-hover));
 		box-shadow: none;
 	}
@@ -553,8 +627,9 @@
 	flex-shrink: 0;
 	min-width: 44px;
 	min-height: 44px;
-	padding: 0;
-	color: var(--whsc-visual-color);
+	/* The Elementor padding control writes this; a literal `0` here ignored it. */
+	padding: var(--whsc-visual-padding);
+	color: var(--whsc-visual-color, var(--whsc-icon-color));
 	background: var(--whsc-visual-bg);
 	border-radius: var(--whsc-visual-radius);
 	box-shadow: none;
@@ -562,7 +637,7 @@
 
 	&:hover:not(:disabled),
 	&:focus:not(:disabled) {
-		color: var(--whsc-visual-color-hover, var(--whsc-visual-color));
+		color: var(--whsc-visual-color-hover, var(--whsc-visual-color, var(--whsc-icon-color)));
 		background: var(--whsc-visual-bg-hover, var(--whsc-icon-bg-hover));
 		box-shadow: none;
 	}
@@ -772,11 +847,11 @@
 
 	&:hover:not(.is-active) {
 		background: var(--whsc-facet-bg-hover);
-		color: var(--whsc-facet-text-hover);
+		color: var(--whsc-facet-text-hover, var(--whsc-text));
 	}
 
 	&.is-active {
-		background: var(--whsc-facet-bg-active);
+		background: var(--whsc-facet-bg-active, var(--whsc-accent-strong));
 		color: var(--whsc-facet-text-active);
 	}
 
@@ -844,8 +919,13 @@
 		color: var(--whsc-input-placeholder);
 	}
 
+	// See `.whsc-assistant__input`: smaller text makes iOS zoom in on focus.
+	@media (hover: none) {
+		font-size: 16px;
+	}
+
 	&:focus {
-		border-color: var(--whsc-input-border-focus);
+		border-color: var(--whsc-input-border-focus, var(--whsc-accent));
 		outline: none;
 	}
 
@@ -864,7 +944,7 @@
 	padding: 7px 16px;
 	border: 0;
 	border-radius: var(--whsc-btn-radius);
-	background: var(--whsc-btn-bg);
+	background: var(--whsc-btn-bg, var(--whsc-accent-strong));
 	color: var(--whsc-btn-text);
 	font-size: 13px;
 	font-weight: 500;
@@ -906,31 +986,37 @@
 /* -------------------------------------------------------------------------
  * Browse (empty / results) layout — recent row on top, popular aside + main.
  * ---------------------------------------------------------------------- */
+/* One grid for all three parts, so Browse.js can move the helpers round the
+ * results without the results ever changing parent: recent searches span the
+ * top row, popular searches and the results share the next. */
 .whsc-browse {
-	display: flex;
-	flex-direction: column;
-	gap: var(--whsc-gap);
-	min-width: 0;
-}
-
-.whsc-browse__columns {
 	display: grid;
 	grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
 	gap: var(--whsc-gap);
 	min-width: 0;
 
-	&.whsc-browse__columns--single {
+	&.whsc-browse--single {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
 	@media screen and (max-width: 782px) {
 		grid-template-columns: minmax(0, 1fr);
 	}
+
+	> .whsc-recent {
+		grid-column: 1 / -1;
+	}
 }
 
 .whsc-browse__aside,
 .whsc-browse__main {
 	min-width: 0;
+}
+
+/* Focus lands on the results heading when the helpers move round it (see
+ * Browse.js); it is not a control, so no ring - the same as the quiz's. */
+.whsc-browse__main > .whsc-section-title:focus {
+	outline: none;
 }
 
 /*
@@ -972,6 +1058,9 @@
 	font: inherit;
 	font-size: 12px;
 	font-weight: 500;
+	/* Stated: inherited, the theme's leading set this target's height - 32px
+	 * here, under the 24px minimum with a tighter theme. */
+	line-height: 1.5;
 	text-transform: none;
 	letter-spacing: normal;
 	color: var(--whsc-clear-text);
@@ -984,7 +1073,7 @@
 	}
 
 	&:active {
-		color: var(--whsc-clear-text-active, var(--whsc-accent));
+		color: var(--whsc-clear-text-active, var(--whsc-accent-strong, var(--whsc-accent)));
 	}
 }
 
@@ -1005,7 +1094,7 @@
 
 	&:hover {
 		background: var(--whsc-chip-bg-hover, var(--whsc-chip-bg));
-		border-color: var(--whsc-chip-border-hover, var(--whsc-chip-border));
+		border-color: var(--whsc-chip-border-hover, var(--whsc-accent));
 	}
 }
 
@@ -1044,8 +1133,16 @@
 .whsc-modal .whsc-chip__label:hover,
 .whsc-modal .whsc-chip__label:focus-visible,
 .whsc-modal .whsc-chip__label:active {
-	color: var(--whsc-chip-text-hover, var(--whsc-accent));
+	color: var(--whsc-chip-text-hover, var(--whsc-accent-strong, var(--whsc-accent)));
 	outline: none;
+}
+
+/* A colour change on 13px text was the only sign of keyboard focus. The ring
+ * goes round the whole chip, the thing that reads as one control; the remove
+ * button inside it draws its own. */
+.whsc-modal .whsc-chip:has(.whsc-chip__label:focus-visible) {
+	outline: 2px solid var(--whsc-accent);
+	outline-offset: 2px;
 }
 
 .whsc-modal .whsc-chip__label:disabled {
@@ -1137,9 +1234,16 @@
 .whsc-modal .whsc-popular-item:hover,
 .whsc-modal .whsc-popular-item:focus-visible,
 .whsc-modal .whsc-popular-item:active {
-	color: var(--whsc-popular-text-hover, var(--whsc-accent));
+	color: var(--whsc-popular-text-hover, var(--whsc-accent-strong, var(--whsc-accent)));
 	background: var(--whsc-popular-bg-hover);
 	outline: none;
+}
+
+/* The hover tint alone (1.1:1 on white) was all keyboard focus showed. Inset,
+ * because on wide screens the list scrolls and clips anything outside it. */
+.whsc-modal .whsc-popular-item:focus-visible {
+	outline: 2px solid var(--whsc-accent);
+	outline-offset: -2px;
 }
 
 .whsc-modal .whsc-popular-item:disabled,
@@ -1156,11 +1260,23 @@
  * wins inside the breakpoint.
  */
 @media screen and (max-width: 782px) {
+	/* No height cap here: as chips the list is a few rows, and capped at 168px
+	 * it became a scroll box inside the scrolling modal for the last few
+	 * pixels of its fourth row - a scroll trap on touch. */
 	.whsc-popular-list {
 		flex-direction: row;
 		flex-wrap: wrap;
 		gap: 8px;
-		max-height: 168px;
+		max-height: none;
+		overflow: visible;
+
+		/* The item's `max-width: 100%` is of this box, which otherwise grows
+		 * to fit the text - so a long term never truncated and pushed the row
+		 * sideways instead. */
+		> li {
+			min-width: 0;
+			max-width: 100%;
+		}
 	}
 
 	.whsc-modal .whsc-popular-item,
@@ -1279,50 +1395,64 @@
 
 .whsc-carousel-dots {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: center;
-	gap: 8px;
-	margin-top: 16px;
+	/* Each dot's button supplies its own spacing (see below), so the dots sit
+	 * as far apart as before and the row still starts 16px under the track. */
+	margin-top: 8px;
 }
 
 /*
- * Fixed 8px round dots with box properties pinned across every state so a
- * theme `button`/`button:hover` reset (padding, border, radius) can't turn
- * them square on hover/focus. These also carry `role="tab"` (facets do too,
- * see above), so the same reset conflict applies here.
+ * The visible dot stays 8px, drawn by `::before`; the button around it is a
+ * 24px target. On touch screens the arrows are hidden and these are the only
+ * controls that page the carousel, and at 8px with 16px between centres they
+ * were under the 24px minimum a target needs. Box properties are pinned across
+ * every state so a theme `button`/`button:hover` reset (padding, border,
+ * radius, background) can't reshape them. These also carry `role="tab"`
+ * (facets do too, see above), so the same reset conflict applies here.
  */
-.whsc-modal .whsc-carousel-dot,
-.whsc-modal .whsc-carousel-dot:hover,
-.whsc-modal .whsc-carousel-dot:focus,
-.whsc-modal .whsc-carousel-dot.is-active {
+.whsc-carousel-dot,
+.whsc-carousel-dot:hover,
+.whsc-carousel-dot:focus,
+.whsc-carousel-dot.is-active {
 	appearance: none;
-	width: 8px;
-	height: 8px;
+	position: relative;
+	width: 24px;
+	height: 24px;
 	min-width: 0;
 	padding: 0;
 	margin: 0;
 	border: none;
 	border-radius: 999px;
+	background: transparent;
 	box-shadow: none;
 	cursor: pointer;
 }
 
-.whsc-modal .whsc-carousel-dot {
-	background: var(--whsc-dot-color);
-	transition: background-color 0.15s ease, transform 0.15s ease;
-
-	&:hover {
-		background: var(--whsc-dot-color-active);
+.whsc-carousel-dot {
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 8px;
+		border-radius: 999px;
+		background: var(--whsc-dot-color);
+		transition: background-color 0.15s ease, transform 0.15s ease;
 	}
 
-	&.is-active {
-		background: var(--whsc-dot-color-active);
+	&:hover::before {
+		background: var(--whsc-dot-color-active, var(--whsc-accent));
+	}
+
+	&.is-active::before {
+		background: var(--whsc-dot-color-active, var(--whsc-accent));
 		transform: scale(1.3);
 	}
 
-	/* Same reset-strips-outline gap as `.whsc-facet` above — restore one. */
+	/* Same reset-strips-outline gap as `.whsc-facet` above — restore one,
+	 * drawn round the dot rather than round the whole target. */
 	&:focus-visible {
 		outline: 2px solid var(--whsc-accent);
-		outline-offset: 2px;
+		outline-offset: -3px;
 	}
 }
 
@@ -1397,7 +1527,8 @@
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
 	color: #fff;
-	background: var(--whsc-accent);
+	// White 11px text: on the accent itself it measured 3.43:1.
+	background: var(--whsc-accent-strong, var(--whsc-accent));
 	border-radius: 999px;
 }
 
@@ -1424,7 +1555,9 @@
 	color: var(--whsc-price-color);
 }
 
-/* Price line: current price + optional strikethrough regular + small suffix. */
+/* Price line: current price + optional strikethrough regular + small suffix.
+ * The line height is stated, like the title's: inherited, it was the theme's
+ * body leading (24px here), which set the card's vertical rhythm from outside. */
 .whsc-card__price {
 	display: flex;
 	flex-wrap: wrap;
@@ -1441,35 +1574,39 @@
 	background: none;
 }
 
+/* The muted price colour is already the lightest text that passes (4.8:1 on
+ * white); faded further on top, the old price measured 3.0:1 and the tax
+ * notice 3.7:1. The strike and the smaller size carry the hierarchy. */
 .whsc-card__price-regular {
 	color: var(--whsc-price-color);
 	text-decoration: line-through;
-	opacity: 0.75;
 }
 
 .whsc-card__price-from {
-	font-size: 0.8em;
+	font-size: 12px;
 	color: var(--whsc-price-color);
 }
 
+/* The shop's tax and shipping line - a legal notice in some markets, so it is
+ * sized to be read, not only to be present. */
 .whsc-card__price-suffix {
 	flex-basis: 100%;
-	font-size: 0.72em;
+	font-size: 11px;
 	line-height: 1.3;
 	color: var(--whsc-price-color);
-	opacity: 0.85;
 }
 
 .whsc-card__stock {
 	font-size: 12px;
+	line-height: 1.3;
 	font-weight: 600;
 
 	&.is-in-stock {
-		color: #2a7d4f;
+		color: var(--whsc-stock-in-color);
 	}
 
 	&.is-out-of-stock {
-		color: #b02a37;
+		color: var(--whsc-stock-out-color);
 	}
 }
 
@@ -1532,8 +1669,22 @@
 	.whsc-modal.components-modal__frame {
 		animation: none;
 	}
+
+	// Carousel.js asks for `auto` under this preference, which defers to this.
+	.whsc-carousel-track {
+		scroll-behavior: auto;
+	}
 }
 
+}
+
+/*
+ * Stated at single-class specificity, outside the wrappers, so a placement's
+ * Elementor typography control (`.whsc-instance-{id} .whsc-card__price`) can
+ * still set it; inherited instead, the price took the theme's body leading.
+ */
+.whsc-card__price {
+	line-height: 1.4;
 }
 
 /*
@@ -1578,9 +1729,11 @@
 	30% { transform: translateY(-4px); opacity: 1; }
 }
 
+// The halo is the assistant's own accent rather than the default green; a
+// custom property in a keyframe resolves on the element being animated.
 @keyframes whsc-thinking-pulse {
-	0%, 100% { box-shadow: 0 0 0 0 rgba(49, 155, 128, 0.45); }
-	50% { box-shadow: 0 0 0 5px rgba(49, 155, 128, 0); }
+	0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--whsc-assistant-accent, var(--whsc-accent, #319b80)) 45%, transparent); }
+	50% { box-shadow: 0 0 0 5px transparent; }
 }
 
 /*
@@ -1594,19 +1747,41 @@
 /* --------------------------------------------------------------------------
  * Search / AI Assistant tab bar
  * ------------------------------------------------------------------------ */
+.whsc-modal-tabbar {
+	display: flex;
+	/* The bottom edge, not the centre: the close button that joins the bar on
+	 * the assistant and quiz tabs is taller than a tab, and centred tabs then
+	 * floated half a pixel above the rule their indicator should cover. */
+	align-items: flex-end;
+	gap: 4px;
+	/* The rule is drawn as an inset shadow rather than a border so it sits
+	 * under the tabs: the active tab's indicator covers it without the negative
+	 * margin a scrolling tablist would clip. */
+	box-shadow: inset 0 -1px 0 var(--whsc-tab-border, var(--whsc-panel-border, rgba(0, 0, 0, 0.12)));
+}
+
+/* Scrolls sideways once the labels outgrow the row - three German labels
+ * already do at 320px - instead of cutting the last tab off at the edge. */
 .whsc-modal-tabs {
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	border-bottom: 1px solid var(--whsc-tab-border, var(--whsc-panel-border, rgba(0, 0, 0, 0.12)));
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-x: auto;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 }
 
 .whsc-modal-tab {
 	appearance: none;
+	flex: none;
 	background: none;
 	border: 0;
 	border-bottom: 2px solid transparent;
-	margin-bottom: -1px;
 	padding: 10px 14px;
 	font: inherit;
 	/* Explicit, so the tabs don't inherit the theme's (much larger) body type
@@ -1615,7 +1790,8 @@
 	line-height: 1.4;
 	font-weight: 600;
 	color: var(--whsc-tab-text, var(--whsc-text, inherit));
-	opacity: 0.6;
+	// 0.6 measured 4.42:1 on white with the default text colour.
+	opacity: 0.7;
 	cursor: pointer;
 	transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
@@ -1623,8 +1799,22 @@
 
 	&.is-active {
 		opacity: 1;
-		color: var(--whsc-tab-text-active, var(--whsc-accent, #2563eb));
+		color: var(--whsc-tab-text-active, var(--whsc-accent-strong, var(--whsc-accent, #2563eb)));
 		border-bottom-color: var(--whsc-tab-indicator, var(--whsc-accent, #2563eb));
+	}
+
+	/* The shared frontend reset removes the outline from every
+	 * `[role="tab"]:focus-visible`, which left these tabs with no focus
+	 * indicator at all. Inset, because the scrolling tablist clips anything
+	 * drawn outside the tab. */
+	&:focus-visible {
+		opacity: 1;
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: -4px;
+	}
+
+	@media screen and (max-width: 480px) {
+		padding-inline: 10px;
 	}
 }
 
@@ -1678,8 +1868,8 @@
 	margin: 0 auto;
 
 	@media screen and (max-width: 782px) {
-		/* Lets the thread, results and composer order themselves in one column
-		 * so the composer stays last (see the `order`s below). */
+		/* Lets the thread, results and composer sit in one column, in the
+		 * order AiAssistant.js renders them there: composer last. */
 		display: contents;
 	}
 }
@@ -1704,7 +1894,6 @@
 	padding-right: 6px;
 
 	@media screen and (max-width: 782px) {
-		order: 1;
 		max-height: 30vh;
 		padding-right: 0;
 	}
@@ -1749,7 +1938,7 @@
 
 	&:hover {
 		border-color: var(--whsc-chip-border-hover, var(--whsc-accent));
-		color: var(--whsc-chip-text-hover, var(--whsc-accent));
+		color: var(--whsc-chip-text-hover, var(--whsc-accent-strong, var(--whsc-accent)));
 	}
 
 	&:focus-visible {
@@ -1826,7 +2015,8 @@
 	background-image: linear-gradient(
 		100deg,
 		var(--whsc-assistant-muted, #6b7177) 30%,
-		var(--whsc-assistant-accent, var(--whsc-accent, #2563eb)) 50%,
+		// The raw accent is 3.4:1 as text; the shine peaks on its strong shade.
+		var(--whsc-assistant-accent-strong, var(--whsc-accent-strong, var(--whsc-accent, #2563eb))) 50%,
 		var(--whsc-assistant-muted, #6b7177) 70%
 	);
 	background-size: 220% 100%;
@@ -1880,7 +2070,7 @@
  * prefix with it, so `.x &` would compile to `.x [root] .whsc-…` and never
  * match. */
 .whsc-assistant__msg--user .whsc-assistant__bubble {
-	background: var(--whsc-assistant-user-bg, var(--whsc-accent, #2563eb));
+	background: var(--whsc-assistant-user-bg, var(--whsc-accent-strong, var(--whsc-accent, #2563eb)));
 	color: var(--whsc-assistant-user-text, #fff);
 	/* Flattened corner points the bubble at its own side of the thread. */
 	border-bottom-right-radius: 5px;
@@ -1943,14 +2133,17 @@
 	background: var(--whsc-input-bg, #fff);
 	transition: border-color 0.15s ease;
 
+	/* The border colour alone was the focus signal - 1px. An outline, as on
+	 * the search field. */
 	&:focus-within {
 		border-color: var(--whsc-input-border-focus, var(--whsc-accent, #2563eb));
+		outline: 2px solid var(--whsc-input-border-focus, var(--whsc-accent, #2563eb));
+		outline-offset: 2px;
 	}
 
 	@media screen and (max-width: 782px) {
 		/* Last in the column, but pinned to the bottom of the scrollport so it
 		 * stays reachable while scrolling the results above it. */
-		order: 3;
 		position: sticky;
 		bottom: 0;
 		z-index: 2;
@@ -1970,6 +2163,12 @@
 	color: var(--whsc-input-text, inherit);
 
 	&::placeholder { color: var(--whsc-input-placeholder, rgba(0, 0, 0, 0.5)); }
+
+	/* Under 16px, iOS Safari zooms the page in when the field takes focus and
+	 * leaves it zoomed; the search field is 16px for the same reason. */
+	@media (hover: none) {
+		font-size: 16px;
+	}
 }
 
 /* Filled circle: a bare glyph read as decoration rather than the send control. */
@@ -1986,7 +2185,7 @@
 	min-height: 36px;
 	padding: 0;
 	border-radius: 50%;
-	background: var(--whsc-btn-bg, var(--whsc-accent, #2563eb));
+	background: var(--whsc-btn-bg, var(--whsc-accent-strong, var(--whsc-accent, #2563eb)));
 	color: var(--whsc-btn-text, #fff);
 	transition: background-color 0.15s ease, transform 0.15s ease;
 
@@ -2024,7 +2223,6 @@
 	border-left: 1px solid var(--whsc-assistant-divider, #e8e9eb);
 
 	@media screen and (max-width: 782px) {
-		order: 2;
 		flex: 1 1 auto;
 		/* Capped so the thread, the results and the composer all stay within
 		 * roughly one screen — otherwise four full-width cards push the input
@@ -2070,7 +2268,7 @@
 
 	&:hover {
 		border-color: var(--whsc-accent, #2563eb);
-		color: var(--whsc-accent, #2563eb);
+		color: var(--whsc-accent-strong, var(--whsc-accent, #2563eb));
 	}
 
 	svg { width: 15px; height: 15px; }
@@ -2185,7 +2383,8 @@
 	text-decoration: none;
 	color: inherit;
 
-	&:hover .whsc-compare__title { color: var(--whsc-accent, #2563eb); }
+	// Text on the accent itself measured 3.43:1; the strong shade is the text one.
+	&:hover .whsc-compare__title { color: var(--whsc-accent-strong, var(--whsc-accent, #2563eb)); }
 }
 
 .whsc-compare__image {
@@ -2284,18 +2483,56 @@
 	line-height: 1.4;
 	font-weight: 600;
 	border-radius: var(--whsc-card-radius, 10px);
-	background: var(--whsc-banner-bg);
+	background: var(--whsc-banner-bg, rgba(49, 155, 128, 0.1));
 	color: var(--whsc-banner-text, var(--whsc-text, inherit));
+
+	// A tint of the placement's own accent where the browser can mix one.
+	@supports (color: color-mix(in srgb, red, blue)) {
+		background: var(--whsc-banner-bg, color-mix(in srgb, var(--whsc-accent) 10%, transparent));
+	}
 }
 
 /* --------------------------------------------------------------------------
  * What the vision model saw in an uploaded photo
  * ------------------------------------------------------------------------ */
+/* The photo a search was run with, and what the model read from it. It sits
+ * at the head of the results column - arriving above the recent searches, it
+ * pushed them down the moment the response came in. */
+/* The photo lines up with the first row of tags. Centred, it floated beside
+ * the middle of four wrapped rows on a phone; a single row still sits centred
+ * against it, because the tags box is at least as tall as the photo. */
+.whsc-visual-query {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+.whsc-visual-query__photo {
+	flex: none;
+	width: 48px;
+	height: 48px;
+	object-fit: cover;
+	border-radius: var(--whsc-card-radius, 12px);
+	border: 1px solid var(--whsc-card-border, #e8e9eb);
+	background: var(--whsc-input-bg, #f4f5f6);
+
+	/* The reset makes every image `display: block`, which outranks the
+	 * browser's own `[hidden]` rule - a photo that fails to load was hidden
+	 * in the DOM and still drawn as a broken image. */
+	&[hidden] {
+		display: none;
+	}
+}
+
 .whsc-visual-tags {
 	display: flex;
 	align-items: center;
+	align-content: center;
 	flex-wrap: wrap;
 	gap: 8px;
+	min-width: 0;
+	min-height: 48px;
 }
 
 .whsc-visual-tags__label {
@@ -2303,7 +2540,8 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	opacity: 0.6;
+	// At 0.6 the default text composited to about 4.4:1 - under 4.5 for 12px.
+	opacity: 0.75;
 	color: var(--whsc-text, inherit);
 }
 
@@ -2373,12 +2611,21 @@
 	padding: 0;
 	font: inherit;
 	font-size: 13px;
-	color: var(--whsc-accent, #2563eb);
+	// 13px link text: on the accent itself it measured 3.43:1.
+	color: var(--whsc-accent-strong, var(--whsc-accent, #2563eb));
 	cursor: pointer;
 	text-decoration: underline;
 	text-underline-offset: 2px;
 
-	&:hover { opacity: 0.8; }
+	// Heavier underline rather than fading: at 0.8 opacity the link measured
+	// 3.81:1 while the pointer was over it.
+	&:hover { text-decoration-thickness: 2px; }
+
+	// Stated, or the theme's own ring applies - 3px with no offset here.
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: 2px;
+	}
 }
 
 .whsc-quiz__image {
@@ -2389,12 +2636,27 @@
 	object-fit: cover;
 }
 
+// The question and the results count are the step's headings, and a theme's
+// heading styles apply to whatever these rules leave unset - this storefront
+// sets a serif, spaced heading face - so the family, spacing and case are
+// stated rather than inherited from `h3`.
 .whsc-quiz__question {
 	margin: 0;
+	font-family: inherit;
 	font-size: 20px;
 	line-height: 1.35;
 	font-weight: 600;
+	letter-spacing: normal;
+	text-transform: none;
 	color: var(--whsc-quiz-question, var(--whsc-text, inherit));
+}
+
+// Focus lands on these when the quiz moves on, so the next step is read out.
+// They are not controls, and a ring around a heading reads as something to
+// click; the answer buttons keep theirs.
+.whsc-quiz__question:focus,
+.whsc-quiz__results-count:focus {
+	outline: none;
 }
 
 .whsc-quiz__options {
@@ -2428,7 +2690,7 @@
 	 * a normal colour never leaves the hover state overriding it. */
 	&:hover {
 		border-color: var(--whsc-quiz-option-border-hover, var(--whsc-chip-border-hover, var(--whsc-accent)));
-		color: var(--whsc-quiz-option-text-hover, var(--whsc-chip-text-hover, var(--whsc-accent)));
+		color: var(--whsc-quiz-option-text-hover, var(--whsc-chip-text-hover, var(--whsc-accent-strong, var(--whsc-accent))));
 		background: var(--whsc-quiz-option-bg-hover, var(--whsc-quiz-option-bg, var(--whsc-chip-bg, #f4f5f6)));
 	}
 
@@ -2445,17 +2707,25 @@
 	width: 100%;
 }
 
+// The actions sit beside the count rather than at the far edge: across a
+// full-width modal "Back" ended up a thousand pixels from the "nothing
+// matched - go back a step" message it is the answer to.
 .whsc-quiz__results-head {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
+	justify-content: flex-start;
+	gap: 12px 20px;
 	flex-wrap: wrap;
 }
 
 .whsc-quiz__results-count {
+	margin: 0;
+	font-family: inherit;
 	font-size: 14px;
+	line-height: 1.4;
 	font-weight: 600;
+	letter-spacing: normal;
+	text-transform: none;
 	color: var(--whsc-text, inherit);
 }
 
@@ -2488,8 +2758,9 @@
 	color: var(--whsc-chip-text, inherit);
 }
 
+// 0.6 measured 4.29:1 on the chip background.
 .whsc-quiz__answer-field {
-	opacity: 0.6;
+	opacity: 0.75;
 }
 
 .whsc-quiz__answer-value {
