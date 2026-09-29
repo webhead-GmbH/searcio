@@ -30,7 +30,9 @@ final class Sync_Keys {
 	/**
 	 * Pruning snapshots (PLAN §5.3). `SNAPSHOT` is the set of document ids known
 	 * to be in the index after the last completed full run; `SEEN` accumulates the
-	 * ids kept during the in-progress run so it stays resumable across ticks.
+	 * ids kept during the in-progress run so it stays resumable across ticks. The
+	 * prune phase also treats every post carrying {@see self::META_DOC_HASH} as
+	 * indexed, because the incremental drain pushes documents no snapshot names.
 	 */
 	public const OPTION_SNAPSHOT = 'webhead_search_cloud_index_snapshot';
 	public const OPTION_SEEN     = 'webhead_search_cloud_sync_seen';

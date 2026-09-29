@@ -109,10 +109,14 @@ abstract class Integration_Test_Case extends WP_UnitTestCase {
 
 	/**
 	 * Enable a single post type for indexing so sync has something to do.
+	 * `$block` overrides parts of that type's mapping, such as
+	 * `include_private`.
+	 *
+	 * @param  array<string,mixed>  $block
 	 */
-	protected function enable_indexing( string $post_type = 'post' ): void {
+	protected function enable_indexing( string $post_type = 'post', array $block = [] ): void {
 		$this->service( 'index_config' )->save(
-			[ $post_type => [ 'enabled' => true ] ]
+			[ $post_type => array_merge( [ 'enabled' => true ], $block ) ]
 		);
 	}
 

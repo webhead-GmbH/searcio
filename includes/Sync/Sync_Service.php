@@ -509,19 +509,19 @@ final class Sync_Service {
 	/* --------------------------------------------------------------------- */
 
 	/**
-	 * Ids present in the previous snapshot but not seen this run no longer
-	 * exist, or are no longer indexable.
+	 * A document this site put in the index that was not seen this run no
+	 * longer exists, or is no longer indexable. Two records say what was put
+	 * there. The sync meta on each post is written by the incremental drain as
+	 * well as by full syncs, so it covers documents no full sync ever pushed,
+	 * which the snapshot does not name. The snapshot of the last completed run
+	 * still names documents whose posts have since been deleted outright,
+	 * taking their meta with them.
 	 */
 	private function begin_prune(): void {
-		$snapshot = $this->read_ids( Sync_Keys::OPTION_SNAPSHOT );
-		$seen     = array_fill_keys( $this->read_ids( Sync_Keys::OPTION_SEEN ), true );
+		$seen    = array_fill_keys( $this->read_ids( Sync_Keys::OPTION_SEEN ), true );
+		$indexed = array_merge( $this->read_ids( Sync_Keys::OPTION_SNAPSHOT ), $this->dirty->indexed_document_ids() );
 
-		$to_delete = array_values(
-			array_filter(
-				$snapshot,
-				static fn( string $doc_id ): bool => ! isset( $seen[ $doc_id ] )
-			)
-		);
+		$to_delete = array_keys( array_diff_key( array_fill_keys( $indexed, true ), $seen ) );
 
 		update_option( Sync_Keys::OPTION_PRUNE, $to_delete, false );
 	}

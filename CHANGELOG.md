@@ -3,6 +3,7 @@
 ## 1.0.5
 
 - The search service moved from `search.webhead.dev` to `https://searcio.com`. The address lives in a single constant, so every request the plugin makes - server-side syncing and the search, assistant and click tracking a visitor's browser sends - follows it. The wordpress.org external-services disclosure and the docs name the new address. Nothing is stored per host, so existing keys keep working and no rebuild of the JavaScript is needed.
+- A full sync now removes every document this site put in the index that is no longer indexable, whichever sync pushed it. The clean-up only knew about documents the last completed full sync had pushed, so a post first indexed by the incremental sync after an edit, and later taken out of the catalogue without being saved again, stayed searchable until someone next saved it. That covers changing the product mapping or "only visible products", turning on WooCommerce's "Hide out of stock items", disabling a language or a content type, and a status written straight to the database. A forced re-sync did not remove it either. The clean-up now also reads the per-post sync record both syncs write. That record also lets a full sync retry a removal the incremental sync could not complete, as long as the post itself still exists (in the trash, say).
 
 ## 1.0.4
 

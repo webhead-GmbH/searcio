@@ -74,6 +74,7 @@ To rebuild it, check the repository out and run `npm install` followed by
 
 = 1.0.5 =
 - The search service moved to a new address, https://searcio.com. Nothing to do on your side; your existing keys keep working.
+- Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.
