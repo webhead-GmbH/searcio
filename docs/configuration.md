@@ -17,6 +17,7 @@ Per content type (WordPress post types, and WooCommerce products if active):
 - **Extra fields** — send additional data under a name you choose, from a custom field, taxonomy, or built-in property.
 - **Options** — include a short excerpt; also index private/password-protected items.
 - For WooCommerce products specifically: price, regular/sale price, SKU, variation SKUs, stock status, categories, tags, average rating, review count, and any selected product attributes (sent as `attr_{name}`).
+- **Only index published, visible products** (WooCommerce, on by default) — index a product only when WooCommerce's own search would list it: catalog visibility "Shop and search results" or "Search results only". "Shop only" and "Hidden" products are left out, and so are out-of-stock products when WooCommerce is set to hide them from the catalog. Private products follow the private option above.
 
 Changes here take effect on the next sync, not retroactively — run a sync (or wait for the next scheduled one) after changing indexing configuration.
 

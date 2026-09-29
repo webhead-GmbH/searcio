@@ -98,6 +98,8 @@ The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Frontend/
   }, 10, 2 );
   ```
 
+- **`woocommerce_product_is_visible`** — WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs — WP-Cron, WP-CLI or REST — so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
+
 ## Testing
 
 There are two PHP suites, the JS unit suite, and a Playwright end-to-end suite:
