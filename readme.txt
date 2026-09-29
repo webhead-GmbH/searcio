@@ -92,6 +92,7 @@ To rebuild it, check the repository out and run `npm install` followed by
 - Fixed a failed search-as-you-type keystroke navigating the shopper away mid-word.
 - Fixed saving Search Config deleting ranking boosts for content types this site does not index.
 - Fixed a switch left on after a plan downgrade blocking every other Search Config save.
+- Fixed WooCommerce products set to "Search results only" being left out of the search index while "Shop only" products were included. Private products are now indexed when the private option is on. The next sync corrects the index; no forced re-sync is needed.
 - New: filter results by price (and any other numeric field you use as a facet) with a minimum and a maximum.
 - New: a Load more button. Results were locked to the first page of twenty, with no way to reach the rest.
 - New: the Connection tab shows what your plan has used this month - searches, documents, AI messages, photo searches - and marks anything near or past its limit.

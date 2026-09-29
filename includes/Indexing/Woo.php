@@ -28,6 +28,12 @@ final class Woo {
 	public const POST_TYPE         = 'product';
 	public const CATEGORY_TAXONOMY = 'product_cat';
 
+	/**
+	 * "Shop and search results" and "Search results only". "Shop only" and
+	 * "Hidden" are excluded from WooCommerce's own search.
+	 */
+	private const SEARCHABLE_VISIBILITIES = [ 'visible', 'search' ];
+
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
 	}
@@ -80,6 +86,31 @@ final class Woo {
 		return $out;
 	}
 
+	/**
+	 * Whether a product may appear in search results: the question
+	 * WooCommerce's own search answers, not the one `WC_Product::is_visible()`
+	 * answers.
+	 *
+	 * `is_visible()` settles "Search results only" and "Shop only" with
+	 * `is_search()`, which is always false where a sync runs (WP-Cron, WP-CLI,
+	 * REST), so it would index shop-only products and drop search-only ones.
+	 * Catalog visibility is read directly instead. Of the other checks
+	 * `is_visible()` makes:
+	 *
+	 * - Post status is not checked. Whether a private product is indexed is
+	 *   the mapping's `include_private` decision, made by the caller, and
+	 *   WooCommerce's check also asks whether the current user can edit the
+	 *   product, which would make the answer depend on who triggered the sync.
+	 * - "Hide out of stock items from the catalog" applies, because WooCommerce
+	 *   applies it to its search results too.
+	 * - A product whose parent is not published is left out, as WooCommerce
+	 *   hides it from shoppers. Only variations have a parent, and they reach
+	 *   the index through their parent, so this matters only if one is passed.
+	 * - The `woocommerce_product_is_visible` filter still runs, so an extension
+	 *   that hides products from shoppers keeps them out of search as well.
+	 *   Its callbacks run in the sync's context: there is no search query, and
+	 *   usually no logged-in user.
+	 */
 	public function is_visible_product( WP_Post $post ): bool {
 		if ( ! $this->is_active() ) {
 			return false;
@@ -91,7 +122,19 @@ final class Woo {
 			return false;
 		}
 
-		return $product->is_visible();
+		$visible = in_array( $product->get_catalog_visibility(), self::SEARCHABLE_VISIBILITIES, true );
+
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) && ! $product->is_in_stock() ) {
+			$visible = false;
+		}
+
+		$parent_id = (int) $product->get_parent_id();
+
+		if ( $parent_id > 0 && 'publish' !== get_post_status( $parent_id ) ) {
+			$visible = false;
+		}
+
+		return (bool) apply_filters( 'woocommerce_product_is_visible', $visible, $product->get_id() );
 	}
 
 	/**

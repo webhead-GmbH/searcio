@@ -195,23 +195,121 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertEqualsCanonicalizing( [ 'TS-S', 'TS-L' ], $fields['skus'] );
 	}
 
-	public function test_is_visible_product(): void {
-		$visible = new WC_Product_Simple();
-		$visible->set_name( 'On the shelf' );
-		$visible->set_regular_price( '5' );
-		$visible->set_catalog_visibility( 'visible' );
-		$visible->set_status( 'publish' );
-		$visible->save();
+	/**
+	 * @return array<string,array{0:string,1:bool}>
+	 */
+	public static function catalog_visibility_provider(): array {
+		return [
+			'shop and search results' => [ 'visible', true ],
+			'search results only'     => [ 'search', true ],
+			'shop only'               => [ 'catalog', false ],
+			'hidden'                  => [ 'hidden', false ],
+		];
+	}
 
-		$hidden = new WC_Product_Simple();
-		$hidden->set_name( 'Hidden' );
-		$hidden->set_regular_price( '5' );
-		$hidden->set_catalog_visibility( 'hidden' );
-		$hidden->set_status( 'publish' );
-		$hidden->save();
+	/**
+	 * Sync runs from WP-Cron, WP-CLI and REST, where `is_search()` is false,
+	 * so asking WooCommerce's `is_visible()` would index "Shop only" products
+	 * and drop "Search results only" ones.
+	 *
+	 * @dataProvider catalog_visibility_provider
+	 */
+	public function test_is_visible_product( string $visibility, bool $expected ): void {
+		$this->assertFalse( is_search() );
 
-		$this->assertTrue( $this->woo->is_visible_product( get_post( $visible->get_id() ) ) );
-		$this->assertFalse( $this->woo->is_visible_product( get_post( $hidden->get_id() ) ) );
+		$product = $this->product( $visibility );
+
+		$this->assertSame( $expected, $this->woo->is_visible_product( get_post( $product->get_id() ) ) );
+	}
+
+	public function test_out_of_stock_products_are_not_visible_when_the_store_hides_them(): void {
+		$product = $this->product( 'search', 'outofstock' );
+		$post    = get_post( $product->get_id() );
+
+		update_option( 'woocommerce_hide_out_of_stock_items', 'no' );
+		$this->assertTrue( $this->woo->is_visible_product( $post ) );
+
+		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
+		$this->assertFalse( $this->woo->is_visible_product( $post ) );
+		$this->assertTrue( $this->woo->is_visible_product( get_post( $this->product( 'search' )->get_id() ) ) );
+	}
+
+	public function test_the_woocommerce_visibility_filter_can_hide_a_product(): void {
+		$product = $this->product( 'visible' );
+
+		add_filter(
+			'woocommerce_product_is_visible',
+			static fn( bool $visible, int $id ): bool => $visible && $id !== $product->get_id(),
+			10,
+			2
+		);
+
+		$this->assertFalse( $this->woo->is_visible_product( get_post( $product->get_id() ) ) );
+		$this->assertTrue( $this->woo->is_visible_product( get_post( $this->product( 'visible' )->get_id() ) ) );
+	}
+
+	public function test_a_variation_follows_its_parents_visibility_and_status(): void {
+		$parent = new WC_Product_Variable();
+		$parent->set_name( 'Parent' );
+		$parent->set_catalog_visibility( 'search' );
+		$parent->set_status( 'draft' );
+		$parent->save();
+
+		$variation = new WC_Product_Variation();
+		$variation->set_parent_id( $parent->get_id() );
+		$variation->set_regular_price( '5' );
+		$variation->save();
+
+		$post = get_post( $variation->get_id() );
+
+		$this->assertFalse( $this->woo->is_visible_product( $post ), 'A variation under a draft parent was visible.' );
+
+		$parent->set_status( 'publish' );
+		$parent->save();
+
+		$this->assertTrue( $this->woo->is_visible_product( $post ) );
+	}
+
+	/**
+	 * The default mapping has `only_visible` on, so this is the path every
+	 * product takes during a sync.
+	 */
+	public function test_document_builder_indexes_search_only_products_and_skips_shop_only_ones(): void {
+		$this->enable_indexing( 'product' );
+
+		/** @var Document_Builder $builder */
+		$builder = $this->service( 'document_builder' );
+
+		$this->assertIsArray( $builder->build( get_post( $this->product( 'search' )->get_id() ) ) );
+		$this->assertNull( $builder->build( get_post( $this->product( 'catalog' )->get_id() ) ) );
+	}
+
+	/**
+	 * Whether a private product is indexed is the mapping's call. WooCommerce's
+	 * own check also asks whether the current user can edit the product, which
+	 * would make the answer depend on who happened to trigger the sync.
+	 */
+	public function test_a_private_product_is_indexable_regardless_of_who_runs_the_sync(): void {
+		$this->service( 'index_config' )->save(
+			[
+				'product' => [
+					'enabled'         => true,
+					'include_private' => true,
+				],
+			]
+		);
+
+		$product = $this->product( 'visible', 'instock', 'private' );
+		$post    = get_post( $product->get_id() );
+
+		/** @var Document_Builder $builder */
+		$builder = $this->service( 'document_builder' );
+
+		wp_set_current_user( 0 );
+		$this->assertTrue( $builder->is_indexable( $post ), 'A private product was not indexable from WP-Cron.' );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+		$this->assertTrue( $builder->is_indexable( $post ) );
 	}
 
 	public function test_returns_no_fields_for_a_non_product_post(): void {
@@ -247,5 +345,17 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertSame( 'Indexed Product', $document['title'] );
 		$this->assertSame( 42.0, $document['price'] );
 		$this->assertSame( 'IDX-42', $document['sku'] );
+	}
+
+	private function product( string $visibility, string $stock_status = 'instock', string $status = 'publish' ): WC_Product_Simple {
+		$product = new WC_Product_Simple();
+		$product->set_name( ucfirst( $visibility ) . ' product' );
+		$product->set_regular_price( '5' );
+		$product->set_catalog_visibility( $visibility );
+		$product->set_stock_status( $stock_status );
+		$product->set_status( $status );
+		$product->save();
+
+		return $product;
 	}
 }

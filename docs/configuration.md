@@ -19,6 +19,7 @@ Per content type (WordPress post types, and WooCommerce products if active):
 - For WooCommerce products specifically: price, regular/sale price, SKU, variation SKUs, stock status, categories, tags, average rating, review count, and any selected product attributes (sent as `attr_{name}`).
   - **Categories** are sent as names under `categories`, and each product carries every parent of its categories too: a product filed under *Shoes › Sneakers* is sent as `["Sneakers", "Shoes"]`. So `filter[categories]=Shoes`, a quiz answer or a merchandising rule naming *Shoes* matches everything under it, as WooCommerce's own category archive does.
   - Category, tag and attribute names are sent as typed. WordPress stores `&`, `<` and `>` in a term name as HTML entities; they are decoded first, so a filter value is the name a shopper sees (`Vergaser & Ansaugung`, not `Vergaser &amp; Ansaugung`).
+- **Only index published, visible products** (WooCommerce, on by default) — index a product only when WooCommerce's own search would list it: catalog visibility "Shop and search results" or "Search results only". "Shop only" and "Hidden" products are left out, and so are out-of-stock products when WooCommerce is set to hide them from the catalog. Private products follow the private option above.
 
 Changes here take effect on the next sync, not retroactively — run a sync (or wait for the next scheduled one) after changing indexing configuration.
 
