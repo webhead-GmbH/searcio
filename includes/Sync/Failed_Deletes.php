@@ -6,12 +6,15 @@
  * the last completed run and from the sync meta on each post. A post deleted
  * outright takes its meta with it, and a document only the incremental drain
  * ever pushed is in no snapshot, so once the drain's delete for such a post
- * fails, neither record names the document any more. This list does, until a
- * delete succeeds: the prune phase reads it and retries on every full sync.
+ * fails, neither record names the document any more. The same happens when
+ * the prune phase's own delete is refused for a document only the snapshot
+ * named, because the run then writes a snapshot of what it saw. This list
+ * names both, until a delete succeeds: the prune phase reads it and retries
+ * on every full sync.
  *
  * It is a per-site option, like the rest of the sync state, so each site of a
- * network keeps its own. It only grows by deletes that failed, so it stays
- * small; nothing is written while it has nothing to change.
+ * network keeps its own. It only grows by deletes the index refused, and
+ * nothing is written while it has nothing to change.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH

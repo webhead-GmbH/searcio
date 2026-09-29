@@ -517,8 +517,10 @@ final class Sync_Service {
 	 * which the snapshot does not name. The snapshot of the last completed run
 	 * still names documents whose posts have since been deleted outright,
 	 * taking their meta with them. {@see Failed_Deletes} names the documents
-	 * whose delete the drain could not complete, which covers a post deleted
-	 * outright that only the drain ever pushed: neither other record names it.
+	 * whose delete the drain or an earlier prune could not complete, which
+	 * covers a post deleted outright that only the drain ever pushed, and one
+	 * whose refused prune dropped it from the snapshot: no other record names
+	 * either.
 	 */
 	private function begin_prune(): void {
 		$seen    = array_fill_keys( $this->read_ids( Sync_Keys::OPTION_SEEN ), true );
@@ -550,6 +552,7 @@ final class Sync_Service {
 		$remaining = array_slice( $queue, count( $slice ) );
 		$done      = 0;
 		$removed   = [];
+		$refused   = [];
 
 		foreach ( $slice as $doc_id ) {
 			// Each delete is its own request, so the deadline is checked per
@@ -580,6 +583,7 @@ final class Sync_Service {
 			 * The queue still advances — one unusable document must not wedge
 			 * the run behind it forever.
 			 */
+			$refused[] = $doc_id;
 			$counters['failed_count']++;
 
 			if ( null === $error ) {
@@ -592,8 +596,16 @@ final class Sync_Service {
 			}
 		}
 
-		// Only a removed document leaves the list of refused deletes; one the
-		// index refused again stays on it for the next full sync.
+		/*
+		 * A refused document goes on the list of refused deletes so the next
+		 * full sync retries it: when only the snapshot named it (a post deleted
+		 * outright whose type is no longer indexed, so the change listener
+		 * queued nothing), complete() will replace that snapshot with what
+		 * this run saw. A removed document leaves the list. The list is
+		 * written before the queue advances, so a tick that dies in between
+		 * sends the slice again rather than losing a refusal.
+		 */
+		$this->failed_deletes->add( $refused );
 		$this->failed_deletes->forget( $removed );
 		update_option( Sync_Keys::OPTION_PRUNE, $remaining, false );
 

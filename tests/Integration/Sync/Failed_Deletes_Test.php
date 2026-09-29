@@ -2,9 +2,10 @@
 /**
  * The list of deletes the index refused.
  *
- * The incremental drain adds to it and the full sync's prune phase reads it,
- * so these tests pin that adding and forgetting are idempotent, that an empty
- * list leaves no option behind, and that each site of a network keeps its own.
+ * The incremental drain and the full sync's prune phase add to it and the
+ * prune phase reads it, so these tests pin that adding and forgetting are
+ * idempotent, that an empty list leaves no option behind, and that each site
+ * of a network keeps its own.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH

@@ -384,6 +384,65 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * The change listener ignores a post type that is no longer indexed, so a
+	 * post of that type deleted outright queues no delete for the drain, and
+	 * its sync meta goes with it: only the last full sync's snapshot still
+	 * names the document. A full sync writes a new snapshot of what it saw, so
+	 * when the index refuses that prune, the next full sync still has to retry
+	 * it rather than forget the document for good.
+	 */
+	public function test_a_full_sync_retries_a_refused_prune_of_a_document_only_the_snapshot_names(): void {
+		$this->connect_client();
+		$this->service( 'index_config' )->save(
+			[
+				'post' => [ 'enabled' => true ],
+				'page' => [ 'enabled' => true ],
+			]
+		);
+		$this->fake_index();
+
+		$page_id = self::factory()->post->create( [ 'post_type' => 'page', 'post_status' => 'publish' ] );
+		$this->run_full_sync();
+		// On a real site the upsert the listener queued for the new page was drained long ago.
+		$this->service( 'incremental_service' )->drain();
+
+		$this->service( 'index_config' )->save(
+			[
+				'post' => [ 'enabled' => true ],
+				'page' => [ 'enabled' => false ],
+			]
+		);
+		wp_delete_post( $page_id, true );
+		$this->assertSame( 0, $this->service( 'change_queue_table' )->pending_count(), 'No delete may be queued for the drain.' );
+		$this->assertSame( [], $this->failed_deletes()->ids() );
+
+		$this->delete_status = 403;
+		$refused             = $this->run_full_sync();
+
+		$this->assertSame( [ 'page-' . $page_id ], $this->delete_requests );
+		$this->assertSame( 1, (int) $refused['failed_count'] );
+
+		$this->delete_requests = [];
+		$this->run_full_sync();
+
+		$this->assertSame( [ 'page-' . $page_id ], $this->delete_requests, 'A prune the index refused must be retried by the next full sync.' );
+		$this->assertSame( [ 'page-' . $page_id ], $this->failed_deletes()->ids(), 'Refused again, the document stays listed once.' );
+
+		$this->delete_status   = 200;
+		$this->delete_requests = [];
+		$accepted              = $this->run_full_sync();
+
+		$this->assertSame( [ 'page-' . $page_id ], $this->delete_requests );
+		$this->assertSame( 1, (int) $accepted['deleted'] );
+		$this->assertSame( [], $this->failed_deletes()->ids() );
+
+		$this->delete_requests = [];
+		$this->run_full_sync();
+
+		$this->assertSame( [], $this->delete_requests, 'A document the index removed must not be deleted again.' );
+	}
+
+	/**
 	 * One document the index keeps refusing must not hold up the drain: its
 	 * change leaves the queue along with the rest of the batch, and the other
 	 * changes in that batch go through.
