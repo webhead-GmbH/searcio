@@ -888,8 +888,10 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
-	color: var(--whsc-title-color);
-	opacity: 0.7;
+	color: var(--whsc-facet-group-label, var(--whsc-title-color));
+	// Softens the section title colour it borrows; a colour chosen for the
+	// label itself is used as chosen (the widget sets this to 1 with it).
+	opacity: var(--whsc-facet-group-label-opacity, 0.7);
 }
 
 /*
@@ -1348,14 +1350,14 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 40px;
-	height: 40px;
-	min-width: 40px;
+	width: var(--whsc-arrow-size, 40px);
+	height: var(--whsc-arrow-size, 40px);
+	min-width: var(--whsc-arrow-size, 40px);
 	padding: 0;
 	color: var(--whsc-arrow-color);
 	background: var(--whsc-arrow-bg);
-	border-radius: 999px;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+	border-radius: var(--whsc-arrow-radius, 999px);
+	box-shadow: var(--whsc-arrow-shadow, 0 2px 10px rgba(0, 0, 0, 0.18));
 	transition: opacity 0.15s ease, background-color 0.15s ease;
 
 	&.whsc-carousel-arrow--prev {
@@ -1373,10 +1375,10 @@
 	&:hover:not(:disabled),
 	&:focus:not(:disabled),
 	&:active:not(:disabled) {
-		color: var(--whsc-arrow-color);
-		background: var(--whsc-arrow-bg);
-		border-radius: 999px;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+		color: var(--whsc-arrow-color-hover, var(--whsc-arrow-color));
+		background: var(--whsc-arrow-bg-hover, var(--whsc-arrow-bg));
+		border-radius: var(--whsc-arrow-radius, 999px);
+		box-shadow: var(--whsc-arrow-shadow, 0 2px 10px rgba(0, 0, 0, 0.18));
 	}
 
 	&:disabled {

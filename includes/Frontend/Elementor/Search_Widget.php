@@ -640,7 +640,7 @@ final class Search_Widget extends Widget_Base {
 			'section_title_note',
 			[
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => __( 'Headings such as "Recent searches", each filter group\'s name and the results count.', 'webhead-search-cloud' ),
+				'raw'             => __( 'Headings such as "Recent searches", "Popular searches" and the results count. Filter group names have their own, under Filters.', 'webhead-search-cloud' ),
 				'content_classes' => 'elementor-descriptor',
 			]
 		);
@@ -1023,6 +1023,35 @@ final class Search_Widget extends Widget_Base {
 			]
 		);
 
+		$this->add_control(
+			'facet_group_heading',
+			[ 'label' => __( 'Group names', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->add_control(
+			'facet_group_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'The small title above each group of filters, such as "Categories" or "Price".', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
+		);
+		// By default the label is the section title colour at 70% opacity; a
+		// colour picked for it is used as picked, so the opacity goes with it.
+		$this->var_color(
+			'facet_group_color',
+			__( 'Color', 'webhead-search-cloud' ),
+			'--whsc-facet-group-label',
+			[ 'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-facet-group-label: {{VALUE}}; --whsc-facet-group-label-opacity: 1;' ] ]
+		);
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name'     => 'facet_group_typography',
+				'label'    => __( 'Typography', 'webhead-search-cloud' ),
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-facet-group__label' ),
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -1251,8 +1280,35 @@ final class Search_Widget extends Widget_Base {
 			[ 'description' => __( 'How wide each result card is, and so how many fit side by side. Set it per device with the responsive switch.', 'webhead-search-cloud' ) ]
 		);
 		$this->var_slider( 'carousel_gap', __( 'Spacing between items', 'webhead-search-cloud' ), '--whsc-carousel-gap', 0, 48, true );
-		$this->var_color( 'arrow_color', __( 'Arrow color', 'webhead-search-cloud' ), '--whsc-arrow-color', [ 'separator' => 'before' ] );
+		$this->add_control(
+			'arrow_heading',
+			[ 'label' => __( 'Arrows', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->start_controls_tabs( 'arrow_tabs' );
+		$this->start_controls_tab( 'arrow_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'arrow_color', __( 'Arrow color', 'webhead-search-cloud' ), '--whsc-arrow-color' );
 		$this->var_color( 'arrow_bg', __( 'Arrow background', 'webhead-search-cloud' ), '--whsc-arrow-bg' );
+		$this->end_controls_tab();
+		$this->start_controls_tab( 'arrow_hover', [ 'label' => __( 'Hover', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'arrow_color_hover', __( 'Arrow color', 'webhead-search-cloud' ), '--whsc-arrow-color-hover' );
+		$this->var_color( 'arrow_bg_hover', __( 'Arrow background', 'webhead-search-cloud' ), '--whsc-arrow-bg-hover' );
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+		$this->var_slider( 'arrow_size', __( 'Arrow size', 'webhead-search-cloud' ), '--whsc-arrow-size', 24, 64, true, [ 'separator' => 'before' ] );
+		$this->var_slider( 'arrow_radius', __( 'Arrow radius', 'webhead-search-cloud' ), '--whsc-arrow-radius', 0, 999 );
+		$this->add_control(
+			'arrow_shadow',
+			[
+				'label'     => __( 'Arrow shadow', 'webhead-search-cloud' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => [
+					''     => __( 'Soft (default)', 'webhead-search-cloud' ),
+					'none' => __( 'None', 'webhead-search-cloud' ),
+				],
+				'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-arrow-shadow: {{VALUE}};' ],
+			]
+		);
 		$this->var_color( 'dot_color', __( 'Dot color', 'webhead-search-cloud' ), '--whsc-dot-color', [ 'separator' => 'before' ] );
 		$this->var_color( 'dot_color_active', __( 'Dot color (active)', 'webhead-search-cloud' ), '--whsc-dot-color-active' );
 
