@@ -856,10 +856,8 @@
 	}
 
 	/*
-	 * The shared reset deliberately strips the default outline from
-	 * `[role="tab"]:focus-visible` (it assumes a DataViews-style tab strip
-	 * supplies its own focus treatment elsewhere), which left keyboard users
-	 * with no visible focus indicator here at all — restore one.
+	 * The shared reset rings a `[role="tab"]` in the admin theme colour; here it
+	 * takes the placement's accent, like every other control in the modal.
 	 */
 	&:focus-visible {
 		outline: 2px solid var(--whsc-accent);
@@ -1448,8 +1446,8 @@
 		transform: scale(1.3);
 	}
 
-	/* Same reset-strips-outline gap as `.whsc-facet` above — restore one,
-	 * drawn round the dot rather than round the whole target. */
+	/* In the placement's accent, like `.whsc-facet` above, and drawn round the
+	 * dot rather than round the whole target. */
 	&:focus-visible {
 		outline: 2px solid var(--whsc-accent);
 		outline-offset: -3px;
@@ -1803,10 +1801,9 @@
 		border-bottom-color: var(--whsc-tab-indicator, var(--whsc-accent, #2563eb));
 	}
 
-	/* The shared frontend reset removes the outline from every
-	 * `[role="tab"]:focus-visible`, which left these tabs with no focus
-	 * indicator at all. Inset, because the scrolling tablist clips anything
-	 * drawn outside the tab. */
+	/* In the placement's accent, like every other control in the modal, where
+	 * the shared reset's tab ring uses the admin theme colour. Inset, because
+	 * the scrolling tablist clips anything drawn outside the tab. */
 	&:focus-visible {
 		opacity: 1;
 		outline: 2px solid var(--whsc-accent, #2563eb);

@@ -198,8 +198,16 @@ body:has([data-webhead-frontend-root]) {
 	display: none;
 }
 
+// Keyboard focus has to stay visible (WCAG 2.4.7 Focus Visible). This rule read
+// `outline: none`, which took away the ring the global `:focus-visible` rule at
+// the end of this file gives every other control in a frontend root and put
+// nothing in its place: a keyboard user tabbing through a tablist saw no
+// indication of where they were. The ring is drawn inside the tab — a negative
+// offset — so the tablist's own overflow cannot clip it and it cannot overlap
+// the neighbouring tab, which is what an outline offset outwards does here.
 [data-webhead-frontend-root][data-webhead-frontend-root] [role='tab']:focus-visible {
-	outline: none;
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-admin-theme-color);
+	outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
 }
 
 [data-webhead-frontend-root][data-webhead-frontend-root] :is(
