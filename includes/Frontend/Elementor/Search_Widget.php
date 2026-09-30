@@ -615,8 +615,35 @@ final class Search_Widget extends Widget_Base {
 		);
 
 		$this->var_slider( 'modal_radius', __( 'Corner radius', 'webhead-search-cloud' ), '--whsc-radius-panel', 0, 40, false, [ 'separator' => 'before' ] );
+		// Docked to the top edge, rounded top corners would only show a gap, so
+		// by default the radius rounds the bottom two.
+		$this->add_control(
+			'modal_round_top',
+			[
+				'label'        => __( 'Round the top corners too', 'webhead-search-cloud' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'selectors'    => [ '.whsc-instance-{{ID}}' => '--whsc-radius-panel-top: var(--whsc-radius-panel);' ],
+				'description'  => __( 'For a modal set down from the top of the screen.', 'webhead-search-cloud' ),
+			]
+		);
 		$this->var_slider( 'modal_padding', __( 'Padding', 'webhead-search-cloud' ), '--whsc-padding', 0, 80, true );
 		$this->var_slider( 'modal_gap', __( 'Section spacing', 'webhead-search-cloud' ), '--whsc-gap', 0, 80, true );
+
+		$this->add_responsive_control(
+			'modal_width',
+			[
+				'label'       => __( 'Modal width', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => [ 'px', '%', 'vw' ],
+				'range'       => [ 'px' => [ 'min' => 320, 'max' => 1920 ], '%' => [ 'min' => 30, 'max' => 100 ], 'vw' => [ 'min' => 30, 'max' => 100 ] ],
+				'separator'   => 'before',
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-modal-width: {{SIZE}}{{UNIT}};' ],
+				'description' => __( 'Leave empty for a full-width modal docked to the top of the screen. A narrower one is centred.', 'webhead-search-cloud' ),
+			]
+		);
+		$this->var_slider( 'modal_offset', __( 'Distance from top', 'webhead-search-cloud' ), '--whsc-modal-offset', 0, 200, true );
 
 		// The modal spans the viewport; this caps the content inside it, so on a
 		// wide screen it can line up with the site's own container.
@@ -1228,6 +1255,19 @@ final class Search_Widget extends Widget_Base {
 				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__title' ),
 			]
 		);
+		$this->add_control(
+			'card_title_lines',
+			[
+				'label'       => __( 'Title lines', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::NUMBER,
+				'min'         => 1,
+				'max'         => 5,
+				'step'        => 1,
+				'placeholder' => '2',
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-card-title-lines: {{VALUE}};' ],
+				'description' => __( 'A longer title is cut off with an ellipsis after this many lines, so cards line up.', 'webhead-search-cloud' ),
+			]
+		);
 		$this->var_color( 'card_price_color', __( 'Price / meta color', 'webhead-search-cloud' ), '--whsc-price-color' );
 		// The amount itself is `.whsc-card__price-current`, which sets its own
 		// weight, so a weight set on the price line alone never reached it.
@@ -1252,8 +1292,21 @@ final class Search_Widget extends Widget_Base {
 			'card_stock_heading',
 			[ 'label' => __( 'Stock status', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
 		);
-		$this->var_color( 'card_stock_in_color', __( 'In stock', 'webhead-search-cloud' ), '--whsc-stock-in-color' );
-		$this->var_color( 'card_stock_out_color', __( 'Out of stock', 'webhead-search-cloud' ), '--whsc-stock-out-color' );
+		$this->add_control(
+			'card_stock_display',
+			[
+				'label'     => __( 'Show', 'webhead-search-cloud' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => [
+					''     => __( 'Show (default)', 'webhead-search-cloud' ),
+					'none' => __( 'Hide', 'webhead-search-cloud' ),
+				],
+				'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-card-stock-display: {{VALUE}};' ],
+			]
+		);
+		$this->var_color( 'card_stock_in_color', __( 'In stock', 'webhead-search-cloud' ), '--whsc-stock-in-color', [ 'condition' => [ 'card_stock_display!' => 'none' ] ] );
+		$this->var_color( 'card_stock_out_color', __( 'Out of stock', 'webhead-search-cloud' ), '--whsc-stock-out-color', [ 'condition' => [ 'card_stock_display!' => 'none' ] ] );
 
 		$this->end_controls_section();
 	}

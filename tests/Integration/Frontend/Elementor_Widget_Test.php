@@ -183,6 +183,11 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 			'carousel_card_width'  => '--whsc-card-width: {{SIZE}}{{UNIT}};',
 			'arrow_radius'         => '--whsc-arrow-radius: {{SIZE}}{{UNIT}};',
 			'arrow_shadow'         => '--whsc-arrow-shadow: {{VALUE}};',
+			'modal_width'          => '--whsc-modal-width: {{SIZE}}{{UNIT}};',
+			'modal_offset'         => '--whsc-modal-offset: {{SIZE}}{{UNIT}};',
+			'modal_round_top'      => '--whsc-radius-panel-top: var(--whsc-radius-panel);',
+			'card_title_lines'     => '--whsc-card-title-lines: {{VALUE}};',
+			'card_stock_display'   => '--whsc-card-stock-display: {{VALUE}};',
 		] as $id => $declaration ) {
 			$this->assertSame( [ '.whsc-instance-{{ID}}' => $declaration ], $ids[ $id ]['selectors'], $id );
 		}
@@ -196,7 +201,7 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 
 		// Set per device. Depending on its breakpoint settings Elementor either
 		// duplicates a responsive control per device or flags the one control.
-		foreach ( [ 'carousel_card_width', 'modal_content_width', 'trigger_box_width', 'trigger_align' ] as $id ) {
+		foreach ( [ 'carousel_card_width', 'modal_content_width', 'modal_width', 'modal_offset', 'trigger_box_width', 'trigger_align' ] as $id ) {
 			$this->assertTrue( ! empty( $ids[ $id ]['is_responsive'] ) || isset( $ids[ $id . '_mobile' ] ), $id );
 		}
 	}
