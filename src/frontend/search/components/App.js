@@ -44,6 +44,10 @@ const App = ( { triggerElements, listElements = [] } ) => {
 	// the editor). Editing a Content setting re-renders the widget, which
 	// replaces its trigger element, so this re-runs whenever the set changes.
 	const previewIndex = triggerElements.findIndex( ( el ) => '1' === el.dataset.editorPreview );
+	// The new trigger usually lands at the same index as the one it replaced,
+	// so the index alone would keep the old modal - and its old search term -
+	// mounted. Counting preview openings gives the modal a fresh key instead.
+	const [ previewRun, setPreviewRun ] = useState( 0 );
 
 	useEffect( () => {
 		if ( previewIndex < 0 ) {
@@ -52,6 +56,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 
 		setQuery( triggerElements[ previewIndex ].dataset.editorQuery || '' );
 		setActiveIndex( previewIndex );
+		setPreviewRun( ( run ) => run + 1 );
 	}, [ triggerElements, previewIndex ] );
 
 	const activeEl = null !== activeIndex ? triggerElements[ activeIndex ] : null;
@@ -87,7 +92,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 			) ) }
 			{ activeEl && (
 				<SearchModal
-					key={ activeIndex }
+					key={ `${ activeIndex }-${ previewRun }` }
 					scopeType={ activeEl.dataset.type || '' }
 					placeholder={ activeEl.dataset.placeholder || '' }
 					enableVoice={ '1' === activeEl.dataset.voice }
