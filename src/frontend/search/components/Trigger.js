@@ -1,5 +1,6 @@
 import { Button, SearchControl } from '@wordpress/components';
 import { search } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Hydrates a server-rendered `[data-whsc-trigger]` placeholder with a real
@@ -15,6 +16,11 @@ import { search } from '@wordpress/icons';
  * instant it finished closing.
  */
 const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange } ) => {
+	// An icon button has no text of its own, so its label is its only name. The
+	// placeholder is optional in the block and the widget, and left empty it
+	// rendered `aria-label=""`: a screen reader announced just "button".
+	const name = placeholder || __( 'Search', 'webhead-search-cloud' );
+
 	if ( 'box' === mode ) {
 		return (
 			<SearchControl
@@ -34,8 +40,8 @@ const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange } ) 
 		return (
 			<Button
 				className="whsc-trigger-icon-button"
-				label={ placeholder }
-				showTooltip={ !! placeholder }
+				label={ name }
+				showTooltip
 				onClick={ onOpen }
 			>
 				<span
@@ -51,8 +57,8 @@ const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange } ) 
 		<Button
 			className="whsc-trigger-icon-button"
 			icon={ search }
-			label={ placeholder }
-			showTooltip={ !! placeholder }
+			label={ name }
+			showTooltip
 			onClick={ onOpen }
 		/>
 	);

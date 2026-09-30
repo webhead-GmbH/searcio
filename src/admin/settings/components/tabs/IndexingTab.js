@@ -3,13 +3,10 @@ import {
 	Button,
 	CheckboxControl,
 	Notice,
-	Panel,
-	PanelBody,
 	SelectControl,
-	TextControl,
 	ToggleControl,
 } from '@wordpress/components';
-import {Card, Text} from '@wordpress/ui';
+import { Card, CollapsibleCard, InputControl, Text } from '@wordpress/ui';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -74,7 +71,7 @@ const parseSource = (source) => {
 
 const Section = ({title, description, children}) => (
 	<div className="whsc-section">
-		<Text render={<h4/>} variant="heading-md" className="whsc-section-title">
+		<Text render={<h5/>} variant="heading-sm" className="whsc-section-title">
 			{title}
 		</Text>
 		{description && (
@@ -129,28 +126,24 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 		}
 
 		return (
-			<TextControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
+			<InputControl
 				label={kind === 'taxonomy'
 					? __('Taxonomy slug', 'webhead-search-cloud')
 					: __('Meta key', 'webhead-search-cloud')}
 				placeholder={kind === 'taxonomy' ? 'product_brand' : '_my_field'}
 				value={value}
-				onChange={setValue}
+				onValueChange={setValue}
 			/>
 		);
 	};
 
 	return (
 		<div className="whsc-custom-field-row">
-			<TextControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
+			<InputControl
 				label={__('Send as', 'webhead-search-cloud')}
 				placeholder="brand"
 				value={field.as}
-				onChange={(next) => onChange({...field, as: next})}
+				onValueChange={(next) => onChange({...field, as: next})}
 			/>
 			<SelectControl
 				__next40pxDefaultSize
@@ -293,154 +286,158 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 	};
 
 	return (
-		<PanelBody title={postType.label} initialOpen={Boolean(block.enabled)}>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				className="whsc-enable-toggle"
-				label={sprintf(
-					/* translators: %s: post type label. */
-					__('Add %s to search', 'webhead-search-cloud'),
-					postType.label
-				)}
-				help={sprintf(
-					/* translators: %s: post type label. */
-					__('When on, your %s are sent to Search Cloud and appear in search results.', 'webhead-search-cloud'),
-					postType.label.toLowerCase()
-				)}
-				checked={Boolean(block.enabled)}
-				onChange={(val) => set('enabled', val)}
-			/>
-
-			{block.enabled && (
-				<div className="whsc-post-type-body">
-					<Section
-						title={__('What appears in results', 'webhead-search-cloud')}
-						description={__(
-							'Choose where each part of a search result comes from. The defaults work for most sites.',
-							'webhead-search-cloud'
-						)}
-					>
-						<div className="whsc-fields-grid">
-							<SelectControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={__('Title', 'webhead-search-cloud')}
-								help={__('The main heading of each result. Required.', 'webhead-search-cloud')}
-								value={block.title_source}
-								options={sourceOptions(sources, postType.taxonomies, false)}
-								onChange={(val) => set('title_source', val)}
-							/>
-							<SelectControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={__('Body text', 'webhead-search-cloud')}
-								help={__('The text Search Cloud looks through for matches.', 'webhead-search-cloud')}
-								value={block.content_source}
-								options={sourceOptions(sources, postType.taxonomies, true)}
-								onChange={(val) => set('content_source', val)}
-							/>
-							<SelectControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={__('Result link', 'webhead-search-cloud')}
-								help={__('Where clicking a result takes the visitor.', 'webhead-search-cloud')}
-								value={block.url_source}
-								options={sourceOptions(sources, postType.taxonomies, true)}
-								onChange={(val) => set('url_source', val)}
-							/>
-							<SelectControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={__('Thumbnail image', 'webhead-search-cloud')}
-								help={__('Image shown next to each result.', 'webhead-search-cloud')}
-								value={block.image_source}
-								options={sourceOptions(sources, postType.taxonomies, true)}
-								onChange={(val) => set('image_source', val)}
-							/>
-						</div>
-					</Section>
-
-					<Section title={__('Options', 'webhead-search-cloud')}>
-						<div className="whsc-toggle-grid">
-							<ToggleControl
-								__nextHasNoMarginBottom
-								label={__('Include a short summary (excerpt)', 'webhead-search-cloud')}
-								checked={Boolean(block.include_excerpt)}
-								onChange={(val) => set('include_excerpt', val)}
-							/>
-							<ToggleControl
-								__nextHasNoMarginBottom
-								label={__('Also index private & password-protected items', 'webhead-search-cloud')}
-								help={__('Off by default.', 'webhead-search-cloud')}
-								checked={Boolean(block.include_private)}
-								onChange={(val) => set('include_private', val)}
-							/>
-						</div>
-					</Section>
-
-					{postType.is_product && (
-						<WooSection woo={woo} block={block} onChange={onChange}/>
+		<CollapsibleCard.Root
+			defaultOpen={Boolean(block.enabled)}
+			className="whsc-card whsc-card--dotted whsc-post-type-card"
+		>
+			<CollapsibleCard.Header render={<h4/>}>{postType.label}</CollapsibleCard.Header>
+			<CollapsibleCard.Content className="whsc-post-type-card__content">
+				<ToggleControl
+					__nextHasNoMarginBottom
+					className="whsc-enable-toggle"
+					label={sprintf(
+						/* translators: %s: post type label. */
+						__('Add %s to search', 'webhead-search-cloud'),
+						postType.label
 					)}
+					help={sprintf(
+						/* translators: %s: post type label. */
+						__('When on, your %s are sent to Search Cloud and appear in search results.', 'webhead-search-cloud'),
+						postType.label.toLowerCase()
+					)}
+					checked={Boolean(block.enabled)}
+					onChange={(val) => set('enabled', val)}
+				/>
 
-					<div className="whsc-advanced">
-						<Button
-							variant="link"
-							onClick={() => setShowAdvanced((v) => !v)}
-							aria-expanded={showAdvanced}
+				{block.enabled && (
+					<div className="whsc-post-type-body">
+						<Section
+							title={__('What appears in results', 'webhead-search-cloud')}
+							description={__(
+								'Choose where each part of a search result comes from. The defaults work for most sites.',
+								'webhead-search-cloud'
+							)}
 						>
-							{showAdvanced
-								? __('Hide advanced options', 'webhead-search-cloud')
-								: __('Show advanced options', 'webhead-search-cloud')}
-						</Button>
+							<div className="whsc-fields-grid">
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__('Title', 'webhead-search-cloud')}
+									help={__('The main heading of each result. Required.', 'webhead-search-cloud')}
+									value={block.title_source}
+									options={sourceOptions(sources, postType.taxonomies, false)}
+									onChange={(val) => set('title_source', val)}
+								/>
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__('Body text', 'webhead-search-cloud')}
+									help={__('The text Search Cloud looks through for matches.', 'webhead-search-cloud')}
+									value={block.content_source}
+									options={sourceOptions(sources, postType.taxonomies, true)}
+									onChange={(val) => set('content_source', val)}
+								/>
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__('Result link', 'webhead-search-cloud')}
+									help={__('Where clicking a result takes the visitor.', 'webhead-search-cloud')}
+									value={block.url_source}
+									options={sourceOptions(sources, postType.taxonomies, true)}
+									onChange={(val) => set('url_source', val)}
+								/>
+								<SelectControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={__('Thumbnail image', 'webhead-search-cloud')}
+									help={__('Image shown next to each result.', 'webhead-search-cloud')}
+									value={block.image_source}
+									options={sourceOptions(sources, postType.taxonomies, true)}
+									onChange={(val) => set('image_source', val)}
+								/>
+							</div>
+						</Section>
 
-						{showAdvanced && (
-							<>
-								<Section
-									title={__('Type label', 'webhead-search-cloud')}
-									description={__(
-										'How this content is grouped and filtered in search. Most sites can leave this as the default.',
-										'webhead-search-cloud'
-									)}
-								>
-									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										label={__('Type', 'webhead-search-cloud')}
-										value={block.type || ''}
-										onChange={(val) => set('type', val)}
-									/>
-								</Section>
+						<Section title={__('Options', 'webhead-search-cloud')}>
+							<div className="whsc-toggle-grid">
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={__('Include a short summary (excerpt)', 'webhead-search-cloud')}
+									checked={Boolean(block.include_excerpt)}
+									onChange={(val) => set('include_excerpt', val)}
+								/>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={__('Also index private & password-protected items', 'webhead-search-cloud')}
+									help={__('Off by default.', 'webhead-search-cloud')}
+									checked={Boolean(block.include_private)}
+									onChange={(val) => set('include_private', val)}
+								/>
+							</div>
+						</Section>
 
-								<Section
-									title={__('Extra fields', 'webhead-search-cloud')}
-									description={__(
-										'Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose.',
-										'webhead-search-cloud'
-									)}
-								>
-									{fields.length > 0 && (
-										<div className="whsc-custom-fields">
-											{fields.map((field, index) => (
-												<CustomFieldRow
-													key={index}
-													field={field}
-													taxonomies={postType.taxonomies}
-													onChange={(next) => updateField(index, next)}
-													onRemove={() => removeField(index)}
-												/>
-											))}
-										</div>
-									)}
-									<Button variant="secondary" onClick={addField}>
-										{__('Add a field', 'webhead-search-cloud')}
-									</Button>
-								</Section>
-							</>
+						{postType.is_product && (
+							<WooSection woo={woo} block={block} onChange={onChange}/>
 						)}
+
+						<div className="whsc-advanced">
+							<Button
+								variant="link"
+								onClick={() => setShowAdvanced((v) => !v)}
+								aria-expanded={showAdvanced}
+							>
+								{showAdvanced
+									? __('Hide advanced options', 'webhead-search-cloud')
+									: __('Show advanced options', 'webhead-search-cloud')}
+							</Button>
+
+							{showAdvanced && (
+								<>
+									<Section
+										title={__('Type label', 'webhead-search-cloud')}
+										description={__(
+											'How this content is grouped and filtered in search. Most sites can leave this as the default.',
+											'webhead-search-cloud'
+										)}
+									>
+										<InputControl
+											label={__('Type', 'webhead-search-cloud')}
+											value={block.type || ''}
+											onValueChange={(val) => set('type', val)}
+										/>
+									</Section>
+
+									<Section
+										title={__('Extra fields', 'webhead-search-cloud')}
+										description={__(
+											'Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose.',
+											'webhead-search-cloud'
+										)}
+									>
+										{fields.length > 0 && (
+											<div className="whsc-custom-fields">
+												{fields.map((field, index) => (
+													<CustomFieldRow
+														key={index}
+														field={field}
+														taxonomies={postType.taxonomies}
+														onChange={(next) => updateField(index, next)}
+														onRemove={() => removeField(index)}
+													/>
+												))}
+											</div>
+										)}
+										<Button variant="secondary" onClick={addField}>
+											{__('Add a field', 'webhead-search-cloud')}
+										</Button>
+									</Section>
+								</>
+							)}
+						</div>
 					</div>
-				</div>
-			)}
-		</PanelBody>
+				)}
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
 	);
 };
 
@@ -547,7 +544,7 @@ const IndexingTab = () => {
 					</p>
 				</Notice>
 
-				<Panel className="whsc-panel">
+				<div className="whsc-post-types">
 					{(catalog.post_types || []).map((postType) => (
 						<PostTypeCard
 							key={postType.slug}
@@ -558,7 +555,7 @@ const IndexingTab = () => {
 							onChange={(block) => updateBlock(postType.slug, block)}
 						/>
 					))}
-				</Panel>
+				</div>
 
 				<div className="whsc-save-bar">
 					<Button

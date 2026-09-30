@@ -47,6 +47,29 @@ final class Connection_State {
 	}
 
 	/**
+	 * Open the window in which the public `/verify` route will answer. Called
+	 * when this site asks Search Cloud to connect it, because the ownership
+	 * ping that follows is the only caller that route exists for.
+	 */
+	public function open_verification_window(): void {
+		$this->settings->set( Plugin_Settings::VERIFICATION_OPENED_AT, time() );
+	}
+
+	/**
+	 * Whether a connection attempt started recently enough that the ownership
+	 * ping could still be arriving.
+	 *
+	 * The service dispatches that ping two minutes after provisioning and
+	 * retries with backoff, so an hour is generous; outside it the route has no
+	 * legitimate caller left.
+	 */
+	public function verification_window_is_open( int $ttl = HOUR_IN_SECONDS ): bool {
+		$opened = (int) $this->settings->get( Plugin_Settings::VERIFICATION_OPENED_AT );
+
+		return 0 !== $opened && ( time() - $opened ) < $ttl;
+	}
+
+	/**
 	 * @return array{pending:bool,email:string}
 	 */
 	public function pending_claim(): array {

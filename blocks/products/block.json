@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "webhead-search-cloud/products",
+	"version": "1.1.0",
+	"title": "Search Cloud Products",
+	"category": "widgets",
+	"icon": "screenoptions",
+	"description": "A row of products from webhead Search Cloud: similar products on a product page, or a curated listing on a category page.",
+	"textdomain": "webhead-search-cloud",
+	"editorScript": "file:../../public/bundle.products-block-editor.js",
+	"render": "file:./render.php",
+	"attributes": {
+		"source": { "type": "string", "default": "similar" },
+		"documentId": { "type": "string", "default": "" },
+		"filterField": { "type": "string", "default": "" },
+		"filterValue": { "type": "string", "default": "" },
+		"heading": { "type": "string", "default": "" },
+		"limit": { "type": "number", "default": null },
+		"layout": { "type": "string", "default": "carousel" },
+		"showBanner": { "type": "boolean", "default": true },
+		"cardSource": { "type": "string", "default": "plugin" }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ]
+	}
+}

@@ -56,13 +56,32 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 		const onScroll = () => measure();
 
 		track.addEventListener( 'scroll', onScroll, { passive: true } );
-		window.addEventListener( 'resize', onScroll );
+
+		// The track changes width without the window doing so - the popular
+		// searches column appearing beside it, the modal's layout switching at a
+		// breakpoint, an embedding page resizing its frame - and the last window
+		// `resize` can arrive before the layout has settled. Counted then, the
+		// dots stayed at a narrower track's page count (23 dots for 7 pages).
+		const observer = 'function' === typeof window.ResizeObserver ? new window.ResizeObserver( onScroll ) : null;
+
+		if ( observer ) {
+			observer.observe( track );
+		} else {
+			window.addEventListener( 'resize', onScroll );
+		}
 
 		return () => {
 			track.removeEventListener( 'scroll', onScroll );
+			observer?.disconnect();
 			window.removeEventListener( 'resize', onScroll );
 		};
 	}, [ items, measure ] );
+
+	// A page of cards gliding past is the kind of motion a visitor who asked for
+	// less of it means; for them the carousel jumps. `auto` defers to the track's
+	// CSS, which drops its own smooth scrolling under the same preference.
+	const scrollBehavior = () =>
+		window.matchMedia?.( '(prefers-reduced-motion: reduce)' ).matches ? 'auto' : 'smooth';
 
 	const scrollByPage = ( direction ) => {
 		const track = trackRef.current;
@@ -71,7 +90,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		track.scrollBy( { left: track.clientWidth * 0.9 * direction, behavior: 'smooth' } );
+		track.scrollBy( { left: track.clientWidth * 0.9 * direction, behavior: scrollBehavior() } );
 	};
 
 	const scrollToPage = ( page ) => {
@@ -81,7 +100,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		track.scrollTo( { left: page * track.clientWidth, behavior: 'smooth' } );
+		track.scrollTo( { left: page * track.clientWidth, behavior: scrollBehavior() } );
 	};
 
 	const onKeyDown = ( event ) => {

@@ -74,6 +74,7 @@ final class Sync_Service {
 		private Search_Cloud_Client $client,
 		private Sync_State $state,
 		private Dirty_Tracker $dirty,
+		private Failed_Deletes $failed_deletes,
 		private Jobs_Manager $jobs,
 		private Settings_Manager $settings
 	) {}
@@ -509,19 +510,28 @@ final class Sync_Service {
 	/* --------------------------------------------------------------------- */
 
 	/**
-	 * Ids present in the previous snapshot but not seen this run no longer
-	 * exist, or are no longer indexable.
+	 * A document this site put in the index that was not seen this run no
+	 * longer exists, or is no longer indexable. Three records say what was put
+	 * there. The sync meta on each post is written by the incremental drain as
+	 * well as by full syncs, so it covers documents no full sync ever pushed,
+	 * which the snapshot does not name. The snapshot of the last completed run
+	 * still names documents whose posts have since been deleted outright,
+	 * taking their meta with them. {@see Failed_Deletes} names the documents
+	 * whose delete the drain or an earlier prune could not complete, which
+	 * covers a post deleted outright that only the drain ever pushed, and one
+	 * whose refused prune dropped it from the snapshot: no other record names
+	 * either.
 	 */
 	private function begin_prune(): void {
-		$snapshot = $this->read_ids( Sync_Keys::OPTION_SNAPSHOT );
-		$seen     = array_fill_keys( $this->read_ids( Sync_Keys::OPTION_SEEN ), true );
+		$seen    = array_fill_keys( $this->read_ids( Sync_Keys::OPTION_SEEN ), true );
+		$refused = $this->failed_deletes->ids();
+		$indexed = array_merge( $this->read_ids( Sync_Keys::OPTION_SNAPSHOT ), $this->dirty->indexed_document_ids(), $refused );
 
-		$to_delete = array_values(
-			array_filter(
-				$snapshot,
-				static fn( string $doc_id ): bool => ! isset( $seen[ $doc_id ] )
-			)
-		);
+		$to_delete = array_keys( array_diff_key( array_fill_keys( $indexed, true ), $seen ) );
+
+		// A document this run saw belongs in the index again (a trashed post was
+		// restored), so the delete that failed for it is no longer owed.
+		$this->failed_deletes->forget( array_keys( array_intersect_key( array_fill_keys( $refused, true ), $seen ) ) );
 
 		update_option( Sync_Keys::OPTION_PRUNE, $to_delete, false );
 	}
@@ -541,6 +551,8 @@ final class Sync_Service {
 		$slice     = array_slice( $queue, 0, self::PRUNE_PER_TICK );
 		$remaining = array_slice( $queue, count( $slice ) );
 		$done      = 0;
+		$removed   = [];
+		$refused   = [];
 
 		foreach ( $slice as $doc_id ) {
 			// Each delete is its own request, so the deadline is checked per
@@ -558,6 +570,7 @@ final class Sync_Service {
 			if ( $response->ok() || 404 === $response->status ) {
 				$counters['deleted']++;
 				$this->dirty->clear_for_document( $doc_id );
+				$removed[] = $doc_id;
 
 				continue;
 			}
@@ -570,6 +583,7 @@ final class Sync_Service {
 			 * The queue still advances — one unusable document must not wedge
 			 * the run behind it forever.
 			 */
+			$refused[] = $doc_id;
 			$counters['failed_count']++;
 
 			if ( null === $error ) {
@@ -582,6 +596,17 @@ final class Sync_Service {
 			}
 		}
 
+		/*
+		 * A refused document goes on the list of refused deletes so the next
+		 * full sync retries it: when only the snapshot named it (a post deleted
+		 * outright whose type is no longer indexed, so the change listener
+		 * queued nothing), complete() will replace that snapshot with what
+		 * this run saw. A removed document leaves the list. The list is
+		 * written before the queue advances, so a tick that dies in between
+		 * sends the slice again rather than losing a refusal.
+		 */
+		$this->failed_deletes->add( $refused );
+		$this->failed_deletes->forget( $removed );
 		update_option( Sync_Keys::OPTION_PRUNE, $remaining, false );
 
 		return [] === $remaining;

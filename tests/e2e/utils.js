@@ -51,7 +51,22 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {Array}          [options.popular]     `/search/popular` items ({ query }).
  * @param {Array}          [options.templates]   `/card-templates` templates.
  * @param {number}         [options.searchStatus] Force a non-200 `/search` status.
+ * @param {?number|Function} [options.total]     `/search` total, or a `(URL) => total` function; defaults to the number of hits returned.
+ * @param {boolean}        [options.semanticSearch] Advertise semantic search, which changes what `total` means.
  * @param {Function}       [options.onSearch]    Called with the `/search` request URL.
+ * @param {?string}        [options.banner]      Merchandising banner returned with `/search`.
+ * @param {Array}          [options.similar]     `/search/similar` results.
+ * @param {number}         [options.similarStatus] Force a non-200 `/search/similar` status.
+ * @param {Object}         [options.redirects]   `{term: url}` - a `/search` for an exact
+ *                                               (case-insensitive) match answers with the
+ *                                               redirect shape instead of results.
+ * @param {boolean}        [options.quiz]        Advertise the quiz capability.
+ * @param {Array}          [options.quizzes]     `/quizzes` payload.
+ * @param {boolean}        [options.visualSearch] Advertise the photo-search capability.
+ * @param {Array}          [options.visualTags]  Tags the vision model "saw".
+ * @param {Array}          [options.visualHits]  `/search/visual` hits.
+ * @param {number}         [options.visualStatus] Force a non-200 `/search/visual` status.
+ * @param {number}         [options.visualDelay]  Hold the `/search/visual` answer this many ms.
  */
 export async function mockSearchCloud( page, options = {} ) {
 	const {
@@ -62,6 +77,10 @@ export async function mockSearchCloud( page, options = {} ) {
 		templates = [],
 		searchStatus = 200,
 		searchId = 'search-e2e',
+		total = null,
+		banner = null,
+		similar = [],
+		similarStatus = 200,
 		assistant = false,
 		assistantReply = 'Here are a few options.',
 		assistantProducts = [],
@@ -69,6 +88,16 @@ export async function mockSearchCloud( page, options = {} ) {
 		assistantDelay = 0,
 		onAssistant,
 		onSearch,
+		searchDelay = 0,
+		redirects = {},
+		quiz = false,
+		quizzes = [],
+		visualSearch = false,
+		semanticSearch = false,
+		visualTags = [ 'red', 'silk', 'dress' ],
+		visualHits = [ postHit( { title: 'Red Silk Dress', type: 'product' }, 'visual-1' ) ],
+		visualStatus = 200,
+		visualDelay = 0,
 	} = options;
 
 	await page.route( '**/api/v1/**', async ( route ) => {
@@ -82,7 +111,37 @@ export async function mockSearchCloud( page, options = {} ) {
 		const json = ( body, status = 200 ) => route.fulfill( { status, headers: CORS, body: JSON.stringify( body ) } );
 
 		if ( '/storefront-config' === path ) {
-			return json( { capabilities: { assistant, semantic_search: false }, facets: [], languages: [] } );
+			return json( {
+				capabilities: { assistant, semantic_search: semanticSearch, quiz, visual_search: visualSearch },
+				facets: [],
+				languages: [],
+			} );
+		}
+		if ( '/search/similar' === path ) {
+			if ( 200 !== similarStatus ) {
+				return json( {}, similarStatus );
+			}
+
+			return json( { similar } );
+		}
+		if ( '/quizzes' === path ) {
+			return json( { quizzes } );
+		}
+		if ( '/search/visual' === path ) {
+			if ( visualDelay > 0 ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, visualDelay ) );
+			}
+			if ( 200 !== visualStatus ) {
+				return json( {}, visualStatus );
+			}
+
+			return json( {
+				query: visualTags.join( ' ' ) || null,
+				tags: visualTags,
+				total: visualHits.length,
+				hits: visualHits,
+				facets: {},
+			} );
 		}
 		if ( '/assistant' === path ) {
 			// `onAssistant` returns the status for this call, so a spec can fail
@@ -106,8 +165,33 @@ export async function mockSearchCloud( page, options = {} ) {
 			if ( 200 !== searchStatus ) {
 				return json( {}, searchStatus );
 			}
+			// Holding one search open is how a spec gets two of them in flight
+			// at once - a function form so it can delay, say, only page two.
+			const held = 'function' === typeof searchDelay ? searchDelay( url ) : searchDelay;
+
+			if ( held > 0 ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, held ) );
+			}
+			// A configured redirect replaces the whole response: no hits, no
+			// total, no facets - matched exactly, ignoring case and padding.
+			const term = ( url.searchParams.get( 'q' ) || '' ).trim().toLowerCase();
+			const target = redirects[ term ];
+
+			if ( target ) {
+				return json( { query: term, redirect: target } );
+			}
 			const list = 'function' === typeof hits ? hits( url ) : hits;
-			return json( { search_id: searchId, hits: list, total: list.length, facets } );
+			// A real `total` is what the index matched, which is only the same as
+			// the page's length when everything fits on one page.
+			return json( {
+				search_id: searchId,
+				hits: list,
+				total: null === total ? list.length : ( 'function' === typeof total ? total( url ) : total ),
+				page: Number( url.searchParams.get( 'page' ) || 1 ),
+				per_page: Number( url.searchParams.get( 'per_page' ) || 20 ),
+				facets,
+				banner,
+			} );
 		}
 		if ( '/search/click' === path ) {
 			return json( { recorded: true }, 202 );
@@ -199,8 +283,20 @@ function wpEvalFile( file, ...args ) {
 }
 
 export function createElementorPost( mode = 'icon' ) {
-	const output = wpEvalFile( 'seed-elementor.php', mode );
+	return seededUrl( wpEvalFile( 'seed-elementor.php', mode ) );
+}
 
+/**
+ * Like `createElementorPost()`, but the widget has its Style-tab controls set,
+ * typography included (see `seed-elementor-themed.php` for the values).
+ *
+ * @param {string} mode Trigger mode: 'icon' or 'box'.
+ */
+export function createThemedElementorPost( mode = 'icon' ) {
+	return seededUrl( wpEvalFile( 'seed-elementor-themed.php', mode ) );
+}
+
+function seededUrl( output ) {
 	// Restrict to URL-safe characters so WP-CLI's trailing status glyph (printed
 	// right after the URL) can't be captured as part of it.
 	const match = output.match( /WHSC_URL:(https?:\/\/[\w./?#&=:%~+-]+)/ );
@@ -235,6 +331,16 @@ export class SearchWidget {
 		this.input = this.modal.locator( '.whsc-search-input__field' );
 		this.cards = this.modal.locator( '.whsc-card' );
 		this.closeButton = this.modal.locator( '.whsc-modal-close' );
+		this.photoInput = this.modal.locator( '.whsc-visual-input' );
+		this.photoButton = this.modal.locator( '.whsc-visual-btn' );
+		this.photoTags = this.modal.locator( '.whsc-visual-tag' );
+		this.quizQuestion = this.modal.locator( '.whsc-quiz__question' );
+		this.quizOptions = this.modal.locator( '.whsc-quiz__option' );
+		this.quizAnswers = this.modal.locator( '.whsc-quiz__answer' );
+		this.quizCards = this.modal.locator( '.whsc-quiz__grid .whsc-card' );
+		this.rangeGroups = this.modal.locator( '.whsc-range' );
+		this.loadMore = this.modal.locator( '.whsc-load-more__button' );
+		this.resultsHeading = this.modal.locator( '.whsc-browse__main .whsc-section-title' );
 	}
 
 	async openModal() {
@@ -257,5 +363,20 @@ export class SearchWidget {
 
 	async close() {
 		await this.closeButton.click();
+	}
+
+	/** Switch to one of the modal's tabs by its visible name. */
+	async openTab( name ) {
+		await this.modal.getByRole( 'tab', { name } ).click();
+	}
+
+	/** Upload a photo through the hidden input the camera button opens. */
+	async searchByPhoto( filePath ) {
+		await this.photoInput.setInputFiles( filePath );
+	}
+
+	/** Answer the question currently on screen. */
+	async answerQuiz( label ) {
+		await this.quizOptions.filter( { hasText: label } ).first().click();
 	}
 }

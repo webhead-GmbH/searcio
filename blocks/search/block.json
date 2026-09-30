@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "webhead-search-cloud/search",
-	"version": "1.0.5",
+	"version": "1.1.0",
 	"title": "Search Cloud",
 	"category": "widgets",
 	"icon": "search",
@@ -104,6 +104,11 @@
 		"facetRadius": { "type": "number", "default": null },
 		"facetsMaxHeight": { "type": "number", "default": null },
 
+		"visualColor": { "type": "string", "default": "" },
+		"visualColorHover": { "type": "string", "default": "" },
+		"visualBg": { "type": "string", "default": "" },
+		"visualBgHover": { "type": "string", "default": "" },
+
 		"tabText": { "type": "string", "default": "" },
 		"tabTextActive": { "type": "string", "default": "" },
 		"tabIndicator": { "type": "string", "default": "" },
@@ -116,6 +121,18 @@
 		"assistantRowBg": { "type": "string", "default": "" },
 		"assistantInputRadius": { "type": "number", "default": null },
 
+		"bannerBg": { "type": "string", "default": "" },
+		"bannerText": { "type": "string", "default": "" },
+
+		"quizQuestion": { "type": "string", "default": "" },
+		"quizOptionBg": { "type": "string", "default": "" },
+		"quizOptionText": { "type": "string", "default": "" },
+		"quizOptionBorder": { "type": "string", "default": "" },
+		"quizOptionBgHover": { "type": "string", "default": "" },
+		"quizOptionTextHover": { "type": "string", "default": "" },
+		"quizOptionBorderHover": { "type": "string", "default": "" },
+		"quizOptionRadius": { "type": "number", "default": null },
+
 		"cardBg": { "type": "string", "default": "" },
 		"cardBorder": { "type": "string", "default": "" },
 		"cardBorderHover": { "type": "string", "default": "" },
@@ -123,6 +140,8 @@
 		"cardPadding": { "type": "number", "default": null },
 		"cardTitle": { "type": "string", "default": "" },
 		"priceColor": { "type": "string", "default": "" },
+		"stockInColor": { "type": "string", "default": "" },
+		"stockOutColor": { "type": "string", "default": "" },
 
 		"arrowColor": { "type": "string", "default": "" },
 		"arrowBg": { "type": "string", "default": "" },

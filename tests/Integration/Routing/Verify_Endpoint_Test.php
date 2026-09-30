@@ -12,6 +12,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Routing;
 
 use WP_REST_Request;
 use WP_REST_Server;
+use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Verify_Endpoint_Test extends Integration_Test_Case {
@@ -61,6 +62,7 @@ final class Verify_Endpoint_Test extends Integration_Test_Case {
 
 	public function test_verify_returns_404_when_not_connected(): void {
 		wp_set_current_user( 0 );
+		$this->open_window();
 
 		$response = $this->server->dispatch( $this->verify_request() );
 
@@ -70,6 +72,7 @@ final class Verify_Endpoint_Test extends Integration_Test_Case {
 	public function test_verify_returns_only_the_write_key_when_connected(): void {
 		wp_set_current_user( 0 );
 		$this->connect_client();
+		$this->open_window();
 
 		$response = $this->server->dispatch( $this->verify_request() );
 		$data     = $response->get_data();
@@ -77,6 +80,51 @@ final class Verify_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'test-write-key', $data['write_key'] );
 		$this->assertArrayNotHasKey( 'write_secret', $data );
+	}
+
+	/**
+	 * The ownership ping is dispatched once, minutes after a connection attempt,
+	 * and never repeated - so outside that window the route has no legitimate
+	 * caller and must not hand the write key to whoever asks.
+	 */
+	public function test_verify_is_closed_outside_a_connection_attempt(): void {
+		wp_set_current_user( 0 );
+		$this->connect_client();
+
+		$response = $this->server->dispatch( $this->verify_request() );
+
+		$this->assertSame( 404, $response->get_status() );
+		$this->assertArrayNotHasKey( 'write_key', (array) $response->get_data() );
+	}
+
+	public function test_verify_is_closed_again_once_the_window_has_passed(): void {
+		wp_set_current_user( 0 );
+		$this->connect_client();
+		$this->open_window( time() - ( 2 * HOUR_IN_SECONDS ) );
+
+		$response = $this->server->dispatch( $this->verify_request() );
+
+		$this->assertSame( 404, $response->get_status() );
+		$this->assertArrayNotHasKey( 'write_key', (array) $response->get_data() );
+	}
+
+	/**
+	 * The token is an HMAC over Search Cloud's own application key, so the
+	 * plugin can never check it - which is exactly why the window exists. A
+	 * present-but-meaningless token is still refused outside one.
+	 */
+	public function test_a_token_alone_no_longer_opens_the_endpoint(): void {
+		wp_set_current_user( 0 );
+		$this->connect_client();
+
+		$request = new WP_REST_Request( 'GET', '/search-cloud/v1/verify' );
+		$request->set_param( 'token', 'anything-at-all' );
+
+		$this->assertSame( 404, $this->server->dispatch( $request )->get_status() );
+	}
+
+	private function open_window( ?int $at = null ): void {
+		$this->settings()->set( Plugin_Settings::VERIFICATION_OPENED_AT, $at ?? time() );
 	}
 
 	private function verify_request(): WP_REST_Request {

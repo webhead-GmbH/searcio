@@ -31,6 +31,13 @@ const POPULAR_TTL = 900000; // 15 minutes.
 // Plan capabilities (whether the AI assistant tab may be shown) change only when
 // the account's plan does — cache generously for the page view.
 const STOREFRONT_CONFIG_TTL = 600000; // 10 minutes.
+// The whole question graph arrives in one response, is served from a
+// server-side cache and is not metered as a search (quiz.md), so fetch it once
+// per page view rather than per question.
+const QUIZZES_TTL = 600000; // 10 minutes.
+// "More like this" changes only when the catalogue does, and it is not metered
+// as a search — so a visitor browsing several products pays for it once.
+const SIMILAR_TTL = 600000; // 10 minutes.
 const CACHE_MAX = 60;
 
 const cache = new Map();
@@ -113,7 +120,7 @@ const request = async ( path, params, ttl, signal ) => {
 
 /**
  * @param {string} q
- * @param {{type?: string, filters?: Object<string,string>, page?: number, perPage?: number, signal?: AbortSignal}} [options]
+ * @param {{type?: string, filters?: Object<string,string>, ranges?: Object<string,string>, page?: number, perPage?: number, signal?: AbortSignal}} [options]
  */
 export const search = ( q, options = {} ) => {
 	const params = { q, type: options.type, page: options.page || 1, per_page: options.perPage || 20 };
@@ -125,6 +132,15 @@ export const search = ( q, options = {} ) => {
 	Object.entries( options.filters || {} ).forEach( ( [ field, value ] ) => {
 		if ( value ) {
 			params[ `filter[${ field }]` ] = value;
+		}
+	} );
+
+	// `range[field]=min:max` — the same allow-list applies, so these fields
+	// also only ever come from a facet the response already returned. Either
+	// bound may be blank ("50:" is "at least 50").
+	Object.entries( options.ranges || {} ).forEach( ( [ field, value ] ) => {
+		if ( value ) {
+			params[ `range[${ field }]` ] = value;
 		}
 	} );
 
@@ -172,6 +188,75 @@ export const fetchPopularSearches = ( options = {} ) => request(
  */
 export const fetchStorefrontConfig = ( options = {} ) =>
 	request( '/storefront-config', {}, STOREFRONT_CONFIG_TTL, options.signal );
+
+/**
+ * Every published guided quiz, each with its full question graph (see
+ * `docs/api/quiz.md`). A site with no published quiz answers `{quizzes: []}`
+ * rather than an error, so an empty list means "hide the entry point", not
+ * "something went wrong".
+ *
+ * @param {{signal?: AbortSignal}} [options]
+ * @return {Promise<{quizzes: Array<Object>}>}
+ */
+export const fetchQuizzes = ( options = {} ) =>
+	request( '/quizzes', {}, QUIZZES_TTL, options.signal );
+
+/**
+ * Products similar to a given one, for a "you may also like" row (see
+ * `docs/api/search.md` `GET /search/similar`). Similarity is semantic: it uses
+ * the source product's own embedding, so a site without AI search answers with
+ * an empty list rather than an error and the row simply does not render.
+ *
+ * Not metered as a search, and it changes only when the catalogue does, so it
+ * is cached for the page view like the card templates.
+ *
+ * @param {string}                            id        The source product's document id.
+ * @param {{limit?: number, signal?: AbortSignal}} [options]
+ * @return {Promise<{similar: Array<Object>}>}
+ */
+export const fetchSimilar = ( id, options = {} ) =>
+	request( '/search/similar', { id, limit: options.limit || 6 }, SIMILAR_TTL, options.signal );
+
+/**
+ * Search by photo (see `docs/api/visual-search.md`). A vision model describes
+ * the image as tags and those tags run as an ordinary search, so the response
+ * carries the same `hits`/`facets` shape as `/search` plus the `tags` it saw.
+ *
+ * Two things it deliberately does not carry: no `search_id` (a photo search is
+ * not a candidate for click attribution) and no `redirect` short-circuit (a
+ * synthetic query never triggers a merchant's typed-term redirect).
+ *
+ * Not cached — the same photo picked twice is a new upload either way, and the
+ * cache is keyed by URL, which a multipart body never varies.
+ *
+ * @param {File}                   file      The image to search with (≤ 8 MB).
+ * @param {{signal?: AbortSignal}} [options]
+ * @return {Promise<{query: ?string, tags: Array<string>, total: number, hits: Array<Object>, facets: Object}>}
+ */
+export const visualSearch = async ( file, options = {} ) => {
+	const body = new FormData();
+
+	body.append( 'photo', file );
+
+	const response = await fetch( buildUrl( '/search/visual', {} ), {
+		method: 'POST',
+		credentials: 'omit',
+		body,
+		signal: options.signal,
+	} );
+
+	if ( ! response.ok ) {
+		// 403 (not turned on for this site), 422 (missing/not an image/too
+		// large) and 429 (monthly allowance or the endpoint's own rate limit)
+		// each need their own message, so carry the status to the caller.
+		const error = new Error( `webhead-search-cloud: /search/visual responded ${ response.status }` );
+		error.status = response.status;
+
+		throw error;
+	}
+
+	return response.json();
+};
 
 /**
  * The conversational shopping assistant (see docs/api/search.md `POST

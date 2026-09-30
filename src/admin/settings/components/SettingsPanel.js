@@ -8,7 +8,7 @@ import {motion} from 'motion/react';
 
 import {showToast} from '../../../toast';
 import {Flex} from '../../../components/Layout';
-import {animateText, fadeInUpProps, renderAnimatedTabTitle} from '../../../utils/animation';
+import {animateText, renderAnimatedTabTitle, useFadeInUpProps} from '../../../utils/animation';
 import SettingsContext from '../../../settings/store/context';
 import SettingsSkeleton from './SettingsSkeleton';
 import UpgradeButton from './UpgradeButton';
@@ -62,6 +62,10 @@ const SettingsPanel = () => {
 	} = useContext(SettingsContext);
 	const [activeTab, setActiveTab] = useState(getInitialTabName);
 	const [isSaveFailureDialogOpen, setIsSaveFailureDialogOpen] = useState(false);
+	// Hooks, so they can ask for the reduced-motion preference: called once
+	// here rather than inline, since one of the panels renders inside a map.
+	const headerIconMotion = useFadeInUpProps(0, -20);
+	const panelMotion = useFadeInUpProps(0.04);
 
 	// All settings tabs require manage-settings; a view/run-sync-only user
 	// (e.g. a shop manager granted only "run sync") only sees the Sync tab.
@@ -104,13 +108,19 @@ const SettingsPanel = () => {
 		})),
 	];
 
+	// A tab built from the settings schema (General, and any group after it)
+	// does not exist until that schema has loaded. Falling back as soon as the
+	// requested tab was missing sent every link to one of them - and every
+	// reload while on one - to Sync before its tab could appear.
+	const isKnownTab = tabs.some((tab) => tab.name === activeTab);
+
 	useEffect(() => {
-		if (tabs.some((tab) => tab.name === activeTab)) {
+		if (isLoading || isKnownTab) {
 			return;
 		}
 
 		setActiveTab(SYNC_TAB);
-	}, [activeTab, tabs]);
+	}, [activeTab, isKnownTab, isLoading]);
 
 	useEffect(() => {
 		const newUrl = addQueryArgs(window.location.href, {tab: activeTab});
@@ -152,7 +162,7 @@ const SettingsPanel = () => {
 					>
 						<Flex.Block>
 							<div className="header-with-icon">
-								<motion.span {...fadeInUpProps(0, -20)} className="header-icon">{SettingsIcon}</motion.span>
+								<motion.span {...headerIconMotion} className="header-icon">{SettingsIcon}</motion.span>
 								<Card.Title render={<h2/>}>
 									<Text render={<span/>} variant="heading-xl">
 										{animateText(__('webhead Search Cloud', 'webhead-search-cloud'))}
@@ -188,14 +198,14 @@ const SettingsPanel = () => {
 						</Tabs.List>
 
 						<Tabs.Panel value={SYNC_TAB} className="tab-content">
-							<motion.div {...fadeInUpProps(0.04)}>
+							<motion.div {...panelMotion}>
 								<SyncTab/>
 							</motion.div>
 						</Tabs.Panel>
 
 						{canManageSettings && (
 							<Tabs.Panel value={INDEXING_TAB} className="tab-content">
-								<motion.div {...fadeInUpProps(0.04)}>
+								<motion.div {...panelMotion}>
 									<IndexingTab/>
 								</motion.div>
 							</Tabs.Panel>
@@ -203,7 +213,7 @@ const SettingsPanel = () => {
 
 						{canManageSettings && (
 							<Tabs.Panel value={SEARCH_CONFIG_TAB} className="tab-content">
-								<motion.div {...fadeInUpProps(0.04)}>
+								<motion.div {...panelMotion}>
 									{isLoading ? <SettingsSkeleton/> : <SearchConfigTab/>}
 								</motion.div>
 							</Tabs.Panel>
@@ -211,7 +221,7 @@ const SettingsPanel = () => {
 
 						{canManageSettings && (
 							<Tabs.Panel value={CONNECTION_TAB} className="tab-content">
-								<motion.div {...fadeInUpProps(0.04)}>
+								<motion.div {...panelMotion}>
 									{isLoading ? <SettingsSkeleton/> : <ConnectionTab/>}
 								</motion.div>
 							</Tabs.Panel>
@@ -222,7 +232,7 @@ const SettingsPanel = () => {
 
 							return (
 								<Tabs.Panel key={group.name} value={group.name} className="tab-content">
-									<motion.div {...fadeInUpProps(0.04)}>
+									<motion.div {...panelMotion}>
 										{isLoading ? (
 											<SettingsSkeleton/>
 										) : (
@@ -238,6 +248,14 @@ const SettingsPanel = () => {
 								</Tabs.Panel>
 							);
 						})}
+
+						{/* Holds the place of a requested schema tab until the schema
+						    says whether it exists, so the page is not blank meanwhile. */}
+						{isLoading && !isKnownTab && (
+							<Tabs.Panel value={activeTab} className="tab-content">
+								<SettingsSkeleton/>
+							</Tabs.Panel>
+						)}
 					</Tabs.Root>
 				</Card.Content>
 				{!SELF_MANAGED_TABS.includes(activeTab) && (

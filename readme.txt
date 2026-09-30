@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.0.5
+Stable tag: 1.1.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -19,8 +19,8 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 ### Key Features:
 - **Full-screen search modal** - a fast, keyboard-friendly overlay with search-as-you-type, autocomplete suggestions,
   recent and popular searches, and an empty-state highlights carousel.
-- **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, price,
-  tags, and so on).
+- **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, tags,
+  and so on), with a minimum/maximum for numeric fields such as price or rating.
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, fully themeable (colors, radius, typography,
@@ -31,6 +31,11 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
   taxonomies, and built-in properties to searchable data.
 - **Search relevance control** - tune searchable fields and weights, per-type ranking boosts, facet and suggestion
   fields, and synonyms - all from Search Cloud's own configuration, editable from the plugin's admin screen.
+- **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
+- **Guided quiz** - a few questions that narrow the catalogue down for shoppers who know what they want but not what it is called.
+- **Search redirects** - send well-known terms straight to a page instead of showing results.
+- **Similar products** - a "you may also like" row on product pages, matched by meaning rather than by shared tags.
+- **Category merchandising** - curate a category listing: pin products to the top, keep products out, show a banner.
 - **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
   results in their current language.
 - **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental
@@ -55,6 +60,7 @@ This plugin sends data to webhead Search Cloud, the hosted service that powers t
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
 * **When a visitor searches:** the search term, and which result they open. Their browser contacts the service directly, so their IP address is visible to it.
 * **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
+* **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
 
 Nothing else is sent, and no visitor accounts are created.
 
@@ -72,8 +78,53 @@ To rebuild it, check the repository out and run `npm install` followed by
 
 == Changelog ==
 
-= 1.0.5 =
+= 1.1.0 =
+- New: search by photo. Shoppers can upload a photo instead of typing, and see the tags the vision model read.
+- New: a guided quiz tab that turns a few questions into a filtered search.
+- New: a "you may also like" row of similar products for your product pages.
+- New: a curated category listing, so your merchandising rules for a category actually apply on that page.
+- Products are indexed under their parent categories too, so filtering on "Shoes" - or a quiz answer or merchandising rule naming it - finds products filed under "Sneakers".
+- Category, tag and attribute names no longer show HTML entities such as "&amp;" in filters and the compare table.
+- Renaming, moving or deleting a category now updates the products in it without a manual sync.
+- New: search-term redirects - send a search straight to a page instead of showing results.
+- Security: the domain-verification endpoint no longer returns the site's write key to unauthenticated callers; it now answers only while a connection attempt is in progress.
+- Fixed the AI assistant breaking permanently after a long reply.
+- Fixed a failed search-as-you-type keystroke navigating the shopper away mid-word.
+- Fixed saving Search Config deleting ranking boosts for content types this site does not index.
+- Fixed a switch left on after a plan downgrade blocking every other Search Config save.
+- Fixed WooCommerce products set to "Search results only" being left out of the search index while "Shop only" products were included. Private products are now indexed when the private option is on. The next sync corrects the index; no forced re-sync is needed.
+- New: filter results by price (and any other numeric field you use as a facet) with a minimum and a maximum.
+- New: a Load more button. Results were locked to the first page of twenty, with no way to reach the rest.
+- New: the Connection tab shows what your plan has used this month - searches, documents, AI messages, photo searches - and marks anything near or past its limit.
+- Merchandising rules can now curate a category listing page, not just a typed search.
+- A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.
+- The photo button and the quiz are themeable in the block editor and Elementor like the rest of the widget.
 - The search service moved to a new address, https://searcio.com. Nothing to do on your side; your existing keys keep working.
+- Security: the write key and secret are no longer sent to the browser, even encrypted - including to users who can only view the settings.
+- Fixed clearing the write key field erasing the saved key; leaving it blank now keeps it, as the field says.
+- The admin cards have their shadow back, the Indexing tab's sections are collapsible with headings in order, and the admin's animations respect the reduced-motion setting.
+- The storefront search shows a clearly visible keyboard focus ring, and disabled buttons there look disabled.
+- The search icon is announced as "Search" to screen readers even when no placeholder text is set.
+- A link to the General settings tab now opens it instead of the Sync tab, and each setting there shows its name and description once.
+- A photo search shows the photo it is searching with while it works, and keeps it beside the tags it produced.
+- The quiz moves keyboard and screen-reader focus to each new question, and its Back and Start over links sit next to the results they belong to.
+- On a phone, search results now appear above the recent and popular searches instead of below them.
+- The default accent colour now passes contrast wherever it is used as text (text in the accent uses a darker shade of it), and a placement's own accent reaches every part of its modal.
+- Every control in the search modal shows a visible keyboard focus outline, including the mode tabs, which had none.
+- Escape closes the search suggestions without clearing what you typed.
+- Better on small and touch screens: the mode tabs scroll instead of being cut off, the carousel's page dots are easier to tap, and the assistant and price fields no longer make iOS zoom in.
+- The results carousel respects the reduced-motion setting.
+- The "In stock" / "Out of stock" colours on the search modal's product cards can be set in the search block and the Elementor search widget.
+- The AI assistant on a phone: the message field follows the products and stays in view, Compare only appears when there is something to compare, and field names like "Categories" are translated.
+- On a phone the search field shows its whole placeholder, and the photo-search row lines up with its tags.
+- Photo search and typed search no longer get mixed up on screen, and a failed photo search restores the filters.
+- Product-row carousels show their page dots.
+- The Elementor widget can keep its search modal open while you edit it, optionally with a search already run, so style changes show as you make them.
+- The Elementor widget's settings are regrouped by the part they style, with new ones for the overlay colour, the modal's font and content width, the card image, the sale badge, the carousel's card width and arrows, filter group names, and the trigger's alignment and width. The modal can also be a centred, floating dialog.
+- The modal overlay fades in as intended, and the carousel's page dots stay right after its width changes.
+- Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
+- Fixed a permanently deleted post staying in search for good when the first attempt to remove it from the index failed. Full syncs now retry the removal until it succeeds.
+- Fixed content staying in search for good when a full sync's attempt to remove it failed, for example after turning a content type off and then permanently deleting its posts. Later full syncs now keep retrying the removal until it succeeds.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.

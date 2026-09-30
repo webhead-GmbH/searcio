@@ -1,19 +1,23 @@
-import {useCallback, useEffect, useId, useRef, useState} from '@wordpress/element';
-import {Button, Modal, Notice} from '@wordpress/components';
-import {closeSmall} from '@wordpress/icons';
+import {useCallback, useEffect, useId, useLayoutEffect, useRef, useState} from '@wordpress/element';
+import {Button, Icon, Modal, Notice} from '@wordpress/components';
+import {closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
-import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick} from '../../../utils/api';
+import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
-import {buildFilterParams, buildTypeParam, extractFieldFacets, humanizeFieldLabel, mergeFieldFacets, toggleSelection} from '../../../utils/facets';
+import {appendHits, buildFilterParams, buildRangeParams, buildTypeParam, extractFieldFacets, extractRangeFields, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {redirectTarget} from '../../../utils/redirect';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
+import QuizPane from './QuizPane';
+import RangeFilters from './RangeFilters';
 import SearchInput from './SearchInput';
 import Suggestions from './Suggestions';
 import Browse from './Browse';
 import Carousel from './Carousel';
 import SearchResultsSkeleton from './SearchResultsSkeleton';
+import VisualSearchButton from './VisualSearchButton';
 
 const SUGGEST_DEBOUNCE = 200;
 const LIVE_SEARCH_DEBOUNCE = 300;
@@ -58,6 +62,28 @@ const nativeSearchUrl = (query) => {
 };
 
 /**
+ * Scroll one tab fully into the sideways-scrolling tab row, by the least
+ * distance that does it.
+ *
+ * @param {?HTMLElement} list The tablist.
+ * @param {?HTMLElement} tab  One of its tabs.
+ */
+const revealTab = (list, tab) => {
+	if (!list || !tab || !list.contains(tab)) {
+		return;
+	}
+
+	const row = list.getBoundingClientRect();
+	const box = tab.getBoundingClientRect();
+
+	if (box.left < row.left) {
+		list.scrollLeft -= row.left - box.left;
+	} else if (box.right > row.right) {
+		list.scrollLeft += box.right - row.right;
+	}
+};
+
+/**
  * @param {Object}   props
  * @param {string}   props.scopeType      Restrict results to one document type (empty = all types).
  * @param {string}   props.placeholder    Placeholder text for the search input.
@@ -69,6 +95,8 @@ const nativeSearchUrl = (query) => {
  *                                        (falls back to the plugin's own card per hit when no template matches).
  * @param {string}   [props.highlightsSource] 'featured' to source the empty-query highlights carousel from
  *                                            `filter[featured]=true` instead of a plain match-all (default 'newest').
+ * @param {boolean}  [props.editorPreview] Opened by the Elementor editor for styling rather than by a visitor:
+ *                                        it takes no focus and runs its search term once.
  * @param {string}   props.initialQuery   Seed value when opened from a box trigger the user was already typing in.
  * @param {(query: string) => void} [props.onQueryChange] Keeps a box trigger's own input in sync while the modal is open.
  * @param {Function} props.onRequestClose
@@ -84,6 +112,7 @@ const SearchModal = ({
 											 highlightsSource,
 											 showCount,
 											 animation,
+											 editorPreview = false,
 											 initialQuery,
 											 onQueryChange,
 											 onRequestClose,
@@ -103,6 +132,10 @@ const SearchModal = ({
 	// Every facet key from the last `/search` response other than the
 	// built-in `types`, rendered as its own dynamic chip group.
 	const [facetGroups, setFacetGroups] = useState({});
+	// Numeric facet fields and the span the loaded hits cover, plus the bounds
+	// the visitor has applied to them (`range[field]=min:max`).
+	const [rangeFields, setRangeFields] = useState({});
+	const [activeRanges, setActiveRanges] = useState({});
 	const [suggestions, setSuggestions] = useState([]);
 	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 	const [results, setResults] = useState(null);
@@ -110,14 +143,45 @@ const SearchModal = ({
 	// The search_id of the highlights carousel, so clicks on it attribute to the
 	// same search the way result clicks attribute to `results.search_id`.
 	const [highlightsSearchId, setHighlightsSearchId] = useState('');
-	// The AI assistant tab is offered only when the plan includes it — read from
-	// /storefront-config so an upgrade flips it on with no code change.
+	// Which of the extra modes this site may show — all read from
+	// /storefront-config, so an upgrade (or publishing a quiz) flips them on
+	// with no code change and nothing here ever offers a control the API would
+	// only answer 403 to.
 	const [assistantEnabled, setAssistantEnabled] = useState(false);
+	const [quizEnabled, setQuizEnabled] = useState(false);
+	const [visualEnabled, setVisualEnabled] = useState(false);
+	// Semantic search changes what `total` in a `/search` response means - see
+	// `totalIsExact()`.
+	const [semanticEnabled, setSemanticEnabled] = useState(false);
 	const [activeTab, setActiveTab] = useState('search');
 	const [assistantOpened, setAssistantOpened] = useState(false);
+	const [quizOpened, setQuizOpened] = useState(false);
+	const tabListRef = useRef(null);
+
+	// The tab row scrolls sideways once it is too narrow for every label, and
+	// the close button that joins it on the assistant and quiz tabs narrows it
+	// further - at 320px the tab just chosen was the one cut off. Bring the
+	// active tab fully into the row, before paint so it never shows cut.
+	useLayoutEffect(() => {
+		revealTab(tabListRef.current, tabListRef.current?.querySelector('.whsc-modal-tab.is-active'));
+	}, [activeTab]);
+	// What the vision model saw in the uploaded photo, shown above the results
+	// so a surprising result set is explained rather than just odd.
+	const [visualTags, setVisualTags] = useState([]);
+	// A photo search owns the results area even though the search box is empty,
+	// which would otherwise read as "idle" and show the highlights carousel.
+	const [visualActive, setVisualActive] = useState(false);
+	// The photo being searched, shown beside what the model read from it. An
+	// object URL for the visitor's own file - nothing is uploaded to show it.
+	const [visualPreview, setVisualPreview] = useState('');
+	// Which kind of search is in flight, apart from what is on screen: a typed
+	// search run over a photo's results still has the photo's state until its
+	// own answer arrives, and was titled and announced as a photo search.
+	const [pendingKind, setPendingKind] = useState('text');
 	const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
 	const [facets, setFacets] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
+	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [error, setError] = useState('');
 	const [recent, setRecent] = useState(() => getRecentSearches());
 	const [isListening, setIsListening] = useState(false);
@@ -158,15 +222,24 @@ const SearchModal = ({
 	// yet, comes back empty, or errors out.
 	const popularSearches = livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches;
 	const trimmedQuery = query.trim();
-	const showEmptyState = '' === trimmedQuery;
+	const showEmptyState = '' === trimmedQuery && !visualActive;
+	// The tab bar exists only if there is a second mode to switch to; with none,
+	// the modal is the plain search box it has always been.
+	const hasTabs = assistantEnabled || quizEnabled;
+	const showSearchPane = !hasTabs || 'search' === activeTab;
 
 	useEffect(() => {
 		onQueryChange?.(query);
 	}, [query, onQueryChange]);
 
+	// In the Elementor editor the modal reopens every time a Content setting
+	// re-renders the widget; taking focus then would pull it out of the field
+	// being typed into in the editor's panel.
 	useEffect(() => {
-		inputRef.current?.focus();
-	}, []);
+		if (!editorPreview) {
+			inputRef.current?.focus();
+		}
+	}, [editorPreview]);
 
 	// `Modal` (`@wordpress/components`) always portals its frame straight to
 	// `document.body` and doesn't forward unrecognized props to it, so
@@ -221,8 +294,9 @@ const SearchModal = ({
 		};
 	}, [cardSource]);
 
-	// Whether the plan includes the AI assistant. Fetched once so the tab only
-	// appears when the account can actually use it; a failure just hides it.
+	// What this site's plan and setup allow. Fetched once so each extra mode
+	// only appears when the account can actually use it; a failure leaves them
+	// all off, which degrades to plain search rather than to a broken control.
 	useEffect(() => {
 		if (!isConfigured()) {
 			return undefined;
@@ -233,7 +307,12 @@ const SearchModal = ({
 		fetchStorefrontConfig()
 			.then((response) => {
 				if (!cancelled) {
-					setAssistantEnabled(Boolean(response?.capabilities?.assistant));
+					const capabilities = response?.capabilities || {};
+
+					setAssistantEnabled(Boolean(capabilities.assistant));
+					setQuizEnabled(Boolean(capabilities.quiz));
+					setVisualEnabled(Boolean(capabilities.visual_search));
+					setSemanticEnabled(Boolean(capabilities.semantic_search));
 				}
 			})
 			.catch(() => {});
@@ -273,7 +352,7 @@ const SearchModal = ({
 	// `facetsOverride` lets a field-facet click pass its just-toggled selection
 	// straight through instead of reading `activeFacets` state, which hasn't
 	// re-rendered yet at the point the click handler fires the request.
-	const loadHighlights = useCallback(async (type, facetsOverride) => {
+	const loadHighlights = useCallback(async (type, facetsOverride, rangesOverride) => {
 		if (!isConfigured()) {
 			setIsLoadingHighlights(false);
 
@@ -290,10 +369,12 @@ const SearchModal = ({
 		// (unlike a real committed search below).
 		const forced = {...currentLangFilter(), ...('featured' === highlightsSource ? {featured: 'true'} : {})};
 		const appliedFacets = facetsOverride ?? activeFacets;
+		const appliedRanges = rangesOverride ?? activeRanges;
 		const filters = buildFilterParams(appliedFacets, forced);
+		const ranges = buildRangeParams(appliedRanges);
 
 		try {
-			const response = await search('', {type, filters, perPage: 12});
+			const response = await search('', {type, filters, ranges, perPage: 12});
 
 			setHighlights(response.hits || []);
 			setHighlightsSearchId(response.search_id || '');
@@ -305,13 +386,14 @@ const SearchModal = ({
 				setFacets(response.facets?.types || []);
 			}
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 		} catch (e) {
 			setHighlights([]);
 		} finally {
 			await delay(Math.max(0, MIN_LOADING - (Date.now() - started)));
 			setIsLoadingHighlights(false);
 		}
-	}, [activeFacets, highlightsSource]);
+	}, [activeFacets, activeRanges, highlightsSource]);
 
 	useEffect(() => {
 		void loadHighlights(scopeType || '');
@@ -357,7 +439,7 @@ const SearchModal = ({
 	// `facetsOverride` mirrors `loadHighlights()`'s param — used only by a
 	// field-facet click, which needs its just-toggled selection applied before
 	// `activeFacets` state itself has re-rendered.
-	const runSearch = useCallback(async (q, type = buildTypeParam(scopeType, activeTypes), commit = true, facetsOverride) => {
+	const runSearch = useCallback(async (q, type = buildTypeParam(scopeType, activeTypes), commit = true, facetsOverride, rangesOverride) => {
 		const trimmed = q.trim();
 
 		setQuery(q);
@@ -380,6 +462,11 @@ const SearchModal = ({
 
 		if ('' === trimmed) {
 			setResults(null);
+			// An empty search leaves the photo behind too. Kept, the column stayed
+			// in the photo state with nothing left to show in it.
+			setVisualTags([]);
+			setVisualActive(false);
+			setVisualPreview('');
 
 			return;
 		}
@@ -400,21 +487,55 @@ const SearchModal = ({
 		const seq = ++searchSeq.current;
 		const isLatest = () => seq === searchSeq.current;
 
+		setPendingKind('text');
 		setIsSearching(true);
 		setError('');
 		const started = Date.now();
 
 		const appliedFacets = facetsOverride ?? activeFacets;
+		const appliedRanges = rangesOverride ?? activeRanges;
 		const filters = buildFilterParams(appliedFacets, currentLangFilter());
+		const ranges = buildRangeParams(appliedRanges);
 
 		try {
-			const response = await search(trimmed, {type, filters, signal: controller.signal});
+			const response = await search(trimmed, {type, filters, ranges, signal: controller.signal});
 
 			if (!isLatest()) {
 				return;
 			}
 
-			setResults(response);
+			/*
+			 * A term the merchant configured as a redirect answers with
+			 * `{query, redirect}` and no results at all, so this has to be
+			 * checked before anything tries to render hits.
+			 *
+			 * Only a committed search navigates. In "search as you type" mode a
+			 * live search fires from the fourth character on, so a visitor
+			 * typing "sale shoes" on a site that redirects "sale" would be
+			 * thrown off the page mid-word. Pressing Enter — or clicking a
+			 * suggestion, chip or popular term — is an explicit "search for
+			 * exactly this", which is when the rule is meant to fire.
+			 */
+			const target = redirectTarget(response);
+
+			if ('' !== target) {
+				if (commit) {
+					setRecent(addRecentSearch(trimmed));
+					window.location.href = target;
+
+					return;
+				}
+
+				// Nothing to show for this keystroke: leave whatever is on
+				// screen alone rather than blanking it out.
+				return;
+			}
+
+			setResults({...response, pageCount: (response.hits || []).length});
+			// A typed search replaces whatever a photo put on screen.
+			setVisualTags([]);
+			setVisualActive(false);
+			setVisualPreview('');
 
 			// See the matching comment in `loadHighlights()` — only refresh the
 			// type chip list from an unfiltered-by-type request.
@@ -423,6 +544,7 @@ const SearchModal = ({
 			}
 
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 
 			setRecent(addRecentSearch(trimmed));
 		} catch (e) {
@@ -432,7 +554,15 @@ const SearchModal = ({
 			}
 
 			setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
-			window.location.href = nativeSearchUrl(trimmed);
+
+			// Handing the visitor over to native search is right for a search
+			// they asked for. It is wrong for a keystroke: in "search as you
+			// type" mode this fires on every character, so a single 429 or 5xx
+			// mid-word would navigate them away with half a word as their query.
+			// A live search that fails just shows the notice and waits.
+			if (commit) {
+				window.location.href = nativeSearchUrl(trimmed);
+			}
 		} finally {
 			if (isLatest()) {
 				await delay(Math.max(0, MIN_LOADING - (Date.now() - started)));
@@ -442,7 +572,105 @@ const SearchModal = ({
 				}
 			}
 		}
-	}, [activeTypes, activeFacets, i18n.error, scopeType]);
+	}, [activeTypes, activeFacets, activeRanges, i18n.error, scopeType]);
+
+	/**
+	 * Search by photo. A vision model turns the image into tags and runs those
+	 * as an ordinary search, so the response carries the same hits and facets a
+	 * typed search would (`docs/api/visual-search.md`).
+	 *
+	 * Unlike a failed typed search this does not fall back to native `?s=`
+	 * search: there is no query to hand over, and WordPress cannot search by
+	 * photo. A failure says so and leaves the visitor where they are.
+	 *
+	 * @param {File} file
+	 */
+	useEffect(() => () => {
+		if ('' !== visualPreview) {
+			URL.revokeObjectURL(visualPreview);
+		}
+	}, [visualPreview]);
+
+	const runVisualSearch = useCallback(async (file) => {
+		if (!isConfigured()) {
+			return;
+		}
+
+		// Clear the typed query so the results on screen are unambiguously the
+		// photo's, and stop the live-search effect reacting to that change.
+		skipLiveSearchRef.current = true;
+		skipSuggestRef.current = true;
+		setQuery('');
+		setSuggestions([]);
+		setSuggestionsDismissed(true);
+
+		abortRef.current?.abort();
+		const controller = new AbortController();
+		abortRef.current = controller;
+		const seq = ++searchSeq.current;
+		const isLatest = () => seq === searchSeq.current;
+
+		setPendingKind('photo');
+		setIsSearching(true);
+		setError('');
+		setVisualActive(true);
+		setVisualTags([]);
+		setVisualPreview(URL.createObjectURL(file));
+		setResults(null);
+		// A photo search takes no filters, and its response carries no facets to
+		// re-render the chips from. Anything left over from a typed search would
+		// be describing results that are no longer on screen — the type chip
+		// still reading "product 4" over three photo matches — and a field
+		// selection would sit invisible and silently narrow the next search.
+		setActiveFacets({});
+		setActiveTypes([]);
+		setFacets([]);
+		// `/search/visual` takes no filters at all, so an applied bound would
+		// sit on screen describing a narrowing that is not being applied.
+		setActiveRanges({});
+		setRangeFields({});
+
+		try {
+			const response = await visualSearch(file, {signal: controller.signal});
+
+			if (!isLatest()) {
+				return;
+			}
+
+			setVisualTags(Array.isArray(response?.tags) ? response.tags : []);
+			setResults(response);
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), {}));
+		} catch (e) {
+			if ('AbortError' === e.name || !isLatest()) {
+				return;
+			}
+
+			// Back to browsing, with the notice on top. Left in the photo state the
+			// results column stayed empty - nothing a skeleton could resolve to,
+			// and a blank half of the modal read as a broken page. The filters were
+			// cleared for the photo, so the highlights come back unfiltered, with
+			// the type chips and ranges that belong to them.
+			setVisualActive(false);
+			setVisualPreview('');
+			void loadHighlights(scopeType || '', {}, {});
+
+			if (403 === e.status) {
+				// The capability said yes but the site has since turned it off.
+				setVisualEnabled(false);
+				setError(__('Photo search is not available on this store.', 'webhead-search-cloud'));
+			} else if (422 === e.status) {
+				setError(__('That file is not an image we can read. Try a JPEG or PNG under 8 MB.', 'webhead-search-cloud'));
+			} else if (429 === e.status) {
+				setError(__('Photo search has reached its limit for now. Please try again later.', 'webhead-search-cloud'));
+			} else {
+				setError(__('That photo search failed. Try another photo.', 'webhead-search-cloud'));
+			}
+		} finally {
+			if (isLatest()) {
+				setIsSearching(false);
+			}
+		}
+	}, [loadHighlights, scopeType]);
 
 	// Only in `type` mode does typing itself trigger the metered `/search`
 	// call, and only once the query is long enough to be meaningful.
@@ -467,6 +695,22 @@ const SearchModal = ({
 		return () => window.clearTimeout(liveSearchTimer.current);
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- re-running on each keystroke via trimmedQuery is intentional.
 	}, [trimmedQuery, searchTrigger]);
+
+	// The editor preview opens with its search term already in the field; run
+	// it once so there are results to style. Uncommitted: it is nobody's
+	// search, so it is not saved as a recent search, and a term configured as
+	// a redirect does not navigate the editor away. The suggestions dropdown
+	// is closed as a committed search would close it, or it would cover the
+	// filters and recent searches being styled; typing in the preview's own
+	// field opens it again.
+	useEffect(() => {
+		if (editorPreview && '' !== trimmedQuery) {
+			setSuggestionsDismissed(true);
+			skipSuggestRef.current = true;
+			void runSearch(query, buildTypeParam(scopeType, activeTypes), false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the preview opens.
+	}, []);
 
 	// Clicking "All" (empty type) clears the selection; clicking a type
 	// toggles it in/out.
@@ -498,10 +742,97 @@ const SearchModal = ({
 		}
 	};
 
+	// A bound is applied on submit rather than on every keystroke: a partly
+	// typed number ("1" on the way to "150") is a different, wrong filter, and
+	// searching for it would make the field fight the person typing in it.
+	const onRangeApply = (field, bound) => {
+		const min = String(bound?.min ?? '').trim();
+		const max = String(bound?.max ?? '').trim();
+		const nextRanges = {...activeRanges};
+
+		if ('' === min && '' === max) {
+			delete nextRanges[field];
+		} else {
+			nextRanges[field] = {min, max};
+		}
+
+		setActiveRanges(nextRanges);
+		const typeParam = buildTypeParam(scopeType, activeTypes);
+
+		if ('' === trimmedQuery) {
+			void loadHighlights(typeParam, undefined, nextRanges);
+		} else {
+			void runSearch(query, typeParam, true, undefined, nextRanges);
+		}
+	};
+
 	const onSelectSuggestion = (label) => {
 		setSuggestionsDismissed(true);
 		void runSearch(label);
 	};
+
+	/**
+	 * Append the next page of the search already on screen.
+	 *
+	 * The API has always paged (`page` / `per_page`, with the true `total`
+	 * alongside the hits); the modal only ever asked for page one and reported
+	 * what it had loaded as if that were everything, so on a catalogue of any
+	 * size the other results were unreachable.
+	 *
+	 * Appends rather than replaces: this is one continuous result list a
+	 * visitor scrolls, not a numbered page they navigate away to.
+	 */
+	const loadMore = useCallback(async () => {
+		if (isLoadingMore || !results) {
+			return;
+		}
+
+		// Not a new search, so this must not claim a new sequence id - it only
+		// has to notice if a real search has replaced what it was extending.
+		const seq = searchSeq.current;
+		const nextPage = (Number(results.page) || 1) + 1;
+		const controller = new AbortController();
+
+		abortRef.current = controller;
+		setIsLoadingMore(true);
+
+		try {
+			const response = await search(trimmedQuery, {
+				type: buildTypeParam(scopeType, activeTypes),
+				filters: buildFilterParams(activeFacets, currentLangFilter()),
+				ranges: buildRangeParams(activeRanges),
+				page: nextPage,
+				signal: controller.signal,
+			});
+
+			if (seq !== searchSeq.current) {
+				return;
+			}
+
+			setResults((current) => ({
+				...response,
+				// Track the page that was asked for, not the one the response
+				// echoes: a response without `page` would otherwise re-request
+				// the same page on every click.
+				page: nextPage,
+				pageCount: (response.hits || []).length,
+				// Clicks on every page attribute to the search that started it.
+				search_id: current?.search_id || response.search_id,
+				hits: appendHits(current?.hits, response.hits),
+			}));
+		} catch (e) {
+			if ('AbortError' !== e.name && seq === searchSeq.current) {
+				setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
+			}
+		} finally {
+			// Released unconditionally, unlike the results above. A new search
+			// starting mid-request is exactly when this must be let go: the
+			// flag only says "a load-more request is in flight", and gating it
+			// on the sequence would leave the next search's button reading
+			// "Loading…" and disabled with nothing left to answer it.
+			setIsLoadingMore(false);
+		}
+	}, [isLoadingMore, results, trimmedQuery, scopeType, activeTypes, activeFacets, activeRanges, i18n.error]);
 
 	const onRemoveRecent = (label) => setRecent(removeRecentSearch(label));
 	const onClearRecent = () => setRecent(clearRecentSearches());
@@ -547,13 +878,59 @@ const SearchModal = ({
 	};
 
 	const resultsHits = results?.hits || [];
+	// `total` is only a count of matches on the lexical path; a semantic query
+	// reports the size of the window it retrieved. Say "of 137" only when that
+	// number means what it looks like it means.
+	const exactTotal = totalIsExact(semanticEnabled, trimmedQuery);
+	const totalResults = Number.isFinite(Number(results?.total)) ? Number(results.total) : resultsHits.length;
+	// A photo search is a single fixed page server-side - it takes no `page`
+	// parameter - so there is nothing more to load for one.
+	const hasMore = !visualActive && hasMorePages(results, resultsHits.length, exactTotal);
+	// Without an exact total there is only one number that is true: how many
+	// are on screen.
+	const shownTotal = exactTotal ? totalResults : resultsHits.length;
 
 	// The main slot inside the browse layout swaps between highlights (idle),
 	// a skeleton (loading), and the results carousel / empty message.
 	let mainTitle;
 	let mainContent;
 
-	if (showEmptyState) {
+	// Which photo the results are for, and what the model read from it - so an
+	// unexpected result set reads as a misread photo rather than broken search.
+	const photoQuery = visualActive && '' !== visualPreview ? (
+		<div className="whsc-visual-query">
+			<img
+				// A fresh element per photo: the `hidden` a failed one set is not
+				// something React manages, and would hide every photo after it.
+				key={visualPreview}
+				className="whsc-visual-query__photo"
+				src={visualPreview}
+				alt={__('Your photo', 'webhead-search-cloud')}
+				// A file that is not an image gets as far as the server before it
+				// is refused; until then, no broken-image glyph.
+				onError={(event) => {
+					event.currentTarget.hidden = true;
+				}}
+			/>
+			{!isSearching && visualTags.length > 0 && (
+				<div className="whsc-visual-tags">
+					<span className="whsc-visual-tags__label">
+						{__('From your photo', 'webhead-search-cloud')}
+					</span>
+					<div className="whsc-visual-tags__list">
+						{visualTags.map((tag) => (
+							<span className="whsc-visual-tag" key={tag}>{tag}</span>
+						))}
+					</div>
+				</div>
+			)}
+		</div>
+	) : null;
+
+	// The highlights also stay while a query is typed but not yet searched
+	// (submit mode, before Enter). That state used to show their title over a
+	// skeleton, which looked like a search loading that never finished.
+	if (showEmptyState || (!isSearching && !results)) {
 		mainTitle = __('Current highlights', 'webhead-search-cloud');
 		mainContent = isLoadingHighlights ? (
 			<SearchResultsSkeleton/>
@@ -573,17 +950,33 @@ const SearchModal = ({
 			/>
 		);
 	} else if (isSearching) {
-		mainTitle = __('Results', 'webhead-search-cloud');
-		mainContent = <SearchResultsSkeleton/>;
+		mainTitle = 'photo' === pendingKind
+			? __('Looking at your photo…', 'webhead-search-cloud')
+			: __('Results', 'webhead-search-cloud');
+		mainContent = (
+			<>
+				{'photo' === pendingKind && photoQuery}
+				<SearchResultsSkeleton/>
+			</>
+		);
 	} else if (results) {
 		mainTitle = resultsHits.length > 0
-			? sprintf(
-				/* translators: %d: number of results. */
-				_n('%d result', '%d results', resultsHits.length, 'webhead-search-cloud'),
-				resultsHits.length
-			)
+			? (exactTotal && hasMore
+				? sprintf(
+					/* translators: 1: number of results loaded so far. 2: total number of results. */
+					__('%1$d of %2$d results', 'webhead-search-cloud'),
+					resultsHits.length,
+					totalResults
+				)
+				: sprintf(
+					/* translators: %d: number of results. */
+					_n('%d result', '%d results', shownTotal, 'webhead-search-cloud'),
+					shownTotal
+				))
 			: __('Results', 'webhead-search-cloud');
 		mainContent = resultsHits.length > 0 ? (
+			<>
+			{photoQuery}
 			<Carousel
 				items={resultsHits}
 				getKey={(hit) => hit.id}
@@ -597,27 +990,59 @@ const SearchModal = ({
 				)}
 				ariaLabel={__('Search results', 'webhead-search-cloud')}
 			/>
+			{hasMore && (
+				<div className="whsc-load-more">
+					<button
+						type="button"
+						className="whsc-load-more__button"
+						onClick={() => void loadMore()}
+						disabled={isLoadingMore}
+					>
+						{isLoadingMore
+							? __('Loading…', 'webhead-search-cloud')
+							: __('Load more results', 'webhead-search-cloud')}
+					</button>
+				</div>
+			)}
+			</>
 		) : (
+			<>
+			{photoQuery}
 			<p className="whsc-no-results">
-				{i18n.noResults || __('No results found.', 'webhead-search-cloud')}
+				{visualActive
+					// A photo that matched nothing is a photo problem, not a
+					// catalogue problem — say what to do about it.
+					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'webhead-search-cloud')
+					: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))}
 			</p>
+			</>
 		);
-	} else {
-		mainTitle = __('Current highlights', 'webhead-search-cloud');
-		mainContent = <SearchResultsSkeleton/>;
 	}
 
 	return (
 		<Modal
 			__experimentalHideHeader
+			focusOnMount={editorPreview ? false : undefined}
 			onRequestClose={onRequestClose}
 			className={`whsc-modal whsc-anim-${animation || 'fade'}${instanceClass ? ` ${instanceClass}` : ''}`}
-			overlayClassName="whsc-modal-overlay"
+			// The instance class goes on the overlay too: the widget's CSS custom
+			// properties are set on it, and the overlay is the frame's parent,
+			// so it would never see the frame's own copy (e.g. its colour).
+			overlayClassName={`whsc-modal-overlay${instanceClass ? ` ${instanceClass}` : ''}`}
 			contentLabel={i18n.placeholder || __('Search', 'webhead-search-cloud')}
 		>
 			<div className="whsc-modal-body">
-				{assistantEnabled && (
-					<div className="whsc-modal-tabs" role="tablist" aria-label={__('Search modes', 'webhead-search-cloud')}>
+				{hasTabs && (
+					<div className="whsc-modal-tabbar">
+					<div
+						className="whsc-modal-tabs"
+						role="tablist"
+						aria-label={__('Search modes', 'webhead-search-cloud')}
+						ref={tabListRef}
+						// Tabbing onto a tab the row cuts off does not scroll it: the
+						// browser leaves a partly visible element where it is.
+						onFocus={(event) => revealTab(tabListRef.current, event.target)}
+					>
 						<button
 							type="button"
 							role="tab"
@@ -627,34 +1052,52 @@ const SearchModal = ({
 						>
 							{__('Search', 'webhead-search-cloud')}
 						</button>
-						<button
-							type="button"
-							role="tab"
-							aria-selected={'assistant' === activeTab}
-							className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
-							onClick={() => {
-								setAssistantOpened(true);
-								setActiveTab('assistant');
-							}}
-						>
-							{__('AI Assistant', 'webhead-search-cloud')}
-						</button>
-						{/* Only the assistant tab needs a close control here; the search
-						    tab keeps its own inside the input row, so enabling the
-						    assistant never restyles the search tab. */}
-						{'assistant' === activeTab && (
-							<Button
-								className="whsc-modal-close whsc-modal-close--tabbed"
-								icon={closeSmall}
-								label={i18n.close || __('Close search', 'webhead-search-cloud')}
-								showTooltip={false}
-								onClick={onRequestClose}
-							/>
+						{assistantEnabled && (
+							<button
+								type="button"
+								role="tab"
+								aria-selected={'assistant' === activeTab}
+								className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
+								onClick={() => {
+									setAssistantOpened(true);
+									setActiveTab('assistant');
+								}}
+							>
+								{__('AI Assistant', 'webhead-search-cloud')}
+							</button>
 						)}
+						{quizEnabled && (
+							<button
+								type="button"
+								role="tab"
+								aria-selected={'quiz' === activeTab}
+								className={`whsc-modal-tab${'quiz' === activeTab ? ' is-active' : ''}`}
+								onClick={() => {
+									setQuizOpened(true);
+									setActiveTab('quiz');
+								}}
+							>
+								{__('Product finder', 'webhead-search-cloud')}
+							</button>
+						)}
+					</div>
+					{/* Only the tabs without a search input need a close control
+					    here; the search tab keeps its own inside the input row, so
+					    turning these modes on never restyles the search tab. It sits
+					    beside the tablist rather than in it: a tablist holds tabs. */}
+					{'search' !== activeTab && (
+						<Button
+							className="whsc-modal-close whsc-modal-close--tabbed"
+							icon={closeSmall}
+							label={i18n.close || __('Close search', 'webhead-search-cloud')}
+							showTooltip={false}
+							onClick={onRequestClose}
+						/>
+					)}
 					</div>
 				)}
 
-				{(!assistantEnabled || 'search' === activeTab) && (
+				{showSearchPane && (
 					<>
 				<div className="whsc-modal-header">
 					<div className="whsc-input-row">
@@ -673,7 +1116,9 @@ const SearchModal = ({
 								className="whsc-submit-btn"
 								onClick={() => void runSearch(query)}
 							>
-								{__('Search', 'webhead-search-cloud')}
+								{/* On a phone only the icon shows; the label stays the name. */}
+								<Icon icon={searchIcon} className="whsc-submit-btn__icon"/>
+								<span className="whsc-submit-btn__label">{__('Search', 'webhead-search-cloud')}</span>
 							</Button>
 						)}
 						{enableVoice && supportsVoice() && (
@@ -700,6 +1145,9 @@ const SearchModal = ({
 								onClick={onVoiceClick}
 							/>
 						)}
+						{visualEnabled && (
+							<VisualSearchButton busy={isSearching} onSelect={(file) => void runVisualSearch(file)}/>
+						)}
 						<Button
 							className="whsc-modal-close"
 							icon={closeSmall}
@@ -718,6 +1166,14 @@ const SearchModal = ({
 						/>
 					)}
 				</div>
+
+				{'string' === typeof results?.banner && '' !== results.banner && (
+					// A merchandising rule can attach a banner to a search (or to a
+					// category listing). The plugin's own Search Config tab writes
+					// these, so not rendering them made the field look broken.
+					// Merchant-authored text, rendered as text — never as markup.
+					<p className="whsc-banner" role="status">{results.banner}</p>
+				)}
 
 				{showFacets && (
 					// A group of independent toggle buttons, not an ARIA tablist —
@@ -767,6 +1223,15 @@ const SearchModal = ({
 					</div>
 				))}
 
+				{!visualActive && (
+					<RangeFilters
+						fields={rangeFields}
+						active={activeRanges}
+						onApply={onRangeApply}
+						busy={isSearching}
+					/>
+				)}
+
 				{error && (
 					<Notice status="error" isDismissible={false}>
 						{error}
@@ -779,20 +1244,32 @@ const SearchModal = ({
 					mainTitle={mainTitle}
 					main={mainContent}
 					busy={isSearching}
+					// Clearing the field keeps the last results in state but puts the
+					// highlights back on screen, so an empty field is never "active".
+					searchActive={!showEmptyState && (isSearching || null !== results)}
 					onSelect={(label) => void runSearch(label)}
 					onRemoveRecent={onRemoveRecent}
 					onClearRecent={onClearRecent}
 				/>
 
 				<p id={statusId} className="whsc-visually-hidden" role="status" aria-live="polite">
-					{isSearching && (i18n.searching || __('Searching…', 'webhead-search-cloud'))}
+					{isSearching && ('photo' === pendingKind
+						? __('Looking at your photo…', 'webhead-search-cloud')
+						: (i18n.searching || __('Searching…', 'webhead-search-cloud')))}
 					{!isSearching && results && (
 						resultsHits.length > 0
-							? sprintf(
-								/* translators: %d: number of results found. */
-								_n('%d result found.', '%d results found.', resultsHits.length, 'webhead-search-cloud'),
-								resultsHits.length
-							)
+							? (exactTotal && hasMore
+								? sprintf(
+									/* translators: 1: number of results shown. 2: total number of results found. */
+									__('Showing %1$d of %2$d results.', 'webhead-search-cloud'),
+									resultsHits.length,
+									totalResults
+								)
+								: sprintf(
+									/* translators: %d: number of results found. */
+									_n('%d result found.', '%d results found.', shownTotal, 'webhead-search-cloud'),
+									shownTotal
+								))
 							: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))
 					)}
 				</p>
@@ -803,6 +1280,24 @@ const SearchModal = ({
 				{assistantEnabled && assistantOpened && (
 					<div className="whsc-assistant-pane" hidden={'assistant' !== activeTab}>
 						<AiAssistant cardSource={cardSource} serverTemplates={serverTemplates} />
+					</div>
+				)}
+
+				{/* Same reasoning as the assistant: staying mounted keeps the
+				    visitor's answers if they look something up in Search mid-quiz. */}
+				{quizEnabled && quizOpened && (
+					<div className="whsc-quiz-pane" hidden={'quiz' !== activeTab}>
+						<QuizPane
+							cardSource={cardSource}
+							serverTemplates={serverTemplates}
+							onEmpty={() => {
+								// The capability says a quiz is published but the list
+								// came back empty; take the tab away rather than leave
+								// a door onto nothing.
+								setQuizEnabled(false);
+								setActiveTab('search');
+							}}
+						/>
 					</div>
 				)}
 			</div>

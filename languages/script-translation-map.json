@@ -35,8 +35,17 @@
     "src/admin/settings/components/tabs/SyncTab.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/tabs/UsageCard.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/blocks/products/edit.js": [
+        "public/bundle.products-block-editor.js"
+    ],
     "src/blocks/search/edit.js": [
         "public/bundle.search-block-editor.js"
+    ],
+    "src/components/Modal.js": [
+        "public/bundle.settings.js"
     ],
     "src/frontend/search/components/AiAssistant.js": [
         "public/bundle.search.js"
@@ -50,6 +59,15 @@
     "src/frontend/search/components/CompareTable.js": [
         "public/bundle.search.js"
     ],
+    "src/frontend/search/components/ProductList.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/QuizPane.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/RangeFilters.js": [
+        "public/bundle.search.js"
+    ],
     "src/frontend/search/components/SearchInput.js": [
         "public/bundle.search.js"
     ],
@@ -59,10 +77,19 @@
     "src/frontend/search/components/Suggestions.js": [
         "public/bundle.search.js"
     ],
+    "src/frontend/search/components/Trigger.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/VisualSearchButton.js": [
+        "public/bundle.search.js"
+    ],
     "src/frontend/search/components/templates.js": [
         "public/bundle.search.js"
     ],
     "src/settings/store/provider.js": [
         "public/bundle.settings.js"
+    ],
+    "src/utils/facets.js": [
+        "public/bundle.search.js"
     ]
 }

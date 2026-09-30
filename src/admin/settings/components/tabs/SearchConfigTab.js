@@ -5,11 +5,9 @@ import {
 	FormTokenField,
 	Notice,
 	RangeControl,
-	TextareaControl,
-	TextControl,
 } from '@wordpress/components';
-import { Card, Text } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { Card, InputControl, Text, TextareaControl } from '@wordpress/ui';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
@@ -20,6 +18,7 @@ import {
 	textToIds,
 	toPayload,
 } from '../../searchConfig';
+import { indexedFields, unindexedFields } from '../../indexedFields';
 import { Grid } from '../../../../components/Layout';
 import { showToast } from '../../../../toast';
 import IndexingSkeleton from './IndexingSkeleton';
@@ -32,62 +31,72 @@ const INDEXING_CONFIG_PATH =
 const TEST_CONNECTION_PATH =
 	pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
 
-// Suggestion-only, not a validation allow-list — the API is the source of
-// truth for what a field name is actually worth. These are the document
-// fields WooCommerce toggles produce when Products indexing is enabled.
-const WOO_FIELD_SUGGESTIONS = [
-	'price',
-	'regular_price',
-	'sale_price',
-	'sku',
-	'stock_status',
-	'categories',
-	'tags',
-	'featured',
-	'rating',
-	'review_count',
-];
-
-/** Keep exactly one boost row per currently-enabled content type, preserving any already-configured value. */
+/**
+ * One editable boost row per content type this site indexes, preserving any
+ * value already configured.
+ *
+ * Boosts for types this WordPress does not index are kept and passed through
+ * untouched. `PUT /search-config` replaces the whole section, so rebuilding the
+ * list from local post types alone would delete a boost set in the panel for a
+ * type that lives somewhere else - another store on the same index, or a type
+ * that was disabled here temporarily.
+ */
 const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 	const existing = new Map( typeBoosts.map( ( row ) => [ row.type, row.boost ] ) );
-
-	return enabledTypes.map( ( type ) => ( {
+	const local = enabledTypes.map( ( type ) => ( {
 		type,
 		boost: existing.has( type ) ? existing.get( type ) : 1,
 	} ) );
+
+	const foreign = typeBoosts.filter( ( row ) => ! enabledTypes.includes( row.type ) );
+
+	return [ ...local, ...foreign ];
 };
 
-const fieldPool = ( catalog ) => {
-	if ( ! catalog ) {
-		return [ 'title', 'content', 'type', 'url' ];
+/**
+ * Warns that configured fields exist on no document from this site. Not a
+ * validation error: the API accepts the names, and another source writing to
+ * the same index could carry them - but from here they silently match nothing.
+ *
+ * @param {Object}        props
+ * @param {Array<string>} props.fields  From `unindexedFields()`.
+ * @param {Function}      props.message Called with (quotedList, count).
+ */
+const UnindexedFieldsNotice = ( { fields, message } ) => {
+	if ( 0 === fields.length ) {
+		return null;
 	}
 
-	const pool = new Set( [ 'title', 'content', 'type', 'url' ] );
-	let hasEnabledProduct = false;
+	const quoted = fields.map( ( field ) => `"${ field }"` ).join( ', ' );
 
-	( catalog.post_types || [] ).forEach( ( postType ) => {
-		if ( ! postType.config?.enabled ) {
-			return;
-		}
-
-		if ( postType.is_product ) {
-			hasEnabledProduct = true;
-		}
-
-		( postType.config.fields || [] ).forEach( ( field ) => {
-			if ( field?.as ) {
-				pool.add( field.as );
-			}
-		} );
-	} );
-
-	if ( hasEnabledProduct && catalog.woo?.active ) {
-		WOO_FIELD_SUGGESTIONS.forEach( ( field ) => pool.add( field ) );
-	}
-
-	return Array.from( pool );
+	return (
+		<Notice status="warning" isDismissible={ false } className="whsc-unindexed-fields">
+			<p>{ message( quoted, fields.length ) }</p>
+		</Notice>
+	);
 };
+
+const unindexedFacetMessage = ( quoted, count ) => sprintf(
+	/* translators: %s: one or more quoted field names, e.g. "category". */
+	_n(
+		'No document on this site has a %s field, so its facet will always be empty. Choose a field from the list, or start indexing it in the Indexing tab.',
+		'No document on this site has the fields %s, so their facets will always be empty. Choose fields from the list, or start indexing them in the Indexing tab.',
+		count,
+		'webhead-search-cloud'
+	),
+	quoted
+);
+
+const unindexedSuggestMessage = ( quoted, count ) => sprintf(
+	/* translators: %s: one or more quoted field names, e.g. "category". */
+	_n(
+		'No document on this site has a %s field, so it will never add a suggestion. Choose a field from the list, or start indexing it in the Indexing tab.',
+		'No document on this site has the fields %s, so they will never add a suggestion. Choose fields from the list, or start indexing them in the Indexing tab.',
+		count,
+		'webhead-search-cloud'
+	),
+	quoted
+);
 
 const enabledTypeLabels = ( catalog ) => {
 	const labels = {};
@@ -172,9 +181,9 @@ const PopularSearchesCard = () => {
 				<TextareaControl
 					label={ __( 'Popular searches', 'webhead-search-cloud' ) }
 					hideLabelFromVision
-					help={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'webhead-search-cloud' ) }
+					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'webhead-search-cloud' ) }
 					value={ popularSearchesText }
-					onChange={ ( value ) => {
+					onValueChange={ ( value ) => {
 						setPopularSearchesText( value );
 						updateSetting( 'popular_searches', fromPopularSearchesText( value ) );
 					} }
@@ -260,6 +269,23 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 
 				<CheckboxControl
 					__nextHasNoMarginBottom
+					label={ __( 'Search by photo', 'webhead-search-cloud' ) }
+					help={
+						featureError( errors, 'visual_search' )
+						|| ( features.visual_search.available
+							? __(
+								'Shoppers can upload a photo instead of typing: a vision model describes what it sees and searches for that. A camera button appears in the search box once this is on.',
+								'webhead-search-cloud'
+							)
+							: unavailable )
+					}
+					checked={ features.visual_search.enabled }
+					disabled={ ! features.visual_search.available && ! features.visual_search.enabled }
+					onChange={ ( enabled ) => onChange( 'visual_search', enabled ) }
+				/>
+
+				<CheckboxControl
+					__nextHasNoMarginBottom
 					label={ __( 'Rank results by what visitors click', 'webhead-search-cloud' ) }
 					help={
 						featureError( errors, 'personalization' )
@@ -289,7 +315,12 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 const MerchandisingCard = ( { rules, errors, onChange } ) => {
 	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
 	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
-	const add = () => onChange( [ ...rules, { query: '', pinned: [], hidden: [], banner: '' } ] );
+	// Every field the normalizer produces, or the new row's category-trigger
+	// inputs are uncontrolled and show whatever the row at this index held.
+	const add = () => onChange( [
+		...rules,
+		{ query: '', filter_field: '', filter_value: '', pinned: [], hidden: [], banner: '' },
+	] );
 
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
@@ -308,16 +339,14 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 				{ rules.map( ( rule, index ) => (
 					<div className="whsc-merchandising-rule" key={ index }>
 						<div className="whsc-merchandising-rule__head">
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							<InputControl
 								label={ __( 'Trigger (search term contains)', 'webhead-search-cloud' ) }
-								help={ rowError( errors, 'merchandising', index, 'query' )
+								description={ rowError( errors, 'merchandising', index, 'query' )
 									|| ( '' === rule.query
 										? __( 'Empty: this rule applies to every search on the site.', 'webhead-search-cloud' )
 										: undefined ) }
 								value={ rule.query }
-								onChange={ ( query ) => update( index, { ...rule, query } ) }
+								onValueChange={ ( query ) => update( index, { ...rule, query } ) }
 							/>
 							<Button
 								icon="trash"
@@ -327,39 +356,117 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 								onClick={ () => remove( index ) }
 							/>
 						</div>
+						{ /* The optional category trigger. Both halves are needed for
+						     either to mean anything, so they sit together and the help
+						     text is on the pair rather than on each input. */ }
 						<div className="whsc-merchandising-rule__ids">
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Pin to top (document ids)', 'webhead-search-cloud' ) }
-								help={ listError( errors, 'merchandising', index, 'pinned' )
-									|| __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
-								value={ idsToText( rule.pinned ) }
-								onChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
+							<InputControl
+								label={ __( 'Also require filter (field)', 'webhead-search-cloud' ) }
+								list="whsc-field-suggestions"
+								description={ rowError( errors, 'merchandising', index, 'filter_field' )
+									|| __( 'Optional. A facet field, e.g. "categories".', 'webhead-search-cloud' ) }
+								value={ rule.filter_field }
+								onValueChange={ ( filter_field ) => update( index, { ...rule, filter_field } ) }
 							/>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Hide (document ids)', 'webhead-search-cloud' ) }
-								help={ listError( errors, 'merchandising', index, 'hidden' )
-									|| __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
-								value={ idsToText( rule.hidden ) }
-								onChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
+							<InputControl
+								label={ __( 'Filter value', 'webhead-search-cloud' ) }
+								description={ rowError( errors, 'merchandising', index, 'filter_value' )
+									|| __(
+										'With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself.',
+										'webhead-search-cloud'
+									) }
+								value={ rule.filter_value }
+								onValueChange={ ( filter_value ) => update( index, { ...rule, filter_value } ) }
 							/>
 						</div>
-						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
+						<div className="whsc-merchandising-rule__ids">
+							<InputControl
+								label={ __( 'Pin to top (document ids)', 'webhead-search-cloud' ) }
+								description={ listError( errors, 'merchandising', index, 'pinned' )
+									|| __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
+								value={ idsToText( rule.pinned ) }
+								onValueChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
+							/>
+							<InputControl
+								label={ __( 'Hide (document ids)', 'webhead-search-cloud' ) }
+								description={ listError( errors, 'merchandising', index, 'hidden' )
+									|| __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
+								value={ idsToText( rule.hidden ) }
+								onValueChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
+							/>
+						</div>
+						<InputControl
 							label={ __( 'Promotional banner', 'webhead-search-cloud' ) }
-							help={ rowError( errors, 'merchandising', index, 'banner' )
+							description={ rowError( errors, 'merchandising', index, 'banner' )
 								|| __( 'Optional message returned with the results for this search.', 'webhead-search-cloud' ) }
 							value={ rule.banner }
-							onChange={ ( banner ) => update( index, { ...rule, banner } ) }
+							onValueChange={ ( banner ) => update( index, { ...rule, banner } ) }
 						/>
 					</div>
 				) ) }
 				<Button variant="secondary" onClick={ add }>
 					{ __( 'Add a rule', 'webhead-search-cloud' ) }
+				</Button>
+			</Card.Content>
+		</Card.Root>
+	);
+};
+
+/**
+ * Send a search straight to a page instead of running it. For the lookups
+ * where a results list is the wrong answer - a promo term, a support page, a
+ * campaign landing page.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.rules
+ * @param {Object}   props.errors
+ * @param {Function} props.onChange Called with the full replacement list.
+ */
+const RedirectsCard = ( { rules, errors, onChange } ) => {
+	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
+	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
+	const add = () => onChange( [ ...rules, { query: '', url: '' } ] );
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
+			<Card.Header className="whsc-settings-card-header">
+				<div className="whsc-settings-card-copy">
+					<Card.Title render={ <h3 /> }>{ __( 'Search redirects', 'webhead-search-cloud' ) }</Card.Title>
+					<Text render={ <p /> } variant="body-sm">
+						{ __(
+							'Send a search straight to a page instead of showing results. The term has to match exactly - capitalisation and surrounding spaces are ignored, but "black friday" will not fire on "black friday deals".',
+							'webhead-search-cloud'
+						) }
+					</Text>
+				</div>
+			</Card.Header>
+			<Card.Content className="whsc-settings-card-content">
+				{ rules.map( ( rule, index ) => (
+					<div className="whsc-redirect-rule" key={ index }>
+						<InputControl
+							label={ __( 'Search term (exact)', 'webhead-search-cloud' ) }
+							description={ rowError( errors, 'redirects', index, 'query' ) }
+							value={ rule.query }
+							onValueChange={ ( query ) => update( index, { ...rule, query } ) }
+						/>
+						<InputControl
+							label={ __( 'Send them to', 'webhead-search-cloud' ) }
+							description={ rowError( errors, 'redirects', index, 'url' )
+								|| __( 'A full URL, or a path on this site starting with /.', 'webhead-search-cloud' ) }
+							value={ rule.url }
+							onValueChange={ ( url ) => update( index, { ...rule, url } ) }
+						/>
+						<Button
+							icon="trash"
+							isDestructive
+							variant="tertiary"
+							label={ __( 'Remove redirect', 'webhead-search-cloud' ) }
+							onClick={ () => remove( index ) }
+						/>
+					</div>
+				) ) }
+				<Button variant="secondary" onClick={ add }>
+					{ __( 'Add a redirect', 'webhead-search-cloud' ) }
 				</Button>
 			</Card.Content>
 		</Card.Root>
@@ -427,7 +534,8 @@ const SearchConfigTab = () => {
 		void load();
 	}, [] );
 
-	const pool = useMemo( () => fieldPool( catalog ), [ catalog ] );
+	const indexed = useMemo( () => indexedFields( catalog ), [ catalog ] );
+	const pool = indexed ?? [];
 	const typeLabels = useMemo( () => enabledTypeLabels( catalog ), [ catalog ] );
 	const hasSearchConfigChanges = JSON.stringify( config ) !== JSON.stringify( persistedConfig );
 	const hasUnsavedChanges = hasSearchConfigChanges || hasUnsavedPopularSearches;
@@ -580,14 +688,12 @@ const SearchConfigTab = () => {
 								<div className="whsc-search-config-repeater">
 									{ config.searchable_fields.map( ( row, index ) => (
 										<div className="whsc-search-config-row" key={ index }>
-											<TextControl
-												__next40pxDefaultSize
-												__nextHasNoMarginBottom
+											<InputControl
 												label={ __( 'Field', 'webhead-search-cloud' ) }
 												list="whsc-field-suggestions"
 												value={ row.field }
-												help={ rowError( fieldErrors, 'searchable_fields', index, 'field' ) }
-												onChange={ ( field ) => updateSearchableField( index, { ...row, field } ) }
+												description={ rowError( fieldErrors, 'searchable_fields', index, 'field' ) }
+												onValueChange={ ( field ) => updateSearchableField( index, { ...row, field } ) }
 											/>
 											<RangeControl
 												__next40pxDefaultSize
@@ -693,6 +799,10 @@ const SearchConfigTab = () => {
 								suggestions={ pool }
 								onChange={ ( value ) => set( 'facet_fields', value ) }
 							/>
+							<UnindexedFieldsNotice
+								fields={ unindexedFields( config.facet_fields, indexed ) }
+								message={ unindexedFacetMessage }
+							/>
 						</Card.Content>
 					</Card.Root>
 
@@ -719,6 +829,10 @@ const SearchConfigTab = () => {
 								suggestions={ pool }
 								onChange={ ( value ) => set( 'suggest_fields', value ) }
 							/>
+							<UnindexedFieldsNotice
+								fields={ unindexedFields( config.suggest_fields, indexed ) }
+								message={ unindexedSuggestMessage }
+							/>
 						</Card.Content>
 					</Card.Root>
 
@@ -738,9 +852,9 @@ const SearchConfigTab = () => {
 							<TextareaControl
 								label={ __( 'Synonyms', 'webhead-search-cloud' ) }
 								hideLabelFromVision
-								help={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'webhead-search-cloud' ) }
+								description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'webhead-search-cloud' ) }
 								value={ config.synonyms.join( '\n' ) }
-								onChange={ ( value ) =>
+								onValueChange={ ( value ) =>
 									set(
 										'synonyms',
 										value.split( '\n' ).map( ( line ) => line.trim() ).filter( ( line ) => '' !== line )
@@ -782,14 +896,12 @@ const SearchConfigTab = () => {
 									) ) }
 								</div>
 							) : (
-								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
+								<InputControl
 									label={ __( 'Languages', 'webhead-search-cloud' ) }
 									hideLabelFromVision
-									help={ __( 'Comma-separated ISO language codes, e.g. "de, en".', 'webhead-search-cloud' ) }
+									description={ __( 'Comma-separated ISO language codes, e.g. "de, en".', 'webhead-search-cloud' ) }
 									value={ config.languages.join( ', ' ) }
-									onChange={ ( value ) =>
+									onValueChange={ ( value ) =>
 										set(
 											'languages',
 											value.split( ',' ).map( ( code ) => code.trim() ).filter( ( code ) => '' !== code )
@@ -812,6 +924,12 @@ const SearchConfigTab = () => {
 						rules={ config.merchandising }
 						errors={ fieldErrors }
 						onChange={ ( rules ) => set( 'merchandising', rules ) }
+					/>
+
+					<RedirectsCard
+						rules={ config.redirects }
+						errors={ fieldErrors }
+						onChange={ ( rules ) => set( 'redirects', rules ) }
 					/>
 				</Grid>
 

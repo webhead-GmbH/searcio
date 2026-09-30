@@ -17,7 +17,6 @@ use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Blocks\Blocks_Manag
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Capabilities\Capability_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Database\Database_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Diagnostics_Manager;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Health_Result;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Site_Health_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Hooks\Hooks_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Jobs\Jobs_Manager;
@@ -58,12 +57,15 @@ use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
+use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
 use Webhead\WP\SearchCloud\Sync\Change_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
 use Webhead\WP\SearchCloud\WP_CLI\Sync_Command;
 use Webhead\WP\SearchCloud\WP_CLI\Command_Registrar;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
 use Webhead\WP\SearchCloud\Frontend\Elementor_Widget;
+use Webhead\WP\SearchCloud\Health\Health_Tests;
+use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -161,7 +163,10 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'verify_endpoint',
 			static function () use ( $container ): Verify_Endpoint {
-				return new Verify_Endpoint( $container->get( 'search_cloud_client' ) );
+				return new Verify_Endpoint(
+					$container->get( 'search_cloud_client' ),
+					$container->get( 'connection_state' )
+				);
 			}
 		);
 		$container->add( 'field_source_resolver', Field_Source_Resolver::class );
@@ -214,6 +219,7 @@ final class Plugin extends Base_Plugin {
 		$container->add( 'sync_runs_table', Sync_Runs_Table::class );
 		$container->add( 'change_queue_table', Change_Queue_Table::class );
 		$container->add( 'dirty_tracker', Dirty_Tracker::class );
+		$container->add( 'failed_deletes', Failed_Deletes::class );
 		$container->add(
 			'sync_state',
 			static function () use ( $container ): Sync_State {
@@ -229,6 +235,7 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'sync_state' ),
 					$container->get( 'dirty_tracker' ),
+					$container->get( 'failed_deletes' ),
 					$container->get( Jobs_Manager::class ),
 					$container->get( Settings_Manager::class )
 				);
@@ -242,6 +249,7 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'document_builder' ),
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'dirty_tracker' ),
+					$container->get( 'failed_deletes' ),
 					$container->get( 'change_queue_table' ),
 					$container->get( 'sync_state' ),
 					$container->get( Jobs_Manager::class )
@@ -353,6 +361,7 @@ final class Plugin extends Base_Plugin {
 
 	protected function register_blocks( Blocks_Manager $blocks_manager, Container $container ): void {
 		$blocks_manager->register_metadata_directory( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'blocks/search' );
+		$blocks_manager->register_metadata_directory( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'blocks/products' );
 	}
 
 	/**
@@ -384,6 +393,7 @@ final class Plugin extends Base_Plugin {
 				delete_option( Sync_Keys::OPTION_SNAPSHOT );
 				delete_option( Sync_Keys::OPTION_SEEN );
 				delete_option( Sync_Keys::OPTION_PRUNE );
+				delete_option( Sync_Keys::OPTION_FAILED_DELETES );
 			},
 			Uninstall_Manager::GROUP_DATA
 		);
@@ -421,159 +431,35 @@ final class Plugin extends Base_Plugin {
 	}
 
 	/**
-	 * Reachability is an async REST test, not a direct test, so it only makes
-	 * a live HTTP call when a user opens the Site Health page.
+	 * The framework calls this on `plugins_loaded`, before a text domain may load,
+	 * and every label is translated, so {@see Health_Tests} registers on `init`.
 	 */
 	protected function register_health_tests( Site_Health_Manager $site_health_manager, Container $container ): void {
-		$site_health_manager->register_direct_test(
-			'webhead_search_cloud_connection_configured',
-			__( 'webhead Search Cloud connection', 'webhead-search-cloud' ),
-			function () use ( $container ): array {
-				if ( ! $container->get( 'search_cloud_client' )->is_configured() ) {
-					return Health_Result::recommended(
-						test: 'webhead_search_cloud_connection_configured',
-						label: __( 'webhead Search Cloud is not connected yet', 'webhead-search-cloud' ),
-						badge_label: 'Search Cloud',
-						description: '<p>' . esc_html__( 'Add your site ID, write key, and write secret on the Connection tab before syncing content.', 'webhead-search-cloud' ) . '</p>'
-					)->to_wordpress_result();
-				}
-
-				return Health_Result::good(
-					test: 'webhead_search_cloud_connection_configured',
-					label: __( 'webhead Search Cloud connection is configured', 'webhead-search-cloud' ),
-					badge_label: 'Search Cloud',
-					description: '<p>' . esc_html__( 'Connection credentials are saved.', 'webhead-search-cloud' ) . '</p>'
-				)->to_wordpress_result();
-			}
-		);
-
-		$site_health_manager->register_async_rest_test(
-			'webhead_search_cloud_connection_reachable',
-			__( 'webhead Search Cloud reachability', 'webhead-search-cloud' ),
-			function () use ( $container ): array {
-				$client = $container->get( 'search_cloud_client' );
-
-				if ( ! $client->is_configured() ) {
-					return Health_Result::recommended(
-						test: 'webhead_search_cloud_connection_reachable',
-						label: __( 'webhead Search Cloud is not connected yet', 'webhead-search-cloud' ),
-						badge_label: 'Search Cloud',
-						description: '<p>' . esc_html__( 'Connect the plugin on the Connection tab, then re-run this check.', 'webhead-search-cloud' ) . '</p>'
-					)->to_wordpress_result();
-				}
-
-				$response = $client->health();
-
-				if ( $response->transport_error || ! $response->ok() ) {
-					return Health_Result::critical(
-						test: 'webhead_search_cloud_connection_reachable',
-						label: __( 'webhead Search Cloud could not be reached', 'webhead-search-cloud' ),
-						badge_label: 'Search Cloud',
-						description: '<p>' . esc_html__( 'The health check to Search Cloud failed. Check the Connection tab and verify your credentials.', 'webhead-search-cloud' ) . '</p>'
-					)->to_wordpress_result();
-				}
-
-				return Health_Result::good(
-					test: 'webhead_search_cloud_connection_reachable',
-					label: __( 'webhead Search Cloud is reachable', 'webhead-search-cloud' ),
-					badge_label: 'Search Cloud',
-					description: '<p>' . esc_html__( 'The last health check succeeded.', 'webhead-search-cloud' ) . '</p>'
-				)->to_wordpress_result();
-			}
-		);
-
-		$site_health_manager->register_direct_test(
-			'webhead_search_cloud_indexing_configured',
-			__( 'webhead Search Cloud indexing', 'webhead-search-cloud' ),
-			function () use ( $container ): array {
-				$indexable = $container->get( 'index_config' )->indexable_post_types();
-
-				if ( [] === $indexable ) {
-					return Health_Result::recommended(
-						test: 'webhead_search_cloud_indexing_configured',
-						label: __( 'No content types are enabled for indexing', 'webhead-search-cloud' ),
-						badge_label: 'Search Cloud',
-						description: '<p>' . esc_html__( 'Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send.', 'webhead-search-cloud' ) . '</p>'
-					)->to_wordpress_result();
-				}
-
-				return Health_Result::good(
-					test: 'webhead_search_cloud_indexing_configured',
-					label: __( 'Content types are enabled for indexing', 'webhead-search-cloud' ),
-					badge_label: 'Search Cloud',
-					description: sprintf(
-						/* translators: %d: number of enabled content types. */
-						'<p>' . esc_html__( '%d content type(s) are enabled for indexing.', 'webhead-search-cloud' ) . '</p>',
-						count( $indexable )
-					)
-				)->to_wordpress_result();
-			}
-		);
-
-		// Surface content left out of the index by language restriction instead
-		// of letting it go silently missing.
-		$site_health_manager->register_direct_test(
-			'webhead_search_cloud_language_coverage',
-			__( 'webhead Search Cloud language coverage', 'webhead-search-cloud' ),
-			function () use ( $container ): array {
-				$history = $container->get( 'sync_state' )->history(
-					[ 'per_page' => 1, 'order_by' => 'id', 'order' => 'desc' ]
-				);
-				$skipped = (int) ( $history['items'][0]['language_skipped'] ?? 0 );
-
-				if ( $skipped > 0 ) {
-					return Health_Result::recommended(
-						test: 'webhead_search_cloud_language_coverage',
-						label: sprintf(
-							/* translators: %d: number of posts skipped. */
-							__( '%d post(s) were skipped from the last sync due to language', 'webhead-search-cloud' ),
-							$skipped
-						),
-						badge_label: 'Search Cloud',
-						description: '<p>' . esc_html__( "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally.", 'webhead-search-cloud' ) . '</p>'
-					)->to_wordpress_result();
-				}
-
-				return Health_Result::good(
-					test: 'webhead_search_cloud_language_coverage',
-					label: __( 'No content was skipped due to language', 'webhead-search-cloud' ),
-					badge_label: 'Search Cloud',
-					description: '<p>' . esc_html__( 'Every indexable post is in an enabled language, or the site has not restricted languages.', 'webhead-search-cloud' ) . '</p>'
-				)->to_wordpress_result();
-			}
+		$this->get_hooks_manager()->register(
+			new Health_Tests(
+				$site_health_manager,
+				$container->get( 'search_cloud_client' ),
+				$container->get( 'index_config' ),
+				$container->get( 'sync_state' )
+			)
 		);
 	}
 
 	/**
-	 * Support/debug fields only; write key, write secret, and search key are
-	 * deliberately never added here.
+	 * Deferred to `init` for the same reason as {@see self::register_health_tests()}.
 	 */
 	protected function register_diagnostics( Diagnostics_Manager $diagnostics_manager, Container $container ): void {
-		$section_id = 'webhead-search-cloud-runtime';
-
-		$diagnostics_manager->register_section(
-			$section_id,
-			__( 'webhead Search Cloud runtime', 'webhead-search-cloud' ),
-			__( 'Connection, indexing, and sync state for support and debugging. Credentials are never included.', 'webhead-search-cloud' ),
-			true
+		$this->get_hooks_manager()->register(
+			new Runtime_Diagnostics(
+				$diagnostics_manager,
+				$container->get( 'search_cloud_client' ),
+				$container->get( 'index_config' ),
+				$container->get( 'sync_service' ),
+				$container->get( Settings_Manager::class ),
+				$container->get( 'multilingual_support' ),
+				$container->get( 'language_config' )
+			)
 		);
-
-		$client       = $container->get( 'search_cloud_client' );
-		$index_config = $container->get( 'index_config' );
-		$sync_service = $container->get( 'sync_service' );
-		$settings     = $container->get( Settings_Manager::class );
-		$status       = $sync_service->status();
-
-		$diagnostics_manager->add_field( $section_id, 'connection_configured', __( 'Connection configured', 'webhead-search-cloud' ), $client->is_configured() );
-		$diagnostics_manager->add_field( $section_id, 'indexable_post_types', __( 'Indexable content types', 'webhead-search-cloud' ), $index_config->indexable_post_types() );
-		$diagnostics_manager->add_field( $section_id, 'sync_retention_days', __( 'Sync history retention (days)', 'webhead-search-cloud' ), (int) $settings->get( Plugin_Settings::SYNC_RETENTION_DAYS ) );
-		$diagnostics_manager->add_field( $section_id, 'active_sync_status', __( 'Active sync run status', 'webhead-search-cloud' ), $status['active']['status'] ?? null );
-		$diagnostics_manager->add_field( $section_id, 'delete_data_on_uninstall', __( 'Delete data on uninstall', 'webhead-search-cloud' ), (bool) $settings->get( Plugin_Settings::DELETE_DATA_ON_UNINSTALL ) );
-
-		$multilingual = $container->get( 'multilingual_support' );
-
-		$diagnostics_manager->add_field( $section_id, 'multilingual_active', __( 'WPML/Polylang active', 'webhead-search-cloud' ), $multilingual->is_active() );
-		$diagnostics_manager->add_field( $section_id, 'enabled_languages', __( 'Enabled languages', 'webhead-search-cloud' ), $container->get( 'language_config' )->enabled_languages() );
 	}
 
 }

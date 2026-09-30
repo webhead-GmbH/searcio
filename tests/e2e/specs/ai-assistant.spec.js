@@ -65,6 +65,76 @@ test.describe( 'AI Assistant tab', () => {
 		await expect( page.locator( '.whsc-compare' ) ).toContainText( 'Alpine White' );
 	} );
 
+	/**
+	 * Products that carry nothing beyond a title, link, image and price have no
+	 * attribute to compare; Compare used to open a table with a header and no
+	 * body.
+	 */
+	test( 'offers Compare only when the products have something to compare', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantProducts: [ postHit( { title: 'Plain one' }, 'p-1' ), postHit( { title: 'Plain two' }, 'p-2' ) ],
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( /assistant/i );
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'anything' );
+		await input.press( 'Enter' );
+
+		await expect( page.locator( '.whsc-assistant__grid .whsc-card' ) ).toHaveCount( 2 );
+		await expect( page.getByRole( 'button', { name: /^compare$/i } ) ).toHaveCount( 0 );
+	} );
+
+	/**
+	 * Stacked on a phone, the message field goes under the products it asks
+	 * about. It was put there with CSS `order`, so Tab from the field jumped
+	 * back up into the products; and its sticky position was stuck to a box
+	 * that never scrolls, so it sat below the fold instead of pinned to it.
+	 */
+	test( 'on a phone the message field follows the products, in the DOM and pinned in view', async ( { page, requestUtils }, testInfo ) => {
+		test.skip( 'mobile-chrome' !== testInfo.project.name, 'The one-column layout.' );
+
+		// Short enough that the pane overflows the modal, so "in view" can only
+		// come from the field being pinned.
+		await page.setViewportSize( { width: 393, height: 480 } );
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantReply: 'Here are four.',
+			assistantProducts: [ 1, 2, 3, 4 ].map( ( n ) => postHit( { title: `Jacket ${ n }`, brand: `Brand ${ n }` }, `p-${ n }` ) ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( /assistant/i );
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'jackets' );
+		await input.press( 'Enter' );
+		await expect( page.locator( '.whsc-assistant__grid .whsc-card' ) ).toHaveCount( 4 );
+
+		const order = await widget.modal.locator( '.whsc-assistant' ).evaluate( ( pane ) =>
+			[ ...pane.querySelectorAll( '.whsc-assistant__thread, .whsc-assistant__results, .whsc-assistant__composer' ) ]
+				.map( ( el ) => el.className.split( ' ' )[ 0 ] )
+		);
+		expect( order ).toEqual( [ 'whsc-assistant__thread', 'whsc-assistant__results', 'whsc-assistant__composer' ] );
+
+		// Pinned: in view with the content scrolled to the top, not below it.
+		const content = widget.modal.locator( '.components-modal__content' );
+		expect( await content.evaluate( ( el ) => el.scrollHeight > el.clientHeight ) ).toBe( true );
+		await content.evaluate( ( el ) => el.scrollTo( 0, 0 ) );
+		await expect( page.locator( '.whsc-assistant__composer' ) ).toBeInViewport( { ratio: 1 } );
+
+		// Focus moves back from the field into the products just above it.
+		await input.focus();
+		await page.keyboard.press( 'Shift+Tab' );
+		expect( await page.evaluate( () => Boolean( document.activeElement?.closest( '.whsc-assistant__results' ) ) ) ).toBe( true );
+	} );
+
 	test( 'keeps the conversation when switching to Search and back', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			assistant: true,

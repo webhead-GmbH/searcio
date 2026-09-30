@@ -78,6 +78,22 @@ final class Plugin_Settings {
 	public const CONNECT_IDEMPOTENCY_KEY = 'connect_idempotency_key';
 
 	/**
+	 * When this site last asked Search Cloud to connect it, as a Unix timestamp.
+	 *
+	 * The domain-ownership ping arrives a couple of minutes later and is the
+	 * only legitimate caller of the public `/verify` route, so this bounds how
+	 * long that route will hand the write key out. See {@see \Webhead\WP\SearchCloud\Routing\Verify_Endpoint}.
+	 */
+	#[Setting(
+		type: 'integer',
+		default: 0,
+		show_in_rest: false,
+		label: 'Verification window opened at',
+		description: 'Unix timestamp of the last /connect attempt; bounds how long /verify answers.'
+	)]
+	public const VERIFICATION_OPENED_AT = 'verification_opened_at';
+
+	/**
 	 * Set when `/connect` returns `pending_claim` (the admin email already has a
 	 * Search Cloud account) so the Connection tab can keep showing the
 	 * "check your inbox" notice across page reloads. Cleared once working

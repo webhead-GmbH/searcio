@@ -12,6 +12,12 @@
  * WooCommerce: variations are not indexed directly — a variation change maps to
  * its parent product so the parent document (price range, SKUs) stays fresh.
  *
+ * Terms: a document carries term names (and, for product categories, every
+ * ancestor's name), so renaming, moving or deleting a term changes documents
+ * whose posts were never saved. Those posts - the term's own and those filed
+ * under any of its descendants - are queued like an edit. An edit that leaves
+ * both the name and the parent alone (a description, a slug) queues nothing.
+ *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
  */
@@ -21,6 +27,8 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Sync;
 
 use WP_Post;
+use WP_Taxonomy;
+use WP_Term;
 use Webhead\WP\SearchCloud\Database\Tables\Change_Queue_Table;
 use Webhead\WP\SearchCloud\Enums\Change_Action;
 use Webhead\WP\SearchCloud\Indexing\Document_Builder;
@@ -36,6 +44,13 @@ defined( 'ABSPATH' ) || exit;
 final class Change_Listener implements Actions {
 	/** Debounce window so a burst of edits coalesces into one drain. */
 	private const DRAIN_DELAY = 10;
+
+	/**
+	 * Name and parent of each term as it was before the edit in progress.
+	 *
+	 * @var array<int,array{name:string,parent:int}>
+	 */
+	private array $terms_before_edit = [];
 
 	public function __construct(
 		private Index_Config $config,
@@ -55,6 +70,9 @@ final class Change_Listener implements Actions {
 			'wp_trash_post'           => [ 'on_trash', 20, 1 ],
 			'before_delete_post'      => [ 'on_delete', 20, 1 ],
 			'woocommerce_update_product' => [ 'on_product', 20, 1 ],
+			'edit_terms'              => [ 'before_term_edit', 20, 2 ],
+			'edited_term'             => [ 'on_term_edited', 20, 3 ],
+			'pre_delete_term'         => [ 'on_term_delete', 20, 2 ],
 		];
 	}
 
@@ -82,6 +100,48 @@ final class Change_Listener implements Actions {
 		$this->sync_post( get_post( $product_id ) );
 	}
 
+	/**
+	 * `edit_terms` fires before the row is written, so the term still reads as
+	 * it was.
+	 */
+	public function before_term_edit( int $term_id, string $taxonomy ): void {
+		$term = get_term( $term_id, $taxonomy );
+
+		if ( $term instanceof WP_Term ) {
+			$this->terms_before_edit[ $term_id ] = [
+				'name'   => $term->name,
+				'parent' => $term->parent,
+			];
+		}
+	}
+
+	public function on_term_edited( int $term_id, int $tt_id, string $taxonomy ): void {
+		$before = $this->terms_before_edit[ $term_id ] ?? null;
+		unset( $this->terms_before_edit[ $term_id ] );
+
+		$term = get_term( $term_id, $taxonomy );
+
+		if ( ! $term instanceof WP_Term ) {
+			return;
+		}
+
+		if ( null !== $before && $before['name'] === $term->name && $before['parent'] === $term->parent ) {
+			return;
+		}
+
+		$this->sync_term_posts( $term_id, $taxonomy );
+	}
+
+	/**
+	 * Runs before WordPress detaches the term and hands its children to its
+	 * parent - the last moment its posts and its descendants can be found. The
+	 * queue holds post ids only and the drain runs later, so each document is
+	 * rebuilt once the term is gone.
+	 */
+	public function on_term_delete( int $term_id, string $taxonomy ): void {
+		$this->sync_term_posts( $term_id, $taxonomy );
+	}
+
 	private function sync_post( ?WP_Post $post ): void {
 		if ( ! $post instanceof WP_Post ) {
 			return;
@@ -104,6 +164,43 @@ final class Change_Listener implements Actions {
 			$this->enqueue( $post->ID, $post->post_type, Change_Action::Upsert );
 		} elseif ( $this->dirty->was_indexed( $post->ID ) ) {
 			$this->enqueue( $post->ID, $post->post_type, Change_Action::Delete );
+		}
+	}
+
+	private function sync_term_posts( int $term_id, string $taxonomy ): void {
+		$object = get_taxonomy( $taxonomy );
+
+		if ( ! $object instanceof WP_Taxonomy ) {
+			return;
+		}
+
+		$post_types = array_intersect( (array) $object->object_type, $this->config->indexable_post_types() );
+
+		if ( [] === $post_types ) {
+			return;
+		}
+
+		$term_ids = [ $term_id ];
+
+		if ( is_taxonomy_hierarchical( $taxonomy ) ) {
+			$children = get_term_children( $term_id, $taxonomy );
+			$term_ids = array_merge( $term_ids, is_array( $children ) ? array_map( 'intval', $children ) : [] );
+		}
+
+		$post_ids = get_objects_in_term( $term_ids, $taxonomy );
+
+		if ( ! is_array( $post_ids ) ) {
+			return;
+		}
+
+		$post_ids = array_values( array_unique( array_map( 'intval', $post_ids ) ) );
+
+		// A category can hold thousands of products; load them in one query
+		// rather than one per post.
+		_prime_post_caches( $post_ids );
+
+		foreach ( $post_ids as $post_id ) {
+			$this->sync_post( get_post( $post_id ) );
 		}
 	}
 

@@ -18,8 +18,9 @@
  * higher specificity than a plain `{{WRAPPER}} .whsc-trigger-*` selector would
  * have — a direct property there would lose to this file's own base rule.
  * Only `Group_Control_Border`/`Group_Control_Typography` output (which can't
- * be redirected to a custom property) still uses a direct selector, boosted
- * with a no-op `:not()` pair where it would otherwise lose the same way.
+ * be redirected to a custom property) still uses a direct selector, and every
+ * one of those goes through {@see self::boosted_selector()} so it outranks
+ * the same rules.
  * `get_script_depends()`/`get_style_depends()` declare the shared runtime
  * bundle so Elementor enqueues it in the editor preview too, giving a live,
  * interactive preview like any native widget.
@@ -45,6 +46,21 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Search_Widget extends Widget_Base {
+	/**
+	 * Four no-op `:not()`s, adding (0,4,0) to a selector. The class never
+	 * exists in the markup, so matching is unchanged.
+	 *
+	 * Every rule in `style.scss` carries the tripled
+	 * `[data-webhead-frontend-root]` prefix, and the ones that set type on a
+	 * control's target reach (0,5,0) — `.whsc-modal .whsc-section-title`,
+	 * `.whsc-modal .whsc-popular-item`, `.whsc-modal .whsc-search-input__field`
+	 * — against (0,2,0) for a plain `.whsc-instance-{{ID}} .whsc-card__title`.
+	 * A site's Elementor Kit (Site Settings) styles bare `input` and `button`
+	 * elements too, at up to (0,3,1). Four points lift the lightest selector here to (0,6,0),
+	 * above all of them.
+	 */
+	private const SPECIFICITY_BOOST = ':not(.whsc-specificity-boost):not(.whsc-specificity-boost):not(.whsc-specificity-boost):not(.whsc-specificity-boost)';
+
 	public function get_name(): string {
 		return 'webhead-search-cloud-search';
 	}
@@ -88,25 +104,33 @@ final class Search_Widget extends Widget_Base {
 	protected function register_controls(): void {
 		$this->register_content_controls();
 
+		// Roughly in the order a visitor meets each part: the trigger, the
+		// modal around everything, then the search itself, its results, and the
+		// other modes last.
 		$this->register_trigger_style_controls();
 		$this->register_modal_style_controls();
+		$this->register_tabs_style_controls();
 		$this->register_field_style_controls();
 		$this->register_button_style_controls();
 		$this->register_suggestion_style_controls();
 		$this->register_browse_style_controls();
 		$this->register_facet_style_controls();
-		$this->register_assistant_style_controls();
 		$this->register_card_style_controls();
 		$this->register_carousel_style_controls();
+		$this->register_banner_style_controls();
+		$this->register_assistant_style_controls();
+		$this->register_quiz_style_controls();
 	}
 
 	/* ---------------------------------------------------------------------
 	 * Content
 	 * ------------------------------------------------------------------ */
 	private function register_content_controls(): void {
+		// Control ids are unchanged from when all of these shared one section,
+		// so saved widgets keep every value; only the grouping is new.
 		$this->start_controls_section(
 			'webhead_search_cloud_content',
-			[ 'label' => __( 'Search', 'webhead-search-cloud' ) ]
+			[ 'label' => __( 'Trigger', 'webhead-search-cloud' ) ]
 		);
 
 		$this->add_control(
@@ -133,50 +157,29 @@ final class Search_Widget extends Widget_Base {
 		);
 
 		$this->add_control(
-			'scope_type',
-			[
-				'label'   => __( 'Restrict to type', 'webhead-search-cloud' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => '',
-				'options' => $this->scope_type_options(),
-			]
-		);
-
-		$this->add_control(
-			'card_source',
-			[
-				'label'       => __( 'Card source', 'webhead-search-cloud' ),
-				'type'        => Controls_Manager::SELECT,
-				'default'     => 'plugin',
-				'options'     => [
-					'plugin' => __( 'Plugin templates', 'webhead-search-cloud' ),
-					'server' => __( 'Search Cloud templates', 'webhead-search-cloud' ),
-				],
-				'description' => __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'webhead-search-cloud' ),
-			]
-		);
-
-		$this->add_control(
-			'highlights_source',
-			[
-				'label'       => __( 'Highlights source', 'webhead-search-cloud' ),
-				'type'        => Controls_Manager::SELECT,
-				'default'     => 'newest',
-				'options'     => [
-					'newest'   => __( 'Newest', 'webhead-search-cloud' ),
-					'featured' => __( 'Featured', 'webhead-search-cloud' ),
-				],
-				'description' => __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'webhead-search-cloud' ),
-			]
-		);
-
-		$this->add_control(
 			'placeholder',
 			[
 				'label'       => __( 'Placeholder text', 'webhead-search-cloud' ),
 				'type'        => Controls_Manager::TEXT,
 				'default'     => '',
 				'placeholder' => __( 'Search…', 'webhead-search-cloud' ),
+			]
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'webhead_search_cloud_behaviour',
+			[ 'label' => __( 'Search', 'webhead-search-cloud' ) ]
+		);
+
+		$this->add_control(
+			'scope_type',
+			[
+				'label'   => __( 'Restrict to type', 'webhead-search-cloud' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => '',
+				'options' => $this->scope_type_options(),
 			]
 		);
 
@@ -228,6 +231,48 @@ final class Search_Widget extends Widget_Base {
 			]
 		);
 
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'webhead_search_cloud_results',
+			[ 'label' => __( 'Results', 'webhead-search-cloud' ) ]
+		);
+
+		$this->add_control(
+			'card_source',
+			[
+				'label'       => __( 'Card source', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'plugin',
+				'options'     => [
+					'plugin' => __( 'Plugin templates', 'webhead-search-cloud' ),
+					'server' => __( 'Search Cloud templates', 'webhead-search-cloud' ),
+				],
+				'description' => __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'webhead-search-cloud' ),
+			]
+		);
+
+		$this->add_control(
+			'highlights_source',
+			[
+				'label'       => __( 'Highlights source', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'newest',
+				'options'     => [
+					'newest'   => __( 'Newest', 'webhead-search-cloud' ),
+					'featured' => __( 'Featured', 'webhead-search-cloud' ),
+				],
+				'description' => __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'webhead-search-cloud' ),
+			]
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'webhead_search_cloud_modal',
+			[ 'label' => __( 'Modal', 'webhead-search-cloud' ) ]
+		);
+
 		$this->add_control(
 			'modal_animation',
 			[
@@ -253,6 +298,34 @@ final class Search_Widget extends Widget_Base {
 				'range'      => [ 'ms' => [ 'min' => 0, 'max' => 1500, 'step' => 50 ] ],
 				'condition'  => [ 'modal_animation!' => 'none' ],
 				'selectors'  => [ '.whsc-instance-{{ID}}' => '--whsc-anim-duration: {{SIZE}}ms;' ],
+			]
+		);
+
+		// The modal is closed until a visitor opens it, so without this every
+		// Style setting below the Trigger was invisible while being changed.
+		$this->add_control(
+			'editor_preview',
+			[
+				'label'        => __( 'Keep open while editing', 'webhead-search-cloud' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'label_on'     => __( 'On', 'webhead-search-cloud' ),
+				'label_off'    => __( 'Off', 'webhead-search-cloud' ),
+				'return_value' => 'yes',
+				'separator'    => 'before',
+				'description'  => __( 'Shows the modal in the editor so you can see the Style settings as you change them. Visitors never see it open by itself.', 'webhead-search-cloud' ),
+			]
+		);
+
+		$this->add_control(
+			'editor_preview_query',
+			[
+				'label'       => __( 'Preview search', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => __( 'e.g. shirt', 'webhead-search-cloud' ),
+				'condition'   => [ 'editor_preview' => 'yes' ],
+				'description' => __( 'Runs this search in the preview, so result cards, filters and prices are there to style. Leave empty to style the empty state: recent and popular searches, and the highlights.', 'webhead-search-cloud' ),
 			]
 		);
 
@@ -300,6 +373,22 @@ final class Search_Widget extends Widget_Base {
 			[
 				'label' => __( 'Trigger', 'webhead-search-cloud' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		// The trigger is an inline box, so the widget's own text alignment
+		// places it in the column, in either mode.
+		$this->add_responsive_control(
+			'trigger_align',
+			[
+				'label'     => __( 'Alignment', 'webhead-search-cloud' ),
+				'type'      => Controls_Manager::CHOOSE,
+				'options'   => [
+					'left'   => [ 'title' => __( 'Left', 'webhead-search-cloud' ), 'icon' => 'eicon-text-align-left' ],
+					'center' => [ 'title' => __( 'Center', 'webhead-search-cloud' ), 'icon' => 'eicon-text-align-center' ],
+					'right'  => [ 'title' => __( 'Right', 'webhead-search-cloud' ), 'icon' => 'eicon-text-align-right' ],
+				],
+				'selectors' => [ $this->boosted_selector( '{{WRAPPER}}' ) => 'text-align: {{VALUE}};' ],
 			]
 		);
 
@@ -407,6 +496,18 @@ final class Search_Widget extends Widget_Base {
 		// `--whsc-input-*` vars the modal's own "Search field" style section
 		// writes — both fall back to that shared baseline by default, but
 		// setting one must not silently overwrite the other.
+		$this->add_responsive_control(
+			'trigger_box_width',
+			[
+				'label'      => __( 'Width', 'webhead-search-cloud' ),
+				'type'       => Controls_Manager::SLIDER,
+				'condition'  => [ 'mode' => 'box' ],
+				'size_units' => [ '%', 'px' ],
+				'range'      => [ '%' => [ 'min' => 10, 'max' => 100 ], 'px' => [ 'min' => 120, 'max' => 1200 ] ],
+				'selectors'  => [ '{{WRAPPER}} .webhead-search-cloud-trigger' => '--whsc-trigger-box-width: {{SIZE}}{{UNIT}};' ],
+			]
+		);
+
 		$this->add_control(
 			'trigger_box_text',
 			[
@@ -443,15 +544,11 @@ final class Search_Widget extends Widget_Base {
 				// `Group_Control_Border` always emits literal `border-*`
 				// properties (it has no custom-property output mode), so it
 				// can't sidestep the specificity fight the same way the
-				// controls above do. The `:not()` pair is a no-op for
-				// matching (the class never exists in the markup) that
-				// exists purely to add two class-level specificity points,
-				// enough to outrank this file's own
-				// `.whsc-trigger-box .components-input-control__container`
-				// rule. Targets the container, not the `<input>` itself —
+				// controls above do, and is boosted instead. Targets the
+				// container, not the `<input>` itself —
 				// `@wordpress/components`' `SearchControl` draws the visible
 				// border/box around that shared container, not the input.
-				'selector'  => '{{WRAPPER}} .whsc-trigger-box .components-input-control__container:not(.whsc-specificity-boost):not(.whsc-specificity-boost)',
+				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__container' ),
 			]
 		);
 		$this->add_responsive_control(
@@ -469,7 +566,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'      => 'trigger_box_typography',
 				'condition' => [ 'mode' => 'box' ],
-				'selector'  => '{{WRAPPER}} .whsc-trigger-box input',
+				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box input' ),
 			]
 		);
 
@@ -490,10 +587,146 @@ final class Search_Widget extends Widget_Base {
 
 		$this->var_color( 'modal_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-bg' );
 		$this->var_color( 'modal_text', __( 'Text color', 'webhead-search-cloud' ), '--whsc-text' );
-		$this->var_color( 'modal_accent', __( 'Accent color', 'webhead-search-cloud' ), '--whsc-accent' );
+		$this->var_color(
+			'modal_accent',
+			__( 'Accent color', 'webhead-search-cloud' ),
+			'--whsc-accent',
+			[ 'description' => __( 'Selected states, focus rings, links and the default button colour. Anything set more specifically in another section wins.', 'webhead-search-cloud' ) ]
+		);
+		$this->var_color(
+			'modal_overlay',
+			__( 'Overlay', 'webhead-search-cloud' ),
+			'--whsc-overlay-bg',
+			[ 'description' => __( 'Covers the page behind the open modal. A colour with transparency keeps the page visible.', 'webhead-search-cloud' ) ]
+		);
+
+		// A font family only: sizes and weights belong to each part, and a size
+		// set here would be overridden by every one of them anyway.
+		$this->add_control(
+			'modal_font_family',
+			[
+				'label'       => __( 'Font family', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::FONT,
+				'default'     => '',
+				'separator'   => 'before',
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-font-family: "{{VALUE}}";' ],
+				'description' => __( 'Used by all text in the modal and in the search box trigger. Leave empty to use the page font.', 'webhead-search-cloud' ),
+			]
+		);
+
 		$this->var_slider( 'modal_radius', __( 'Corner radius', 'webhead-search-cloud' ), '--whsc-radius-panel', 0, 40, false, [ 'separator' => 'before' ] );
+		// Docked to the top edge, rounded top corners would only show a gap, so
+		// by default the radius rounds the bottom two.
+		$this->add_control(
+			'modal_round_top',
+			[
+				'label'        => __( 'Round the top corners too', 'webhead-search-cloud' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'selectors'    => [ '.whsc-instance-{{ID}}' => '--whsc-radius-panel-top: var(--whsc-radius-panel);' ],
+				'description'  => __( 'For a modal set down from the top of the screen.', 'webhead-search-cloud' ),
+			]
+		);
 		$this->var_slider( 'modal_padding', __( 'Padding', 'webhead-search-cloud' ), '--whsc-padding', 0, 80, true );
 		$this->var_slider( 'modal_gap', __( 'Section spacing', 'webhead-search-cloud' ), '--whsc-gap', 0, 80, true );
+
+		$this->add_responsive_control(
+			'modal_width',
+			[
+				'label'       => __( 'Modal width', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => [ 'px', '%', 'vw' ],
+				'range'       => [ 'px' => [ 'min' => 320, 'max' => 1920 ], '%' => [ 'min' => 30, 'max' => 100 ], 'vw' => [ 'min' => 30, 'max' => 100 ] ],
+				'separator'   => 'before',
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-modal-width: {{SIZE}}{{UNIT}};' ],
+				'description' => __( 'Leave empty for a full-width modal docked to the top of the screen. A narrower one is centred.', 'webhead-search-cloud' ),
+			]
+		);
+		$this->var_slider( 'modal_offset', __( 'Distance from top', 'webhead-search-cloud' ), '--whsc-modal-offset', 0, 200, true );
+
+		// The modal spans the viewport; this caps the content inside it, so on a
+		// wide screen it can line up with the site's own container.
+		$this->add_responsive_control(
+			'modal_content_width',
+			[
+				'label'       => __( 'Content width', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => [ 'px', '%' ],
+				'range'       => [ 'px' => [ 'min' => 480, 'max' => 1920 ], '%' => [ 'min' => 40, 'max' => 100 ] ],
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-content-width: {{SIZE}}{{UNIT}};' ],
+				'description' => __( "The widest the content grows inside the full-width modal. Use your theme's container width to line it up with the page.", 'webhead-search-cloud' ),
+			]
+		);
+
+		$this->add_control(
+			'section_title_heading',
+			[ 'label' => __( 'Section titles', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->add_control(
+			'section_title_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'Headings such as "Recent searches", "Popular searches" and the results count. Filter group names have their own, under Filters.', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
+		);
+		$this->var_color( 'title_color', __( 'Color', 'webhead-search-cloud' ), '--whsc-title-color' );
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name'     => 'title_typography',
+				'label'    => __( 'Typography', 'webhead-search-cloud' ),
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-section-title' ),
+			]
+		);
+
+		$this->end_controls_section();
+	}
+
+	/* ---------------------------------------------------------------------
+	 * Style — Mode tabs (Search / AI Assistant / Product finder). Only drawn
+	 * when a second mode is on for the site, and they sit above every mode,
+	 * so they are not the assistant's own.
+	 * ------------------------------------------------------------------ */
+	private function register_tabs_style_controls(): void {
+		$this->start_controls_section(
+			'style_mode_tabs',
+			[
+				'label' => __( 'Mode tabs', 'webhead-search-cloud' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'mode_tabs_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'The row of tabs above the search box. It only appears when the AI assistant or a guided quiz is on for your site.', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
+		);
+
+		$this->start_controls_tabs( 'tab_state_tabs' );
+		$this->start_controls_tab( 'tab_state_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'tab_text', __( 'Tab text', 'webhead-search-cloud' ), '--whsc-tab-text' );
+		$this->end_controls_tab();
+		$this->start_controls_tab( 'tab_state_active', [ 'label' => __( 'Active', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'tab_text_active', __( 'Tab text', 'webhead-search-cloud' ), '--whsc-tab-text-active' );
+		$this->var_color( 'tab_indicator', __( 'Underline', 'webhead-search-cloud' ), '--whsc-tab-indicator' );
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->var_color( 'tab_border', __( 'Divider', 'webhead-search-cloud' ), '--whsc-tab-border', [ 'separator' => 'before' ] );
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name'     => 'tab_typography',
+				'label'    => __( 'Typography', 'webhead-search-cloud' ),
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-modal-tab' ),
+			]
+		);
 
 		$this->end_controls_section();
 	}
@@ -526,15 +759,12 @@ final class Search_Widget extends Widget_Base {
 
 		$this->var_slider( 'field_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-input-radius', 0, 999, false, [ 'separator' => 'before' ] );
 
-		// `.whsc-modal.whsc-instance-{{ID}}` (the modal root carries both classes)
-		// out-specifies the plugin's own `.whsc-modal .whsc-search-input__field`
-		// base rule, so the user's typography reliably wins regardless of
-		// stylesheet load order.
+		// The modal root carries both `.whsc-modal` and the instance class.
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			[
 				'name'     => 'field_typography',
-				'selector' => '.whsc-modal.whsc-instance-{{ID}} .whsc-search-input__field',
+				'selector' => $this->boosted_selector( '.whsc-modal.whsc-instance-{{ID}} .whsc-search-input__field' ),
 			]
 		);
 
@@ -555,7 +785,15 @@ final class Search_Widget extends Widget_Base {
 
 		$this->add_control(
 			'submit_heading',
-			[ 'label' => __( 'Search button', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
+			[ 'label' => __( 'Primary buttons', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
+		);
+		$this->add_control(
+			'submit_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'The Search button, "Load more" under the results and the price filter\'s Apply.', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
 		);
 
 		$this->start_controls_tabs( 'submit_color_tabs' );
@@ -570,8 +808,21 @@ final class Search_Widget extends Widget_Base {
 		$this->end_controls_tabs();
 
 		$this->var_slider( 'submit_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-btn-radius', 0, 999, false, [ 'separator' => 'before' ] );
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name'     => 'submit_typography',
+				'label'    => __( 'Typography', 'webhead-search-cloud' ),
+				'selector' => $this->boosted_selector(
+					'.whsc-instance-{{ID}} .whsc-submit-btn',
+					'.whsc-instance-{{ID}} .whsc-load-more__button',
+					'.whsc-instance-{{ID}} .whsc-range__apply'
+				),
+			]
+		);
 
 		$this->icon_button_controls( 'voice', __( 'Voice button', 'webhead-search-cloud' ), 'voice' );
+		$this->icon_button_controls( 'visual', __( 'Photo search button', 'webhead-search-cloud' ), 'visual' );
 		$this->icon_button_controls( 'close', __( 'Close button', 'webhead-search-cloud' ), 'close' );
 		$this->icon_button_controls( 'clearbtn', __( 'Clear button', 'webhead-search-cloud' ), 'clearbtn' );
 
@@ -641,6 +892,15 @@ final class Search_Widget extends Widget_Base {
 		$this->end_controls_tab();
 		$this->end_controls_tabs();
 
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name'     => 'suggest_typography',
+				'label'    => __( 'Item typography', 'webhead-search-cloud' ),
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-suggestion' ),
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -656,19 +916,9 @@ final class Search_Widget extends Widget_Base {
 			]
 		);
 
-		$this->var_color( 'title_color', __( 'Section title color', 'webhead-search-cloud' ), '--whsc-title-color' );
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			[
-				'name'     => 'title_typography',
-				'label'    => __( 'Section title typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-section-title',
-			]
-		);
-
 		$this->add_control(
 			'chip_heading',
-			[ 'label' => __( 'Recent chips', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+			[ 'label' => __( 'Recent chips', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
 		);
 		$this->start_controls_tabs( 'chip_tabs' );
 		$this->start_controls_tab( 'chip_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
@@ -739,7 +989,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'popular_typography',
 				'label'    => __( 'Popular typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-popular-item',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-popular-item' ),
 			]
 		);
 
@@ -747,13 +997,14 @@ final class Search_Widget extends Widget_Base {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Type filters
+	 * Style — Filters: the content-type chips and every facet group
+	 * (categories, brands, ...) share one look.
 	 * ------------------------------------------------------------------ */
 	private function register_facet_style_controls(): void {
 		$this->start_controls_section(
 			'style_facets',
 			[
-				'label' => __( 'Type filters', 'webhead-search-cloud' ),
+				'label' => __( 'Filters', 'webhead-search-cloud' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			]
 		);
@@ -781,7 +1032,7 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'facet_typography',
 				'label'    => __( 'Label typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-facet__label',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-facet__label' ),
 			]
 		);
 
@@ -795,7 +1046,36 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'facet_count_typography',
 				'label'    => __( 'Count typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-facet__count',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-facet__count' ),
+			]
+		);
+
+		$this->add_control(
+			'facet_group_heading',
+			[ 'label' => __( 'Group names', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->add_control(
+			'facet_group_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'The small title above each group of filters, such as "Categories" or "Price".', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
+		);
+		// By default the label is the section title colour at 70% opacity; a
+		// colour picked for it is used as picked, so the opacity goes with it.
+		$this->var_color(
+			'facet_group_color',
+			__( 'Color', 'webhead-search-cloud' ),
+			'--whsc-facet-group-label',
+			[ 'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-facet-group-label: {{VALUE}}; --whsc-facet-group-label-opacity: 1;' ] ]
+		);
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name'     => 'facet_group_typography',
+				'label'    => __( 'Typography', 'webhead-search-cloud' ),
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-facet-group__label' ),
 			]
 		);
 
@@ -803,9 +1083,9 @@ final class Search_Widget extends Widget_Base {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Search / AI Assistant tabs and the assistant pane. Shown only
-	 * when the plan includes the assistant, but the controls are always
-	 * available so a site can theme it ahead of enabling it.
+	 * Style — the assistant pane. Shown only when the plan includes the
+	 * assistant, but the controls are always available so a site can theme it
+	 * ahead of enabling it.
 	 * ------------------------------------------------------------------ */
 	private function register_assistant_style_controls(): void {
 		$this->start_controls_section(
@@ -816,34 +1096,76 @@ final class Search_Widget extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
-			'tab_heading',
-			[ 'label' => __( 'Search / AI tabs', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING ]
-		);
-
-		$this->start_controls_tabs( 'tab_state_tabs' );
-		$this->start_controls_tab( 'tab_state_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
-		$this->var_color( 'tab_text', __( 'Tab text', 'webhead-search-cloud' ), '--whsc-tab-text' );
-		$this->end_controls_tab();
-		$this->start_controls_tab( 'tab_state_active', [ 'label' => __( 'Active', 'webhead-search-cloud' ) ] );
-		$this->var_color( 'tab_text_active', __( 'Tab text', 'webhead-search-cloud' ), '--whsc-tab-text-active' );
-		$this->var_color( 'tab_indicator', __( 'Underline', 'webhead-search-cloud' ), '--whsc-tab-indicator' );
-		$this->end_controls_tab();
-		$this->end_controls_tabs();
-
-		$this->var_color( 'tab_border', __( 'Divider', 'webhead-search-cloud' ), '--whsc-tab-border', [ 'separator' => 'before' ] );
-
-		$this->add_control(
-			'assistant_heading',
-			[ 'label' => __( 'Assistant', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
-		);
-
 		$this->var_color( 'assistant_accent', __( 'Accent (avatar, dots)', 'webhead-search-cloud' ), '--whsc-assistant-accent' );
 		$this->var_color( 'assistant_text', __( 'Reply text', 'webhead-search-cloud' ), '--whsc-assistant-text' );
 		$this->var_color( 'assistant_user_bg', __( 'Your message background', 'webhead-search-cloud' ), '--whsc-assistant-user-bg' );
 		$this->var_color( 'assistant_user_text', __( 'Your message text', 'webhead-search-cloud' ), '--whsc-assistant-user-text' );
 		$this->var_color( 'assistant_row_bg', __( 'Compare row shading', 'webhead-search-cloud' ), '--whsc-assistant-row-bg' );
 		$this->var_slider( 'assistant_input_radius', __( 'Message field radius', 'webhead-search-cloud' ), '--whsc-assistant-input-radius', 0, 999, false, [ 'separator' => 'before' ] );
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * The guided quiz tab. Its answers are the only thing on screen while a
+	 * question is showing, so they get their own colours rather than borrowing
+	 * the filter chips' - a merchant will usually want them to read as the
+	 * primary action.
+	 */
+	private function register_banner_style_controls(): void {
+		$this->start_controls_section(
+			'style_banner',
+			[
+				'label' => __( 'Promotional banner', 'webhead-search-cloud' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'banner_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'Shown above the results when a merchandising rule attaches a banner to the search.', 'webhead-search-cloud' ),
+				'content_classes' => 'elementor-descriptor',
+			]
+		);
+
+		$this->var_color( 'banner_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-banner-bg' );
+		$this->var_color( 'banner_text', __( 'Text', 'webhead-search-cloud' ), '--whsc-banner-text' );
+
+		$this->end_controls_section();
+	}
+
+	private function register_quiz_style_controls(): void {
+		$this->start_controls_section(
+			'style_quiz',
+			[
+				'label' => __( 'Guided quiz', 'webhead-search-cloud' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->var_color( 'quiz_question', __( 'Question text', 'webhead-search-cloud' ), '--whsc-quiz-question' );
+
+		$this->add_control(
+			'quiz_option_heading',
+			[ 'label' => __( 'Answers', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+
+		$this->start_controls_tabs( 'quiz_option_tabs' );
+		$this->start_controls_tab( 'quiz_option_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'quiz_option_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-quiz-option-bg' );
+		$this->var_color( 'quiz_option_text', __( 'Text', 'webhead-search-cloud' ), '--whsc-quiz-option-text' );
+		$this->var_color( 'quiz_option_border', __( 'Border', 'webhead-search-cloud' ), '--whsc-quiz-option-border' );
+		$this->end_controls_tab();
+		$this->start_controls_tab( 'quiz_option_hover', [ 'label' => __( 'Hover', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'quiz_option_bg_hover', __( 'Background', 'webhead-search-cloud' ), '--whsc-quiz-option-bg-hover' );
+		$this->var_color( 'quiz_option_text_hover', __( 'Text', 'webhead-search-cloud' ), '--whsc-quiz-option-text-hover' );
+		$this->var_color( 'quiz_option_border_hover', __( 'Border', 'webhead-search-cloud' ), '--whsc-quiz-option-border-hover' );
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+
+		$this->var_slider( 'quiz_option_radius', __( 'Answer radius', 'webhead-search-cloud' ), '--whsc-quiz-option-radius', 0, 999, false, [ 'separator' => 'before' ] );
 
 		$this->end_controls_section();
 	}
@@ -874,22 +1196,87 @@ final class Search_Widget extends Widget_Base {
 		$this->var_slider( 'card_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-card-radius', 0, 40, false, [ 'separator' => 'before' ] );
 		$this->var_slider( 'card_padding', __( 'Padding', 'webhead-search-cloud' ), '--whsc-card-padding', 0, 40, true );
 
-		$this->var_color( 'card_title_color', __( 'Title color', 'webhead-search-cloud' ), '--whsc-card-title', [ 'separator' => 'before' ] );
+		$this->add_control(
+			'card_image_heading',
+			[ 'label' => __( 'Image', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->add_control(
+			'card_image_ratio',
+			[
+				'label'     => __( 'Aspect ratio', 'webhead-search-cloud' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => [
+					''       => __( 'Square (default)', 'webhead-search-cloud' ),
+					'4 / 5'  => __( 'Portrait 4:5', 'webhead-search-cloud' ),
+					'3 / 4'  => __( 'Portrait 3:4', 'webhead-search-cloud' ),
+					'2 / 3'  => __( 'Tall 2:3', 'webhead-search-cloud' ),
+					'4 / 3'  => __( 'Landscape 4:3', 'webhead-search-cloud' ),
+					'16 / 9' => __( 'Wide 16:9', 'webhead-search-cloud' ),
+				],
+				'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-card-image-ratio: {{VALUE}};' ],
+			]
+		);
+		$this->add_control(
+			'card_image_fit',
+			[
+				'label'       => __( 'Fit', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::SELECT,
+				'default'     => '',
+				'options'     => [
+					''        => __( 'Fill and crop (default)', 'webhead-search-cloud' ),
+					'contain' => __( 'Show the whole image', 'webhead-search-cloud' ),
+				],
+				'description' => __( '"Show the whole image" keeps packshots on a plain background uncropped; the background below fills the space around them.', 'webhead-search-cloud' ),
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-card-image-fit: {{VALUE}};' ],
+			]
+		);
+		$this->var_color( 'card_image_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-card-image-bg' );
+		$this->var_slider( 'card_image_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-card-image-radius', 0, 40 );
+
+		$this->add_control(
+			'card_badge_heading',
+			[ 'label' => __( 'Sale badge', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->var_color( 'card_badge_bg', __( 'Background', 'webhead-search-cloud' ), '--whsc-badge-bg' );
+		$this->var_color( 'card_badge_text', __( 'Text', 'webhead-search-cloud' ), '--whsc-badge-text' );
+		$this->var_slider( 'card_badge_radius', __( 'Border radius', 'webhead-search-cloud' ), '--whsc-badge-radius', 0, 999 );
+
+		$this->add_control(
+			'card_text_heading',
+			[ 'label' => __( 'Title and price', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->var_color( 'card_title_color', __( 'Title color', 'webhead-search-cloud' ), '--whsc-card-title' );
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			[
 				'name'     => 'card_title_typography',
 				'label'    => __( 'Title typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-card__title',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__title' ),
+			]
+		);
+		$this->add_control(
+			'card_title_lines',
+			[
+				'label'       => __( 'Title lines', 'webhead-search-cloud' ),
+				'type'        => Controls_Manager::NUMBER,
+				'min'         => 1,
+				'max'         => 5,
+				'step'        => 1,
+				'placeholder' => '2',
+				'selectors'   => [ '.whsc-instance-{{ID}}' => '--whsc-card-title-lines: {{VALUE}};' ],
+				'description' => __( 'A longer title is cut off with an ellipsis after this many lines, so cards line up.', 'webhead-search-cloud' ),
 			]
 		);
 		$this->var_color( 'card_price_color', __( 'Price / meta color', 'webhead-search-cloud' ), '--whsc-price-color' );
+		// The amount itself is `.whsc-card__price-current`, which sets its own
+		// weight, so a weight set on the price line alone never reached it.
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			[
 				'name'     => 'card_price_typography',
 				'label'    => __( 'Price typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-card__price',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__price', '.whsc-instance-{{ID}} .whsc-card__price-current' ),
 			]
 		);
 		$this->add_group_control(
@@ -897,9 +1284,29 @@ final class Search_Widget extends Widget_Base {
 			[
 				'name'     => 'card_price_suffix_typography',
 				'label'    => __( 'Price suffix / "from" typography', 'webhead-search-cloud' ),
-				'selector' => '.whsc-instance-{{ID}} .whsc-card__price-suffix, .whsc-instance-{{ID}} .whsc-card__price-from',
+				'selector' => $this->boosted_selector( '.whsc-instance-{{ID}} .whsc-card__price-suffix', '.whsc-instance-{{ID}} .whsc-card__price-from' ),
 			]
 		);
+
+		$this->add_control(
+			'card_stock_heading',
+			[ 'label' => __( 'Stock status', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->add_control(
+			'card_stock_display',
+			[
+				'label'     => __( 'Show', 'webhead-search-cloud' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => [
+					''     => __( 'Show (default)', 'webhead-search-cloud' ),
+					'none' => __( 'Hide', 'webhead-search-cloud' ),
+				],
+				'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-card-stock-display: {{VALUE}};' ],
+			]
+		);
+		$this->var_color( 'card_stock_in_color', __( 'In stock', 'webhead-search-cloud' ), '--whsc-stock-in-color', [ 'condition' => [ 'card_stock_display!' => 'none' ] ] );
+		$this->var_color( 'card_stock_out_color', __( 'Out of stock', 'webhead-search-cloud' ), '--whsc-stock-out-color', [ 'condition' => [ 'card_stock_display!' => 'none' ] ] );
 
 		$this->end_controls_section();
 	}
@@ -916,13 +1323,62 @@ final class Search_Widget extends Widget_Base {
 			]
 		);
 
+		$this->var_slider(
+			'carousel_card_width',
+			__( 'Card width', 'webhead-search-cloud' ),
+			'--whsc-card-width',
+			100,
+			480,
+			true,
+			[ 'description' => __( 'How wide each result card is, and so how many fit side by side. Set it per device with the responsive switch.', 'webhead-search-cloud' ) ]
+		);
 		$this->var_slider( 'carousel_gap', __( 'Spacing between items', 'webhead-search-cloud' ), '--whsc-carousel-gap', 0, 48, true );
-		$this->var_color( 'arrow_color', __( 'Arrow color', 'webhead-search-cloud' ), '--whsc-arrow-color', [ 'separator' => 'before' ] );
+		$this->add_control(
+			'arrow_heading',
+			[ 'label' => __( 'Arrows', 'webhead-search-cloud' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->start_controls_tabs( 'arrow_tabs' );
+		$this->start_controls_tab( 'arrow_normal', [ 'label' => __( 'Normal', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'arrow_color', __( 'Arrow color', 'webhead-search-cloud' ), '--whsc-arrow-color' );
 		$this->var_color( 'arrow_bg', __( 'Arrow background', 'webhead-search-cloud' ), '--whsc-arrow-bg' );
+		$this->end_controls_tab();
+		$this->start_controls_tab( 'arrow_hover', [ 'label' => __( 'Hover', 'webhead-search-cloud' ) ] );
+		$this->var_color( 'arrow_color_hover', __( 'Arrow color', 'webhead-search-cloud' ), '--whsc-arrow-color-hover' );
+		$this->var_color( 'arrow_bg_hover', __( 'Arrow background', 'webhead-search-cloud' ), '--whsc-arrow-bg-hover' );
+		$this->end_controls_tab();
+		$this->end_controls_tabs();
+		$this->var_slider( 'arrow_size', __( 'Arrow size', 'webhead-search-cloud' ), '--whsc-arrow-size', 24, 64, true, [ 'separator' => 'before' ] );
+		$this->var_slider( 'arrow_radius', __( 'Arrow radius', 'webhead-search-cloud' ), '--whsc-arrow-radius', 0, 999 );
+		$this->add_control(
+			'arrow_shadow',
+			[
+				'label'     => __( 'Arrow shadow', 'webhead-search-cloud' ),
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '',
+				'options'   => [
+					''     => __( 'Soft (default)', 'webhead-search-cloud' ),
+					'none' => __( 'None', 'webhead-search-cloud' ),
+				],
+				'selectors' => [ '.whsc-instance-{{ID}}' => '--whsc-arrow-shadow: {{VALUE}};' ],
+			]
+		);
 		$this->var_color( 'dot_color', __( 'Dot color', 'webhead-search-cloud' ), '--whsc-dot-color', [ 'separator' => 'before' ] );
 		$this->var_color( 'dot_color_active', __( 'Dot color (active)', 'webhead-search-cloud' ), '--whsc-dot-color-active' );
 
 		$this->end_controls_section();
+	}
+
+	/**
+	 * Selector for a group control that writes literal properties rather than
+	 * a custom property: each comma-separated part gets
+	 * {@see self::SPECIFICITY_BOOST}, since the boost only counts on the part
+	 * it is attached to.
+	 */
+	private function boosted_selector( string ...$selectors ): string {
+		return implode(
+			', ',
+			array_map( static fn ( string $selector ): string => $selector . self::SPECIFICITY_BOOST, $selectors )
+		);
 	}
 
 	/* ---------------------------------------------------------------------
@@ -999,6 +1455,24 @@ final class Search_Widget extends Widget_Base {
 		return trim( (string) ob_get_clean() );
 	}
 
+	/**
+	 * Whether this render is for the Elementor editor with "Keep open while
+	 * editing" on. Checked on the server, so a saved setting can never open the
+	 * modal for a visitor.
+	 *
+	 * @param  array<string,mixed>  $settings
+	 */
+	private function is_editor_preview( array $settings ): bool {
+		if ( 'yes' !== ( $settings['editor_preview'] ?? '' ) || ! class_exists( '\Elementor\Plugin' ) ) {
+			return false;
+		}
+
+		$elementor = \Elementor\Plugin::$instance;
+
+		return ( isset( $elementor->editor ) && $elementor->editor->is_edit_mode() )
+			|| ( isset( $elementor->preview ) && $elementor->preview->is_preview_mode() );
+	}
+
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
 
@@ -1023,6 +1497,8 @@ final class Search_Widget extends Widget_Base {
 				'voiceIconHtml' => $this->render_icon_html( $settings, 'voice_icon' ),
 				'animation'     => (string) ( $settings['modal_animation'] ?? 'fade' ),
 				'showCount'     => 'yes' === ( $settings['show_count'] ?? 'yes' ),
+				'editorPreview' => $this->is_editor_preview( $settings ),
+				'editorQuery'   => (string) ( $settings['editor_preview_query'] ?? '' ),
 			]
 		);
 		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped

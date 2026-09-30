@@ -5,7 +5,7 @@ import {trendingUp} from '@wordpress/icons';
 import {motion} from 'motion/react';
 import apiFetch from '@wordpress/api-fetch';
 
-import {fadeInUpProps} from '../../../utils/animation';
+import {useFadeInUpProps} from '../../../utils/animation';
 
 const pluginData = window.webhead_search_cloudData || {};
 const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
@@ -22,6 +22,9 @@ const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/webhead-se
 const UpgradeButton = () => {
 	const [plan, setPlan] = useState(null);
 	const isConnected = pluginData?.connection?.isConnected === true;
+	// Before the early return below: a hook skipped on the first render and
+	// called on a later one breaks React's hook order.
+	const ctaMotion = useFadeInUpProps(0.2, -12);
 
 	useEffect(() => {
 		if (!isConnected) {
@@ -52,7 +55,7 @@ const UpgradeButton = () => {
 	}
 
 	return (
-		<motion.div {...fadeInUpProps(0.2, -12)} className="whsc-upgrade-cta">
+		<motion.div {...ctaMotion} className="whsc-upgrade-cta">
 			<Button
 				__next40pxDefaultSize
 				variant="primary"

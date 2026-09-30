@@ -36,7 +36,7 @@
         "coenjacobs/mozart": "^1.2.3",
         "phpunit/phpunit": "^9.6",
         "webhead/wp-plugin-framework": "^1.0",
-        "wp-phpunit/wp-phpunit": "^7.0",
+        "wp-phpunit/wp-phpunit": "^7.1",
         "yoast/phpunit-polyfills": "^4.0"
     },
     "config": {

@@ -111,4 +111,28 @@ final class Trigger_Markup_Test extends TestCase {
 
 		$this->assertStringContainsString( 'data-highlights-source="featured"', $html );
 	}
+
+	/**
+	 * Only the Elementor editor asks for the modal to open by itself, so an
+	 * ordinary trigger carries no trace of it - not even an "off" value.
+	 */
+	public function test_editor_preview_is_absent_unless_asked_for(): void {
+		$html = Trigger_Markup::render( [ 'editorQuery' => 'shirt' ] );
+
+		$this->assertStringNotContainsString( 'data-editor-preview', $html );
+		$this->assertStringNotContainsString( 'data-editor-query', $html );
+	}
+
+	public function test_editor_preview_carries_its_search_term(): void {
+		$html = Trigger_Markup::render( [ 'editorPreview' => true, 'editorQuery' => '  Shirt  ' ] );
+
+		$this->assertStringContainsString( 'data-editor-preview="1" data-editor-query="Shirt"', $html );
+	}
+
+	public function test_editor_preview_escapes_its_search_term(): void {
+		$html = Trigger_Markup::render( [ 'editorPreview' => true, 'editorQuery' => '"><script>alert(1)</script>' ] );
+
+		$this->assertStringNotContainsString( '<script>', $html );
+		$this->assertStringContainsString( 'data-editor-query="&quot;&gt;&lt;script&gt;', $html );
+	}
 }

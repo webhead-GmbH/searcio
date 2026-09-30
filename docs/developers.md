@@ -36,9 +36,9 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 
 | Route | Method | Capability | Purpose |
 |---|---|---|---|
-| `/settings` | GET / POST | view / manage_settings | Generic REST-exposed settings (schema + values) |
+| `/settings` | GET / POST | view / manage_settings | Generic REST-exposed settings (schema + values). `write_key` and `write_secret` are write-only: a response carries `__stored__` when one is saved and `''` when not, never the value; posting back `__stored__` or an empty string leaves the stored credential untouched |
 | `/connection/test` | POST | view | Verify write credentials; returns site ID and document usage |
-| `/indexing/config` | GET / POST | view / manage_settings | Per-post-type indexing field mapping |
+| `/indexing/config` | GET / POST | view / manage_settings | Per-post-type indexing field mapping, plus `indexed_fields`: every field a document can carry under the saved mapping (`Index_Config::indexed_fields()`, with product fields from `Woo::TOGGLE_FIELDS`) |
 | `/search-config` | GET / PUT | view / manage_settings | Proxies Search Cloud's own search configuration (fields, weights, boosts, facets, suggestions, synonyms, languages) |
 | `/sync/status` | GET | view | Current sync state and indexable-type summary |
 | `/sync/start` | POST | run_sync | Start a sync (`?force=true` re-sends everything) |
@@ -48,7 +48,7 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 | `/sync/history` | DELETE | run_sync | Clear all finished history |
 | `/cache/clear` | POST | manage_settings | Reset OPcache |
 
-One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret) and only when the site is connected. It requires the `?token=` query parameter the ping always sends — a tokenless request is rejected with `400` so the write key is never handed to an unauthenticated scanner. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
+One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret), and only while a verification this site started is still open: connecting opens a one-hour window, and outside it the route answers `404`. The window is the protection. The ping's `?token=` is an HMAC over Search Cloud's own application key, which the plugin cannot check, so requiring it alone proved nothing — appending `?token=x` used to return the write key. A tokenless request is still rejected with `400`, and a closed window or an unconnected site with `404`. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
 
 ### WP-CLI
 
@@ -88,6 +88,10 @@ Both tables are managed through `Database_Manager` and registered `Table` classe
 
 The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Frontend/Elementor/Search_Widget.php`) share the same rendering, styling, and runtime bundle (`Trigger_Markup`, `Frontend_Assets`) so the two embed points can't drift apart. The search modal is portalled to `document.body` at runtime in both cases, with per-instance CSS custom properties applied to both the trigger and the modal root.
 
+Tokens that default to another token (the active tab's colour to the accent, the button background to the accent's text shade, an icon button's colour to the shared icon colour, and so on) are not declared anywhere: each rule that reads one names the default as its fallback, for example `var(--whsc-tab-text-active, var(--whsc-accent-strong))`. A fallback resolves on the element that uses it, so it follows that placement's own `--whsc-accent`; a value you set - on the placement's `whsc-instance-*` class, or site-wide on `:root` or `body` - is inherited and wins. Text drawn in the accent uses `--whsc-accent-strong`, a darker mix of `--whsc-accent` (`color-mix()`, where supported; the accent itself where not), which takes the default green to 5.8:1 on white. A light custom accent can still fall under 4.5:1 as text - `#f5a623` gives about 3.6:1 - so set `--whsc-accent-strong`, or the text tokens built on it, for such an accent. Borders, dots and focus rings keep the accent itself. The assistant's own accent has the same pair, `--whsc-assistant-accent` and `--whsc-assistant-accent-strong`. These two shades are the only derived tokens declared on each placement (at zero specificity), so set them on the placement rather than on an ancestor.
+
+The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-out-color`. The search block (`stockInColor` / `stockOutColor`) and the Elementor search widget (`card_stock_in_color` / `card_stock_out_color`) set them for their modal; product rows (the products block and widget) have no style controls and take the defaults or site-wide CSS.
+
 ### Filters
 
 - **`webhead_search_cloud/index/allow_protected_meta`** — `(bool $allow, string $meta_key, WP_Post $post)`. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
@@ -97,6 +101,8 @@ The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Frontend/
       return '_my_public_field' === $key ? true : $allow;
   }, 10, 2 );
   ```
+
+- **`woocommerce_product_is_visible`** — WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs — WP-Cron, WP-CLI or REST — so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
 
 ## Testing
 

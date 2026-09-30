@@ -26,7 +26,7 @@ final class Trigger_Markup {
 	private const HIGHLIGHTS_SOURCES = [ 'newest', 'featured' ];
 
 	/**
-	 * @param  array{mode?:string,scopeType?:string,placeholder?:string,className?:string,enableVoice?:bool,searchTrigger?:string,instanceClass?:string,iconHtml?:string,voiceIconHtml?:string,animation?:string,showCount?:bool,cardSource?:string,highlightsSource?:string}  $attributes
+	 * @param  array{mode?:string,scopeType?:string,placeholder?:string,className?:string,enableVoice?:bool,searchTrigger?:string,instanceClass?:string,iconHtml?:string,voiceIconHtml?:string,animation?:string,showCount?:bool,cardSource?:string,highlightsSource?:string,editorPreview?:bool,editorQuery?:string}  $attributes
 	 */
 	public static function render( array $attributes ): string {
 		$mode           = in_array( $attributes['mode'] ?? '', [ 'box', 'icon' ], true ) ? $attributes['mode'] : 'icon';
@@ -45,6 +45,15 @@ final class Trigger_Markup {
 		// 'featured' sources the empty-query highlights carousel from
 		// `filter[featured]=true` instead of a plain match-all.
 		$highlights_source = in_array( $attributes['highlightsSource'] ?? '', self::HIGHLIGHTS_SOURCES, true ) ? $attributes['highlightsSource'] : 'newest';
+		// Opens the modal on its own, which only the Elementor editor asks for
+		// (the widget checks it is rendering there), so it is omitted entirely
+		// otherwise rather than written as an "off" value.
+		$editor_preview = ! empty( $attributes['editorPreview'] )
+			? sprintf(
+				' data-editor-preview="1" data-editor-query="%s"',
+				esc_attr( is_string( $attributes['editorQuery'] ?? null ) ? trim( (string) $attributes['editorQuery'] ) : '' )
+			)
+			: '';
 
 		// The instance class is applied to the trigger itself (so Elementor's
 		// Style-tab selectors, which target the trigger's ancestor wrapper,
@@ -65,7 +74,7 @@ final class Trigger_Markup {
 		// portalled modal (rendered separately under `document.body`, see
 		// `index.js`) carries the same attribute on its own mount element.
 		return sprintf(
-			'<div class="%1$s" data-whsc-trigger data-webhead-frontend-root data-mode="%2$s" data-type="%3$s" data-placeholder="%4$s" data-voice="%5$s" data-search-trigger="%6$s" data-instance-class="%7$s" data-animation="%8$s" data-show-count="%9$s" data-icon="%10$s" data-voice-icon="%11$s" data-card-source="%12$s" data-highlights-source="%13$s"></div>',
+			'<div class="%1$s" data-whsc-trigger data-webhead-frontend-root data-mode="%2$s" data-type="%3$s" data-placeholder="%4$s" data-voice="%5$s" data-search-trigger="%6$s" data-instance-class="%7$s" data-animation="%8$s" data-show-count="%9$s" data-icon="%10$s" data-voice-icon="%11$s" data-card-source="%12$s" data-highlights-source="%13$s"%14$s></div>',
 			esc_attr( $classes ),
 			esc_attr( $mode ),
 			esc_attr( $scope_type ),
@@ -81,7 +90,8 @@ final class Trigger_Markup {
 			esc_attr( $icon_html ),
 			esc_attr( $voice_icon_html ),
 			esc_attr( $card_source ),
-			esc_attr( $highlights_source )
+			esc_attr( $highlights_source ),
+			$editor_preview
 		);
 	}
 }

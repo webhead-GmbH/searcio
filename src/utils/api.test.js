@@ -101,6 +101,18 @@ describe( 'search', () => {
 		expect( url ).not.toContain( 'filter%5Bcolor%5D' );
 	} );
 
+	it( 'sends numeric bounds the way the API takes them: range[field]=min:max', async () => {
+		const api = loadApi();
+
+		await api.search( 'shirt', { ranges: { price: '10:50', rating: '4:' }, page: 2 } );
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+
+		expect( url ).toContain( 'range%5Bprice%5D=10%3A50' );
+		expect( url ).toContain( 'range%5Brating%5D=4%3A' );
+		expect( url ).toContain( 'page=2' );
+	} );
+
 	it( 'throws when the response is not ok', async () => {
 		global.fetch.mockResolvedValue( jsonResponse( {}, false, 500 ) );
 		const api = loadApi();
@@ -254,5 +266,126 @@ describe( 'askAssistant', () => {
 		const api = loadApi();
 
 		await expect( api.askAssistant( 'x' ) ).rejects.toMatchObject( { status: 429 } );
+	} );
+} );
+
+describe( 'visualSearch', () => {
+	it( 'uploads the photo as multipart with the key in the query string', async () => {
+		global.fetch.mockResolvedValue(
+			jsonResponse( { query: 'red silk dress', tags: [ 'red', 'silk' ], total: 1, hits: [ { id: 'p-1' } ] } )
+		);
+		const api = loadApi();
+		const photo = new File( [ 'x' ], 'dress.jpg', { type: 'image/jpeg' } );
+
+		const result = await api.visualSearch( photo );
+
+		const [ url, options ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/search/visual?' );
+		// A preflight carries no custom headers, so the credential has to be in
+		// the URL for the API to resolve the site and answer CORS.
+		expect( url ).toContain( 'key=sk_test' );
+		expect( options.method ).toBe( 'POST' );
+		expect( options.body ).toBeInstanceOf( FormData );
+		expect( options.body.get( 'photo' ) ).toBe( photo );
+		// Never a Content-Type of our own: the boundary is the browser's to set.
+		expect( options.headers ).toBeUndefined();
+		expect( result.tags ).toEqual( [ 'red', 'silk' ] );
+	} );
+
+	it( 'throws an error carrying the HTTP status so callers can tell 403 from 422 from 429', async () => {
+		const api = loadApi();
+
+		for ( const status of [ 403, 422, 429 ] ) {
+			global.fetch.mockResolvedValue( jsonResponse( {}, false, status ) );
+
+			await expect(
+				api.visualSearch( new File( [ 'x' ], 'p.jpg', { type: 'image/jpeg' } ) )
+			).rejects.toMatchObject( { status } );
+		}
+	} );
+
+	/** A photo with nothing recognisable in it is a success, not an error. */
+	it( 'passes an empty result through rather than treating it as a failure', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { query: null, tags: [], total: 0, hits: [], facets: [] } ) );
+		const api = loadApi();
+
+		const result = await api.visualSearch( new File( [ 'x' ], 'blur.jpg', { type: 'image/jpeg' } ) );
+
+		expect( result.hits ).toEqual( [] );
+		expect( result.tags ).toEqual( [] );
+	} );
+} );
+
+describe( 'fetchQuizzes', () => {
+	it( 'requests the quiz list with the search key', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { quizzes: [ { id: 4, questions: [] } ] } ) );
+		const api = loadApi();
+
+		const result = await api.fetchQuizzes();
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/quizzes?' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( result.quizzes ).toHaveLength( 1 );
+	} );
+
+	/**
+	 * The whole question graph arrives in one response and is not metered, so
+	 * the widget must not re-fetch it per question.
+	 */
+	it( 'serves a repeat call from the cache instead of hitting the network again', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { quizzes: [] } ) );
+		const api = loadApi();
+
+		await api.fetchQuizzes();
+		await api.fetchQuizzes();
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+} );
+
+describe( 'fetchSimilar', () => {
+	it( 'asks for more like a given product, with the search key', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [ { id: 'p-2' } ] } ) );
+		const api = loadApi();
+
+		const result = await api.fetchSimilar( 'product-1', { limit: 4 } );
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/search/similar?' );
+		expect( url ).toContain( 'id=product-1' );
+		expect( url ).toContain( 'limit=4' );
+		expect( url ).toContain( 'key=sk_test' );
+		expect( result.similar ).toHaveLength( 1 );
+	} );
+
+	it( 'defaults to six', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await api.fetchSimilar( 'product-1' );
+
+		expect( global.fetch.mock.calls[ 0 ][ 0 ] ).toContain( 'limit=6' );
+	} );
+
+	/**
+	 * A site without AI search answers with an empty list rather than an error,
+	 * so the caller can hide the row instead of handling a failure.
+	 */
+	it( 'passes an empty list through rather than treating it as a failure', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await expect( api.fetchSimilar( 'product-1' ) ).resolves.toEqual( { similar: [] } );
+	} );
+
+	it( 'serves a repeat call from the cache: it is not metered and changes only with the catalogue', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await api.fetchSimilar( 'product-1' );
+		await api.fetchSimilar( 'product-1' );
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

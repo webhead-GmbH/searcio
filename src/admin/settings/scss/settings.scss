@@ -67,6 +67,40 @@
     color: var(--wpds-color-foreground-content-neutral-weak);
   }
 
+  // A boolean field puts its switch on the title row, so the header is a row
+  // with the copy growing and the switch held to the end.
+  .whsc-settings-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--wpds-dimension-gap-lg);
+  }
+
+  .whsc-settings-card-copy {
+    min-width: 0;
+  }
+
+  .whsc-settings-card-switch {
+    flex: 0 0 auto;
+    padding-top: var(--wpds-dimension-padding-xs);
+  }
+
+  // The title beside it already names the switch. ToggleControl renders its own
+  // label rather than BaseControl's, so it ignores hideLabelFromVision and has
+  // to be hidden here - visually only, because that label is still what names
+  // the switch for a screen reader.
+  .whsc-settings-card-switch .components-toggle-control__label {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
   .components-base-control,
   .components-textarea-control__input {
     margin-bottom: 0;
@@ -149,18 +183,6 @@
     display: grid;
     gap: var(--wpds-dimension-gap-lg);
     padding-inline: 0;
-  }
-
-  .components-panel__body>.components-panel__body-title {
-    background: #f0f0f0;
-
-    &:hover {
-      background: #dfdede;
-    }
-  }
-
-  .components-panel__body.is-opened>.components-panel__body-title {
-    margin-bottom: 15px;
   }
 }
 
@@ -258,13 +280,9 @@
     margin: 0 0 20px;
   }
 
-  .whsc-panel {
-    margin-bottom: 20px;
-  }
-
-  // Each collapsible post-type section.
-  .components-panel__body-title {
-    font-weight: 600;
+  .whsc-post-types {
+    display: grid;
+    gap: var(--wh-card-gap);
   }
 
   .whsc-enable-toggle {
@@ -447,6 +465,12 @@
     gap: 18px;
   }
 
+  // Card content stacks without a gap, so a warning about the fields above
+  // would otherwise touch the token field it is about.
+  .whsc-unindexed-fields {
+    margin: var(--wpds-dimension-gap-md) 0 0;
+  }
+
   // The AI index status, reported under its checkbox rather than as help text
   // so it reads as live state instead of a description of the setting.
   .whsc-search-config-status {
@@ -487,6 +511,27 @@
       @media screen and (max-width: 600px) {
         grid-template-columns: 1fr;
       }
+    }
+  }
+
+  /* A redirect is two fields and a delete, so it stays on one row rather than
+     borrowing the merchandising rule's stacked card. */
+  .whsc-redirect-rule {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: start;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+
+    .components-button.is-destructive {
+      margin-top: 22px;
+    }
+
+    @media screen and (max-width: 600px) {
+      grid-template-columns: 1fr auto;
     }
   }
 }
@@ -676,5 +721,66 @@
   &.is-cancelled {
     background: #f0f0f1;
     color: #646970;
+  }
+}
+
+/*
+ * Plan allowances on the Connection tab (`UsageCard`). Three states, because
+ * the difference between "fine", "watch this" and "this has stopped working"
+ * is the whole point of showing the numbers at all.
+ */
+.whsc-usage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    --whsc-usage-fill: #2271b1;
+
+    &--near {
+      --whsc-usage-fill: #b26200;
+    }
+
+    &--spent {
+      --whsc-usage-fill: #b32d2e;
+    }
+  }
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  &__label {
+    font-weight: 500;
+  }
+
+  &__count {
+    color: #50575e;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__bar {
+    height: 6px;
+    border-radius: 999px;
+    background: #f0f0f1;
+    overflow: hidden;
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--whsc-usage-fill);
+  }
+
+  &__note {
+    color: var(--whsc-usage-fill);
+    margin: 0;
   }
 }

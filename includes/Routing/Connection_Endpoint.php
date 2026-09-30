@@ -104,6 +104,10 @@ final class Connection_Endpoint extends Rest_API {
 			dpa: $dpa
 		);
 
+		// The ownership ping follows within minutes; nothing else ever calls
+		// `/verify`, so the route stays shut outside this window.
+		$this->connection_state->open_verification_window();
+
 		$response = $this->client->connect( $connect_request->to_payload() );
 
 		return new WP_REST_Response(
@@ -176,7 +180,8 @@ final class Connection_Endpoint extends Rest_API {
 		}
 
 		$body      = $response->body();
-		$documents = is_array( $body['usage']['documents'] ?? null ) ? $body['usage']['documents'] : [];
+		$usage     = is_array( $body['usage'] ?? null ) ? $body['usage'] : [];
+		$documents = is_array( $usage['documents'] ?? null ) ? $usage['documents'] : [];
 
 		$plan      = is_array( $body['plan'] ?? null ) ? $body['plan'] : [];
 		$languages = is_array( $plan['languages'] ?? null ) ? $plan['languages'] : [];
@@ -195,6 +200,10 @@ final class Connection_Endpoint extends Rest_API {
 				'percent'    => isset( $documents['percent'] ) ? (int) $documents['percent'] : null,
 				'near_limit' => (bool) ( $documents['near_limit'] ?? false ),
 			],
+			// Every metered allowance, not just documents: a site that has spent
+			// its monthly searches or AI messages has a storefront that is
+			// failing right now, and nothing else in wp-admin would say so.
+			'usage'            => self::usage_metrics( $usage ),
 			// Language entitlement, needed before the admin UI can offer a language picker at all.
 			'languages'        => [
 				'limit'   => isset( $languages['limit'] ) ? ( null === $languages['limit'] ? null : (int) $languages['limit'] ) : null,
@@ -286,6 +295,37 @@ final class Connection_Endpoint extends Rest_API {
 		return is_string( $message ) && '' !== $message
 			? $message
 			: __( 'Connection failed.', 'webhead-search-cloud' );
+	}
+
+	/**
+	 * Normalise `usage` from `GET /health` into one shape per metric.
+	 *
+	 * The service returns one entry per {@see \App\Enums\UsageMetric} case, and
+	 * adds to that list over time, so the keys are taken from the response
+	 * rather than from a list here that would silently drop a new one. A `limit`
+	 * of null means unmetered on this plan.
+	 *
+	 * @param  array<string,mixed>  $usage
+	 * @return array<string,array{used:?int,limit:?int,percent:?int,exceeded:bool,near_limit:bool}>
+	 */
+	private static function usage_metrics( array $usage ): array {
+		$metrics = [];
+
+		foreach ( $usage as $name => $metric ) {
+			if ( ! is_string( $name ) || ! is_array( $metric ) ) {
+				continue;
+			}
+
+			$metrics[ $name ] = [
+				'used'       => isset( $metric['used'] ) ? (int) $metric['used'] : null,
+				'limit'      => isset( $metric['limit'] ) && null !== $metric['limit'] ? (int) $metric['limit'] : null,
+				'percent'    => isset( $metric['percent'] ) && null !== $metric['percent'] ? (int) $metric['percent'] : null,
+				'exceeded'   => (bool) ( $metric['exceeded'] ?? false ),
+				'near_limit' => (bool) ( $metric['near_limit'] ?? false ),
+			];
+		}
+
+		return $metrics;
 	}
 
 	private function error_message( int $status ): string {
