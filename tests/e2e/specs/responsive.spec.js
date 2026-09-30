@@ -256,6 +256,41 @@ test.describe( 'Responsive layout', () => {
 		await expect( widget.resultsHeading ).toHaveText( '20 results' );
 	} );
 
+	/**
+	 * The track changes width without the window resizing - the popular
+	 * searches column appearing beside it, the layout switching at a
+	 * breakpoint, the Elementor editor resizing its preview frame - and the
+	 * page count has to follow it. It followed window resizes only, and after
+	 * the editor switched devices showed 23 dots for 7 pages.
+	 */
+	test( 'the carousel pages follow the track when it changes width on its own', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { hits: MANY_HITS } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'shirt' );
+		await expect( widget.modal.locator( '.whsc-carousel-dot' ).first() ).toBeAttached();
+
+		// Halve the content without touching the window.
+		await widget.modal.evaluate( ( modal ) => {
+			const body = modal.querySelector( '.whsc-modal-body' );
+			body.style.maxWidth = `${ Math.round( body.getBoundingClientRect().width / 2 ) }px`;
+		} );
+
+		// One dot per page of the narrowed track, and more than one page of it.
+		await expect
+			.poll( () =>
+				widget.modal.evaluate( ( modal ) => {
+					const track = modal.querySelector( '.whsc-carousel-track' );
+					const pages = Math.ceil( track.scrollWidth / track.clientWidth );
+
+					return pages > 1 && modal.querySelectorAll( '.whsc-carousel-dot' ).length === pages;
+				} )
+			)
+			.toBe( true );
+	} );
+
 	test( 'the carousel jumps instead of gliding when less motion is asked for', async ( { page, requestUtils } ) => {
 		await page.emulateMedia( { reducedMotion: 'reduce' } );
 		await mockSearchCloud( page, { hits: MANY_HITS } );

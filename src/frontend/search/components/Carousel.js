@@ -56,10 +56,23 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 		const onScroll = () => measure();
 
 		track.addEventListener( 'scroll', onScroll, { passive: true } );
-		window.addEventListener( 'resize', onScroll );
+
+		// The track changes width without the window doing so - the popular
+		// searches column appearing beside it, the modal's layout switching at a
+		// breakpoint, an embedding page resizing its frame - and the last window
+		// `resize` can arrive before the layout has settled. Counted then, the
+		// dots stayed at a narrower track's page count (23 dots for 7 pages).
+		const observer = 'function' === typeof window.ResizeObserver ? new window.ResizeObserver( onScroll ) : null;
+
+		if ( observer ) {
+			observer.observe( track );
+		} else {
+			window.addEventListener( 'resize', onScroll );
+		}
 
 		return () => {
 			track.removeEventListener( 'scroll', onScroll );
+			observer?.disconnect();
 			window.removeEventListener( 'resize', onScroll );
 		};
 	}, [ items, measure ] );
