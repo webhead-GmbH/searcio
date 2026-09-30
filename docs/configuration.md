@@ -50,6 +50,12 @@ What the search modal offers is decided by Search Cloud's `/storefront-config`, 
 
 Every mode is themeable from the same place as the rest of the widget — the block editor's Styles sidebar or Elementor's Style tab.
 
+### Styling the Elementor widget
+
+The modal is closed until a visitor opens it, so turn on **Content → Modal → Keep open while editing** before working through the Style tab: the modal then opens in the editor preview and every change shows as you make it. **Preview search** runs a search there too, so result cards, filters and prices are on screen to style; leave it empty to style the empty state (recent and popular searches, highlights). Visitors never see the modal open by itself, whatever is saved.
+
+The Style tab follows the modal from the outside in: the trigger, the modal (colours, overlay, one font family for everything, corner radius, spacing, content width, section titles), the mode tabs, the search field, the primary buttons (Search, Load more and the price filter's Apply), suggestions, recent and popular searches, filters (including each group's name), result cards (image ratio and fit, sale badge, title and price), the carousel (card width per device, arrows, dots), the banner, the assistant and the quiz. Anything left empty keeps the plugin's default.
+
 ### Product rows
 
 Besides the search modal, the plugin ships a **Search Cloud Products** block (and the matching Elementor widget) for placing a row of products anywhere on the storefront. Two sources:

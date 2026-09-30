@@ -3,13 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: webhead Search Cloud 1.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/webhead-search-cloud\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/relaxed-knuth-33d071\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-29T14:21:24+00:00\n"
+"POT-Creation-Date: 2026-09-30T08:08:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -70,7 +70,7 @@ msgid "Products"
 msgstr ""
 
 #: includes/Frontend/Elementor/Products_Widget.php:79
-#: includes/Frontend/Elementor/Search_Widget.php:243
+#: includes/Frontend/Elementor/Search_Widget.php:228
 #: src/blocks/products/edit.js:36
 msgid "Show"
 msgstr ""
@@ -138,7 +138,7 @@ msgid "Layout"
 msgstr ""
 
 #: includes/Frontend/Elementor/Products_Widget.php:146
-#: includes/Frontend/Elementor/Search_Widget.php:999
+#: includes/Frontend/Elementor/Search_Widget.php:1268
 #: src/blocks/products/edit.js:106
 #: src/blocks/search/edit.js:379
 msgid "Carousel"
@@ -155,215 +155,269 @@ msgid "How many products"
 msgstr ""
 
 #: includes/Frontend/Elementor/Products_Widget.php:168
-#: includes/Frontend/Elementor/Search_Widget.php:166
+#: includes/Frontend/Elementor/Search_Widget.php:244
 #: src/blocks/products/edit.js:126
 #: src/blocks/search/edit.js:99
 msgid "Card source"
 msgstr ""
 
 #: includes/Frontend/Elementor/Products_Widget.php:172
-#: includes/Frontend/Elementor/Search_Widget.php:170
+#: includes/Frontend/Elementor/Search_Widget.php:248
 #: src/blocks/products/edit.js:129
 #: src/blocks/search/edit.js:103
 msgid "Plugin templates"
 msgstr ""
 
 #: includes/Frontend/Elementor/Products_Widget.php:173
-#: includes/Frontend/Elementor/Search_Widget.php:171
+#: includes/Frontend/Elementor/Search_Widget.php:249
 #: src/blocks/products/edit.js:130
 #: src/blocks/search/edit.js:104
 msgid "Search Cloud templates"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:127
-#: src/frontend/search/components/SearchInput.js:31
-#: src/frontend/search/components/SearchModal.js:1004
-#: src/frontend/search/components/SearchModal.js:1025
-#: src/frontend/search/components/SearchModal.js:1093
-#: src/frontend/search/components/Trigger.js:22
-msgid "Search"
+#: includes/Frontend/Elementor/Search_Widget.php:133
+#: includes/Frontend/Elementor/Search_Widget.php:374
+#: src/admin/settings/components/tabs/SyncHistory.js:194
+#: src/blocks/search/edit.js:181
+msgid "Trigger"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:133
+#: includes/Frontend/Elementor/Search_Widget.php:139
 #: src/blocks/search/edit.js:80
 msgid "Trigger style"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:137
+#: includes/Frontend/Elementor/Search_Widget.php:143
 #: src/blocks/search/edit.js:83
 msgid "Search box"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:138
+#: includes/Frontend/Elementor/Search_Widget.php:144
 #: src/blocks/search/edit.js:84
 msgid "Icon button"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:146
+#: includes/Frontend/Elementor/Search_Widget.php:152
 #: src/blocks/search/edit.js:215
 msgid "Icon"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:149
+#: includes/Frontend/Elementor/Search_Widget.php:155
 msgid "Leave empty to use the default search icon."
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:156
+#: includes/Frontend/Elementor/Search_Widget.php:162
+#: src/blocks/search/edit.js:121
+msgid "Placeholder text"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:165
+#: includes/Frontend/Frontend_Assets.php:197
+#: src/blocks/search/edit.js:123
+msgid "Search…"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:173
+#: src/frontend/search/components/SearchInput.js:31
+#: src/frontend/search/components/SearchModal.js:1032
+#: src/frontend/search/components/SearchModal.js:1053
+#: src/frontend/search/components/SearchModal.js:1121
+#: src/frontend/search/components/Trigger.js:22
+msgid "Search"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:179
 #: src/blocks/search/edit.js:91
 msgid "Restrict to type"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:173
+#: includes/Frontend/Elementor/Search_Widget.php:189
+#: src/blocks/search/edit.js:128
+msgid "Enable voice search"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:192
+#: includes/Frontend/Elementor/Search_Widget.php:312
+msgid "On"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:193
+#: includes/Frontend/Elementor/Search_Widget.php:313
+msgid "Off"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:201
+#: src/blocks/search/edit.js:235
+msgid "Voice icon"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:204
+msgid "Leave empty to use the default microphone icon."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:211
+#: src/blocks/search/edit.js:134
+msgid "When to search"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:215
+#: src/blocks/search/edit.js:138
+msgid "On submit (Enter / button)"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:216
+#: src/blocks/search/edit.js:139
+msgid "While typing"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:218
+msgid "'While typing' searches automatically after 3 characters."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:225
+#: src/blocks/search/edit.js:145
+msgid "Show result count on filters"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:229
+msgid "Hide"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:238
+#: src/frontend/search/components/SearchModal.js:955
+#: src/frontend/search/components/SearchModal.js:976
+msgid "Results"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:251
 #: src/blocks/search/edit.js:100
 msgid "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card."
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:180
+#: includes/Frontend/Elementor/Search_Widget.php:258
 #: src/blocks/search/edit.js:111
 msgid "Highlights source"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:184
+#: includes/Frontend/Elementor/Search_Widget.php:262
 #: src/blocks/search/edit.js:115
 msgid "Newest"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:185
+#: includes/Frontend/Elementor/Search_Widget.php:263
 #: src/admin/settings/components/tabs/IndexingTab.js:206
 #: src/blocks/search/edit.js:116
 #: src/utils/facets.js:68
 msgid "Featured"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:187
+#: includes/Frontend/Elementor/Search_Widget.php:265
 #: src/blocks/search/edit.js:112
 msgid "What the empty-query \"highlights\" carousel shows. \"Featured\" only works once a boolean \"featured\" custom field is pushed for this type (Indexing tab)."
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:194
-#: src/blocks/search/edit.js:121
-msgid "Placeholder text"
+#: includes/Frontend/Elementor/Search_Widget.php:273
+#: includes/Frontend/Elementor/Search_Widget.php:583
+#: src/blocks/search/edit.js:196
+msgid "Modal"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:197
-#: includes/Frontend/Frontend_Assets.php:197
-#: src/blocks/search/edit.js:123
-msgid "Search…"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:204
-#: src/blocks/search/edit.js:128
-msgid "Enable voice search"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:207
-msgid "On"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:208
-msgid "Off"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:216
-#: src/blocks/search/edit.js:235
-msgid "Voice icon"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:219
-msgid "Leave empty to use the default microphone icon."
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:226
-#: src/blocks/search/edit.js:134
-msgid "When to search"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:230
-#: src/blocks/search/edit.js:138
-msgid "On submit (Enter / button)"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:231
-#: src/blocks/search/edit.js:139
-msgid "While typing"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:233
-msgid "'While typing' searches automatically after 3 characters."
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:240
-#: src/blocks/search/edit.js:145
-msgid "Show result count on filters"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:244
-msgid "Hide"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:252
+#: includes/Frontend/Elementor/Search_Widget.php:279
 #: src/blocks/search/edit.js:152
 msgid "Open animation"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:256
+#: includes/Frontend/Elementor/Search_Widget.php:283
+#: includes/Frontend/Elementor/Search_Widget.php:1307
 #: src/blocks/search/edit.js:155
 msgid "None"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:257
+#: includes/Frontend/Elementor/Search_Widget.php:284
 #: src/blocks/search/edit.js:156
 msgid "Fade"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:258
+#: includes/Frontend/Elementor/Search_Widget.php:285
 #: src/blocks/search/edit.js:157
 msgid "Slide down"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:259
+#: includes/Frontend/Elementor/Search_Widget.php:286
 #: src/blocks/search/edit.js:158
 msgid "Slide up"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:260
+#: includes/Frontend/Elementor/Search_Widget.php:287
 #: src/blocks/search/edit.js:159
 msgid "Zoom"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:268
+#: includes/Frontend/Elementor/Search_Widget.php:295
 #: src/blocks/search/edit.js:167
 msgid "Animation duration (ms)"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:289
+#: includes/Frontend/Elementor/Search_Widget.php:309
+msgid "Keep open while editing"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:316
+msgid "Shows the modal in the editor so you can see the Style settings as you change them. Visitors never see it open by itself."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:323
+msgid "Preview search"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:326
+msgid "e.g. shirt"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:328
+msgid "Runs this search in the preview, so result cards, filters and prices are there to style. Leave empty to style the empty state: recent and popular searches, and the highlights."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:344
 #: src/blocks/search/edit.js:52
 msgid "All types"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:319
-#: src/admin/settings/components/tabs/SyncHistory.js:194
-#: src/blocks/search/edit.js:181
-msgid "Trigger"
+#: includes/Frontend/Elementor/Search_Widget.php:384
+msgid "Alignment"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:341
+#: includes/Frontend/Elementor/Search_Widget.php:387
+msgid "Left"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:388
+msgid "Center"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:389
+msgid "Right"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:412
 #: src/blocks/search/edit.js:190
 msgid "Icon size"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:354
+#: includes/Frontend/Elementor/Search_Widget.php:425
 #: src/blocks/search/edit.js:191
 msgid "Button size"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:367
-#: includes/Frontend/Elementor/Search_Widget.php:474
-#: includes/Frontend/Elementor/Search_Widget.php:541
-#: includes/Frontend/Elementor/Search_Widget.php:583
-#: includes/Frontend/Elementor/Search_Widget.php:615
-#: includes/Frontend/Elementor/Search_Widget.php:788
-#: includes/Frontend/Elementor/Search_Widget.php:950
+#: includes/Frontend/Elementor/Search_Widget.php:438
+#: includes/Frontend/Elementor/Search_Widget.php:557
+#: includes/Frontend/Elementor/Search_Widget.php:733
+#: includes/Frontend/Elementor/Search_Widget.php:783
+#: includes/Frontend/Elementor/Search_Widget.php:827
+#: includes/Frontend/Elementor/Search_Widget.php:1000
+#: includes/Frontend/Elementor/Search_Widget.php:1169
+#: includes/Frontend/Elementor/Search_Widget.php:1208
+#: includes/Frontend/Elementor/Search_Widget.php:1216
 #: src/blocks/search/edit.js:192
 #: src/blocks/search/edit.js:221
 #: src/blocks/search/edit.js:307
@@ -371,50 +425,53 @@ msgstr ""
 msgid "Border radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:380
-#: includes/Frontend/Elementor/Search_Widget.php:533
-#: includes/Frontend/Elementor/Search_Widget.php:573
-#: includes/Frontend/Elementor/Search_Widget.php:605
-#: includes/Frontend/Elementor/Search_Widget.php:647
-#: includes/Frontend/Elementor/Search_Widget.php:686
-#: includes/Frontend/Elementor/Search_Widget.php:704
-#: includes/Frontend/Elementor/Search_Widget.php:730
-#: includes/Frontend/Elementor/Search_Widget.php:774
-#: includes/Frontend/Elementor/Search_Widget.php:837
-#: includes/Frontend/Elementor/Search_Widget.php:910
-#: includes/Frontend/Elementor/Search_Widget.php:942
+#: includes/Frontend/Elementor/Search_Widget.php:451
+#: includes/Frontend/Elementor/Search_Widget.php:684
+#: includes/Frontend/Elementor/Search_Widget.php:725
+#: includes/Frontend/Elementor/Search_Widget.php:773
+#: includes/Frontend/Elementor/Search_Widget.php:817
+#: includes/Frontend/Elementor/Search_Widget.php:859
+#: includes/Frontend/Elementor/Search_Widget.php:897
+#: includes/Frontend/Elementor/Search_Widget.php:915
+#: includes/Frontend/Elementor/Search_Widget.php:941
+#: includes/Frontend/Elementor/Search_Widget.php:986
+#: includes/Frontend/Elementor/Search_Widget.php:1129
+#: includes/Frontend/Elementor/Search_Widget.php:1161
+#: includes/Frontend/Elementor/Search_Widget.php:1288
 msgid "Normal"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:384
-#: includes/Frontend/Elementor/Search_Widget.php:403
-#: includes/Frontend/Elementor/Search_Widget.php:441
-#: includes/Frontend/Elementor/Search_Widget.php:530
-#: includes/Frontend/Elementor/Search_Widget.php:606
-#: includes/Frontend/Elementor/Search_Widget.php:610
+#: includes/Frontend/Elementor/Search_Widget.php:455
+#: includes/Frontend/Elementor/Search_Widget.php:474
+#: includes/Frontend/Elementor/Search_Widget.php:524
+#: includes/Frontend/Elementor/Search_Widget.php:722
+#: includes/Frontend/Elementor/Search_Widget.php:818
+#: includes/Frontend/Elementor/Search_Widget.php:822
 #: src/blocks/search/edit.js:184
 msgid "Icon color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:392
-#: includes/Frontend/Elementor/Search_Widget.php:411
-#: includes/Frontend/Elementor/Search_Widget.php:505
-#: includes/Frontend/Elementor/Search_Widget.php:527
-#: includes/Frontend/Elementor/Search_Widget.php:574
-#: includes/Frontend/Elementor/Search_Widget.php:578
-#: includes/Frontend/Elementor/Search_Widget.php:607
-#: includes/Frontend/Elementor/Search_Widget.php:611
-#: includes/Frontend/Elementor/Search_Widget.php:687
-#: includes/Frontend/Elementor/Search_Widget.php:692
-#: includes/Frontend/Elementor/Search_Widget.php:709
-#: includes/Frontend/Elementor/Search_Widget.php:735
-#: includes/Frontend/Elementor/Search_Widget.php:775
-#: includes/Frontend/Elementor/Search_Widget.php:779
-#: includes/Frontend/Elementor/Search_Widget.php:783
-#: includes/Frontend/Elementor/Search_Widget.php:887
-#: includes/Frontend/Elementor/Search_Widget.php:911
-#: includes/Frontend/Elementor/Search_Widget.php:916
-#: includes/Frontend/Elementor/Search_Widget.php:939
+#: includes/Frontend/Elementor/Search_Widget.php:463
+#: includes/Frontend/Elementor/Search_Widget.php:482
+#: includes/Frontend/Elementor/Search_Widget.php:588
+#: includes/Frontend/Elementor/Search_Widget.php:719
+#: includes/Frontend/Elementor/Search_Widget.php:774
+#: includes/Frontend/Elementor/Search_Widget.php:778
+#: includes/Frontend/Elementor/Search_Widget.php:819
+#: includes/Frontend/Elementor/Search_Widget.php:823
+#: includes/Frontend/Elementor/Search_Widget.php:898
+#: includes/Frontend/Elementor/Search_Widget.php:903
+#: includes/Frontend/Elementor/Search_Widget.php:920
+#: includes/Frontend/Elementor/Search_Widget.php:946
+#: includes/Frontend/Elementor/Search_Widget.php:987
+#: includes/Frontend/Elementor/Search_Widget.php:991
+#: includes/Frontend/Elementor/Search_Widget.php:995
+#: includes/Frontend/Elementor/Search_Widget.php:1106
+#: includes/Frontend/Elementor/Search_Widget.php:1130
+#: includes/Frontend/Elementor/Search_Widget.php:1135
+#: includes/Frontend/Elementor/Search_Widget.php:1158
+#: includes/Frontend/Elementor/Search_Widget.php:1207
+#: includes/Frontend/Elementor/Search_Widget.php:1214
 #: src/blocks/search/edit.js:186
 #: src/blocks/search/edit.js:199
 #: src/blocks/search/edit.js:213
@@ -424,99 +481,181 @@ msgstr ""
 msgid "Background"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:399
-#: includes/Frontend/Elementor/Search_Widget.php:577
-#: includes/Frontend/Elementor/Search_Widget.php:609
-#: includes/Frontend/Elementor/Search_Widget.php:650
-#: includes/Frontend/Elementor/Search_Widget.php:691
-#: includes/Frontend/Elementor/Search_Widget.php:707
-#: includes/Frontend/Elementor/Search_Widget.php:733
-#: includes/Frontend/Elementor/Search_Widget.php:778
-#: includes/Frontend/Elementor/Search_Widget.php:915
-#: includes/Frontend/Elementor/Search_Widget.php:945
+#: includes/Frontend/Elementor/Search_Widget.php:470
+#: includes/Frontend/Elementor/Search_Widget.php:777
+#: includes/Frontend/Elementor/Search_Widget.php:821
+#: includes/Frontend/Elementor/Search_Widget.php:862
+#: includes/Frontend/Elementor/Search_Widget.php:902
+#: includes/Frontend/Elementor/Search_Widget.php:918
+#: includes/Frontend/Elementor/Search_Widget.php:944
+#: includes/Frontend/Elementor/Search_Widget.php:990
+#: includes/Frontend/Elementor/Search_Widget.php:1134
+#: includes/Frontend/Elementor/Search_Widget.php:1164
+#: includes/Frontend/Elementor/Search_Widget.php:1292
 msgid "Hover"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:431
-#: includes/Frontend/Elementor/Search_Widget.php:506
-#: includes/Frontend/Elementor/Search_Widget.php:528
+#: includes/Frontend/Elementor/Search_Widget.php:502
+msgid "Width"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:514
+#: includes/Frontend/Elementor/Search_Widget.php:589
+#: includes/Frontend/Elementor/Search_Widget.php:720
 msgid "Text color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:450
+#: includes/Frontend/Elementor/Search_Widget.php:533
 msgid "Background color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:500
-#: src/blocks/search/edit.js:196
-msgid "Modal"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:507
+#: includes/Frontend/Elementor/Search_Widget.php:592
 msgid "Accent color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:508
+#: includes/Frontend/Elementor/Search_Widget.php:594
+msgid "Selected states, focus rings, links and the default button colour. Anything set more specifically in another section wins."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:598
+msgid "Overlay"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:600
+msgid "Covers the page behind the open modal. A colour with transparency keeps the page visible."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:608
+msgid "Font family"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:613
+msgid "Used by all text in the modal and in the search box trigger. Leave empty to use the page font."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:617
 #: src/blocks/search/edit.js:204
 msgid "Corner radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:509
-#: includes/Frontend/Elementor/Search_Widget.php:620
-#: includes/Frontend/Elementor/Search_Widget.php:718
-#: includes/Frontend/Elementor/Search_Widget.php:951
+#: includes/Frontend/Elementor/Search_Widget.php:618
+#: includes/Frontend/Elementor/Search_Widget.php:832
+#: includes/Frontend/Elementor/Search_Widget.php:929
+#: includes/Frontend/Elementor/Search_Widget.php:1170
 #: src/blocks/search/edit.js:205
 #: src/blocks/search/edit.js:375
 msgid "Padding"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:510
+#: includes/Frontend/Elementor/Search_Widget.php:619
 #: src/blocks/search/edit.js:206
 msgid "Section spacing"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:522
+#: includes/Frontend/Elementor/Search_Widget.php:626
+msgid "Content width"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:631
+msgid "The widest the content grows inside the full-width modal. Use your theme's container width to line it up with the page."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:637
+msgid "Section titles"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:643
+msgid "Headings such as \"Recent searches\", \"Popular searches\" and the results count. Filter group names have their own, under Filters."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:647
+#: includes/Frontend/Elementor/Search_Widget.php:1042
+msgid "Color"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:652
+#: includes/Frontend/Elementor/Search_Widget.php:699
+#: includes/Frontend/Elementor/Search_Widget.php:788
+#: includes/Frontend/Elementor/Search_Widget.php:1050
+msgid "Typography"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:669
+msgid "Mode tabs"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:678
+msgid "The row of tabs above the search box. It only appears when the AI assistant or a guided quiz is on for your site."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:685
+#: includes/Frontend/Elementor/Search_Widget.php:688
+#: src/blocks/search/edit.js:315
+msgid "Tab text"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:687
+#: includes/Frontend/Elementor/Search_Widget.php:922
+#: includes/Frontend/Elementor/Search_Widget.php:994
+msgid "Active"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:689
+msgid "Underline"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:693
+#: src/blocks/search/edit.js:318
+msgid "Divider"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:714
 #: src/blocks/search/edit.js:210
 msgid "Search field"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:529
+#: includes/Frontend/Elementor/Search_Widget.php:721
 msgid "Placeholder color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:534
-#: includes/Frontend/Elementor/Search_Widget.php:537
+#: includes/Frontend/Elementor/Search_Widget.php:726
+#: includes/Frontend/Elementor/Search_Widget.php:729
 msgid "Border color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:536
+#: includes/Frontend/Elementor/Search_Widget.php:728
 msgid "Focus"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:562
+#: includes/Frontend/Elementor/Search_Widget.php:754
 #: src/blocks/search/edit.js:225
 msgid "Buttons"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:569
-msgid "Search button"
+#: includes/Frontend/Elementor/Search_Widget.php:761
+msgid "Primary buttons"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:575
-#: includes/Frontend/Elementor/Search_Widget.php:579
-#: includes/Frontend/Elementor/Search_Widget.php:688
-#: includes/Frontend/Elementor/Search_Widget.php:693
-#: includes/Frontend/Elementor/Search_Widget.php:705
-#: includes/Frontend/Elementor/Search_Widget.php:708
-#: includes/Frontend/Elementor/Search_Widget.php:712
-#: includes/Frontend/Elementor/Search_Widget.php:731
-#: includes/Frontend/Elementor/Search_Widget.php:734
-#: includes/Frontend/Elementor/Search_Widget.php:776
-#: includes/Frontend/Elementor/Search_Widget.php:780
-#: includes/Frontend/Elementor/Search_Widget.php:784
-#: includes/Frontend/Elementor/Search_Widget.php:888
-#: includes/Frontend/Elementor/Search_Widget.php:912
-#: includes/Frontend/Elementor/Search_Widget.php:917
+#: includes/Frontend/Elementor/Search_Widget.php:767
+msgid "The Search button, \"Load more\" under the results and the price filter's Apply."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:775
+#: includes/Frontend/Elementor/Search_Widget.php:779
+#: includes/Frontend/Elementor/Search_Widget.php:899
+#: includes/Frontend/Elementor/Search_Widget.php:904
+#: includes/Frontend/Elementor/Search_Widget.php:916
+#: includes/Frontend/Elementor/Search_Widget.php:919
+#: includes/Frontend/Elementor/Search_Widget.php:923
+#: includes/Frontend/Elementor/Search_Widget.php:942
+#: includes/Frontend/Elementor/Search_Widget.php:945
+#: includes/Frontend/Elementor/Search_Widget.php:988
+#: includes/Frontend/Elementor/Search_Widget.php:992
+#: includes/Frontend/Elementor/Search_Widget.php:996
+#: includes/Frontend/Elementor/Search_Widget.php:1107
+#: includes/Frontend/Elementor/Search_Widget.php:1131
+#: includes/Frontend/Elementor/Search_Widget.php:1136
+#: includes/Frontend/Elementor/Search_Widget.php:1215
 #: src/blocks/search/edit.js:200
 #: src/blocks/search/edit.js:214
 #: src/blocks/search/edit.js:299
@@ -524,266 +663,295 @@ msgstr ""
 msgid "Text"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:585
+#: includes/Frontend/Elementor/Search_Widget.php:797
 msgid "Voice button"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:586
+#: includes/Frontend/Elementor/Search_Widget.php:798
 msgid "Photo search button"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:587
+#: includes/Frontend/Elementor/Search_Widget.php:799
 msgid "Close button"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:588
+#: includes/Frontend/Elementor/Search_Widget.php:800
 msgid "Clear button"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:637
+#: includes/Frontend/Elementor/Search_Widget.php:849
 #: src/blocks/search/edit.js:257
 msgid "Suggestions"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:642
+#: includes/Frontend/Elementor/Search_Widget.php:854
 #: src/blocks/search/edit.js:260
 msgid "Panel background"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:643
+#: includes/Frontend/Elementor/Search_Widget.php:855
 #: src/blocks/search/edit.js:261
 msgid "Panel border"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:644
+#: includes/Frontend/Elementor/Search_Widget.php:856
 #: src/blocks/search/edit.js:267
 msgid "Panel radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:648
-#: includes/Frontend/Elementor/Search_Widget.php:651
+#: includes/Frontend/Elementor/Search_Widget.php:860
+#: includes/Frontend/Elementor/Search_Widget.php:863
 #: src/blocks/search/edit.js:262
 msgid "Item text"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:652
+#: includes/Frontend/Elementor/Search_Widget.php:864
 msgid "Item background"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:666
+#: includes/Frontend/Elementor/Search_Widget.php:872
+msgid "Item typography"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:887
 #: src/blocks/search/edit.js:271
 msgid "Recent & popular"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:671
-msgid "Section title color"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:676
-msgid "Section title typography"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:683
+#: includes/Frontend/Elementor/Search_Widget.php:894
 msgid "Recent chips"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:689
-#: includes/Frontend/Elementor/Search_Widget.php:694
-#: includes/Frontend/Elementor/Search_Widget.php:913
-#: includes/Frontend/Elementor/Search_Widget.php:918
-#: includes/Frontend/Elementor/Search_Widget.php:943
-#: includes/Frontend/Elementor/Search_Widget.php:946
+#: includes/Frontend/Elementor/Search_Widget.php:900
+#: includes/Frontend/Elementor/Search_Widget.php:905
+#: includes/Frontend/Elementor/Search_Widget.php:1132
+#: includes/Frontend/Elementor/Search_Widget.php:1137
+#: includes/Frontend/Elementor/Search_Widget.php:1162
+#: includes/Frontend/Elementor/Search_Widget.php:1165
 #: src/blocks/search/edit.js:217
 #: src/blocks/search/edit.js:366
 msgid "Border"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:697
+#: includes/Frontend/Elementor/Search_Widget.php:908
 msgid "Radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:701
+#: includes/Frontend/Elementor/Search_Widget.php:912
 msgid "\"Clear all\" link"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:711
-#: includes/Frontend/Elementor/Search_Widget.php:782
-#: includes/Frontend/Elementor/Search_Widget.php:840
-msgid "Active"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:727
+#: includes/Frontend/Elementor/Search_Widget.php:938
 msgid "Popular items"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:738
-#: includes/Frontend/Elementor/Search_Widget.php:1004
+#: includes/Frontend/Elementor/Search_Widget.php:949
+#: includes/Frontend/Elementor/Search_Widget.php:1282
 #: src/blocks/search/edit.js:388
 msgid "Spacing between items"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:739
+#: includes/Frontend/Elementor/Search_Widget.php:950
 msgid "Item radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:743
+#: includes/Frontend/Elementor/Search_Widget.php:954
 msgid "Item padding"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:753
+#: includes/Frontend/Elementor/Search_Widget.php:964
 msgid "Popular typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:768
-#: src/blocks/search/edit.js:295
-msgid "Type filters"
+#: includes/Frontend/Elementor/Search_Widget.php:980
+msgid "Filters"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:789
+#: includes/Frontend/Elementor/Search_Widget.php:1001
 msgid "Max height"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:789
+#: includes/Frontend/Elementor/Search_Widget.php:1001
 msgid "Caps a long filter list and lets it scroll instead of stretching the modal."
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:795
+#: includes/Frontend/Elementor/Search_Widget.php:1007
 msgid "Label typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:802
+#: includes/Frontend/Elementor/Search_Widget.php:1014
 msgid "Result count"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:804
+#: includes/Frontend/Elementor/Search_Widget.php:1016
 msgid "Count color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:809
+#: includes/Frontend/Elementor/Search_Widget.php:1021
 msgid "Count typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:826
+#: includes/Frontend/Elementor/Search_Widget.php:1028
+msgid "Group names"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1034
+msgid "The small title above each group of filters, such as \"Categories\" or \"Price\"."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1067
 #: src/blocks/search/edit.js:323
-#: src/frontend/search/components/SearchModal.js:1038
+#: src/frontend/search/components/SearchModal.js:1066
 msgid "AI Assistant"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:833
-#: src/blocks/search/edit.js:312
-msgid "Modal tabs"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:838
-#: includes/Frontend/Elementor/Search_Widget.php:841
-#: src/blocks/search/edit.js:315
-msgid "Tab text"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:842
-msgid "Underline"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:846
-#: src/blocks/search/edit.js:318
-msgid "Divider"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:850
-msgid "Assistant"
-msgstr ""
-
-#: includes/Frontend/Elementor/Search_Widget.php:853
+#: includes/Frontend/Elementor/Search_Widget.php:1072
 #: src/blocks/search/edit.js:326
 msgid "Accent (avatar, dots)"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:854
+#: includes/Frontend/Elementor/Search_Widget.php:1073
 #: src/blocks/search/edit.js:327
 msgid "Reply text"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:855
+#: includes/Frontend/Elementor/Search_Widget.php:1074
 #: src/blocks/search/edit.js:328
 msgid "Your message background"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:856
+#: includes/Frontend/Elementor/Search_Widget.php:1075
 #: src/blocks/search/edit.js:329
 msgid "Your message text"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:857
+#: includes/Frontend/Elementor/Search_Widget.php:1076
 #: src/blocks/search/edit.js:330
 msgid "Compare row shading"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:858
+#: includes/Frontend/Elementor/Search_Widget.php:1077
 #: src/blocks/search/edit.js:333
 msgid "Message field radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:873
+#: includes/Frontend/Elementor/Search_Widget.php:1092
 #: src/admin/settings/components/tabs/SearchConfigTab.js:399
 #: src/blocks/search/edit.js:337
 msgid "Promotional banner"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:882
+#: includes/Frontend/Elementor/Search_Widget.php:1101
 msgid "Shown above the results when a merchandising rule attaches a banner to the search."
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:897
+#: includes/Frontend/Elementor/Search_Widget.php:1116
 #: src/blocks/search/edit.js:346
 msgid "Guided quiz"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:902
+#: includes/Frontend/Elementor/Search_Widget.php:1121
 #: src/blocks/search/edit.js:349
 msgid "Question text"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:906
+#: includes/Frontend/Elementor/Search_Widget.php:1125
 msgid "Answers"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:922
+#: includes/Frontend/Elementor/Search_Widget.php:1141
 #: src/blocks/search/edit.js:358
 msgid "Answer radius"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:934
+#: includes/Frontend/Elementor/Search_Widget.php:1153
 #: src/blocks/search/edit.js:362
 msgid "Result cards"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:953
+#: includes/Frontend/Elementor/Search_Widget.php:1174
+msgid "Image"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1179
+msgid "Aspect ratio"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1183
+msgid "Square (default)"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1184
+msgid "Portrait 4:5"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1185
+msgid "Portrait 3:4"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1186
+msgid "Tall 2:3"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1187
+msgid "Landscape 4:3"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1188
+msgid "Wide 16:9"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1196
+msgid "Fit"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1200
+msgid "Fill and crop (default)"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1201
+msgid "Show the whole image"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1203
+msgid "\"Show the whole image\" keeps packshots on a plain background uncropped; the background below fills the space around them."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1212
+msgid "Sale badge"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1220
+msgid "Title and price"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1222
 msgid "Title color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:958
+#: includes/Frontend/Elementor/Search_Widget.php:1227
 msgid "Title typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:962
+#: includes/Frontend/Elementor/Search_Widget.php:1231
 msgid "Price / meta color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:969
+#: includes/Frontend/Elementor/Search_Widget.php:1238
 msgid "Price typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:977
+#: includes/Frontend/Elementor/Search_Widget.php:1246
 msgid "Price suffix / \"from\" typography"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:984
+#: includes/Frontend/Elementor/Search_Widget.php:1253
 #: src/admin/settings/components/tabs/IndexingTab.js:203
 #: src/utils/facets.js:65
 msgid "Stock status"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:986
+#: includes/Frontend/Elementor/Search_Widget.php:1255
 #: src/blocks/search/edit.js:370
 #: src/frontend/search/components/CompareTable.js:46
 #: src/frontend/search/components/templates.js:101
@@ -791,41 +959,71 @@ msgstr ""
 msgid "In stock"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:987
+#: includes/Frontend/Elementor/Search_Widget.php:1256
 #: src/blocks/search/edit.js:371
 #: src/frontend/search/components/CompareTable.js:47
 #: src/frontend/search/components/templates.js:101
 msgid "Out of stock"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:1005
+#: includes/Frontend/Elementor/Search_Widget.php:1275
+msgid "Card width"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1280
+msgid "How wide each result card is, and so how many fit side by side. Set it per device with the responsive switch."
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1285
+msgid "Arrows"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1289
+#: includes/Frontend/Elementor/Search_Widget.php:1293
 #: src/blocks/search/edit.js:382
 msgid "Arrow color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:1006
+#: includes/Frontend/Elementor/Search_Widget.php:1290
+#: includes/Frontend/Elementor/Search_Widget.php:1294
 #: src/blocks/search/edit.js:383
 msgid "Arrow background"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:1007
+#: includes/Frontend/Elementor/Search_Widget.php:1297
+msgid "Arrow size"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1298
+msgid "Arrow radius"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1302
+msgid "Arrow shadow"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1306
+msgid "Soft (default)"
+msgstr ""
+
+#: includes/Frontend/Elementor/Search_Widget.php:1312
 #: src/blocks/search/edit.js:384
 msgid "Dot color"
 msgstr ""
 
-#: includes/Frontend/Elementor/Search_Widget.php:1008
+#: includes/Frontend/Elementor/Search_Widget.php:1313
 #: src/blocks/search/edit.js:385
 msgid "Dot color (active)"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:198
-#: src/frontend/search/components/SearchModal.js:992
-#: src/frontend/search/components/SearchModal.js:1245
+#: src/frontend/search/components/SearchModal.js:1016
+#: src/frontend/search/components/SearchModal.js:1273
 msgid "No results found."
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:199
-#: src/frontend/search/components/SearchModal.js:1230
+#: src/frontend/search/components/SearchModal.js:1258
 msgid "Searching…"
 msgstr ""
 
@@ -841,8 +1039,8 @@ msgid "Sale"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:203
-#: src/frontend/search/components/SearchModal.js:548
-#: src/frontend/search/components/SearchModal.js:801
+#: src/frontend/search/components/SearchModal.js:556
+#: src/frontend/search/components/SearchModal.js:825
 msgid "Search is unavailable right now."
 msgstr ""
 
@@ -865,18 +1063,18 @@ msgid "Clear"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:207
-#: src/frontend/search/components/SearchModal.js:1064
-#: src/frontend/search/components/SearchModal.js:1126
+#: src/frontend/search/components/SearchModal.js:1092
+#: src/frontend/search/components/SearchModal.js:1154
 msgid "Close search"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:208
-#: src/frontend/search/components/SearchModal.js:1114
+#: src/frontend/search/components/SearchModal.js:1142
 msgid "Search by voice"
 msgstr ""
 
 #: includes/Frontend/Frontend_Assets.php:209
-#: src/frontend/search/components/SearchModal.js:1161
+#: src/frontend/search/components/SearchModal.js:1189
 msgid "All"
 msgstr ""
 
@@ -2561,6 +2759,10 @@ msgstr ""
 msgid "Popular item radius"
 msgstr ""
 
+#: src/blocks/search/edit.js:295
+msgid "Type filters"
+msgstr ""
+
 #: src/blocks/search/edit.js:301
 msgid "Text (hover)"
 msgstr ""
@@ -2579,6 +2781,10 @@ msgstr ""
 
 #: src/blocks/search/edit.js:308
 msgid "Max height (px)"
+msgstr ""
+
+#: src/blocks/search/edit.js:312
+msgid "Modal tabs"
 msgstr ""
 
 #: src/blocks/search/edit.js:316
@@ -2692,7 +2898,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:321
-#: src/frontend/search/components/SearchModal.js:949
+#: src/frontend/search/components/SearchModal.js:973
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -2711,20 +2917,20 @@ msgstr ""
 msgid "Remove from recent searches"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:160
+#: src/frontend/search/components/Carousel.js:173
 msgid "Previous"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:188
+#: src/frontend/search/components/Carousel.js:201
 msgid "Next"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:194
+#: src/frontend/search/components/Carousel.js:207
 msgid "Pages"
 msgstr ""
 
 #. translators: %d: page number.
-#: src/frontend/search/components/Carousel.js:204
+#: src/frontend/search/components/Carousel.js:217
 #, js-format
 msgid "Go to page %d"
 msgstr ""
@@ -2805,7 +3011,7 @@ msgid "Your answers"
 msgstr ""
 
 #: src/frontend/search/components/QuizPane.js:403
-#: src/frontend/search/components/SearchModal.js:978
+#: src/frontend/search/components/SearchModal.js:1002
 msgid "Loading…"
 msgstr ""
 
@@ -2845,83 +3051,78 @@ msgstr ""
 msgid "Clear %s filter"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:652
+#: src/frontend/search/components/SearchModal.js:660
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:654
+#: src/frontend/search/components/SearchModal.js:662
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:656
+#: src/frontend/search/components/SearchModal.js:664
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:658
+#: src/frontend/search/components/SearchModal.js:666
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:884
+#: src/frontend/search/components/SearchModal.js:908
 msgid "Your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:894
+#: src/frontend/search/components/SearchModal.js:918
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:910
-#: src/frontend/search/components/SearchModal.js:925
+#: src/frontend/search/components/SearchModal.js:934
+#: src/frontend/search/components/SearchModal.js:949
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:930
-#: src/frontend/search/components/SearchModal.js:1229
+#: src/frontend/search/components/SearchModal.js:954
+#: src/frontend/search/components/SearchModal.js:1257
 msgid "Looking at your photo…"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:931
-#: src/frontend/search/components/SearchModal.js:952
-msgid "Results"
-msgstr ""
-
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:943
+#: src/frontend/search/components/SearchModal.js:967
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:967
+#: src/frontend/search/components/SearchModal.js:991
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:979
+#: src/frontend/search/components/SearchModal.js:1003
 msgid "Load more results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:991
+#: src/frontend/search/components/SearchModal.js:1015
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1012
+#: src/frontend/search/components/SearchModal.js:1040
 msgid "Search modes"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1052
+#: src/frontend/search/components/SearchModal.js:1080
 msgid "Product finder"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1154
+#: src/frontend/search/components/SearchModal.js:1182
 msgid "Filter by type"
 msgstr ""
 
 #. translators: 1: number of results shown. 2: total number of results found.
-#: src/frontend/search/components/SearchModal.js:1236
+#: src/frontend/search/components/SearchModal.js:1264
 #, js-format
 msgid "Showing %1$d of %2$d results."
 msgstr ""
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:1242
+#: src/frontend/search/components/SearchModal.js:1270
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."

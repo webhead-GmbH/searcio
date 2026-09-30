@@ -119,6 +119,9 @@ To rebuild it, check the repository out and run `npm install` followed by
 - On a phone the search field shows its whole placeholder, and the photo-search row lines up with its tags.
 - Photo search and typed search no longer get mixed up on screen, and a failed photo search restores the filters.
 - Product-row carousels show their page dots.
+- The Elementor widget can keep its search modal open while you edit it, optionally with a search already run, so style changes show as you make them.
+- The Elementor widget's settings are regrouped by the part they style, with new ones for the overlay colour, the modal's font and content width, the card image, the sale badge, the carousel's card width and arrows, filter group names, and the trigger's alignment and width.
+- The modal overlay fades in as intended, and the carousel's page dots stay right after its width changes.
 - Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
 - Fixed a permanently deleted post staying in search for good when the first attempt to remove it from the index failed. Full syncs now retry the removal until it succeeds.
 - Fixed content staying in search for good when a full sync's attempt to remove it failed, for example after turning a content type off and then permanently deleting its posts. Later full syncs now keep retrying the removal until it succeeds.
