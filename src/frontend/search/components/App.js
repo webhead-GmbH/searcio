@@ -1,4 +1,4 @@
-import { createPortal, useState } from '@wordpress/element';
+import { createPortal, useEffect, useState } from '@wordpress/element';
 
 import Trigger from './Trigger';
 import ProductList from './ProductList';
@@ -38,6 +38,21 @@ const App = ( { triggerElements, listElements = [] } ) => {
 			window.requestAnimationFrame( () => el.querySelector( 'input' )?.focus() );
 		}
 	};
+
+	// The Elementor editor can ask for one widget's modal to stay open while
+	// its Style settings change (the widget only sets this while rendering in
+	// the editor). Editing a Content setting re-renders the widget, which
+	// replaces its trigger element, so this re-runs whenever the set changes.
+	const previewIndex = triggerElements.findIndex( ( el ) => '1' === el.dataset.editorPreview );
+
+	useEffect( () => {
+		if ( previewIndex < 0 ) {
+			return;
+		}
+
+		setQuery( triggerElements[ previewIndex ].dataset.editorQuery || '' );
+		setActiveIndex( previewIndex );
+	}, [ triggerElements, previewIndex ] );
 
 	const activeEl = null !== activeIndex ? triggerElements[ activeIndex ] : null;
 
@@ -83,6 +98,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 					instanceClass={ activeEl.dataset.instanceClass || '' }
 					showCount={ '0' !== activeEl.dataset.showCount }
 					animation={ activeEl.dataset.animation || 'fade' }
+					editorPreview={ '1' === activeEl.dataset.editorPreview }
 					initialQuery={ query }
 					onQueryChange={ setQuery }
 					onRequestClose={ closeModal }

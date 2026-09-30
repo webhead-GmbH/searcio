@@ -227,9 +227,10 @@
 	display: inline-flex;
 	color: inherit;
 	font: inherit;
+	font-family: var(--whsc-font-family, inherit);
 
 	&.whsc-trigger--box {
-		width: 100%;
+		width: var(--whsc-trigger-box-width, 100%);
 	}
 }
 
@@ -346,6 +347,7 @@
 	margin: 0;
 	background: var(--whsc-bg);
 	color: var(--whsc-text);
+	font-family: var(--whsc-font-family, inherit);
 	border-radius: 0 0 var(--whsc-radius-panel) var(--whsc-radius-panel);
 }
 
@@ -372,7 +374,7 @@
 	min-width: 0;
 	gap: var(--whsc-gap);
 	width: 100%;
-	max-width: 100%;
+	max-width: var(--whsc-content-width, 100%);
 	overflow-x: hidden;
 	margin: 0 auto;
 	padding: var(--whsc-padding);
@@ -1323,10 +1325,10 @@
 
 .whsc-carousel-item {
 	flex: 0 0 auto;
-	width: 200px;
+	width: var(--whsc-card-width, 200px);
 
 	@media screen and (max-width: 600px) {
-		width: 150px;
+		width: var(--whsc-card-width, 150px);
 	}
 }
 
@@ -1496,10 +1498,10 @@
 
 .whsc-card__image {
 	width: 100%;
-	aspect-ratio: 1 / 1;
-	object-fit: cover;
-	border-radius: calc(var(--whsc-card-radius) - 3px);
-	background: #f1f2f4;
+	aspect-ratio: var(--whsc-card-image-ratio, 1 / 1);
+	object-fit: var(--whsc-card-image-fit, cover);
+	border-radius: var(--whsc-card-image-radius, calc(var(--whsc-card-radius) - 3px));
+	background: var(--whsc-card-image-bg, #f1f2f4);
 	-webkit-user-drag: none;
 	user-select: none;
 }
@@ -1524,10 +1526,10 @@
 	line-height: 1.4;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
-	color: #fff;
 	// White 11px text: on the accent itself it measured 3.43:1.
-	background: var(--whsc-accent-strong, var(--whsc-accent));
-	border-radius: 999px;
+	color: var(--whsc-badge-text, #fff);
+	background: var(--whsc-badge-bg, var(--whsc-accent-strong, var(--whsc-accent)));
+	border-radius: var(--whsc-badge-radius, 999px);
 }
 
 .whsc-card__title {
@@ -1648,6 +1650,8 @@
  * ---------------------------------------------------------------------- */
 .whsc-modal-overlay {
 	animation: whsc-overlay-in 0.25s ease both;
+	// The fallback is the colour `@wordpress/components` gives its overlay.
+	background-color: var(--whsc-overlay-bg, rgba(0, 0, 0, 0.35));
 }
 
 .whsc-modal.components-modal__frame {

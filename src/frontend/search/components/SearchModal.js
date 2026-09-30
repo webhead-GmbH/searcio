@@ -95,6 +95,8 @@ const revealTab = (list, tab) => {
  *                                        (falls back to the plugin's own card per hit when no template matches).
  * @param {string}   [props.highlightsSource] 'featured' to source the empty-query highlights carousel from
  *                                            `filter[featured]=true` instead of a plain match-all (default 'newest').
+ * @param {boolean}  [props.editorPreview] Opened by the Elementor editor for styling rather than by a visitor:
+ *                                        it takes no focus and runs its search term once.
  * @param {string}   props.initialQuery   Seed value when opened from a box trigger the user was already typing in.
  * @param {(query: string) => void} [props.onQueryChange] Keeps a box trigger's own input in sync while the modal is open.
  * @param {Function} props.onRequestClose
@@ -110,6 +112,7 @@ const SearchModal = ({
 											 highlightsSource,
 											 showCount,
 											 animation,
+											 editorPreview = false,
 											 initialQuery,
 											 onQueryChange,
 											 onRequestClose,
@@ -229,9 +232,14 @@ const SearchModal = ({
 		onQueryChange?.(query);
 	}, [query, onQueryChange]);
 
+	// In the Elementor editor the modal reopens every time a Content setting
+	// re-renders the widget; taking focus then would pull it out of the field
+	// being typed into in the editor's panel.
 	useEffect(() => {
-		inputRef.current?.focus();
-	}, []);
+		if (!editorPreview) {
+			inputRef.current?.focus();
+		}
+	}, [editorPreview]);
 
 	// `Modal` (`@wordpress/components`) always portals its frame straight to
 	// `document.body` and doesn't forward unrecognized props to it, so
@@ -688,6 +696,17 @@ const SearchModal = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- re-running on each keystroke via trimmedQuery is intentional.
 	}, [trimmedQuery, searchTrigger]);
 
+	// The editor preview opens with its search term already in the field; run
+	// it once so there are results to style. Uncommitted: it is nobody's
+	// search, so it is not saved as a recent search, and a term configured as
+	// a redirect does not navigate the editor away.
+	useEffect(() => {
+		if (editorPreview && '' !== trimmedQuery) {
+			void runSearch(query, buildTypeParam(scopeType, activeTypes), false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the preview opens.
+	}, []);
+
 	// Clicking "All" (empty type) clears the selection; clicking a type
 	// toggles it in/out.
 	const onTypeFacetClick = (type) => {
@@ -998,9 +1017,13 @@ const SearchModal = ({
 	return (
 		<Modal
 			__experimentalHideHeader
+			focusOnMount={editorPreview ? false : undefined}
 			onRequestClose={onRequestClose}
 			className={`whsc-modal whsc-anim-${animation || 'fade'}${instanceClass ? ` ${instanceClass}` : ''}`}
-			overlayClassName="whsc-modal-overlay"
+			// The instance class goes on the overlay too: the widget's CSS custom
+			// properties are set on it, and the overlay is the frame's parent,
+			// so it would never see the frame's own copy (e.g. its colour).
+			overlayClassName={`whsc-modal-overlay${instanceClass ? ` ${instanceClass}` : ''}`}
 			contentLabel={i18n.placeholder || __('Search', 'webhead-search-cloud')}
 		>
 			<div className="whsc-modal-body">
