@@ -27,7 +27,7 @@ namespace Webhead\WP\SearchCloud\Sync;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * @since 1.0.5
+ * @since 1.1.0
  */
 final class Failed_Deletes {
 	/**
