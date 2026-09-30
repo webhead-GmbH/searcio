@@ -59,6 +59,17 @@ $whsc_settings = [
 	// Merchandising banner.
 	'banner_bg'               => '#fef3c7',
 	'banner_text'             => '#92400e',
+
+	// The overlay, card image, sale badge, carousel card and filter group
+	// name, each away from its default.
+	'modal_overlay'           => 'rgba(18, 52, 86, 0.8)',
+	'card_image_ratio'        => '4 / 5',
+	'card_image_bg'           => '#fde68a',
+	'card_badge_bg'           => '#7c2d12',
+	'card_badge_text'         => '#fef3c7',
+	'card_badge_radius'       => [ 'unit' => 'px', 'size' => 0 ],
+	'carousel_card_width'     => [ 'unit' => 'px', 'size' => 260 ],
+	'facet_group_color'       => '#065f46',
 ];
 
 // Each size, weight and line height differs from the storefront stylesheet's

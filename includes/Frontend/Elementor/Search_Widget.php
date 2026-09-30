@@ -388,7 +388,7 @@ final class Search_Widget extends Widget_Base {
 					'center' => [ 'title' => __( 'Center', 'webhead-search-cloud' ), 'icon' => 'eicon-text-align-center' ],
 					'right'  => [ 'title' => __( 'Right', 'webhead-search-cloud' ), 'icon' => 'eicon-text-align-right' ],
 				],
-				'selectors' => [ '{{WRAPPER}}' => 'text-align: {{VALUE}};' ],
+				'selectors' => [ $this->boosted_selector( '{{WRAPPER}}' ) => 'text-align: {{VALUE}};' ],
 			]
 		);
 

@@ -97,4 +97,41 @@ test.describe( 'Elementor widget', () => {
 			await expect.poll( () => typographyOf( element ), { message: selector } ).toEqual( expected );
 		}
 	} );
+
+	test( 'applies the overlay, card image, sale badge, card width and filter group settings', async ( { page, requestUtils } ) => {
+		test.skip( ! ( await isPluginActive( requestUtils, 'elementor' ) ), 'Elementor is not active.' );
+
+		await mockSearchCloud( page, {
+			hits: [ postHit( { type: 'product', title: 'Zip Hoodie', price: 20, on_sale: true } ) ],
+			facets: { types: [ { value: 'product', count: 1 } ], categories: [ { value: 'Hoodies', count: 1 } ] },
+		} );
+		await page.goto( createThemedElementorPost( 'icon' ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'hoodie' );
+		await expect( widget.cards.first() ).toBeVisible();
+
+		/**
+		 * @param {import('@playwright/test').Locator} locator
+		 * @param {string[]}                           properties
+		 */
+		const styleOf = ( locator, properties ) =>
+			locator.evaluate( ( el, names ) => names.map( ( name ) => window.getComputedStyle( el ).getPropertyValue( name ) ), properties );
+
+		// The overlay is portalled straight to `body`, outside every scoped
+		// rule, so its colour (and its fade-in) never used to reach it.
+		await expect.poll( () => styleOf( page.locator( '.whsc-modal-overlay' ), [ 'background-color' ] ) ).toEqual( [ 'rgba(18, 52, 86, 0.8)' ] );
+		await expect
+			.poll( () => styleOf( widget.modal.locator( '.whsc-card__image' ).first(), [ 'aspect-ratio', 'background-color' ] ) )
+			.toEqual( [ '4 / 5', 'rgb(253, 230, 138)' ] );
+		await expect
+			.poll( () => styleOf( widget.modal.locator( '.whsc-card__badge' ).first(), [ 'background-color', 'color', 'border-top-left-radius' ] ) )
+			.toEqual( [ 'rgb(124, 45, 18)', 'rgb(254, 243, 199)', '0px' ] );
+		await expect.poll( () => styleOf( widget.modal.locator( '.whsc-carousel-item' ).first(), [ 'width' ] ) ).toEqual( [ '260px' ] );
+		// A colour picked for the group name is used as picked, not dimmed.
+		await expect
+			.poll( () => styleOf( widget.modal.locator( '.whsc-facet-group__label' ).first(), [ 'color', 'opacity' ] ) )
+			.toEqual( [ 'rgb(6, 95, 70)', '1' ] );
+	} );
 } );
