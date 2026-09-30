@@ -699,9 +699,14 @@ const SearchModal = ({
 	// The editor preview opens with its search term already in the field; run
 	// it once so there are results to style. Uncommitted: it is nobody's
 	// search, so it is not saved as a recent search, and a term configured as
-	// a redirect does not navigate the editor away.
+	// a redirect does not navigate the editor away. The suggestions dropdown
+	// is closed as a committed search would close it, or it would cover the
+	// filters and recent searches being styled; typing in the preview's own
+	// field opens it again.
 	useEffect(() => {
 		if (editorPreview && '' !== trimmedQuery) {
+			setSuggestionsDismissed(true);
+			skipSuggestRef.current = true;
 			void runSearch(query, buildTypeParam(scopeType, activeTypes), false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the preview opens.
