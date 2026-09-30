@@ -1648,14 +1648,9 @@
 
 /* -------------------------------------------------------------------------
  * Modal entrance animation (per-instance, chosen in the editor).
- * The overlay fades in for every variant; the frame gets the chosen motion.
+ * The overlay fades in for every variant (see `.whsc-modal-overlay` below the
+ * wrappers); the frame gets the chosen motion.
  * ---------------------------------------------------------------------- */
-.whsc-modal-overlay {
-	animation: whsc-overlay-in 0.25s ease both;
-	// The fallback is the colour `@wordpress/components` gives its overlay.
-	background-color: var(--whsc-overlay-bg, rgba(0, 0, 0, 0.35));
-}
-
 .whsc-modal.components-modal__frame {
 	animation-duration: var(--whsc-anim-duration, 0.3s);
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
@@ -1669,7 +1664,6 @@
 .whsc-anim-zoom.components-modal__frame { animation-name: whsc-zoom-in; }
 
 @media (prefers-reduced-motion: reduce) {
-	.whsc-modal-overlay,
 	.whsc-modal.components-modal__frame {
 		animation: none;
 	}
@@ -1689,6 +1683,23 @@
  */
 .whsc-card__price {
 	line-height: 1.4;
+}
+
+/*
+ * Outside the wrappers too: `@wordpress/components` portals the overlay
+ * straight to `body`, so it sits under no `[data-webhead-frontend-root]` and a
+ * rule scoped by one never reached it - not its fade-in, not a colour. At one
+ * class it still outranks the package's own `.components-modal__screen-overlay`,
+ * because this stylesheet loads after `wp-components`.
+ */
+.whsc-modal-overlay {
+	animation: whsc-overlay-in 0.25s ease both;
+	// The fallback is the colour `@wordpress/components` gives its overlay.
+	background-color: var(--whsc-overlay-bg, rgba(0, 0, 0, 0.35));
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
 }
 
 /*
