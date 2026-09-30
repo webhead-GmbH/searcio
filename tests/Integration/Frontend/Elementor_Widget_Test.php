@@ -64,6 +64,41 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		$this->assertNotSame( '', $widget->get_title() );
 	}
 
+	/**
+	 * The row is printed as `Product_List_Markup::render()` builds it: kses
+	 * would strip the `data-*` attributes the front end hydrates from, so the
+	 * values arrive escaped by the markup class and nothing else.
+	 */
+	public function test_products_widget_prints_the_row_with_its_settings(): void {
+		$widget = new Products_Widget(
+			[
+				'id'         => 'e4f5a6b',
+				'elType'     => 'widget',
+				'widgetType' => 'webhead-search-cloud-products',
+				'settings'   => [
+					'source'       => 'category',
+					'filter_field' => 'categories',
+					'filter_value' => 'Shoes & Boots',
+					'heading'      => '<b>More</b>',
+				],
+			],
+			[]
+		);
+
+		ob_start();
+		$widget->render_content();
+		$html = (string) ob_get_clean();
+
+		$row = new \WP_HTML_Tag_Processor( $html );
+		$this->assertTrue( $row->next_tag( [ 'class_name' => 'whsc-instance-e4f5a6b' ] ) );
+		$this->assertNotNull( $row->get_attribute( 'data-whsc-list' ) );
+		$this->assertSame( 'category', $row->get_attribute( 'data-source' ) );
+		$this->assertSame( 'categories', $row->get_attribute( 'data-filter-field' ) );
+		$this->assertSame( 'Shoes & Boots', $row->get_attribute( 'data-filter-value' ) );
+		$this->assertSame( '<b>More</b>', $row->get_attribute( 'data-heading' ) );
+		$this->assertStringNotContainsString( '<b>', $html );
+	}
+
 	public function test_registrar_is_a_no_op_for_an_object_without_a_register_method(): void {
 		$manager = new class() {
 			/** @var array<int,mixed> */

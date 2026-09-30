@@ -2,7 +2,7 @@
 Contributors: webheadgmbh, mohammad425
 Tags: search, woocommerce
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.3
 Stable tag: 1.1.0
 License: GPL-3.0-or-later
@@ -125,6 +125,7 @@ To rebuild it, check the repository out and run `npm install` followed by
 - Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
 - Fixed a permanently deleted post staying in search for good when the first attempt to remove it from the index failed. Full syncs now retry the removal until it succeeds.
 - Fixed content staying in search for good when a full sync's attempt to remove it failed, for example after turning a content type off and then permanently deleting its posts. Later full syncs now keep retrying the removal until it succeeds.
+- Tested up to WordPress 7.1.
 
 = 1.0.4 =
 - The AI assistant's answers now render properly instead of showing raw Markdown.

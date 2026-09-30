@@ -181,10 +181,7 @@ final class Products_Widget extends Widget_Base {
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
 
-		// Echoed as built, not through kses: kses strips the `data-*` attributes
-		// the front-end hydrates from. Every part is escaped inside
-		// Product_List_Markup::render().
-		echo Product_List_Markup::render( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup is escaped inside Product_List_Markup::render().
+		$markup = Product_List_Markup::render(
 			[
 				'source'        => (string) ( $settings['source'] ?? 'similar' ),
 				'documentId'    => (string) ( $settings['document_id'] ?? '' ),
@@ -198,5 +195,10 @@ final class Products_Widget extends Widget_Base {
 				'instanceClass' => 'whsc-instance-' . $this->get_id(),
 			]
 		);
+
+		// Echoed as built, not through kses: kses strips the `data-*` attributes
+		// the front-end hydrates from. Every part is escaped inside
+		// Product_List_Markup::render().
+		echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup is escaped inside Product_List_Markup::render().
 	}
 }

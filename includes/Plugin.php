@@ -10,6 +10,10 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud;
 
+// Ahead of the imports: the list is long enough that a guard after it falls
+// outside the first 50 lines, which is all Plugin Check reads for one.
+defined( 'ABSPATH' ) || exit;
+
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Foundation\Plugin as Base_Plugin;
 use Webhead\WP\SearchCloud\Dependencies\League\Container\Container;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Page_Registry;
@@ -66,8 +70,6 @@ use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
 use Webhead\WP\SearchCloud\Frontend\Elementor_Widget;
 use Webhead\WP\SearchCloud\Health\Health_Tests;
 use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
-
-defined( 'ABSPATH' ) || exit;
 
 /**
  * @since 1.0.0
