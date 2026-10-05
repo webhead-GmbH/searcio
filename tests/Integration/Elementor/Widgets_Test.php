@@ -287,7 +287,7 @@ final class Widgets_Test extends Integration_Test_Case {
 	 * the boost only counts on the part it is attached to.
 	 */
 	public function test_every_literal_style_selector_is_boosted(): void {
-		$boost = str_repeat( ':not(.whsc-specificity-boost)', 4 );
+		$boost = ':not(#whsc#whsc#whsc#whsc)';
 		// Without Elementor's own Advanced-tab controls, which are not ours.
 		$stack = ( new Search_Widget() )->get_stack( false );
 		// Outside the editor Elementor files style controls separately, and

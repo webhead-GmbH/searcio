@@ -7,71 +7,380 @@
 // unlayered CSS, and unlayered declarations outrank normal declarations inside
 // @layer even when the layered CSS is loaded later.
 
+@use 'sass:meta';
+
+// What a rule of this file weighs.
+//
+// A site's stylesheet is written for the whole page: a theme's `button {}`,
+// Elementor's Site Settings as
+// `.elementor-kit-7 input:not([type='button']):not([type='submit']):focus {}`,
+// a designer's `#content a {}`. None of it is in a cascade layer, so this file
+// is weighed against it by specificity alone, and the heaviest of those is one
+// id. `$lift` matches every element and weighs two ids, of an id no element
+// has: written after a selector, it puts the rule above what a site writes and
+// leaves what the rule matches as it was.
+$attr: "[data-webhead-frontend-root]";
+$lift: ":is(*, #webhead#webhead)";
+$root: "#{$attr}#{$lift}";
+$page: "body:has(#{$attr})#{$lift}";
+
+// Where a control of the surface can be: in the root, or in a popover, a modal,
+// a tooltip or a menu, which are drawn at the end of `body`, outside it.
+$overlays: ".components-popover__fallback-container, .components-popover, .components-modal__screen-overlay, .components-tooltip, .components-snackbar-list, [data-wp-compat-overlay-slot]";
+$scope: ":is(#{$attr}, body:has(#{$attr}) :is(#{$overlays}), #webhead#webhead)";
+
+// Black is the brand, here as in the admin: every control, every fill and every
+// button. Green is for focus and for links, and for nothing else.
+//
+// A theme provider writes its own values for most of this list onto its own
+// element, and what it works out for a black brand is not what the house uses:
+// its darkest fill is #2d2d2d, and its focus ring is the brand. So the list is
+// set in three places: on the root, for a surface without a provider; on what a
+// provider wraps, which is one element below its own; and on `body`, for the
+// menus and popovers that are drawn outside the root.
 [data-webhead-frontend-root],
+[data-webhead-frontend-root] [data-wpds-corner-radius] > *,
 body:has([data-webhead-frontend-root]) {
-	--wp-admin-theme-color: #319b80;
+	--wh-primary: #101010;
+	--wh-primary-dark: #000000;
+	// What is written on the brand.
+	--wh-secondary: #ffffff;
+	--wh-accent: #319b80;
+	--wh-accent-dark: #1d594a;
+	// The green a word can be read in: 5.1:1 on white, where the accent is 3.4:1.
+	--wh-link: #007d63;
+
+	// The brand, for `@wordpress/components`: a fill and what is written on it.
+	--wp-components-color-accent: var(--wh-primary);
+	--wp-components-color-accent-darker-10: var(--wh-primary-dark);
+	--wp-components-color-accent-darker-20: var(--wh-primary-dark);
+	--wp-components-color-accent-inverted: var(--wh-secondary);
+	// The same for `@wordpress/ui`, which reads design tokens.
+	--wpds-color-background-interactive-brand-strong: var(--wh-primary);
+	--wpds-color-background-interactive-brand-strong-active: var(--wh-primary-dark);
+	--wpds-color-background-interactive-neutral-strong: var(--wh-primary);
+	--wpds-color-background-interactive-neutral-strong-active: var(--wh-primary-dark);
+	--wpds-color-background-thumb-brand: var(--wh-primary);
+	--wpds-color-background-thumb-brand-active: var(--wh-primary-dark);
+	--wpds-color-foreground-interactive-brand-strong: var(--wh-secondary);
+	--wpds-color-foreground-interactive-brand-strong-active: var(--wh-secondary);
+	--wpds-color-foreground-interactive-neutral-strong: var(--wh-secondary);
+	--wpds-color-foreground-interactive-neutral-strong-active: var(--wh-secondary);
+	// And a control that is only outlined: its ring, and what is written in it.
+	--wpds-color-stroke-interactive-brand: var(--wh-primary);
+	--wpds-color-stroke-interactive-brand-active: var(--wh-primary-dark);
+	--wpds-color-foreground-interactive-brand: var(--wh-primary);
+	--wpds-color-foreground-interactive-brand-active: var(--wh-primary-dark);
+	// A selected row and its edge, as tints of the brand.
+	--wpds-color-stroke-surface-brand: color-mix(in oklch,var(--wh-primary) 40%,#fff);
+	--wpds-color-background-interactive-brand-weak-active: color-mix(in oklch,var(--wh-primary) 8%,#fff);
+
+	// Focus, whichever package draws the ring.
+	--wp-admin-theme-color: var(--wh-accent);
 	--wp-admin-theme-color--rgb: 49, 155, 128;
-	--wp-admin-theme-color-darker-10: #1d594a;
+	--wp-admin-theme-color-darker-10: var(--wh-accent-dark);
 	--wp-admin-theme-color-darker-10--rgb: 29, 89, 74;
-	--wp-admin-theme-color-darker-20: #16483c;
-	--wp-admin-theme-color-darker-20--rgb: 22, 72, 60;
-	--wp-components-color-accent: var(--wp-admin-theme-color);
-	--wp-components-color-accent-darker-10: var(--wp-admin-theme-color-darker-10);
-	--wp-components-color-accent-darker-20: var(--wp-admin-theme-color-darker-20);
-	--wpds-color-stroke-focus: var(--wp-admin-theme-color);
-	--wpds-color-stroke-surface-brand: color-mix(in oklch,var(--wp-admin-theme-color,#319b80) 40%,#fff);
-	--wpds-color-background-interactive-brand-weak-active: color-mix(in oklch,var(--wp-admin-theme-color,#319b80) 12%,#fff);
+	--wp-admin-theme-color-darker-20: var(--wh-accent-dark);
+	--wp-admin-theme-color-darker-20--rgb: 29, 89, 74;
+	--wpds-color-stroke-focus: var(--wh-accent);
 }
 
-[data-webhead-frontend-root] {
+// The text of the surface. Everything a page hands down to what is in it is
+// stated here: a surface in an Elementor Text Editor widget that is centred,
+// italic, in capitals and with a shadow reads as it does on a plain page. The
+// rule weighs one attribute, which is enough against what is handed down, and
+// a class of the plugin's own on the root can still say otherwise.
+#{$attr} {
 	box-sizing: border-box;
 	color: var(--wpds-color-foreground-content-neutral);
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
+	font-style: normal;
+	font-variant: normal;
+	font-weight: var(--wpds-typography-font-weight-default);
+	letter-spacing: normal;
 	line-height: var(--wpds-typography-line-height-md);
 	min-width: 0;
+	text-align: start;
+	text-indent: 0;
+	text-shadow: none;
 	text-size-adjust: 100%;
+	text-transform: none;
+	white-space: normal;
+	word-spacing: normal;
 }
 
-[data-webhead-frontend-root],
-[data-webhead-frontend-root] *,
-[data-webhead-frontend-root] *::before,
-[data-webhead-frontend-root] *::after {
+// And what it is drawn on. The text is the design system's, dark on light, and
+// a section of a page can be any colour: on a dark one it could not be read.
+// `:where()` gives the rule no weight, so a class of the plugin's own takes the
+// background away for a surface that sets its colours for where it is, with
+// the `color.bg` of `ThemeProvider`.
+:where(#{$attr}) {
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+}
+
+// The same for a popover, a modal and a tooltip, which have `body` above them
+// and the site's text with it. No weight here either: each of them states its
+// own colour and size, and those stay.
+:where(body:has(#{$attr})) :where(#{$overlays}) {
+	color: var(--wpds-color-foreground-content-neutral);
+	font-family: var(--wpds-typography-font-family-body);
+	font-size: var(--wpds-typography-font-size-md);
+	font-style: normal;
+	font-variant: normal;
+	font-weight: var(--wpds-typography-font-weight-default);
+	letter-spacing: normal;
+	line-height: var(--wpds-typography-line-height-md);
+	text-align: start;
+	text-indent: 0;
+	text-shadow: none;
+	text-transform: none;
+	white-space: normal;
+	word-spacing: normal;
+}
+
+// What a site writes on an element, taken off.
+//
+// `all: revert-layer` in a rule outside a layer sets every property back to
+// what the cascade layers say, as if no rule outside one had matched. For an
+// element of `@wordpress/ui` that is its whole design: the styles of that
+// package are in a layer, which is why a theme's `button {}` outranks every
+// one of them. For an element with no class it is the browser's own style.
+// Either way the site's rule is gone, whatever it set.
+//
+// It reaches three kinds of element. One with no class. One whose class is a
+// CSS module's (`<hash>__<name>`), as every class of `@wordpress/ui` is, and
+// is not of a package whose styles are outside a layer. And a button or a
+// field of `@wordpress/components` whose styles are all in that package's
+// stylesheet, which is written again below this rule with more weight than it.
+//
+// It leaves three kinds alone, because it would take their own styles off as
+// well. An element whose styles `@wordpress/components` writes when it runs
+// (`css-`): the rules further down restate those by name. Everything of
+// DataViews, which is styled by element. And an element with a class of the
+// plugin's own, which is the plugin's to style: do not give one to a control
+// of `@wordpress/ui`, for the rule then leaves that control to the theme.
+//
+// The rule weighs two ids and no more. Every other rule of this file is above
+// it, and a rule a plugin writes for an element with no class is below it:
+// give the element a class of the plugin's.
+$tags: "a, address, blockquote, button, caption, code, dd, dl, dt, fieldset, figcaption, figure, h1, h2, h3, h4, h5, h6, hr, img, input, kbd, label, legend, li, mark, ol, optgroup, p, pre, samp, select, table, tbody, td, textarea, tfoot, th, thead, tr, ul";
+$written-late: "[class*='css-'], [class*='dataviews-'], [class*='dataforms-']";
+$unlayered: "[class*='components-'], #{$written-late}, [class*='webhead-search-cloud-']";
+$taken-off: ":where(:not([class]):not(:is([class*='dataviews-'], [class*='dataforms-']) *), [class*='__']:not(#{$unlayered}), :is(button, input, optgroup, select, textarea)[class*='components-']:not(#{$written-late}))";
+
+#{$scope} :where(#{$tags})#{$taken-off},
+#{$scope} :where(#{$tags})#{$taken-off}::before,
+#{$scope} :where(#{$tags})#{$taken-off}::after,
+#{$scope} :where(input, textarea)#{$taken-off}::placeholder {
+	all: revert-layer;
+}
+
+// A theme that draws a tick or a dot of its own on `input::after` draws it on
+// every checkbox and radio button of the page. Whatever package the control is
+// from, what is drawn in it is the package's.
+#{$scope} :where(input)::before,
+#{$scope} :where(input)::after {
+	all: revert-layer;
+}
+
+// What a site writes on a label, a heading or a paragraph of
+// `@wordpress/components`, and the package does not: the slant and the spacing
+// of the letters, the shadow, the capitals. `inherit` is what these elements
+// have on a page with no theme.
+#{$scope} :where(a, dd, dt, h1, h2, h3, h4, h5, h6, label, legend, li, p, td, th):where([class*='components-']) {
+	font-style: inherit;
+	letter-spacing: inherit;
+	text-indent: inherit;
+	text-shadow: inherit;
+	text-transform: inherit;
+	word-spacing: inherit;
+}
+
+// And the colour, the font and the size, which the package does write for some
+// of them. Not for an element whose styles it writes when it runs (`css-`):
+// this rule would outrank those, and the rules further down say them again by
+// name.
+$static: "[class*='components-']:not([class*='css-'])";
+
+#{$scope} :where(h1, h2, h3, h4, h5, h6, label, legend):where(#{$static}) {
+	color: inherit;
+	font-family: inherit;
+	line-height: inherit;
+}
+
+#{$scope} :where(label, legend):where(#{$static}) {
+	font-size: inherit;
+	font-weight: inherit;
+	margin: 0;
+	padding: 0;
+	vertical-align: baseline;
+}
+
+// The label of a field of `@wordpress/components` is one the package writes
+// when it runs, with one class, and a theme's `label {}` outranks it. This is
+// what the package says, in the design system's own sizes.
+#{$scope} :where(label, legend).components-base-control__label {
+	color: inherit;
+	display: block;
+	font-family: inherit;
+	font-size: var(--wpds-typography-font-size-xs);
+	font-style: inherit;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	letter-spacing: inherit;
+	line-height: 1.4;
+	margin: 0 0 var(--wpds-dimension-gap-sm);
+	max-width: none;
+	padding: 0;
+	text-indent: inherit;
+	text-shadow: inherit;
+	text-transform: uppercase;
+	vertical-align: baseline;
+	word-spacing: inherit;
+}
+
+// The stylesheet of `@wordpress/components` again, with the weight of this
+// file. The entrypoint imports it plain, for what is drawn outside the root;
+// here every rule of it is written under the scope, so that what the package
+// says about a button, a field or a menu item outranks what a site says about
+// `button`, `input` and `a`. The rules below this one are the house's, and
+// outrank the package's as they did before either was lifted.
+#{$scope} {
+	@include meta.load-css('@wordpress/components/build-style/style.css');
+}
+
+// A row or a column of `@wordpress/components` lets what is in it shrink, by a
+// rule the package writes when it runs. The rule at the top takes that off a
+// button standing in one, so it is said again.
+#{$scope} .components-flex > * {
+	min-height: 0;
+	min-width: 0;
+}
+
+#{$root},
+#{$root} *,
+#{$root} *::before,
+#{$root} *::after {
 	box-sizing: border-box;
 }
 
-[data-webhead-frontend-root] :is(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
+#{$root} :is(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) {
 	margin-block: 0;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(button, input, optgroup, select, textarea) {
+// A theme's `button` and `input` rules, set back to the surface's own text.
+//
+// For a control with no class, and for the controls of `@wordpress/components`
+// and DataViews, which the rules further down then colour. Not for a control
+// of `@wordpress/ui`. That package's styles are in a cascade layer, and any
+// rule outside a layer outranks every rule inside one: this rule used to
+// reach those controls too, and a filled button from that package had its
+// label in the text colour, dark on a dark fill. `:where()` keeps the weight of
+// the rule what it was, under the rules below it.
+#{$root}#{$attr} :is(button, input, optgroup, select, textarea):where(:not([class]), [class*='components-'], [class*='dataviews-']) {
 	color: inherit;
 	font: inherit;
-	letter-spacing: inherit;
-	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(button, [role='button'], [role='tab'], a) {
+#{$root}#{$attr} :is(button, input, optgroup, select, textarea) {
+	letter-spacing: inherit;
+	text-indent: 0;
+	text-shadow: none;
+	text-transform: none;
+	word-spacing: inherit;
+}
+
+// The controls `@wordpress/components` styles when it runs. Its rule for one
+// has a single class, or the same class three times, and a theme's `button {}`
+// or Elementor's rule for a field outranks either; nothing can give those rules
+// more weight, so what a site reaches is said again here, by name. It is what
+// the package says on WordPress 7.1, for a control of the default size.
+//
+// A control that is not named here is not held: CustomSelectControl,
+// UnitControl, ColorPicker and the rest of what the package styles this way.
+// Measure one under a theme before a surface uses it, and prefer the control
+// of `@wordpress/ui`, which the rule at the top of this file holds whole.
+#{$scope} input.components-input-control__input.components-input-control__input {
+	accent-color: auto;
+	border-radius: 0;
+	font-size: 16px;
+	line-height: 1;
+	margin: 0;
+	outline-offset: 0;
+	// The browser's own, which is what the package leaves it at.
+	padding-block: 1px;
+	transition-duration: 0s;
+
+	// Under 16px a phone enlarges the page when the field takes focus.
+	@media (min-width: 600px) {
+		font-size: var(--wpds-typography-font-size-md);
+	}
+}
+
+// The side padding of such a field: the package's for the default size, and
+// its smaller one beside an icon or a button of the field's own. A smaller
+// field has a smaller padding that is in no class, so a field in DataViews,
+// where they are small, is left as the package draws it.
+#{$scope} input.components-input-control__input.components-input-control__input:not(:is([class*='dataviews-'], [class*='dataforms-']) *) {
+	padding-inline: var(--wpds-dimension-padding-md);
+}
+
+#{$scope} .components-input-control__prefix + input.components-input-control__input.components-input-control__input {
+	padding-inline-start: var(--wpds-dimension-padding-xs);
+}
+
+#{$scope} input.components-input-control__input.components-input-control__input:has(+ .components-input-control__suffix) {
+	padding-inline-end: var(--wpds-dimension-padding-xs);
+}
+
+#{$scope} button.components-toggle-group-control-option-base {
+	background: transparent;
+	border: 0;
+	border-radius: 1px;
+	box-shadow: none;
+	display: flex;
+	padding: 0 var(--wpds-dimension-padding-md);
+	text-decoration: none;
+	white-space: normal;
+}
+
+#{$scope} input.components-range-control__slider.components-range-control__slider {
+	padding: 0;
+}
+
+// A slider is a field nobody sees, over a track, and the package marks its
+// focus with a halo of the accent round the thumb: the brand's black, faded.
+// This is the ring every other control has, drawn round the thumb.
+#{$scope} .components-range-control__slider:focus-visible ~ .components-range-control__thumb-wrapper {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
+}
+
+#{$scope} .components-range-control__slider:focus-visible ~ .components-range-control__thumb-wrapper > span::before {
+	content: none;
+}
+
+#{$root}#{$attr} :is(button, [role='button'], [role='tab'], a) {
 	touch-action: manipulation;
 }
 
-[data-webhead-frontend-root] :is(img, video, canvas) {
+#{$root} :is(img, video, canvas) {
 	display: block;
 	max-width: 100%;
 }
 
-[data-webhead-frontend-root] svg {
+#{$root} svg {
 	max-width: 100%;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(.components-button, [role='tab']) {
+#{$root}#{$attr} :is(.components-button, [role='tab']) {
 	appearance: none;
 	font-family: var(--wpds-typography-font-family-body);
 	text-decoration: none;
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button {
+#{$root}#{$attr} .components-button {
 	border: 0;
 	border-color: transparent;
 	border-radius: var(--wpds-border-radius-sm);
@@ -82,15 +391,15 @@ body:has([data-webhead-frontend-root]) {
 	transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button svg {
+#{$root}#{$attr} .components-button svg {
 	fill: currentColor;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button:hover:not(:disabled, [aria-disabled='true']) {
+#{$root}#{$attr} .components-button:hover:not(:disabled, [aria-disabled='true']) {
 	color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button:active:not(:disabled, [aria-disabled='true']) {
+#{$root}#{$attr} .components-button:active:not(:disabled, [aria-disabled='true']) {
 	background: var(--wpds-color-background-interactive-neutral-weak-active);
 	color: var(--wpds-color-foreground-interactive-neutral-active);
 }
@@ -102,41 +411,48 @@ body:has([data-webhead-frontend-root]) {
 // field. Against an accent-coloured border that is close to invisible, and it is
 // under the 2px a focus indicator is expected to carry. It is a keyboard-only
 // regression, so nothing about it shows in a screenshot of the page at rest.
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button:focus:not(:active) {
+#{$root}#{$attr} .components-button:focus:not(:active) {
 	box-shadow: none;
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
-	outline-offset: var(--wpds-border-width-focus, 2px);
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary {
+#{$root}#{$attr} .components-button.is-primary {
 	background: var(--wp-components-color-accent);
-	color: var(--wpds-color-foreground-interactive-brand-strong);
+	color: var(--wp-components-color-accent-inverted);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary:hover:not(:disabled, [aria-disabled='true']) {
+#{$root}#{$attr} .components-button.is-primary:hover:not(:disabled, [aria-disabled='true']) {
 	background: var(--wp-components-color-accent-darker-10);
-	color: var(--wpds-color-foreground-interactive-brand-strong);
+	color: var(--wp-components-color-accent-inverted);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary:active:not(:disabled, [aria-disabled='true']) {
+#{$root}#{$attr} .components-button.is-primary:active:not(:disabled, [aria-disabled='true']) {
 	background: var(--wp-components-color-accent-darker-20);
-	color: var(--wpds-color-foreground-interactive-brand-strong-active);
+	color: var(--wp-components-color-accent-inverted);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary {
+#{$root}#{$attr} .components-button.is-secondary {
 	background: transparent;
 	box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wp-components-color-accent);
 	color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary:hover:not(:disabled, [aria-disabled='true']) {
+#{$root}#{$attr} .components-button.is-secondary:hover:not(:disabled, [aria-disabled='true']) {
 	background: color-mix(in srgb, var(--wp-components-color-accent) 4%, transparent);
 	box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wp-components-color-accent-darker-20);
 	color: var(--wp-components-color-accent-darker-20);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link {
+// A button drawn as a link is a link, and links are green. The accent is set on
+// the button itself, so the rules below colour it without knowing.
+#{$root}#{$attr} .components-button.is-link {
+	--wp-components-color-accent: var(--wh-link);
+	--wp-components-color-accent-darker-20: var(--wh-accent-dark);
+}
+
+#{$root}#{$attr} .components-button.is-tertiary,
+#{$root}#{$attr} .components-button.is-link {
 	background: transparent;
 	color: var(--wp-components-color-accent);
 }
@@ -153,40 +469,58 @@ body:has([data-webhead-frontend-root]) {
 // because this file zeroes `border` on `.components-button` to keep a theme's
 // borders out; the ring here is an inset shadow, so the disabled ring has to be
 // stated as one too.
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary:disabled,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-primary[aria-disabled='true'] {
+#{$root}#{$attr} .components-button.is-primary:disabled,
+#{$root}#{$attr} .components-button.is-primary[aria-disabled='true'] {
 	background: var(--wp-components-color-accent);
 	color: rgba(255, 255, 255, 0.4);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary:disabled,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary[aria-disabled='true'],
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-secondary[aria-disabled='true']:hover {
+#{$root}#{$attr} .components-button.is-secondary:disabled,
+#{$root}#{$attr} .components-button.is-secondary[aria-disabled='true'],
+#{$root}#{$attr} .components-button.is-secondary[aria-disabled='true']:hover {
 	background: transparent;
 	box-shadow: inset 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-interactive-neutral-disabled);
 	color: var(--wpds-color-foreground-interactive-neutral-disabled);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary:disabled,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary[aria-disabled='true'],
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link:disabled,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link[aria-disabled='true'] {
+#{$root}#{$attr} .components-button.is-tertiary:disabled,
+#{$root}#{$attr} .components-button.is-tertiary[aria-disabled='true'],
+#{$root}#{$attr} .components-button.is-link:disabled,
+#{$root}#{$attr} .components-button.is-link[aria-disabled='true'] {
 	background: transparent;
 	color: var(--wpds-color-foreground-interactive-neutral-disabled);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-tertiary:hover:not(:disabled, [aria-disabled='true']),
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-link:hover:not(:disabled, [aria-disabled='true']) {
+#{$root}#{$attr} .components-button.is-tertiary:hover:not(:disabled, [aria-disabled='true']),
+#{$root}#{$attr} .components-button.is-link:hover:not(:disabled, [aria-disabled='true']) {
 	background: color-mix(in srgb, var(--wp-components-color-accent) 4%, transparent);
 	color: var(--wp-components-color-accent-darker-20);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-button.is-pressed:not(:disabled, [aria-disabled='true']) {
+// Links are green. A `Link` from `@wordpress/ui` reads its colour from the
+// brand's foreground token, so the token is set on the anchor itself: green for
+// a link, and whatever the provider worked out for everything else that reads
+// it. A link written with no class takes the colour directly, in place of the
+// theme's.
+#{$root}#{$attr} a:not(.components-button) {
+	--wpds-color-foreground-interactive-brand: var(--wh-link);
+	--wpds-color-foreground-interactive-brand-active: var(--wh-accent-dark);
+}
+
+#{$root}#{$attr} a:not([class]) {
+	color: var(--wh-link);
+}
+
+#{$root}#{$attr} a:not([class]):is(:hover, :focus) {
+	color: var(--wh-accent-dark);
+}
+
+#{$root}#{$attr} .components-button.is-pressed:not(:disabled, [aria-disabled='true']) {
 	background: var(--wpds-color-background-interactive-neutral-strong);
 	color: var(--wpds-color-foreground-interactive-neutral-strong);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] [role='tab'] {
+#{$root}#{$attr} [role='tab'] {
 	background: transparent;
 	border: 0;
 	box-shadow: none;
@@ -194,7 +528,7 @@ body:has([data-webhead-frontend-root]) {
 	cursor: var(--wpds-cursor-control);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] [role='tab'] > svg[class*='tab-chevron'] {
+#{$root}#{$attr} [role='tab'] > svg[class*='tab-chevron'] {
 	display: none;
 }
 
@@ -205,12 +539,12 @@ body:has([data-webhead-frontend-root]) {
 // indication of where they were. The ring is drawn inside the tab — a negative
 // offset — so the tablist's own overflow cannot clip it and it cannot overlap
 // the neighbouring tab, which is what an outline offset outwards does here.
-[data-webhead-frontend-root][data-webhead-frontend-root] [role='tab']:focus-visible {
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-admin-theme-color);
-	outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
+#{$root}#{$attr} [role='tab']:focus-visible {
+	outline: var(--wpds-border-width-focus) solid var(--wp-admin-theme-color);
+	outline-offset: calc(-1 * var(--wpds-border-width-focus));
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.components-search-control input[type='search'],
 	.dataviews-search input[type='search'],
 	.dataviews-filters__search-widget-filter-combobox__input
@@ -224,18 +558,18 @@ body:has([data-webhead-frontend-root]) {
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.components-search-control input[type='search'],
 	.dataviews-search input[type='search'],
 	.dataviews-filters__search-widget-filter-combobox__input
 ):focus {
 	border-color: var(--wpds-color-stroke-interactive-neutral);
 	box-shadow: none;
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-admin-theme-color);
-	outline-offset: var(--wpds-border-width-focus, 2px);
+	outline: var(--wpds-border-width-focus) solid var(--wp-admin-theme-color);
+	outline-offset: var(--wpds-border-width-focus);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.components-text-control__input,
 	.components-textarea-control__input,
 	.components-input-control__input,
@@ -249,7 +583,7 @@ body:has([data-webhead-frontend-root]) {
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.components-text-control__input,
 	.components-textarea-control__input,
 	.components-input-control__input,
@@ -257,24 +591,24 @@ body:has([data-webhead-frontend-root]) {
 ):focus {
 	border-color: var(--wpds-color-stroke-interactive-neutral);
 	box-shadow: none;
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
-	outline-offset: var(--wpds-border-width-focus, 2px);
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__backdrop {
+#{$root}#{$attr} .components-input-control__backdrop {
 	border-color: var(--wpds-color-stroke-interactive-neutral);
 	border-radius: var(--wpds-border-radius-sm);
 	box-shadow: 0 0 0 transparent;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container:focus-within .components-input-control__backdrop {
+#{$root}#{$attr} .components-input-control__container:focus-within .components-input-control__backdrop {
 	border-color: var(--wpds-color-stroke-interactive-neutral);
 	box-shadow: none;
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
-	outline-offset: var(--wpds-border-width-focus, 2px);
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr}#{$attr} :is(
 	input.components-text-control__input,
 	textarea.components-textarea-control__input,
 	select.components-select-control__input
@@ -287,7 +621,7 @@ body:has([data-webhead-frontend-root]) {
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr}#{$attr} :is(
 	input.components-text-control__input,
 	input.components-input-control__input,
 	textarea.components-textarea-control__input,
@@ -295,23 +629,23 @@ body:has([data-webhead-frontend-root]) {
 ):focus {
 	border-color: var(--wpds-color-stroke-interactive-neutral);
 	box-shadow: none;
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wp-components-color-accent);
-	outline-offset: var(--wpds-border-width-focus, 2px);
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container .components-input-control__input {
+#{$root}#{$attr}#{$attr} .components-input-control__container .components-input-control__input {
 	border: 0;
 	background: transparent;
 	box-shadow: none;
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .components-input-control__container:focus-within .components-input-control__input {
+#{$root}#{$attr}#{$attr} .components-input-control__container:focus-within .components-input-control__input {
 	box-shadow: none;
 	outline: 0;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] input.components-range-control__slider[type='range'] {
+#{$root}#{$attr}#{$attr} input.components-range-control__slider[type='range'] {
 	border: 0;
 	border-radius: 0;
 	background: transparent;
@@ -319,11 +653,18 @@ body:has([data-webhead-frontend-root]) {
 	accent-color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control .components-h-stack {
+// A switch draws its ring on the track, which the accent also fills, so the
+// ring would be the brand's black. This is the package's rule with the colour
+// of focus.
+#{$root}#{$attr} .components-form-toggle .components-form-toggle__input:focus + .components-form-toggle__track {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wpds-color-stroke-focus);
+}
+
+#{$root}#{$attr} .components-checkbox-control .components-h-stack {
 	align-items: center;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input-container {
+#{$root}#{$attr} .components-checkbox-control__input-container {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -334,7 +675,7 @@ body:has([data-webhead-frontend-root]) {
 	vertical-align: middle;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'] {
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox'] {
 	appearance: none;
 	display: inline-block;
 	position: relative;
@@ -356,23 +697,23 @@ body:has([data-webhead-frontend-root]) {
 	accent-color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__label {
+#{$root}#{$attr} .components-checkbox-control__label {
 	display: inline-flex;
 	align-items: center;
 	min-height: var(--wpds-typography-line-height-sm);
 	line-height: var(--wpds-typography-line-height-sm);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']::before {
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']::before {
 	content: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:hover:not(:disabled) {
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']:hover:not(:disabled) {
 	border-color: var(--wpds-color-stroke-interactive-neutral-active);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:focus {
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-components-color-accent);
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']:focus {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wpds-color-stroke-focus);
 	outline: 2px solid transparent;
 	outline-offset: 2px;
 }
@@ -381,8 +722,8 @@ body:has([data-webhead-frontend-root]) {
 // checked *disabled* box filled solid brand green exactly like a live one, with
 // only the greyed tick hinting otherwise — which reads as a rendering fault, not
 // as a disabled control.
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:not(:disabled, [aria-disabled='true']):checked,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:not(:disabled, [aria-disabled='true'])[aria-checked='mixed'] {
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']:not(:disabled, [aria-disabled='true']):checked,
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']:not(:disabled, [aria-disabled='true'])[aria-checked='mixed'] {
 	background: var(--wp-components-color-accent);
 	border-color: var(--wp-components-color-accent);
 }
@@ -390,30 +731,30 @@ body:has([data-webhead-frontend-root]) {
 // And the unchecked disabled box: the base rule above states one background and
 // one border for every state, so the package's disabled greys never applied and
 // a disabled box was indistinguishable from an enabled one.
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:disabled,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'][aria-disabled='true'] {
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']:disabled,
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox'][aria-disabled='true'] {
 	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 	background: var(--wpds-color-stroke-surface-neutral-weak);
 	cursor: default;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox']:disabled:checked,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-checkbox-control__input[type='checkbox'][aria-disabled='true'][aria-checked='true'] {
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox']:disabled:checked,
+#{$root}#{$attr} .components-checkbox-control__input[type='checkbox'][aria-disabled='true'][aria-checked='true'] {
 	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 	background: var(--wpds-color-stroke-interactive-neutral-disabled);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-selection-checkbox .components-checkbox-control__input[type='checkbox'] {
+#{$root}#{$attr} .dataviews-selection-checkbox .components-checkbox-control__input[type='checkbox'] {
 	margin: 0;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__option {
+#{$root}#{$attr} .components-radio-control__option {
 	display: inline-flex;
 	align-items: center;
 	min-height: var(--wpds-typography-line-height-sm);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio'] {
+#{$root}#{$attr} .components-radio-control__input[type='radio'] {
 	appearance: none;
 	position: relative;
 	display: inline-block;
@@ -429,19 +770,19 @@ body:has([data-webhead-frontend-root]) {
 	accent-color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:not(:disabled, [aria-disabled='true']):checked {
+#{$root}#{$attr} .components-radio-control__input[type='radio']:not(:disabled, [aria-disabled='true']):checked {
 	border-color: var(--wp-components-color-accent);
 	background: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:disabled,
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio'][aria-disabled='true'] {
+#{$root}#{$attr} .components-radio-control__input[type='radio']:disabled,
+#{$root}#{$attr} .components-radio-control__input[type='radio'][aria-disabled='true'] {
 	border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 	background: var(--wpds-color-stroke-surface-neutral-weak);
 	cursor: default;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:checked::before {
+#{$root}#{$attr} .components-radio-control__input[type='radio']:checked::before {
 	content: '';
 	position: absolute;
 	top: 50%;
@@ -451,16 +792,16 @@ body:has([data-webhead-frontend-root]) {
 	margin: 0;
 	border: 0;
 	border-radius: 50%;
-	background: var(--wpds-color-foreground-interactive-brand-strong);
+	background: var(--wp-components-color-accent-inverted);
 	transform: translate(-50%, -50%);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-radio-control__input[type='radio']:focus {
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wp-components-color-accent);
+#{$root}#{$attr} .components-radio-control__input[type='radio']:focus {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wpds-color-stroke-focus);
 	outline: 2px solid transparent;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.dataviews-filters__search-widget-listitem-single-selection,
 	.dataviews-filters__search-widget-listitem-multi-selection
 ) {
@@ -469,7 +810,7 @@ body:has([data-webhead-frontend-root]) {
 	accent-color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.dataviews-filters__search-widget-listitem-single-selection,
 	.dataviews-filters__search-widget-listitem-multi-selection
 ):is(:hover, :focus) {
@@ -478,7 +819,7 @@ body:has([data-webhead-frontend-root]) {
 	outline: 2px solid transparent;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] :is(
+#{$root}#{$attr} :is(
 	.dataviews-filters__search-widget-listitem-single-selection,
 	.dataviews-filters__search-widget-listitem-multi-selection
 ):is(:checked, .is-selected, [aria-checked='true']) {
@@ -486,7 +827,7 @@ body:has([data-webhead-frontend-root]) {
 	border-color: var(--wp-components-color-accent);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-list .dataviews-view-list__item {
+#{$root}#{$attr}#{$attr} .dataviews-view-list .dataviews-view-list__item {
 	appearance: none;
 	border: 0;
 	border-radius: var(--wpds-border-radius-sm);
@@ -497,19 +838,19 @@ body:has([data-webhead-frontend-root]) {
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-list .dataviews-view-list__item:is(:hover, :focus, :active) {
+#{$root}#{$attr}#{$attr} .dataviews-view-list .dataviews-view-list__item:is(:hover, :focus, :active) {
 	background: none;
 	box-shadow: none;
 	color: inherit;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table {
+#{$root}#{$attr}#{$attr} .dataviews-view-table {
 	border: 0;
 	border-collapse: collapse;
 	background: inherit;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table :is(th, td) {
+#{$root}#{$attr}#{$attr} .dataviews-view-table :is(th, td) {
 	border: 0;
 	background: inherit;
 	box-shadow: none;
@@ -517,23 +858,23 @@ body:has([data-webhead-frontend-root]) {
 	text-transform: none;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table tr :is(th, td):first-child {
+#{$root}#{$attr}#{$attr} .dataviews-view-table tr :is(th, td):first-child {
 	padding-left: var(--wpds-dimension-padding-2xl);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table tr :is(th, td):last-child {
+#{$root}#{$attr}#{$attr} .dataviews-view-table tr :is(th, td):last-child {
 	padding-right: var(--wpds-dimension-padding-2xl);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table :is(th, td).dataviews-view-table__checkbox-column {
+#{$root}#{$attr}#{$attr} .dataviews-view-table :is(th, td).dataviews-view-table__checkbox-column {
 	padding-right: 0;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] .dataviews-view-table tbody :is(th, td) {
+#{$root}#{$attr}#{$attr} .dataviews-view-table tbody :is(th, td) {
 	background: transparent;
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) {
 	color: var(--wpds-color-foreground-content-neutral);
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
@@ -541,7 +882,7 @@ body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='
 	text-transform: none;
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item) {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item) {
 	appearance: none;
 	border-radius: var(--wpds-border-radius-sm);
 	box-shadow: none;
@@ -551,23 +892,23 @@ body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='
 	text-transform: none;
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], .components-button, .components-item, .components-toggle-group-control-option-base) {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], .components-button, .components-item, .components-toggle-group-control-option-base) {
 	background: transparent;
 	border-color: transparent;
 	color: var(--wpds-color-foreground-interactive-neutral);
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) .components-toggle-group-control-option-base {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) .components-toggle-group-control-option-base {
 	min-height: var(--wpds-dimension-size-md);
 	padding: 0 var(--wpds-dimension-padding-md);
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) button[class*='isIconStyles'] {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) button[class*='isIconStyles'] {
 	min-width: var(--wpds-dimension-size-md);
 	padding: 0;
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) .components-item {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) .components-item {
 	display: flex;
 	align-items: center;
 	width: 100%;
@@ -575,31 +916,31 @@ body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-md);
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item):hover {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item):hover {
 	background: var(--wpds-color-background-interactive-neutral-weak-active);
 	color: var(--wpds-color-foreground-interactive-neutral-active);
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is([aria-pressed='true'], [aria-checked='true'], [data-active-item='true'], [class*='pressed-buttonView']) {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) :is([aria-pressed='true'], [aria-checked='true'], [data-active-item='true'], [class*='pressed-buttonView']) {
 	background: var(--wpds-color-background-interactive-neutral-strong);
 	border-color: var(--wpds-color-background-interactive-neutral-strong);
 	color: var(--wpds-color-foreground-interactive-neutral-strong);
 }
 
-body:has([data-webhead-frontend-root]) :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item):focus-visible {
+#{$page} :is(.components-popover__content, [role='menu'][data-open='true']) :is(button, [role='button'], [role='menuitem'], [role='menuitemradio'], .components-button, .components-item):focus-visible {
 	outline: 2px solid transparent;
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent);
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-base-control {
+#{$root}#{$attr} .components-base-control {
 	margin-block-end: 0;
 }
 
-[data-webhead-frontend-root][data-webhead-frontend-root] .components-base-control__help {
+#{$root}#{$attr} .components-base-control__help {
 	margin-block-end: 0;
 }
 
-[data-webhead-frontend-root] :focus-visible {
+#{$root} :focus-visible {
 	outline: var(--wpds-border-width-sm) solid var(--wp-admin-theme-color);
 	outline-offset: var(--wpds-dimension-padding-xs);
 }

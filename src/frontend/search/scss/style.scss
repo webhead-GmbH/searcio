@@ -190,22 +190,59 @@
 }
 
 /*
- * Everything below is wrapped in this tripled attribute selector so it
- * reliably outranks the shared reset's own boosted rules
- * (`src/components/Default/frontend-reset.scss` uses up to
- * `[data-webhead-frontend-root]` repeated 3 times itself). Adopting that
- * reset exposed real conflicts: several of the reset's generic rules match
- * our own markup too (our type-filter/dot pills use `role="tab"`; our
- * buttons use `.components-button`; several controls are plain `<button>`
- * elements matched by `:is(button, input, ...)`), and those reset rules'
- * specificity — boosted the same way, sometimes with an extra bare-element
- * match inside `:is(...)` — was beating plain 2–3 class selectors like
- * `.whsc-modal .whsc-facet` or ties that lost once cascade order didn't
- * save us. Wrapping here fixes every one of those conflicts at once instead
- * of chasing them selector-by-selector, without editing the reset itself
- * (framework-owned, overwritten on `scaffold:update`).
+ * What a rule of this file weighs.
+ *
+ * The shared reset (`src/components/Default/frontend-reset.scss`,
+ * framework-owned and overwritten on `scaffold:update`) is written to outweigh
+ * a site's stylesheet: each of its rules carries `:is(*, #webhead#webhead)`,
+ * two ids of an id no element has. It takes a theme's styles off every button
+ * and field of `@wordpress/components`, and off every element whose class is
+ * written `block__element`, then draws the package's own design over them
+ * with the same weight. That is the right base for a surface made of
+ * WordPress's controls as they come. This surface has a design of its own
+ * - its buttons are `.components-button`, its pills carry `role="tab"`, its
+ * classes are `whsc-block__element` - and every one of those rules matches it.
+ *
+ * So this file weighs one id more. `$lift` matches every element and adds
+ * three ids, which puts each rule below above the reset's and leaves what the
+ * rule matches as it was. The reset stays the base, with nothing in it edited.
  */
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] {
+$lift: ':is(*, #whsc#whsc#whsc)';
+
+/*
+ * The roots. The reset states a surface's text on its root and draws the root
+ * on white, for a surface that looks the same wherever it is put. A trigger
+ * and a product row are the opposite on purpose: they sit in a header or a
+ * page section, in the site's own type and on the site's own background, and
+ * the alignment set on the Elementor widget reaches the trigger by
+ * inheritance. So these roots hand everything back to the page.
+ */
+.webhead-search-cloud-trigger#{$lift},
+.webhead-search-cloud-products#{$lift} {
+	background-color: transparent;
+	color: inherit;
+	font: inherit;
+	letter-spacing: inherit;
+	text-align: inherit;
+	text-indent: inherit;
+	text-shadow: inherit;
+	text-transform: inherit;
+	white-space: inherit;
+	word-spacing: inherit;
+}
+
+/*
+ * The modal sets its own colours and sizes from the `--whsc-*` properties and
+ * takes the family and the base size from the page, as it always has. The
+ * rest of what the reset states here - no capitals, no spacing, no shadow
+ * handed down from `body` - is kept.
+ */
+.whsc-modal-overlay#{$lift} {
+	color: inherit;
+	font: inherit;
+}
+
+[data-webhead-frontend-root]#{$lift} {
 
 /* Screen-reader-only status text (search progress / result-count announcements). */
 .whsc-visually-hidden {
@@ -1758,11 +1795,11 @@
 
 /*
  * The tab bar and the assistant sit after the top-level `@keyframes` above,
- * so they need their own copy of the specificity wrapper — without it these
+ * so they need their own copy of the wrapper and its weight — without it these
  * rules lose to the shared frontend reset (which is why the compare toggle
  * rendered as bare text and the tabs took the theme's body type).
  */
-[data-webhead-frontend-root][data-webhead-frontend-root][data-webhead-frontend-root] {
+[data-webhead-frontend-root]#{$lift} {
 
 /* --------------------------------------------------------------------------
  * Search / AI Assistant tab bar

@@ -13,10 +13,10 @@
  * both the trigger and, by the front-end JS, the portalled modal root). The
  * trigger itself lives inside `{{WRAPPER}}` and its Style-tab controls mostly
  * write CSS custom properties too (`--whsc-trigger-*`), for the same reason:
- * `style.scss`'s own trigger rules sit inside the `[data-webhead-frontend-root]`
- * -tripled block used to outrank the shared frontend reset, which gives them
- * higher specificity than a plain `{{WRAPPER}} .whsc-trigger-*` selector would
- * have — a direct property there would lose to this file's own base rule.
+ * `style.scss`'s own trigger rules carry the three ids of weight that put them
+ * above the shared frontend reset, which is more than a plain
+ * `{{WRAPPER}} .whsc-trigger-*` selector has — a direct property there would
+ * lose to this file's own base rule.
  * Only `Group_Control_Border`/`Group_Control_Typography` output (which can't
  * be redirected to a custom property) still uses a direct selector, and every
  * one of those goes through {@see self::boosted_selector()} so it outranks
@@ -48,19 +48,17 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Search_Widget extends Widget {
 	/**
-	 * Four no-op `:not()`s, adding (0,4,0) to a selector. The class never
-	 * exists in the markup, so matching is unchanged.
+	 * A no-op `:not()` that adds four ids of weight to a selector. No element
+	 * has the id, so matching is unchanged.
 	 *
-	 * Every rule in `style.scss` carries the tripled
-	 * `[data-webhead-frontend-root]` prefix, and the ones that set type on a
-	 * control's target reach (0,5,0) — `.whsc-modal .whsc-section-title`,
-	 * `.whsc-modal .whsc-popular-item`, `.whsc-modal .whsc-search-input__field`
-	 * — against (0,2,0) for a plain `.whsc-instance-{{ID}} .whsc-card__title`.
-	 * A site's Elementor Kit (Site Settings) styles bare `input` and `button`
-	 * elements too, at up to (0,3,1). Four points lift the lightest selector here to (0,6,0),
-	 * above all of them.
+	 * The shared frontend reset weighs two ids, to outrank whatever a site's
+	 * Elementor Kit (Site Settings) writes for bare `input` and `button`
+	 * elements. Every rule in `style.scss` weighs three, to keep the plugin's
+	 * own design above the reset. What a control on the Style tab sets has to
+	 * win over both, against (0,2,0) for a plain
+	 * `.whsc-instance-{{ID}} .whsc-card__title`: four ids put it there.
 	 */
-	private const SPECIFICITY_BOOST = ':not(.whsc-specificity-boost):not(.whsc-specificity-boost):not(.whsc-specificity-boost):not(.whsc-specificity-boost)';
+	private const SPECIFICITY_BOOST = ':not(#whsc#whsc#whsc#whsc)';
 
 	public function get_name(): string {
 		return 'webhead-search-cloud-search';
@@ -388,10 +386,9 @@ final class Search_Widget extends Widget {
 		// `--whsc-trigger-size`, `--whsc-trigger-radius`) that `style.scss`
 		// reads with a hardcoded fallback, rather than setting `width`/
 		// `height`/`border-radius` directly: this file's own base rule for
-		// `.whsc-trigger-icon-button` lives inside the same
-		// `[data-webhead-frontend-root]`-tripled block used to outrank the
-		// shared frontend reset, which gives it higher specificity than a
-		// plain `{{WRAPPER}} .whsc-trigger-icon-button` selector — a direct
+		// `.whsc-trigger-icon-button` carries the three ids of weight that
+		// put it above the shared frontend reset, which is more than a
+		// plain `{{WRAPPER}} .whsc-trigger-icon-button` selector has — a direct
 		// property here would silently lose to that base rule. Custom
 		// properties sidestep the specificity fight entirely: a rule that
 		// matches the element directly always wins over an inherited value
