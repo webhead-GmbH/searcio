@@ -123,6 +123,66 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 409, $response->get_status() );
 	}
 
+	/**
+	 * A cast is not a check: `(string)` on `order_by[]=id` is the word "Array"
+	 * and a PHP warning. The routes declare the type of what they take, and
+	 * WordPress refuses a value of another shape before the method runs.
+	 *
+	 * @dataProvider wrongly_shaped_values
+	 *
+	 * @param  array<string,mixed>  $params
+	 */
+	public function test_a_value_of_the_wrong_shape_is_refused_before_the_method_runs( string $method, string $route, array $params ): void {
+		$this->login_operator();
+
+		$request = new WP_REST_Request( $method, '/webhead-search-cloud/v1' . $route );
+
+		foreach ( $params as $name => $value ) {
+			$request->set_param( $name, $value );
+		}
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertSame( array_keys( $params ), array_keys( $response->get_data()['data']['params'] ) );
+	}
+
+	/**
+	 * @return array<string,array{0:string,1:string,2:array<string,mixed>}>
+	 */
+	public static function wrongly_shaped_values(): array {
+		return [
+			'a list for the sort column'  => [ 'GET', '/sync/history', [ 'order_by' => [ 'id' ] ] ],
+			'a list for the status'       => [ 'GET', '/sync/history', [ 'status' => [ 'completed' ] ] ],
+			'a word for the page'         => [ 'GET', '/sync/history', [ 'page' => 'two' ] ],
+			'a word for the page size'    => [ 'GET', '/sync/history', [ 'per_page' => 'all' ] ],
+			'a word for the force switch' => [ 'POST', '/sync/start', [ 'force' => 'please' ] ],
+			'a word for the run to pause' => [ 'POST', '/sync/pause', [ 'id' => 'latest' ] ],
+		];
+	}
+
+	public function test_the_history_still_answers_what_the_table_sends(): void {
+		$this->login_operator();
+
+		$request = new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/sync/history' );
+		$request->set_query_params(
+			[
+				'page'     => '1',
+				'per_page' => '20',
+				'order_by' => 'created_at',
+				'order'    => 'asc',
+				'status'   => Sync_Status::Completed->value,
+			]
+		);
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( 'items', $response->get_data() );
+		$this->assertArrayHasKey( 'total', $response->get_data() );
+	}
+
 	private function login_operator(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 	}

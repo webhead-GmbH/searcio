@@ -43,7 +43,7 @@ final class Indexing_Endpoint extends Rest_API {
 		return new WP_REST_Response( $this->config->catalog() );
 	}
 
-	#[Route( '/indexing/config', methods: 'POST', permission_callback: 'can_manage_settings' )]
+	#[Route( '/indexing/config', methods: 'POST', permission_callback: 'can_manage_settings', args: [ 'config' => [ 'type' => 'object' ] ] )]
 	public function save_config( WP_REST_Request $request ): WP_REST_Response {
 		$incoming = $request->get_param( 'config' );
 

@@ -32,7 +32,8 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_search_key',
 		show_in_rest: true,
 		label: 'Search key',
-		description: 'Public search key (sk_...) used by the browser. Restricted by your domain allowlist.'
+		description: 'Public search key (sk_...) used by the browser. Restricted by your domain allowlist.',
+		schema: [ 'format' => 'text-field' ]
 	)]
 	public const SEARCH_KEY = 'search_key';
 
@@ -73,7 +74,8 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_connect_idempotency_key',
 		show_in_rest: false,
 		label: 'Connect idempotency key',
-		description: 'UUID generated once and replayed on every /connect retry for this site.'
+		description: 'UUID generated once and replayed on every /connect retry for this site.',
+		schema: [ 'format' => 'text-field' ]
 	)]
 	public const CONNECT_IDEMPOTENCY_KEY = 'connect_idempotency_key';
 
@@ -119,7 +121,8 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_connect_pending_email',
 		show_in_rest: true,
 		label: 'Connect pending claim email',
-		description: 'The email address the pending-claim confirmation link was sent to.'
+		description: 'The email address the pending-claim confirmation link was sent to.',
+		schema: [ 'format' => 'text-field' ]
 	)]
 	public const CONNECT_PENDING_EMAIL = 'connect_pending_email';
 
@@ -185,7 +188,7 @@ final class Plugin_Settings {
 		show_in_rest: false,
 		label: 'Enabled languages',
 		description: "Local mirror of Search Cloud's configured languages.",
-		schema: [ 'items' => [ 'type' => 'string' ] ]
+		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
 	)]
 	public const ENABLED_LANGUAGES = 'enabled_languages';
 
@@ -200,7 +203,7 @@ final class Plugin_Settings {
 		show_in_rest: true,
 		label: 'Popular searches',
 		description: 'Curated list of queries shown as suggestions before the visitor types anything.',
-		schema: [ 'items' => [ 'type' => 'string' ] ]
+		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
 	)]
 	public const POPULAR_SEARCHES = 'popular_searches';
 

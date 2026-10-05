@@ -51,7 +51,7 @@ final class Verify_Endpoint extends Rest_API {
 		return 'search-cloud/v1';
 	}
 
-	#[Route( '/verify', methods: 'GET', permission_callback: 'is_public' )]
+	#[Route( '/verify', methods: 'GET', permission_callback: 'is_public', args: [ 'token' => [ 'type' => 'string' ] ] )]
 	public function verify( WP_REST_Request $request ): WP_REST_Response {
 		/*
 		 * The only legitimate caller is Search Cloud's domain-ownership ping,

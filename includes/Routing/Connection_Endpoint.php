@@ -66,7 +66,18 @@ final class Connection_Endpoint extends Rest_API {
 	 * admin email / current user / blog name defaults; `terms_privacy` and
 	 * `dpa` are the two consent checkboxes.
 	 */
-	#[Route( '/connection/connect', methods: 'POST', permission_callback: 'can_manage_settings' )]
+	#[Route(
+		'/connection/connect',
+		methods: 'POST',
+		permission_callback: 'can_manage_settings',
+		args: [
+			'terms_privacy' => [ 'type' => 'boolean' ],
+			'dpa'           => [ 'type' => 'boolean' ],
+			'email'         => [ 'type' => 'string' ],
+			'admin_name'    => [ 'type' => 'string' ],
+			'site_name'     => [ 'type' => 'string' ],
+		]
+	)]
 	public function connect( WP_REST_Request $request ): WP_REST_Response {
 		$terms_privacy = (bool) $request->get_param( 'terms_privacy' );
 		$dpa           = (bool) $request->get_param( 'dpa' );
