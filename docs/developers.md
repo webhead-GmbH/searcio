@@ -92,6 +92,8 @@ The bundle is printed through the framework's asset registry (`Plugin::get_asset
 
 Tokens that default to another token (the active tab's colour to the accent, the button background to the accent's text shade, an icon button's colour to the shared icon colour, and so on) are not declared anywhere: each rule that reads one names the default as its fallback, for example `var(--whsc-tab-text-active, var(--whsc-accent-strong))`. A fallback resolves on the element that uses it, so it follows that placement's own `--whsc-accent`; a value you set - on the placement's `whsc-instance-*` class, or site-wide on `:root` or `body` - is inherited and wins. Text drawn in the accent uses `--whsc-accent-strong`, a darker mix of `--whsc-accent` (`color-mix()`, where supported; the accent itself where not), which takes the default green to 5.8:1 on white. A light custom accent can still fall under 4.5:1 as text - `#f5a623` gives about 3.6:1 - so set `--whsc-accent-strong`, or the text tokens built on it, for such an accent. Borders, dots and focus rings keep the accent itself. The assistant's own accent has the same pair, `--whsc-assistant-accent` and `--whsc-assistant-accent-strong`. These two shades are the only derived tokens declared on each placement (at zero specificity), so set them on the placement rather than on an ancestor.
 
+The storefront stylesheet (`src/frontend/search/scss/style.scss`) is written above the framework's reset on purpose. The reset (`src/components/Default/frontend-reset.scss`, framework-owned) weighs two ids, so that WordPress's controls look the same under any theme or Elementor kit; it takes a site's styles off every button and field of `@wordpress/components` and off every element whose class is written `block__element`, which is every element of this surface. The stylesheet's `$lift` adds three ids to each of its rules, the Elementor widget's literal selectors add four (`Search_Widget::SPECIFICITY_BOOST`), and the three roots - the trigger, a product row and the modal's overlay - hand the page's own type, alignment and background back, which the reset would otherwise replace with the design system's. Theme a placement through the `--whsc-*` properties: a custom property does not compete on specificity. A rule of your own on a `.whsc-*` element has to carry `!important`.
+
 The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-out-color`. The search block (`stockInColor` / `stockOutColor`) and the Elementor search widget (`card_stock_in_color` / `card_stock_out_color`) set them for their modal; product rows (the products block and widget) have no style controls and take the defaults or site-wide CSS.
 
 ### Filters
@@ -113,7 +115,7 @@ There are two PHP suites, the JS unit suite, and a Playwright end-to-end suite:
 ```bash
 composer test:unit          # PHPUnit — fast, DB-free pure-logic classes (tests/Unit)
 npm run test:integration    # PHPUnit — real WordPress + database via wp-env (tests/Integration)
-npm run test:js             # Jest — pure-logic JS utilities
+npm run test:js             # Jest, through `wp-scripts test-unit-jest` — pure-logic JS utilities
 npm run test:e2e            # Playwright — real browser, desktop + mobile (tests/e2e)
 ```
 

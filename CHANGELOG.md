@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- **A page without search costs nothing.** The plugin boots on every request, and on a page with no search trigger it used to send a database query and translate eleven strings before deciding it had nothing to do. It now sends no query and loads no translation there: the storefront script and what it is given are only prepared by a block or a widget that is actually on the page.
+- **The settings screen is redrawn on the framework's page shell.** The page has one title and each tab one heading under it, the tab strip runs the width of the screen and scrolls on a phone instead of wrapping, and the cards, fields, notices and placeholders are the WordPress Design System's own. Black is the brand and green marks focus and links. *Upgrade plan* is an action in the page header like any other, and no longer purple.
+- A screen that could not load now says why and offers to try again. The settings, the Indexing tab and the Search Config tab each waited on a request, and when one failed the Search Config tab stayed a placeholder for good while the others showed an empty screen.
+- A save that fails is reported beside the button that failed, with the reason the REST API gave. The General tab used to open a dialog that said to review the fields whatever had gone wrong, and the other tabs a toast that disappeared. Search Config, which saves two things with one button, says what was stored and what was not in one message.
+- Clearing the sync history, deleting a run from it and disconnecting from Search Cloud ask first. None of the three can be undone by a click, and the first two used to happen at once.
+- The consent checkboxes on the Connection tab list their documents as links under the sentence they belong to, and *Learn more* is *How connecting works*, beside *Not this email?*.
+- The plan allowances on the Connection tab are three colours again - fine, close to the limit, spent - and a redirect in Search Config stacks its two fields on a phone instead of squeezing them into one row.
+- The search and products blocks space the controls in their editor panels evenly. Fields had been touching whatever followed them since the panels moved to the design system's controls.
+- Updated the webhead plugin framework to 1.4.0, with the WordPress packages the admin is built on. `npm audit` reports only `braces`, which has no fixed release.
+- The Elementor widgets are listed in the editor panel under *webhead Search Cloud* rather than under *General*. Widgets already on a page are unaffected: they are saved under the same names.
+- The storefront adopts the framework's new reset, which keeps WordPress's own controls looking the same on every site. The search modal has a design of its own, so its stylesheet is written to outrank the reset, and the Elementor style controls to outrank both. Theming through the `--whsc-*` properties is unchanged; a rule of your own that restyles a `.whsc-*` element directly now needs `!important` to win.
+- The storefront script starts through `wp-dom-ready`, and its handle is `webhead-search-cloud-bundle-search`.
+- REST routes say what each parameter is, so a value of the wrong shape is refused with a 400 before any code runs.
+- The package no longer carries the framework's private updater or its command runner, neither of which this plugin uses.
+- The JavaScript unit suite runs through `wp-scripts test-unit-jest`: `@wordpress/scripts` 36 moved `test-unit-js` to Vitest and stopped bundling Jest.
+
 ## 1.1.0
 
 - **Search by photo.** A shopper can upload a photo (or take one, on a phone) instead of typing: a vision model describes what it sees and searches for that. The camera button only appears when the site has the feature turned on, and the tags the model read are shown above the results, so an unexpected result set reads as a misread photo rather than as broken search. A rejected image, a spent monthly allowance and a feature that has since been switched off each say what happened instead of failing silently.
