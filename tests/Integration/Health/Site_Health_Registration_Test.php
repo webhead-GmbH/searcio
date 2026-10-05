@@ -1,11 +1,13 @@
 <?php
 /**
- * Site Health tests and diagnostics register on `init`, not at boot.
+ * Site Health tests and diagnostics register at boot and translate nothing
+ * until Site Health is opened.
  *
- * The plugin boots on `plugins_loaded`. Their labels are translated, and
- * WordPress 6.7+ reports any translation looked up before `after_setup_theme`
- * with `_doing_it_wrong( '_load_textdomain_just_in_time' )` - a notice on every
- * request of a site running with `WP_DEBUG`.
+ * The plugin boots on `plugins_loaded`, on every request of the site. WordPress
+ * 6.7+ reports any translation looked up before `after_setup_theme` with
+ * `_doing_it_wrong( '_load_textdomain_just_in_time' )`, and a translation
+ * looked up on `init` instead loads the text domain from disk on every
+ * front-end page, for labels only the Site Health screen ever shows.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -16,6 +18,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Tests\Integration\Health;
 
 use Webhead\WP\SearchCloud\Plugin;
+use Webhead\WP\SearchCloud\Health\Health_Tests;
 use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
@@ -75,6 +78,41 @@ final class Site_Health_Registration_Test extends Integration_Test_Case {
 
 		$this->assertArrayNotHasKey( '_load_textdomain_just_in_time', $this->caught_doing_it_wrong );
 		$this->assertSame( [], $translated, 'The plugin translated strings while it booted.' );
+	}
+
+	/**
+	 * `init` runs on every request. Neither class may wait there to translate
+	 * its labels: that is a text domain loaded for every visitor.
+	 */
+	public function test_nothing_waits_on_init_to_register(): void {
+		global $wp_filter;
+
+		$waiting = [];
+
+		foreach ( $wp_filter['init']->callbacks ?? [] as $callbacks ) {
+			foreach ( $callbacks as $callback ) {
+				$object = is_array( $callback['function'] ) ? $callback['function'][0] : null;
+
+				if ( $object instanceof Health_Tests || $object instanceof Runtime_Diagnostics ) {
+					$waiting[] = $object::class;
+				}
+			}
+		}
+
+		$this->assertSame( [], $waiting );
+	}
+
+	public function test_the_names_are_translated_when_site_health_asks_for_them(): void {
+		add_filter( 'gettext_' . self::DOMAIN, static fn ( string $translation, string $text ): string => 'DE: ' . $text, 10, 2 );
+
+		$tests   = apply_filters( 'site_status_tests', [ 'direct' => [], 'async' => [] ] );
+		$section = apply_filters( 'debug_information', [] )[ Runtime_Diagnostics::SECTION_ID ] ?? [];
+
+		$this->assertSame( 'DE: webhead Search Cloud connection', $tests['direct']['webhead_search_cloud_connection_configured']['label'] ?? null );
+		$this->assertSame( 'DE: webhead Search Cloud reachability', $tests['async']['webhead_search_cloud_connection_reachable']['label'] ?? null );
+		$this->assertSame( 'DE: webhead Search Cloud runtime', $section['label'] ?? null );
+		$this->assertStringStartsWith( 'DE: Connection, indexing', $section['description'] ?? '' );
+		$this->assertSame( 'DE: Connection configured', $section['fields']['connection_configured']['label'] ?? null );
 	}
 
 	public function test_the_health_tests_are_registered_with_their_labels(): void {

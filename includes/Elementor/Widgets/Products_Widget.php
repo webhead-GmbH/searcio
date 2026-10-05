@@ -16,19 +16,19 @@
 
 declare( strict_types=1 );
 
-namespace Webhead\WP\SearchCloud\Frontend\Elementor;
+namespace Webhead\WP\SearchCloud\Elementor\Widgets;
 
 use Elementor\Controls_Manager;
-use Elementor\Widget_Base;
-use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
+use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Widget;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * @since 1.1.0
  */
-final class Products_Widget extends Widget_Base {
+final class Products_Widget extends Widget {
 	public function get_name(): string {
 		return 'webhead-search-cloud-products';
 	}
@@ -42,29 +42,13 @@ final class Products_Widget extends Widget_Base {
 	}
 
 	/**
-	 * @return array<int,string>
-	 */
-	public function get_categories(): array {
-		return [ 'general' ];
-	}
-
-	/**
-	 * Declaring the shared runtime is what makes the row hydrate inside the
+	 * Naming the shared runtime is what makes the row hydrate inside the
 	 * Elementor editor preview too, exactly as {@see Search_Widget} does.
 	 *
 	 * @return string[]
 	 */
-	public function get_script_depends(): array {
-		Frontend_Assets::enqueue();
-
-		return [ Frontend_Assets::HANDLE ];
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public function get_style_depends(): array {
-		return [ Frontend_Assets::HANDLE ];
+	protected function asset_entries(): array {
+		return [ Frontend_Config::ENTRY ];
 	}
 
 	protected function register_controls(): void {

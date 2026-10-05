@@ -2,9 +2,9 @@
 /**
  * Elementor widget integration tests.
  *
- * Covers the plugin's Elementor integration point: the guarded
- * {@see \Webhead\WP\SearchCloud\Frontend\Elementor_Widget} registrar and the
- * {@see \Webhead\WP\SearchCloud\Frontend\Elementor\Search_Widget} contract
+ * Covers the plugin's Elementor integration point: the two widgets it names
+ * to the framework's Elementor manager in `Plugin::register_elementor()`, and
+ * the {@see \Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget} contract
  * (name, category, keywords, and the shared runtime bundle it depends on). The
  * widget's rendered markup is the same `Trigger_Markup` output already covered
  * by the unit suite and the block render test, so it is not re-asserted here.
@@ -18,15 +18,14 @@
 
 declare( strict_types=1 );
 
-namespace Webhead\WP\SearchCloud\Tests\Integration\Frontend;
+namespace Webhead\WP\SearchCloud\Tests\Integration\Elementor;
 
-use Webhead\WP\SearchCloud\Frontend\Elementor\Search_Widget;
-use Webhead\WP\SearchCloud\Frontend\Elementor_Widget;
-use Webhead\WP\SearchCloud\Frontend\Elementor\Products_Widget;
-use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
+use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
-final class Elementor_Widget_Test extends Integration_Test_Case {
+final class Widgets_Test extends Integration_Test_Case {
 	public function set_up(): void {
 		parent::set_up();
 
@@ -35,25 +34,46 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		}
 	}
 
-	public function test_registrar_registers_both_widgets(): void {
-		$manager = $this->fake_widgets_manager();
-
-		( new Elementor_Widget() )->register( $manager );
-
-		$this->assertCount( 2, $manager->registered );
-		$this->assertInstanceOf( Search_Widget::class, $manager->registered[0] );
-		$this->assertInstanceOf( Products_Widget::class, $manager->registered[1] );
+	public function test_both_widgets_are_named_to_the_framework_manager(): void {
+		$this->assertSame(
+			[ Search_Widget::class, Products_Widget::class ],
+			array_values( $this->plugin()->get_elementor_manager()->widgets() )
+		);
 	}
 
 	/**
-	 * Both widgets declare the shared runtime bundle, which is what makes them
+	 * Named is not registered: Elementor has to end up holding both, under the
+	 * names saved pages refer to them by.
+	 */
+	public function test_elementor_holds_both_widgets_under_their_saved_names(): void {
+		$widgets = \Elementor\Plugin::$instance->widgets_manager;
+
+		$this->assertInstanceOf( Search_Widget::class, $widgets->get_widget_types( 'webhead-search-cloud-search' ) );
+		$this->assertInstanceOf( Products_Widget::class, $widgets->get_widget_types( 'webhead-search-cloud-products' ) );
+	}
+
+	/**
+	 * Both widgets name the shared runtime bundle, which is what makes them
 	 * hydrate inside the Elementor editor preview rather than only on the front
-	 * end.
+	 * end. The handles come from the plugin's asset registry, and exist once
+	 * the bundle has been built.
 	 */
 	public function test_both_widgets_declare_the_shared_runtime(): void {
+		$assets = $this->plugin()->get_assets();
+
+		if ( ! $assets->exists( Frontend_Config::ENTRY ) ) {
+			$this->markTestSkipped( 'The storefront bundle is not built; run `npm run build`.' );
+		}
+
+		$handle = $assets->handle( Frontend_Config::ENTRY );
+
 		foreach ( [ new Search_Widget(), new Products_Widget() ] as $widget ) {
-			$this->assertContains( Frontend_Assets::HANDLE, $widget->get_script_depends() );
-			$this->assertContains( Frontend_Assets::HANDLE, $widget->get_style_depends() );
+			$this->assertSame( [ $handle ], $widget->get_script_depends() );
+			$this->assertNotSame( [], $widget->get_style_depends() );
+
+			foreach ( $widget->get_style_depends() as $style ) {
+				$this->assertTrue( wp_style_is( $style, 'registered' ), $style );
+			}
 		}
 	}
 
@@ -99,24 +119,13 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		$this->assertStringNotContainsString( '<b>', $html );
 	}
 
-	public function test_registrar_is_a_no_op_for_an_object_without_a_register_method(): void {
-		$manager = new class() {
-			/** @var array<int,mixed> */
-			public array $registered = [];
-		};
-
-		// Must not fatal even though `$manager` has no register() method.
-		( new Elementor_Widget() )->register( $manager );
-
-		$this->assertSame( [], $manager->registered );
-	}
-
 	public function test_widget_identity(): void {
 		$widget = new Search_Widget();
 
 		$this->assertSame( 'webhead-search-cloud-search', $widget->get_name() );
 		$this->assertNotSame( '', $widget->get_title() );
-		$this->assertContains( 'general', $widget->get_categories() );
+		// Listed under the plugin's own category in the panel.
+		$this->assertSame( [ $this->plugin()->get_elementor_manager()->category_slug() ], $widget->get_categories() );
 		$this->assertContains( 'search', $widget->get_keywords() );
 	}
 
@@ -271,13 +280,6 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		$this->assertStringContainsString( 'data-editor-preview="1" data-editor-query="shirt"', $html );
 	}
 
-	public function test_widget_declares_the_shared_runtime_bundle(): void {
-		$widget = new Search_Widget();
-
-		$this->assertContains( Frontend_Assets::HANDLE, $widget->get_script_depends() );
-		$this->assertContains( Frontend_Assets::HANDLE, $widget->get_style_depends() );
-	}
-
 	/**
 	 * A control writing a literal property (typography, border) rather than a
 	 * `--whsc-*` custom property competes with `style.scss` on specificity,
@@ -327,21 +329,5 @@ final class Elementor_Widget_Test extends Integration_Test_Case {
 		$widget->render_content();
 
 		return (string) ob_get_clean();
-	}
-
-	/**
-	 * A stand-in for Elementor's widgets manager that records what gets
-	 * registered. Matches the `register( $widget )` shape the registrar checks
-	 * for with `method_exists()`.
-	 */
-	private function fake_widgets_manager(): object {
-		return new class() {
-			/** @var array<int,mixed> */
-			public array $registered = [];
-
-			public function register( $widget ): void {
-				$this->registered[] = $widget;
-			}
-		};
 	}
 }

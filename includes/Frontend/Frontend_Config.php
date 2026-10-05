@@ -1,12 +1,12 @@
 <?php
 /**
- * Front-end search asset registration.
+ * What the storefront bundle is told about the site it runs on.
  *
- * Registers (does not auto-enqueue) the React-based front-end search bundle
- * and localizes the public runtime config it needs. The block's `render.php`
- * and the Elementor widget both call {@see self::enqueue()} so the bundle
- * only loads on pages where a trigger is actually placed. The bundle depends
- * on `@wordpress/components`, so its style handle is enqueued alongside ours.
+ * The bundle itself is the webpack entry {@see self::ENTRY}, printed through
+ * the plugin's asset registry by whatever draws a surface: a block's
+ * `render.php` and the two Elementor widgets. The registry registers it the
+ * first time one of them asks, and only then calls {@see self::to_array()} -
+ * so a page with no surface on it reads no setting and translates no string.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -19,8 +19,6 @@ namespace Webhead\WP\SearchCloud\Frontend;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Asset_Manifest;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Language;
 
@@ -29,9 +27,12 @@ defined( 'ABSPATH' ) || exit;
 /**
  * @since 1.0.0
  */
-final class Frontend_Assets {
-	public const HANDLE = 'webhead-search-cloud-frontend-search';
-	private const ENTRY  = 'bundle.search';
+final class Frontend_Config {
+	/** The webpack entry every storefront surface of this plugin is drawn by. */
+	public const ENTRY = 'bundle.search';
+
+	/** The global the entry's script reads this configuration from. */
+	public const OBJECT_NAME = 'webheadSearchCloudFrontend';
 
 	public function __construct(
 		private Settings_Manager $settings,
@@ -39,104 +40,6 @@ final class Frontend_Assets {
 		private Language $language,
 		private Language_Config $language_config
 	) {}
-
-	#[Action( 'init' )]
-	public function register(): void {
-		$manifest = Asset_Manifest::from_entry(
-			\Webhead\WP\SearchCloud\PLUGIN_DIR . 'public',
-			\Webhead\WP\SearchCloud\PLUGIN_URL . 'public',
-			self::ENTRY
-		);
-
-		if ( ! $manifest->script_exists() ) {
-			return;
-		}
-
-		wp_register_script( self::HANDLE, $manifest->script_url(), $manifest->script_dependencies(), $manifest->version(), true );
-		wp_set_script_translations( self::HANDLE, 'webhead-search-cloud', \Webhead\WP\SearchCloud\PLUGIN_DIR . 'languages' );
-
-		$style_asset = $this->resolve_style_asset();
-
-		if ( null !== $style_asset ) {
-			// `filemtime()`, not `$manifest->version()`: the manifest's version
-			// hash comes from webpack's DependencyExtractionWebpackPlugin, which
-			// only hashes this entry's JS content. A rebuild that only touches
-			// this entry's SCSS leaves that hash unchanged, so the stylesheet's
-			// `?ver=` querystring would stay identical across a CSS-only update
-			// and browsers keep serving the stale cached file indefinitely —
-			// most visibly in the Elementor editor's preview iframe, which
-			// otherwise reflects style changes immediately.
-			wp_register_style( self::HANDLE, $style_asset['url'], [ 'wp-components' ], (string) filemtime( $style_asset['path'] ) );
-		}
-
-		wp_localize_script( self::HANDLE, 'webheadSearchCloudFrontend', $this->localize_data() );
-	}
-
-	/**
-	 * Called by the block render callback and the Elementor widget — the only
-	 * two places a trigger can be placed on the front-end. Static because both
-	 * call sites run outside the service container (block `render.php` is
-	 * required directly by WordPress core; the Elementor widget is instantiated
-	 * by Elementor's own registry) and enqueueing only needs the handle that
-	 * {@see self::register()} already registered on `init`.
-	 */
-	public static function enqueue(): void {
-		if ( ! wp_script_is( self::HANDLE, 'registered' ) ) {
-			return;
-		}
-
-		wp_enqueue_script( self::HANDLE );
-
-		if ( wp_style_is( self::HANDLE, 'registered' ) ) {
-			wp_enqueue_style( self::HANDLE );
-		}
-	}
-
-	/**
-	 * `Asset_Manifest` assumes a plain `{entry}.css` output, but this entry's
-	 * only synchronous style import (no other JS shares its chunk) makes
-	 * webpack's MiniCssExtractPlugin name the chunk `style-{entry}.css`
-	 * instead. `Asset_Manifest` is not RTL-aware either way, so resolve the
-	 * stylesheet ourselves: prefer the RTL-suffixed file when `is_rtl()`, and
-	 * check both the plain and `style-` prefixed basenames webpack can emit.
-	 * A prior version checked `$manifest->style_exists()` first, which is
-	 * always true here (the LTR `style-` file always exists) and so silently
-	 * skipped the RTL lookup below on every request.
-	 */
-	/**
-	 * @return array{url:string,path:string}|null
-	 */
-	private function resolve_style_asset(): ?array {
-		$suffix = is_rtl() ? '-rtl' : '';
-
-		$asset = $this->find_style_asset( self::ENTRY . $suffix );
-
-		if ( null !== $asset ) {
-			return $asset;
-		}
-
-		// RTL build output missing for some reason: better to ship the LTR
-		// stylesheet than none at all.
-		return '' === $suffix ? null : $this->find_style_asset( self::ENTRY );
-	}
-
-	/**
-	 * @return array{url:string,path:string}|null
-	 */
-	private function find_style_asset( string $entry ): ?array {
-		$base_path = rtrim( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'public', '/\\' );
-		$base_url  = rtrim( \Webhead\WP\SearchCloud\PLUGIN_URL . 'public', '/' );
-
-		foreach ( [ $entry, 'style-' . $entry ] as $candidate ) {
-			$path = $base_path . '/' . $candidate . '.css';
-
-			if ( is_file( $path ) ) {
-				return [ 'url' => $base_url . '/' . $candidate . '.css', 'path' => $path ];
-			}
-		}
-
-		return null;
-	}
 
 	/**
 	 * Currency symbol, position and decimal count, sourced from WooCommerce so
@@ -171,9 +74,12 @@ final class Frontend_Assets {
 	}
 
 	/**
+	 * Called by the asset registry when it registers the entry, which is the
+	 * first time a surface on the page asks for it.
+	 *
 	 * @return array<string,mixed>
 	 */
-	private function localize_data(): array {
+	public function to_array(): array {
 		$host = defined( 'Webhead\WP\SearchCloud\SERVICE_URL' ) ? \Webhead\WP\SearchCloud\SERVICE_URL : '';
 
 		return [

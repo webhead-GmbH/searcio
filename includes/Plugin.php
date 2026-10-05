@@ -20,6 +20,7 @@ use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Page_Registry
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Blocks\Blocks_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Capabilities\Capability_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Database\Database_Manager;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Elementor_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Diagnostics_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Site_Health_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Hooks\Hooks_Manager;
@@ -37,7 +38,6 @@ use Webhead\WP\SearchCloud\Jobs\Scheduled_Sync_Job;
 use Webhead\WP\SearchCloud\Jobs\Sync_Tick_Job;
 use Webhead\WP\SearchCloud\Jobs\Change_Drain_Job;
 use Webhead\WP\SearchCloud\Admin\Settings_Page;
-use Webhead\WP\SearchCloud\Admin\Rtl_Style_Fix;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Database\Tables\Sync_Runs_Table;
 use Webhead\WP\SearchCloud\Database\Tables\Change_Queue_Table;
@@ -66,8 +66,9 @@ use Webhead\WP\SearchCloud\Sync\Change_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
 use Webhead\WP\SearchCloud\WP_CLI\Sync_Command;
 use Webhead\WP\SearchCloud\WP_CLI\Command_Registrar;
-use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
-use Webhead\WP\SearchCloud\Frontend\Elementor_Widget;
+use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
 use Webhead\WP\SearchCloud\Health\Health_Tests;
 use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
 
@@ -218,8 +219,10 @@ final class Plugin extends Base_Plugin {
 				return new Woo_Compatibility( $container->get( 'woo' ) );
 			}
 		);
-		$container->add( 'sync_runs_table', Sync_Runs_Table::class );
-		$container->add( 'change_queue_table', Change_Queue_Table::class );
+		// Shared: a table is registered with the Database_Manager once, and
+		// every service that is handed one has to be handed that same object.
+		$container->addShared( 'sync_runs_table', Sync_Runs_Table::class );
+		$container->addShared( 'change_queue_table', Change_Queue_Table::class );
 		$container->add( 'dirty_tracker', Dirty_Tracker::class );
 		$container->add( 'failed_deletes', Failed_Deletes::class );
 		$container->add(
@@ -322,9 +325,9 @@ final class Plugin extends Base_Plugin {
 			}
 		);
 		$container->add(
-			'frontend_assets',
-			static function () use ( $container ): Frontend_Assets {
-				return new Frontend_Assets(
+			'frontend_config',
+			static function () use ( $container ): Frontend_Config {
+				return new Frontend_Config(
 					$container->get( Settings_Manager::class ),
 					$container->get( 'index_config' ),
 					$container->get( 'language' ),
@@ -332,8 +335,17 @@ final class Plugin extends Base_Plugin {
 				);
 			}
 		);
-		$container->add( 'elementor_widget', Elementor_Widget::class );
-		$container->add( 'admin_rtl_style_fix', Rtl_Style_Fix::class );
+
+		// How the storefront entry is registered, said before anything asks for
+		// it. The configuration is a callback: it is built when a block or a
+		// widget on the page enqueues the entry, and on no other request.
+		$this->get_assets()
+			->configure( Frontend_Config::ENTRY, [ 'style_dependencies' => [ 'wp-components' ] ] )
+			->localize(
+				Frontend_Config::ENTRY,
+				Frontend_Config::OBJECT_NAME,
+				static fn (): array => $container->get( 'frontend_config' )->to_array()
+			);
 	}
 
 	protected function register_admin_pages( Page_Registry $page_registry, Container $container ): void {
@@ -351,9 +363,18 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'search_config_endpoint' ) );
 		$hooks_manager->register( $container->get( 'command_registrar' ) );
 		$hooks_manager->register( $container->get( 'change_listener' ) );
-		$hooks_manager->register( $container->get( 'frontend_assets' ) );
-		$hooks_manager->register( $container->get( 'elementor_widget' ) );
-		$hooks_manager->register( $container->get( 'admin_rtl_style_fix' ) );
+	}
+
+	/**
+	 * Named by class and never built: a widget extends a class of Elementor's
+	 * and cannot be loaded on a site without it. The category title is asked
+	 * for when Elementor builds its panel, not while the plugin boots.
+	 */
+	protected function register_elementor( Elementor_Manager $elementor_manager, Container $container ): void {
+		$elementor_manager
+			->set_category( static fn (): string => __( 'webhead Search Cloud', 'webhead-search-cloud' ), 'eicon-search' )
+			->register_widget( Search_Widget::class )
+			->register_widget( Products_Widget::class );
 	}
 
 	protected function register_tables( Database_Manager $database_manager, Container $container ): void {
@@ -371,14 +392,13 @@ final class Plugin extends Base_Plugin {
 	 * off touches nothing registered here. Turning it on removes this plugin's
 	 * tables, options, and per-post metadata locally; it never calls the
 	 * Search Cloud API, so already-synced documents remain in the remote index.
+	 *
+	 * The policy itself is chosen in {@see self::uninstall_current_site()}: this
+	 * method runs on every request of the site, and the setting is only worth
+	 * a query when the plugin is actually being removed.
 	 */
 	protected function configure_uninstall( Uninstall_Manager $uninstall_manager, Container $container ): void {
-		$settings_manager = $container->get( Settings_Manager::class );
-		$delete_data      = (bool) $settings_manager->get( Plugin_Settings::DELETE_DATA_ON_UNINSTALL );
-
-		$uninstall_manager->set_policy(
-			$delete_data ? Uninstall_Manager::POLICY_DELETE_DATA : Uninstall_Manager::POLICY_KEEP_DATA
-		);
+		$uninstall_manager->set_policy( Uninstall_Manager::POLICY_KEEP_DATA );
 
 		$uninstall_manager->register_cleanup(
 			'webhead_search_cloud_scheduled_hooks',
@@ -433,35 +453,59 @@ final class Plugin extends Base_Plugin {
 	}
 
 	/**
-	 * The framework calls this on `plugins_loaded`, before a text domain may load,
-	 * and every label is translated, so {@see Health_Tests} registers on `init`.
+	 * Read the opt-in setting for the site being cleaned, then clean it. On a
+	 * network each site is asked about its own setting.
 	 */
-	protected function register_health_tests( Site_Health_Manager $site_health_manager, Container $container ): void {
-		$this->get_hooks_manager()->register(
-			new Health_Tests(
-				$site_health_manager,
-				$container->get( 'search_cloud_client' ),
-				$container->get( 'index_config' ),
-				$container->get( 'sync_state' )
-			)
-		);
+	protected function uninstall_current_site(): void {
+		$this->get_uninstall_manager()->set_policy( $this->uninstall_policy() );
+
+		parent::uninstall_current_site();
 	}
 
 	/**
-	 * Deferred to `init` for the same reason as {@see self::register_health_tests()}.
+	 * What the current site asked to have done with its data on uninstall.
+	 */
+	public function uninstall_policy(): string {
+		return (bool) $this->get_settings_manager()->get( Plugin_Settings::DELETE_DATA_ON_UNINSTALL )
+			? Uninstall_Manager::POLICY_DELETE_DATA
+			: Uninstall_Manager::POLICY_KEEP_DATA;
+	}
+
+	/**
+	 * The framework calls this while the plugin boots, on every request and
+	 * before a text domain may load. {@see Health_Tests::register()} translates
+	 * nothing; its one hook puts the tests' names into the reader's language
+	 * when WordPress lists them.
+	 */
+	protected function register_health_tests( Site_Health_Manager $site_health_manager, Container $container ): void {
+		$health_tests = new Health_Tests(
+			$site_health_manager,
+			$container->get( 'search_cloud_client' ),
+			$container->get( 'index_config' ),
+			$container->get( 'sync_state' )
+		);
+
+		$health_tests->register();
+		$this->get_hooks_manager()->register( $health_tests );
+	}
+
+	/**
+	 * As {@see self::register_health_tests()}: the section is registered here
+	 * and its fields are read when Site Health Info is built.
 	 */
 	protected function register_diagnostics( Diagnostics_Manager $diagnostics_manager, Container $container ): void {
-		$this->get_hooks_manager()->register(
-			new Runtime_Diagnostics(
-				$diagnostics_manager,
-				$container->get( 'search_cloud_client' ),
-				$container->get( 'index_config' ),
-				$container->get( 'sync_service' ),
-				$container->get( Settings_Manager::class ),
-				$container->get( 'multilingual_support' ),
-				$container->get( 'language_config' )
-			)
+		$diagnostics = new Runtime_Diagnostics(
+			$diagnostics_manager,
+			$container->get( 'search_cloud_client' ),
+			$container->get( 'index_config' ),
+			$container->get( 'sync_service' ),
+			$container->get( Settings_Manager::class ),
+			$container->get( 'multilingual_support' ),
+			$container->get( 'language_config' )
 		);
+
+		$diagnostics->register();
+		$this->get_hooks_manager()->register( $diagnostics );
 	}
 
 }

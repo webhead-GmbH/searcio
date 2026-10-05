@@ -4,8 +4,8 @@
  *
  * Mirrors the Gutenberg block's attributes/markup exactly (same trigger, same
  * runtime bundle) via {@see \Webhead\WP\SearchCloud\Frontend\Trigger_Markup}
- * and {@see \Webhead\WP\SearchCloud\Frontend\Frontend_Assets}, so the two
- * embed points never drift apart.
+ * and the entry {@see \Webhead\WP\SearchCloud\Frontend\Frontend_Config::ENTRY},
+ * so the two embed points never drift apart.
  *
  * The search modal is portalled to `document.body` at runtime, so it is never
  * a DOM descendant of Elementor's `{{WRAPPER}}`. Modal appearance is therefore
@@ -21,8 +21,9 @@
  * be redirected to a custom property) still uses a direct selector, and every
  * one of those goes through {@see self::boosted_selector()} so it outranks
  * the same rules.
- * `get_script_depends()`/`get_style_depends()` declare the shared runtime
- * bundle so Elementor enqueues it in the editor preview too, giving a live,
+ * {@see self::asset_entries()} names the shared runtime bundle, and the
+ * framework's widget base hands its handles to Elementor, which prints them on
+ * the pages that use the widget and in the editor preview, giving a live,
  * interactive preview like any native widget.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
@@ -31,21 +32,21 @@
 
 declare( strict_types=1 );
 
-namespace Webhead\WP\SearchCloud\Frontend\Elementor;
+namespace Webhead\WP\SearchCloud\Elementor\Widgets;
 
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
-use Elementor\Widget_Base;
-use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
+use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Widget;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * @since 1.0.0
  */
-final class Search_Widget extends Widget_Base {
+final class Search_Widget extends Widget {
 	/**
 	 * Four no-op `:not()`s, adding (0,4,0) to a selector. The class never
 	 * exists in the markup, so matching is unchanged.
@@ -73,32 +74,21 @@ final class Search_Widget extends Widget_Base {
 		return 'eicon-search';
 	}
 
-	public function get_categories(): array {
-		return [ 'general' ];
-	}
-
 	public function get_keywords(): array {
 		return [ 'search', 'search cloud', 'webhead' ];
 	}
 
 	/**
-	 * Declaring the shared runtime bundle here (rather than only enqueueing it
-	 * in {@see self::render()}) is what makes the widget render and live-update
-	 * inside the Elementor editor preview iframe: Elementor enqueues a widget's
-	 * declared script/style dependencies in the editor exactly as on the front
+	 * Naming the shared runtime bundle here, and enqueueing nothing in
+	 * {@see self::render()}, is what makes the widget render and live-update
+	 * inside the Elementor editor preview iframe: Elementor prints a widget's
+	 * declared script and stylesheet in the editor exactly as on the front
 	 * end, so the React runtime is present to hydrate the trigger placeholder.
 	 *
 	 * @return string[]
 	 */
-	public function get_script_depends(): array {
-		return [ Frontend_Assets::HANDLE ];
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public function get_style_depends(): array {
-		return [ Frontend_Assets::HANDLE ];
+	protected function asset_entries(): array {
+		return [ Frontend_Config::ENTRY ];
 	}
 
 	protected function register_controls(): void {
@@ -1463,20 +1453,11 @@ final class Search_Widget extends Widget_Base {
 	 * @param  array<string,mixed>  $settings
 	 */
 	private function is_editor_preview( array $settings ): bool {
-		if ( 'yes' !== ( $settings['editor_preview'] ?? '' ) || ! class_exists( '\Elementor\Plugin' ) ) {
-			return false;
-		}
-
-		$elementor = \Elementor\Plugin::$instance;
-
-		return ( isset( $elementor->editor ) && $elementor->editor->is_edit_mode() )
-			|| ( isset( $elementor->preview ) && $elementor->preview->is_preview_mode() );
+		return 'yes' === ( $settings['editor_preview'] ?? '' ) && $this->is_editing();
 	}
 
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
-
-		Frontend_Assets::enqueue();
 
 		// Every value is escaped inside Trigger_Markup::render(), which returns a
 		// finished attribute-escaped element. The disable/enable pair spans the
