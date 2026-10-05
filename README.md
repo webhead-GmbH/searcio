@@ -43,7 +43,7 @@
 
 ## Requirements
 
-- WordPress 6.0 or later
+- WordPress 6.8 or later
 - PHP 8.3 or later
 - A [webhead Search Cloud](https://searcio.com) account with a site connected, to get your search key and write
   credentials

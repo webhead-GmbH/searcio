@@ -223,9 +223,7 @@ const SyncTab = () => {
 						<Card.Content className="whsc-card__content">
 							<Stack direction="column" gap="lg">
 								<Stack direction="column" gap="sm">
-									{/* The bar is the site's own, and WordPress has had it since
-									    6.6. An older one still says the same in the line below. */}
-									{ProgressBar && <ProgressBar className="whsc-sync-progress" value={progressValue}/>}
+									<ProgressBar className="whsc-sync-progress" value={progressValue}/>
 									<Text variant="body-sm" className="whsc-progress-label">
 										{percent === null
 											? sprintf(

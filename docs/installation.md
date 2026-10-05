@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- WordPress 6.0 or later
+- WordPress 6.8 or later
 - PHP 8.3 or later
 - A [webhead Search Cloud](https://searcio.com) account with a site created
 - WooCommerce 8.0 or later (optional, only needed to index and search products)

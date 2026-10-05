@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **WordPress 6.8 is now the minimum**, up from 6.0. It is the version the framework is built and tested for, and the header had been promising more than the plugin delivered: the settings screen has needed 6.2 since it moved to React 18, and is written against the components of a current WordPress. A site on an older release keeps the version it has and is not offered this one.
 - **A page without search costs nothing.** The plugin boots on every request, and on a page with no search trigger it used to send a database query and translate eleven strings before deciding it had nothing to do. It now sends no query and loads no translation there: the storefront script and what it is given are only prepared by a block or a widget that is actually on the page.
 - **The settings screen is redrawn on the framework's page shell.** The page has one title and each tab one heading under it, the tab strip runs the width of the screen and scrolls on a phone instead of wrapping, and the cards, fields, notices and placeholders are the WordPress Design System's own. Black is the brand and green marks focus and links. *Upgrade plan* is an action in the page header like any other, and no longer purple.
 - A screen that could not load now says why and offers to try again. The settings, the Indexing tab and the Search Config tab each waited on a request, and when one failed the Search Config tab stayed a placeholder for good while the others showed an empty screen.

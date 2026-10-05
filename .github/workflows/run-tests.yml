@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         php: [ "8.4", "8.3" ]
-        wp: [ "latest", "6.0" ]
+        wp: [ "latest", "6.8" ]
       fail-fast: false
 
     steps:
@@ -49,12 +49,12 @@ jobs:
 
       # The integration suite (which is the only thing that exercises Elementor
       # and WooCommerce) runs on WP "latest" only — wp-phpunit targets current
-      # WordPress and the old WP 6.0 test framework is not PHP 8.4-safe. So the
-      # "latest" leg installs current Elementor + WooCommerce, while the "6.0"
-      # leg installs the plugin alone: it runs unit tests only, and current
-      # Elementor (needs WP 6.8+) / WooCommerce (needs WP 6.9+) would abort
-      # `wp-env start` there. If integration is ever extended to the 6.0 leg,
-      # pin Elementor 3.23.x (3.24.0 raised its minimum to WP 6.3) instead.
+      # WordPress. So the "latest" leg installs current Elementor + WooCommerce,
+      # while the "6.8" leg, the oldest WordPress the plugin supports, installs
+      # the plugin alone: it runs unit tests only, and current WooCommerce
+      # (needs WP 6.9+) would abort `wp-env start` there. If integration is
+      # ever extended to the 6.8 leg, pin a WooCommerce release that still
+      # supports it.
       #
       # The unversioned downloads on purpose: wp-env names a plugin's folder
       # after its zip, and `elementor.latest-stable.zip` lands in
@@ -125,7 +125,7 @@ jobs:
 
       # The wp-phpunit test framework targets current WordPress, so the
       # integration suite runs on WP "latest" across both PHP versions. The unit
-      # suite above still covers the full PHP x WP (incl. 6.0) compatibility matrix.
+      # suite above still covers the full PHP x WP (incl. 6.8) compatibility matrix.
       -   name: Run PHPUnit integration suite (wp-env)
           if: matrix.wp == 'latest'
           run: npm run test:integration

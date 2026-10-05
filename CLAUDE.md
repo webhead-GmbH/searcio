@@ -10,7 +10,7 @@ This repository is a framework-scaffolded WordPress plugin. Keep changes aligned
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
 - Description: `Connect WordPress and WooCommerce to webhead Search Cloud.`
-- Minimum WordPress version: `6.0`
+- Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
 - Text domain: `webhead-search-cloud`
