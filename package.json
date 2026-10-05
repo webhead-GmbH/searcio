@@ -6,7 +6,7 @@
     "scripts": {
         "start": "wp-scripts start",
         "build": "wp-scripts build",
-        "test:js": "wp-scripts test-unit-js",
+        "test:js": "wp-scripts test-unit-jest",
         "test:e2e": "wp-scripts test-playwright --config playwright.config.js",
         "test:e2e:headed": "wp-scripts test-playwright --config playwright.config.js --headed",
         "test:e2e:desktop": "wp-scripts test-playwright --config playwright.config.js --project=desktop-chrome",
@@ -31,6 +31,7 @@
         "@wordpress/blocks": "~16.1.0",
         "@wordpress/components": "^41.0.0",
         "@wordpress/dataviews": "~19.1.0",
+        "@wordpress/dom-ready": "^4.56.0",
         "@wordpress/element": "^8.8.0",
         "@wordpress/i18n": "^6.29.0",
         "@wordpress/icons": "~17.0.0",
@@ -42,14 +43,19 @@
         "react-toastify": "^11.1.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.29.7",
         "@playwright/test": "^1.63.0",
         "@wordpress/babel-preset-default": "^8.36.0",
         "@wordpress/env": "^11.16.0",
         "@wordpress/eslint-plugin": "^25.6.0",
+        "@wordpress/jest-preset-default": "^14.2.0",
         "@wordpress/scripts": "^36.0.0",
+        "babel-jest": "^30.5.0",
         "babel-loader": "^10.1.1",
         "babel-plugin-prismjs": "^2.1.0",
         "eslint": "^10.6.0",
+        "jest": "^30.5.0",
+        "jest-environment-jsdom": "^30.5.0",
         "webpack": "^5.111.1",
         "webpack-remove-empty-scripts": "^1.1.1"
     },

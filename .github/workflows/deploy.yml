@@ -70,7 +70,8 @@ jobs:
             --exclude-from=".distignore" \
             --exclude "/README.md" \
             --exclude "/CHANGELOG.md" \
-            --exclude "/icon.png"
+            --exclude "/icon.png" \
+            --exclude "/jest.config.cjs"
 
       - name: Cleanup non-runtime translation source files
         env:
