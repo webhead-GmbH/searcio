@@ -1,3 +1,22 @@
+# Webhead scaffold managed file. scaffold:update may refresh this file.
+#
+# Everything listed here is excluded from the distributed plugin package. The
+# test harness in particular must never ship: it exposes the local wp-env setup
+# and Plugin Check flags development files in a release build.
+
+# Version control and editor metadata
+.git
+.gitignore
+.gitattributes
+.editorconfig
+.distignore
+
+# Placeholders that keep an empty directory in git. A package may not contain a
+# hidden file: Plugin Check reports each one as an error, and wordpress.org
+# refuses the upload.
+.gitkeep
+
+# AI and agent guidance
 .agents
 .claude
 .codex
@@ -5,38 +24,74 @@
 .clinerules
 .windsurf
 .github
-.git
-.gitignore
-.gitattributes
-.distignore
-.editorconfig
-.wp-env.json
-.wp-env.override.json
-.wp-env.override.json.example
-node_modules
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# Test harness
 tests
-*.test.js
-docs
-# wordpress.org requires the human-readable source for the minified bundles in
-# public/. It is provided the other way the guideline allows - a link to the
-# repository and the build command, in readme.txt - so src/ stays out of the
-# package rather than adding 130 KB nobody installing the plugin will read.
-src
-vendor/webhead/wp-plugin-framework
-composer.json
-composer.lock
-package.json
-package-lock.json
+.phpunit.result.cache
+.phpunit.result
+.phpunit.cache
 phpunit.xml
 phpunit.xml.dist
 phpunit-integration.xml.dist
 phpunit-integration-multisite.xml.dist
-phpstan.neon
-phpcs.xml
 playwright.config.js
+.wp-env.json
+.wp-env.override.json
+.wp-env.override.json.example
 artifacts
+playwright-report
+test-results
+
+# Static analysis and linting
+phpcs.xml
+phpcs.xml.dist
+phpstan.neon
+phpmd.xml
+.eslintrc.js
+
+# Build tooling and sources
+node_modules
+src
 webpack.config.js
-AGENTS.md
-CLAUDE.md
+package.json
+package-lock.json
+composer.lock
+# composer.json ships. wordpress.org expects it beside a vendor directory, and
+# Plugin Check warns (missing_composer_json_file) when it is not there.
+
+# The framework itself is not shipped: Mozart rewrites it into
+# includes/Dependencies under this plugin's own namespace.
+vendor/webhead/wp-plugin-framework
+vendor/bin
+
+# NOTE: the remaining dev dependencies (PHPUnit, Mozart, Symfony, ...) are not
+# listed here because the list changes with every version. Build the release
+# from a production install instead:
+#
+#     composer install            # dev tree, so Mozart can build includes/Dependencies
+#     composer install --no-dev --no-scripts --optimize-autoloader
+#                                 # drop the dev tree before packaging;
+#                                 # --no-scripts because post-install-cmd
+#                                 # calls vendor/bin/mozart, which --no-dev
+#                                 # has just removed
+#
+# Then confirm includes/Dependencies holds only `Webhead`, `League`, `Psr`, and the
+# prefixed composer autoloader.
+
+# Local secrets. These are gitignored, but .distignore governs an archive built
+# from the working tree, so an untracked .env would otherwise ship.
+.env
+.env.*
+
+# Documentation and scratch output
+docs
 *.log
 .DS_Store
+
+# Whatever else is hidden. A package may not contain a hidden file or directory
+# at all, and editors and tools leave more of them behind than a list keeps up
+# with.
+.*

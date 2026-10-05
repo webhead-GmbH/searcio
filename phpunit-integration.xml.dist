@@ -1,17 +1,24 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Webhead scaffold managed file. scaffold:update may refresh this file. -->
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
         bootstrap="tests/Integration/bootstrap.php"
         backupGlobals="false"
-        colors="true"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd">
+        colors="true">
     <!--
-        WordPress + database integration suite. Boots a real WordPress through
+        WordPress + database integration suite. Boots real WordPress through
         wp-phpunit and is meant to run inside the wp-env `tests-cli` container:
 
             npm run test:integration
 
-        The fast, DB-free unit suite lives in tests/Unit (phpunit.xml.dist).
+        Every test runs inside a transaction that is rolled back afterwards, so
+        rows created by a test disappear between tests. Schema changes (DDL) are
+        committed implicitly by MySQL and therefore survive — that is why the
+        bootstrap creates the plugin's tables once, before the suite starts.
+
+        The same suite runs again in multisite mode through
+        phpunit-integration-multisite.xml.dist.
     -->
     <testsuites>
         <testsuite name="integration">

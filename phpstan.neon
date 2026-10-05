@@ -1,20 +1,26 @@
+# Webhead scaffold managed file. scaffold:update may refresh this file.
+#
+# Run with phpstan/phpstan and szepeviktor/phpstan-wordpress in require-dev:
+#
+#   composer require --dev phpstan/phpstan szepeviktor/phpstan-wordpress
+#   vendor/bin/phpstan analyse
 parameters:
-    level: max
+    level: 5
     paths:
-        - .
+        - includes
     excludePaths:
-        - ./includes/Dependencies/*
-        - ./includes/classes/*
-        - ./languages/*
-        - ./node_modules/*
-        - ./phpcs-sniffs/*
-        - ./public/*
-        - ./src/*
-        - ./tests/*
-        - ./vendor/*
-    fileExtensions:
-        - php
+        # Read for the classes they declare, not analysed: the bundled runtime
+        # is Mozart's output, not this plugin's code.
+        analyse:
+            - includes/Dependencies
+            - includes/classes/dependencies (?)
+            - includes/Elementor
+    scanDirectories:
+        - vendor
     ignoreErrors:
-        - identifier: constant.notFound
-    dynamicConstantNames:
-        - WEBHEADSEARCHCLOUDE_PLATFORM
+        # The plugin's own constants are defined by its main file when
+        # WordPress loads it, which static analysis does not follow.
+        -
+            identifier: constant.notFound
+            message: '#^Constant Webhead\\WP\\SearchCloud\\[A-Z_]+ not found\.$#'
+            reportUnmatched: false

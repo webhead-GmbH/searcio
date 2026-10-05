@@ -1,10 +1,14 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
 	"core": "WordPress/WordPress",
 	"plugins": [
-		".",
-		"https://downloads.wordpress.org/plugin/elementor.latest-stable.zip",
-		"https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
+		"https://downloads.wordpress.org/plugin/elementor.zip",
+		"https://downloads.wordpress.org/plugin/woocommerce.zip",
+		"."
 	],
+	"config": {
+		"AUTOMATIC_UPDATER_DISABLED": true
+	},
 	"env": {
 		"tests": {
 			"phpVersion": "8.3"

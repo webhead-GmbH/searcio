@@ -84,11 +84,8 @@ dist
 /artifacts/
 /playwright-report/
 /test-results/
-/public/**/*
-!/public/.gitkeep
+/public/
 /includes/Dependencies/
-!/includes/Dependencies/index.php
-!/includes/Dependencies/.gitkeep
 
 # Machine-local: wp-env's per-developer override (core pin, ports) and the
 # Playwright MCP browser tool's session logs.

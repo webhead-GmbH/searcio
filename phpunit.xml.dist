@@ -1,19 +1,22 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Webhead scaffold managed file. scaffold:update may refresh this file. -->
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
         bootstrap="tests/bootstrap.php"
         backupGlobals="false"
-        colors="true"
-        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd">
-    <php>
-        <env name="WORDPRESS_TABLE_PREFIX" value="wp_"/>
-    </php>
+        colors="true">
+    <!--
+        Fast unit suite: no WordPress, no database, no Docker.
+
+            composer test:unit
+
+        Only put tests here that can be proven without WordPress. Anything that
+        needs activation, options, capabilities, REST routing, cron, custom
+        tables, or hook timing belongs in tests/Integration and runs through
+        phpunit-integration.xml.dist under wp-env.
+    -->
     <testsuites>
-        <!--
-            Pure-PHP unit tests only (no WordPress, no database). The full
-            WordPress + database integration suite lives in tests/Integration
-            and runs through phpunit-integration.xml.dist under wp-env.
-        -->
         <testsuite name="unit">
             <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>

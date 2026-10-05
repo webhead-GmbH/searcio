@@ -1,3 +1,6 @@
+# Setup required once per repository: add a COMPOSER_AUTH secret with
+# credentials that can read the private webhead/wp-plugin-framework repository.
+# Without it, `composer install` fails on the very first run.
 name: Run Tests
 
 on:
@@ -10,10 +13,6 @@ jobs:
     name: Execute Unit Tests (PHP ${{ matrix.php }}, WP ${{ matrix.wp }})
     runs-on: ubuntu-latest
 
-    # Needed by `composer install` to pull the private wp-plugin-framework via VCS.
-    env:
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-
     strategy:
       matrix:
         php: [ "8.4", "8.3" ]
@@ -22,12 +21,14 @@ jobs:
 
     steps:
       -   name: Checkout repository
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
 
+      # package.json asks for Node 22: the webpack configuration loads the
+      # design system's token plugin, an ES module, with require().
       -   name: Setup Node.js
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v4
           with:
-            node-version: '20'
+            node-version: '22'
 
       -   name: Setup PHP ${{ matrix.php }}
           uses: shivammathur/setup-php@v2
@@ -36,8 +37,12 @@ jobs:
             extensions: mbstring, intl
             coverage: none
 
+      # Scoped to this step: a job-level secret is visible to every step,
+      # including third-party actions.
       -   name: Install Composer dependencies
-          run: composer install --no-progress --no-suggest --prefer-dist
+          env:
+            COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+          run: composer install --no-progress --prefer-dist
 
       -   name: Install NPM dependencies
           run: npm ci
@@ -50,10 +55,16 @@ jobs:
       # Elementor (needs WP 6.8+) / WooCommerce (needs WP 6.9+) would abort
       # `wp-env start` there. If integration is ever extended to the 6.0 leg,
       # pin Elementor 3.23.x (3.24.0 raised its minimum to WP 6.3) instead.
+      #
+      # The unversioned downloads on purpose: wp-env names a plugin's folder
+      # after its zip, and `elementor.latest-stable.zip` lands in
+      # `elementor.latest-stable/`, which nothing looks for. The updater is off
+      # so that a WordPress one minor release behind does not put the site into
+      # maintenance mode while the suite runs.
       -   name: Generate .wp-env.json for WP ${{ matrix.wp }}
           run: |
             if [ "${{ matrix.wp }}" = "latest" ]; then
-              PLUGINS='".", "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip", "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"'
+              PLUGINS='"https://downloads.wordpress.org/plugin/elementor.zip", "https://downloads.wordpress.org/plugin/woocommerce.zip", "."'
             else
               PLUGINS='"."'
             fi
@@ -63,6 +74,9 @@ jobs:
               "plugins": [
                 ${PLUGINS}
               ],
+              "config": {
+                "AUTOMATIC_UPDATER_DISABLED": true
+              },
               "env": {
                 "tests": {
                   "phpVersion": "${{ matrix.php }}"
@@ -116,6 +130,10 @@ jobs:
           if: matrix.wp == 'latest'
           run: npm run test:integration
 
+      -   name: Run PHPUnit integration suite, multisite (wp-env)
+          if: matrix.wp == 'latest'
+          run: npm run test:integration:multisite
+
       -   name: Stop wp-env
           if: always()
           run: npm run wp-env -- stop
@@ -124,18 +142,14 @@ jobs:
     name: Playwright E2E (WP latest)
     runs-on: ubuntu-latest
 
-    # Needed by `composer install` to pull the private wp-plugin-framework via VCS.
-    env:
-      COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-
     steps:
       -   name: Checkout repository
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
 
       -   name: Setup Node.js
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v4
           with:
-            node-version: '20'
+            node-version: '22'
 
       -   name: Setup PHP
           uses: shivammathur/setup-php@v2
@@ -144,8 +158,12 @@ jobs:
             extensions: mbstring, intl
             coverage: none
 
+      # Scoped to this step: a job-level secret is visible to every step,
+      # including third-party actions.
       -   name: Install Composer dependencies
-          run: composer install --no-progress --no-suggest --prefer-dist
+          env:
+            COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+          run: composer install --no-progress --prefer-dist
 
       -   name: Install NPM dependencies
           run: npm ci
@@ -163,10 +181,13 @@ jobs:
             {
               "core": "https://wordpress.org/wordpress-latest.zip",
               "plugins": [
-                ".",
-                "https://downloads.wordpress.org/plugin/elementor.latest-stable.zip",
-                "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip"
+                "https://downloads.wordpress.org/plugin/elementor.zip",
+                "https://downloads.wordpress.org/plugin/woocommerce.zip",
+                "."
               ],
+              "config": {
+                "AUTOMATIC_UPDATER_DISABLED": true
+              },
               "env": {
                 "tests": {
                   "phpVersion": "8.3"
