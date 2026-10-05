@@ -1,4 +1,4 @@
-import { Card, Text } from '@wordpress/ui';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -56,9 +56,9 @@ const UsageCard = ( { usage } ) => {
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<Card.Header className="whsc-settings-card-header">
 				<div className="whsc-settings-card-copy">
-					{ /* An h4: the card sits inside the connection card, whose title is
-					     the tab's h3. The same level would make it a sibling section. */ }
-					<Card.Title render={ <h4 /> }>{ __( 'This month', 'webhead-search-cloud' ) }</Card.Title>
+					{ /* An h3: the card is a section of the connection tab, whose
+					     heading is the h2 under the page title. */ }
+					<Card.Title render={ <h3 /> }>{ __( 'This month', 'webhead-search-cloud' ) }</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
 							'What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search.',
@@ -67,52 +67,55 @@ const UsageCard = ( { usage } ) => {
 					</Text>
 				</div>
 			</Card.Header>
-			<Card.Content className="whsc-settings-card-content whsc-usage">
-				{ entries.map( ( [ key, metric ] ) => {
-					const percent = Math.max( 0, Math.min( 100, Number( metric.percent ) || 0 ) );
-					const state = metric.exceeded ? 'spent' : ( metric.near_limit ? 'near' : 'ok' );
+			<Card.Content className="whsc-settings-card-content">
+				<Stack direction="column" gap="lg" className="whsc-usage">
+					{ entries.map( ( [ key, metric ] ) => {
+						const percent = Math.max( 0, Math.min( 100, Number( metric.percent ) || 0 ) );
+						const state = metric.exceeded ? 'spent' : ( metric.near_limit ? 'near' : 'ok' );
 
-					return (
-						<div className={ `whsc-usage__row whsc-usage__row--${ state }` } key={ key }>
-							<div className="whsc-usage__head">
-								<span className="whsc-usage__label">{ labels[ key ] || humanize( key ) }</span>
-								<span className="whsc-usage__count">
-									{ sprintf(
-										/* translators: 1: amount used. 2: the plan's allowance. */
-										__( '%1$s of %2$s', 'webhead-search-cloud' ),
-										Number( metric.used || 0 ).toLocaleString(),
-										Number( metric.limit ).toLocaleString()
+						return (
+							<Stack direction="column" gap="xs" className={ `whsc-usage__row whsc-usage__row--${ state }` } key={ key }>
+								<Stack direction="row" gap="md" justify="space-between" align="baseline">
+									<Text className="whsc-usage__label">{ labels[ key ] || humanize( key ) }</Text>
+									<Text className="whsc-usage__count">
+										{ sprintf(
+											/* translators: 1: amount used. 2: the plan's allowance. */
+											__( '%1$s of %2$s', 'webhead-search-cloud' ),
+											Number( metric.used || 0 ).toLocaleString(),
+											Number( metric.limit ).toLocaleString()
+										) }
+									</Text>
+								</Stack>
+								{ /* The bar repeats the number rather than replacing it: a
+								     percentage is easier to compare, the count is easier to
+								     act on. Its three colours are the point of it, which is
+								     more than a progress bar says. */ }
+								<div
+									className="whsc-usage__bar"
+									role="img"
+									aria-label={ sprintf(
+										/* translators: 1: allowance name. 2: percentage used. */
+										__( '%1$s: %2$d%% used', 'webhead-search-cloud' ),
+										labels[ key ] || humanize( key ),
+										percent
 									) }
-								</span>
-							</div>
-							{ /* The bar repeats the number rather than replacing it: a
-							     percentage is easier to compare, the count is easier to
-							     act on. */ }
-							<div
-								className="whsc-usage__bar"
-								role="img"
-								aria-label={ sprintf(
-									/* translators: 1: allowance name. 2: percentage used. */
-									__( '%1$s: %2$d%% used', 'webhead-search-cloud' ),
-									labels[ key ] || humanize( key ),
-									percent
+								>
+									<span className="whsc-usage__fill" style={ { width: `${ percent }%` } } />
+								</div>
+								{ metric.exceeded && (
+									<Text variant="body-sm" className="whsc-usage__note">
+										{ __( 'Spent for this month. Upgrade to keep this working.', 'webhead-search-cloud' ) }
+									</Text>
 								) }
-							>
-								<span className="whsc-usage__fill" style={ { width: `${ percent }%` } } />
-							</div>
-							{ metric.exceeded && (
-								<Text render={ <p /> } variant="body-sm" className="whsc-usage__note">
-									{ __( 'Spent for this month. Upgrade to keep this working.', 'webhead-search-cloud' ) }
-								</Text>
-							) }
-							{ ! metric.exceeded && metric.near_limit && (
-								<Text render={ <p /> } variant="body-sm" className="whsc-usage__note">
-									{ __( 'Close to the limit.', 'webhead-search-cloud' ) }
-								</Text>
-							) }
-						</div>
-					);
-				} ) }
+								{ ! metric.exceeded && metric.near_limit && (
+									<Text variant="body-sm" className="whsc-usage__note">
+										{ __( 'Close to the limit.', 'webhead-search-cloud' ) }
+									</Text>
+								) }
+							</Stack>
+						);
+					} ) }
+				</Stack>
 			</Card.Content>
 		</Card.Root>
 	);

@@ -1,4 +1,4 @@
-import {Notice} from '@wordpress/components';
+import {Notice} from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 
 /**
@@ -34,16 +34,18 @@ const ConnectionResultNotice = ({result}) => {
 			: '';
 
 		return (
-			<Notice status="success" isDismissible={false}>
-				<p>{detail}{siteIdSuffix}</p>
-			</Notice>
+			<Notice.Root intent="success">
+				<Notice.Description>{detail}{siteIdSuffix}</Notice.Description>
+			</Notice.Root>
 		);
 	}
 
 	return (
-		<Notice status="error" isDismissible={false}>
-			<p>{result.message || __('Connection failed.', 'webhead-search-cloud')}</p>
-		</Notice>
+		<Notice.Root intent="error">
+			<Notice.Description>
+				{result.message || __('Connection failed.', 'webhead-search-cloud')}
+			</Notice.Description>
+		</Notice.Root>
 	);
 };
 

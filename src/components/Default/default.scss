@@ -1,19 +1,27 @@
-// @wordpress/theme removed the --wpds-elevation-* custom properties, so
-// `var( --wpds-elevation-xs )` resolved to nothing and every card lost its
-// shadow without a warning. @wordpress/base-styles still ships the documented
-// levels as SASS variables, which is where the not-recommended Elevation
-// component itself points.
+// @wordpress/theme removed the --wpds-elevation-* custom properties in 1.0 and 2.0
+// has not restored them, so `var( --wpds-elevation-xs )` applies nothing at all.
+// The Elevation component is not-recommended for the same reason and points here:
+// @wordpress/base-styles still ships the four documented levels as SASS variables.
 @use "@wordpress/base-styles/variables" as wp-base;
 
 :root {
 	--wh-toastify-admin-offset: var(--wpds-dimension-gap-xl);
 	--toastify-toast-top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wh-toastify-admin-offset));
+	// Black is the brand. Every control, every fill and every button takes it,
+	// from the rules further down. The theme provider is given the same colour
+	// where a screen is mounted (`primary: '#101010'`) and works out the rest of
+	// the brand's tokens from it. Change one and change the other.
 	--wh-primary: #101010;
 	--wh-primary-dark: #000000;
+	// What is written on the brand.
 	--wh-secondary: #ffffff;
 	--wh-secondary-dark: #eeeeee;
+	// Green is for focus and for links, and for nothing else.
 	--wh-accent: #319b80;
 	--wh-accent-dark: #1d594a;
+	// The green a word can be read in. The accent is 3.4:1 on white, which is
+	// enough for a focus ring and not for text; this one is 5.1:1.
+	--wh-link: #007d63;
 	--wh-surface-radius: var(--wpds-border-radius-xl);
 	--wh-card-radius: var(--wpds-border-radius-lg);
 	--wh-control-radius: var(--wpds-border-radius-sm);
@@ -37,21 +45,133 @@ body .Toastify__toast-container--top-right {
 	top: var(--toastify-toast-top);
 }
 
+// Where a screen draws. `.panel-container` is the class the AdminPage shell
+// carries, so every screen is inside it; the root id is here for whatever is
+// mounted without the shell. The rest is drawn outside both, at the end of
+// `body`: the overlays of `@wordpress/ui` share one slot, a popover of
+// `@wordpress/components` carries its class, and menus and dialogs their role.
+$overlays: "[data-wp-compat-overlay-slot], .components-popover, [data-dialog], [role='dialog']";
+$surfaces: ".panel-container, #{$overlays}";
+
+// The brand, for the controls of `@wordpress/components`: what a button, a
+// switch or a radio is filled with, and what is written on that fill. The two
+// are one pair and are set together.
+//
+// And focus, which is green whichever package draws the ring. This package
+// draws most of its rings in `--wp-admin-theme-color`, and what it fills it
+// fills with the accent. The theme provider writes that colour as part of the
+// black brand, so it is set back here. Not on `body`: there it is the colour
+// scheme the person chose for WordPress, and WordPress's own buttons and links
+// read it.
 #webhead-search-cloud-root,
-.panel-container,
-[data-dialog][role='menu'],
-[role='dialog'] {
+#{$surfaces} {
+	--wp-components-color-accent: var(--wh-primary);
+	--wp-components-color-accent-darker-10: var(--wh-primary-dark);
+	--wp-components-color-accent-darker-20: var(--wp-components-color-accent-darker-10);
+	--wp-components-color-accent-inverted: var(--wh-secondary);
 	--wp-admin-theme-color: var(--wh-accent);
 	--wp-admin-theme-color--rgb: 49, 155, 128;
 	--wp-admin-theme-color-darker-10: var(--wh-accent-dark);
 	--wp-admin-theme-color-darker-10--rgb: 29, 89, 74;
 	--wp-admin-theme-color-darker-20: var(--wp-admin-theme-color-darker-10);
 	--wp-admin-theme-color-darker-20--rgb: var(--wp-admin-theme-color-darker-10--rgb);
-	--wp-components-color-accent: var(--wh-primary);
-	--wp-components-color-accent-darker-10: var(--wh-primary-dark);
-	--wp-components-color-accent-darker-20: var(--wp-components-color-accent-darker-10);
-	--wpds-color-stroke-surface-brand: color-mix(in oklch,var(--wp-admin-theme-color,#319b80) 40%,#fff);
-	--wpds-color-background-interactive-brand-weak-active: color-mix(in oklch,var(--wp-admin-theme-color,#319b80) 12%,#fff);
+}
+
+// The same two things for `@wordpress/ui`, which reads design tokens.
+//
+// The theme provider works the tokens out from the brand, and for a black
+// brand its darkest fill is #2d2d2d, which is also the fill of a neutral
+// button: a checked box from this package was a shade lighter than the radio
+// beside it, and a notice's button a shade lighter than the button under it.
+// So the two fills are set to the brand, with what is written on them, and the
+// focus ring to the green. So are the ring of a control that is only outlined
+// and what is written in it: an outline button of this package was the same
+// shade lighter than the secondary button of the other one beside it. Every
+// other token stays as the provider worked it out.
+//
+// The provider writes its tokens onto the document root and onto its own
+// element, so these are set on `body`, which nothing else does, for whatever is
+// drawn outside the screen, and on the shell, which is inside the provider.
+body,
+#webhead-search-cloud-root,
+#{$surfaces} {
+	--wpds-color-background-interactive-brand-strong: var(--wh-primary);
+	--wpds-color-background-interactive-brand-strong-active: var(--wh-primary-dark);
+	--wpds-color-background-interactive-neutral-strong: var(--wh-primary);
+	--wpds-color-background-interactive-neutral-strong-active: var(--wh-primary-dark);
+	--wpds-color-background-thumb-brand: var(--wh-primary);
+	--wpds-color-background-thumb-brand-active: var(--wh-primary-dark);
+	--wpds-color-foreground-interactive-brand-strong: var(--wh-secondary);
+	--wpds-color-foreground-interactive-brand-strong-active: var(--wh-secondary);
+	--wpds-color-foreground-interactive-neutral-strong: var(--wh-secondary);
+	--wpds-color-foreground-interactive-neutral-strong-active: var(--wh-secondary);
+	--wpds-color-stroke-interactive-brand: var(--wh-primary);
+	--wpds-color-stroke-interactive-brand-active: var(--wh-primary-dark);
+	--wpds-color-foreground-interactive-brand: var(--wh-primary);
+	--wpds-color-foreground-interactive-brand-active: var(--wh-primary-dark);
+	--wpds-color-stroke-focus: var(--wh-accent);
+}
+
+// Four places where `@wordpress/components` draws focus in the accent, which
+// is the brand, and would draw it black.
+//
+// The border an input, a select or a search field takes in focus is drawn by
+// its backdrop, an element that paints nothing else. So the accent is changed
+// on the backdrop alone.
+:is(#{$surfaces}) .components-input-control__backdrop {
+	--wp-components-color-accent: var(--wpds-color-stroke-focus);
+}
+
+// A switch draws its ring on the track, which the accent also fills, and a
+// modal that scrolls draws it on its content, around buttons the accent fills.
+// The accent cannot be changed there, so these two are the package's own
+// rules with the colour changed.
+:is(#{$surfaces}) .components-form-toggle .components-form-toggle__input:focus + .components-form-toggle__track {
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-background-surface-neutral-strong), 0 0 0 calc(2 * var(--wp-admin-border-width-focus)) var(--wpds-color-stroke-focus);
+}
+
+[role='dialog'] .components-modal__content.is-scrollable:focus-visible {
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+}
+
+// A slider is a field nobody sees, over a track, and the package marks its
+// focus with a halo of the accent round the thumb, which the accent also
+// fills: the brand's black, faded. This is the ring every other control has,
+// drawn round the thumb, with the halo taken off. The frontend reset has the
+// same two rules.
+:is(#{$surfaces}) .components-range-control__slider:focus-visible ~ .components-range-control__thumb-wrapper {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+	outline-offset: var(--wpds-border-width-focus);
+}
+
+:is(#{$surfaces}) .components-range-control__slider:focus-visible ~ .components-range-control__thumb-wrapper > span::before {
+	content: none;
+}
+
+// Links are green. A `Link` from `@wordpress/ui` reads its colour from the
+// brand's foreground token, which the black brand makes black. The token is
+// set on the anchor itself, so that it is green for a link and stays black for
+// everything else that reads it: an active filter, a pressed toggle.
+:is(#{$surfaces}) a:not(.components-button) {
+	--wpds-color-foreground-interactive-brand: var(--wh-link);
+	--wpds-color-foreground-interactive-brand-active: var(--wh-accent-dark);
+}
+
+// A link the plugin writes itself, with no class, would be WordPress blue.
+:is(#{$surfaces}) a:not([class]) {
+	color: var(--wh-link);
+
+	&:hover,
+	&:focus {
+		color: var(--wh-accent-dark);
+	}
+}
+
+// And a button drawn as a link is a link.
+:is(#{$surfaces}) .components-button.is-link {
+	--wp-components-color-accent: var(--wh-link);
+	--wp-components-color-accent-darker-10: var(--wh-accent-dark);
+	--wp-components-color-accent-darker-20: var(--wh-accent-dark);
 }
 
 .components-base-control:has(input[disabled]) {
@@ -67,6 +187,9 @@ body .Toastify__toast-container--top-right {
 	transform: none;
 }
 
+// What every screen inside the AdminPage shell shares: the page padding and
+// the card surfaces. The shell's own header and surface are described in
+// `admin-page.scss`.
 .panel-container {
 	padding: var(--wh-panel-padding);
 	margin: 0 auto;
@@ -76,15 +199,8 @@ body .Toastify__toast-container--top-right {
 		transition: none;
 	}
 
-	.whsc-settings-panel-card,
 	.whsc-settings-card {
 		transition: none;
-	}
-
-	.whsc-settings-panel-card {
-		border-radius: var(--wh-surface-radius);
-		box-shadow: var(--wh-card-elevation);
-		overflow: hidden;
 	}
 
 	.whsc-card {
@@ -108,80 +224,14 @@ body .Toastify__toast-container--top-right {
 		background-size: 12px 12px;
 	}
 
-	.header {
-		background-color: var(--wh-primary);
-		color: var(--wh-secondary);
-
-		h2 {
-			color: var(--wh-secondary);
-		}
-
-		.components-button {
-			font-weight: 700;
-			--wp-components-color-accent: var(--wh-accent);
-			--wp-components-color-accent-darker-10: var(--wh-accent-dark);
-			--wp-components-color-accent-darker-20: var(--wh-accent-dark);
-		}
-
-		.webhead-search-cloud-admin-links .components-button {
-			color: var(--wh-secondary);
-			border-color: rgba(255, 255, 255, 0.25);
-
-			svg {
-				fill: var(--wh-secondary);
-			}
-		}
-
-		.header-with-icon {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: 0 var(--wpds-dimension-gap-sm);
-
-			.header-icon {
-				fill: var(--wh-secondary);
-				display: flex;
-				align-items: center;
-
-				svg {
-					width: 25px;
-					height: 25px;
-				}
-			}
-
-			.header-description {
-				flex: 0 0 100%;
-				margin-left: 32px;
-				margin-top: 0;
-				color: var(--wh-secondary);
-				opacity: 0.8;
-			}
-		}
-	}
-
-	.webhead-loading-container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		min-height: 200px;
-		gap: var(--wh-card-gap);
-	}
-
-	.unsaved-changes-notice {
-		margin-bottom: var(--wh-panel-gap);
-	}
-
-	.action-buttons {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--wpds-dimension-gap-md);
-		margin-top: var(--wh-panel-gap);
-		padding-top: var(--wh-card-gap);
-		border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
-	}
-
 	.wh-badge {
+		// Both `color-mix()` calls below read this. Without a default, a badge
+		// carrying any class other than `.front-end` or `.admin` — a bare one,
+		// or one written with the package's own intent names — made both
+		// declarations invalid at computed-value time, and the chip vanished:
+		// no background, and text in whatever colour it inherited.
+		--base-color: var(--wpds-color-foreground-content-neutral);
+
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -212,12 +262,5 @@ body .Toastify__toast-container--top-right {
 		&.admin {
 			--base-color: #9338e9;
 		}
-	}
-
-	.editor-actions {
-		display: flex;
-		justify-content: flex-end;
-		gap: var(--wpds-dimension-gap-sm);
-		margin-top: var(--wh-card-gap);
 	}
 }

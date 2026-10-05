@@ -5,10 +5,15 @@ const SettingsContext = createContext( {
 	settings: {},
 	hasUnsavedChanges: false,
 	isLoading: true,
+	isSaving: false,
+	loadError: null,
+	saveError: null,
+	clearSaveError: () => {},
 	settingGroups: [],
+	retryLoad: () => {},
+	reloadSettings: async () => {},
 	saveSettings: async () => false,
 	updateSetting: () => {},
-	reloadSettings: async () => {},
 } );
 
 export default SettingsContext;

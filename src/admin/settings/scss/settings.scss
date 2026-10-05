@@ -1,7 +1,11 @@
-@use "./../../../components/Default/default";
-@import "./../../../components/Default/dataviews.css";
+// The plugin's variables, card variants and accent colours arrive with the
+// AdminPage shell, which imports them for every screen, and the DataViews
+// stylesheet arrives with `src/components/DataViews.js`. Loading either again
+// here put a second copy of the same rules into this bundle.
 
-.settings-tabs .tab-content {
+// The shell puts every `role="tabpanel"` gap-lg below its strip. The placeholder
+// shown while the tabs are loading is not a tab panel, so it is told here.
+.settings-tabs--loading .tab-content {
   margin-top: var(--wpds-dimension-gap-lg);
 }
 
@@ -9,10 +13,11 @@
   min-width: 0;
 }
 
+// The strip scrolls sideways instead of wrapping. Its width, its inset and the
+// rule under it are the shell's, which draws every tab strip full-bleed.
 .settings-tabs__list {
   gap: var(--wpds-dimension-gap-sm);
   flex-wrap: nowrap;
-  max-width: 100%;
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -23,8 +28,8 @@
   -webkit-overflow-scrolling: touch;
 }
 
+// That a tab stays as wide as its label is the shell's rule, for every strip.
 .settings-tabs__tab {
-  flex: 0 0 auto;
   max-width: min(220px, 72vw);
   border-radius: var(--wpds-border-radius-sm);
   scroll-snap-align: start;
@@ -48,101 +53,141 @@
   opacity: 0.8;
 }
 
+// The strip while the schema is still loading: placeholders where the tab
+// labels will be, in a row as tall as the real strip, so nothing moves when the
+// tabs arrive. They are aria-hidden; the skeleton below is what says "loading".
+.settings-tabs--loading .settings-tabs__list {
+  display: flex;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-lg);
+  min-height: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-padding-sm));
+}
+
+// Skeleton paints and pulses; these only give it the shape of what is coming.
+.settings-tabs__tab-placeholder {
+  flex: 0 0 auto;
+  width: 72px;
+  height: var(--wpds-dimension-size-2xs);
+  border-radius: var(--wpds-border-radius-sm);
+}
+
+.whsc-settings-skeleton__card {
+  height: calc(var(--wpds-dimension-size-lg) * 3);
+  border-radius: var(--wpds-border-radius-lg);
+}
+
+.whsc-skeleton__title {
+  width: min(100%, var(--wpds-dimension-surface-width-xs));
+  height: var(--wpds-dimension-size-xs);
+  border-radius: var(--wpds-border-radius-sm);
+}
+
+.whsc-skeleton__line {
+  width: min(100%, var(--wpds-dimension-surface-width-lg));
+  height: var(--wpds-dimension-size-2xs);
+  border-radius: var(--wpds-border-radius-sm);
+}
+
+.whsc-skeleton__row {
+  height: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-size-2xs));
+  border-radius: var(--wpds-border-radius-lg);
+}
+
+.whsc-skeleton__button {
+  width: calc(var(--wpds-dimension-size-lg) * 3);
+  height: var(--wpds-dimension-size-lg);
+  border-radius: var(--wpds-border-radius-sm);
+}
+
+.whsc-skeleton__table {
+  height: calc(var(--wpds-dimension-size-lg) * 4);
+  border-radius: var(--wpds-border-radius-lg);
+}
+
+// What a tab is for, at the top of its panel. wp-admin gives a bare `h2` and
+// `p` a margin of their own inside `.wrap`; the column's gap is what spaces
+// these two.
+.whsc-tab-intro {
+  .whsc-tab-intro__title,
+  .whsc-tab-intro__description {
+    margin: 0;
+    padding: 0;
+  }
+
+  .whsc-tab-intro__description {
+    max-width: var(--wpds-dimension-surface-width-2xl);
+    color: var(--wpds-color-foreground-content-neutral-weak);
+  }
+}
+
 .whsc-settings-grid {
   .whsc-settings-card {
     height: 100%;
   }
 
-  .whsc-settings-card-header,
-  .whsc-settings-card-content {
-    padding: var(--wpds-dimension-padding-2xl);
+  // A merchandising rule holds five inputs, so its card spans the grid rather
+  // than being squeezed into one column.
+  .whsc-settings-card--wide {
+    grid-column: 1 / -1;
   }
+}
 
-  .whsc-settings-card-header h3 {
+// `Card.Header` and `Card.Content` are NOT padded here. The component already
+// applies its own padding to both, and deliberately removes it again where the
+// two meet; restating `padding`, even with the identical value, puts that back
+// as dead space between a header and its content. @wordpress/ui ships inside
+// `@layer wp-ui`, so anything restated here overrides the component outright:
+// only what is genuinely being changed is named.
+.whsc-settings-card-header,
+.whsc-card__header,
+.whsc-section,
+.whsc-sync-history {
+  h2,
+  h3,
+  h4 {
     margin: 0;
   }
 
-  .whsc-settings-card-header p {
+  p {
     margin: 0;
     color: var(--wpds-color-foreground-content-neutral-weak);
   }
+}
 
-  // A boolean field puts its switch on the title row, so the header is a row
-  // with the copy growing and the switch held to the end.
-  .whsc-settings-card-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--wpds-dimension-gap-lg);
-  }
-
-  .whsc-settings-card-copy {
-    min-width: 0;
-  }
-
-  .whsc-settings-card-switch {
-    flex: 0 0 auto;
-    padding-top: var(--wpds-dimension-padding-xs);
-  }
-
-  // The title beside it already names the switch. ToggleControl renders its own
-  // label rather than BaseControl's, so it ignores hideLabelFromVision and has
-  // to be hidden here - visually only, because that label is still what names
-  // the switch for a screen reader.
-  .whsc-settings-card-switch .components-toggle-control__label {
-    border: 0;
-    clip-path: inset(50%);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
-  }
-
-  .components-base-control,
-  .components-textarea-control__input {
-    margin-bottom: 0;
-  }
+// A boolean field puts its switch on the title row, so the header is a row
+// with the copy growing and the switch held to the end.
+.whsc-settings-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--wpds-dimension-gap-lg);
 }
 
 .whsc-settings-card-copy {
   display: grid;
   gap: var(--wpds-dimension-gap-xs);
+  min-width: 0;
 }
 
-.whsc-settings-panel-header-layout {
-  width: 100%;
+.whsc-settings-card-switch {
+  flex: 0 0 auto;
+  padding-top: var(--wpds-dimension-padding-xs);
 }
 
-// "Upgrade plan" CTA shown in the header on Free accounts. Deliberately purple
-// (not the theme's green primary) so it reads as a distinct, promotional action.
-.whsc-upgrade-cta {
-  flex-shrink: 0;
-
-  .whsc-upgrade-button.components-button.is-primary {
-    background: #7c3aed;
-    color: #fff;
-
-    &:hover:not(:disabled):not([aria-disabled='true']),
-    &:active:not(:disabled):not([aria-disabled='true']) {
-      background: #6d28d9;
-      color: #fff;
-    }
-
-    &:focus:not(:disabled):not([aria-disabled='true']) {
-      box-shadow: 0 0 0 1px #fff, 0 0 0 3px #7c3aed;
-      outline: 2px solid transparent;
-    }
-  }
-}
-
-@media screen and (max-width: 767px) {
-  .whsc-upgrade-cta .whsc-upgrade-button.components-button {
-    width: 100%;
-    justify-content: center;
-  }
+// The title beside it already names the switch. ToggleControl renders its own
+// label rather than BaseControl's, so it ignores hideLabelFromVision and has
+// to be hidden here - visually only, because that label is still what names
+// the switch for a screen reader.
+.whsc-settings-card-switch .components-toggle-control__label {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 .whsc-dataviews-field-header-with-icon {
@@ -150,637 +195,173 @@
   align-items: center;
   gap: var(--wpds-dimension-gap-xs);
   min-width: 0;
-
-  &__icon {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-/* -------------------------------------------------------------------------
- * Shared per-tab card shell (Connection / Indexing / Sync / Search UI) —
- * every self-managed tab wraps its content in one top-level Card so titles
- * get correct Text-variant sizing and consistent spacing, per the
- * react-admin skill's card rules.
- * ---------------------------------------------------------------------- */
-.whsc-tab-card {
-  border: 0;
-  border-radius: 0;
-
-  .whsc-tab-card-header {
-    display: grid;
-    gap: var(--wpds-dimension-gap-xs);
-    padding-inline: 0;
-    padding-top: 0;
-
-    p {
-      margin: 0;
-      color: var(--wpds-color-foreground-content-neutral-weak);
-    }
-  }
-
-  .whsc-tab-card-content {
-    display: grid;
-    gap: var(--wpds-dimension-gap-lg);
-    padding-inline: 0;
-  }
-}
-
-/* -------------------------------------------------------------------------
- * Shared "advanced options" reveal (Indexing + Connection tabs): a link
- * toggle separated from the content above by a hairline, revealing a
- * left-aligned, full-width block underneath.
- * ---------------------------------------------------------------------- */
-.whsc-advanced {
-  width: 100%;
-  padding-top: 16px;
-  margin-top: 20px;
-  border-top: 1px solid #f0f0f1;
-
-  .whsc-section:first-child {
-    padding-top: 20px;
-    margin-top: 16px;
-    border-top: 1px solid #f0f0f1;
-  }
-
-  > .whsc-card {
-    margin-top: 16px;
-  }
 }
 
 /* -------------------------------------------------------------------------
  * Connection tab
  * ---------------------------------------------------------------------- */
-.webhead-search-cloud-connection-actions {
-  margin-top: var(--wpds-dimension-gap-lg);
+
+// The connect moment only (action, consents, hint): a narrow measure in the
+// middle of the tab. Every block it can reveal - another email, the pasted
+// keys - is outside it and as wide as the tab.
+.webhead-search-cloud-connect-hero {
+  width: 100%;
+  max-width: var(--wpds-dimension-surface-width-lg);
+  margin-inline: auto;
+  padding-block-start: var(--wpds-dimension-padding-lg);
 }
 
 .webhead-search-cloud-connection-hint {
   margin: 0;
   color: var(--wpds-color-foreground-content-neutral-weak);
-
-  /* "Learn more" reads as part of the sentence, not a standalone control. */
-  .webhead-search-cloud-connection-explainer-link.components-button {
-    display: inline;
-    height: auto;
-    padding: 0;
-    font-size: inherit;
-    line-height: inherit;
-    vertical-align: baseline;
-  }
 }
 
-/* Compact centered hero for the connect moment only (CTA, consents, hint);
- * every progressive-disclosure block (email override, manual key entry)
- * lives OUTSIDE it, full-width and left-aligned. */
-.webhead-search-cloud-connect-hero {
-  width: 100%;
-  max-width: 30rem;
-  margin-inline: auto;
-  padding-block: var(--wpds-dimension-gap-lg) 0;
+.webhead-search-cloud-connect-hero .webhead-search-cloud-connection-hint {
   text-align: center;
 }
 
-.webhead-search-cloud-connect-cta {
-  height: auto;
-  min-height: 3rem;
-  padding-block: var(--wpds-dimension-padding-lg);
-  padding-inline: var(--wpds-dimension-padding-3xl);
-}
+/* -------------------------------------------------------------------------
+ * Indexing tab
+ * ---------------------------------------------------------------------- */
+.whsc-custom-field-row {
+  display: grid;
+  gap: var(--wpds-dimension-gap-md);
+  grid-template-columns: 1fr 1fr 1fr auto;
+  align-items: end;
 
-.webhead-search-cloud-connect-consents {
-  .components-checkbox-control__label {
-    text-align: left;
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
-.webhead-search-cloud-email-override,
-.webhead-search-cloud-manual-entry-card {
-  width: 100%;
-  padding: var(--wpds-dimension-padding-2xl);
-  border-radius: var(--wpds-border-radius-lg);
-  text-align: left;
-}
-
-.webhead-search-cloud-indexing {
-  .whsc-intro {
-    margin-bottom: 12px;
-
-    h3 {
-      margin: 0 0 4px;
-    }
-
-    p {
-      margin: 0;
-      color: #646970;
-    }
-  }
-
-  .whsc-searchable-notice {
-    margin: 0 0 20px;
-  }
-
-  .whsc-post-types {
-    display: grid;
-    gap: var(--wh-card-gap);
-  }
-
-  .whsc-enable-toggle {
-    margin-bottom: 4px;
-  }
-
-  .whsc-post-type-body {
-    margin-top: 8px;
-  }
-
-  // Logical sub-sections inside a post type, with clear vertical rhythm.
-  .whsc-section {
-    padding-top: 20px;
-    margin-top: 20px;
-    border-top: 1px solid #f0f0f1;
-
-    &:first-child {
-      padding-top: 0;
-      margin-top: 0;
-      border-top: 0;
-    }
-  }
-
-  .whsc-section-title {
-    margin: 0 0 4px;
-  }
-
-  .whsc-section-description {
-    margin: 0 0 16px;
-    color: #646970;
-  }
-
-  // Recognised-field selects, two-up on wide screens.
-  .whsc-fields-grid {
-    display: grid;
-    gap: 20px 24px;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    align-items: start;
-  }
-
-  // Toggle groups laid out in responsive columns to keep height down.
-  .whsc-toggle-grid {
-    display: grid;
-    gap: 12px 32px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    align-items: start;
-  }
-
-  // A lead toggle (e.g. "only visible") sitting above a toggle grid.
-  .components-base-control + .whsc-toggle-grid,
-  .components-toggle-control + .whsc-toggle-grid {
-    margin-top: 16px;
-  }
-
-  // Attribute checkboxes in compact responsive columns.
-  .whsc-attr-grid {
-    display: grid;
-    gap: 8px 24px;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    align-items: start;
-  }
-
-  .whsc-custom-fields {
-    display: grid;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .whsc-custom-field-row {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: 1fr 1fr 1fr auto;
-    align-items: end;
-
-    .components-button.is-destructive {
-      margin-bottom: 2px;
-    }
-
-    @media screen and (max-width: 600px) {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .whsc-save-bar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-
-  .whsc-save-summary {
-    color: #646970;
-  }
+.whsc-save-summary {
+  color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 /* -------------------------------------------------------------------------
  * Search Config tab
  * ---------------------------------------------------------------------- */
-.webhead-search-cloud-search-config {
-  .whsc-search-config-repeater {
-    display: grid;
-    gap: 12px;
-    margin-bottom: 12px;
+.whsc-search-config-row {
+  display: grid;
+  gap: var(--wpds-dimension-gap-md);
+  grid-template-columns: 2fr 1fr auto;
+  align-items: end;
+
+  &.whsc-search-config-row--boost {
+    grid-template-columns: 1fr 2fr;
   }
 
-  .whsc-search-config-row {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: 2fr 1fr auto;
-    align-items: end;
-
-    &.whsc-search-config-row--boost {
-      grid-template-columns: 1fr 2fr;
-    }
-
-    .components-button.is-destructive {
-      margin-bottom: 2px;
-    }
-
-    @media screen and (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
+}
 
-  // A plain label standing in for the read-only "Type" column of a boost
-  // row — deliberately not a disabled TextControl, whose grayed-out
-  // background reads as a broken/unclickable input rather than a caption.
-  .whsc-search-config-type-label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding-top: 2px;
+.whsc-search-config-type-label__caption,
+.whsc-search-config-status {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
 
-    &__caption {
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-      color: #757575;
-    }
+// A site with many indexed fields turns these token lists into a tall block
+// that stretches its card far past the one beside it and breaks the two-column
+// grid. Cap the token area and let it scroll instead; the input itself stays
+// in view because it sits inside the same scrolling container.
+.whsc-token-field .components-form-token-field__input-container {
+  max-height: calc(var(--wpds-dimension-size-lg) * 3);
+  overflow-y: auto;
+}
 
-    &__value {
-      font-size: 13px;
-      font-weight: 500;
-      padding: 6px 0;
-    }
-  }
+// A redirect is two fields and a delete, on one row. On a phone the row has no
+// room for two fields: they stack, with the delete under them at the end.
+.whsc-redirect-rule {
+  display: grid;
+  gap: var(--wpds-dimension-gap-md);
+  grid-template-columns: 1fr 1fr auto;
+  align-items: start;
 
-  .whsc-save-bar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 1fr;
 
-  // A site with many indexed fields turns these token lists into a tall block
-  // that stretches its card far past the one beside it and breaks the two-column
-  // grid. Cap the token area and let it scroll instead; the input itself stays
-  // in view because it sits inside the same scrolling container.
-  .whsc-token-field .components-form-token-field__input-container {
-    max-height: 130px;
-    overflow-y: auto;
-  }
-
-  // Language checkboxes (PLAN.md §5.2), in compact responsive columns —
-  // same pattern as the Indexing tab's product-attribute checkboxes.
-  .whsc-language-grid {
-    display: grid;
-    gap: 8px 24px;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    align-items: start;
-  }
-
-  // These checkboxes carry multi-line help text and use
-  // `__nextHasNoMarginBottom`, so without an explicit gap each one's help runs
-  // straight into the next checkbox's label.
-  .whsc-feature-switches {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  // Card content stacks without a gap, so a warning about the fields above
-  // would otherwise touch the token field it is about.
-  .whsc-unindexed-fields {
-    margin: var(--wpds-dimension-gap-md) 0 0;
-  }
-
-  // The AI index status, reported under its checkbox rather than as help text
-  // so it reads as live state instead of a description of the setting.
-  .whsc-search-config-status {
-    margin: -12px 0 0 32px;
-    color: #757575;
-  }
-
-  // A merchandising rule holds four inputs, so it spans the settings grid
-  // rather than being squeezed into one column.
-  .whsc-settings-card--wide {
-    grid-column: 1 / -1;
-  }
-
-  .whsc-merchandising-rule {
-    display: grid;
-    gap: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-
-    &__head {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: 1fr auto;
-      align-items: start;
-
-      .components-button.is-destructive {
-        margin-top: 22px;
-      }
-    }
-
-    &__ids {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: 1fr 1fr;
-
-      @media screen and (max-width: 600px) {
-        grid-template-columns: 1fr;
-      }
-    }
-  }
-
-  /* A redirect is two fields and a delete, so it stays on one row rather than
-     borrowing the merchandising rule's stacked card. */
-  .whsc-redirect-rule {
-    display: grid;
-    gap: 12px;
-    grid-template-columns: 1fr 1fr auto;
-    align-items: start;
-    padding: 16px;
-    margin-bottom: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-
-    .components-button.is-destructive {
-      margin-top: 22px;
-    }
-
-    @media screen and (max-width: 600px) {
-      grid-template-columns: 1fr auto;
+    .whsc-row-remove {
+      justify-self: end;
+      padding-block-start: 0;
     }
   }
 }
 
-.panel-container {
-  @media screen and (max-width: 767px) {
-    .whsc-settings-panel-header:has(.header-with-icon) {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .whsc-settings-panel-header .header-description {
-      margin-left: 0;
-    }
-  }
-}
-
-.whsc-settings-actions {
-  display: flex;
-  align-items: center;
+// The delete stands level with the fields, which begin one label below the
+// top of the row: a label is one line of the smallest text and the gap a field
+// keeps under it. Measured, not assumed: 16px and 8px.
+.whsc-row-remove {
+  padding-block-start: calc(var(--wpds-typography-line-height-xs) + var(--wpds-dimension-gap-sm));
 }
 
 /* -------------------------------------------------------------------------
  * Sync tab
  * ---------------------------------------------------------------------- */
-.webhead-search-cloud-sync {
-  .whsc-intro {
-    margin-bottom: 16px;
-  }
 
-  .whsc-sync-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    background: #fff;
-  }
-
-  .whsc-sync-card-head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .whsc-progress {
-    height: 10px;
-    border-radius: 999px;
-    background: #f0f0f1;
-    overflow: hidden;
-  }
-
-  .whsc-progress-bar {
-    height: 100%;
-    width: 0;
-    background: var(--wp-admin-theme-color, #3858e9);
-    border-radius: 999px;
-    transition: width 0.4s ease;
-
-    &.is-indeterminate {
-      width: 35%;
-      animation: whsc-indeterminate 1.2s infinite ease-in-out;
-    }
-  }
-
-  .whsc-progress-error {
-    margin-bottom: 15px;
-  }
-
-  @keyframes whsc-indeterminate {
-    0% {
-      margin-left: -35%;
-    }
-    100% {
-      margin-left: 100%;
-    }
-  }
-
-  .whsc-progress-label {
-    margin: 8px 0 16px;
-    color: #646970;
-  }
-
-  .whsc-counters {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
-
-    @media screen and (max-width: 600px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .whsc-counter {
-    display: flex;
-    flex-direction: column;
-    padding: 12px;
-    border-radius: 6px;
-    background: #f6f7f7;
-  }
-
-  .whsc-counter-value {
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.2;
-  }
-
-  .whsc-counter-label {
-    color: #646970;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  .whsc-sync-start {
-    margin-bottom: 20px;
-  }
-
-  .whsc-retention {
-    margin: 8px 0 24px;
-
-    .components-base-control {
-      max-width: 260px;
-    }
-
-    .components-button {
-      margin-top: 25px;
-    }
-  }
-
-  .whsc-sync-tag {
-    font-size: 12px;
-    color: #646970;
-    background: #f0f0f1;
-    border-radius: 4px;
-    padding: 2px 8px;
-  }
-
-  .whsc-sync-history-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 8px;
-
-    h4 {
-      margin: 0;
-    }
-  }
+// A progress bar is 160px wide whatever holds it; this one is as wide as its
+// card. Through the card, because WordPress writes that width when the bar is
+// drawn, at the weight of one class and after this stylesheet: one class of
+// ours alone ties with it and loses on order.
+.whsc-sync-run .whsc-sync-progress {
+  width: 100%;
 }
 
-.whsc-status-badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 3px 10px;
-  background: #f0f0f1;
-  color: #1d2327;
+.whsc-progress-label,
+.whsc-counter__label {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
 
-  &.is-running {
-    background: #e6f0ff;
-    color: #0a4ea2;
-  }
-
-  &.is-paused {
-    background: #fcf3e3;
-    color: #8a6116;
-  }
-
-  &.is-queued {
-    background: #f0f0f1;
-    color: #50575e;
-  }
-
-  &.is-completed {
-    background: #e5f5ea;
-    color: #135e2b;
-  }
-
-  &.is-failed {
-    background: #fce9e9;
-    color: #9a1c1c;
-  }
-
-  &.is-cancelled {
-    background: #f0f0f1;
-    color: #646970;
-  }
+.whsc-counter {
+  padding: var(--wpds-dimension-padding-md);
+  border-radius: var(--wpds-border-radius-md);
+  background: var(--wpds-color-background-surface-neutral);
 }
 
 /*
  * Plan allowances on the Connection tab (`UsageCard`). Three states, because
  * the difference between "fine", "watch this" and "this has stopped working"
- * is the whole point of showing the numbers at all.
+ * is the whole point of showing the numbers at all. The bar takes the colour
+ * of its row, which is also what the note under it is written in. These are
+ * the tones' lighter text colours: the full ones are near-black, and three
+ * near-black bars read as one state.
  */
-.whsc-usage {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.whsc-usage__row {
+  color: var(--wpds-color-foreground-content-info-weak);
 
-  &__row {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    --whsc-usage-fill: #2271b1;
-
-    &--near {
-      --whsc-usage-fill: #b26200;
-    }
-
-    &--spent {
-      --whsc-usage-fill: #b32d2e;
-    }
+  &--near {
+    color: var(--wpds-color-foreground-content-warning-weak);
   }
 
-  &__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
+  &--spent {
+    color: var(--wpds-color-foreground-content-error-weak);
   }
+}
 
-  &__label {
-    font-weight: 500;
-  }
+.whsc-usage__label,
+.whsc-usage__count {
+  color: var(--wpds-color-foreground-content-neutral);
+}
 
-  &__count {
-    color: #50575e;
-    font-variant-numeric: tabular-nums;
-  }
+.whsc-usage__label {
+  font-weight: var(--wpds-typography-font-weight-emphasis);
+}
 
-  &__bar {
-    height: 6px;
-    border-radius: 999px;
-    background: #f0f0f1;
-    overflow: hidden;
-  }
+.whsc-usage__count {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+  font-variant-numeric: tabular-nums;
+}
 
-  &__fill {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: var(--whsc-usage-fill);
-  }
+.whsc-usage__bar {
+  height: var(--wpds-dimension-size-4xs);
+  border-radius: var(--wpds-border-radius-lg);
+  background: var(--wpds-color-background-track-neutral-weak);
+  overflow: hidden;
+}
 
-  &__note {
-    color: var(--whsc-usage-fill);
-    margin: 0;
-  }
+.whsc-usage__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
 }

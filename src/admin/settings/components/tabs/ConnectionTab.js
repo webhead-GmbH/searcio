@@ -1,19 +1,17 @@
 import {useContext, useEffect, useState} from '@wordpress/element';
-import {
-	__experimentalConfirmDialog as ConfirmDialog,
-	Button,
-	CheckboxControl,
-	Notice,
-} from '@wordpress/components';
-import { Card, InputControl, Text } from '@wordpress/ui';
+import {Button} from '@wordpress/components';
+import {Card, CheckboxControl, CollapsibleCard, InputControl, Notice, Stack, Text} from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
-import {Flex, Grid} from '../../../../components/Layout';
+import {Grid} from '../../../../components/Layout';
+import Modal from '../../../../components/Modal';
 import {showToast} from '../../../../toast';
+import TabIntro from '../TabIntro';
 import ConnectionExplainer from './ConnectionExplainer';
 import ConnectionResultNotice from './ConnectionResultNotice';
+import LegalLinks from './LegalLinks';
 import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
 
@@ -30,11 +28,6 @@ const FALLBACK_LEGAL_LINKS = {
 };
 
 const GENERIC_CONNECT_ERROR = __('The connection request failed.', 'webhead-search-cloud');
-
-/** Wraps `text` in a link when `url` is present; a plain string otherwise. `stopPropagation` keeps a click from also toggling the checkbox the link's label belongs to. */
-const legalLink = (url, text) => (url
-	? <a href={url} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>{text}</a>
-	: text);
 
 /**
  * Connection tab: zero-friction Connect (docs/api/building-a-plugin.md
@@ -107,7 +100,7 @@ const ConnectionTab = () => {
 	// Live Search Cloud-configured legal links (GET /connect), fetched here
 	// rather than localized on page load so an unreachable Search Cloud never
 	// delays opening any other settings tab. The plugin's own constants keep
-	// the checkboxes/tooltip usable in the meantime.
+	// the consents usable in the meantime.
 	useEffect(() => {
 		let cancelled = false;
 
@@ -180,7 +173,6 @@ const ConnectionTab = () => {
 	};
 
 	const onDisconnect = async () => {
-		setDisconnectConfirmOpen(false);
 		setIsDisconnecting(true);
 
 		try {
@@ -209,155 +201,142 @@ const ConnectionTab = () => {
 		? __('Connecting…', 'webhead-search-cloud')
 		: __('Connect to Search Cloud', 'webhead-search-cloud');
 
+	// One disclosure for the pasted-keys path, whichever state the tab is in.
+	const manualEntry = (
+		<CollapsibleCard.Root
+			open={manualEntryExpanded}
+			onOpenChange={setManualEntryExpanded}
+			className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card"
+		>
+			<CollapsibleCard.Header render={<h3/>}>
+				{isConnected
+					? __('Advanced: manual key entry / rotate keys', 'webhead-search-cloud')
+					: __('Advanced: manual key entry', 'webhead-search-cloud')}
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content className="whsc-card__content">
+				<ManualConnectionEntry pendingClaim={!isConnected && pendingClaim}/>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	);
+
 	return (
-		<Card.Root className="whsc-tab-card">
-			<Card.Header className="whsc-tab-card-header">
-				<Card.Title render={<h3/>}>
-					{__('Search Cloud connection', 'webhead-search-cloud')}
-				</Card.Title>
-				<Text render={<p/>} variant="body-sm">
-					{__(
-						'Connect this site to webhead Search Cloud to start syncing content and enable search.',
-						'webhead-search-cloud'
-					)}
-				</Text>
-			</Card.Header>
-			<Card.Content className="whsc-tab-card-content">
-				{isConnected ? (
-					<Flex direction="column" gap={16}>
-						<ConnectionResultNotice result={connectedResult}/>
+		<Stack direction="column" gap="lg" className="webhead-search-cloud-connection">
+			<TabIntro
+				title={__('Search Cloud connection', 'webhead-search-cloud')}
+				description={__(
+					'Connect this site to webhead Search Cloud to start syncing content and enable search.',
+					'webhead-search-cloud'
+				)}
+			/>
 
-						{/* The same health response the notice above reads. A spent
-						    allowance is why a storefront stops returning results, so it
-						    belongs where an admin looks when search "breaks". */}
-						<UsageCard usage={connectedResult?.usage}/>
+			{isConnected ? (
+				<>
+					<ConnectionResultNotice result={connectedResult}/>
 
-						<Flex align="center" gap={12} wrap>
-							<Button
-								__next40pxDefaultSize
-								variant="secondary"
-								isDestructive
-								isBusy={isDisconnecting}
-								disabled={isDisconnecting}
-								onClick={() => setDisconnectConfirmOpen(true)}
-							>
-								{__('Disconnect', 'webhead-search-cloud')}
-							</Button>
-						</Flex>
+					{/* The same health response the notice above reads. A spent
+					    allowance is why a storefront stops returning results, so it
+					    belongs where an admin looks when search "breaks". */}
+					<UsageCard usage={connectedResult?.usage}/>
 
-						<div className="whsc-advanced">
-							<Button
-								variant="link"
-								aria-expanded={manualEntryExpanded}
-								onClick={() => setManualEntryExpanded((expanded) => !expanded)}
-							>
-								{manualEntryExpanded
-									? __('Hide advanced options', 'webhead-search-cloud')
-									: __('Advanced: manual key entry / rotate keys', 'webhead-search-cloud')}
-							</Button>
-
-							{manualEntryExpanded && (
-								<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
-									<ManualConnectionEntry pendingClaim={false}/>
-								</div>
-							)}
-						</div>
-
-						<ConfirmDialog
-							isOpen={disconnectConfirmOpen}
-							onConfirm={onDisconnect}
-							onCancel={() => setDisconnectConfirmOpen(false)}
-							confirmButtonText={__('Disconnect', 'webhead-search-cloud')}
+					<Stack direction="row" gap="sm" align="center" wrap="wrap">
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							isDestructive
+							isBusy={isDisconnecting}
+							disabled={isDisconnecting}
+							onClick={() => setDisconnectConfirmOpen(true)}
 						>
-							{__(
-								'This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account.',
-								'webhead-search-cloud'
-							)}
-						</ConfirmDialog>
-					</Flex>
-				) : (
-					<Flex direction="column" gap={20} className="webhead-search-cloud-connect">
-						{pendingClaim && (
-							<Notice status="info" isDismissible={false}>
-								<p>
-									{sprintf(
-										/* translators: %s: the email address a confirmation link was sent to. */
-										__(
-											'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below.',
-											'webhead-search-cloud'
-										),
-										pendingClaimEmail
-									)}
-								</p>
-							</Notice>
-						)}
+							{__('Disconnect', 'webhead-search-cloud')}
+						</Button>
+					</Stack>
 
-						{connectError && (
-							<Notice status="error" isDismissible={false}>
-								<p>{connectError}</p>
-							</Notice>
-						)}
+					{manualEntry}
+				</>
+			) : (
+				<>
+					{pendingClaim && (
+						<Notice.Root intent="info">
+							<Notice.Description>
+								{sprintf(
+									/* translators: %s: the email address a confirmation link was sent to. */
+									__(
+										'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below.',
+										'webhead-search-cloud'
+									),
+									pendingClaimEmail
+								)}
+							</Notice.Description>
+						</Notice.Root>
+					)}
 
-						<Flex direction="column" align="center" gap={16} className="webhead-search-cloud-connect-hero">
-							<Button
-								__next40pxDefaultSize
-								accessibleWhenDisabled
-								variant="primary"
-								isBusy={isConnecting}
-								disabled={connectDisabled}
-								description={
-									!termsPrivacy
-										? __('Accept the Terms of Service and Privacy Policy to continue.', 'webhead-search-cloud')
-										: undefined
+					{connectError && (
+						<Notice.Root intent="error">
+							<Notice.Description>{connectError}</Notice.Description>
+						</Notice.Root>
+					)}
+
+					{/* The one column that centres what is in it: the connect
+					    moment is a button, two consents and a sentence, and each
+					    is meant to be as wide as it is. */}
+					<Stack direction="column" align="center" gap="lg" className="webhead-search-cloud-connect-hero">
+						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+							variant="primary"
+							isBusy={isConnecting}
+							disabled={connectDisabled}
+							description={
+								!termsPrivacy
+									? __('Accept the Terms of Service and Privacy Policy to continue.', 'webhead-search-cloud')
+									: undefined
+							}
+							showTooltip={!termsPrivacy}
+							onClick={onConnect}
+							className="webhead-search-cloud-connect-cta"
+						>
+							{connectLabel}
+						</Button>
+
+						<Stack direction="column" gap="md" className="webhead-search-cloud-connect-consents">
+							<CheckboxControl
+								label={__('I accept the Terms of Service and Privacy Policy (required)', 'webhead-search-cloud')}
+								details={
+									<LegalLinks
+										links={[
+											{url: legalLinks.termsUrl, label: __('Terms of Service', 'webhead-search-cloud')},
+											{url: legalLinks.privacyUrl, label: __('Privacy Policy', 'webhead-search-cloud')},
+										]}
+									/>
 								}
-								showTooltip={!termsPrivacy}
-								onClick={onConnect}
-								className="webhead-search-cloud-connect-cta"
-							>
-								{connectLabel}
-							</Button>
+								checked={termsPrivacy}
+								onCheckedChange={(checked) => setTermsPrivacy(Boolean(checked))}
+							/>
+							<CheckboxControl
+								label={__('I accept the Data Processing Agreement (optional)', 'webhead-search-cloud')}
+								details={
+									<LegalLinks
+										links={[
+											{url: legalLinks.dpaUrl, label: __('Data Processing Agreement', 'webhead-search-cloud')},
+										]}
+									/>
+								}
+								checked={dpa}
+								onCheckedChange={(checked) => setDpa(Boolean(checked))}
+							/>
+						</Stack>
 
-							<Flex direction="column" align="center" gap={8} className="webhead-search-cloud-connect-consents">
-								<CheckboxControl
-									__nextHasNoMarginBottom
-									checked={termsPrivacy}
-									onChange={setTermsPrivacy}
-									label={
-										<>
-											{__('I accept the', 'webhead-search-cloud')}{' '}
-											{legalLink(legalLinks.termsUrl, __('Terms of Service', 'webhead-search-cloud'))}
-											{' '}{__('and', 'webhead-search-cloud')}{' '}
-											{legalLink(legalLinks.privacyUrl, __('Privacy Policy', 'webhead-search-cloud'))}.
-											{' '}{__('(required)', 'webhead-search-cloud')}
-										</>
-									}
-								/>
-								<CheckboxControl
-									__nextHasNoMarginBottom
-									checked={dpa}
-									onChange={setDpa}
-									label={
-										<>
-											{__('I accept the', 'webhead-search-cloud')}{' '}
-											{legalLink(legalLinks.dpaUrl, __('Data Processing Agreement', 'webhead-search-cloud'))}.
-											{' '}{__('(optional)', 'webhead-search-cloud')}
-										</>
-									}
-								/>
-							</Flex>
+						<Text render={<p/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
+							{effectiveEmail
+								? sprintf(
+									/* translators: %s: the email address used to connect. */
+									__("You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'webhead-search-cloud'),
+									effectiveEmail
+								)
+								: __('An admin email is required to connect.', 'webhead-search-cloud')}
+						</Text>
 
-							<Text render={<p/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
-								{effectiveEmail
-									? sprintf(
-										/* translators: %s: the email address used to connect. */
-										__("You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'webhead-search-cloud'),
-										effectiveEmail
-									)
-									: __('An admin email is required to connect.', 'webhead-search-cloud')}
-								{' '}
-								<ConnectionExplainer legal={legalLinks}/>
-							</Text>
-
+						<Stack direction="row" gap="lg" justify="center" align="center" wrap="wrap">
 							<Button
 								variant="link"
 								className="webhead-search-cloud-email-override-toggle"
@@ -368,11 +347,14 @@ const ConnectionTab = () => {
 									? __('Use the default email instead', 'webhead-search-cloud')
 									: __('Not this email?', 'webhead-search-cloud')}
 							</Button>
-						</Flex>
+							<ConnectionExplainer legal={legalLinks}/>
+						</Stack>
+					</Stack>
 
-						{showEmailOverride && (
-							<div className="whsc-card whsc-card--dotted webhead-search-cloud-email-override">
-								<Grid minColumnWidth={{base: 200, md: 220}} gap={12} align="start">
+					{showEmailOverride && (
+						<Card.Root className="whsc-card whsc-card--dotted webhead-search-cloud-email-override">
+							<Card.Content className="whsc-card__content">
+								<Grid minColumnWidth={{base: 200, md: 220}} gap="var(--wpds-dimension-gap-md)" align="start">
 									<InputControl
 										type="email"
 										label={__('Email', 'webhead-search-cloud')}
@@ -391,30 +373,46 @@ const ConnectionTab = () => {
 										onValueChange={setOverrideCompanyName}
 									/>
 								</Grid>
-							</div>
-						)}
+							</Card.Content>
+						</Card.Root>
+					)}
 
-						<div className="whsc-advanced">
-							<Button
-								variant="link"
-								aria-expanded={manualEntryExpanded}
-								onClick={() => setManualEntryExpanded((expanded) => !expanded)}
-							>
-								{manualEntryExpanded
-									? __('Hide advanced options', 'webhead-search-cloud')
-									: __('Advanced: manual key entry', 'webhead-search-cloud')}
-							</Button>
+					{manualEntry}
+				</>
+			)}
 
-							{manualEntryExpanded && (
-								<div className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card">
-									<ManualConnectionEntry pendingClaim={pendingClaim}/>
-								</div>
-							)}
-						</div>
-					</Flex>
-				)}
-			</Card.Content>
-		</Card.Root>
+			{/* Removing the credentials stops search on the storefront and is not
+			    undone by a click, so it is asked about in a dialog that only its
+			    own buttons close. */}
+			<Modal
+				isOpen={disconnectConfirmOpen}
+				onClose={() => setDisconnectConfirmOpen(false)}
+				title={__('Disconnect from Search Cloud?', 'webhead-search-cloud')}
+				size="small"
+				showCloseButton={false}
+				closeOnEscape={false}
+				closeOnBackdropClick={false}
+				actions={[
+					{
+						label: __('Cancel', 'webhead-search-cloud'),
+						variant: 'tertiary',
+					},
+					{
+						label: __('Disconnect', 'webhead-search-cloud'),
+						variant: 'primary',
+						isDestructive: true,
+						onClick: onDisconnect,
+					},
+				]}
+			>
+				<Text>
+					{__(
+						'This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account.',
+						'webhead-search-cloud'
+					)}
+				</Text>
+			</Modal>
+		</Stack>
 	);
 };
 

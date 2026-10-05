@@ -1,22 +1,24 @@
-import ContentLoader from 'react-content-loader';
+import { __ } from '@wordpress/i18n';
+import { Skeleton, Stack } from '@wordpress/ui';
 
-// Mirrors the real screen's stacked collapsible rows, per the front-end
-// guideline to use react-content-loader for known layouts instead of a spinner.
-const IndexingSkeleton = () => (
-	<ContentLoader
-		width="100%"
-		height={ 360 }
-		role="presentation"
-		aria-hidden="true"
-		className="webhead-search-cloud-indexing-skeleton"
-	>
-		<rect x="0" y="0" rx="6" ry="6" width="320" height="22" />
-		<rect x="0" y="40" rx="6" ry="6" width="80%" height="14" />
-		<rect x="0" y="80" rx="10" ry="10" width="100%" height="56" />
-		<rect x="0" y="148" rx="10" ry="10" width="100%" height="56" />
-		<rect x="0" y="216" rx="10" ry="10" width="100%" height="56" />
-		<rect x="0" y="284" rx="10" ry="10" width="100%" height="56" />
-	</ContentLoader>
+/**
+ * Mirrors the stacked rows of the Indexing and Search Config tabs: an intro,
+ * then one placeholder per card. The region is what says "loading"; the blocks
+ * in it are decorative.
+ */
+const IndexingSkeleton = ( { label = __( 'Loading the indexing configuration', 'webhead-search-cloud' ) } ) => (
+	<div className="whsc-skeleton" role="status" aria-busy="true" aria-label={ label }>
+		<Stack direction="column" gap="lg">
+			<Stack direction="column" gap="sm">
+				<Skeleton className="whsc-skeleton__title" />
+				<Skeleton className="whsc-skeleton__line" />
+			</Stack>
+			<Skeleton className="whsc-skeleton__row" />
+			<Skeleton className="whsc-skeleton__row" />
+			<Skeleton className="whsc-skeleton__row" />
+			<Skeleton className="whsc-skeleton__row" />
+		</Stack>
+	</div>
 );
 
 export default IndexingSkeleton;

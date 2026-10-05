@@ -380,3 +380,54 @@ export class SearchWidget {
 		await this.quizOptions.filter( { hasText: label } ).first().click();
 	}
 }
+
+/**
+ * What an admin screen stacks without a gap, as a list of sentences; empty
+ * when nothing touches.
+ *
+ * `Card.Content` does not space what is put in it, and neither does a fragment:
+ * two elements written one after the other sit flush against each other unless
+ * a `Stack` with a `gap`, or the shell's own content area, holds them. That
+ * cannot be seen in the source, so it is measured: the children of the shell's
+ * content, of each tab panel and what it wraps, and of each part of a card that
+ * carries the plugin's card class. The inside of a control or a table is the
+ * component's own business.
+ *
+ * @param {import('@playwright/test').Page} page
+ */
+export async function touchingInShell( page ) {
+	return page.locator( '.webhead-search-cloud-admin-page' ).evaluate( ( element ) => {
+		const panels = [ ...element.querySelectorAll( '[role="tabpanel"]' ) ];
+		const containers = [
+			element.querySelector( '.webhead-search-cloud-admin-page__content' ),
+			...panels,
+			// A panel animates what it holds in one wrapper; the tab's own
+			// column is the first thing inside that.
+			...panels.map( ( panel ) => panel.firstElementChild?.firstElementChild ),
+			...[ ...element.querySelectorAll( '.whsc-card' ) ].flatMap( ( card ) => [ ...card.children ] ),
+		].filter( Boolean );
+
+		const name = ( node ) => `${ node.tagName.toLowerCase() }.${ String( node.className ).split( ' ' )[ 0 ] }`;
+
+		return containers.flatMap( ( container ) => {
+			const boxes = [ ...container.children ]
+				.filter( ( child ) => ! [ 'absolute', 'fixed' ].includes( window.getComputedStyle( child ).position ) )
+				.map( ( child ) => ( { child, box: child.getBoundingClientRect() } ) )
+				.filter( ( { box } ) => box.width > 0 && box.height > 0 );
+
+			return boxes.slice( 1 ).flatMap( ( { child, box }, index ) => {
+				const above = boxes[ index ];
+
+				// Beside the one before it, not under it.
+				if ( box.top < above.box.bottom - 1 ) {
+					return [];
+				}
+
+				// 4px is the smallest gap token there is.
+				return box.top - above.box.bottom < 3.5
+					? [ `${ name( child ) } touches ${ name( above.child ) } in ${ name( container ) }` ]
+					: [];
+			} );
+		} );
+	} );
+}
