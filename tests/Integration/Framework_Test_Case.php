@@ -10,7 +10,7 @@
  * that is rolled back afterwards. Rows created in a test disappear; schema
  * created during bootstrap does not.
  *
- * @author    webhead GmbH <mh@webhead.dev>
+ * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
  */
 

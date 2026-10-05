@@ -26,6 +26,7 @@ loaded beside it.
 | `references/tokens.md` | Constructing or checking a `--wpds-*` name; elevation; radius |
 | `references/css-traps.md` | About to restyle anything the packages ship — Button, Card, wp-admin `h1` |
 | `references/patterns.md` | Building tabs, a save flow, errors, a modal, a destructive action, loading states |
+| `references/screens.md` | Putting a screen together: a new page, what goes into a card, a card header, a card grid, an empty state, a table |
 
 ## Check a fact instead of recalling it
 
@@ -47,22 +48,53 @@ The Gutenberg Storybook is React-rendered, so fetching its HTML returns an empty
 
 For props, read the `.d.ts` under `node_modules/@wordpress/ui/build-types/`.
 
+**The Storybook documents Gutenberg's trunk; this plugin runs the packages in its
+`package.json`.** The two differ. Take the rule from the Storybook and the name of an export or a
+prop from `node_modules`. When a `@wordpress/*` version moves, read the breaking changes in
+`node_modules/@wordpress/<package>/CHANGELOG.md` for every release in between.
+
+The design system recommends its "WordPress Design System MCP Server" to AI agents. When it is
+connected, ask it for a component's status before opening a browser.
+
+These files were written on 2026-10-03 against `@wordpress/components` 41, `@wordpress/ui` 0.23,
+`@wordpress/theme` 2.2, `@wordpress/icons` 17 and `@wordpress/dataviews` 19.1.
+
+## When the design system falls short, stop and ask
+
+The design system's contributing page addresses AI agents directly, and it is a rule here: **when
+you meet a shortcoming, stop and ask before working around it.** The signs that you have met one:
+
+- overriding a component's styles through its internal class names or its markup,
+- hard-coding a colour, a spacing, a radius or a font value,
+- copying a component's source, or importing a private path,
+- building a control of your own that resembles one the design system has.
+
+Say which component, token or page it is and what is missing, say plainly that a workaround is
+not recommended and drifts from the design system, and let the person decide. Offer to draft the
+issue; **do not file issues or pull requests on Gutenberg yourself.** A workaround the person
+chose gets a comment naming the gap.
+
 ## Which component to reach for
 
 This is **not** "prefer `@wordpress/ui`". Upstream is mid-migration and the two packages disagree
-in both directions: 30 `@wordpress/components` exports are not-recommended, and 18
-`@wordpress/ui` components are use-with-caution — nearly all of them because they are *"not yet
-recommended for use alongside components from `@wordpress/components`"*. This plugin's admin
-screens are built from `@wordpress/components` controls, so that caveat applies to them.
+in both directions: 34 `@wordpress/components` exports are not-recommended or deprecated, and
+about twenty `@wordpress/ui` components are use-with-caution — nearly all of them because they are
+*"not yet recommended for use alongside components from `@wordpress/components`"*.
+
+So choose **per component, by its status**: take the one that is recommended, and where the
+`@wordpress/ui` one is cautionary stay on `@wordpress/components`. That is why the settings screen
+imports `Button` and `ToggleControl` from `@wordpress/components` and `Notice`, `Card`, `Tabs`,
+`InputControl`, `Stack` and `Skeleton` from `@wordpress/ui`.
 
 The full lists and the `@wordpress/ui` export shapes are in `references/component-status.md`. Two
 rules that never need looking up:
 
 - **A `not-recommended` component is not an option**, whatever a neighbouring file still does.
-- **`@wordpress/ui` form controls take `onValueChange`, not `onChange`.** The wrong one is not an
-  error; it is a control that silently never updates.
+- **No `@wordpress/ui` form control takes `onChange`.** Text, select and radio controls take
+  `onValueChange`; `CheckboxControl` takes `checked` and `onCheckedChange`. The wrong one is not
+  an error; it is a control that silently never updates.
 
-## Design tokens, in three rules
+## Design tokens, in four rules
 
 `@wordpress/theme` publishes the `--wpds-*` custom properties in `prebuilt/css/design-tokens.css`.
 **That file is the authority.** The whole grammar is in `references/tokens.md`.
@@ -70,9 +102,12 @@ rules that never need looking up:
 - **Build the name from the grammar, never from memory** —
   `--wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]`. There is no `text`, no `border`,
   and no bare `content-*`.
-- **A token that does not exist fails silently.** `var()` with no fallback and no definition makes
-  the whole declaration invalid at computed-value time, which looks exactly like a rule nobody
-  wrote.
+- **A token that does not exist stops the build, in a stylesheet.** `webpack.config.js` runs
+  `@wordpress/theme`'s `postcss-ds-token-fallbacks`, which fails with `Unknown design token` on a
+  name the package does not have. In a `style` prop or a JavaScript string the same mistake is
+  still silent: the declaration is dropped, which looks exactly like a rule nobody wrote.
+- **Write the token bare, and never set one.** The build writes the fallback; a `--wpds-*: …`
+  declaration of your own is the sign of a gap to ask about, not an override to add.
 - **Elevation is not a `--wpds-*` property** — it lives in `@wordpress/base-styles` as
   `$elevation-x-small` and friends. Radius *is* a token, and its whole scale is switchable, so
   write the token and never the number.
@@ -80,9 +115,10 @@ rules that never need looking up:
 ## Every admin screen uses the same shell
 
 `src/components/AdminPage.js` owns the page chrome — the dark header, the title
-and description, the actions slot, the surface radius, the page padding and the
-rhythm between whatever the page puts inside it. **Use it for every registered
-page**, so a second screen cannot look like a different plugin:
+and description, the actions slot, the surface radius, the page padding, the
+width and the rhythm between whatever the page puts inside it. The generated
+settings screen is drawn by it. **Use it for every page you register**, so a
+second screen cannot look like a different plugin:
 
 ```jsx
 <AdminPage
@@ -106,6 +142,33 @@ its panel — is defined once there rather than per screen, which is why the tab
 panel used to sit flush against its tabs on any screen that was not the settings
 one.
 
+What follows from the shell drawing every screen:
+
+- **Never give a screen a frame of its own.** No wrapper with a `max-width`, its
+  own padding, or a header beside the shell's. The shell is as wide as the window
+  lets it be and inset the same on every side; a screen that wants a narrower
+  measure narrows what it puts *inside*. A frame of its own is how a second page
+  ended up 1440px wide beside a settings screen of 2340px, and 20px to its left.
+- **`tabbed`** when the content opens with a tab strip: the strip then sits
+  directly under the header, as it does on the settings screen, and the shell
+  draws it the way the design system asks for tabs that top a panel — as wide as
+  the surface, with a light line under it, each label as wide as its text. Do not
+  style the strip yourself.
+- **The page title is the `h1`.** Cards directly under it take
+  `Card.Title render={ <h2/> }`.
+- **The accent colours, the card variants and the badges arrive with the shell.**
+  It imports `src/components/Default` and carries the `panel-container` class
+  that stylesheet is scoped to, so they apply on every screen and not only on
+  the one whose root element the stylesheet names. A page needs no
+  `get_default_asset_entry()` for them.
+- **Do not edit `AdminPage.js` or `admin-page.scss`.** They are framework-owned
+  and `composer framework:update` refreshes them. Change the look in
+  `src/components/Default/default.scss`, which is yours.
+
+**Adding a page takes four things**: a class that extends `Admin\Page`, its registration, a
+webpack entry, and the file that mounts the screen. `references/screens.md` has the recipe and
+the two tests to copy for the new page.
+
 The shell is a **surface** (`xl` radius); the cards inside it are cards (`lg`).
 
 ### What the header guarantees
@@ -120,7 +183,7 @@ The shell is a **surface** (`xl` radius); the cards inside it are cards (`lg`).
   isBusy?, isDestructive? }` — not raw elements. The shell decides how each one
   looks, which is the only way two screens can agree.
 - **At most two buttons sit in the header.** The first is outlined in white, the
-  second is filled with the brand colour, keyed to *position* rather than to what
+  second is filled with white and written in black, keyed to *position* rather than to what
   the button does, so one header never shows two competing primaries. The third
   descriptor onwards collapses into a single `moreVertical` toggle backed by a
   Popover menu. Do not add a third button; add a third descriptor.
@@ -130,8 +193,8 @@ The shell is a **surface** (`xl` radius); the cards inside it are cards (`lg`).
   header, which is the thing the overflow menu exists to prevent.
 - **Hover lifts; it does not invert.** The outlined button takes a translucent
   white wash and keeps its white text — filling it solid white made the secondary
-  action louder than the primary beside it. The filled one darkens to
-  `--wh-accent-dark`. Transition everything the hover touches — the package
+  action louder than the primary beside it. The filled one dims to
+  `--wh-secondary-dark`. Transition everything the hover touches — the package
   transitions `border-color` alone, so a background swap snaps — and drop the
   transition under `prefers-reduced-motion`.
 
@@ -153,6 +216,21 @@ has no `gap`, which is the usual cause.
 Vertical rhythm by token: `gap-xs` between a card title and its description, `gap-lg` between a
 tab strip and its panel and between related cards, `gap-xl` between major sections.
 
+### Three things a card does not do
+
+- **`Card.Content` pads itself and does not space its children.** More than one child of a
+  `Card.Content`, a tab panel or a fragment goes in a `Stack direction="column"` with a `gap`
+  token. Buttons go in a row `Stack` of their own, and the column never takes `align="start"`:
+  that shrinks every child, and it left a notice 26px wide.
+- **`Card.Header` does not lay out a title and a control.** They stack and touch unless one row
+  `Stack` with `justify="space-between"` holds both.
+- **Cards do not arrange themselves.** Small cards go beside each other in the plugin's
+  `Grid auto`, not in a hand-written `auto-fill` grid, which leaves empty columns on a wide
+  screen.
+
+`references/screens.md` has each with its sample and what it looked like the other way. Read it
+before putting a second element into anything.
+
 **A card separates one section from another. One section needs no card.** If a screen or a tab
 holds a single region, put it straight into the page shell — wrapping it draws a box around the
 whole thing and promises a second section that never arrives. Reach for cards when there are
@@ -163,20 +241,6 @@ several regions and the reader needs to tell them apart.
 header anywhere in the design system. Restating any of it — even with the identical token — breaks
 the component's own spacing, because `@wordpress/ui` ships inside `@layer wp-ui` and an unlayered
 rule beats a layered one however specific either is. `references/css-traps.md` has the anatomy.
-
-**Lay small cards beside each other.** A column of half-empty full-width cards makes a page far
-taller than its content, and every card past the fold costs a scroll. Put them in a grid when
-their content is short — but not so eagerly that a card is squeezed below roughly 280px, which
-reads as broken. Size the track to the content, not to the number of cards:
-
-```scss
-.webhead-search-cloud-section-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--wpds-dimension-gap-xl);
-    align-items: start;
-}
-```
 
 ```jsx
 <Card.Root className="webhead-search-cloud-card webhead-search-cloud-card--dotted">
@@ -223,4 +287,28 @@ getComputedStyle( document.documentElement ).getPropertyValue( '--wpds-typograph
 // At a narrow viewport: the strip scrolls, the page does not.
 const list = document.querySelector( '[role="tablist"]' );
 list.scrollWidth > list.clientWidth && document.documentElement.scrollWidth <= document.documentElement.clientWidth;
+
+// Where a screen starts and how wide it is. Run it on two screens of the plugin
+// and compare the two results; they must be the same.
+( ( s ) => [ s.getBoundingClientRect().x, s.getBoundingClientRect().width ] )(
+    document.querySelector( '.webhead-search-cloud-admin-page__surface' ) );
+
+// What a card's content stacks: the top and the bottom of each child. A bottom
+// equal to the next top means the two touch.
+[ ...document.querySelector( '.webhead-search-cloud-card__content' ).children ]
+    .map( ( c ) => c.getBoundingClientRect() ).map( ( r ) => [ Math.round( r.top ), Math.round( r.bottom ) ] );
+
+// The tab strip under the header: as wide as the surface, with a line under it.
+( ( l ) => [ l.getBoundingClientRect().width, getComputedStyle( l ).borderBottomWidth ] )(
+    document.querySelector( '[role="tablist"]' ) );
 ```
+
+**Measure at more than one width, and one of them wider than any laptop.** A frame
+that stops growing at some maximum looks right on every screen narrower than that
+maximum. In a browser you cannot resize, `document.documentElement.style.zoom = '0.66'`
+makes the layout one and a half times as wide.
+
+**Measure every state, not the screen at rest.** Click each action, open each overlay, make a
+field wrong, empty the list, then narrow the window and switch to a right-to-left language.
+`webhead-verify-before-you-write` has the list, and the reason: a notice that was 26px wide only
+existed after a click. The zoom above misplaces popovers, so open those at zoom 1.

@@ -13,7 +13,8 @@ Generated files are a framework-owned contract, but product plugins may customiz
 ## Generated Contract
 
 - `composer.json` keeps `webhead/wp-plugin-framework` in `require-dev`.
-- Mozart output lives in `includes/Dependencies` for release builds.
+- Mozart output lives in `includes/Dependencies` for release builds. The path comes from `extra.mozart.dep_directory` in `composer.json`; read it from there instead of assuming it.
+- `composer install` runs `vendor/bin/webhead bundle:prune` after Mozart. It removes the framework modules listed under `extra.webhead.exclude-modules` (`updates`, `command-runner`) and refuses to build while plugin code still uses one of them.
 - `package.json` may include product-specific custom dependencies and scripts.
 - `package.json` includes framework-owned npm overrides for vulnerable `@wordpress/scripts` transitive build tooling; preserve product-specific custom overrides. `scaffold:update` drops an override the framework has retired, but only when its value is still the one the framework wrote.
 - `composer framework:update` runs `vendor/bin/webhead scaffold:update --path=.`.
@@ -22,6 +23,9 @@ Generated files are a framework-owned contract, but product plugins may customiz
 - AI guidance lives in `AGENTS.md`, `CLAUDE.md`, tool-native files, `.agents/skills/*`, `.claude/skills/*`, and `.codex/*` when selected.
 - Legacy `.ai` guidance is removed by the scaffold updater after current agent-native files and `.agents/skills/*` files are written.
 - Generated `Example_*` classes and example block files are reference scaffolds only. Their registrations in `includes/Plugin.php` should remain commented until replaced with real plugin behavior and tests, and unused examples must be deleted before production.
+- `scaffold:update` removes what earlier scaffolds wrote to hold a directory open: an `index.php` that only says "Silence is golden", an empty `.gitkeep`, and then the directories that leaves empty (`templates`, `includes/DTO`, `includes/Enums`, `includes/classes`). It removes a file only while it is still exactly what the scaffold wrote, and it keeps the `index.php` in the plugin root and a `languages` directory that holds nothing else. Do not put those files back.
+- `bundle:prune` removes the directory Mozart keeps for class-mapped packages (`extra.mozart.classmap_directory`) when it is empty. `phpstan.neon` names that path with ` (?)` because of it.
+- `scaffold:update` refreshes `src/components/AdminPage.js` and `src/components/admin-page.scss`, the shell every admin screen is drawn by, in a plugin that has them. `src/components/Default/default.scss` is the plugin's own and is never rewritten.
 
 ## Update Rules
 
@@ -30,7 +34,7 @@ Generated files are a framework-owned contract, but product plugins may customiz
 - Preserve custom Composer packages, dev packages, scripts, and package metadata.
 - Preserve custom npm dependencies, dev dependencies, scripts, and overrides.
 - Preserve custom `.agents/skills/*` files while updating framework-owned AI guide files.
-- Preserve unmanaged `.editorconfig`, `phpcs.xml`, `phpstan.neon`, and `webpack.config.js` files unless they carry the Webhead managed marker.
+- Preserve unmanaged `.editorconfig`, `phpcs.xml`, `phpstan.neon`, and `webpack.config.js` files unless they carry the `Webhead scaffold managed file` marker.
 - Do not delete `composer.json` or `package.json` and recreate them from stubs.
 - After dependency changes, run `composer update -W` and `npm install` as appropriate.
 

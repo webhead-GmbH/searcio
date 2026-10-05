@@ -109,4 +109,7 @@ If this plugin was scaffolded before the harness existed, `.gitignore` may still
 - Validate multisite behavior when changes touch options, database tables, activation, blog switching, or capability sync.
 - Run `npm install` and `npm run build` after JavaScript, block-editor, or admin UI changes, and before the end-to-end suite.
 - Open the settings UI in a browser and verify card title sizing, nested card variants, keyboard focus, and responsive wrapping.
+- Check every state of a screen, not the screen at rest: click each action, open each overlay, make a field wrong, empty the list, narrow the window, and switch to a right-to-left language.
+- Measure that nothing a screen stacks touches what is above it. `leaves a gap between everything it stacks` in `tests/e2e/specs/settings-page.spec.js` does it for the settings screen; copy it for every page you add.
+- Open every admin screen you added beside the settings screen, at a width above 1920px as well as on a phone, and measure both: same left edge, same width, same header. A frame that stops growing at some maximum looks right on any screen narrower than that maximum.
 - Verify REST routes still use `webhead-search-cloud/v1` and permission callbacks remain explicit.

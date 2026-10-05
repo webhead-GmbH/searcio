@@ -43,21 +43,37 @@ npm run test:integration -- --filter Activation_Test
 
 ## Extending The Bootstrap
 
-Create `tests/Integration/bootstrap-extra.php` for anything plugin-specific. It is loaded before the plugin registers its own `muplugins_loaded` callback, so callbacks it adds on that action run first — which is how you make a companion plugin's classes exist before this plugin boots against them.
+`tests/Integration/bootstrap-extra.php` is where anything plugin-specific goes. It is loaded before the plugin registers its own `muplugins_loaded` callback, so callbacks it adds on that action run first — which is how you make a companion plugin's classes exist before this plugin boots against them.
+
+The scaffold writes the file when the plugin has a `Requires Plugins` header or an Elementor widget, already loading those plugins. It is yours from then on; create it yourself when the plugin gains its first companion later.
+
+The test database is installed from scratch on every run, so WordPress starts with **no active plugin**. A companion that `.wp-env.json` installs is on disk and nothing more: unless this file requires its main file, every test that needs it skips.
 
 ```php
 tests_add_filter(
 	'muplugins_loaded',
 	static function (): void {
-		foreach ( glob( WP_PLUGIN_DIR . '/*/woocommerce.php' ) ?: [] as $main ) {
-			require_once $main;
-			break;
+		foreach ( [ 'woocommerce' ] as $slug ) {
+			$main_file = WP_PLUGIN_DIR . '/' . $slug . '/' . $slug . '.php';
+
+			if ( is_readable( $main_file ) ) {
+				require_once $main_file;
+			}
+		}
+	}
+);
+
+// WooCommerce creates its tables and roles when it is installed, which a test
+// database never was.
+tests_add_filter(
+	'setup_theme',
+	static function (): void {
+		if ( class_exists( 'WC_Install' ) ) {
+			WC_Install::install();
 		}
 	}
 );
 ```
-
-wp-env names a plugin folder after its source, so a zip URL like `woocommerce.latest-stable.zip` becomes `woocommerce.latest-stable/`, not `woocommerce/`. Glob for the main file rather than hard-coding a folder name.
 
 ## Transactions: What Resets And What Does Not
 
@@ -92,13 +108,18 @@ When expectations genuinely differ, use the skip helpers rather than branching o
 
 ## Adding Companion Plugins
 
-Add them to `plugins` in `.wp-env.json`, which is yours to edit:
+Add them to `plugins` in `.wp-env.json`, which is yours to edit, **before** this plugin:
 
 ```json
-"plugins": [ ".", "https://downloads.wordpress.org/plugin/woocommerce.latest-stable.zip" ]
+"plugins": [ "https://downloads.wordpress.org/plugin/woocommerce.zip", "." ]
 ```
 
-Then `npm run env:destroy && npm run env:start`. Tests that need a companion plugin must skip themselves when it is absent, so the suite still passes on an install that does not have it.
+Two things about that line are load-bearing:
+
+- **Order.** wp-env activates the plugins in the order listed, and WordPress refuses to activate a plugin whose `Requires Plugins` are not active yet. A requirement listed after `.` stops `npm run env:start`.
+- **The unversioned URL.** wp-env names a plugin's folder after its zip file, so `woocommerce.latest-stable.zip` lands in `woocommerce.latest-stable/`. WordPress matches `Requires Plugins: woocommerce` against the folder name and does not find it. `woocommerce.zip` is the same release and lands in `woocommerce/`. To pin a version use `woocommerce.9.8.1.zip`: wp-env strips a trailing version from the name.
+
+Then `npm run env:destroy && npm run env:start`, and add the slug to the list in `tests/Integration/bootstrap-extra.php` so the integration suite loads it. Tests that need a companion plugin must skip themselves when it is absent, so the suite still passes on an install that does not have it.
 
 ## Pinning The WordPress Version
 

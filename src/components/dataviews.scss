@@ -1,0 +1,51 @@
+// Webhead scaffold managed file. scaffold:update may refresh this file.
+//
+// What the house adds to a DataViews table, wherever one is rendered. It
+// arrives with `src/components/DataViews.js`.
+
+// A table takes the brand as every other part of a screen does: a selected
+// row's checkbox, an active filter and the count beside it are black, and the
+// focus ring is green. There used to be a rule here that made the accent green
+// inside a table, which gave one screen two accents.
+
+// A long value in a table cell. DataViews lays a cell out as one line that does
+// not wrap, so a column given a width cuts its text off at the edge with
+// nothing to say there was more. Wrap the value in this class from the field's
+// `render` and it takes two lines and ends in an ellipsis:
+//
+//     render: ( { item } ) => <span className="webhead-search-cloud-cell-clamp">{ item.note }</span>
+//
+// Clamping the cell itself does not work. DataViews makes the cell's wrapper a
+// flex row that does not wrap, through a selector more specific than a class of
+// ours.
+.webhead-search-cloud-cell-clamp {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	overflow-wrap: anywhere;
+	white-space: normal;
+}
+
+// A dataset without media, in the grid layout. DataViews draws an empty media
+// box above every card even when the view says `showMedia: false`, and it puts
+// the selection checkbox and the actions button in the top corners of the card,
+// over the media. With the box hidden they would sit over the title, so the
+// title keeps clear of both. Put this class on an element around the table:
+//
+//     <div className="webhead-search-cloud-dataviews--no-media"><DataViews … /></div>
+//
+// This reaches into DataViews through its own class names, because the
+// component has no way to say that a dataset has no media. Remove it when it
+// has one.
+.webhead-search-cloud-dataviews--no-media {
+	.dataviews-view-grid__media--placeholder {
+		display: none;
+	}
+
+	// As specific as the rule it adds to: DataViews pads this element through
+	// the grid and the card, and a shorter selector loses to it.
+	:is(.dataviews-view-grid, .dataviews-view-grid-infinite-scroll) .dataviews-view-grid__card .dataviews-view-grid__title-actions {
+		padding-inline: calc(var(--wpds-dimension-size-2xs) + 2 * var(--wpds-dimension-padding-sm));
+	}
+}

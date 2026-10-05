@@ -83,11 +83,13 @@
         "test:integration": "\"vendor/bin/phpunit\" --configuration phpunit-integration.xml.dist",
         "post-install-cmd": [
             "\"vendor/bin/mozart\" compose",
-            "composer dump-autoload"
+            "composer dump-autoload",
+            "\"vendor/bin/webhead\" bundle:prune --path=."
         ],
         "post-update-cmd": [
             "\"vendor/bin/mozart\" compose",
-            "composer dump-autoload"
+            "composer dump-autoload",
+            "\"vendor/bin/webhead\" bundle:prune --path=."
         ],
         "framework:update": "\"vendor/bin/webhead\" scaffold:update --path=.",
         "make-pot": "wp i18n make-pot . languages/webhead-search-cloud.pot --domain=webhead-search-cloud --exclude=.agents,.claude,.codex,tests,docs,node_modules,vendor,public,languages,includes/Dependencies,includes/classes"
