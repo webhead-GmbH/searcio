@@ -47,6 +47,12 @@
         "process-timeout": 0
     },
     "extra": {
+        "webhead": {
+            "exclude-modules": [
+                "updates",
+                "command-runner"
+            ]
+        },
         "mozart": {
             "dep_namespace": "Webhead\\WP\\SearchCloud\\Dependencies\\",
             "dep_directory": "/includes/Dependencies/",
