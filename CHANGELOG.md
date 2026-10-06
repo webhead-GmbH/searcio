@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.0
 
 - **WordPress 6.8 is now the minimum**, up from 6.0. It is the version the framework is built and tested for, and the header had been promising more than the plugin delivered: the settings screen has needed 6.2 since it moved to React 18, and is written against the components of a current WordPress. A site on an older release keeps the version it has and is not offered this one.
 - **A page without search costs nothing.** The plugin boots on every request, and on a page with no search trigger it used to send a database query and translate eleven strings before deciding it had nothing to do. It now sends no query and loads no translation there: the storefront script and what it is given are only prepared by a block or a widget that is actually on the page.

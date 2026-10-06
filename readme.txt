@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -77,6 +77,28 @@ To rebuild it, check the repository out and run `npm install` followed by
 `npm run build`.
 
 == Changelog ==
+
+= 1.2.0 =
+- Requires WordPress 6.8 or newer, up from 6.0. A site on an older WordPress keeps the version it has.
+- Fixed a sync that met an error staying paused until somebody resumed it by hand. Until then no scheduled sync ran and no change made in the shop was sent, so a price or a stock level could be wrong in the search for days. A sync that cannot reach Search Cloud now stays running, says when it tries again, and sends the same batch after 1, 2, 5, 10, 15 and 30 minutes. If that fails too it ends as failed, which lets the changes through again.
+- The daily scheduled sync continues a paused sync. A sync an earlier version left paused comes back within a day of updating (or at once with Resume), and a pause made by hand now lasts until the next scheduled sync at the latest. The Sync tab says so while a sync is paused.
+- A batch that is sent again is counted once in a sync's Processed and Failed numbers.
+- `wp webhead-search-cloud sync run` waits and tries again as the background sync does, and exits with an error when the sync did not complete. It used to report a failed sync as completed.
+- Fixed result cards designed in Search Cloud showing an empty search modal, since 1.0.2. They are drawn again, and as the panel draws them: without the plugin's own card frame round them, and without the site's styles for headings, links and images reaching into them.
+- The search looks the same on a site that styles every element. A customized Elementor kit, or a theme's rules for buttons, fields, links and headings, no longer changes the modal's chips, filters, fields and cards. The site's own font, text size and text colour are still followed.
+- Theming through the `--whsc-*` properties is unchanged. A rule of your own that restyles a `.whsc-*` element directly now needs `!important` to win.
+- New: the arrow keys move through the search suggestions, and Enter searches for the one they are on.
+- A link in an AI assistant reply is shown as a link instead of as brackets and an address. Only an http(s) address or a path on your site becomes one.
+- Fixed the results carousel in right-to-left languages: its arrows, its page dots and the arrow keys work there now.
+- Keyboard focus rings are drawn whole on filter chips, carousel cards, the Compare switch and the compare table, and at the same width on every screen.
+- The message shown when a search or a photo search fails matches the rest of the modal, and the search box's placeholder follows the colour of the box's text.
+- A page without a search trigger no longer costs a database query and the loading of translations.
+- The settings screen is redrawn with WordPress's current components: one title, a tab strip that scrolls on a phone, and the same cards, fields and notices throughout.
+- A settings screen that could not load says why and offers to try again, and a save that fails is reported beside its button with the reason.
+- Clearing the sync history, deleting a run from it and disconnecting from Search Cloud ask for confirmation first.
+- The Elementor widgets are listed under "webhead Search Cloud" in the editor panel instead of "General". Widgets already on a page are unaffected.
+- REST routes describe their parameters, so a value of the wrong shape is refused with a 400.
+- Updated the webhead plugin framework to 1.4.0. The package no longer carries the framework's updater or its command runner.
 
 = 1.1.0 =
 - New: search by photo. Shoppers can upload a photo instead of typing, and see the tags the vision model read.
