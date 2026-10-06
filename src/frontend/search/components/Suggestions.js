@@ -4,19 +4,35 @@ import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * The id of one option, which the search field names as its active descendant
+ * while the arrow keys move through the list.
+ *
+ * @param {string} id    The list's id.
+ * @param {number} index
+ * @return {string}
+ */
+export const optionId = ( id, index ) => `${ id }-option-${ index }`;
+
+/**
  * Floating, dismissible autocomplete dropdown anchored under the search
  * input. Never pushes page content — it's absolutely positioned by its
  * parent (a `position: relative` wrapper) — and closes on an explicit
  * button, outside click, or Escape (captured before the modal's own Escape
  * handler so it dismisses the dropdown first, not the whole modal).
  *
+ * The arrow keys are the search field's (see `SearchModal`): focus stays in
+ * the field, where the visitor is typing, and the option they have moved to is
+ * marked here and named to assistive technology through the field's
+ * `aria-activedescendant`.
+ *
  * @param {Object}                props
  * @param {string}                props.id
  * @param {string[]}              props.suggestions
+ * @param {number}                [props.activeIndex] The option the arrow keys are on, or -1.
  * @param {(label: string) => void} props.onSelect
  * @param {() => void}            props.onDismiss
  */
-const Suggestions = ( { id, suggestions, onSelect, onDismiss } ) => {
+const Suggestions = ( { id, suggestions, activeIndex = -1, onSelect, onDismiss } ) => {
 	const containerRef = useRef( null );
 
 	useEffect( () => {
@@ -45,6 +61,18 @@ const Suggestions = ( { id, suggestions, onSelect, onDismiss } ) => {
 		};
 	}, [ onDismiss ] );
 
+	// A long list scrolls inside the modal; the option the keys moved to is
+	// brought into view, and nothing moves when it already is.
+	useEffect( () => {
+		if ( activeIndex < 0 ) {
+			return;
+		}
+
+		containerRef.current?.ownerDocument
+			.getElementById( optionId( id, activeIndex ) )
+			?.scrollIntoView?.( { block: 'nearest' } );
+	}, [ id, activeIndex ] );
+
 	return (
 		<div className="whsc-suggestions" ref={ containerRef }>
 			<Button
@@ -60,13 +88,14 @@ const Suggestions = ( { id, suggestions, onSelect, onDismiss } ) => {
 				role="listbox"
 				aria-label={ __( 'Search suggestions', 'webhead-search-cloud' ) }
 			>
-				{ suggestions.map( ( label ) => (
+				{ suggestions.map( ( label, index ) => (
 					<li key={ label } role="presentation">
 						<button
 							type="button"
-							className="whsc-suggestion"
+							id={ optionId( id, index ) }
+							className={ `whsc-suggestion${ index === activeIndex ? ' is-active' : '' }` }
 							role="option"
-							aria-selected="false"
+							aria-selected={ index === activeIndex }
 							onClick={ () => onSelect( label ) }
 						>
 							{ label }

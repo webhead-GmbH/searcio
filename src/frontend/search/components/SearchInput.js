@@ -19,6 +19,7 @@ const SearchInput = forwardRef( ( {
 	autoFocus,
 	suggestionsId,
 	suggestionsOpen,
+	activeSuggestionId,
 }, ref ) => (
 	<div className="whsc-search-input">
 		<Icon icon={ search } className="whsc-search-input__icon" />
@@ -33,6 +34,9 @@ const SearchInput = forwardRef( ( {
 			aria-autocomplete="list"
 			aria-expanded={ !! suggestionsOpen }
 			aria-controls={ suggestionsId }
+			// The suggestion the arrow keys are on. Focus stays here, in the
+			// field; this is how a screen reader hears where the keys went.
+			aria-activedescendant={ activeSuggestionId || undefined }
 			autoFocus={ autoFocus }
 			autoComplete="off"
 			onChange={ ( event ) => onChange( event.target.value ) }

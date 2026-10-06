@@ -976,10 +976,21 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	transition: background-color 0.15s ease, color 0.15s ease;
 
 	&:hover,
-	&:focus-visible {
+	&:focus-visible,
+	&.is-active {
 		color: var(--whsc-suggestion-text-hover, var(--whsc-suggestion-text));
 		background: var(--whsc-suggestion-bg-hover);
 		outline: none;
+	}
+
+	// Reached from the keyboard, by Tab or by the arrow keys of the search
+	// field (`.is-active`): the fill alone is the pointer's mark, and too
+	// faint to be the only sign of where the keys are. Inside the item, as
+	// on a popular search, because the list scrolls.
+	&:focus-visible,
+	&.is-active {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: -2px;
 	}
 }
 
