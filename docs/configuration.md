@@ -70,7 +70,8 @@ Rows use the same product cards as the search modal, in the plugin's default sty
 ## Sync
 
 - **Start sync** / **Re-sync everything** — start a normal incremental-aware sync, or force a full re-send that ignores what's already indexed (uses more of your document quota; use this after a mapping change you want retroactively applied, or if you suspect the index has drifted).
-- **Pause / Resume / Cancel** — control over the currently active run.
+- **Pause / Resume / Cancel** — control over the currently active run. While a sync is paused, changes made in the shop are not sent to Search Cloud either: they wait for it to finish. A pause therefore lasts until the next scheduled sync at the latest, which continues the paused run.
+- **When Search Cloud does not answer** — the run stays *Running*, says when it tries again, and sends the same batch after 1, 2, 5, 10, 15 and 30 minutes. After that it ends as *Failed*; changes made in the shop are sent again from then on, and the next scheduled sync starts over. To have it tried at once, pause the run and resume it.
 - **Sync history** — a sortable, filterable table of past runs (status, trigger, processed/pushed/deleted counts, timestamps), with per-row delete and a bulk "clear finished" action.
 
 ## General

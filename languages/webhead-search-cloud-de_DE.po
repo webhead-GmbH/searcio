@@ -975,15 +975,29 @@ msgstr "Tariflimit für %1$s erreicht (Limit %2$s). Upgrade deinen Tarif oder re
 msgid "Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr "Dein Search Cloud-Tariflimit wurde erreicht. Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
 
-#: includes/Sync/Sync_Service.php:749
-msgid "Could not reach Search Cloud. The sync is paused and will retry."
-msgstr "Search Cloud konnte nicht erreicht werden. Die Synchronisierung ist pausiert und wird erneut versucht."
-
-#. translators: %d: HTTP status code.
-#: includes/Sync/Sync_Service.php:754
+#. translators: %s: a length of time, such as "5 mins".
+#: includes/Sync/Sync_Service.php:899
 #, php-format
-msgid "Search Cloud returned an error (HTTP %d). The sync is paused and will retry."
-msgstr "Search Cloud hat einen Fehler zurückgegeben (HTTP %d). Die Synchronisierung ist pausiert und wird erneut versucht."
+msgid "Could not reach Search Cloud. The sync tries again in %s."
+msgstr "Search Cloud konnte nicht erreicht werden. Die Synchronisierung versucht es in %s erneut."
+
+#. translators: 1: HTTP status code, 2: a length of time, such as "5 mins".
+#: includes/Sync/Sync_Service.php:906
+#, php-format
+msgid "Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s."
+msgstr "Search Cloud hat einen Fehler zurückgegeben (HTTP %1$d). Die Synchronisierung versucht es in %2$s erneut."
+
+#. translators: %d: number of tries.
+#: includes/Sync/Sync_Service.php:921
+#, php-format
+msgid "Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers."
+msgstr "Search Cloud konnte in %d Versuchen nicht erreicht werden, deshalb wurde diese Synchronisierung beendet. Die nächste geplante Synchronisierung beginnt von vorn; zwischenzeitliche Änderungen werden gesendet, sobald Search Cloud wieder antwortet."
+
+#. translators: 1: HTTP status code, 2: number of tries.
+#: includes/Sync/Sync_Service.php:928
+#, php-format
+msgid "Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers."
+msgstr "Search Cloud hat in %2$d Versuchen einen Fehler zurückgegeben (HTTP %1$d), deshalb wurde diese Synchronisierung beendet. Die nächste geplante Synchronisierung beginnt von vorn; zwischenzeitliche Änderungen werden gesendet, sobald Search Cloud wieder antwortet."
 
 #: includes/WP_CLI/Sync_Command.php:107
 #: includes/WP_CLI/Sync_Command.php:151

@@ -249,8 +249,19 @@ const SyncTab = () => {
 								</Grid>
 
 								{active.last_error && (
-									<Notice.Root intent="error">
+									// A run that is waiting to send a batch again is still
+									// running, and says when it tries: that is a warning.
+									// Anything else a run says about itself is an error.
+									<Notice.Root intent={active.status === 'running' && active.cursor?.retries > 0 ? 'warning' : 'error'}>
 										<Notice.Description>{active.last_error}</Notice.Description>
+									</Notice.Root>
+								)}
+
+								{active.status === 'paused' && (
+									<Notice.Root intent="info">
+										<Notice.Description>
+											{__('While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before.', 'webhead-search-cloud')}
+										</Notice.Description>
 									</Notice.Root>
 								)}
 

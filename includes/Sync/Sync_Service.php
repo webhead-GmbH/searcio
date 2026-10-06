@@ -40,8 +40,28 @@ final class Sync_Service {
 	private const BATCH_SIZE           = 200;
 	private const MAX_BATCHES_PER_TICK = 5;
 	private const TICK_DELAY           = 5;
-	private const BACKOFF_DELAY        = 60;
 	private const PRUNE_PER_TICK       = 100;
+
+	/**
+	 * How long a run waits before it sends a batch the index did not take
+	 * again: a minute after the first failure, then longer each time. The
+	 * client has already tried each request a few times within seconds, so
+	 * what gets here is an index that is down, not one that hiccuped.
+	 *
+	 * The waits add up to a little over an hour. A run that still cannot write
+	 * then is given up: it holds the one active slot, and while it does the
+	 * incremental drain sends no change and no scheduled sync starts.
+	 *
+	 * @var array<int,int>
+	 */
+	private const RETRY_DELAYS = [
+		MINUTE_IN_SECONDS,
+		2 * MINUTE_IN_SECONDS,
+		5 * MINUTE_IN_SECONDS,
+		10 * MINUTE_IN_SECONDS,
+		15 * MINUTE_IN_SECONDS,
+		30 * MINUTE_IN_SECONDS,
+	];
 
 	/**
 	 * Wall-clock budget for one tick. A prune batch costs one HTTP round trip
@@ -60,8 +80,9 @@ final class Sync_Service {
 
 	/**
 	 * How long a scheduled tick may be overdue before the worker is treated as
-	 * dead. A healthy run reschedules itself within {@see self::BACKOFF_DELAY}
-	 * seconds, so anything past that plus a margin means WP-Cron is not firing
+	 * dead. A run schedules its next tick itself, seconds ahead or, while it
+	 * waits to try a failed batch again, up to half an hour ahead; a tick that
+	 * is this long past its time means WP-Cron is not firing
 	 * (DISABLE_WP_CRON, no site traffic) or a fatal killed the tick. Operator
 	 * control actions must then act directly instead of parking a between-batch
 	 * signal that no live tick will ever read.
@@ -113,6 +134,7 @@ final class Sync_Service {
 			'phase'      => 'index',
 			'type_index' => 0,
 			'last_id'    => 0,
+			'retries'    => 0,
 		];
 
 		$id = $this->state->create( $trigger, $user_id, $force, $this->estimate_total( $types ), $cursor );
@@ -146,7 +168,8 @@ final class Sync_Service {
 		$id     = (int) $run['id'];
 		$status = (string) $run['status'];
 
-		// Only a running row advances; paused/queued rows wait for an explicit resume.
+		// Only a running row advances. A paused one waits for Resume, or for
+		// the next scheduled sync, which resumes it: see run_scheduled().
 		if ( Sync_Status::Running->value !== $status ) {
 			return;
 		}
@@ -222,6 +245,7 @@ final class Sync_Service {
 			}
 
 			$type   = $types[ $cursor['type_index'] ];
+			$before = $counters;
 			$result = $this->index_batch( $type, (int) $cursor['last_id'], $force, $cv, $counters );
 
 			if ( 'plan_limit' === $result['outcome'] ) {
@@ -232,14 +256,48 @@ final class Sync_Service {
 			}
 
 			if ( 'error' === $result['outcome'] ) {
-				// Transient failure survived the client's own retries: pause with an
-				// actionable error and try again on a later, slower tick.
+				/*
+				 * The index did not take the batch, after the client's own tries.
+				 * The run stays running and sends the same batch again later,
+				 * waiting longer each time. It used to be set to Paused here with
+				 * a tick scheduled "to retry", but a tick does not advance a
+				 * paused run: nothing ever resumed it, and it held the active slot
+				 * until somebody pressed Resume.
+				 *
+				 * Nothing of the batch is counted: it is read again on the next
+				 * try, and counting each try would have the run process more than
+				 * there is. Its documents count as failed once, when the run stops
+				 * trying.
+				 */
+				$counters = $before;
+				$cursor['retries']++;
+				$given_up = $cursor['retries'] > count( self::RETRY_DELAYS );
+
+				if ( $given_up ) {
+					$counters['failed_count'] += $result['failed'];
+				}
+
 				$this->persist( $id, $cursor, $counters );
-				$this->state->save( $id, [ 'last_error' => $result['message'] ] );
-				$this->state->set_status( $id, Sync_Status::Paused );
-				$this->schedule_tick( self::BACKOFF_DELAY );
+
+				if ( $given_up ) {
+					$this->state->finish( $id, Sync_Status::Failed, $this->given_up_message( $result['response'], $cursor['retries'] ) );
+					$this->clear_tick();
+
+					return;
+				}
+
+				$delay = self::RETRY_DELAYS[ $cursor['retries'] - 1 ];
+
+				$this->state->save( $id, [ 'last_error' => $this->retry_message( $result['response'], $delay ) ] );
+				$this->schedule_tick( $delay );
 
 				return;
+			}
+
+			if ( $cursor['retries'] > 0 ) {
+				// The index is taking writes again: the failure is behind the run.
+				$cursor['retries'] = 0;
+				$this->state->save( $id, [ 'last_error' => null ] );
 			}
 
 			if ( $result['exhausted'] ) {
@@ -275,6 +333,17 @@ final class Sync_Service {
 				$this->schedule_tick( self::TICK_DELAY );
 			}
 
+			/*
+			 * A paused run holds the slot as well, and nothing but a person ends
+			 * a pause. The scheduled sync is the site's promise that the index
+			 * is brought up to date every day, and a pause does not take that
+			 * back: it lasts until this runs at the latest. That also picks up
+			 * the runs earlier versions paused at their first failure and left.
+			 */
+			if ( Sync_Status::Paused->value === (string) $active['status'] ) {
+				$this->resume( (int) $active['id'] );
+			}
+
 			return;
 		}
 
@@ -300,7 +369,12 @@ final class Sync_Service {
 		// the worker is dead (cron not firing, or a fatal killed the tick) no
 		// tick will ever read that signal, so pause the run directly — the cursor
 		// is already persisted, so a later resume continues where it left off.
-		if ( $this->worker_alive() ) {
+		// A run that is waiting to try a batch again has no tick at work either:
+		// its next one is minutes away, and is not needed once it is paused.
+		if ( $this->awaits_retry( $run ) ) {
+			$this->clear_tick();
+			$this->state->set_status( $id, Sync_Status::Paused );
+		} elseif ( $this->worker_alive() ) {
 			$this->state->request_control( $id, Sync_Control::Pause );
 		} else {
 			$this->state->set_status( $id, Sync_Status::Paused );
@@ -316,7 +390,17 @@ final class Sync_Service {
 			return false;
 		}
 
-		$this->state->save( $id, [ 'last_error' => null ] );
+		// Whoever resumes it wants it tried now, and from the shortest wait.
+		$cursor            = $this->cursor( $run );
+		$cursor['retries'] = 0;
+
+		$this->state->save(
+			$id,
+			[
+				'last_error' => null,
+				'cursor'     => $cursor,
+			]
+		);
 		$this->state->set_status( $id, Sync_Status::Running );
 		$this->schedule_tick( self::TICK_DELAY );
 
@@ -336,7 +420,7 @@ final class Sync_Service {
 		// tick worker is dead (cron not firing, a fatal killed it) — has no tick
 		// in flight to honour that signal, so finish it directly: clear any stray
 		// scheduled tick and free the single active slot so a new sync can start.
-		if ( Sync_Status::Running === $status && $this->worker_alive() ) {
+		if ( Sync_Status::Running === $status && $this->worker_alive() && ! $this->awaits_retry( $run ) ) {
 			$this->state->request_control( $id, Sync_Control::Cancel );
 		} else {
 			$this->jobs->unschedule( Sync_Keys::HOOK_TICK );
@@ -357,6 +441,35 @@ final class Sync_Service {
 		$next = $this->jobs->next_run( Sync_Keys::HOOK_TICK );
 
 		return false !== $next && $next > time() - self::STALE_TICK_GRACE;
+	}
+
+	/**
+	 * Seconds until the active run sends a batch the index did not take again,
+	 * or 0 when it is not waiting to. For a caller that drives the run itself,
+	 * as `wp webhead-search-cloud sync run` does, and so has to wait as WP-Cron
+	 * would.
+	 */
+	public function seconds_until_retry(): int {
+		$run = $this->state->active();
+
+		if ( null === $run || Sync_Status::Running->value !== (string) $run['status'] || ! $this->awaits_retry( $run ) ) {
+			return 0;
+		}
+
+		$next = $this->jobs->next_run( Sync_Keys::HOOK_TICK );
+
+		return false === $next ? 0 : max( 0, (int) $next - time() );
+	}
+
+	/**
+	 * Is the run between two tries of a batch the index did not take? No tick
+	 * is at work then, and the next one can be half an hour away, so a control
+	 * action acts on the run itself rather than leave a signal for that tick.
+	 *
+	 * @param  array<string,mixed>  $run
+	 */
+	private function awaits_retry( array $run ): bool {
+		return $this->cursor( $run )['retries'] > 0;
 	}
 
 	public function apply_retention(): void {
@@ -384,7 +497,7 @@ final class Sync_Service {
 
 	/**
 	 * @param  array<string,int>  $counters  Mutated in place.
-	 * @return array{outcome:string,exhausted:bool,last_id:int,message?:string}
+	 * @return array{outcome:string,exhausted:bool,last_id:int,message?:string,response?:Api_Response,failed?:int}
 	 */
 	private function index_batch( string $type, int $after_id, bool $force, int $cv, array &$counters ): array {
 		$ids = $this->next_ids( $type, $after_id, self::BATCH_SIZE );
@@ -453,13 +566,12 @@ final class Sync_Service {
 			}
 
 			if ( ! $response->ok() ) {
-				$counters['failed_count'] += count( $documents );
-
 				return [
 					'outcome'   => 'error',
 					'exhausted' => false,
 					'last_id'   => $after_id,
-					'message'   => $this->error_message( $response ),
+					'response'  => $response,
+					'failed'    => count( $documents ),
 				];
 			}
 
@@ -685,8 +797,11 @@ final class Sync_Service {
 	}
 
 	/**
+	 * `retries` counts the tries of the current batch that failed one after the
+	 * other; a batch the index takes sets it back to 0.
+	 *
 	 * @param  array<string,mixed>  $run
-	 * @return array{phase:string,type_index:int,last_id:int}
+	 * @return array{phase:string,type_index:int,last_id:int,retries:int}
 	 */
 	private function cursor( array $run ): array {
 		$cursor = json_decode( (string) ( $run['cursor_state'] ?? '' ), true );
@@ -696,6 +811,7 @@ final class Sync_Service {
 			'phase'      => isset( $cursor['phase'] ) ? (string) $cursor['phase'] : 'index',
 			'type_index' => (int) ( $cursor['type_index'] ?? 0 ),
 			'last_id'    => (int) ( $cursor['last_id'] ?? 0 ),
+			'retries'    => max( 0, (int) ( $cursor['retries'] ?? 0 ) ),
 		];
 	}
 
@@ -769,15 +885,49 @@ final class Sync_Service {
 		return __( 'Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync.', 'webhead-search-cloud' );
 	}
 
-	private function error_message( Api_Response $response ): string {
+	/**
+	 * What a run says while it waits to send a batch again.
+	 *
+	 * @param  int  $delay  Seconds until the next try.
+	 */
+	private function retry_message( Api_Response $response, int $delay ): string {
+		$wait = human_time_diff( time(), time() + $delay );
+
 		if ( $response->transport_error ) {
-			return __( 'Could not reach Search Cloud. The sync is paused and will retry.', 'webhead-search-cloud' );
+			return sprintf(
+				/* translators: %s: a length of time, such as "5 mins". */
+				__( 'Could not reach Search Cloud. The sync tries again in %s.', 'webhead-search-cloud' ),
+				$wait
+			);
 		}
 
 		return sprintf(
-			/* translators: %d: HTTP status code. */
-			__( 'Search Cloud returned an error (HTTP %d). The sync is paused and will retry.', 'webhead-search-cloud' ),
-			$response->status
+			/* translators: 1: HTTP status code, 2: a length of time, such as "5 mins". */
+			__( 'Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s.', 'webhead-search-cloud' ),
+			$response->status,
+			$wait
+		);
+	}
+
+	/**
+	 * What a run says when it stops trying.
+	 *
+	 * @param  int  $tries  How many times the batch was sent.
+	 */
+	private function given_up_message( Api_Response $response, int $tries ): string {
+		if ( $response->transport_error ) {
+			return sprintf(
+				/* translators: %d: number of tries. */
+				__( 'Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'webhead-search-cloud' ),
+				$tries
+			);
+		}
+
+		return sprintf(
+			/* translators: 1: HTTP status code, 2: number of tries. */
+			__( 'Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'webhead-search-cloud' ),
+			$response->status,
+			$tries
 		);
 	}
 }

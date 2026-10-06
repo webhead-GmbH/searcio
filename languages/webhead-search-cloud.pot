@@ -3,13 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: webhead Search Cloud 1.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/relaxed-knuth-33d071\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/webhead-search-cloud\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-05T16:36:21+00:00\n"
+"POT-Creation-Date: 2026-10-06T14:33:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -220,10 +220,10 @@ msgid "Search…"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:161
-#: src/frontend/search/components/SearchInput.js:31
-#: src/frontend/search/components/SearchModal.js:1032
-#: src/frontend/search/components/SearchModal.js:1053
-#: src/frontend/search/components/SearchModal.js:1121
+#: src/frontend/search/components/SearchInput.js:32
+#: src/frontend/search/components/SearchModal.js:1086
+#: src/frontend/search/components/SearchModal.js:1107
+#: src/frontend/search/components/SearchModal.js:1176
 #: src/frontend/search/components/Trigger.js:22
 msgid "Search"
 msgstr ""
@@ -287,8 +287,8 @@ msgid "Hide"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:226
-#: src/frontend/search/components/SearchModal.js:955
-#: src/frontend/search/components/SearchModal.js:976
+#: src/frontend/search/components/SearchModal.js:1009
+#: src/frontend/search/components/SearchModal.js:1030
 msgid "Results"
 msgstr ""
 
@@ -824,7 +824,7 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:1081
 #: src/blocks/search/edit.js:319
-#: src/frontend/search/components/SearchModal.js:1066
+#: src/frontend/search/components/SearchModal.js:1120
 msgid "AI Assistant"
 msgstr ""
 
@@ -1052,13 +1052,13 @@ msgid "Dot color (active)"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:104
-#: src/frontend/search/components/SearchModal.js:1016
-#: src/frontend/search/components/SearchModal.js:1273
+#: src/frontend/search/components/SearchModal.js:1070
+#: src/frontend/search/components/SearchModal.js:1331
 msgid "No results found."
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:105
-#: src/frontend/search/components/SearchModal.js:1258
+#: src/frontend/search/components/SearchModal.js:1316
 msgid "Searching…"
 msgstr ""
 
@@ -1074,8 +1074,8 @@ msgid "Sale"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:109
-#: src/frontend/search/components/SearchModal.js:556
-#: src/frontend/search/components/SearchModal.js:825
+#: src/frontend/search/components/SearchModal.js:558
+#: src/frontend/search/components/SearchModal.js:827
 msgid "Search is unavailable right now."
 msgstr ""
 
@@ -1093,23 +1093,23 @@ msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:112
 #: src/frontend/search/components/RangeFilters.js:134
-#: src/frontend/search/components/SearchInput.js:45
+#: src/frontend/search/components/SearchInput.js:49
 msgid "Clear"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:113
-#: src/frontend/search/components/SearchModal.js:1092
-#: src/frontend/search/components/SearchModal.js:1154
+#: src/frontend/search/components/SearchModal.js:1146
+#: src/frontend/search/components/SearchModal.js:1209
 msgid "Close search"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:114
-#: src/frontend/search/components/SearchModal.js:1142
+#: src/frontend/search/components/SearchModal.js:1197
 msgid "Search by voice"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:115
-#: src/frontend/search/components/SearchModal.js:1189
+#: src/frontend/search/components/SearchModal.js:1245
 msgid "All"
 msgstr ""
 
@@ -1334,7 +1334,7 @@ msgid "That run could not be deleted. The active run is protected."
 msgstr ""
 
 #: includes/Routing/Sync_Endpoint.php:158
-#: includes/WP_CLI/Sync_Command.php:201
+#: includes/WP_CLI/Sync_Command.php:249
 msgid "That action is not available for the current run state."
 msgstr ""
 
@@ -1378,7 +1378,7 @@ msgstr ""
 
 #. translators: 1: document id, 2: HTTP status code.
 #: includes/Sync/Incremental_Service.php:230
-#: includes/Sync/Sync_Service.php:592
+#: includes/Sync/Sync_Service.php:704
 #, php-format
 msgid "Could not remove %1$s from the index (HTTP %2$d)."
 msgstr ""
@@ -1389,70 +1389,84 @@ msgstr ""
 msgid "Search Cloud rejected the update (HTTP %d)."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:89
+#: includes/Sync/Sync_Service.php:110
 msgid "Add and save your Search Cloud credentials before syncing."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:98
+#: includes/Sync/Sync_Service.php:119
 #: src/admin/settings/components/tabs/SyncTab.js:198
 msgid "No content types are enabled for indexing yet."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:105
+#: includes/Sync/Sync_Service.php:126
 msgid "A sync is already in progress."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:123
+#: includes/Sync/Sync_Service.php:145
 msgid "Could not start the sync run."
 msgstr ""
 
 #. translators: 1: plan metric name, 2: plan limit.
-#: includes/Sync/Sync_Service.php:763
+#: includes/Sync/Sync_Service.php:879
 #, php-format
 msgid "Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:769
+#: includes/Sync/Sync_Service.php:885
 msgid "Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:774
-msgid "Could not reach Search Cloud. The sync is paused and will retry."
-msgstr ""
-
-#. translators: %d: HTTP status code.
-#: includes/Sync/Sync_Service.php:779
+#. translators: %s: a length of time, such as "5 mins".
+#: includes/Sync/Sync_Service.php:899
 #, php-format
-msgid "Search Cloud returned an error (HTTP %d). The sync is paused and will retry."
+msgid "Could not reach Search Cloud. The sync tries again in %s."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:107
-#: includes/WP_CLI/Sync_Command.php:151
+#. translators: 1: HTTP status code, 2: a length of time, such as "5 mins".
+#: includes/Sync/Sync_Service.php:906
+#, php-format
+msgid "Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s."
+msgstr ""
+
+#. translators: %d: number of tries.
+#: includes/Sync/Sync_Service.php:921
+#, php-format
+msgid "Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers."
+msgstr ""
+
+#. translators: 1: HTTP status code, 2: number of tries.
+#: includes/Sync/Sync_Service.php:928
+#, php-format
+msgid "Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers."
+msgstr ""
+
+#: includes/WP_CLI/Sync_Command.php:125
+#: includes/WP_CLI/Sync_Command.php:199
 msgid "Could not start the sync."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:131
+#: includes/WP_CLI/Sync_Command.php:179
 msgid "Sync completed."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:154
+#: includes/WP_CLI/Sync_Command.php:202
 #: src/admin/settings/components/tabs/SyncTab.js:151
 msgid "Sync started."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:166
+#: includes/WP_CLI/Sync_Command.php:214
 msgid "Sync paused."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:178
+#: includes/WP_CLI/Sync_Command.php:226
 msgid "Sync resumed."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:190
+#: includes/WP_CLI/Sync_Command.php:238
 msgid "Sync cancelled."
 msgstr ""
 
-#: includes/WP_CLI/Sync_Command.php:197
+#: includes/WP_CLI/Sync_Command.php:245
 msgid "There is no active sync."
 msgstr ""
 
@@ -1708,7 +1722,7 @@ msgstr ""
 #: src/admin/settings/components/tabs/ConnectionTab.js:397
 #: src/admin/settings/components/tabs/SyncHistory.js:284
 #: src/admin/settings/components/tabs/SyncHistory.js:378
-#: src/admin/settings/components/tabs/SyncTab.js:272
+#: src/admin/settings/components/tabs/SyncTab.js:281
 msgid "Cancel"
 msgstr ""
 
@@ -2094,7 +2108,7 @@ msgid "Ready"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:128
-#: src/admin/settings/components/tabs/SyncTab.js:250
+#: src/admin/settings/components/tabs/SyncTab.js:248
 #: src/admin/settings/syncStatus.js:12
 msgid "Failed"
 msgstr ""
@@ -2412,12 +2426,12 @@ msgid "Processed"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SyncHistory.js:231
-#: src/admin/settings/components/tabs/SyncTab.js:247
+#: src/admin/settings/components/tabs/SyncTab.js:245
 msgid "Pushed"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SyncHistory.js:238
-#: src/admin/settings/components/tabs/SyncTab.js:249
+#: src/admin/settings/components/tabs/SyncTab.js:247
 msgid "Deleted"
 msgstr ""
 
@@ -2489,7 +2503,7 @@ msgid "This sends new and changed content to Search Cloud. Continue?"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SyncTab.js:38
-#: src/admin/settings/components/tabs/SyncTab.js:287
+#: src/admin/settings/components/tabs/SyncTab.js:296
 msgid "Start sync"
 msgstr ""
 
@@ -2502,7 +2516,7 @@ msgid "This re-sends your entire catalog to Search Cloud, ignoring what’s alre
 msgstr ""
 
 #: src/admin/settings/components/tabs/SyncTab.js:43
-#: src/admin/settings/components/tabs/SyncTab.js:296
+#: src/admin/settings/components/tabs/SyncTab.js:305
 msgid "Re-sync everything"
 msgstr ""
 
@@ -2551,30 +2565,34 @@ msgid "Full re-sync"
 msgstr ""
 
 #. translators: %d: processed item count.
-#: src/admin/settings/components/tabs/SyncTab.js:233
+#: src/admin/settings/components/tabs/SyncTab.js:231
 #, js-format
 msgid "%d items processed…"
 msgstr ""
 
 #. translators: 1: processed, 2: estimated total, 3: percentage.
-#: src/admin/settings/components/tabs/SyncTab.js:238
+#: src/admin/settings/components/tabs/SyncTab.js:236
 #, js-format
 msgid "%1$s of ~%2$s processed (%3$d%%)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:248
+#: src/admin/settings/components/tabs/SyncTab.js:246
 msgid "Skipped"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:262
+#: src/admin/settings/components/tabs/SyncTab.js:263
+msgid "While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before."
+msgstr ""
+
+#: src/admin/settings/components/tabs/SyncTab.js:271
 msgid "Pause"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:267
+#: src/admin/settings/components/tabs/SyncTab.js:276
 msgid "Resume"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:313
+#: src/admin/settings/components/tabs/SyncTab.js:322
 msgid "Not now"
 msgstr ""
 
@@ -3011,7 +3029,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:321
-#: src/frontend/search/components/SearchModal.js:973
+#: src/frontend/search/components/SearchModal.js:1027
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -3030,20 +3048,20 @@ msgstr ""
 msgid "Remove from recent searches"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:173
+#: src/frontend/search/components/Carousel.js:188
 msgid "Previous"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:201
+#: src/frontend/search/components/Carousel.js:216
 msgid "Next"
 msgstr ""
 
-#: src/frontend/search/components/Carousel.js:207
+#: src/frontend/search/components/Carousel.js:222
 msgid "Pages"
 msgstr ""
 
 #. translators: %d: page number.
-#: src/frontend/search/components/Carousel.js:217
+#: src/frontend/search/components/Carousel.js:232
 #, js-format
 msgid "Go to page %d"
 msgstr ""
@@ -3124,7 +3142,7 @@ msgid "Your answers"
 msgstr ""
 
 #: src/frontend/search/components/QuizPane.js:403
-#: src/frontend/search/components/SearchModal.js:1002
+#: src/frontend/search/components/SearchModal.js:1056
 msgid "Loading…"
 msgstr ""
 
@@ -3164,89 +3182,89 @@ msgstr ""
 msgid "Clear %s filter"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:660
+#: src/frontend/search/components/SearchModal.js:662
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:662
+#: src/frontend/search/components/SearchModal.js:664
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:664
+#: src/frontend/search/components/SearchModal.js:666
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:666
+#: src/frontend/search/components/SearchModal.js:668
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:908
+#: src/frontend/search/components/SearchModal.js:962
 msgid "Your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:918
+#: src/frontend/search/components/SearchModal.js:972
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:934
-#: src/frontend/search/components/SearchModal.js:949
+#: src/frontend/search/components/SearchModal.js:988
+#: src/frontend/search/components/SearchModal.js:1003
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:954
-#: src/frontend/search/components/SearchModal.js:1257
+#: src/frontend/search/components/SearchModal.js:1008
+#: src/frontend/search/components/SearchModal.js:1315
 msgid "Looking at your photo…"
 msgstr ""
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:967
+#: src/frontend/search/components/SearchModal.js:1021
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:991
+#: src/frontend/search/components/SearchModal.js:1045
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1003
+#: src/frontend/search/components/SearchModal.js:1057
 msgid "Load more results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1015
+#: src/frontend/search/components/SearchModal.js:1069
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1040
+#: src/frontend/search/components/SearchModal.js:1094
 msgid "Search modes"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1080
+#: src/frontend/search/components/SearchModal.js:1134
 msgid "Product finder"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1182
+#: src/frontend/search/components/SearchModal.js:1238
 msgid "Filter by type"
 msgstr ""
 
 #. translators: 1: number of results shown. 2: total number of results found.
-#: src/frontend/search/components/SearchModal.js:1264
+#: src/frontend/search/components/SearchModal.js:1322
 #, js-format
 msgid "Showing %1$d of %2$d results."
 msgstr ""
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:1270
+#: src/frontend/search/components/SearchModal.js:1328
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/Suggestions.js:53
+#: src/frontend/search/components/Suggestions.js:81
 msgid "Dismiss suggestions"
 msgstr ""
 
-#: src/frontend/search/components/Suggestions.js:61
+#: src/frontend/search/components/Suggestions.js:89
 msgid "Search suggestions"
 msgstr ""
 
