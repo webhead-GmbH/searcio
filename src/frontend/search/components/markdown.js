@@ -12,9 +12,18 @@
  */
 import { createElement, Fragment } from '@wordpress/element';
 
-// `**bold**`, `*italic*`/`_italic_`, `` `code` ``. Ordered so the two-asterisk
-// form is matched before the single-asterisk one.
-const INLINE = /(\*\*[^*]+\*\*|__[^_]+__|\*[^*\n]+\*|_[^_\n]+_|`[^`\n]+`)/;
+import { leavesSite, safeHref } from '../../../utils/url';
+
+// `[label](address)`. The address has no spaces and may hold one pair of
+// brackets of its own, as in `/wiki/Parka_(coat)`. An image, `![label](address)`,
+// is read as a link to it: nothing is loaded into the page from an address the
+// model wrote, and its `!` does not stay behind in the text.
+const LINK = /^!?\[([^\]\n]+)\]\(((?:[^()\s]|\([^()\s]*\))+)\)$/;
+
+// A link, `**bold**`, `*italic*`/`_italic_`, `` `code` ``. The link comes
+// first, so an underscore in its address is not read as the start of italics,
+// and the two-asterisk form before the single-asterisk one.
+const INLINE = /(!?\[[^\]\n]+\]\((?:[^()\s]|\([^()\s]*\))+\)|\*\*[^*]+\*\*|__[^_]+__|\*[^*\n]+\*|_[^_\n]+_|`[^`\n]+`)/;
 
 const ORDERED_ITEM = /^\s*(\d+)[.)]\s+(.*)$/;
 const BULLET_ITEM = /^\s*[-*•]\s+(.*)$/;
@@ -33,6 +42,33 @@ const renderInline = ( text, keyPrefix ) =>
 		.filter( ( part ) => '' !== part )
 		.map( ( part, index ) => {
 			const key = `${ keyPrefix }-${ index }`;
+			const link = part.match( LINK );
+
+			if ( link ) {
+				const label = renderInline( link[ 1 ], key );
+				// The model wrote the address: only the web's own schemes and a
+				// path on this site become a link, and anything else stays the
+				// words it was the label of.
+				const href = safeHref( link[ 2 ] );
+
+				if ( '' === href ) {
+					return label;
+				}
+
+				return createElement(
+					'a',
+					{
+						key,
+						className: 'whsc-md__link',
+						href,
+						// Another site opens beside the shop, not instead of the
+						// conversation; the shop's own pages open in its place,
+						// as a result card does.
+						...( leavesSite( href ) ? { target: '_blank', rel: 'noopener noreferrer' } : {} ),
+					},
+					label
+				);
+			}
 
 			if ( part.startsWith( '**' ) && part.endsWith( '**' ) ) {
 				return createElement( 'strong', { key }, part.slice( 2, -2 ) );

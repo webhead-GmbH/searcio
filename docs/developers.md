@@ -100,6 +100,8 @@ A card designed in Search Cloud (`cardSource: server`, `src/frontend/search/comp
 
 The search field is a combobox and its suggestions a listbox (`SearchInput.js`, `Suggestions.js`). Focus stays in the field: the arrow keys are handled there (`onInputKeyDown()` in `SearchModal.js`), the option they are on is marked with `aria-selected` and `.is-active`, and the field names it in `aria-activedescendant`. Typing on clears the mark, so Enter never searches for a suggestion the visitor has typed past.
 
+An address that did not come from the plugin's own code goes through `safeHref()` (`src/utils/url.js`) before it becomes an `href` or reaches `window.location`: a search redirect a merchant configured, and a link the assistant wrote into a reply (`markdown.js`, which builds React elements and never markup). It follows an `http(s)` address or a path that starts with one slash, and nothing else; `//host` and `/\host` are another host in the clothes of a path.
+
 The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-out-color`. The search block (`stockInColor` / `stockOutColor`) and the Elementor search widget (`card_stock_in_color` / `card_stock_out_color`) set them for their modal; product rows (the products block and widget) have no style controls and take the defaults or site-wide CSS.
 
 ### Filters

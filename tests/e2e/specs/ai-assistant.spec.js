@@ -70,6 +70,62 @@ test.describe( 'AI Assistant tab', () => {
 	 * attribute to compare; Compare used to open a table with a header and no
 	 * body.
 	 */
+	/**
+	 * A reply read "The [size guide](https://example.test/size) helps." on
+	 * screen. The model writes the address, so only an address of the web or a
+	 * path on this site becomes a link.
+	 */
+	test( 'draws the links of a reply, and only the ones that are safe to follow', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantReply: [
+				'The [size guide](/size-guide/) helps with the fit.',
+				'',
+				'- [the maker](https://example.org/boots_(alpine)) has the care sheet',
+				'- [not a link](javascript:alert(1)) stays words',
+			].join( '\n' ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await page.getByRole( 'tab', { name: /assistant/i } ).click();
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'which size?' );
+		await input.press( 'Enter' );
+
+		const reply = page.locator( '.whsc-assistant__msg--assistant .whsc-assistant__bubble' );
+		const links = reply.getByRole( 'link' );
+
+		await expect( reply ).toContainText( 'The size guide helps with the fit.' );
+		await expect( reply ).not.toContainText( '](' );
+		await expect( links ).toHaveCount( 2 );
+
+		// A page of this shop opens in place.
+		const own = reply.getByRole( 'link', { name: 'size guide' } );
+
+		await expect( own ).toHaveAttribute( 'href', '/size-guide/' );
+		await expect( own ).not.toHaveAttribute( 'target', /.+/ );
+
+		// Another site opens beside the shop, and is not handed the opener.
+		const other = reply.getByRole( 'link', { name: 'the maker' } );
+
+		await expect( other ).toHaveAttribute( 'href', 'https://example.org/boots_(alpine)' );
+		await expect( other ).toHaveAttribute( 'target', '_blank' );
+		await expect( other ).toHaveAttribute( 'rel', 'noopener noreferrer' );
+
+		// A scheme that runs script is words and nothing else.
+		await expect( reply ).toContainText( 'not a link stays words' );
+		await expect( reply ).not.toContainText( 'javascript' );
+
+		// It reads as a link without relying on colour, and shows where the keys are.
+		expect( await own.evaluate( ( el ) => window.getComputedStyle( el ).textDecorationLine ) ).toBe( 'underline' );
+		await own.focus();
+		await page.keyboard.press( 'Shift' );
+		expect( await own.evaluate( ( el ) => window.getComputedStyle( el ).outlineStyle ) ).toBe( 'solid' );
+	} );
+
 	test( 'offers Compare only when the products have something to compare', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			assistant: true,

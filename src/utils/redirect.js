@@ -6,6 +6,7 @@
  * `{query, redirect}` — no `hits`, no `total`, no `facets` — and the visitor
  * should be sent to that URL instead of being shown a results list.
  */
+import { safeHref } from './url';
 
 /**
  * A redirect response is recognised by the presence of the key, not by the
@@ -28,25 +29,10 @@ export const isRedirect = ( response ) => 'string' === typeof response?.redirect
  * Protocol-relative (`//host/path`) is not accepted. It passes a naive
  * "starts with /" check while actually pointing at another host, and a
  * merchant who means an external destination can write the scheme - which is
- * what the documented example does.
+ * what the documented example does. `safeHref()` holds the rule, which a link
+ * in an assistant's reply is held to as well.
  *
  * @param {Object} response A `/search` response.
  * @return {string}
  */
-export const redirectTarget = ( response ) => {
-	if ( ! isRedirect( response ) ) {
-		return '';
-	}
-
-	const url = response.redirect.trim();
-
-	if ( /^https?:\/\//i.test( url ) ) {
-		return url;
-	}
-
-	if ( url.startsWith( '/' ) && ! url.startsWith( '//' ) ) {
-		return url;
-	}
-
-	return '';
-};
+export const redirectTarget = ( response ) => ( isRedirect( response ) ? safeHref( response.redirect ) : '' );

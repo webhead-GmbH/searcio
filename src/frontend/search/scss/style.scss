@@ -2801,6 +2801,27 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+/*
+ * A link the assistant wrote. In the strong shade of the accent, which is the
+ * one that reads as text, and underlined, so that it is not told from the
+ * words round it by colour alone.
+ */
+.whsc-md__link {
+	color: var(--whsc-accent-strong, var(--whsc-accent, #2563eb));
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	border-radius: 3px;
+
+	&:hover {
+		text-decoration: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: 2px;
+	}
+}
+
 .whsc-assistant__bubble code {
 	padding: 1px 5px;
 	border-radius: 4px;
