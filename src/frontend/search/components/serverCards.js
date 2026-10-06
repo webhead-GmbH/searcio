@@ -9,7 +9,7 @@
  * markup the server already built and the site owner already trusts (it's
  * their own design).
  */
-import { useEffect } from '@wordpress/element';
+import { useLayoutEffect } from '@wordpress/element';
 
 import { formatPrice, PRICE_FIELDS } from '../../../utils/currency';
 import { PLACEHOLDER_IMAGE_DATA_URI } from '../../../utils/placeholderImage';
@@ -83,17 +83,26 @@ const DANGEROUS_URL_RE = /^\s*(?:javascript|vbscript|data|file):/i;
  * content, custom fields) that lower-privileged users can influence, so a value
  * like `javascript:alert(1)` in an `href` must not survive to the live DOM.
  *
+ * Each element's attributes are read by name rather than found with a
+ * selector. `[xlink:href]` is not a selector a browser accepts — the colon has
+ * to be escaped, and `querySelectorAll()` throws on it, which took the whole
+ * modal down with it — and an escaped one still misses the attribute where it
+ * is actually written: on an inline `<svg>`, where the HTML parser puts it in
+ * the XLink namespace.
+ *
  * @param {Element} root
  */
 const sanitizeUrls = ( root ) => {
-	URL_ATTRIBUTES.forEach( ( attribute ) => {
-		root.querySelectorAll( `[${ attribute }]` ).forEach( ( el ) => {
-			const value = el.getAttribute( attribute ) || '';
+	root.querySelectorAll( '*' ).forEach( ( el ) => {
+		[ ...el.attributes ].forEach( ( attribute ) => {
+			if ( ! URL_ATTRIBUTES.includes( attribute.name.toLowerCase() ) ) {
+				return;
+			}
 
 			// Allow inline images (`data:image/...`); block every other data: URI
 			// and all javascript:/vbscript:/file: schemes.
-			if ( DANGEROUS_URL_RE.test( value ) && ! /^\s*data:image\//i.test( value ) ) {
-				el.removeAttribute( attribute );
+			if ( DANGEROUS_URL_RE.test( attribute.value ) && ! /^\s*data:image\//i.test( attribute.value ) ) {
+				el.removeAttributeNode( attribute );
 			}
 		} );
 	} );
@@ -364,8 +373,87 @@ export const postProcessMarkup = ( html, hit ) => {
 export const buildServerCardHtml = ( template, hit ) =>
 	postProcessMarkup( substitutePlaceholders( template.html, hit ), hit );
 
+// Matches every element and weighs four ids, of an id no element has. The
+// storefront's stylesheet weighs three (`$lift` in `scss/style.scss`), the
+// reset under it two, and a site's own rules one at most.
+const TEMPLATE_WEIGHT = ':is(*, #whsc#whsc#whsc#whsc)';
+
+/**
+ * A selector list split at its top-level commas — not the ones inside
+ * `:is(a, b)`, `[data-x="a,b"]` or a string.
+ *
+ * @param {string} list
+ * @return {string[]}
+ */
+const splitSelectors = ( list ) => {
+	const selectors = [];
+	let depth = 0;
+	let quote = '';
+	let start = 0;
+
+	for ( let index = 0; index < list.length; index++ ) {
+		const char = list[ index ];
+
+		if ( '\\' === char ) {
+			index++;
+		} else if ( quote ) {
+			quote = char === quote ? '' : quote;
+		} else if ( '"' === char || "'" === char ) {
+			quote = char;
+		} else if ( '(' === char || '[' === char ) {
+			depth++;
+		} else if ( ')' === char || ']' === char ) {
+			depth--;
+		} else if ( ',' === char && 0 === depth ) {
+			selectors.push( list.slice( start, index ) );
+			start = index + 1;
+		}
+	}
+
+	selectors.push( list.slice( start ) );
+
+	return selectors.map( ( selector ) => selector.trim() ).filter( Boolean );
+};
+
+/**
+ * Give every selector of a list the template's weight, without changing what
+ * it matches: `TEMPLATE_WEIGHT` joins the selector's first compound, after the
+ * element name when it starts with one (`a.sct-12-root`), where a pseudo-class
+ * has to be written.
+ *
+ * @param {string} list A rule's selector list.
+ * @return {string}
+ */
+export const liftSelectors = ( list ) =>
+	splitSelectors( list )
+		.map( ( selector ) => selector.replace( /^(\*|[a-zA-Z_][\w-]*)?/, ( type ) => `${ type }${ TEMPLATE_WEIGHT }` ) )
+		.join( ', ' );
+
+/**
+ * @param {CSSRuleList} rules
+ */
+const liftRules = ( rules ) => {
+	Array.from( rules ).forEach( ( rule ) => {
+		if ( 'string' === typeof rule.selectorText ) {
+			rule.selectorText = liftSelectors( rule.selectorText );
+		} else if ( rule.cssRules ) {
+			// `@media`, `@supports`, `@container`: the rules inside one.
+			liftRules( rule.cssRules );
+		}
+	} );
+};
+
 /**
  * Step 3 of the contract: inject a template's CSS once per template id.
+ *
+ * The rules are the template's whole design, each written with one class
+ * (`.sct-12-title`), which is less than nearly everything else on the page: a
+ * theme's or an Elementor kit's `.elementor-kit-7 h3 {}` outweighs it, and so
+ * do the storefront's own reset and the base it gives a card (see "A card
+ * designed in Search Cloud" in `scss/style.scss`). So once the browser has
+ * parsed them their selectors are rewritten to weigh more than all of those.
+ * What a rule matches does not change, and neither does one rule's order
+ * against another's.
  *
  * @param {number|string} id
  * @param {string}        [css]
@@ -381,6 +469,12 @@ export const ensureTemplateCss = ( id, css ) => {
 	style.textContent = css;
 	document.head.appendChild( style );
 
+	try {
+		liftRules( style.sheet.cssRules );
+	} catch ( error ) {
+		// The rules stay as the service wrote them, at the weight they had.
+	}
+
 	injectedTemplateIds.add( id );
 };
 
@@ -392,7 +486,8 @@ export const ensureTemplateCss = ( id, css ) => {
  * @param {Object} props.template
  */
 export const ServerCard = ( { hit, template, onClick } ) => {
-	useEffect( () => {
+	// Before the first paint, so the card is never seen without its styles.
+	useLayoutEffect( () => {
 		ensureTemplateCss( template.id, template.css );
 	}, [ template.id, template.css ] );
 
