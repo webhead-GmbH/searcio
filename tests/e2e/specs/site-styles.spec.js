@@ -16,6 +16,10 @@
  * the other specs, so it is customized only while it is being walked.
  */
 
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
 import {
 	test,
 	expect,
@@ -114,15 +118,23 @@ const MOCK = {
 	popular: [ 'hoodie', 'belt', 'cap', 'beanie' ].map( ( query ) => ( { query } ) ),
 	suggestions: [ 'shirt', 'shirt dress' ],
 	assistant: true,
-	assistantReply: 'Here are **two options**:\n\n- a shell for wet days\n- a warm *base layer*\n\nBoth are in stock.',
+	assistantReply: 'Here are **two options**:\n\n- a shell for wet days\n- a warm *base layer*\n\nThe [size guide](/size-guide/) helps, and so does [the maker](https://example.org/care).',
 	assistantProducts: PRODUCTS.slice( 0, 3 ),
 	quiz: true,
 	quizzes: [ QUIZ ],
 	visualSearch: true,
+	// This month's photo searches are spent: the one way to an error that
+	// leaves the modal open.
+	visualStatus: 429,
 	banner: 'Winter sale - up to 40% off',
 	similar: PRODUCTS.slice( 0, 6 ),
 	templates: [ TEMPLATE ],
 };
+
+// A one-pixel PNG, for the photo search that is refused.
+const PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+
+let photo;
 
 /**
  * The page the storefront is walked on: every placement, and a button of the
@@ -266,6 +278,9 @@ async function walk( page, url ) {
 	await widget.input.fill( 'shi' );
 	await expect( widget.modal.getByRole( 'listbox', { name: 'Search suggestions' } ) ).toBeVisible();
 	await keep( 'suggestions' );
+	await page.keyboard.press( 'ArrowDown' );
+	await expect( widget.modal.getByRole( 'option', { selected: true } ) ).toHaveCount( 1 );
+	await keep( 'suggestions, a key on the first one' );
 
 	// Results: the banner, the filters, a price range, the cards, the next page.
 	await widget.search( 'shirt' );
@@ -283,6 +298,12 @@ async function walk( page, url ) {
 	await reach( widget.loadMore );
 	await keep( 'results, focus on load more' );
 
+	await widget.searchByPhoto( photo );
+	await expect( widget.modal.getByRole( 'alert' ) ).toBeVisible();
+	await widget.input.blur();
+	await away();
+	await keep( 'an error' );
+
 	await widget.openTab( /assistant/i );
 	await page.locator( '.whsc-assistant__input' ).fill( 'a warm jacket for wet days' );
 	await page.locator( '.whsc-assistant__input' ).press( 'Enter' );
@@ -291,6 +312,11 @@ async function walk( page, url ) {
 	await keep( 'assistant' );
 	await page.locator( '.whsc-assistant__compare-toggle' ).hover();
 	await keep( 'assistant, pointer on the compare switch' );
+	await page.locator( '.whsc-assistant__bubble a' ).first().hover();
+	await keep( 'assistant, pointer on a link of the reply' );
+	await away();
+	await reach( page.locator( '.whsc-assistant__bubble a' ).last() );
+	await keep( 'assistant, focus on a link of the reply' );
 	await away();
 
 	await widget.openTab( /product finder/i );
@@ -374,19 +400,31 @@ const PARTS = {
 		'modal, focus on the close button',
 		'modal, focus on a tab',
 		'suggestions',
+		'suggestions, a key on the first one',
 	],
 	'the results and their filters': [
 		'results',
 		'results, pointer on a filter',
 		'results, focus in a price bound',
 		'results, focus on load more',
+		'an error',
 	],
-	'the assistant': [ 'assistant', 'assistant, pointer on the compare switch' ],
+	'the assistant': [
+		'assistant',
+		'assistant, pointer on the compare switch',
+		'assistant, pointer on a link of the reply',
+		'assistant, focus on a link of the reply',
+	],
 	'the product finder': [ 'product finder', 'product finder, pointer on an answer' ],
 	'a card designed in Search Cloud': [ 'designed cards', 'designed cards, pointer on a card' ],
 };
 
 test.describe( 'On a site that styles every element', () => {
+	test.beforeAll( () => {
+		photo = path.join( fs.mkdtempSync( path.join( os.tmpdir(), 'whsc-' ) ), 'dress.png' );
+		fs.writeFileSync( photo, Buffer.from( PIXEL, 'base64' ) );
+	} );
+
 	test.afterAll( () => {
 		clearSiteStyles();
 	} );
