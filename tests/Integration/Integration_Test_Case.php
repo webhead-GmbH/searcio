@@ -5,9 +5,11 @@
  * Gives every integration test typed access to the booted plugin container and
  * its sync services, plus small helpers for the things sync tests repeatedly
  * need: a persisted run row, control over the tick cron schedule, faked Search
- * Cloud HTTP responses, and a connected/indexable configuration. Extends
- * `WP_UnitTestCase`, so each test runs inside a rolled-back transaction and the
- * `sync_runs` / `change_queue` tables reset automatically between tests.
+ * Cloud HTTP responses, and a connected/indexable configuration. Extends the
+ * framework's `Framework_Test_Case`, which reaches the booted plugin, its
+ * container and its settings, and through it `WP_UnitTestCase`, so each test
+ * runs inside a rolled-back transaction and the `sync_runs` / `change_queue`
+ * tables reset automatically between tests.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -17,47 +19,18 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Tests\Integration;
 
-use WP_UnitTestCase;
-use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
-use Webhead\WP\SearchCloud\Dependencies\League\Container\Container;
 
-abstract class Integration_Test_Case extends WP_UnitTestCase {
-	protected function plugin(): Plugin {
-		$plugin = $GLOBALS['whsc_test_plugin'] ?? null;
-
-		if ( ! $plugin instanceof Plugin ) {
-			$this->fail( 'The plugin was not booted by the integration bootstrap.' );
-		}
-
-		return $plugin;
-	}
-
-	protected function container(): Container {
-		return $this->plugin()->get_container();
-	}
-
-	/**
-	 * @return mixed
-	 */
-	protected function service( string $id ) {
-		return $this->container()->get( $id );
-	}
-
+abstract class Integration_Test_Case extends Framework_Test_Case {
 	protected function sync_service(): Sync_Service {
 		return $this->service( 'sync_service' );
 	}
 
 	protected function sync_state(): Sync_State {
 		return $this->service( 'sync_state' );
-	}
-
-	protected function settings(): Settings_Manager {
-		return $this->service( Settings_Manager::class );
 	}
 
 	/* --------------------------------------------------------------------- */

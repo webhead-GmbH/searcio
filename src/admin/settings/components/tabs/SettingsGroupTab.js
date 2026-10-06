@@ -1,11 +1,12 @@
-// Notice and ToggleControl stay on @wordpress/components: their @wordpress/ui
-// counterparts are marked use-with-caution precisely for being mixed with
-// @wordpress/components, which is what this screen does. InputControl and
-// TextareaControl move, because the @wordpress/components versions are
-// not-recommended and the @wordpress/ui replacements are recommended.
+// ToggleControl stays on @wordpress/components: it is recommended there, and
+// its @wordpress/ui counterpart, SwitchControl, is use-with-caution precisely
+// for being mixed with @wordpress/components, which is what this screen does.
+// InputControl, TextareaControl and Notice come from @wordpress/ui, because
+// the @wordpress/components versions are not-recommended and these are the
+// replacements the design system names.
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { Notice, ToggleControl } from '@wordpress/components';
-import { Card, InputControl, Text, TextareaControl } from '@wordpress/ui';
+import { ToggleControl } from '@wordpress/components';
+import { Card, InputControl, Notice, Stack, Text, TextareaControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 import { Grid } from '../../../../components/Layout';
@@ -49,7 +50,9 @@ const JsonFieldControl = ( { settingKey, definition, value, updateSetting } ) =>
 	}, [ serialized ] );
 
 	return (
-		<>
+		// A Stack and not a fragment. Card.Content does not space what is put
+		// in it, so the notice sat flush against the field above it.
+		<Stack direction="column" gap="md">
 			<TextareaControl
 				label={ definition.label || settingKey }
 				hideLabelFromVision
@@ -72,16 +75,16 @@ const JsonFieldControl = ( { settingKey, definition, value, updateSetting } ) =>
 				} }
 			/>
 			{ isInvalid ? (
-				<Notice status="error" isDismissible={ false }>
-					<p>
+				<Notice.Root intent="error">
+					<Notice.Description>
 						{ __(
 							'This is not valid JSON yet, so the change has not been applied. Finish the value to save it.',
 							'webhead-search-cloud'
 						) }
-					</p>
-				</Notice>
+					</Notice.Description>
+				</Notice.Root>
 			) : null }
-		</>
+		</Stack>
 	);
 };
 
@@ -158,7 +161,7 @@ const renderFieldCard = ( field, settings, updateSetting ) => {
 		<Card.Root key={ key } className="whsc-settings-card whsc-card whsc-card--dotted">
 			<Card.Header className="whsc-settings-card-header">
 				<div className="whsc-settings-card-copy">
-					<Card.Title render={ <h3 /> }>{ definition.label || key }</Card.Title>
+					<Card.Title render={ <h2 /> }>{ definition.label || key }</Card.Title>
 					{ definition.description ? (
 						<Text render={ <p /> } variant="body-sm">
 							{ definition.description }
@@ -187,9 +190,11 @@ const renderFieldCard = ( field, settings, updateSetting ) => {
 const SettingsGroupTab = ( { fields, settings, updateSetting, children } ) => {
 	if ( fields.length === 0 && ! children ) {
 		return (
-			<Notice status="info" isDismissible={ false }>
-				<p>{ __( 'No settings are registered for this tab yet.', 'webhead-search-cloud' ) }</p>
-			</Notice>
+			<Notice.Root intent="info">
+				<Notice.Description>
+					{ __( 'No settings are registered for this tab yet.', 'webhead-search-cloud' ) }
+				</Notice.Description>
+			</Notice.Root>
 		);
 	}
 

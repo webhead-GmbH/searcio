@@ -10,7 +10,8 @@
 
 declare( strict_types=1 );
 
-use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
+use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
+use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
 
 defined( 'ABSPATH' ) || exit;
@@ -36,7 +37,8 @@ if ( '' === $markup ) {
 	return;
 }
 
-Frontend_Assets::enqueue();
+// WordPress includes this file itself, so it asks for the running plugin.
+Plugin::instance()?->get_assets()->enqueue( Frontend_Config::ENTRY );
 
 // Not run through kses: it would strip the `data-*` attributes the front-end
 // hydrates from. Every part is escaped inside Product_List_Markup::render(),

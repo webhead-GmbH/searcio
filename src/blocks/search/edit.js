@@ -1,17 +1,17 @@
 import { useEffect, useState } from '@wordpress/element';
 import { InspectorControls, PanelColorSettings, useBlockProps } from '@wordpress/block-editor';
 import {
-	Icon,
 	PanelBody,
 	RadioControl,
 	RangeControl,
-	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { InputControl } from '@wordpress/ui';
+import { Icon, InputControl, SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { search as SearchIcon } from '@wordpress/icons';
+
+import InspectorStack from '../InspectorStack';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { instanceId, mode, scopeType, cardSource, highlightsSource, placeholder, enableVoice, searchTrigger, showCount, animation } = attributes;
@@ -49,7 +49,9 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	}, [] );
 
 	const scopeOptions = [
-		{ value: '', label: __( 'All types', 'webhead-search-cloud' ) },
+		// The item whose value is null is what the select shows for "nothing
+		// chosen"; an empty string would show its placeholder instead.
+		{ value: null, label: __( 'All types', 'webhead-search-cloud' ) },
 		...postTypes
 			.filter( ( postType ) => postType.config?.enabled )
 			.map( ( postType ) => ( { value: postType.slug, label: postType.label } ) ),
@@ -76,103 +78,97 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Search settings', 'webhead-search-cloud' ) }>
-					<RadioControl
-						label={ __( 'Trigger style', 'webhead-search-cloud' ) }
-						selected={ mode }
-						options={ [
-							{ label: __( 'Search box', 'webhead-search-cloud' ), value: 'box' },
-							{ label: __( 'Icon button', 'webhead-search-cloud' ), value: 'icon' },
-						] }
-						onChange={ ( value ) => setAttributes( { mode: value } ) }
-					/>
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Restrict to type', 'webhead-search-cloud' ) }
-						value={ scopeType }
-						options={ scopeOptions }
-						onChange={ ( value ) => setAttributes( { scopeType: value } ) }
-					/>
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Card source', 'webhead-search-cloud' ) }
-						help={ __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'webhead-search-cloud' ) }
-						value={ cardSource }
-						options={ [
-							{ value: 'plugin', label: __( 'Plugin templates', 'webhead-search-cloud' ) },
-							{ value: 'server', label: __( 'Search Cloud templates', 'webhead-search-cloud' ) },
-						] }
-						onChange={ ( value ) => setAttributes( { cardSource: value } ) }
-					/>
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Highlights source', 'webhead-search-cloud' ) }
-						help={ __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'webhead-search-cloud' ) }
-						value={ highlightsSource }
-						options={ [
-							{ value: 'newest', label: __( 'Newest', 'webhead-search-cloud' ) },
-							{ value: 'featured', label: __( 'Featured', 'webhead-search-cloud' ) },
-						] }
-						onChange={ ( value ) => setAttributes( { highlightsSource: value } ) }
-					/>
-					<InputControl
-						label={ __( 'Placeholder text', 'webhead-search-cloud' ) }
-						value={ placeholder }
-						placeholder={ __( 'Search…', 'webhead-search-cloud' ) }
-						onValueChange={ ( value ) => setAttributes( { placeholder: value } ) }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Enable voice search', 'webhead-search-cloud' ) }
-						help={ __( 'Shows a microphone button in the modal (browser support required).', 'webhead-search-cloud' ) }
-						checked={ Boolean( enableVoice ) }
-						onChange={ ( value ) => setAttributes( { enableVoice: value } ) }
-					/>
-					<RadioControl
-						label={ __( 'When to search', 'webhead-search-cloud' ) }
-						help={ __( "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button.", 'webhead-search-cloud' ) }
-						selected={ searchTrigger }
-						options={ [
-							{ label: __( 'On submit (Enter / button)', 'webhead-search-cloud' ), value: 'submit' },
-							{ label: __( 'While typing', 'webhead-search-cloud' ), value: 'type' },
-						] }
-						onChange={ ( value ) => setAttributes( { searchTrigger: value } ) }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Show result count on filters', 'webhead-search-cloud' ) }
-						checked={ Boolean( showCount ) }
-						onChange={ ( value ) => setAttributes( { showCount: value } ) }
-					/>
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Open animation', 'webhead-search-cloud' ) }
-						value={ animation }
-						options={ [
-							{ value: 'none', label: __( 'None', 'webhead-search-cloud' ) },
-							{ value: 'fade', label: __( 'Fade', 'webhead-search-cloud' ) },
-							{ value: 'slide-down', label: __( 'Slide down', 'webhead-search-cloud' ) },
-							{ value: 'slide-up', label: __( 'Slide up', 'webhead-search-cloud' ) },
-							{ value: 'zoom', label: __( 'Zoom', 'webhead-search-cloud' ) },
-						] }
-						onChange={ ( value ) => setAttributes( { animation: value } ) }
-					/>
-					{ 'none' !== animation && (
-						<RangeControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Animation duration (ms)', 'webhead-search-cloud' ) }
-							value={ animationDuration ?? undefined }
-							onChange={ setSize( 'animationDuration' ) }
-							min={ 0 }
-							max={ 1500 }
-							step={ 50 }
-							allowReset
+					<InspectorStack>
+						<RadioControl
+							label={ __( 'Trigger style', 'webhead-search-cloud' ) }
+							selected={ mode }
+							options={ [
+								{ label: __( 'Search box', 'webhead-search-cloud' ), value: 'box' },
+								{ label: __( 'Icon button', 'webhead-search-cloud' ), value: 'icon' },
+							] }
+							onChange={ ( value ) => setAttributes( { mode: value } ) }
 						/>
-					) }
+						<SelectControl
+							label={ __( 'Restrict to type', 'webhead-search-cloud' ) }
+							value={ scopeType || null }
+							items={ scopeOptions }
+							onValueChange={ ( value ) => setAttributes( { scopeType: value ?? '' } ) }
+						/>
+						<SelectControl
+							label={ __( 'Card source', 'webhead-search-cloud' ) }
+							description={ __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'webhead-search-cloud' ) }
+							value={ cardSource }
+							items={ [
+								{ value: 'plugin', label: __( 'Plugin templates', 'webhead-search-cloud' ) },
+								{ value: 'server', label: __( 'Search Cloud templates', 'webhead-search-cloud' ) },
+							] }
+							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
+						/>
+						<SelectControl
+							label={ __( 'Highlights source', 'webhead-search-cloud' ) }
+							description={ __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'webhead-search-cloud' ) }
+							value={ highlightsSource }
+							items={ [
+								{ value: 'newest', label: __( 'Newest', 'webhead-search-cloud' ) },
+								{ value: 'featured', label: __( 'Featured', 'webhead-search-cloud' ) },
+							] }
+							onValueChange={ ( value ) => setAttributes( { highlightsSource: value } ) }
+						/>
+						<InputControl
+							label={ __( 'Placeholder text', 'webhead-search-cloud' ) }
+							value={ placeholder }
+							placeholder={ __( 'Search…', 'webhead-search-cloud' ) }
+							onValueChange={ ( value ) => setAttributes( { placeholder: value } ) }
+						/>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Enable voice search', 'webhead-search-cloud' ) }
+							help={ __( 'Shows a microphone button in the modal (browser support required).', 'webhead-search-cloud' ) }
+							checked={ Boolean( enableVoice ) }
+							onChange={ ( value ) => setAttributes( { enableVoice: value } ) }
+						/>
+						<RadioControl
+							label={ __( 'When to search', 'webhead-search-cloud' ) }
+							help={ __( "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button.", 'webhead-search-cloud' ) }
+							selected={ searchTrigger }
+							options={ [
+								{ label: __( 'On submit (Enter / button)', 'webhead-search-cloud' ), value: 'submit' },
+								{ label: __( 'While typing', 'webhead-search-cloud' ), value: 'type' },
+							] }
+							onChange={ ( value ) => setAttributes( { searchTrigger: value } ) }
+						/>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show result count on filters', 'webhead-search-cloud' ) }
+							checked={ Boolean( showCount ) }
+							onChange={ ( value ) => setAttributes( { showCount: value } ) }
+						/>
+						<SelectControl
+							label={ __( 'Open animation', 'webhead-search-cloud' ) }
+							value={ animation }
+							items={ [
+								{ value: 'none', label: __( 'None', 'webhead-search-cloud' ) },
+								{ value: 'fade', label: __( 'Fade', 'webhead-search-cloud' ) },
+								{ value: 'slide-down', label: __( 'Slide down', 'webhead-search-cloud' ) },
+								{ value: 'slide-up', label: __( 'Slide up', 'webhead-search-cloud' ) },
+								{ value: 'zoom', label: __( 'Zoom', 'webhead-search-cloud' ) },
+							] }
+							onValueChange={ ( value ) => setAttributes( { animation: value } ) }
+						/>
+						{ 'none' !== animation && (
+							<RangeControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Animation duration (ms)', 'webhead-search-cloud' ) }
+								value={ animationDuration ?? undefined }
+								onChange={ setSize( 'animationDuration' ) }
+								min={ 0 }
+								max={ 1500 }
+								step={ 50 }
+								allowReset
+							/>
+						) }
+					</InspectorStack>
 				</PanelBody>
 			</InspectorControls>
 

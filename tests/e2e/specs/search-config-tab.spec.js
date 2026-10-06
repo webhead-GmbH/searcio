@@ -9,9 +9,13 @@
  * renders is indistinguishable from a feature that does not exist.
  */
 
-import { test, expect, setConnected } from '../utils';
+import { test, expect, setConnected, touchingInShell } from '../utils';
 
 const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=search-config';
+
+// A notice is also read out, through a live region that holds the same words
+// outside the screen. What is asserted is what is drawn on it.
+const SCREEN = '#webhead-search-cloud-root';
 
 const CONFIG = {
 	searchable_fields: [ { field: 'title', weight: 5 } ],
@@ -160,6 +164,108 @@ test.describe( 'Search Config tab', () => {
 		setConnected( false );
 	} );
 
+	test( 'leaves a gap between everything it stacks', async ( { page } ) => {
+		await mockSearchConfig( page, [], { ...CONFIG, facet_fields: [ 'categories', 'category' ] } );
+		await mockCatalog( page );
+		await page.goto( SETTINGS_URL );
+
+		// With a warning under a token field, which is a second child of a card.
+		await expect( page.locator( '.whsc-unindexed-fields' ).first() ).toBeVisible( LOADED );
+
+		expect( await touchingInShell( page ) ).toEqual( [] );
+	} );
+
+	/**
+	 * With no configuration there is nothing to draw. The reason used to be set
+	 * on a notice the placeholder never made room for, so the tab stayed a
+	 * placeholder for good.
+	 */
+	test( 'says why the configuration did not load, and asks again when told to', async ( { page } ) => {
+		let fail = true;
+
+		await mockSearchConfig( page );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/search-config' ),
+			( route ) => {
+				if ( ! fail ) {
+					return route.fallback();
+				}
+
+				return route.fulfill( {
+					status: 502,
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify( { code: 'upstream', message: 'Search Cloud did not answer.' } ),
+				} );
+			}
+		);
+		await page.goto( SETTINGS_URL );
+
+		await expect(
+			page.locator( SCREEN ).getByText( 'The search configuration could not be loaded: Search Cloud did not answer.' )
+		).toBeVisible( LOADED );
+
+		fail = false;
+		await page.getByRole( 'button', { name: 'Try again' } ).click();
+
+		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+	} );
+
+	/**
+	 * One notice beside the button that failed, with the reason the API gave,
+	 * and no toast over it saying the same thing in fewer words.
+	 */
+	test( 'reports a save that failed beside the Save button, with the reason', async ( { page } ) => {
+		await mockSearchConfig( page );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/search-config' ),
+			( route ) => {
+				if ( 'GET' === route.request().method() ) {
+					return route.fallback();
+				}
+
+				return route.fulfill( {
+					status: 422,
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify( { code: 'invalid', message: 'A redirect needs a URL.' } ),
+				} );
+			}
+		);
+		await page.goto( SETTINGS_URL );
+
+		const rule = page.locator( '.whsc-redirect-rule' ).first();
+
+		await expect( rule ).toBeVisible( LOADED );
+		await rule.locator( 'input' ).nth( 1 ).fill( 'https://example.test/other' );
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+
+		await expect(
+			page.locator( SCREEN ).getByText( 'The search configuration could not be saved: A redirect needs a URL.' )
+		).toBeVisible();
+		await expect( page.getByText( 'Search configuration saved.' ) ).toHaveCount( 0 );
+		// What was typed is still there to be corrected.
+		await expect( rule.locator( 'input' ).nth( 1 ) ).toHaveValue( 'https://example.test/other' );
+	} );
+
+	/**
+	 * The delete stands level with the fields beside it, which begin one label
+	 * below the top of the row. On a phone the row is a column instead.
+	 */
+	test( 'keeps a redirect\'s delete level with its fields', async ( { page } ) => {
+		test.skip( page.viewportSize().width <= 782, 'A redirect is stacked on a narrow screen.' );
+
+		await mockSearchConfig( page );
+		await page.goto( SETTINGS_URL );
+
+		const rule = page.locator( '.whsc-redirect-rule' ).first();
+
+		await expect( rule ).toBeVisible( LOADED );
+
+		const remove = await rule.getByRole( 'button', { name: 'Remove redirect' } ).boundingBox();
+		const field = await rule.locator( 'input' ).first().boundingBox();
+
+		expect( Math.abs( remove.y - field.y ) ).toBeLessThanOrEqual( 2 );
+	} );
+
 	test( 'shows the redirect rules the site has configured', async ( { page } ) => {
 		await mockSearchConfig( page );
 		await page.goto( SETTINGS_URL );
@@ -184,7 +290,7 @@ test.describe( 'Search Config tab', () => {
 		await mockSearchConfig( page );
 		await page.goto( SETTINGS_URL );
 
-		const toggle = page.getByLabel( 'Search by photo', { exact: true } );
+		const toggle = page.getByRole( 'checkbox', { name: 'Search by photo', exact: true } );
 		await expect( toggle ).toBeVisible( LOADED );
 		await expect( toggle ).not.toBeChecked();
 	} );

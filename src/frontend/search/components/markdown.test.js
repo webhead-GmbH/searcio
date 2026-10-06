@@ -103,3 +103,101 @@ describe( 'renderMarkdown', () => {
 		expect( renderMarkdown( undefined ) ).toEqual( [] );
 	} );
 } );
+
+/** Every `<a>` in the tree, as its props. */
+const links = ( nodes ) => {
+	const out = [];
+
+	const walk = ( node ) => {
+		if ( Array.isArray( node ) ) {
+			node.forEach( walk );
+		} else if ( node && 'object' === typeof node ) {
+			if ( 'a' === node.type ) {
+				out.push( node.props );
+			}
+
+			walk( node.props?.children );
+		}
+	};
+
+	walk( nodes );
+
+	return out;
+};
+
+/**
+ * A reply read "The [size guide](https://example.test/size) helps with the fit."
+ * on screen, brackets and address and all.
+ */
+describe( 'renderMarkdown - links', () => {
+	it( 'turns [label](address) into a link, not literal brackets', () => {
+		const tree = renderMarkdown( 'The [size guide](/size-guide/) helps with the fit.' );
+		const parts = summarize( tree );
+
+		expect( links( tree ) ).toHaveLength( 1 );
+		expect( links( tree )[ 0 ].href ).toBe( '/size-guide/' );
+		expect( parts.join( '' ) ).toBe( '<p>The <a>size guide helps with the fit.' );
+	} );
+
+	it( 'opens a page of this site in place, as a result card does', () => {
+		const [ link ] = links( renderMarkdown( `[Boots](${ window.location.origin }/boots/)` ) );
+
+		expect( link.target ).toBeUndefined();
+		expect( link.rel ).toBeUndefined();
+	} );
+
+	it( 'opens another site beside the shop, without handing it the opener', () => {
+		const [ link ] = links( renderMarkdown( '[the maker](https://example.org/boots)' ) );
+
+		expect( link.href ).toBe( 'https://example.org/boots' );
+		expect( link.target ).toBe( '_blank' );
+		expect( link.rel ).toBe( 'noopener noreferrer' );
+	} );
+
+	it.each( [
+		[ '[click](javascript:alert(1))' ],
+		[ '[click](data:text/html,<b>x</b>)' ],
+		[ '[click](//evil.test/x)' ],
+		[ '[click](/\\evil.test/x)' ],
+		[ '[click](boots/)' ],
+	] )( 'keeps only the words of %s', ( markdown ) => {
+		const tree = renderMarkdown( markdown );
+
+		expect( links( tree ) ).toHaveLength( 0 );
+		expect( summarize( tree ).join( '' ) ).toBe( '<p>click' );
+	} );
+
+	it( 'formats the label, and keeps an underscore in the address out of the italics', () => {
+		const tree = renderMarkdown( 'See [**Alpine** boots](https://example.org/alpine_boots_2026) and _more_.' );
+		const parts = summarize( tree );
+
+		expect( links( tree )[ 0 ].href ).toBe( 'https://example.org/alpine_boots_2026' );
+		expect( parts ).toEqual( [ '<p>', 'See ', '<a>', '<strong>', 'Alpine', ' boots', ' and ', '<em>', 'more', '.' ] );
+	} );
+
+	it( 'takes a pair of brackets in the address with it', () => {
+		const tree = renderMarkdown( 'A [parka](https://example.org/wiki/Parka_(coat)) is warm.' );
+
+		expect( links( tree )[ 0 ].href ).toBe( 'https://example.org/wiki/Parka_(coat)' );
+		expect( summarize( tree ).join( '' ) ).toBe( '<p>A <a>parka is warm.' );
+	} );
+
+	it( 'draws a link inside a list item', () => {
+		const tree = renderMarkdown( '- [Jacket](/jacket/)\n- [Boots](/boots/)' );
+
+		expect( links( tree ).map( ( link ) => link.href ) ).toEqual( [ '/jacket/', '/boots/' ] );
+	} );
+
+	it( 'reads an image as a link to it, and loads nothing', () => {
+		const tree = renderMarkdown( 'Here it is: ![the jacket](https://example.org/jacket.jpg)' );
+		const parts = summarize( tree );
+
+		expect( parts ).not.toContain( '<img>' );
+		expect( links( tree )[ 0 ].href ).toBe( 'https://example.org/jacket.jpg' );
+		expect( parts.join( '' ) ).toBe( '<p>Here it is: <a>the jacket' );
+	} );
+
+	it( 'leaves brackets that are not a link as they were written', () => {
+		expect( summarize( renderMarkdown( 'Sizes [S, M, L] (see chart)' ) ).join( '' ) ).toBe( '<p>Sizes [S, M, L] (see chart)' );
+	} );
+} );

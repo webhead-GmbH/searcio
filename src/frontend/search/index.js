@@ -1,4 +1,5 @@
 import { createRoot } from '@wordpress/element';
+import domReady from '@wordpress/dom-ready';
 
 import './scss/style.scss';
 import App from './components/App';
@@ -81,8 +82,7 @@ const boot = () => {
 	} );
 };
 
-if ( 'loading' === document.readyState ) {
-	document.addEventListener( 'DOMContentLoaded', boot );
-} else {
-	boot();
-}
+// At once when the page has been read, which is the case whenever a caching or
+// a consent plugin runs this script late. A `DOMContentLoaded` listener of its
+// own would wait for an event that had long fired.
+domReady( boot );

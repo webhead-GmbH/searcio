@@ -10,12 +10,14 @@
 
 declare( strict_types=1 );
 
-use Webhead\WP\SearchCloud\Frontend\Frontend_Assets;
+use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
+use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
 
 defined( 'ABSPATH' ) || exit;
 
-Frontend_Assets::enqueue();
+// WordPress includes this file itself, so it asks for the running plugin.
+Plugin::instance()?->get_assets()->enqueue( Frontend_Config::ENTRY );
 
 $instance_id    = preg_replace( '/[^a-zA-Z0-9_-]/', '', (string) ( $attributes['instanceId'] ?? '' ) );
 $instance_class = '' !== $instance_id ? 'whsc-instance-' . $instance_id : '';

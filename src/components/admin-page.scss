@@ -1,0 +1,489 @@
+// Webhead scaffold managed file. scaffold:update may refresh this file.
+//
+// The one place an admin screen's chrome is described. Every page uses the
+// AdminPage shell, the settings screen included, so they cannot drift apart:
+// change the header here and every screen changes with it.
+@use "@wordpress/base-styles/variables" as wp-base;
+
+.webhead-search-cloud-admin-page {
+	// The content frame owns the page padding, the same on every side. Cards
+	// inside are siblings on a rhythm and never supply the gap that separates
+	// them.
+	//
+	// It has no `max-width`, and that is deliberate. This shell used to stop at
+	// 1440px and start flush against wp-admin's menu while the settings screen
+	// filled the window from an inset of its own, so on a wide monitor a second
+	// page was little more than half as wide as the first and sat 20px to its
+	// left. A screen that wants a narrower measure narrows what it puts inside.
+	padding: var(--wh-panel-padding, var(--wpds-dimension-padding-xl));
+
+	// The label on the brand. `default.scss` makes the accent of a
+	// `@wordpress/components` control black and used to leave what is written
+	// on it to the theme provider, which was given the house green then and
+	// derived the label from that. `@wordpress/theme` 2.0 answered white. 2.2
+	// recalculated the ramp and answered a dark colour, right on the green and
+	// unreadable on the black: a primary button, the settings screen's Save
+	// button included, was #0e100f on #101010. An accent and what is written
+	// on it are one pair, so whoever sets the first sets the second.
+	//
+	// `default.scss` says this as well, for menus and dialogs, which are drawn
+	// outside the shell. It is repeated here because that file is the plugin's
+	// own and `scaffold:update` never rewrites it, while this one is refreshed:
+	// a plugin generated before the line existed gets it from the shell.
+	--wp-components-color-accent-inverted: var(--wh-secondary, #fff);
+}
+
+.webhead-search-cloud-admin-page__surface {
+	// A surface, not a card: `xl` here, `lg` for the cards inside, because a
+	// container and its immediate child must not share a radius.
+	border-radius: var(--wpds-border-radius-xl);
+	// The token a Card paints itself with. One step down, at
+	// `surface-neutral`, a white card or a DataViews table set into the shell
+	// showed as a lighter rectangle on a surface that was almost the same white.
+	background: var(--wpds-color-background-surface-neutral-strong);
+	box-shadow: wp-base.$elevation-x-small;
+	overflow: hidden;
+}
+
+.webhead-search-cloud-admin-page__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wpds-dimension-gap-lg);
+	flex-wrap: wrap;
+	padding: var(--wpds-dimension-padding-2xl);
+	background-color: var(--wh-primary);
+	color: var(--wh-secondary);
+}
+
+.webhead-search-cloud-admin-page__heading {
+	display: flex;
+	// The icon belongs to the title, not to the block of title and description:
+	// centred against both it floated between the two lines.
+	align-items: flex-start;
+	gap: var(--wpds-dimension-gap-sm);
+	min-width: 0;
+}
+
+.webhead-search-cloud-admin-page__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	// One title line tall, so the icon is centred on the title whatever the
+	// description below it does.
+	height: var(--wpds-typography-line-height-md);
+
+	svg {
+		fill: var(--wh-secondary);
+	}
+}
+
+.webhead-search-cloud-admin-page__titles {
+	min-width: 0;
+}
+
+// Scoped through the header on purpose. wp-admin styles `h1` itself and wins
+// against a single class: `.wrap h1` sets both `font: 23px/1.3` and
+// `padding: 9px 0 4px`, so the title rendered at the wrong size *and* carried
+// 13px of padding nothing here asked for. Two classes win the specificity, and
+// the padding has to be zeroed explicitly — declaring only `margin` leaves
+// wp-admin's padding in place, which is exactly what happened.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__title {
+	margin: 0;
+	padding: 0;
+	color: var(--wh-secondary);
+	font-family: var(--wpds-typography-font-family-heading);
+	// The `heading-xl` pair. A page title is the largest text on the screen; at
+	// `lg` it was the size of the card titles underneath it.
+	font-size: var(--wpds-typography-font-size-xl);
+	line-height: var(--wpds-typography-line-height-md);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+// Same reasoning: wp-admin gives `p` its own margin inside the admin body.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__description {
+	// gap-xs between a title and its description, as the rhythm rules say.
+	margin: var(--wpds-dimension-gap-xs) 0 0 0;
+	padding: 0;
+	color: var(--wh-secondary);
+	opacity: 0.8;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
+}
+
+.webhead-search-cloud-admin-page__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+	flex-shrink: 0;
+}
+
+// Through the header, so it outranks the plugin stylesheet's own
+// `.panel-container .components-button`, which turns transitions off and would
+// otherwise win or lose on nothing but the order two files were bundled in.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__actions {
+	.components-button {
+		white-space: nowrap;
+		font-weight: 700;
+		// The package transitions `border-color` alone, so a hover that changes
+		// background and text snapped between two states. This lists everything
+		// the hover actually touches — and `border-color` has to stay in it,
+		// because the ring is a border here: dropping it made the ring darken a
+		// frame before the fill caught up. Nothing animates `box-shadow`; there
+		// is no shadow on any of these shapes.
+		transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+}
+
+// Three shapes, keyed to position rather than to what the button does: the
+// first is outlined in white so it reads as secondary against the dark header,
+// the second is filled with white so a header can carry one obvious primary
+// action without two of them competing, and the overflow toggle below is
+// neither.
+//
+// All three restyle the ring with `border-color`, because that is the property
+// @wordpress/components actually uses: `.components-button` ships
+// `border: 1px solid transparent` and `.is-secondary` colours it with the admin
+// accent. An `inset` box-shadow does not replace that border — it draws a
+// second ring inside it, which is exactly what went wrong here: a white shadow
+// ring sitting inside the package's green border.
+//
+// The package sets that colour again in five separate states — `:hover`,
+// `:focus:not(:active)`, `:active`, `:disabled` and `[aria-disabled]` — so
+// overriding the base alone leaves the accent showing the moment the pointer
+// arrives. Each shape below restates it for every state it owns.
+//
+// Focus is an `outline`, not a shadow, so none of the `box-shadow: none` below
+// touches it. Its colour comes from a variable, which is the component's own
+// hook — but *which* variable depends on which build is running, and two are:
+//
+//   node_modules/@wordpress/components (v40, what `npm ls` reports):
+//     outline: … solid var(--focus-color, var(--wpds-color-stroke-focus, …))
+//   the `wp-components` handle WordPress core actually enqueues on the page:
+//     outline: … solid var(--wpds-color-stroke-focus, …)
+//
+// Core ships an older build with no `--focus-color` layer, and core's is the
+// one that renders. Setting only `--focus-color` looked right in the package
+// source and did nothing on the screen — the ring stayed `#007d63`, a dark
+// green nobody can see on a black header. Both are set, so the ring is white
+// under either build.
+.webhead-search-cloud-admin-page__header {
+	--wpds-color-stroke-focus: var(--wh-secondary);
+	--focus-color: var(--wh-secondary);
+}
+
+// Which build is running also decides what a ring *is*, and the rules above
+// were written against one of them. WordPress 7.1 gives every button
+// `border: 1px solid transparent`, colours it for a secondary button and draws
+// focus as an outline. The releases before it give a button `border: 0`, draw
+// a secondary button's ring as an inset shadow and draw focus as a shadow in
+// the accent. A shape that set `border-color` and `box-shadow: none`, as the
+// ones below do, had no ring at all on WordPress 7.0, and its focus was the
+// accent's black on the black header.
+//
+// So the whole border is stated here, and the whole of focus, and neither is
+// left to the build.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__actions .components-button {
+	border-style: solid;
+	border-width: var(--wpds-border-width-xs);
+
+	&:focus:not(:active) {
+		box-shadow: none;
+		outline: var(--wpds-border-width-focus) solid var(--wh-secondary);
+		outline-offset: var(--wpds-border-width-focus);
+	}
+}
+
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--outline.components-button {
+	color: var(--wh-secondary);
+	background: transparent;
+	border-color: var(--wh-secondary);
+	box-shadow: none;
+
+	svg {
+		fill: var(--wh-secondary);
+	}
+
+	// Hover lifts it instead of inverting it. Filling it solid white made the
+	// secondary action the loudest thing in the header — brighter than the
+	// primary beside it — and the swap read as a flash rather than a response.
+	// A translucent wash keeps the text white and the hierarchy intact.
+	//
+	// The colour has to be restated too. `.is-secondary:hover` sets `color` to
+	// the accent and beats the base rule, so leaving it out turns the label
+	// green on hover.
+	&:hover:not(:disabled),
+	&:focus:not(:active),
+	&:active:not(:disabled) {
+		color: var(--wh-secondary);
+		border-color: var(--wh-secondary);
+
+		svg {
+			fill: var(--wh-secondary);
+		}
+	}
+
+	&:hover:not(:disabled),
+	&:focus-visible:not(:disabled) {
+		background: rgba(255, 255, 255, 0.12);
+	}
+
+	// The package greys a disabled button for a light surface — `#949494` text
+	// and a `#dbdbdb` ring — and its `border-color` rule outranks the base rule
+	// here while its `color` rule does not. The result was a button that
+	// contradicted itself: a bold pure-white label inside a light grey ring,
+	// reading as a rendering fault rather than as disabled. The selectors below
+	// match the package's own specificity so the whole state is owned, not half
+	// of it.
+	&:disabled,
+	&:disabled:not(:focus),
+	&[aria-disabled="true"]:not(:focus),
+	&[aria-disabled="true"]:hover:not(:focus) {
+		color: rgba(255, 255, 255, 0.4);
+		background: transparent;
+		border-color: rgba(255, 255, 255, 0.24);
+
+		svg {
+			fill: rgba(255, 255, 255, 0.4);
+		}
+	}
+
+	// `isBusy` animates a gradient the package paints in near-white
+	// (`#fafafa`/`#e0e0e0`) — bright diagonal stripes scrolling across a black
+	// header. The animation is kept and the stripes are restated in the header's
+	// own palette. `background-image` and `background-size` rather than the
+	// shorthand, because the shorthand is what erased the gradient and left the
+	// keyframes animating a background that had no image to move.
+	&.is-busy,
+	&.is-busy:disabled,
+	&.is-busy[aria-disabled="true"] {
+		color: var(--wh-secondary);
+		background-color: transparent;
+		background-size: 100px 100%;
+		background-image: linear-gradient(
+			-45deg,
+			rgba(255, 255, 255, 0.08) 33%,
+			rgba(255, 255, 255, 0.22) 33%,
+			rgba(255, 255, 255, 0.22) 70%,
+			rgba(255, 255, 255, 0.08) 70%
+		);
+		border-color: rgba(255, 255, 255, 0.4);
+	}
+}
+
+// The filled action. The header is the brand's black, so the fill is what is
+// written on the brand: white, with a black label. It used to be the green
+// accent, which is for focus and for links and for nothing else.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--solid.components-button {
+	color: var(--wh-primary);
+	background: var(--wh-secondary);
+	border-color: var(--wh-secondary);
+	box-shadow: none;
+
+	svg {
+		fill: var(--wh-primary);
+	}
+
+	// The fill dims on hover and the ring does not follow it down, so the
+	// button keeps its edge against the header while the fill reacts.
+	&:hover:not(:disabled),
+	&:focus:not(:active),
+	&:active:not(:disabled) {
+		color: var(--wh-primary);
+		background: var(--wh-secondary-dark);
+		border-color: var(--wh-secondary);
+
+		svg {
+			fill: var(--wh-primary);
+		}
+	}
+
+	// Disabled, the whole button steps back: a solid white block with a faint
+	// label was still the loudest thing in the header.
+	&:disabled,
+	&:disabled:not(:focus),
+	&[aria-disabled="true"]:not(:focus),
+	&[aria-disabled="true"]:hover:not(:focus) {
+		color: var(--wh-primary);
+		background: rgba(255, 255, 255, 0.4);
+		border-color: transparent;
+
+		svg {
+			fill: var(--wh-primary);
+		}
+	}
+
+	&.is-busy,
+	&.is-busy:disabled,
+	&.is-busy[aria-disabled="true"] {
+		color: var(--wh-primary);
+		background-color: var(--wh-secondary);
+		background-size: 100px 100%;
+		background-image: linear-gradient(
+			-45deg,
+			var(--wh-secondary) 33%,
+			var(--wh-secondary-dark) 33%,
+			var(--wh-secondary-dark) 70%,
+			var(--wh-secondary) 70%
+		);
+		border-color: var(--wh-secondary);
+	}
+}
+
+// The third shape: the way in to everything that did not fit. It is not a peer
+// of the two buttons beside it, so it carries no ring at all and takes a square
+// the size of its icon — bordered and full height, it read as a third action
+// and crowded the header, which is the thing the overflow menu exists to
+// prevent.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--ghost.components-button {
+	color: var(--wh-secondary);
+	background: transparent;
+	border-color: transparent;
+	box-shadow: none;
+	min-width: 32px;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border-radius: var(--wpds-border-radius-sm);
+
+	svg {
+		fill: var(--wh-secondary);
+	}
+
+	&:hover:not(:disabled),
+	&:focus:not(:active),
+	&:active:not(:disabled),
+	&[aria-expanded="true"] {
+		color: var(--wh-secondary);
+		background: rgba(255, 255, 255, 0.12);
+		border-color: transparent;
+		box-shadow: none;
+
+		svg {
+			fill: var(--wh-secondary);
+		}
+	}
+
+	&:disabled,
+	&:disabled:not(:focus),
+	&[aria-disabled="true"]:not(:focus),
+	&[aria-disabled="true"]:hover:not(:focus) {
+		color: rgba(255, 255, 255, 0.4);
+		background: transparent;
+		border-color: transparent;
+
+		svg {
+			fill: rgba(255, 255, 255, 0.4);
+		}
+	}
+}
+
+// A destructive header action keeps its position's shape but says so. The
+// overflow menu already honours the same `isDestructive` descriptor, so without
+// this the identical action looked dangerous in third position and ordinary in
+// first.
+.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--destructive.components-button {
+	color: var(--wh-secondary);
+	background: transparent;
+	border-color: var(--wpds-color-stroke-interactive-error);
+
+	svg {
+		fill: var(--wh-secondary);
+	}
+
+	&:hover:not(:disabled),
+	&:focus:not(:active),
+	&:active:not(:disabled) {
+		color: var(--wh-secondary);
+		background: var(--wpds-color-background-interactive-error-strong);
+		border-color: var(--wpds-color-background-interactive-error-strong);
+
+		svg {
+			fill: var(--wh-secondary);
+		}
+	}
+}
+
+.webhead-search-cloud-admin-page__content {
+	padding: var(--wpds-dimension-padding-2xl);
+
+	// The container supplies the rhythm between whatever a page puts in it, so a
+	// card never has to space itself and two cards can never end up touching.
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpds-dimension-gap-xl);
+
+	// A tab panel sits gap-lg below its strip. Keyed to the role rather than to
+	// one screen's class name, so a second screen's tabs cannot end up flush
+	// against their panel the way they did before this moved here.
+	[role="tabpanel"] {
+		margin-top: var(--wpds-dimension-gap-lg);
+	}
+}
+
+// A tab strip that opens the content belongs to the header above it, so the
+// content gives up its top padding and the strip sits directly under the bar.
+// Asked for with the `tabbed` prop rather than detected, because the strip is a
+// placeholder while its tabs are still loading and the padding must not move
+// when the real one arrives.
+.webhead-search-cloud-admin-page__content--tabbed {
+	padding-block-start: 0;
+}
+
+// Panel tabs, as the design system draws them: "when tabs sit at the top of a
+// panel, below a screen header and above padded content, use a full-bleed tab
+// list with a light bottom border. The border should span the full width of the
+// panel. The tab labels should stay only as wide as their text."
+//
+// So the strip gives back the content's inline padding with a negative margin
+// and takes it again as its own, which keeps the first label where the content
+// starts while the rule under it runs from one edge of the surface to the other.
+// Keyed to the role, so any tabbed screen gets it, and to the strip that opens
+// the content: the list itself or the first thing `Tabs.Root` holds. A tab list
+// further in, inside a card or a table, is not the page's strip and keeps the
+// component's own shape. The last selector is for a placeholder strip, which
+// has no role while its tabs are still loading.
+.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"],
+.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"],
+.webhead-search-cloud-admin-page__content--tabbed .webhead-search-cloud-admin-page__tab-strip {
+	box-sizing: border-box;
+	display: flex;
+	width: auto;
+	max-width: none;
+	margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+// "The tab labels should stay only as wide as their text." `Tabs.List` is as
+// wide as its tabs and lets each one grow to fill it (`flex: 1 0 auto`), which
+// changes nothing while the list fits its tabs. Made as wide as the surface it
+// stretched two tabs to half the strip each, 761px for the word "Overview".
+.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"] > [role="tab"],
+.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"] > [role="tab"] {
+	flex: 0 0 auto;
+}
+
+// On a narrow screen the actions go under the title and take the width, rather
+// than wrapping to a second line at whatever width the labels happen to have.
+@media screen and (max-width: 767px) {
+	.webhead-search-cloud-admin-page__header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.webhead-search-cloud-admin-page__actions {
+		flex-wrap: wrap;
+	}
+
+	.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--outline.components-button,
+	.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--solid.components-button {
+		flex: 1 1 auto;
+		justify-content: center;
+	}
+}

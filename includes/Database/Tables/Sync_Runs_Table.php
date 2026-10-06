@@ -102,13 +102,12 @@ final class Sync_Runs_Table extends Table {
 	 * @param  array<string,mixed>  $data
 	 */
 	public function insert_row( array $data ): int {
-		$result = $this->insert( $data );
+		// Not `$wpdb->insert_id` after insert(): the write invalidates the
+		// table's cache group, which can insert an option row of its own, and
+		// `insert_id` is then that row's.
+		$id = $this->insert_get_id( $data );
 
-		if ( false === $result ) {
-			return 0;
-		}
-
-		return (int) $this->get_connection()->insert_id;
+		return false === $id ? 0 : $id;
 	}
 
 	/**

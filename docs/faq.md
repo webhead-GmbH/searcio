@@ -28,7 +28,7 @@ Language configuration only appears when Search Cloud's own service reports lang
 
 ### A sync run shows "Failed" or content is being skipped
 
-Open the sync history row for the failed run — the last error message is shown there. Common causes: the Search Cloud plan's document limit was reached (upgrade your plan or reduce what you index), or the connection dropped mid-run (the sync automatically pauses and retries on transient network/rate-limit errors).
+Open the sync history row for the failed run — the last error message is shown there. Common causes: the Search Cloud plan's document limit was reached (upgrade your plan or reduce what you index), or Search Cloud could not be reached for over an hour. A sync that cannot write stays *Running* and tries again by itself, waiting longer each time; only when the last of those tries fails does it end as *Failed*. Nothing has to be done then: changes made in the shop are sent as soon as Search Cloud answers again, and the next scheduled sync runs a full one.
 
 ### How do I stop the plugin from deleting my data if I uninstall it?
 

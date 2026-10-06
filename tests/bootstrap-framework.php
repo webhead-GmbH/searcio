@@ -13,7 +13,7 @@
  * conditionally and a missing file simply means the prefixed classes are not
  * available yet.
  *
- * @author    webhead GmbH <mh@webhead.dev>
+ * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
  */
 

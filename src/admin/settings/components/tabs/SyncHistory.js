@@ -1,11 +1,14 @@
 import {useEffect, useMemo, useState} from '@wordpress/element';
-import {Button, Icon} from '@wordpress/components';
-import {DataViews} from '@wordpress/dataviews';
-import {__} from '@wordpress/i18n';
+import {Button} from '@wordpress/components';
+import {Badge, Icon, Stack, Text} from '@wordpress/ui';
+import {__, _n, sprintf} from '@wordpress/i18n';
 import {calendar, tag, trash} from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
 
+import {DataViews} from '../../../../components/DataViews';
+import Modal from '../../../../components/Modal';
 import {showToast} from '../../../../toast';
+import {statusIntent, statusLabels} from '../../syncStatus';
 
 const pluginData = window.webhead_search_cloudData || {};
 const CAN_RUN_SYNC = pluginData?.caps?.runSync !== false;
@@ -29,21 +32,12 @@ const storeView = (view) => {
 	try {
 		window.localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify(view));
 	} catch (error) {
-		// Storage unavailable (private browsing / quota) — persistence is a
+		// Storage unavailable (private browsing / quota) - persistence is a
 		// nice-to-have, not a requirement.
 	}
 };
 
 const ACTIVE = ['queued', 'running', 'paused'];
-
-const STATUS_ELEMENTS = [
-	{value: 'completed', label: __('Completed', 'webhead-search-cloud')},
-	{value: 'failed', label: __('Failed', 'webhead-search-cloud')},
-	{value: 'cancelled', label: __('Cancelled', 'webhead-search-cloud')},
-	{value: 'running', label: __('Running', 'webhead-search-cloud')},
-	{value: 'paused', label: __('Paused', 'webhead-search-cloud')},
-	{value: 'queued', label: __('Queued', 'webhead-search-cloud')},
-];
 
 const TRIGGER_ELEMENTS = [
 	{value: 'manual', label: __('Manual', 'webhead-search-cloud')},
@@ -60,6 +54,24 @@ const ORDER_COLUMN = {
 	pushed: 'pushed',
 	created_at: 'created_at',
 };
+
+// Every column but the first, which is the title and takes what these leave.
+// A width is not a preference: it is read from here on every load and never
+// from the stored view, or a later change would not reach a browser that had
+// opened the table before.
+const COLUMN_STYLES = {
+	status: {width: '16%', minWidth: 120},
+	trigger: {width: '14%', minWidth: 110},
+	processed: {width: '12%', minWidth: 100},
+	pushed: {width: '12%', minWidth: 90},
+	deleted: {width: '12%', minWidth: 90},
+	created_at: {width: '22%', minWidth: 170},
+};
+
+const withColumnStyles = (view) => ({
+	...view,
+	layout: {...(view.layout || {}), styles: COLUMN_STYLES},
+});
 
 const formatDate = (iso) => {
 	if (!iso) {
@@ -84,16 +96,23 @@ const DEFAULT_VIEW = {
 	layout: {},
 };
 
+const renderFieldHeaderWithIcon = (label, icon) => (
+	<span className="whsc-dataviews-field-header-with-icon">
+		<Icon icon={icon} size={16}/>
+		<span>{label}</span>
+	</span>
+);
+
 /**
- * Sync history table built on @wordpress/dataviews with server-driven
- * filtering, sorting and pagination (per the front-end guideline). The active
- * run is protected from deletion both here (eligibility) and server-side.
+ * Sync history table built on DataViews with server-driven filtering, sorting
+ * and pagination. The active run is protected from deletion both here
+ * (eligibility) and server-side.
  */
 const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
-	const [view, setView] = useState(() => ({
+	const [view, setView] = useState(() => withColumnStyles({
 		...DEFAULT_VIEW,
 		...(loadStoredView() || {}),
-		// Always start on page 1 — resuming on a stale/out-of-range page from
+		// Always start on page 1 - resuming on a stale/out-of-range page from
 		// a previous session would just show an empty table.
 		page: 1,
 	}));
@@ -101,17 +120,13 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 	const [total, setTotal] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
 	const [reload, setReload] = useState(0);
-
-	const renderFieldHeaderWithIcon = (label, icon) => (
-		<span className="whsc-dataviews-field-header-with-icon">
-			<Icon className="whsc-dataviews-field-header-with-icon__icon" icon={icon}/>
-			<span>{label}</span>
-		</span>
-	);
+	const [isClearOpen, setIsClearOpen] = useState(false);
 
 	const updateView = (nextView) => {
-		setView(nextView);
-		storeView(nextView);
+		const styled = withColumnStyles(nextView);
+
+		setView(styled);
+		storeView(styled);
 	};
 
 	useEffect(() => {
@@ -167,67 +182,73 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 	}, [apiBase, view, reload, refreshSignal]);
 
 	const fields = useMemo(
-		() => [
-			{
-				id: 'id',
-				label: __('Run', 'webhead-search-cloud'),
-				enableSorting: true,
-				enableHiding: false,
-				filterBy: false,
-				render: ({item}) => `#${item.id}`,
-			},
-			{
-				id: 'status',
-				label: __('Status', 'webhead-search-cloud'),
-				header: renderFieldHeaderWithIcon(__('Status', 'webhead-search-cloud'), tag),
-				enableSorting: true,
-				elements: STATUS_ELEMENTS,
-				filterBy: {operators: ['is']},
-				render: ({item}) => (
-					<span className={`whsc-status-badge is-${item.status}`}>
-						{STATUS_ELEMENTS.find((element) => element.value === item.status)?.label || item.status}
-					</span>
-				),
-			},
-			{
-				id: 'trigger',
-				label: __('Trigger', 'webhead-search-cloud'),
-				enableSorting: true,
-				elements: TRIGGER_ELEMENTS,
-				filterBy: {operators: ['is']},
-				getValue: ({item}) => item.trigger,
-				render: ({item}) =>
-					TRIGGER_ELEMENTS.find((element) => element.value === item.trigger)?.label || item.trigger,
-			},
-			{
-				id: 'processed',
-				label: __('Processed', 'webhead-search-cloud'),
-				enableSorting: true,
-				filterBy: false,
-				render: ({item}) => Number(item.processed).toLocaleString(),
-			},
-			{
-				id: 'pushed',
-				label: __('Pushed', 'webhead-search-cloud'),
-				enableSorting: true,
-				filterBy: false,
-				render: ({item}) => Number(item.pushed).toLocaleString(),
-			},
-			{
-				id: 'deleted',
-				label: __('Deleted', 'webhead-search-cloud'),
-				filterBy: false,
-				render: ({item}) => Number(item.deleted).toLocaleString(),
-			},
-			{
-				id: 'created_at',
-				label: __('Started', 'webhead-search-cloud'),
-				header: renderFieldHeaderWithIcon(__('Started', 'webhead-search-cloud'), calendar),
-				enableSorting: true,
-				filterBy: false,
-				render: ({item}) => formatDate(item.created_at),
-			},
-		],
+		() => {
+			const labels = statusLabels();
+			const statusElements = ['completed', 'failed', 'cancelled', 'running', 'paused', 'queued']
+				.map((value) => ({value, label: labels[value]}));
+
+			return [
+				{
+					id: 'id',
+					label: __('Run', 'webhead-search-cloud'),
+					enableSorting: true,
+					enableHiding: false,
+					filterBy: false,
+					render: ({item}) => `#${item.id}`,
+				},
+				{
+					id: 'status',
+					label: __('Status', 'webhead-search-cloud'),
+					header: renderFieldHeaderWithIcon(__('Status', 'webhead-search-cloud'), tag),
+					enableSorting: true,
+					elements: statusElements,
+					filterBy: {operators: ['is']},
+					render: ({item}) => (
+						<Badge intent={statusIntent(item.status)}>
+							{labels[item.status] || String(item.status)}
+						</Badge>
+					),
+				},
+				{
+					id: 'trigger',
+					label: __('Trigger', 'webhead-search-cloud'),
+					enableSorting: true,
+					elements: TRIGGER_ELEMENTS,
+					filterBy: {operators: ['is']},
+					getValue: ({item}) => item.trigger,
+					render: ({item}) =>
+						TRIGGER_ELEMENTS.find((element) => element.value === item.trigger)?.label || item.trigger,
+				},
+				{
+					id: 'processed',
+					label: __('Processed', 'webhead-search-cloud'),
+					enableSorting: true,
+					filterBy: false,
+					render: ({item}) => Number(item.processed).toLocaleString(),
+				},
+				{
+					id: 'pushed',
+					label: __('Pushed', 'webhead-search-cloud'),
+					enableSorting: true,
+					filterBy: false,
+					render: ({item}) => Number(item.pushed).toLocaleString(),
+				},
+				{
+					id: 'deleted',
+					label: __('Deleted', 'webhead-search-cloud'),
+					filterBy: false,
+					render: ({item}) => Number(item.deleted).toLocaleString(),
+				},
+				{
+					id: 'created_at',
+					label: __('Started', 'webhead-search-cloud'),
+					header: renderFieldHeaderWithIcon(__('Started', 'webhead-search-cloud'), calendar),
+					enableSorting: true,
+					filterBy: false,
+					render: ({item}) => formatDate(item.created_at),
+				},
+			];
+		},
 		[]
 	);
 
@@ -240,16 +261,50 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 				isDestructive: true,
 				supportsBulk: true,
 				isEligible: (item) => CAN_RUN_SYNC && !ACTIVE.includes(item.status),
-				callback: async (selected) => {
-					await Promise.all(
-						selected.map((item) =>
-							apiFetch({path: `${apiBase}/history/${item.id}`, method: 'DELETE'}).catch(() => null)
-						)
-					);
+				modalHeader: (selected) => _n('Delete this run?', 'Delete these runs?', selected.length, 'webhead-search-cloud'),
+				modalSize: 'small',
+				// A deleted run cannot be brought back, so the table asks first
+				// and the button says what it does.
+				RenderModal: ({items: selected, closeModal}) => (
+					<Stack direction="column" gap="lg">
+						<Text>
+							{sprintf(
+								/* translators: %d: number of sync runs. */
+								_n(
+									'%d run is removed from the history for good. What it sent to Search Cloud stays where it is.',
+									'%d runs are removed from the history for good. What they sent to Search Cloud stays where it is.',
+									selected.length,
+									'webhead-search-cloud'
+								),
+								selected.length
+							)}
+						</Text>
+						<Stack direction="row" gap="sm" justify="flex-end">
+							<Button __next40pxDefaultSize variant="tertiary" onClick={closeModal}>
+								{__('Cancel', 'webhead-search-cloud')}
+							</Button>
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								isDestructive
+								onClick={async () => {
+									closeModal();
 
-					setReload((value) => value + 1);
-					onChanged?.();
-				},
+									await Promise.all(
+										selected.map((item) =>
+											apiFetch({path: `${apiBase}/history/${item.id}`, method: 'DELETE'}).catch(() => null)
+										)
+									);
+
+									setReload((value) => value + 1);
+									onChanged?.();
+								}}
+							>
+								{__('Delete permanently', 'webhead-search-cloud')}
+							</Button>
+						</Stack>
+					</Stack>
+				),
 			},
 		],
 		[apiBase, onChanged]
@@ -262,37 +317,83 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 			setReload((value) => value + 1);
 			onChanged?.();
 		} catch (error) {
-			showToast(__('Could not clear the history.', 'webhead-search-cloud'), 'error');
+			showToast(
+				error?.message || __('Could not clear the history.', 'webhead-search-cloud'),
+				'error'
+			);
 		}
 	};
 
 	return (
-		<div className="whsc-sync-history">
-			<div className="whsc-sync-history-head">
-				<h4>{__('Sync history', 'webhead-search-cloud')}</h4>
-				<Button variant="tertiary" isDestructive onClick={clearFinished} disabled={total === 0 || !CAN_RUN_SYNC}>
+		<Stack direction="column" gap="md" className="whsc-sync-history">
+			<Stack direction="row" gap="md" justify="space-between" align="center" wrap="wrap">
+				<Text render={<h3/>} variant="heading-md" className="whsc-sync-history__title">
+					{__('Sync history', 'webhead-search-cloud')}
+				</Text>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					isDestructive
+					onClick={() => setIsClearOpen(true)}
+					disabled={total === 0 || !CAN_RUN_SYNC}
+				>
 					{__('Clear finished', 'webhead-search-cloud')}
 				</Button>
+			</Stack>
+
+			{/* The dataset has no media; the class keeps an empty media box out of
+			    every layout that would draw one. */}
+			<div className="webhead-search-cloud-dataviews--no-media">
+				<DataViews
+					data={items}
+					fields={fields}
+					view={view}
+					onChangeView={updateView}
+					actions={actions}
+					isLoading={isLoading}
+					paginationInfo={{
+						totalItems: total,
+						totalPages: Math.max(1, Math.ceil(total / view.perPage)),
+					}}
+					defaultLayouts={{
+						table: {showMedia: false, layout: {styles: COLUMN_STYLES}},
+						activity: {showMedia: false},
+					}}
+					getItemId={(item) => String(item.id)}
+				/>
 			</div>
 
-			<DataViews
-				data={items}
-				fields={fields}
-				view={view}
-				onChangeView={updateView}
-				actions={actions}
-				isLoading={isLoading}
-				paginationInfo={{
-					totalItems: total,
-					totalPages: Math.max(1, Math.ceil(total / view.perPage)),
-				}}
-				defaultLayouts={{
-					table: {},
-					activity: {showMedia: false},
-				}}
-				getItemId={(item) => String(item.id)}
-			/>
-		</div>
+			{/* Clearing cannot be undone, so it is asked about in a dialog that
+			    only its own buttons close. */}
+			<Modal
+				isOpen={isClearOpen}
+				onClose={() => setIsClearOpen(false)}
+				title={__('Clear the finished runs?', 'webhead-search-cloud')}
+				size="small"
+				showCloseButton={false}
+				closeOnEscape={false}
+				closeOnBackdropClick={false}
+				actions={[
+					{
+						label: __('Cancel', 'webhead-search-cloud'),
+						variant: 'tertiary',
+					},
+					{
+						label: __('Clear permanently', 'webhead-search-cloud'),
+						variant: 'primary',
+						isDestructive: true,
+						onClick: clearFinished,
+					},
+				]}
+			>
+				<Text>
+					{__(
+						'Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Search Cloud changes.',
+						'webhead-search-cloud'
+					)}
+				</Text>
+			</Modal>
+		</Stack>
 	);
 };
 

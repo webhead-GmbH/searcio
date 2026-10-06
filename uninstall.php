@@ -12,6 +12,14 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 require_once __DIR__ . '/webhead-search-cloud.php';
 
-$plugin = new \Webhead\WP\SearchCloud\Plugin();
+// In a function of its own: WordPress includes this file inside
+// uninstall_plugin(), whose own variable is called $plugin.
+( static function (): void {
+	$instance = new \Webhead\WP\SearchCloud\Plugin();
 
-$plugin->uninstall( $plugin->is_active_for_network() );
+	// WordPress deactivates a plugin before it deletes it, so asking whether
+	// the plugin is network active here always answers no. The framework
+	// records how far activation reached instead, and that record is what
+	// decides whether uninstall cleans every site of the network.
+	$instance->uninstall( $instance->was_activated_for_network() );
+} )();

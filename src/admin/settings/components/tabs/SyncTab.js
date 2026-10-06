@@ -1,26 +1,19 @@
 import {useCallback, useEffect, useRef, useState} from '@wordpress/element';
-import {__experimentalConfirmDialog as ConfirmDialog, Button, Notice,} from '@wordpress/components';
-import {Card, Text} from '@wordpress/ui';
+import {__experimentalConfirmDialog as ConfirmDialog, Button, ProgressBar} from '@wordpress/components';
+import {Badge, Card, Notice, Stack, Text} from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import {showToast} from '../../../../toast';
+import {Grid} from '../../../../components/Layout';
+import {statusIntent, statusLabels} from '../../syncStatus';
+import TabIntro from '../TabIntro';
 import SyncSkeleton from './SyncSkeleton';
 import SyncHistory from './SyncHistory';
-import {Flex} from "../../../../components/Layout";
 
 const pluginData = window.webhead_search_cloudData || {};
 const SYNC_BASE = pluginData?.api?.syncBase || '/webhead-search-cloud/v1/sync';
 const CAN_RUN_SYNC = pluginData?.caps?.runSync !== false;
-
-const STATUS_LABELS = {
-	queued: __('Queued', 'webhead-search-cloud'),
-	running: __('Running', 'webhead-search-cloud'),
-	paused: __('Paused', 'webhead-search-cloud'),
-	completed: __('Completed', 'webhead-search-cloud'),
-	failed: __('Failed', 'webhead-search-cloud'),
-	cancelled: __('Cancelled', 'webhead-search-cloud'),
-};
 
 const tabUrl = (tab) => {
 	const url = new URL(window.location.href);
@@ -30,10 +23,10 @@ const tabUrl = (tab) => {
 };
 
 const Counter = ({label, value}) => (
-	<div className="whsc-counter">
-		<span className="whsc-counter-value">{Number(value || 0).toLocaleString()}</span>
-		<span className="whsc-counter-label">{label}</span>
-	</div>
+	<Stack direction="column" gap="xs" className="whsc-counter">
+		<Text variant="heading-lg">{Number(value || 0).toLocaleString()}</Text>
+		<Text variant="body-sm" className="whsc-counter__label">{label}</Text>
+	</Stack>
 );
 
 // Copy for the confirmation dialog shown before Start / Re-sync everything /
@@ -134,7 +127,7 @@ const SyncTab = () => {
 	};
 
 	// Start / Re-sync everything / Cancel only run after the user confirms in
-	// the dialog below — `confirmAction` holds which one is pending.
+	// the dialog below - `confirmAction` holds which one is pending.
 	const runConfirmedAction = async () => {
 		const action = confirmAction;
 
@@ -160,15 +153,10 @@ const SyncTab = () => {
 	};
 
 	if (loading || !status) {
-		return (
-			<Card.Root className="whsc-tab-card">
-				<Card.Content className="whsc-tab-card-content">
-					<SyncSkeleton/>
-				</Card.Content>
-			</Card.Root>
-		);
+		return <SyncSkeleton/>;
 	}
 
+	const labels = statusLabels();
 	const active = status.active;
 	const configured = Boolean(status.configured);
 	const hasTypes = Array.isArray(status.indexable) && status.indexable.length > 0;
@@ -176,107 +164,128 @@ const SyncTab = () => {
 		active && active.total_estimated > 0
 			? Math.min(100, Math.round((active.processed / active.total_estimated) * 100))
 			: null;
+	// No estimate yet: a running sync moves without a number, a waiting one
+	// stands at nothing.
+	const progressValue = null === percent && 'running' !== active?.status ? 0 : percent ?? undefined;
 
 	return (
-		<Card.Root className="whsc-tab-card">
-			<Card.Header className="whsc-tab-card-header">
-				<Card.Title render={<h3/>}>
-					{__('Sync', 'webhead-search-cloud')}
-				</Card.Title>
-				<Text render={<p/>} variant="body-sm">
-					{__(
+		<>
+			<Stack direction="column" gap="lg" className="webhead-search-cloud-sync">
+				<TabIntro
+					title={__('Sync', 'webhead-search-cloud')}
+					description={__(
 						'Send your content to Search Cloud. Only new and changed items are sent on each run, so repeat syncs are fast.',
 						'webhead-search-cloud'
 					)}
-				</Text>
-			</Card.Header>
-			<Card.Content className="whsc-tab-card-content webhead-search-cloud-sync">
+				/>
+
 				{!configured && (
-					<Notice status="warning" isDismissible={false}>
-						<p>
-							{__('Add and save your Search Cloud credentials first.', 'webhead-search-cloud')}{' '}
-							<a href={tabUrl('connection')}>{__('Go to Connection', 'webhead-search-cloud')}</a>
-						</p>
-					</Notice>
+					<Notice.Root intent="warning">
+						<Notice.Description>
+							{__('Add and save your Search Cloud credentials first.', 'webhead-search-cloud')}
+						</Notice.Description>
+						<Notice.Actions>
+							<Notice.ActionLink href={tabUrl('connection')}>
+								{__('Go to Connection', 'webhead-search-cloud')}
+							</Notice.ActionLink>
+						</Notice.Actions>
+					</Notice.Root>
 				)}
 
 				{configured && !hasTypes && (
-					<Notice status="info" isDismissible={false}>
-						<p>
-							{__('No content types are enabled for indexing yet.', 'webhead-search-cloud')}{' '}
-							<a href={tabUrl('indexing')}>{__('Go to Indexing', 'webhead-search-cloud')}</a>
-						</p>
-					</Notice>
+					<Notice.Root intent="info">
+						<Notice.Description>
+							{__('No content types are enabled for indexing yet.', 'webhead-search-cloud')}
+						</Notice.Description>
+						<Notice.Actions>
+							<Notice.ActionLink href={tabUrl('indexing')}>
+								{__('Go to Indexing', 'webhead-search-cloud')}
+							</Notice.ActionLink>
+						</Notice.Actions>
+					</Notice.Root>
 				)}
 
 				{active ? (
-					<Card.Root className="whsc-card whsc-card--dotted">
-						<Card.Header className="whsc-sync-card-head">
-						<span className={`whsc-status-badge is-${active.status}`}>
-							{STATUS_LABELS[active.status] || active.status}
-						</span>
-							{active.force && (
-								<span className="whsc-sync-tag">{__('Full re-sync', 'webhead-search-cloud')}</span>
-							)}
-						</Card.Header>
-						<Card.Content>
-							<div className="whsc-progress" role="progressbar" aria-valuenow={percent ?? undefined} aria-valuemin={0}
-							     aria-valuemax={100}>
-								<div
-									className={`whsc-progress-bar${percent === null && active.status === 'running' ? ' is-indeterminate' : ''}`}
-									style={percent === null ? undefined : {width: `${percent}%`}}
-								/>
-							</div>
-
-							<p className="whsc-progress-label">
-								{percent === null
-									? sprintf(
-										/* translators: %d: processed item count. */
-										__('%d items processed…', 'webhead-search-cloud'),
-										active.processed
-									)
-									: sprintf(
-										/* translators: 1: processed, 2: estimated total, 3: percentage. */
-										__('%1$s of ~%2$s processed (%3$d%%)', 'webhead-search-cloud'),
-										Number(active.processed).toLocaleString(),
-										Number(active.total_estimated).toLocaleString(),
-										percent
+					<Card.Root className="whsc-card whsc-card--dotted whsc-sync-run">
+						<Card.Header className="whsc-card__header">
+							<Stack direction="row" gap="md" justify="space-between" align="center" wrap="wrap">
+								<Card.Title render={<h3/>}>{__('Current run', 'webhead-search-cloud')}</Card.Title>
+								<Stack direction="row" gap="sm" align="center">
+									<Badge intent={statusIntent(active.status)}>
+										{labels[active.status] || String(active.status)}
+									</Badge>
+									{active.force && (
+										<Badge>{__('Full re-sync', 'webhead-search-cloud')}</Badge>
 									)}
-							</p>
+								</Stack>
+							</Stack>
+						</Card.Header>
+						<Card.Content className="whsc-card__content">
+							<Stack direction="column" gap="lg">
+								<Stack direction="column" gap="sm">
+									<ProgressBar className="whsc-sync-progress" value={progressValue}/>
+									<Text variant="body-sm" className="whsc-progress-label">
+										{percent === null
+											? sprintf(
+												/* translators: %d: processed item count. */
+												__('%d items processed…', 'webhead-search-cloud'),
+												active.processed
+											)
+											: sprintf(
+												/* translators: 1: processed, 2: estimated total, 3: percentage. */
+												__('%1$s of ~%2$s processed (%3$d%%)', 'webhead-search-cloud'),
+												Number(active.processed).toLocaleString(),
+												Number(active.total_estimated).toLocaleString(),
+												percent
+											)}
+									</Text>
+								</Stack>
 
-							<div className="whsc-counters">
-								<Counter label={__('Pushed', 'webhead-search-cloud')} value={active.pushed}/>
-								<Counter label={__('Skipped', 'webhead-search-cloud')} value={active.skipped}/>
-								<Counter label={__('Deleted', 'webhead-search-cloud')} value={active.deleted}/>
-								<Counter label={__('Failed', 'webhead-search-cloud')} value={active.failed_count}/>
-							</div>
+								<Grid auto={{base: 120, md: 160}} gap="var(--wpds-dimension-gap-md)" align="start">
+									<Counter label={__('Pushed', 'webhead-search-cloud')} value={active.pushed}/>
+									<Counter label={__('Skipped', 'webhead-search-cloud')} value={active.skipped}/>
+									<Counter label={__('Deleted', 'webhead-search-cloud')} value={active.deleted}/>
+									<Counter label={__('Failed', 'webhead-search-cloud')} value={active.failed_count}/>
+								</Grid>
 
-							{active.last_error && (
-								<Notice status="error" isDismissible={false} className="whsc-progress-error">
-									<p>{active.last_error}</p>
-								</Notice>
-							)}
-
-							<Flex gap="10px" align="center">
-								{active.status === 'running' && (
-									<Button variant="secondary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/pause', {}, null)}>
-										{__('Pause', 'webhead-search-cloud')}
-									</Button>
+								{active.last_error && (
+									// A run that is waiting to send a batch again is still
+									// running, and says when it tries: that is a warning.
+									// Anything else a run says about itself is an error.
+									<Notice.Root intent={active.status === 'running' && active.cursor?.retries > 0 ? 'warning' : 'error'}>
+										<Notice.Description>{active.last_error}</Notice.Description>
+									</Notice.Root>
 								)}
+
 								{active.status === 'paused' && (
-									<Button variant="primary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/resume', {}, null)}>
-										{__('Resume', 'webhead-search-cloud')}
-									</Button>
+									<Notice.Root intent="info">
+										<Notice.Description>
+											{__('While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before.', 'webhead-search-cloud')}
+										</Notice.Description>
+									</Notice.Root>
 								)}
-								<Button variant="tertiary" isDestructive isBusy={busy} disabled={busy || !CAN_RUN_SYNC}
-								        onClick={() => setConfirmAction({type: 'cancel'})}>
-									{__('Cancel', 'webhead-search-cloud')}
-								</Button>
-							</Flex>
+
+								<Stack direction="row" gap="sm" align="center" wrap="wrap">
+									{active.status === 'running' && (
+										<Button __next40pxDefaultSize variant="secondary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/pause', {}, null)}>
+											{__('Pause', 'webhead-search-cloud')}
+										</Button>
+									)}
+									{active.status === 'paused' && (
+										<Button __next40pxDefaultSize variant="primary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/resume', {}, null)}>
+											{__('Resume', 'webhead-search-cloud')}
+										</Button>
+									)}
+									<Button __next40pxDefaultSize variant="tertiary" isDestructive isBusy={busy} disabled={busy || !CAN_RUN_SYNC}
+									        onClick={() => setConfirmAction({type: 'cancel'})}>
+										{__('Cancel', 'webhead-search-cloud')}
+									</Button>
+								</Stack>
+							</Stack>
 						</Card.Content>
 					</Card.Root>
 				) : (
-					<Flex gap="10px" align="center" className="whsc-sync-start">
+					<Stack direction="row" gap="sm" align="center" wrap="wrap" className="whsc-sync-start">
 						<Button
 							variant="primary"
 							__next40pxDefaultSize
@@ -295,7 +304,7 @@ const SyncTab = () => {
 						>
 							{__('Re-sync everything', 'webhead-search-cloud')}
 						</Button>
-					</Flex>
+					</Stack>
 				)}
 
 				<SyncHistory
@@ -303,7 +312,8 @@ const SyncTab = () => {
 					refreshSignal={historyKey}
 					onChanged={() => setHistoryKey((value) => value + 1)}
 				/>
-			</Card.Content>
+			</Stack>
+			{/* The dialog draws no title of its own, so the body asks the question. */}
 			<ConfirmDialog
 				isOpen={!!confirmAction}
 				onConfirm={runConfirmedAction}
@@ -312,13 +322,13 @@ const SyncTab = () => {
 				cancelButtonText={__('Not now', 'webhead-search-cloud')}
 			>
 				{confirmAction && (
-					<>
-						<p><strong>{CONFIRM_COPY[confirmAction.type].title}</strong></p>
-						<p>{CONFIRM_COPY[confirmAction.type].body}</p>
-					</>
+					<Stack direction="column" gap="sm">
+						<Text variant="heading-md">{CONFIRM_COPY[confirmAction.type].title}</Text>
+						<Text>{CONFIRM_COPY[confirmAction.type].body}</Text>
+					</Stack>
 				)}
 			</ConfirmDialog>
-		</Card.Root>
+		</>
 	);
 };
 

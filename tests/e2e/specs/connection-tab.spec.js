@@ -8,7 +8,7 @@
  * the card applies, and each can fail on its own.
  */
 
-import { test, expect, setConnected } from '../utils';
+import { test, expect, setConnected, touchingInShell } from '../utils';
 
 const CONNECTION_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=connection';
 
@@ -86,6 +86,21 @@ test.describe( 'Connection tab allowances', () => {
 		await expect( assistant ).toContainText( 'Spent for this month.' );
 		// A spent allowance says so once - not also "close to the limit".
 		await expect( assistant ).not.toContainText( 'Close to the limit.' );
+
+		// Three states are three colours: a bar that is fine, one to watch and
+		// one that has stopped something must not look alike.
+		const fill = ( row ) => row.locator( '.whsc-usage__fill' ).evaluate( ( el ) => window.getComputedStyle( el ).backgroundColor );
+		const documents = page.locator( '.whsc-usage__row', { hasText: 'Indexed documents' } );
+		const colours = [ await fill( documents ), await fill( searches ), await fill( assistant ) ];
+
+		expect( new Set( colours ).size ).toBe( 3 );
+
+		// And each is a colour: the tones' darkest shades are all but black.
+		colours.forEach( ( colour ) => {
+			const channels = colour.match( /\d+/g ).slice( 0, 3 ).map( Number );
+
+			expect( Math.max( ...channels ) ).toBeGreaterThanOrEqual( 120 );
+		} );
 		await expect( page.getByRole( 'img', { name: 'Searches: 90% used' } ) ).toBeVisible();
 	} );
 
@@ -93,8 +108,50 @@ test.describe( 'Connection tab allowances', () => {
 		await mockHealth( page );
 		await page.goto( CONNECTION_URL );
 
-		// The card is nested in the connection card, whose title is the tab's h3.
-		await expect( page.getByRole( 'heading', { level: 4, name: 'This month' } ) ).toBeVisible( LOADED );
-		await expect( page.getByRole( 'heading', { level: 3, name: 'Search Cloud connection' } ) ).toBeVisible();
+		// The card is a section of the connection tab, whose heading is the h2
+		// under the page title.
+		await expect( page.getByRole( 'heading', { level: 3, name: 'This month' } ) ).toBeVisible( LOADED );
+		await expect( page.getByRole( 'heading', { level: 2, name: 'Search Cloud connection' } ) ).toBeVisible();
+	} );
+
+	test( 'leaves a gap between everything the connected tab stacks', async ( { page } ) => {
+		await mockHealth( page );
+		await page.goto( CONNECTION_URL );
+
+		await expect( page.locator( '.whsc-usage__label' ).first() ).toBeVisible( LOADED );
+
+		expect( await touchingInShell( page ) ).toEqual( [] );
+	} );
+
+	/**
+	 * Removing the credentials stops search on the storefront and is not undone
+	 * by a click, so it is asked about in a dialog only its own buttons close.
+	 */
+	test( 'asks before it disconnects, and does nothing when told not to', async ( { page } ) => {
+		let disconnected = false;
+
+		await mockHealth( page );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/connection/disconnect' ),
+			( route ) => {
+				disconnected = true;
+
+				return route.fulfill( { status: 200, headers: { 'Content-Type': 'application/json' }, body: '{}' } );
+			}
+		);
+		await page.goto( CONNECTION_URL );
+
+		await page.getByRole( 'button', { name: 'Disconnect' } ).click( LOADED );
+
+		const dialog = page.getByRole( 'dialog', { name: 'Disconnect from Search Cloud?' } );
+
+		await expect( dialog ).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+		await expect( dialog ).toBeVisible();
+
+		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
+
+		await expect( dialog ).toHaveCount( 0 );
+		expect( disconnected ).toBe( false );
 	} );
 } );

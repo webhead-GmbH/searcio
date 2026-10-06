@@ -1,11 +1,10 @@
 import {useContext, useState} from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { InputControl, Text } from '@wordpress/ui';
-import {__} from '@wordpress/i18n';
+import { InputControl, Notice, Stack, Text } from '@wordpress/ui';
+import {__, sprintf} from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
-import {Flex} from '../../../../components/Layout';
 import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
 
@@ -20,7 +19,7 @@ const SECRET_PLACEHOLDER = '••••••••••••';
  * default; the parent expands it automatically on `pending_claim` or a `409`.
  */
 const ManualConnectionEntry = ({pendingClaim}) => {
-	const {settings, updateSetting, saveSettings, isSaving, isLoading, hasUnsavedChanges} =
+	const {settings, updateSetting, saveSettings, saveError, clearSaveError, isSaving, isLoading, hasUnsavedChanges} =
 		useContext(SettingsContext);
 
 	const [writeKey, setWriteKey] = useState('');
@@ -33,17 +32,16 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 	const onSave = async () => {
 		const success = await saveSettings();
 
-		if (success) {
-			setWriteKey('');
-			setWriteSecret('');
+		// A failure is reported by the notice above the buttons, with the
+		// reason the REST API gave; a toast as well would say it twice.
+		if (!success) {
+			return;
 		}
 
-		showToast(
-			success
-				? __('Connection settings saved.', 'webhead-search-cloud')
-				: __('Could not save the connection settings.', 'webhead-search-cloud'),
-			success ? 'success' : 'error'
-		);
+		setWriteKey('');
+		setWriteSecret('');
+
+		showToast(__('Connection settings saved.', 'webhead-search-cloud'), 'success');
 	};
 
 	const onTest = async () => {
@@ -89,7 +87,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 		: undefined;
 
 	return (
-		<Flex direction="column" gap={16} className="webhead-search-cloud-manual-entry">
+		<Stack direction="column" gap="lg" className="webhead-search-cloud-manual-entry">
 			<Text render={<p/>} variant="body-sm">
 				{__(
 					'Enter the credentials from your site page in the Search Cloud app. The write key and secret are stored encrypted and never sent to the browser in clear text.',
@@ -137,11 +135,25 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 
 			<ConnectionResultNotice result={result}/>
 
-			<Flex
+			{saveError && (
+				<Notice.Root intent="error">
+					<Notice.Description>
+						{sprintf(
+							/* translators: %s: reason the settings could not be saved, as reported by the REST API. */
+							__('The settings could not be saved: %s', 'webhead-search-cloud'),
+							saveError
+						)}
+					</Notice.Description>
+					<Notice.CloseIcon onClick={clearSaveError}/>
+				</Notice.Root>
+			)}
+
+			<Stack
 				className="webhead-search-cloud-connection-actions"
+				direction="row"
 				align="center"
-				gap={12}
-				wrap
+				gap="md"
+				wrap="wrap"
 			>
 				<Button
 					__next40pxDefaultSize
@@ -170,8 +182,8 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				<Text render={<span/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
 					{__('Test uses your saved credentials - save first.', 'webhead-search-cloud')}
 				</Text>
-			</Flex>
-		</Flex>
+			</Stack>
+		</Stack>
 	);
 };
 

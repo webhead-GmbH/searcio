@@ -2,7 +2,7 @@
     "src/admin/settings/components/SettingsPanel.js": [
         "public/bundle.settings.js"
     ],
-    "src/admin/settings/components/UpgradeButton.js": [
+    "src/admin/settings/components/SettingsSkeleton.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/CacheClearCard.js": [
@@ -15,6 +15,9 @@
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/ConnectionTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/IndexingSkeleton.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/IndexingTab.js": [
@@ -32,10 +35,19 @@
     "src/admin/settings/components/tabs/SyncHistory.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/tabs/SyncSkeleton.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/tabs/SyncTab.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/UsageCard.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/syncStatus.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/upgradeAction.js": [
         "public/bundle.settings.js"
     ],
     "src/blocks/products/edit.js": [
@@ -43,6 +55,9 @@
     ],
     "src/blocks/search/edit.js": [
         "public/bundle.search-block-editor.js"
+    ],
+    "src/components/AdminPage.js": [
+        "public/bundle.settings.js"
     ],
     "src/components/Modal.js": [
         "public/bundle.settings.js"

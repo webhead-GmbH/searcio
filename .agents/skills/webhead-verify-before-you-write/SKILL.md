@@ -36,8 +36,21 @@ These produce no error at all. Nothing goes red; the thing just does not work.
 | `<Badge intent="success">` | Intents are `none \| stable \| draft \| informational \| low \| medium \| high`. Anything else renders unstyled. |
 | `<InputControl onChange={…}>` | The `@wordpress/ui` controls take **`onValueChange`**. The field renders perfectly and never updates. |
 | `<ToggleControl hideLabelFromVision>` | `ToggleControl` renders its own label and ignores the prop entirely. |
-| `box-shadow: var( --wpds-elevation-xs )` | `@wordpress/theme` removed the elevation properties. The declaration is dropped; no shadow, no warning. |
-| A `--wpds-*` name that does not exist | Same silence. CSS drops the declaration and nothing reports it. |
+| `box-shadow: var( --wpds-elevation-xs )` | `@wordpress/theme` removed the elevation properties. The declaration was dropped; no shadow, no warning. The build stops on it now (`Unknown design token`), in a stylesheet. |
+| A `--wpds-*` name that does not exist, in a `style` prop or a JavaScript string | Same silence, and the build does not reach it. CSS drops the declaration and nothing reports it. |
+| Two elements, one after the other, in a `Card.Content` | `Card.Content` pads itself and does not space its children; a fragment does not either. They touch — 0px, measured — and the source looks fine. A `Stack direction="column"` with a `gap` holds them. |
+| `.thing svg { fill: white; }` | `@wordpress/icons` 17 draws most icons as strokes carrying `fill: none` inline. The rule does nothing; `color` recolours them. |
+| `<Notice.Root status="error" isDismissible>` | That is the `@wordpress/components` API. The `@wordpress/ui` notice takes `intent`, and is dismissible when it holds a `Notice.CloseIcon`. |
+| `import { ButtonLink, Progress } from '@wordpress/ui'` | Names from the Storybook, which documents Gutenberg's trunk. 0.23 exports `LinkButton` and no `Progress`: `undefined`, and #130 again. |
+| `<Stack direction="column" align="start">` around a button and a notice | `align` applies to every child. The button stays as wide as its label, which was the point, and the notice collapses to 26px with its text one word to a line. It only shows after the button is clicked. Buttons go in `<Stack direction="row">`. |
+| A custom property set on a screen's root, or on `body`, to recolour it | A theme provider writes its values inline on `<html>` and on its own element, and WordPress sets `--wp-admin-theme-color` on `body.admin-color-*`. A value set above either never arrives. Read it back with `getComputedStyle` on the control. |
+| An element rule (`button { color: inherit; }`) outside a cascade layer | `@wordpress/ui` styles are in a layer, and a rule outside one outranks them whatever its specificity: a filled button had its label dark on a dark fill. |
+| `<CheckboxControl onValueChange={…}>` | A checkbox takes `checked` and `onCheckedChange`. Text, select and radio controls take `onValueChange`. Neither takes `onChange`. |
+| `import { DataViews } from '@wordpress/dataviews'` on a second screen | The package's stylesheet is a separate file. The table renders without it: 1275px wide in a 2293px frame, headers centred. Import it from `src/components/DataViews`. |
+| `styles: { name: { width: '18%' } }` where `name` is the `titleField` | DataViews sizes the primary column itself and ignores the style. |
+| A line clamp on `.dataviews-view-table__cell-content-wrapper` | DataViews makes that element a row that does not wrap, through a more specific selector. The text is cut at the edge with no ellipsis. Clamp the value in the field's `render`. |
+| `<ConfirmDialog title="Move to trash?">` | The title is the dialog's accessible name and is not drawn. The body has to ask the question. |
+| `<EmptyState.Root>` straight into a page | It centres its content, not itself, and sits at the left edge. |
 
 **How to not be in this table:** open the package before you use it.
 
@@ -112,6 +125,34 @@ git checkout -- src/components/Default/default.scss
 
 Check that the guard names the thing you broke, not merely that something
 failed: a command that does not exist also exits non-zero.
+
+## A screen is every state it has
+
+A page was built, opened, measured and reported as correct. The person who asked for it clicked
+its one button, and the notice that appeared was 26px wide. Nothing that had been checked was
+wrong; the state that was wrong had never been on the screen.
+
+**Opening a screen checks one state of it.** Before saying a screen works:
+
+- **Click every action** and look at what appears: the notice, the busy button, the toast.
+- **Open every overlay**: the menu, the confirmation, the modal. Tick what gates a button and
+  look at the button again.
+- **Make every field wrong** once, and make a save fail, and read what the screen says.
+- **Empty the list.** A table has a state with no rows and one with a filter that matches none.
+- **Select something**: a row, several rows, a tab that is not the first.
+- **Narrow the window** to a phone's width, where the menu collapses and the header's actions
+  move under the title.
+- **Switch to a right-to-left language**, when the plugin will be used in one. The build writes a
+  mirrored stylesheet and the framework tells WordPress about it, but a `left` or a `right`
+  written into a `style` prop is not mirrored by anything.
+
+Two things about the tools:
+
+- **Read the numbers, not the picture.** A screenshot scaled to fit made dark grey text look red.
+  The computed colour was the one the stylesheet asked for.
+- **`document.documentElement.style.zoom` misplaces overlays.** It makes a wide layout in a narrow
+  window, and it is the right tool for widths, but a popover positioned while it is set opens in
+  the wrong place. Check menus and popovers at zoom 1.
 
 ## Measure the page; do not look at it
 
@@ -210,12 +251,60 @@ symptom is a 404 or a missing service rather than a "class not found". After
 adding a PHP class to a plugin, run `composer dump-autoload` before concluding
 that the registration is wrong.
 
+## What only shows up in a real plugin on a real site
+
+Every one of these had passing tests when it was found.
+
+- **`$wpdb->insert_id` after `$table->insert()` is not the row's id.** The write
+  invalidates the table's cache group, which can store an option, and the first
+  time that is a new row in the options table. Use `$table->insert_get_id()`.
+- **A label translated in a `register_*()` method is translated while the
+  plugin boots.** It costs a query on every request and raises "translation
+  loading was triggered too early". Give a closure where the API takes one.
+- **An inline style beats a responsive control.** A widget that prints
+  `style="--columns:3"` and also declares the property through Elementor
+  `selectors` shows three columns on every screen. Print one or the other.
+- **A spec that asks `isVisible()` once and skips is a spec that never runs.**
+  The React app has not fetched its data when the page has loaded. Wait with
+  `await expect( locator ).toBeVisible()`, and read "1 skipped" as a failure
+  until you know why.
+- **The integration suite has no active plugin.** It reinstalls the database, so
+  a companion plugin is not loaded unless `tests/Integration/bootstrap-extra.php`
+  requires it, and a test that needs it passes by skipping.
+- **wp-env names a plugin's folder after its zip file.** `x.latest-stable.zip`
+  becomes `x.latest-stable/`, which `Requires Plugins: x` does not match. Use
+  `x.zip`, and list it before `.` in `.wp-env.json`.
+- **An admin screen inside another plugin's screen shares its URL.** The
+  settings app remembers its open group in the URL; inside WooCommerce >
+  Settings, `tab` is WooCommerce's own argument and must not be written over.
+- **A width cap cannot be seen on a screen narrower than the cap.** A second
+  admin page was 1440px wide beside a settings screen of 2340px, and 20px to its
+  left. It had been opened and tested, every time at laptop width and every time
+  on its own. Put two screens side by side as numbers, at a viewport wider than
+  any laptop; `is drawn by the page shell and fills the frame it is given` in
+  `tests/e2e/specs/settings-page.spec.js` does it at 2400px, and is one of the
+  two tests to copy for each page you add.
+- **Two things that touch look like a choice in a screenshot.** A page was
+  built with a paragraph and a button in one `Card.Content`, and they sat
+  flush against each other: nothing in a card spaces its children. It was
+  opened, looked at and passed. `leaves a gap between everything it stacks`
+  in the same spec measures it, and is the other test to copy.
+- **A directory that is there is read as a directory that is used.** A
+  `templates` directory holding a placeholder, an `Example_*` class nobody
+  registers, an `index.php` that says nothing: each is kept by whoever comes
+  next, and copied. Create a directory with its first file, delete it with its
+  last, and delete an example you are not building on together with its test.
+
 ## Before you say it is done
 
 - [ ] Every new import was checked against the installed package.
 - [ ] Every new route, page or endpoint follows the sibling that already exists.
 - [ ] `npm run build` was run and its **exit code** was zero.
 - [ ] The screen was opened and **measured**, not just screenshotted.
+- [ ] Every screen you touched was compared with the settings screen, as numbers,
+      at a viewport wider than 1920px.
+- [ ] Nothing was left behind: no empty directory, no placeholder file, no example
+      the plugin does not use.
 - [ ] The browser console was read, and any error was traced to its source
       rather than assumed to be stale.
 - [ ] Any check you added was made to fail on purpose at least once.

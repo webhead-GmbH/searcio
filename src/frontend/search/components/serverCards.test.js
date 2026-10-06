@@ -7,12 +7,55 @@ jest.mock( '../../../utils/api', () => ( {
 // eslint-disable-next-line import/first -- must follow the jest.mock() call above.
 import {
 	postProcessMarkup,
+	ensureTemplateCss,
 	escapeHtml,
 	evaluateCondition,
 	evaluateConditions,
+	liftSelectors,
 	matchTemplate,
 	substitutePlaceholders,
 } from './serverCards';
+
+const WEIGHT = ':is(*, #whsc#whsc#whsc#whsc)';
+
+describe( 'liftSelectors', () => {
+	it.each( [
+		[ '.sct-12-title', `${ WEIGHT }.sct-12-title` ],
+		[ '.sct-12-button:hover', `${ WEIGHT }.sct-12-button:hover` ],
+		// A pseudo-class cannot be written before an element name.
+		[ 'a.sct-12-root', `a${ WEIGHT }.sct-12-root` ],
+		[ '*', `*${ WEIGHT }` ],
+		[ '.sct-12-html p, .sct-12-html li::before', `${ WEIGHT }.sct-12-html p, ${ WEIGHT }.sct-12-html li::before` ],
+		// Commas that do not separate two selectors.
+		[ '.sct-12-a:is(.x, .y) > p', `${ WEIGHT }.sct-12-a:is(.x, .y) > p` ],
+		[ '.sct-12-a[data-tags="a,b"], .sct-12-b', `${ WEIGHT }.sct-12-a[data-tags="a,b"], ${ WEIGHT }.sct-12-b` ],
+	] )( 'gives %s the weight of a template', ( selector, lifted ) => {
+		expect( liftSelectors( selector ) ).toBe( lifted );
+	} );
+} );
+
+describe( 'ensureTemplateCss', () => {
+	it( 'adds the stylesheet of a template once, with every rule at the weight of a template', () => {
+		ensureTemplateCss( 77, '.sct-77-a { color: red; } @media (max-width: 767px) { .sct-77-a, .sct-77-b:hover { color: blue; } }' );
+		ensureTemplateCss( 77, '.sct-77-a { color: green; }' );
+
+		const styles = document.head.querySelectorAll( 'style[data-sct-id="77"]' );
+
+		expect( styles ).toHaveLength( 1 );
+
+		const rules = Array.from( styles[ 0 ].sheet.cssRules );
+
+		expect( rules[ 0 ].selectorText ).toBe( `${ WEIGHT }.sct-77-a` );
+		expect( rules[ 0 ].style.color ).toBe( 'red' );
+		expect( rules[ 1 ].cssRules[ 0 ].selectorText ).toBe( `${ WEIGHT }.sct-77-a, ${ WEIGHT }.sct-77-b:hover` );
+	} );
+
+	it( 'adds nothing for a template without styles', () => {
+		ensureTemplateCss( 78, '' );
+
+		expect( document.head.querySelector( 'style[data-sct-id="78"]' ) ).toBeNull();
+	} );
+} );
 
 describe( 'escapeHtml', () => {
 	it( 'escapes HTML-significant characters', () => {
@@ -73,6 +116,25 @@ describe( 'server card XSS hardening', () => {
 		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
 
 		expect( result ).not.toContain( 'data:text/html' );
+	} );
+
+	it( 'strips a javascript: scheme from the xlink:href of an inline SVG', () => {
+		const hit = { source: { url: 'javascript:alert(1)' } };
+		const html = '<svg viewBox="0 0 24 24"><a xlink:href="{{url}}"><path d="M0 0h24v24H0z"/></a></svg>';
+
+		const result = postProcessMarkup( substitutePlaceholders( html, hit ), hit );
+
+		expect( result ).not.toContain( 'javascript:' );
+		expect( result ).toContain( '<path' );
+	} );
+
+	it( 'keeps the icon of a template, whose markup carries a namespace', () => {
+		const html = '<span class="sct-1-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span>';
+
+		const result = postProcessMarkup( html, { source: {} } );
+
+		expect( result ).toContain( 'viewBox="0 0 24 24"' );
+		expect( result ).toContain( 'fill="currentColor"' );
 	} );
 
 	it( 'keeps an ordinary relative href untouched', () => {

@@ -28,10 +28,25 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Sync_Command {
+	/**
+	 * How `run` waits for a run's next try, given the seconds.
+	 *
+	 * @var \Closure(int):void
+	 */
+	private \Closure $wait;
+
+	/**
+	 * @param  (\Closure(int):void)|null  $wait  Stands in for sleep(): the integration suite has no hour to wait.
+	 */
 	public function __construct(
 		private Sync_Service $service,
-		private Sync_State $state
-	) {}
+		private Sync_State $state,
+		?\Closure $wait = null
+	) {
+		$this->wait = $wait ?? static function ( int $seconds ): void {
+			sleep( $seconds );
+		};
+	}
 
 	/**
 	 * Show the current sync status.
@@ -85,6 +100,9 @@ final class Sync_Command {
 	 * Run a full sync synchronously to completion.
 	 *
 	 * Best for a real system-cron entry. If a run is already active it is resumed.
+	 * When Search Cloud does not take a batch the command waits and sends it
+	 * again, as the background sync does, for a little over an hour in all; it
+	 * exits with an error when the sync does not complete.
 	 *
 	 * ## OPTIONS
 	 *
@@ -106,8 +124,14 @@ final class Sync_Command {
 			if ( empty( $result['ok'] ) ) {
 				\WP_CLI::error( (string) ( $result['message'] ?? __( 'Could not start the sync.', 'webhead-search-cloud' ) ) );
 			}
-		} elseif ( Sync_Status::Paused->value === (string) $run['status'] ) {
-			$this->service->resume( (int) $run['id'] );
+
+			$id = (int) ( $result['run']['id'] ?? 0 );
+		} else {
+			$id = (int) $run['id'];
+
+			if ( Sync_Status::Paused->value === (string) $run['status'] ) {
+				$this->service->resume( $id );
+			}
 		}
 
 		$guard = 0;
@@ -126,7 +150,31 @@ final class Sync_Command {
 
 				return;
 			}
+
+			// Search Cloud did not take a batch. The run has scheduled its next
+			// try; nothing but this loop runs it here, so the wait is ours.
+			$wait = null === $active ? 0 : $this->service->seconds_until_retry();
+
+			if ( $wait > 0 ) {
+				\WP_CLI::warning( (string) ( $active['last_error'] ?? '' ) );
+				( $this->wait )( $wait );
+			}
 		} while ( null !== $active && $guard < 100000 );
+
+		// The run is no longer active, which is not the same as done: a plan
+		// limit, or a Search Cloud that stayed down, ends it as failed.
+		$finished = $this->state->find( $id );
+		$status   = (string) ( $finished['status'] ?? '' );
+		$error    = (string) ( $finished['last_error'] ?? '' );
+
+		if ( Sync_Status::Completed->value !== $status ) {
+			\WP_CLI::error( '' !== $error ? $error : sprintf( 'Run #%d ended in state "%s".', $id, $status ) );
+		}
+
+		// A completed run can still say what it could not remove from the index.
+		if ( '' !== $error ) {
+			\WP_CLI::warning( $error );
+		}
 
 		\WP_CLI::success( __( 'Sync completed.', 'webhead-search-cloud' ) );
 	}

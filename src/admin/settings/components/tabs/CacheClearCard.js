@@ -1,11 +1,10 @@
 import { useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { Card, Text } from '@wordpress/ui';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
 import { showToast } from '../../../../toast';
-import { Flex } from '../../../../components/Layout';
 
 const pluginData = window.webhead_search_cloudData || {};
 const CACHE_CLEAR_PATH = pluginData?.api?.cacheClearPath || '/webhead-search-cloud/v1/cache/clear';
@@ -36,7 +35,7 @@ const CacheClearCard = () => {
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<Card.Header className="whsc-settings-card-header">
 				<div className="whsc-settings-card-copy">
-					<Card.Title render={ <h3 /> }>
+					<Card.Title render={ <h2 /> }>
 						{ __( 'Cache', 'webhead-search-cloud' ) }
 					</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
@@ -48,7 +47,7 @@ const CacheClearCard = () => {
 				</div>
 			</Card.Header>
 			<Card.Content className="whsc-settings-card-content">
-				<Flex align="center" gap={ 12 } wrap>
+				<Stack direction="row" gap="sm" align="center" wrap="wrap">
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
@@ -58,7 +57,7 @@ const CacheClearCard = () => {
 					>
 						{ isClearing ? __( 'Clearing…', 'webhead-search-cloud' ) : __( 'Clear cache', 'webhead-search-cloud' ) }
 					</Button>
-				</Flex>
+				</Stack>
 			</Card.Content>
 		</Card.Root>
 	);

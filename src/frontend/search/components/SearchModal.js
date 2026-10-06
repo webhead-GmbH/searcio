@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useId, useLayoutEffect, useRef, useState} from '@wordpress/element';
-import {Button, Icon, Modal, Notice} from '@wordpress/components';
+import {Button, Icon, Modal} from '@wordpress/components';
 import {closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
@@ -13,7 +13,7 @@ import AiAssistant from './AiAssistant';
 import QuizPane from './QuizPane';
 import RangeFilters from './RangeFilters';
 import SearchInput from './SearchInput';
-import Suggestions from './Suggestions';
+import Suggestions, {optionId} from './Suggestions';
 import Browse from './Browse';
 import Carousel from './Carousel';
 import SearchResultsSkeleton from './SearchResultsSkeleton';
@@ -138,6 +138,8 @@ const SearchModal = ({
 	const [activeRanges, setActiveRanges] = useState({});
 	const [suggestions, setSuggestions] = useState([]);
 	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
+	// The suggestion the arrow keys are on, or -1 while they are on none.
+	const [activeSuggestion, setActiveSuggestion] = useState(-1);
 	const [results, setResults] = useState(null);
 	const [highlights, setHighlights] = useState([]);
 	// The search_id of the highlights carousel, so clicks on it attribute to the
@@ -870,9 +872,61 @@ const SearchModal = ({
 		abortRef.current?.abort();
 	}, []);
 
+	const suggestionsOpen = !suggestionsDismissed && suggestions.length > 0;
+
+	// A new list has nothing marked in it, and neither has one the visitor
+	// has typed on from: Enter then searches for what is in the field.
+	useEffect(() => {
+		setActiveSuggestion(-1);
+	}, [suggestions, query]);
+
+	/**
+	 * The keys of the search field. Down and Up move through the suggestions
+	 * and round from one end to the other, while focus stays in the field;
+	 * Enter searches for the one that is marked, and for what was typed when
+	 * none is. Down also brings back a list that Escape put away.
+	 */
 	const onInputKeyDown = (event) => {
+		// A key that only confirms a character being composed is not for us.
+		// Safari reports the Enter that ends a composition as not composing,
+		// with the key code every browser gives a key an input method took.
+		if (event.nativeEvent?.isComposing || 229 === event.keyCode) {
+			return;
+		}
+
+		if (('ArrowDown' === event.key || 'ArrowUp' === event.key) && suggestions.length > 0) {
+			event.preventDefault();
+
+			const step = 'ArrowDown' === event.key ? 1 : -1;
+			const last = suggestions.length - 1;
+
+			if (!suggestionsOpen) {
+				setSuggestionsDismissed(false);
+				setActiveSuggestion(1 === step ? 0 : last);
+
+				return;
+			}
+
+			setActiveSuggestion((current) => {
+				if (current < 0) {
+					return 1 === step ? 0 : last;
+				}
+
+				return (current + step + suggestions.length) % suggestions.length;
+			});
+
+			return;
+		}
+
 		if ('Enter' === event.key) {
 			event.preventDefault();
+
+			if (suggestionsOpen && activeSuggestion >= 0 && suggestions[activeSuggestion]) {
+				onSelectSuggestion(suggestions[activeSuggestion]);
+
+				return;
+			}
+
 			void runSearch(query);
 		}
 	};
@@ -1108,7 +1162,8 @@ const SearchModal = ({
 							onKeyDown={onInputKeyDown}
 							placeholder={placeholder || i18n.placeholder || ''}
 							suggestionsId={suggestionsId}
-							suggestionsOpen={!suggestionsDismissed && suggestions.length > 0}
+							suggestionsOpen={suggestionsOpen}
+							activeSuggestionId={suggestionsOpen && activeSuggestion >= 0 ? optionId(suggestionsId, activeSuggestion) : ''}
 						/>
 						{'submit' === searchTrigger && (
 							<Button
@@ -1157,10 +1212,11 @@ const SearchModal = ({
 						/>
 					</div>
 
-					{!suggestionsDismissed && suggestions.length > 0 && (
+					{suggestionsOpen && (
 						<Suggestions
 							id={suggestionsId}
 							suggestions={suggestions}
+							activeIndex={activeSuggestion}
 							onSelect={onSelectSuggestion}
 							onDismiss={() => setSuggestionsDismissed(true)}
 						/>
@@ -1233,9 +1289,11 @@ const SearchModal = ({
 				)}
 
 				{error && (
-					<Notice status="error" isDismissible={false}>
-						{error}
-					</Notice>
+					// The surface's own box, as the assistant and the product finder
+					// draw theirs. A `Notice` of `@wordpress/components` looks like
+					// whichever version of that package the plugin was built with:
+					// a bar with a red edge in one release, a bordered box in the next.
+					<p className="whsc-search-error" role="alert">{error}</p>
 				)}
 
 				<Browse

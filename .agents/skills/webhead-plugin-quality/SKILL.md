@@ -21,6 +21,7 @@ Use this before finalizing changes that affect WordPress runtime behavior, relea
 - Keep plugin-owned filesystem writes under approved roots and handle failure results.
 - Keep cache keys scoped and grouped through the framework cache facade.
 - Keep Site Health tests and diagnostics aligned with runtime behavior.
+- `phpcs.xml` and `phpstan.neon` are written so that this plugin's generated code passes both. When the tools are installed (`wp-coding-standards/wpcs`, `phpstan/phpstan`, `szepeviktor/phpstan-wordpress`), run `vendor/bin/phpcs` and `vendor/bin/phpstan analyse` before finishing a PHP change, and fix a finding in the code rather than by widening the ruleset. Short arrays and a slash in hook names are this project's style.
 
 ## Translations
 
@@ -33,4 +34,5 @@ Use this before finalizing changes that affect WordPress runtime behavior, relea
 - Release packages should ship `includes/Dependencies`, not `vendor/webhead/wp-plugin-framework`.
 - `includes/Dependencies` must contain runtime code only. It should hold `Webhead`, `League`, `Psr`, and the prefixed `composer` autoloader — and nothing else. A `Symfony` directory, a `Console` directory, or any `.stub` file means the Mozart configuration in `composer.json` lost its `excluded_packages` or `override_autoload` entries; restore them with `composer framework:update`. Shipping them adds megabytes of development tooling and produces a large number of Plugin Check findings unrelated to this plugin.
 - Do not ship `node_modules`, tests, local agent guidance folders, or generated development caches.
-- Run Plugin Check before release when scaffolded plugin code or runtime behavior changed.
+- Run Plugin Check before release when scaffolded plugin code or runtime behavior changed. Build the release package first, then check it the way wordpress.org does: `wp plugin check webhead-search-cloud --error-severity=7 --warning-severity=6 --include-low-severity-errors --exclude-checks=prefixing --categories=plugin_repo`. Only a result of type `ERROR` refuses a submission. The `ERROR_LOW_SEVERITY` results inside `includes/Dependencies` for league/container and the Mozart autoloader are third-party code and fail nothing; a finding in a `Webhead` file there is a framework defect to report, not something to suppress here.
+- A plugin hosted on WordPress.org may not contain an updater or start processes, and Plugin Check reports both by reading the code. Such a plugin lists `updates` and `command-runner` under `extra.webhead.exclude-modules` in `composer.json`. Guard optional framework services with `has_update_manager()` and `has_diagnostics_command_runner()` before using them.

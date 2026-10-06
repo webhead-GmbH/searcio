@@ -202,7 +202,7 @@ test.describe( 'search by photo', () => {
 
 		await widget.searchByPhoto( photo );
 
-		await expect( widget.modal.locator( '.components-notice' ) ).toBeVisible();
+		await expect( widget.modal.getByRole( 'alert' ) ).toBeVisible();
 		await expect( chips.first() ).toBeVisible();
 	} );
 
@@ -231,7 +231,7 @@ test.describe( 'search by photo', () => {
 		await widget.openModal();
 		await widget.searchByPhoto( photo );
 
-		await expect( widget.modal.locator( '.components-notice' ) ).toBeVisible();
+		await expect( widget.modal.getByRole( 'alert' ) ).toBeVisible();
 		// No thumbnail of a photo that produced nothing, and no results heading
 		// over an empty column.
 		await expect( widget.modal.getByRole( 'img', { name: 'Your photo' } ) ).toHaveCount( 0 );
@@ -282,7 +282,7 @@ test.describe( 'search by photo', () => {
 		await widget.openModal();
 		await widget.searchByPhoto( photo );
 
-		await expect( widget.modal.locator( '.components-notice' ) ).toContainText( 'image' );
+		await expect( widget.modal.getByRole( 'alert' ) ).toContainText( 'image' );
 	} );
 
 	test( 'says so when the monthly allowance is spent', async ( { page, requestUtils } ) => {
@@ -293,6 +293,34 @@ test.describe( 'search by photo', () => {
 		await widget.openModal();
 		await widget.searchByPhoto( photo );
 
-		await expect( widget.modal.locator( '.components-notice' ) ).toContainText( 'limit' );
+		await expect( widget.modal.getByRole( 'alert' ) ).toContainText( 'limit' );
+	} );
+
+	/**
+	 * The message was a `Notice` of `@wordpress/components`, and looked like
+	 * whichever version of that package the plugin was built with. It is the
+	 * surface's own tinted block now, the one the assistant and the product
+	 * finder show for their errors.
+	 */
+	test( 'draws the message as the surface draws an error', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { visualSearch: true, visualStatus: 429 } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+
+		const message = widget.modal.getByRole( 'alert' );
+
+		await expect( message ).toBeVisible();
+		await expect( widget.modal.locator( '.components-notice' ) ).toHaveCount( 0 );
+		await expect( message ).toHaveCSS( 'background-color', 'rgb(253, 242, 242)' );
+		await expect( message ).toHaveCSS( 'color', 'rgb(179, 38, 30)' );
+		await expect( message ).toHaveCSS( 'border-top-width', '0px' );
+
+		// As wide as the modal's content, like the banner it stands in the place of.
+		const widths = await message.evaluate( ( el ) => [ el.getBoundingClientRect().width, el.parentElement.clientWidth ] );
+
+		expect( widths[ 0 ] ).toBeGreaterThan( widths[ 1 ] * 0.8 );
 	} );
 } );

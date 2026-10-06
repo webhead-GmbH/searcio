@@ -32,6 +32,30 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Sync_Endpoint extends Rest_API {
+	/**
+	 * The run a control action or a delete is about. Left out, a control
+	 * action is about the active run.
+	 */
+	private const RUN_ARGS = [
+		'id' => [ 'type' => 'integer' ],
+	];
+
+	/**
+	 * What the history table asks with. The type is checked by WordPress
+	 * before the method runs; the range of a number and the list a name has
+	 * to be on are held by {@see \Webhead\WP\SearchCloud\Database\Tables\Sync_Runs_Table::query_history()}.
+	 */
+	private const HISTORY_ARGS = [
+		'page'        => [ 'type' => 'integer' ],
+		'per_page'    => [ 'type' => 'integer' ],
+		'order_by'    => [ 'type' => 'string' ],
+		'order'       => [ 'type' => 'string' ],
+		'status'      => [ 'type' => 'string' ],
+		'trigger'     => [ 'type' => 'string' ],
+		'date_after'  => [ 'type' => 'string' ],
+		'date_before' => [ 'type' => 'string' ],
+	];
+
 	public function __construct(
 		private Sync_Service $service,
 		private Sync_State $state
@@ -46,7 +70,7 @@ final class Sync_Endpoint extends Rest_API {
 		return new WP_REST_Response( $this->service->status() );
 	}
 
-	#[Route( '/sync/start', methods: 'POST', permission_callback: 'can_run_sync' )]
+	#[Route( '/sync/start', methods: 'POST', permission_callback: 'can_run_sync', args: [ 'force' => [ 'type' => 'boolean' ] ] )]
 	public function start( WP_REST_Request $request ): WP_REST_Response {
 		$force  = (bool) $request->get_param( 'force' );
 		$result = $this->service->start( Sync_Trigger::Manual, get_current_user_id() ?: null, $force );
@@ -54,22 +78,22 @@ final class Sync_Endpoint extends Rest_API {
 		return new WP_REST_Response( $result, $result['ok'] ? 200 : 409 );
 	}
 
-	#[Route( '/sync/pause', methods: 'POST', permission_callback: 'can_run_sync' )]
+	#[Route( '/sync/pause', methods: 'POST', permission_callback: 'can_run_sync', args: self::RUN_ARGS )]
 	public function pause( WP_REST_Request $request ): WP_REST_Response {
 		return $this->control( $request, 'pause' );
 	}
 
-	#[Route( '/sync/resume', methods: 'POST', permission_callback: 'can_run_sync' )]
+	#[Route( '/sync/resume', methods: 'POST', permission_callback: 'can_run_sync', args: self::RUN_ARGS )]
 	public function resume( WP_REST_Request $request ): WP_REST_Response {
 		return $this->control( $request, 'resume' );
 	}
 
-	#[Route( '/sync/cancel', methods: 'POST', permission_callback: 'can_run_sync' )]
+	#[Route( '/sync/cancel', methods: 'POST', permission_callback: 'can_run_sync', args: self::RUN_ARGS )]
 	public function cancel( WP_REST_Request $request ): WP_REST_Response {
 		return $this->control( $request, 'cancel' );
 	}
 
-	#[Route( '/sync/history', methods: 'GET', permission_callback: 'can_view' )]
+	#[Route( '/sync/history', methods: 'GET', permission_callback: 'can_view', args: self::HISTORY_ARGS )]
 	public function history( WP_REST_Request $request ): WP_REST_Response {
 		$result = $this->state->history(
 			[
@@ -87,7 +111,7 @@ final class Sync_Endpoint extends Rest_API {
 		return new WP_REST_Response( $result );
 	}
 
-	#[Route( '/sync/history/(?P<id>\\d+)', methods: 'DELETE', permission_callback: 'can_run_sync' )]
+	#[Route( '/sync/history/(?P<id>\\d+)', methods: 'DELETE', permission_callback: 'can_run_sync', args: self::RUN_ARGS )]
 	public function delete( WP_REST_Request $request ): WP_REST_Response {
 		$deleted = $this->state->delete( (int) $request->get_param( 'id' ) );
 

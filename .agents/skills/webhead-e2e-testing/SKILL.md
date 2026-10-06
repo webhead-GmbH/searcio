@@ -84,3 +84,4 @@ Use `isPluginActive( requestUtils, 'elementor' )` for specs that need a companio
 - Traces, screenshots, and videos for failures land in `artifacts/`. CI uploads that directory when the job fails.
 - `await page.pause()` opens the Playwright inspector.
 - Check the browser console for a React mount failure before suspecting the selector: an unbuilt or unenqueued bundle looks exactly like a missing element.
+- A `503` on every request, with "Briefly unavailable for scheduled maintenance" in the failure's page snapshot, is WordPress updating itself, not this plugin. `.wp-env.json` sets `AUTOMATIC_UPDATER_DISABLED` so a new environment does not start one; keep that constant when editing the file.

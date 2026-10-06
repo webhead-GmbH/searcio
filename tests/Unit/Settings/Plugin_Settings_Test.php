@@ -9,6 +9,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Tests\Unit\Settings;
 
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionClassConstant;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Setting;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
@@ -79,5 +80,74 @@ final class Plugin_Settings_Test extends TestCase {
 			$this->assertNotSame( '', $override['label'] );
 			$this->assertNotSame( '', $override['description'] );
 		}
+	}
+
+	/**
+	 * A text setting is stored as it is sent unless it says what it holds: a
+	 * `format` in its schema, an `enum`, a `pattern`, or a sanitize callback.
+	 * With none of them, markup posted to the settings endpoint is kept. A
+	 * masked setting is the exception: a secret has to be stored unchanged.
+	 */
+	public function test_every_text_setting_says_what_it_holds(): void {
+		foreach ( $this->declared_settings() as $name => $setting ) {
+			if ( 'string' !== $setting->type || $setting->masked ) {
+				continue;
+			}
+
+			$says = isset( $setting->schema['format'] )
+				|| isset( $setting->schema['enum'] )
+				|| isset( $setting->schema['pattern'] )
+				|| null !== $setting->sanitize_callback;
+
+			$this->assertTrue( $says, sprintf( 'Setting [%s] is text with no format, enum, pattern or sanitize callback: it stores whatever it is sent.', $name ) );
+		}
+	}
+
+	/**
+	 * The same for a list of texts, whose items are what is stored.
+	 */
+	public function test_every_list_of_texts_says_what_its_items_hold(): void {
+		foreach ( $this->declared_settings() as $name => $setting ) {
+			if ( 'array' !== $setting->type || 'string' !== ( $setting->schema['items']['type'] ?? null ) ) {
+				continue;
+			}
+
+			$items = $setting->schema['items'];
+
+			$this->assertTrue(
+				isset( $items['format'] ) || isset( $items['enum'] ) || isset( $items['pattern'] ) || null !== $setting->sanitize_callback,
+				sprintf( 'Setting [%s] is a list of texts whose items have no format, enum or pattern.', $name )
+			);
+		}
+	}
+
+	/**
+	 * Two settings sharing an option key would silently overwrite each other.
+	 */
+	public function test_option_keys_are_unique(): void {
+		$option_keys = array_values(
+			array_filter(
+				array_map( static fn ( Setting $setting ): ?string => $setting->option_key, $this->declared_settings() )
+			)
+		);
+
+		$this->assertSame( array_values( array_unique( $option_keys ) ), $option_keys );
+	}
+
+	/**
+	 * Every declared setting, keyed by its setting name.
+	 *
+	 * @return array<string, Setting>
+	 */
+	private function declared_settings(): array {
+		$settings = [];
+
+		foreach ( ( new ReflectionClass( Plugin_Settings::class ) )->getReflectionConstants() as $constant ) {
+			foreach ( $constant->getAttributes( Setting::class ) as $attribute ) {
+				$settings[ (string) $constant->getValue() ] = $attribute->newInstance();
+			}
+		}
+
+		return $settings;
 	}
 }

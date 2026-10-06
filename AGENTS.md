@@ -10,7 +10,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
 - Description: `Connect WordPress and WooCommerce to webhead Search Cloud.`
-- Minimum WordPress version: `6.0`
+- Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
 - Text domain: `webhead-search-cloud`
@@ -26,7 +26,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Scaffold preset: `Existing Plugin`
 - React admin UI: enabled
 - Block editor scaffold: enabled
-- Elementor integration: disabled
+- Elementor widgets: enabled
 - REST API scaffold: enabled
 - Shortcodes scaffold: disabled
 - Database example table: enabled
@@ -45,6 +45,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Read `.agents/skills/webhead-design-system/SKILL.md` before choosing a WordPress component or writing any admin UI, token, card, tab, form, or saving behaviour. It carries the current status of every component, which moves faster than memory does.
 - Read `.agents/skills/webhead-react-admin/SKILL.md` before changing admin UI, asset loading, DataViews tables, or REST/UI integration.
 - Read `.agents/skills/webhead-frontend/SKILL.md` before changing frontend React UI, frontend reset CSS, conditional frontend asset loading, responsive behavior, or accessibility.
+- Read `.agents/skills/webhead-elementor-widgets/SKILL.md` before changing Elementor widgets, controls, live preview templates, style controls, or widget asset loading.
 - When using Codex, also read `.codex/instructions.md` before editing.
 - When using Claude, activate the relevant mirrored skill under `.claude/skills/` before editing plugin code.
 
@@ -97,7 +98,8 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Block support is scaffolded. Keep `block.json`, render templates, and build output aligned.
 - REST endpoints are present. Keep permission callbacks explicit and settings reads schema-driven.
 - Custom table support is present. Keep schema changes, table lookup, truncation, drops, version-state cleanup, metadata cleanup, and uninstall table removal behind `Database_Manager` and registered `Table` classes.
-- Generated `Example_*` classes and example block files are reference scaffolds. Their registrations in `includes/Plugin.php` must stay commented until replaced with real plugin behavior and tests, and unused examples must be deleted before production.
+- Generated `Example_*` classes and example block files are reference scaffolds. Their registrations in `includes/Plugin.php` must stay commented until replaced with real plugin behavior and tests. An example the plugin is not going to build on is deleted, not kept for reference: remove the file, its test, its container binding and its commented registration in the same change.
+- The tree holds what the plugin uses and nothing else. A directory exists because a file with something in it is there: create it with its first file, and remove it when its last file goes. The two placeholders that stay are the `index.php` in the plugin root and `languages/`, which the plugin header names.
 - A recurring job example is part of the framework contract. Keep recurring work idempotent and lock-aware.
 - Use `get_cache_manager()` for new caching work and invalidate by group instead of flushing global caches.
 - Put non-table migrations, option renames, data backfills, and capability resync steps in `register_upgrade_steps()`.
@@ -128,18 +130,21 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Add or update automated tests in the same change for every behavior, scaffold output, REST/UI contract, lifecycle path, or bug fix you touch.
 - Create focused DTO/value object classes for reusable payloads that cross services, REST endpoints, tables, or UI boundaries.
 - Create PHP enums for finite states, modes, policies, or option values instead of spreading string literals through the codebase.
-- Use `@wordpress/dataviews` for admin tables and keep search, filtering, sorting, and pagination server-driven.
-- Use recommended `@wordpress/ui` primitives for generated admin UI: `Card.Root`, `Card.Header`, `Card.Title`, `Card.Content`, `Tabs.Root`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`, and `Text`.
+- Draw every admin screen with `src/components/AdminPage.js`, as the settings screen is. The shell owns the header, the page padding and the width, so two screens drawn by it start at the same place and are equally wide; pass `tabbed` when the content opens with a tab strip.
+- Use `@wordpress/dataviews` for admin tables, imported from `src/components/DataViews.js` so that its stylesheet comes with it, and keep search, filtering, sorting, and pagination server-driven.
+- Use recommended `@wordpress/ui` primitives for generated admin UI: `Card.Root`, `Card.Header`, `Card.Title`, `Card.Content`, `Tabs.Root`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`, `Text`, `Stack`, `Skeleton`, `InputControl`, and the compound `Notice` (`Notice.Root` with `intent`). Choose per component by its Storybook status, not per package: `Button` and `ToggleControl` stay on `@wordpress/components`.
+- Hold more than one element inside a `Card.Content`, a tab panel, or a fragment in a `Stack` with a `gap` token. `Card.Content` pads itself and does not space its children, so two elements written one after the other touch. Put buttons in a row `Stack` of their own, and never `align="start"` on the column.
 - Put titles inside `Card.Header` with `Card.Title`; use the `render` prop for semantic heading levels.
 - Use `Text` variants such as `heading-xl`, `heading-lg`, `heading-md`, `body-md`, and `body-sm` instead of hard-coded admin font sizes.
-- Use Webhead card variants deliberately: `*-card--dotted` for second-level cards inside another card, `*-card--secondary` for third-level cards inside dotted cards, and `*-card--grid` only when a grid background is intentionally useful.
-- Follow WordPress Design System elevation and radius tokens: use card/container radius tokens and extra-small elevation for grouped content, reserving larger elevation for transient overlays or modals.
-- Use WordPress Design System tokens by purpose: semantic colors for foreground/background/stroke states, `Text` variants or typography tokens for text, radius tokens by container size, elevation tokens by layer purpose, and motion tokens for duration/easing.
-- Follow the documented save/submit pattern: busy state while saving, disabled save button with a "No unsaved changes" tooltip when clean, success feedback through the plugin snackbar/toast pattern, and `ConfirmDialog` for failed saves.
+- Use webhead card variants deliberately: `*-card--dotted` for second-level cards inside another card, `*-card--secondary` for third-level cards inside dotted cards, and `*-card--grid` only when a grid background is intentionally useful.
+- Follow WordPress Design System radius and elevation guidance: use card/container radius tokens, and take elevation from the `$elevation-*` variables of `@wordpress/base-styles`, which is not a `--wpds-*` token: extra small for grouped content, larger levels for transient overlays or modals.
+- Use WordPress Design System tokens by purpose: semantic colors for foreground/background/stroke states, `Text` variants or typography tokens for text, radius tokens by container size, and motion tokens for duration/easing. Write a token bare and never set one: the build writes its fallback and stops on a name `@wordpress/theme` does not define.
+- Follow the documented save/submit pattern: busy state while saving, disabled save button with a "No unsaved changes" tooltip when clean, success feedback through the plugin snackbar/toast pattern, and one inline error `Notice` beside the save button, carrying the reason the REST API gave, when a save fails.
 - Follow destructive-action guidance: no destructive styling for reversible non-visible changes, `ConfirmDialog` for visible but undoable changes, and a non-dismissible modal with an `isDestructive` primary action for irreversible changes.
 - Choose `Badge` intent by attention priority: prefer `none` or plain text for normal states, then `stable`, `draft`, `informational`, `low`, `medium`, or `high` only when the view needs that emphasis.
 - Use higher-level controls or `DataForm` before low-level form primitives, keep tab panels as `Tabs` instead of link lists, and use tooltips only as visual labels with accessible trigger names.
-- Keep large tab sets responsive with a horizontally scrollable `Tabs.List`, token spacing, visible focus, and browser checks at desktop and mobile widths.
+- Keep large tab sets responsive with a horizontally scrollable `Tabs.List`, token spacing, visible focus, and browser checks at desktop and mobile widths. The shell draws the strip of a `tabbed` page full-bleed with a light bottom border; do not style it per screen.
+- When the WordPress Design System does not cover something, stop and ask before working around it: name the component, token, or page and what is missing, and let the person decide.
 
 ## Don't
 
@@ -154,8 +159,12 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Do not edit files carrying the `Webhead scaffold managed file` marker; `scaffold:update` overwrites them. Use `tests/Integration/bootstrap-extra.php` and `Integration_Test_Case` instead.
 - Do not add WordPress function polyfills to `tests/bootstrap.php` to force a test into the unit tier; move the test to `tests/Integration`.
 - Do not ship the test harness: keep `tests`, `phpunit*.xml.dist`, `playwright.config.js`, and `.wp-env.json` listed in `.distignore`.
-- Do not use `Heading`, `Card`, or `TabPanel` from `@wordpress/components` in new WordPress 7+ React admin code when recommended `@wordpress/ui` replacements exist.
+- Do not use `Heading`, `Text`, `Card`, `TabPanel`, `Notice`, `InputControl`, `SelectControl`, `CheckboxControl`, or `Flex` from `@wordpress/components` in new React admin code: each is not-recommended and has a recommended `@wordpress/ui` replacement.
+- Do not override a component through its internal class names, hard-code a colour or a spacing, set a `--wpds-*` property, or file issues or pull requests on Gutenberg to get around a gap in the design system. Ask first.
 - Do not fix wp-admin typography drift by adding arbitrary CSS `font-size` values to generated admin styles.
+- Do not give an admin screen a frame of its own. A wrapper with its own `max-width`, padding or header makes that screen narrower than, or offset from, the ones `AdminPage` draws.
+- Do not add a directory for later, a `.gitkeep`, or an `index.php` that only says "Silence is golden", and do not leave a directory behind once its files are gone.
+- Do not keep a generated `Example_*` file, or its test, that the plugin does not use.
 
 ## Verification
 
@@ -172,4 +181,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Validate multisite behavior when changes touch options, database tables, activation, blog switching, or capability sync.
 - Run `npm install` and `npm run build` after JavaScript, block-editor, or admin UI changes, and before the end-to-end suite.
 - Open the settings UI in a browser and verify card title sizing, nested card variants, keyboard focus, and responsive wrapping.
+- Check every state of a screen, not the screen at rest: click each action, open each overlay, make a field wrong, empty the list, narrow the window, and switch to a right-to-left language.
+- Measure that nothing a screen stacks touches what is above it. `leaves a gap between everything it stacks` in `tests/e2e/specs/settings-page.spec.js` does it for the settings screen; copy it for every page you add.
+- Open every admin screen you added beside the settings screen, at a width above 1920px as well as on a phone, and measure both: same left edge, same width, same header. A frame that stops growing at some maximum looks right on any screen narrower than that maximum.
 - Verify REST routes still use `webhead-search-cloud/v1` and permission callbacks remain explicit.

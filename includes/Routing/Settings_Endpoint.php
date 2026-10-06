@@ -61,7 +61,7 @@ final class Settings_Endpoint extends Rest_API {
 		return new WP_REST_Response( $this->prepare_for_rest( $this->settings->export_for_rest() ) );
 	}
 
-	#[Route( '/settings', methods: 'POST', permission_callback: 'can_manage_settings' )]
+	#[Route( '/settings', methods: 'POST', permission_callback: 'can_manage_settings', args: [ 'settings' => [ 'type' => 'object' ] ] )]
 	public function update_settings( WP_REST_Request $request ): WP_REST_Response {
 		$incoming = $request->get_param( 'settings' );
 

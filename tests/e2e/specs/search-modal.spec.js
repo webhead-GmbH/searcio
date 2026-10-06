@@ -136,6 +136,122 @@ test.describe( 'Search modal', () => {
 	} );
 
 	/**
+	 * The list was a `listbox` whose options could only be reached with Tab,
+	 * one stop each: the arrow keys, which are what a listbox promises, did
+	 * nothing.
+	 */
+	test( 'the arrow keys move through the suggestions and Enter searches for the marked one', async ( { page, requestUtils } ) => {
+		const searched = [];
+
+		await mockSearchCloud( page, {
+			suggestions: [ 'Hoodie', 'Hoodie with Logo', 'Hoodie with Zipper' ],
+			onSearch: ( url ) => searched.push( url.searchParams.get( 'q' ) ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.input.fill( 'hood' );
+
+		const options = widget.modal.getByRole( 'option' );
+
+		await expect( options ).toHaveCount( 3 );
+		// Nothing is marked until a key says so.
+		await expect( widget.modal.getByRole( 'option', { selected: true } ) ).toHaveCount( 0 );
+		await expect( widget.input ).not.toHaveAttribute( 'aria-activedescendant', /.+/ );
+
+		// Focus stays in the field; the field names the option the keys are on.
+		const marked = async ( index ) => {
+			await expect( options.nth( index ) ).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( widget.modal.getByRole( 'option', { selected: true } ) ).toHaveCount( 1 );
+			await expect( widget.input ).toHaveAttribute( 'aria-activedescendant', await options.nth( index ).getAttribute( 'id' ) );
+			await expect( widget.input ).toBeFocused();
+		};
+
+		await page.keyboard.press( 'ArrowDown' );
+		await marked( 0 );
+		await page.keyboard.press( 'ArrowDown' );
+		await marked( 1 );
+		await page.keyboard.press( 'ArrowUp' );
+		await marked( 0 );
+		// Round the top to the last one, and round the bottom to the first.
+		await page.keyboard.press( 'ArrowUp' );
+		await marked( 2 );
+		await page.keyboard.press( 'ArrowDown' );
+		await marked( 0 );
+		await page.keyboard.press( 'ArrowDown' );
+		await marked( 1 );
+
+		// The mark can be seen: a ring, not only the pointer's faint fill.
+		expect( await options.nth( 1 ).evaluate( ( el ) => window.getComputedStyle( el ).outlineStyle ) ).toBe( 'solid' );
+		expect( await options.nth( 0 ).evaluate( ( el ) => window.getComputedStyle( el ).outlineStyle ) ).toBe( 'none' );
+
+		// What was typed is still what is in the field.
+		await expect( widget.input ).toHaveValue( 'hood' );
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect( widget.input ).toHaveValue( 'Hoodie with Logo' );
+		await expect( widget.modal.getByRole( 'listbox', { name: 'Search suggestions' } ) ).toBeHidden();
+		await expect.poll( () => searched ).toContain( 'Hoodie with Logo' );
+	} );
+
+	test( 'Enter searches for what was typed when no suggestion is marked, and typing on forgets the mark', async ( { page, requestUtils } ) => {
+		const searched = [];
+
+		await mockSearchCloud( page, {
+			suggestions: [ 'Hoodie', 'Hoodie with Logo' ],
+			onSearch: ( url ) => searched.push( url.searchParams.get( 'q' ) ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.input.fill( 'hood' );
+
+		const suggestions = widget.modal.getByRole( 'listbox', { name: 'Search suggestions' } );
+
+		await expect( suggestions ).toBeVisible();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( widget.modal.getByRole( 'option', { selected: true } ) ).toHaveCount( 1 );
+
+		// One more letter: the search is for the field again, not for the
+		// suggestion that was marked a moment ago.
+		await page.keyboard.type( 'i' );
+		await expect( widget.modal.getByRole( 'option', { selected: true } ) ).toHaveCount( 0 );
+		await page.keyboard.press( 'Enter' );
+
+		await expect( widget.input ).toHaveValue( 'hoodi' );
+		await expect.poll( () => searched ).toContain( 'hoodi' );
+		expect( searched ).not.toContain( 'Hoodie' );
+	} );
+
+	test( 'the Down key brings back suggestions that Escape put away', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { suggestions: [ 'Hoodie', 'Hoodie with Logo' ] } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.input.fill( 'hoodie' );
+
+		const suggestions = widget.modal.getByRole( 'listbox', { name: 'Search suggestions' } );
+
+		await expect( suggestions ).toBeVisible();
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Escape' );
+		await expect( suggestions ).toBeHidden();
+		await expect( widget.input ).not.toHaveAttribute( 'aria-activedescendant', /.+/ );
+
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Open again, from the top, and not from where the keys were before.
+		await expect( suggestions ).toBeVisible();
+		await expect( widget.modal.getByRole( 'option' ).nth( 0 ) ).toHaveAttribute( 'aria-selected', 'true' );
+		await expect( widget.modal ).toBeVisible();
+	} );
+
+	/**
 	 * The stock line was the one card colour no placement could change: a fixed
 	 * green and red. The defaults stay those colours; a placement's own win.
 	 */
