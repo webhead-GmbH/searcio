@@ -336,7 +336,10 @@ export async function rightToLeft( page ) {
 			return route.fallback();
 		}
 
-		const response = await route.fetch();
+		// No limit of its own. A fetch is given ten seconds here, a busy test
+		// site takes longer than that to serve a page now and then, and the
+		// navigation that asked for the page has a limit already.
+		const response = await route.fetch( { timeout: 0 } );
 		const body = ( await response.text() )
 			.replace( '<html ', '<html dir="rtl" ' )
 			.replace( '<body class="', '<body class="rtl ' );
