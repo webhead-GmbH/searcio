@@ -314,6 +314,37 @@ export function clearSiteStyles() {
 	wpEvalFile( 'seed-site-styles.php', 'clear' );
 }
 
+/**
+ * Serve every page as WordPress does on a site whose language is written right
+ * to left: `dir="rtl"` on the document, `rtl` on the body, and the storefront's
+ * `-rtl` stylesheet in place of the other. The test site has no such language,
+ * and switching it to one would change the site under every other spec.
+ *
+ * @param {import('@playwright/test').Page} page
+ */
+export async function rightToLeft( page ) {
+	await page.route( /\/public\/style-bundle\.search\.css/, ( route ) => {
+		const url = new URL( route.request().url() );
+
+		url.pathname = url.pathname.replace( 'style-bundle.search.css', 'style-bundle.search-rtl.css' );
+
+		return route.continue( { url: url.toString() } );
+	} );
+
+	await page.route( '**/*', async ( route ) => {
+		if ( 'document' !== route.request().resourceType() ) {
+			return route.fallback();
+		}
+
+		const response = await route.fetch();
+		const body = ( await response.text() )
+			.replace( '<html ', '<html dir="rtl" ' )
+			.replace( '<body class="', '<body class="rtl ' );
+
+		return route.fulfill( { response, body } );
+	} );
+}
+
 function seededUrl( output ) {
 	// Restrict to URL-safe characters so WP-CLI's trailing status glyph (printed
 	// right after the URL) can't be captured as part of it.

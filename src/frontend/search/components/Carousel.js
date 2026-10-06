@@ -11,6 +11,12 @@ const DRAG_THRESHOLD = 6;
  * native scrollbar hidden (see `style.scss`). Reused for the empty-state
  * highlights and for search results.
  *
+ * In a right-to-left page the track starts at its right edge and `scrollLeft`
+ * runs from 0 down to a negative number, so every position here is counted
+ * from the start of the track rather than from its left: read as it stood, the
+ * previous arrow never came alive, the next one scrolled the wrong way against
+ * the edge, and no dot was ever the active one.
+ *
  * @param {Object}                       props
  * @param {Array}                        props.items
  * @param {(item) => any}                props.getKey
@@ -23,6 +29,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 	const [ activePage, setActivePage ] = useState( 0 );
 	const [ canPrev, setCanPrev ] = useState( false );
 	const [ canNext, setCanNext ] = useState( false );
+	const [ isRtl, setIsRtl ] = useState( false );
 
 	// Pointer-drag bookkeeping. `moved` gates the click-suppression so a plain
 	// click on a card still navigates, but a drag does not.
@@ -35,13 +42,16 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		const { scrollLeft, clientWidth, scrollWidth } = track;
+		const { clientWidth, scrollWidth } = track;
+		// How far the track has moved from where it starts, whichever side that is.
+		const travelled = Math.abs( track.scrollLeft );
 		const pages = clientWidth > 0 ? Math.max( 1, Math.ceil( scrollWidth / clientWidth ) ) : 1;
 
+		setIsRtl( 'rtl' === window.getComputedStyle( track ).direction );
 		setPageCount( pages );
-		setActivePage( Math.min( pages - 1, Math.round( scrollLeft / clientWidth ) ) );
-		setCanPrev( scrollLeft > 4 );
-		setCanNext( scrollLeft + clientWidth < scrollWidth - 4 );
+		setActivePage( clientWidth > 0 ? Math.min( pages - 1, Math.round( travelled / clientWidth ) ) : 0 );
+		setCanPrev( travelled > 4 );
+		setCanNext( travelled + clientWidth < scrollWidth - 4 );
 	}, [] );
 
 	useEffect( () => {
@@ -83,6 +93,9 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 	const scrollBehavior = () =>
 		window.matchMedia?.( '(prefers-reduced-motion: reduce)' ).matches ? 'auto' : 'smooth';
 
+	// Onwards through the cards is to the left in a right-to-left page.
+	const onwards = () => ( isRtl ? -1 : 1 );
+
 	const scrollByPage = ( direction ) => {
 		const track = trackRef.current;
 
@@ -90,7 +103,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		track.scrollBy( { left: track.clientWidth * 0.9 * direction, behavior: scrollBehavior() } );
+		track.scrollBy( { left: track.clientWidth * 0.9 * direction * onwards(), behavior: scrollBehavior() } );
 	};
 
 	const scrollToPage = ( page ) => {
@@ -100,14 +113,16 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			return;
 		}
 
-		track.scrollTo( { left: page * track.clientWidth, behavior: scrollBehavior() } );
+		track.scrollTo( { left: page * track.clientWidth * onwards(), behavior: scrollBehavior() } );
 	};
 
+	// An arrow key moves the track the way the arrow points, in either direction
+	// of text.
 	const onKeyDown = ( event ) => {
 		if ( 'ArrowLeft' === event.key ) {
-			scrollByPage( -1 );
+			scrollByPage( -1 * onwards() );
 		} else if ( 'ArrowRight' === event.key ) {
-			scrollByPage( 1 );
+			scrollByPage( onwards() );
 		}
 	};
 
@@ -169,7 +184,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 		<div className="whsc-carousel">
 			<Button
 				className="whsc-carousel-arrow whsc-carousel-arrow--prev"
-				icon={ chevronLeft }
+				icon={ isRtl ? chevronRight : chevronLeft }
 				label={ __( 'Previous', 'webhead-search-cloud' ) }
 				showTooltip={ false }
 				disabled={ ! canPrev }
@@ -197,7 +212,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			</div>
 			<Button
 				className="whsc-carousel-arrow whsc-carousel-arrow--next"
-				icon={ chevronRight }
+				icon={ isRtl ? chevronLeft : chevronRight }
 				label={ __( 'Next', 'webhead-search-cloud' ) }
 				showTooltip={ false }
 				disabled={ ! canNext }
