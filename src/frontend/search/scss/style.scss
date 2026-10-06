@@ -326,6 +326,19 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	margin-inline: 0;
 }
 
+/*
+ * One ring for the whole surface. The reset draws the ring of a button of
+ * `@wordpress/components`, and of the box trigger, at the design system's
+ * width, which is 2px and becomes 1.5px on a dense screen. Every ring this
+ * file draws is 2px, so on a phone the close button's was thinner than the
+ * one round the filter beside it.
+ */
+.components-button:focus,
+.components-input-control__container:focus-within .components-input-control__backdrop {
+	outline-width: 2px;
+	outline-offset: 2px;
+}
+
 /* Screen-reader-only status text (search progress / result-count announcements). */
 .whsc-visually-hidden {
 	position: absolute;
@@ -980,8 +993,15 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	/* A field with many values (dozens of brands, colours…) would otherwise
 	 * grow this chip row tall enough to push the results far down the modal.
 	 * Cap it and let it scroll; themeable per placement. */
-	max-height: var(--whsc-facets-max-height, 132px);
+	max-height: calc(var(--whsc-facets-max-height, 132px) + 8px);
 	overflow-y: auto;
+	/* Room for the ring of a chip in keyboard focus, which is drawn 4px outside
+	 * the chip. A box that scrolls cuts what is drawn outside its padding, so
+	 * a chip in the first or the last row lost the top or the bottom of its
+	 * ring, and the first chip of a row the left. The margin puts the chips
+	 * back where they were, and the height above counts the padding in. */
+	padding: 4px;
+	margin: -4px;
 }
 
 /*
@@ -1658,6 +1678,17 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		outline: 2px solid var(--whsc-accent);
 		outline-offset: 2px;
 	}
+}
+
+/*
+ * In a carousel, and in the assistant's results, the ring is drawn inside the
+ * card. Both scroll, and a box that scrolls cuts what is drawn outside it: the
+ * first card of a carousel lost the left side of its ring and the last the
+ * right, and so did the cards at either edge of the assistant's grid.
+ */
+:is(.whsc-carousel-track, .whsc-assistant__results) .whsc-card:focus-visible,
+:is(.whsc-carousel-track, .whsc-assistant__results) .whsc-card--server a:focus-visible {
+	outline-offset: -2px;
 }
 
 /*
@@ -2568,9 +2599,11 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 	svg { width: 15px; height: 15px; }
 
+	// Inside the button: it sits in the corner of the results, which scroll
+	// and cut a ring drawn outside it on two sides.
 	&:focus-visible {
 		outline: 2px solid var(--whsc-accent, #2563eb);
-		outline-offset: 2px;
+		outline-offset: -2px;
 	}
 }
 
@@ -2637,7 +2670,9 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	top: 0;
 	z-index: 1;
 	vertical-align: bottom;
-	padding-top: 0;
+	// Room above the product for the ring it shows in keyboard focus: the
+	// cell is the top of a box that scrolls, and stays there while it does.
+	padding-top: 6px;
 	background: var(--whsc-bg, #fff);
 	border-bottom-width: 2px;
 }
@@ -2680,6 +2715,19 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 	// Text on the accent itself measured 3.43:1; the strong shade is the text one.
 	&:hover .whsc-compare__title { color: var(--whsc-accent-strong, var(--whsc-accent, #2563eb)); }
+
+	// The surface's ring: the link had none of its own. It is drawn inside the
+	// link's box, which is made 6px larger all round for it and set back by
+	// the same margin, so that it lies in the cell's padding: the table
+	// scrolls, and a ring drawn outside the link was cut at the top of it.
+	padding: 6px;
+	margin: -6px;
+	border-radius: 12px;
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent, #2563eb);
+		outline-offset: -2px;
+	}
 }
 
 .whsc-compare__image {
