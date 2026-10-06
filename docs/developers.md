@@ -102,6 +102,8 @@ The search field is a combobox and its suggestions a listbox (`SearchInput.js`, 
 
 An address that did not come from the plugin's own code goes through `safeHref()` (`src/utils/url.js`) before it becomes an `href` or reaches `window.location`: a search redirect a merchant configured, and a link the assistant wrote into a reply (`markdown.js`, which builds React elements and never markup). It follows an `http(s)` address or a path that starts with one slash, and nothing else; `//host` and `/\host` are another host in the clothes of a path.
 
+An error the modal shows is the surface's own element (`.whsc-search-error`, with the assistant's and the product finder's error colours), not a `Notice` of `@wordpress/components`, whose look changes with the package.
+
 The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-out-color`. The search block (`stockInColor` / `stockOutColor`) and the Elementor search widget (`card_stock_in_color` / `card_stock_out_color`) set them for their modal; product rows (the products block and widget) have no style controls and take the defaults or site-wide CSS.
 
 ### Filters

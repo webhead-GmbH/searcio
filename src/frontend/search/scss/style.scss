@@ -2851,6 +2851,21 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /* --------------------------------------------------------------------------
  * Merchandising banner
  * ------------------------------------------------------------------------ */
+/*
+ * A search that failed, or a photo that could not be searched for. The same
+ * tinted block the assistant and the product finder show for theirs, in the
+ * shape of the banner it stands in the place of.
+ */
+.whsc-search-error {
+	margin: 0;
+	padding: 12px 16px;
+	font-size: 14px;
+	line-height: 1.4;
+	border-radius: var(--whsc-card-radius, 10px);
+	background: var(--whsc-assistant-error-bg, #fdf2f2);
+	color: var(--whsc-assistant-error-text, #b3261e);
+}
+
 .whsc-banner {
 	margin: 0;
 	padding: 12px 16px;

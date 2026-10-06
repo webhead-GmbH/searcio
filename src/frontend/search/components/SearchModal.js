@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useId, useLayoutEffect, useRef, useState} from '@wordpress/element';
-import {Button, Icon, Modal, Notice} from '@wordpress/components';
+import {Button, Icon, Modal} from '@wordpress/components';
 import {closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
@@ -1289,9 +1289,11 @@ const SearchModal = ({
 				)}
 
 				{error && (
-					<Notice status="error" isDismissible={false}>
-						{error}
-					</Notice>
+					// The surface's own box, as the assistant and the product finder
+					// draw theirs. A `Notice` of `@wordpress/components` looks like
+					// whichever version of that package the plugin was built with:
+					// a bar with a red edge in one release, a bordered box in the next.
+					<p className="whsc-search-error" role="alert">{error}</p>
 				)}
 
 				<Browse
