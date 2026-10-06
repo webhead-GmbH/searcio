@@ -296,6 +296,24 @@ export function createThemedElementorPost( mode = 'icon' ) {
 	return seededUrl( wpEvalFile( 'seed-elementor-themed.php', mode ) );
 }
 
+/**
+ * Give the site the styles of one somebody has designed - an Elementor kit's
+ * Site Settings where there is a kit, and a stylesheet of the site's own - so a
+ * spec can read the storefront under them (see `seed-site-styles.php` for what
+ * is written). The site is shared with every other spec: whoever calls this
+ * calls `clearSiteStyles()` when it is done, in a `finally`.
+ *
+ * @param {string} scope 'elements' styles the site's elements, 'body' sets its own type, 'all' does both.
+ */
+export function setSiteStyles( scope = 'elements' ) {
+	wpEvalFile( 'seed-site-styles.php', 'set', scope );
+}
+
+/** Put the site's styles back as `setSiteStyles()` found them. Safe to call when nothing was set. */
+export function clearSiteStyles() {
+	wpEvalFile( 'seed-site-styles.php', 'clear' );
+}
+
 function seededUrl( output ) {
 	// Restrict to URL-safe characters so WP-CLI's trailing status glyph (printed
 	// right after the URL) can't be captured as part of it.

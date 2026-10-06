@@ -232,17 +232,99 @@ $lift: ':is(*, #whsc#whsc#whsc)';
 }
 
 /*
- * The modal sets its own colours and sizes from the `--whsc-*` properties and
- * takes the family and the base size from the page, as it always has. The
- * rest of what the reset states here - no capitals, no spacing, no shadow
- * handed down from `body` - is kept.
+ * The modal is drawn in `body`, and takes the site's type from it the same
+ * way, as it always has: the family, the size and weight its own rules build
+ * on, and the spacing a theme sets for all of its text. Its colours and its
+ * background are its own, from the `--whsc-*` properties.
  */
 .whsc-modal-overlay#{$lift} {
 	color: inherit;
 	font: inherit;
+	letter-spacing: inherit;
+	text-align: inherit;
+	text-indent: inherit;
+	text-shadow: inherit;
+	text-transform: inherit;
+	white-space: inherit;
+	word-spacing: inherit;
+}
+
+/*
+ * What a site writes on an element of this surface, taken off.
+ *
+ * A theme styles `button`, `a`, `h3`, `ul`, `img` and `input` for the whole
+ * page, an Elementor kit does the same from its Site Settings
+ * (`.elementor-kit-7 button {}`, `.elementor-kit-7 h3 {}`), and a designer's
+ * own CSS reaches for an id. Each of them lands on every property the rules
+ * below do not state: a kit's dashed border and 30px of padding on a filter
+ * chip, its italic capitals on a card, a theme's underline on a section title.
+ *
+ * `all: revert-layer`, in a rule outside a layer, sets every property back to
+ * what the cascade layers say, as if no rule outside one had matched, and
+ * leaves what is inherited to be inherited: the site's font still reaches the
+ * surface through its root. The reset says this for an element with no class
+ * and for one whose class is written `block__element`. This says it for the
+ * rest of what the surface draws: an element with a class of its own that has
+ * no `__` in it, the few tags the reset's list leaves out, and an icon, which
+ * a theme's `button svg {}` otherwise resizes and recolours.
+ *
+ * It weighs two ids, like the reset's rule: above a site's stylesheet, whose
+ * heaviest selector is one id, and below every rule of this file, which weigh
+ * three. So a property this file states is this file's, and one it does not
+ * state is the browser's, on every site alike.
+ *
+ * An element of `@wordpress/components` is left to the reset, which loads
+ * that package's stylesheet a second time for it, and one the package styles
+ * when it runs (`css-`) to the package: this rule would take those styles off.
+ */
+$below: ':is(*, #whsc#whsc)';
+$own: ":where([class*='whsc-']):where(:not([class*='components-'], [class*='css-']))";
+$unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg, svg *):where(:not([class]))';
+
+[data-webhead-frontend-root]#{$below} :is(#{$own}, #{$unlisted}),
+[data-webhead-frontend-root]#{$below} :is(#{$own}, #{$unlisted})::before,
+[data-webhead-frontend-root]#{$below} :is(#{$own}, #{$unlisted})::after {
+	all: revert-layer;
+	// What the reset gives every element of a root, said again: this rule
+	// weighs the same as that one and comes after it.
+	box-sizing: border-box;
+}
+
+[data-webhead-frontend-root]#{$below} #{$own}::placeholder {
+	all: revert-layer;
 }
 
 [data-webhead-frontend-root]#{$lift} {
+
+/*
+ * A control is set in the type of what holds it.
+ *
+ * The reset gives a button or a field with no class the browser's own style,
+ * and one of `@wordpress/components` the package's: Arial, or the system font,
+ * in a modal set in the site's font. `:where()` keeps this below every rule
+ * that follows, which is where a rule that only sets a starting point belongs.
+ * A button of `@wordpress/components` keeps the colour the package gives it.
+ */
+:where(button, input, optgroup, select, textarea) {
+	font: inherit;
+	letter-spacing: inherit;
+	text-transform: none;
+}
+
+:where(button, input, optgroup, select, textarea):where(:not(.components-button)) {
+	color: inherit;
+}
+
+/*
+ * An icon keeps its own box. The package's stylesheet, which the reset loads a
+ * second time from the version this plugin is built with, pulls the icon of an
+ * icon-only button in by a pixel on each side: room for a border the reset
+ * takes off the button, and two pixels out of an icon that has a fixed frame
+ * round it here.
+ */
+.components-button svg {
+	margin-inline: 0;
+}
 
 /* Screen-reader-only status text (search progress / result-count announcements). */
 .whsc-visually-hidden {
@@ -356,9 +438,48 @@ $lift: ':is(*, #whsc#whsc#whsc)';
 		border-radius: var(--whsc-trigger-box-radius, var(--whsc-input-radius));
 	}
 
+	/*
+	 * The line round the box is drawn by the control's backdrop, an element
+	 * laid over the container, which the package has follow the container's
+	 * radius. The reset states a radius of its own there, and the box lost
+	 * its shape: square corners on a pill, and a square ring in focus.
+	 */
+	.components-input-control__backdrop {
+		border-radius: inherit;
+	}
+
+	/* The ring every other field of the surface has, in the placement's accent. */
+	.components-input-control__container:focus-within .components-input-control__backdrop {
+		outline-color: var(--whsc-accent);
+	}
+
 	input {
 		background: transparent;
 		color: var(--whsc-trigger-box-text, var(--whsc-input-text));
+		// The package's, which `font: inherit` at the top of this file replaced
+		// with the line height of the page.
+		line-height: 1;
+
+		// Under 16px a phone enlarges the page when a field takes focus, and
+		// leaves it enlarged. The package and the reset both say so for this
+		// field; the same `font: inherit` took it back to the size of the box.
+		@media (max-width: 599.98px) {
+			font-size: 16px;
+		}
+	}
+
+	/*
+	 * The package styles this field when it runs, so the reset holds it by
+	 * name and only for what it names, and a site's `input::placeholder {}`
+	 * reached the placeholder: its opacity, its capitals, its slant. The
+	 * colour is the package's own, which `all` takes off with the rest, said
+	 * as a share of the text's colour so that it follows a box set light on
+	 * dark.
+	 */
+	input::placeholder {
+		all: revert-layer;
+		color: rgba(30, 30, 30, 0.62);
+		color: color-mix(in srgb, currentColor 62%, transparent);
 	}
 
 	/*
@@ -382,6 +503,9 @@ $lift: ':is(*, #whsc#whsc#whsc)';
 .whsc-modal.components-modal__frame {
 	align-self: flex-start;
 	width: 100%;
+	// Stated, because this element is the package's as well as the surface's
+	// and is not one the rule at the top of this file reaches.
+	border: 0;
 	max-width: var(--whsc-modal-width, 100%);
 	height: auto;
 	max-height: calc(92vh - var(--whsc-modal-offset, 0px));
@@ -596,6 +720,14 @@ $lift: ':is(*, #whsc#whsc#whsc)';
 	color: var(--whsc-btn-text);
 	border-radius: var(--whsc-btn-radius);
 	box-shadow: none;
+
+	// The edge of a filled button where colours are forced and fills are not
+	// drawn. WordPress writes it for a primary button and the reset takes it
+	// off with the rest of what a site says about `button`. Not in focus,
+	// where the ring is the outline.
+	&:not(:focus) {
+		outline: 1px solid transparent;
+	}
 	transition: background-color 0.15s ease, color 0.15s ease;
 
 	// Icon-only on a phone (see `.whsc-input-row`): a 44px circle like the
@@ -1826,11 +1958,11 @@ $lift: ':is(*, #whsc#whsc#whsc)';
 }
 
 /*
- * Stated at single-class specificity, outside the wrappers, so a placement's
- * Elementor typography control (`.whsc-instance-{id} .whsc-card__price`) can
- * still set it; inherited instead, the price took the theme's body leading.
+ * Stated on the price itself; inherited instead, it took the theme's body
+ * leading. A placement's Elementor typography control still sets it: those
+ * selectors weigh more than anything in this file.
  */
-.whsc-card__price {
+[data-webhead-frontend-root]#{$lift} .whsc-card__price {
 	line-height: 1.4;
 }
 
