@@ -3193,16 +3193,16 @@
         },
         {
             "name": "webhead/wp-plugin-framework",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "git@github.com:webhead-GmbH/wp-plugin-framework.git",
-                "reference": "c7f2a08ca2632bdac0278de62e1ce876488fcba8"
+                "reference": "dd02d48558f42c6f96eb4cb19a8ddfdc049bc089"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webhead-GmbH/wp-plugin-framework/zipball/c7f2a08ca2632bdac0278de62e1ce876488fcba8",
-                "reference": "c7f2a08ca2632bdac0278de62e1ce876488fcba8",
+                "url": "https://api.github.com/repos/webhead-GmbH/wp-plugin-framework/zipball/dd02d48558f42c6f96eb4cb19a8ddfdc049bc089",
+                "reference": "dd02d48558f42c6f96eb4cb19a8ddfdc049bc089",
                 "shasum": ""
             },
             "require": {
@@ -3252,10 +3252,10 @@
             ],
             "description": "Reusable WordPress plugin framework with Database ORM, Hooks Manager, Options abstraction, REST API routing, and Scaffolding CLI.",
             "support": {
-                "source": "https://github.com/webhead-GmbH/wp-plugin-framework/tree/1.4.0",
+                "source": "https://github.com/webhead-GmbH/wp-plugin-framework/tree/1.4.1",
                 "issues": "https://github.com/webhead-GmbH/wp-plugin-framework/issues"
             },
-            "time": "2026-10-05T08:28:56+00:00"
+            "time": "2026-10-07T09:52:24+00:00"
         },
         {
             "name": "wp-phpunit/wp-phpunit",

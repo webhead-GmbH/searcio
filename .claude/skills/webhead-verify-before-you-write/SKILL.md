@@ -232,7 +232,7 @@ Both looked like "no rule matches", which reads as a clean bill of health. If a
 scan returns nothing, **prove the scan can return something** before believing
 it. Filter after collecting, never inside the collector.
 
-## Two ways the browser lies about state
+## Three ways the browser lies about state
 
 - **`document.activeElement` is not `:focus`.** With the pane unfocused, a
   programmatic `.focus()` sets `activeElement` while `el.matches(':focus')` stays
@@ -243,6 +243,10 @@ it. Filter after collecting, never inside the collector.
   `background-color` measures as the pre-hover colour indefinitely. Force frames
   with a few screenshots, then re-read. This is the same artifact that makes an
   entrance animation measure as `opacity: 0`.
+- **A probe that asks for a frame changes the frame.** Sampled from a
+  `requestAnimationFrame` loop, a header's words never flickered; on the screen
+  each was gone for a frame. Read what an animation leaves from its `finish`
+  event, through a `MessageChannel` message, which asks for no frame.
 
 ## Rebuild after you change PHP that adds a class
 
