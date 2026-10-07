@@ -124,8 +124,8 @@ test.describe( 'Connection tab allowances', () => {
 	} );
 
 	/**
-	 * Removing the credentials stops search on the storefront and is not undone
-	 * by a click, so it is asked about in a dialog only its own buttons close.
+	 * Disconnecting deletes the site and its index on Search Cloud, which no
+	 * click undoes, so it is asked about in a dialog only its own buttons close.
 	 */
 	test( 'asks before it disconnects, and does nothing when told not to', async ( { page } ) => {
 		let disconnected = false;
@@ -148,6 +148,13 @@ test.describe( 'Connection tab allowances', () => {
 		await expect( dialog ).toBeVisible();
 		await page.keyboard.press( 'Escape' );
 		await expect( dialog ).toBeVisible();
+
+		// What is lost, what search does meanwhile and what is kept - and the
+		// button that goes ahead is named for what it deletes.
+		await expect( dialog ).toContainText( 'removes the site from Search Cloud and permanently deletes its search index there' );
+		await expect( dialog ).toContainText( "falls back to WordPress's own search until you connect again and run a sync" );
+		await expect( dialog ).toContainText( 'Nothing in WordPress is deleted.' );
+		await expect( dialog.getByRole( 'button', { name: 'Disconnect and delete the index' } ) ).toBeVisible();
 
 		await dialog.getByRole( 'button', { name: 'Cancel' } ).click();
 
@@ -181,5 +188,31 @@ test.describe( 'Connection tab allowances', () => {
 				page.locator( '[class*="__notice"]' ).filter( { hasText: 'documents indexed' } )
 			).toContainText( 'Connected - 96 / 300,000 documents indexed.' );
 		} );
+	} );
+} );
+
+test.describe( 'Connection tab before the site is connected', () => {
+	test.beforeAll( () => {
+		setConnected( false );
+	} );
+
+	/**
+	 * The explainer sends its reader to a control on the tab behind it, so it
+	 * has to call that control what the tab calls it.
+	 */
+	test( 'explains connecting with the label the email link has', async ( { page } ) => {
+		// The legal links are a real round trip to Search Cloud otherwise.
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/connection/legal' ),
+			( route ) => route.fulfill( { status: 200, headers: { 'Content-Type': 'application/json' }, body: '{}' } )
+		);
+		await page.goto( CONNECTION_URL );
+
+		await expect( page.getByRole( 'button', { name: 'Not this email?' } ) ).toBeVisible( LOADED );
+
+		await page.getByRole( 'button', { name: 'How connecting works' } ).click();
+
+		await expect( page.getByRole( 'dialog', { name: 'How connecting to Search Cloud works' } ) )
+			.toContainText( 'under "Not this email?"' );
 	} );
 } );

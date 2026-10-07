@@ -381,9 +381,9 @@ const ConnectionTab = () => {
 				</>
 			)}
 
-			{/* Removing the credentials stops search on the storefront and is not
-			    undone by a click, so it is asked about in a dialog that only its
-			    own buttons close. */}
+			{/* Disconnecting deletes the site and its index on Search Cloud, which
+			    no click undoes, so it is asked about in a dialog that only its own
+			    buttons close, and the one that goes ahead says what it deletes. */}
 			<Modal
 				isOpen={disconnectConfirmOpen}
 				onClose={() => setDisconnectConfirmOpen(false)}
@@ -398,7 +398,7 @@ const ConnectionTab = () => {
 						variant: 'tertiary',
 					},
 					{
-						label: __('Disconnect', 'webhead-search-cloud'),
+						label: __('Disconnect and delete the index', 'webhead-search-cloud'),
 						variant: 'primary',
 						isDestructive: true,
 						onClick: onDisconnect,
@@ -407,7 +407,7 @@ const ConnectionTab = () => {
 			>
 				<Text>
 					{__(
-						'This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account.',
+						"This removes the site from Search Cloud and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted.",
 						'webhead-search-cloud'
 					)}
 				</Text>
