@@ -154,4 +154,32 @@ test.describe( 'Connection tab allowances', () => {
 		await expect( dialog ).toHaveCount( 0 );
 		expect( disconnected ).toBe( false );
 	} );
+
+	/**
+	 * wp-admin is written in the language of the user's profile, and a browser
+	 * is often set to another one. A number then has to follow the screen: a
+	 * Persian browser used to put "۲۷۰٬۰۰۰ of ۳۰۰٬۰۰۰" into the English sentence.
+	 * The suite itself runs in `en-US`, the one browser that cannot show this.
+	 */
+	test.describe( 'in a browser set to another language than the screen', () => {
+		test.use( { locale: 'fa-IR' } );
+
+		test( 'writes its numbers in the language of the screen', async ( { page } ) => {
+			await mockHealth( page );
+			await page.goto( CONNECTION_URL );
+
+			const count = page.locator( '.whsc-usage__count' ).first();
+
+			await expect( count ).toBeVisible( LOADED );
+
+			// The browser is the Persian one this is about, and the screen is not.
+			expect( await page.evaluate( () => ( 270000 ).toLocaleString() ) ).toBe( '۲۷۰٬۰۰۰' );
+			await expect( page.locator( 'html' ) ).toHaveAttribute( 'lang', /^en/ );
+
+			await expect( count ).toHaveText( '270,000 of 300,000' );
+			await expect(
+				page.locator( '[class*="__notice"]' ).filter( { hasText: 'documents indexed' } )
+			).toContainText( 'Connected - 96 / 300,000 documents indexed.' );
+		} );
+	} );
 } );

@@ -1,6 +1,8 @@
 import { Card, Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
+import { formatNumber } from '../../../../utils/number';
+
 /**
  * What this account has spent of each metered allowance this month.
  *
@@ -81,8 +83,8 @@ const UsageCard = ( { usage } ) => {
 										{ sprintf(
 											/* translators: 1: amount used. 2: the plan's allowance. */
 											__( '%1$s of %2$s', 'webhead-search-cloud' ),
-											Number( metric.used || 0 ).toLocaleString(),
-											Number( metric.limit ).toLocaleString()
+											formatNumber( metric.used || 0 ),
+											formatNumber( metric.limit )
 										) }
 									</Text>
 								</Stack>

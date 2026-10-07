@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **Numbers and dates on the settings screen follow the language of the screen, not of the browser.** The plan allowances and the connected notice on the Connection tab, the counters of a running sync and the sync history were written with the browser's own formatting, so a browser set to another language than the WordPress profile mixed the two: an English screen in a Persian browser read "۲۷۰٬۰۰۰ of ۳۰۰٬۰۰۰", and a date in the history came out in the Persian calendar. A number is now grouped as the language of the screen groups it, with the digits WordPress itself writes in every language. A date in the sync history is written as the rest of wp-admin writes one: in the site's date format and time zone, where it used to be the browser's time zone, with the month in the language of the screen. The end-to-end suite pins its browser to `en-US`, the one setting that could not show this, so two specs now run in a Persian browser.
+
 ## 1.2.0
 
 - **WordPress 6.8 is now the minimum**, up from 6.0. It is the version the framework is built and tested for, and the header had been promising more than the plugin delivered: the settings screen has needed 6.2 since it moved to React 18, and is written against the components of a current WordPress. A site on an older release keeps the version it has and is not offered this one.

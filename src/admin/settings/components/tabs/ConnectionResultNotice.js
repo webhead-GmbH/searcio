@@ -1,6 +1,8 @@
 import {Notice} from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 
+import {formatNumber} from '../../../../utils/number';
+
 /**
  * Renders a health-check style result (`{ ok, documents, site_id, message }`)
  * as a success/error Notice. Shared by the Connect button's own result and
@@ -19,10 +21,10 @@ const ConnectionResultNotice = ({result}) => {
 				? sprintf(
 					/* translators: 1: used documents, 2: document limit. */
 					__('Connected - %1$s / %2$s documents indexed.', 'webhead-search-cloud'),
-					Number(docs.used).toLocaleString(),
+					formatNumber(docs.used),
 					docs.limit === null || docs.limit === undefined
 						? __('unlimited', 'webhead-search-cloud')
-						: Number(docs.limit).toLocaleString()
+						: formatNumber(docs.limit)
 				)
 				: __('Connected.', 'webhead-search-cloud');
 		const siteIdSuffix = result.site_id

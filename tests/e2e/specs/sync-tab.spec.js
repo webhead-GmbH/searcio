@@ -56,6 +56,24 @@ async function mockActiveRun( page, run ) {
 }
 
 /**
+ * The history table's rows, in place of whatever runs the test site has kept.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {Object[]}                        items
+ */
+async function mockHistory( page, items ) {
+	await page.route(
+		( url ) => decodeURIComponent( url.href ).includes( '/webhead-search-cloud/v1/sync/history' ),
+		( route ) =>
+			route.fulfill( {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( { items, total: items.length } ),
+			} )
+	);
+}
+
+/**
  * The notice that carries the given words. Its intent is only in its class,
  * which the component writes as `…__is-<intent>`.
  *
@@ -124,5 +142,43 @@ test.describe( 'Sync tab', () => {
 		await expect( notice( run, /The next scheduled sync continues it/ ) ).toBeVisible();
 
 		expect( await touchingInShell( page ) ).toEqual( [] );
+	} );
+
+	/**
+	 * wp-admin is written in the language of the user's profile, whatever the
+	 * browser is set to. A Persian browser used to write the counts in Persian
+	 * digits and the date in the Persian calendar, inside English sentences.
+	 * The suite itself runs in `en-US`, the one browser that cannot show this.
+	 */
+	test.describe( 'in a browser set to another language than the screen', () => {
+		test.use( { locale: 'fa-IR' } );
+
+		test( 'writes its numbers and dates in the language of the screen', async ( { page } ) => {
+			await mockActiveRun( page, { pushed: 12480 } );
+			await mockHistory( page, [
+				{
+					...RUN,
+					id: 40,
+					status: 'completed',
+					processed: 12500,
+					pushed: 12480,
+					deleted: 1020,
+					created_at: '2026-10-05T12:00:00+00:00',
+				},
+			] );
+			await page.goto( SETTINGS_URL );
+
+			const run = page.locator( RUN_CARD );
+
+			await expect( run.getByText( '400 of ~1,200 processed (33%)' ) ).toBeVisible();
+			await expect( run.locator( '.whsc-counter' ).filter( { hasText: 'Pushed' } ) ).toContainText( '12,480' );
+
+			const row = page.locator( '.whsc-sync-history tr' ).filter( { hasText: '#40' } );
+
+			await expect( row ).toContainText( '12,500' );
+			await expect( row ).toContainText( '1,020' );
+			// Noon in UTC is the same day in whatever time zone the site is set to.
+			await expect( row ).toContainText( /October 5, 2026 \d{1,2}:\d{2} [ap]m/ );
+		} );
 	} );
 } );
