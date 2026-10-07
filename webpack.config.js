@@ -112,7 +112,24 @@ module.exports = {
 	},
 	resolve: {
 		...defaults.resolve,
-		modules: [ path.resolve( __dirname, 'node_modules' ) ],
+		// A package is looked for the way Node looks for it: in the
+		// `node_modules` nearest to the file that asks, and then upwards. So a
+		// package gets the copy of a dependency that npm installed for it.
+		//
+		// This used to name the top `node_modules` of the plugin as the only
+		// place to look. When two packages need different releases of a third,
+		// npm puts one at the top and the other under the package that needs
+		// it, and from there it was never read. `motion` 14 ran on the
+		// `framer-motion` 11 that `@wordpress/components` brings, and nothing
+		// said so: the build passed, and every word of a page header went out
+		// for one frame at the end of its fade, which that release does and
+		// the one `motion` asked for does not.
+		//
+		// What that line was there for is kept by the restriction. Nothing
+		// outside the plugin is bundled, so a package the manifest forgot
+		// stops the build here, and not on the next machine, where no
+		// directory above the plugin happens to hold it.
+		restrictions: [ __dirname ],
 		extensions: [
 			...( defaults.resolve ? defaults.resolve.extensions || [ '.js', '.jsx', '.ts', '.tsx' ] : [] ),
 		],

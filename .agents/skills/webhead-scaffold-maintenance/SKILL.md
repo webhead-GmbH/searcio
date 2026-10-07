@@ -26,6 +26,8 @@ Generated files are a framework-owned contract, but product plugins may customiz
 - `scaffold:update` removes what earlier scaffolds wrote to hold a directory open: an `index.php` that only says "Silence is golden", an empty `.gitkeep`, and then the directories that leaves empty (`templates`, `includes/DTO`, `includes/Enums`, `includes/classes`). It removes a file only while it is still exactly what the scaffold wrote, and it keeps the `index.php` in the plugin root and a `languages` directory that holds nothing else. Do not put those files back.
 - `bundle:prune` removes the directory Mozart keeps for class-mapped packages (`extra.mozart.classmap_directory`) when it is empty. `phpstan.neon` names that path with ` (?)` because of it.
 - `scaffold:update` refreshes `src/components/AdminPage.js` and `src/components/admin-page.scss`, the shell every admin screen is drawn by, in a plugin that has them. `src/components/Default/default.scss` is the plugin's own and is never rewritten.
+- `webpack.config.js` resolves a package as Node does, from the `node_modules` nearest to the file that asks, and bundles nothing from outside the plugin (`resolve.restrictions`). Do not give it a `resolve.modules` list. One that names the top `node_modules` bundles a package with another package's release of its dependency, and the build passes: `motion` ran on the `framer-motion` of `@wordpress/components`, and the words of a page header went out for a frame as they came in. `scaffold:update` refreshes a configuration that carries the marker and names the line to change in one that does not.
+- A package linked into `node_modules` from another directory (`npm link`, a `file:` dependency) is outside the plugin and is not bundled. `npm install --install-links` installs a copy of it.
 
 ## Update Rules
 
@@ -42,7 +44,8 @@ Generated files are a framework-owned contract, but product plugins may customiz
 
 - Confirm custom packages and scripts survived the update.
 - Run the affected PHPUnit tests.
-- Build JavaScript assets when package or webpack output changed.
+- Build JavaScript assets when package or webpack output changed. What is in `public` was made by the configuration of the build before, so an update that refreshed `webpack.config.js` changes nothing on a screen until `npm run build` has run.
 - Run `npm install`, then `npm audit` and `npm run build`, when the update changed JavaScript dependencies, npm overrides, or build tooling. (The framework repository audits the generated manifest upstream; that script does not exist in this plugin.)
+- An exit code of 0 from `npm install` does not say that an override the update added or raised is in the tree. npm can report `up to date` and keep the copy it had: the lockfile and `node_modules` each hold it for the other. `scaffold:update` names the packages; run `npm ls <package>` for them, and where a copy is `invalid`, delete `package-lock.json` and `node_modules` and install again. `npm audit` goes on reporting the advisory until then.
 - Run `npm run test:e2e` for generated React admin UI changes when the wp-env site is running.
 - Keep `README.md` and agent skill guidance aligned with the current generated workflow.
