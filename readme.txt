@@ -31,6 +31,8 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
   taxonomies, and built-in properties to searchable data.
 - **Search relevance control** - tune searchable fields and weights, per-type ranking boosts, facet and suggestion
   fields, and synonyms - all from Search Cloud's own configuration, editable from the plugin's admin screen.
+- **AI Assistant** - a chat tab that answers in prose and shows the products it is talking about, with a table to
+  compare them.
 - **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
 - **Guided quiz** - a few questions that narrow the catalogue down for shoppers who know what they want but not what it is called.
 - **Search redirects** - send well-known terms straight to a page instead of showing results.
@@ -39,15 +41,17 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 - **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
   results in their current language.
 - **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental
-  drain that pushes edits shortly after they happen. Full sync history, pause/resume/cancel controls, and retention
-  settings are all available from the dashboard.
+  sync that pushes edits shortly after they happen. A sync that cannot reach Search Cloud tries again by itself. Full
+  sync history, pause/resume/cancel controls, and retention settings are all available from the dashboard.
 - **WP-CLI support** - run and monitor syncs from the command line for real system-cron setups.
 
 == Installation ==
 
 1. Install and activate the plugin like any other WordPress plugin.
-2. Go to **Search Cloud** in the WordPress admin menu and open the **Connection** tab.
-3. Enter the search key, write key, and write secret from your Search Cloud site page, then save.
+2. Go to **Search Cloud** in the WordPress admin menu. A site that is not connected yet opens on the **Connection**
+   tab.
+3. Accept the terms and click **Connect to Search Cloud**. If you already have keys for this site, enter them under
+   **Advanced: manual key entry** instead.
 4. Open the **Indexing** tab and choose which content should be searchable.
 5. Open the **Sync** tab and start your first sync.
 6. Add the **Search Cloud** block to a page (or the **Search Cloud** widget in Elementor) to place the search trigger
@@ -57,7 +61,9 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
 
 This plugin sends data to webhead Search Cloud, the hosted service that powers the search. Search does not work without it.
 
+* **When you connect:** the site's name and address, and the email address and name of the admin who connects. Search Cloud uses them to create your account, or to find the one you have.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
+* **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Search Cloud stores and applies.
 * **When a visitor searches:** the search term, and which result they open. Their browser contacts the service directly, so their IP address is visible to it.
 * **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
 * **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
