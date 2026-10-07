@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -83,6 +83,15 @@ To rebuild it, check the repository out and run `npm install` followed by
 `npm run build`.
 
 == Changelog ==
+
+= 1.2.1 =
+- Fixed the words in the header of the settings screen flickering as they appear.
+- The confirmation before disconnecting says what disconnecting does: Search Cloud removes the site and permanently deletes its search index, your shop uses WordPress's own search until you connect again and run a sync, and nothing in WordPress is deleted. It said that only the saved credentials are removed. The button that goes ahead now reads "Disconnect and delete the index".
+- Numbers and dates on the settings screen follow the language of your WordPress profile instead of the language of your browser. A date in the sync history is shown in your site's date format and time zone.
+- "How connecting works" names the link for another email address by its label, "Not this email?".
+- The Terms of Service, Privacy Policy and Data Processing Agreement links on the Connection tab lead to the documents at searcio.com when Search Cloud cannot be reached. They led to an address that asks for a password.
+- This readme says what connecting sends to Search Cloud, and what saving the Search Config tab sends.
+- Updated the webhead plugin framework to 1.4.1.
 
 = 1.2.0 =
 - Requires WordPress 6.8 or newer, up from 6.0. A site on an older WordPress keeps the version it has.

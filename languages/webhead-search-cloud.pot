@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: webhead Search Cloud 1.2.0\n"
+"Project-Id-Version: webhead Search Cloud 1.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/webhead-search-cloud\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-07T05:54:05+00:00\n"
+"POT-Creation-Date: 2026-10-07T11:11:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -179,7 +179,7 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:121
 #: includes/Elementor/Widgets/Search_Widget.php:362
-#: src/admin/settings/components/tabs/SyncHistory.js:214
+#: src/admin/settings/components/tabs/SyncHistory.js:219
 #: src/blocks/search/edit.js:177
 msgid "Trigger"
 msgstr ""
@@ -1301,7 +1301,7 @@ msgstr ""
 
 #: includes/Routing/Connection_Endpoint.php:308
 #: includes/Routing/Connection_Endpoint.php:347
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:46
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:48
 msgid "Connection failed."
 msgstr ""
 
@@ -1394,7 +1394,7 @@ msgid "Add and save your Search Cloud credentials before syncing."
 msgstr ""
 
 #: includes/Sync/Sync_Service.php:119
-#: src/admin/settings/components/tabs/SyncTab.js:198
+#: src/admin/settings/components/tabs/SyncTab.js:199
 msgid "No content types are enabled for indexing yet."
 msgstr ""
 
@@ -1450,7 +1450,7 @@ msgid "Sync completed."
 msgstr ""
 
 #: includes/WP_CLI/Sync_Command.php:202
-#: src/admin/settings/components/tabs/SyncTab.js:151
+#: src/admin/settings/components/tabs/SyncTab.js:152
 msgid "Sync started."
 msgstr ""
 
@@ -1471,7 +1471,7 @@ msgid "There is no active sync."
 msgstr ""
 
 #: src/admin/settings/components/SettingsPanel.js:92
-#: src/admin/settings/components/tabs/SyncTab.js:175
+#: src/admin/settings/components/tabs/SyncTab.js:176
 msgid "Sync"
 msgstr ""
 
@@ -1598,21 +1598,21 @@ msgid "Accepting the Terms of Service and Privacy Policy is required to continue
 msgstr ""
 
 #. translators: 1: used documents, 2: document limit.
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:21
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:23
 #, js-format
 msgid "Connected - %1$s / %2$s documents indexed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:24
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:26
 msgid "unlimited"
 msgstr ""
 
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:27
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:29
 msgid "Connected."
 msgstr ""
 
 #. translators: %d: the Search Cloud site id.
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:31
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:33
 #, js-format
 msgid " (site #%d)"
 msgstr ""
@@ -1719,9 +1719,9 @@ msgid "Disconnect from Search Cloud?"
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:397
-#: src/admin/settings/components/tabs/SyncHistory.js:284
-#: src/admin/settings/components/tabs/SyncHistory.js:378
-#: src/admin/settings/components/tabs/SyncTab.js:281
+#: src/admin/settings/components/tabs/SyncHistory.js:289
+#: src/admin/settings/components/tabs/SyncHistory.js:383
+#: src/admin/settings/components/tabs/SyncTab.js:282
 msgid "Cancel"
 msgstr ""
 
@@ -2111,7 +2111,7 @@ msgid "Ready"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:128
-#: src/admin/settings/components/tabs/SyncTab.js:248
+#: src/admin/settings/components/tabs/SyncTab.js:249
 #: src/admin/settings/syncStatus.js:12
 msgid "Failed"
 msgstr ""
@@ -2403,93 +2403,93 @@ msgstr ""
 msgid "No settings are registered for this tab yet."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:43
+#: src/admin/settings/components/tabs/SyncHistory.js:45
 msgid "Manual"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:44
+#: src/admin/settings/components/tabs/SyncHistory.js:46
 msgid "Scheduled"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:45
+#: src/admin/settings/components/tabs/SyncHistory.js:47
 msgid "Incremental"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:193
+#: src/admin/settings/components/tabs/SyncHistory.js:198
 msgid "Run"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:201
-#: src/admin/settings/components/tabs/SyncHistory.js:202
+#: src/admin/settings/components/tabs/SyncHistory.js:206
+#: src/admin/settings/components/tabs/SyncHistory.js:207
 msgid "Status"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:224
+#: src/admin/settings/components/tabs/SyncHistory.js:229
 msgid "Processed"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:231
-#: src/admin/settings/components/tabs/SyncTab.js:245
+#: src/admin/settings/components/tabs/SyncHistory.js:236
+#: src/admin/settings/components/tabs/SyncTab.js:246
 msgid "Pushed"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:238
-#: src/admin/settings/components/tabs/SyncTab.js:247
+#: src/admin/settings/components/tabs/SyncHistory.js:243
+#: src/admin/settings/components/tabs/SyncTab.js:248
 msgid "Deleted"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:244
-#: src/admin/settings/components/tabs/SyncHistory.js:245
+#: src/admin/settings/components/tabs/SyncHistory.js:249
+#: src/admin/settings/components/tabs/SyncHistory.js:250
 msgid "Started"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:259
+#: src/admin/settings/components/tabs/SyncHistory.js:264
 msgid "Delete"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:264
+#: src/admin/settings/components/tabs/SyncHistory.js:269
 msgid "Delete this run?"
 msgid_plural "Delete these runs?"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: number of sync runs.
-#: src/admin/settings/components/tabs/SyncHistory.js:273
+#: src/admin/settings/components/tabs/SyncHistory.js:278
 #, js-format
 msgid "%d run is removed from the history for good. What it sent to Search Cloud stays where it is."
 msgid_plural "%d runs are removed from the history for good. What they sent to Search Cloud stays where it is."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:303
+#: src/admin/settings/components/tabs/SyncHistory.js:308
 msgid "Delete permanently"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:316
+#: src/admin/settings/components/tabs/SyncHistory.js:321
 msgid "Finished runs cleared."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:321
+#: src/admin/settings/components/tabs/SyncHistory.js:326
 msgid "Could not clear the history."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:331
+#: src/admin/settings/components/tabs/SyncHistory.js:336
 msgid "Sync history"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:340
+#: src/admin/settings/components/tabs/SyncHistory.js:345
 msgid "Clear finished"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:371
+#: src/admin/settings/components/tabs/SyncHistory.js:376
 msgid "Clear the finished runs?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:382
+#: src/admin/settings/components/tabs/SyncHistory.js:387
 msgid "Clear permanently"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncHistory.js:390
+#: src/admin/settings/components/tabs/SyncHistory.js:395
 msgid "Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Search Cloud changes."
 msgstr ""
 
@@ -2497,153 +2497,153 @@ msgstr ""
 msgid "Loading the sync status"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:36
+#: src/admin/settings/components/tabs/SyncTab.js:37
 msgid "Start sync?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:37
+#: src/admin/settings/components/tabs/SyncTab.js:38
 msgid "This sends new and changed content to Search Cloud. Continue?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:38
-#: src/admin/settings/components/tabs/SyncTab.js:296
+#: src/admin/settings/components/tabs/SyncTab.js:39
+#: src/admin/settings/components/tabs/SyncTab.js:297
 msgid "Start sync"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:41
+#: src/admin/settings/components/tabs/SyncTab.js:42
 msgid "Re-sync everything?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:42
+#: src/admin/settings/components/tabs/SyncTab.js:43
 msgid "This re-sends your entire catalog to Search Cloud, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:43
-#: src/admin/settings/components/tabs/SyncTab.js:305
+#: src/admin/settings/components/tabs/SyncTab.js:44
+#: src/admin/settings/components/tabs/SyncTab.js:306
 msgid "Re-sync everything"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:46
+#: src/admin/settings/components/tabs/SyncTab.js:47
 msgid "Cancel this sync?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:47
+#: src/admin/settings/components/tabs/SyncTab.js:48
 msgid "This stops the current run. Progress made so far is kept, and you can start a new sync anytime. Continue?"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:48
+#: src/admin/settings/components/tabs/SyncTab.js:49
 msgid "Cancel sync"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:119
+#: src/admin/settings/components/tabs/SyncTab.js:120
 msgid "That action could not be completed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:150
+#: src/admin/settings/components/tabs/SyncTab.js:151
 msgid "Full re-sync started."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:176
+#: src/admin/settings/components/tabs/SyncTab.js:177
 msgid "Send your content to Search Cloud. Only new and changed items are sent on each run, so repeat syncs are fast."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:185
+#: src/admin/settings/components/tabs/SyncTab.js:186
 msgid "Add and save your Search Cloud credentials first."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:189
+#: src/admin/settings/components/tabs/SyncTab.js:190
 msgid "Go to Connection"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:202
+#: src/admin/settings/components/tabs/SyncTab.js:203
 msgid "Go to Indexing"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:212
+#: src/admin/settings/components/tabs/SyncTab.js:213
 msgid "Current run"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:218
+#: src/admin/settings/components/tabs/SyncTab.js:219
 msgid "Full re-sync"
 msgstr ""
 
 #. translators: %d: processed item count.
-#: src/admin/settings/components/tabs/SyncTab.js:231
+#: src/admin/settings/components/tabs/SyncTab.js:232
 #, js-format
 msgid "%d items processed…"
 msgstr ""
 
 #. translators: 1: processed, 2: estimated total, 3: percentage.
-#: src/admin/settings/components/tabs/SyncTab.js:236
+#: src/admin/settings/components/tabs/SyncTab.js:237
 #, js-format
 msgid "%1$s of ~%2$s processed (%3$d%%)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:246
+#: src/admin/settings/components/tabs/SyncTab.js:247
 msgid "Skipped"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:263
+#: src/admin/settings/components/tabs/SyncTab.js:264
 msgid "While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:271
+#: src/admin/settings/components/tabs/SyncTab.js:272
 msgid "Pause"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:276
+#: src/admin/settings/components/tabs/SyncTab.js:277
 msgid "Resume"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SyncTab.js:322
+#: src/admin/settings/components/tabs/SyncTab.js:323
 msgid "Not now"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:22
+#: src/admin/settings/components/tabs/UsageCard.js:24
 msgid "Searches"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:23
+#: src/admin/settings/components/tabs/UsageCard.js:25
 msgid "Indexed documents"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:24
+#: src/admin/settings/components/tabs/UsageCard.js:26
 msgid "AI assistant messages"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:25
+#: src/admin/settings/components/tabs/UsageCard.js:27
 msgid "Photo searches"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:26
+#: src/admin/settings/components/tabs/UsageCard.js:28
 msgid "AI image tagging"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:61
+#: src/admin/settings/components/tabs/UsageCard.js:63
 msgid "This month"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:63
+#: src/admin/settings/components/tabs/UsageCard.js:65
 msgid "What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search."
 msgstr ""
 
 #. translators: 1: amount used. 2: the plan's allowance.
-#: src/admin/settings/components/tabs/UsageCard.js:83
+#: src/admin/settings/components/tabs/UsageCard.js:85
 #, js-format
 msgid "%1$s of %2$s"
 msgstr ""
 
 #. translators: 1: allowance name. 2: percentage used.
-#: src/admin/settings/components/tabs/UsageCard.js:98
+#: src/admin/settings/components/tabs/UsageCard.js:100
 #, js-format
 msgid "%1$s: %2$d%% used"
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:107
+#: src/admin/settings/components/tabs/UsageCard.js:109
 msgid "Spent for this month. Upgrade to keep this working."
 msgstr ""
 
-#: src/admin/settings/components/tabs/UsageCard.js:112
+#: src/admin/settings/components/tabs/UsageCard.js:114
 msgid "Close to the limit."
 msgstr ""
 
