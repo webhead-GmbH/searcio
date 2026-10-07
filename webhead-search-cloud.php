@@ -61,15 +61,19 @@ defined( 'Webhead\WP\SearchCloud\CACHE_GROUP' )
 defined( 'Webhead\WP\SearchCloud\SERVICE_URL' )
 || define( 'Webhead\WP\SearchCloud\SERVICE_URL', 'https://searcio.com' );
 
-/** Linked from the consent checkboxes on the Connection tab. */
+/**
+ * Linked from the consent checkboxes on the Connection tab until Search Cloud
+ * supplies its own, and whenever it cannot be reached. They are the documents
+ * `GET /connect` names, at the address of the service.
+ */
 defined( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL' )
-|| define( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL', 'https://webhead.dev/legal/terms' );
+|| define( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL', 'https://searcio.com/impressum' );
 
 defined( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL' )
-|| define( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL', 'https://webhead.dev/legal/privacy' );
+|| define( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL', 'https://searcio.com/datenschutz' );
 
 defined( 'Webhead\WP\SearchCloud\LEGAL_DPA_URL' )
-|| define( 'Webhead\WP\SearchCloud\LEGAL_DPA_URL', 'https://webhead.dev/legal/dpa' );
+|| define( 'Webhead\WP\SearchCloud\LEGAL_DPA_URL', 'https://searcio.com/data-processing-agreement' );
 
 register_activation_hook(
 	__FILE__,
