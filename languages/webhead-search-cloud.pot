@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-06T15:53:51+00:00\n"
+"POT-Creation-Date: 2026-10-07T05:54:05+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -1582,7 +1582,7 @@ msgid "How connecting to Search Cloud works"
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:43
-msgid "Clicking Connect sends the email address shown below (or the one you enter under \"Use a different email\") to Search Cloud, along with this site's address."
+msgid "Clicking Connect sends the email address shown on the Connection tab (or the one you enter under \"Not this email?\") to Search Cloud, along with this site's address."
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:49
@@ -1659,7 +1659,6 @@ msgid "Connect this site to webhead Search Cloud to start syncing content and en
 msgstr ""
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:250
-#: src/admin/settings/components/tabs/ConnectionTab.js:401
 msgid "Disconnect"
 msgstr ""
 
@@ -1726,8 +1725,12 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: src/admin/settings/components/tabs/ConnectionTab.js:401
+msgid "Disconnect and delete the index"
+msgstr ""
+
 #: src/admin/settings/components/tabs/ConnectionTab.js:409
-msgid "This removes the saved connection credentials from this site only. It does not delete or change anything in your Search Cloud account."
+msgid "This removes the site from Search Cloud and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted."
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingSkeleton.js:9

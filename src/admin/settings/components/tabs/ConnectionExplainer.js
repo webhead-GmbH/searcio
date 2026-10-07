@@ -41,7 +41,7 @@ const ConnectionExplainer = ({legal}) => {
 			>
 				<Text render={<p/>} variant="body-md">
 					{__(
-						'Clicking Connect sends the email address shown below (or the one you enter under "Use a different email") to Search Cloud, along with this site\'s address.',
+						'Clicking Connect sends the email address shown on the Connection tab (or the one you enter under "Not this email?") to Search Cloud, along with this site\'s address.',
 						'webhead-search-cloud'
 					)}
 				</Text>
