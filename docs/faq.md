@@ -6,13 +6,23 @@ This is the plugin's deliberate fallback behavior: if Search Cloud can't be reac
 
 Things to check:
 
-- **Connection** tab → is the connection configured and does "Test connection" succeed?
+- **Connection** tab → does it say *Connected*? If the keys were entered by hand, does **Test connection** (under *Advanced: manual key entry*) succeed?
 - **Search Config** tab → **Languages** — if you previously restricted languages and later deactivated WPML/Polylang without checking this tab again, the stored language list can go stale. Re-open and re-save the Languages section to refresh it (this is also handled automatically now — the plugin only applies a language restriction while a multilingual plugin is actually active).
 - Browser console/network tab → look for a failed request to your Search Cloud endpoint.
 
 ### "Test connection" fails
 
-Double-check the write key and write secret were copied correctly from your Search Cloud site page (not the search key). A masked field that's already saved doesn't need to be retyped unless you're rotating it — leave it blank to keep the existing value.
+The test is under **Advanced: manual key entry** on the Connection tab and checks the credentials that are saved, so save first. Double-check the write key and write secret were copied correctly from your Search Cloud site page (not the search key). A masked field that's already saved doesn't need to be retyped unless you're rotating it — leave it blank to keep the existing value.
+
+### "Connect to Search Cloud" did not connect the site
+
+- *An account already exists for …* — the email address already has a Search Cloud account, so nothing was created. Open the confirmation link Search Cloud sent to that address, choose the account there, then paste the keys the dashboard shows under **Advanced: manual key entry**.
+- *This domain is already connected* — the site exists in a Search Cloud account already. Log into the dashboard, copy its keys and paste them under **Advanced: manual key entry**.
+- *Too many connect attempts* — connecting is rate-limited. Wait a while and try again.
+
+### What does Disconnect do?
+
+It removes the site from Search Cloud, not only from WordPress: the service deletes the site and its index, the keys stop working and the saved credentials are cleared. Nothing on the WordPress side is deleted. To use search again, connect again and run a sync, which fills a new index.
 
 ### Product indexing options are missing / grayed out
 

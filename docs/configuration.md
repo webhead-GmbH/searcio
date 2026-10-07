@@ -1,12 +1,16 @@
 # Configuration Reference
 
-All settings live under **Search Cloud** in the WordPress admin menu, split across five tabs. Viewing the dashboard requires the `webhead-search-cloud_view` capability; changing connection credentials, indexing, or search configuration requires `webhead-search-cloud_manage_settings`; running or managing syncs requires `webhead-search-cloud_run_sync`. All three are granted to Administrators by default — see [`developers.md`](developers.md#capabilities) to grant them to other roles.
+All settings live under **Search Cloud** in the WordPress admin menu, split across five tabs: **Sync**, **Indexing**, **Search Config**, **Connection** and **General**. They are described here in the order you set a site up in. Viewing the dashboard requires the `webhead-search-cloud_view` capability; changing connection credentials, indexing, or search configuration requires `webhead-search-cloud_manage_settings`; running or managing syncs requires `webhead-search-cloud_run_sync`. All three are granted to Administrators by default — see [`developers.md`](developers.md#capabilities) to grant them to other roles. A user without `manage_settings` sees the Sync tab only.
 
 ## Connection
 
-- **Search key** — the public key (`sk_...`) used by the browser. Restricted by your Search Cloud domain allowlist.
-- **Write key** / **Write secret** — server-side credentials (`wk_...` + secret) used to push content and manage configuration. Stored encrypted; masked once saved.
-- **Test connection** — verifies the saved write credentials and shows your site ID and document usage (used / plan limit).
+- **Connect to Search Cloud** — connects the site in one step, once the Terms of Service and Privacy Policy are accepted (the Data Processing Agreement is optional). It uses the site admin's email address, or the one entered under **Not this email?**. An address with no Search Cloud account gets one and the site is connected at once; an address that already has an account is sent a confirmation link instead, and the keys are then pasted under *Advanced: manual key entry*. **How connecting works** explains this on the tab itself. See [`installation.md`](installation.md#2-connect-to-search-cloud).
+- **Search Cloud connection** — shown once the site is connected: the number of documents in the index against your plan's limit, and what the plan allows this month and how much of it is used (searches, indexed documents, AI assistant messages, photo searches, AI image tagging). An allowance that is close to its limit or spent is marked.
+- **Disconnect** — asks first. It removes the site from Search Cloud: the service deletes the site and its index, the keys stop working, and the saved credentials are cleared here. The domain can be connected again afterwards, to a new, empty index, which a sync fills.
+- **Advanced: manual key entry** (*/ rotate keys* once connected) — the three keys, for a site that already exists in your Search Cloud account and for replacing a key:
+  - **Search key** — the public key (`sk_...`) used by the browser. Restricted by your Search Cloud domain allowlist.
+  - **Write key** / **Write secret** — server-side credentials (`wk_...` + secret) used to push content and manage configuration. Stored encrypted; masked once saved.
+  - **Test connection** — verifies the saved write credentials and shows your site ID and document usage (used / plan limit). It tests what is saved, so save first.
 
 ## Indexing
 
@@ -46,7 +50,7 @@ What the search modal offers is decided by Search Cloud's `/storefront-config`, 
 
 - **AI Assistant** — a chat tab that answers in prose and returns the products it is talking about, with a Compare table across their attributes.
 - **Search by photo** — a camera button in the search box. The shopper uploads (or, on a phone, takes) a photo; a vision model describes it as tags and those tags run as an ordinary search. The tags are shown above the results, so an unexpected result set reads as a misread photo rather than as broken search. Turn it on under *AI & ranking* above.
-- **Find your match** — a guided quiz tab: a few questions that narrow the catalogue down for a shopper who knows what they want but not what it is called. The questions are built in the Search Cloud panel; the tab appears once at least one quiz is published. Answers accumulate into filters and run as a single search at the end.
+- **Product finder** — a guided quiz tab: a few questions that narrow the catalogue down for a shopper who knows what they want but not what it is called. The questions are built in the Search Cloud panel; the tab appears once at least one quiz is published. Answers accumulate into filters and run as a single search at the end.
 
 Every mode is themeable from the same place as the rest of the widget — the block editor's Styles sidebar or Elementor's Style tab.
 
@@ -78,4 +82,4 @@ Rows use the same product cards as the search modal, in the plugin's default sty
 
 - **Keep history for (days)** — how long finished sync runs are kept before being pruned automatically. `0` keeps them forever.
 - **Delete plugin data on uninstall** — off by default. When enabled, deleting the plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud.
-- **Cache** — a "Clear cache" button that resets this plugin's own cached data and PHP's opcode cache, so a just-changed setting or template shows up immediately.
+- **Cache** — a **Clear cache** button that resets this plugin's own cached data and PHP's opcode cache, so a just-changed setting or template shows up immediately.
