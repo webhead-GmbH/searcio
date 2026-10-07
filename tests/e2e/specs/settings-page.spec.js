@@ -73,6 +73,82 @@ test.describe( 'Settings screen', () => {
 		expect( Math.abs( measured.surfaceWidth - ( measured.frameWidth - 2 * measured.insetStart ) ) ).toBeLessThanOrEqual( 1 );
 	} );
 
+	/**
+	 * The words of the header fade in one after the other, and each was gone
+	 * for one frame after it had arrived. The animation library ends a fade by
+	 * taking the animation away and writing its last value as a style. The
+	 * release `@wordpress/components` brings takes it away first and writes a
+	 * frame later, and the frame between the two is painted with the style the
+	 * word started from. `motion` asks for a release that writes first, and the
+	 * bundle did not hold it while `webpack.config.js` read the top of
+	 * `node_modules` only.
+	 *
+	 * Read in the first task after an animation says it has finished, through a
+	 * `MessageChannel`. A probe that waits for the next frame gives the library
+	 * that frame to write in, and measures a header that never flickered.
+	 *
+	 * The suite asks for reduced motion, which is a header that does not
+	 * animate, so this test asks for the animations back.
+	 */
+	test( 'keeps what comes into the header once it is there', async ( { page } ) => {
+		await page.emulateMedia( { reducedMotion: 'no-preference' } );
+		await page.addInitScript( () => {
+			const seen = [];
+			const animate = Element.prototype.animate;
+			const afterwards = new MessageChannel();
+
+			window.__headerEntrances = seen;
+
+			afterwards.port1.onmessage = ( event ) => {
+				const entrance = seen[ event.data ];
+				const style = getComputedStyle( entrance.element );
+
+				entrance.afterwards = { opacity: style.opacity, transform: style.transform };
+			};
+
+			Element.prototype.animate = function ( ...given ) {
+				const animation = animate.apply( this, given );
+
+				if ( this.closest( '.webhead-search-cloud-admin-page__header' ) ) {
+					const entrance = { element: this, afterwards: null };
+					const index = seen.push( entrance ) - 1;
+
+					animation.addEventListener( 'finish', () => afterwards.port2.postMessage( index ) );
+				}
+
+				return animation;
+			};
+		} );
+
+		await page.goto( SETTINGS_URL );
+
+		await expect( page.locator( '.webhead-search-cloud-admin-page__header' ) ).toBeVisible( LOADED );
+
+		const read = () => page.evaluate( () => {
+			const header = document.querySelector( '.webhead-search-cloud-admin-page__header' );
+			const words = [ ...header.querySelectorAll( '.webhead-search-cloud-admin-page__title span, .webhead-search-cloud-admin-page__description span' ) ];
+
+			return {
+				words: words.length,
+				// A word the library animated some other way would be a word this
+				// test says nothing about.
+				unseen: words.filter( ( word ) => ! window.__headerEntrances.some( ( entrance ) => entrance.element === word ) ).length,
+				pending: window.__headerEntrances.filter( ( entrance ) => ! entrance.afterwards ).length,
+				gone: window.__headerEntrances
+					.filter( ( entrance ) => entrance.afterwards && ( '1' !== entrance.afterwards.opacity || 'none' !== entrance.afterwards.transform ) )
+					.map( ( entrance ) => `${ entrance.element === header ? 'the header' : `"${ entrance.element.textContent.trim() }"` }: opacity ${ entrance.afterwards.opacity }, transform ${ entrance.afterwards.transform }` ),
+			};
+		} );
+
+		await expect.poll( async () => ( await read() ).unseen, { timeout: 15000 } ).toBe( 0 );
+		await expect.poll( async () => ( await read() ).pending, { timeout: 15000 } ).toBe( 0 );
+
+		const entrance = await read();
+
+		expect( entrance.words ).toBeGreaterThan( 1 );
+		expect( entrance.gone ).toEqual( [] );
+	} );
+
 	test( 'names the page once, and the open tab under it', async ( { page } ) => {
 		await page.goto( `${ SETTINGS_URL }&tab=sync` );
 
