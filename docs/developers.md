@@ -12,6 +12,8 @@ npm run build
 
 `composer install` also runs Mozart, which copies the framework runtime into `includes/Dependencies` under the `Webhead\WP\SearchCloud\Dependencies\` namespace. The framework itself (`webhead/wp-plugin-framework`) is a `require-dev` dependency only — it must never ship in a release; `includes/Dependencies` is the runtime copy that does.
 
+The build bundles a package the way Node finds it: from the `node_modules` nearest to the file that imports it. A package therefore gets the release of a dependency that npm installed for it, also when another package needs a different one: `motion` runs on its own `framer-motion` and not on the older one `@wordpress/components` brings. Nothing from outside the checkout is bundled. A checkout with no `node_modules` of its own, a git worktree for one, stops with `Can't resolve` where it used to read the directory above it, and so does a `node_modules` that is a link to another checkout's, or a package that `npm link` or a `file:` dependency links in. Run `npm install` in the checkout itself; `npm install --install-links` installs a copy of a linked package. `node vendor/webhead/wp-plugin-framework/tests/scaffold-npm-audit/resolution.js .` asks the configuration where it finds each package, without building.
+
 For a release build:
 
 ```bash
