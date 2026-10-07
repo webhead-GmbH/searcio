@@ -3,7 +3,7 @@
 ## Unreleased
 
 - The readme says what connecting sends to Search Cloud - the site's name and address and the email address and name of the admin who connects - and what saving the Search Config tab sends. Its installation steps describe connecting with one click, and it lists the AI Assistant among the features.
-- The README's badges show the current version and the WordPress and PHP the plugin asks for. The documents describe connecting, disconnecting and the capabilities as they are, list the connection routes, and call the quiz tab by its name, *Product finder*.
+- The README's badges show the current version and the WordPress and PHP the plugin asks for, and the unit suite now compares the version wherever it is written, so they cannot fall behind again. The documents describe connecting, disconnecting and the capabilities as they are, list the connection routes, and call the quiz tab by its name, *Product finder*.
 
 ## 1.2.0
 
