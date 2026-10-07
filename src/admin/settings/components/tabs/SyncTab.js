@@ -7,6 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 import {showToast} from '../../../../toast';
 import {Grid} from '../../../../components/Layout';
 import {statusIntent, statusLabels} from '../../syncStatus';
+import {formatNumber} from '../../../../utils/number';
 import TabIntro from '../TabIntro';
 import SyncSkeleton from './SyncSkeleton';
 import SyncHistory from './SyncHistory';
@@ -24,7 +25,7 @@ const tabUrl = (tab) => {
 
 const Counter = ({label, value}) => (
 	<Stack direction="column" gap="xs" className="whsc-counter">
-		<Text variant="heading-lg">{Number(value || 0).toLocaleString()}</Text>
+		<Text variant="heading-lg">{formatNumber(value || 0)}</Text>
 		<Text variant="body-sm" className="whsc-counter__label">{label}</Text>
 	</Stack>
 );
@@ -234,8 +235,8 @@ const SyncTab = () => {
 											: sprintf(
 												/* translators: 1: processed, 2: estimated total, 3: percentage. */
 												__('%1$s of ~%2$s processed (%3$d%%)', 'webhead-search-cloud'),
-												Number(active.processed).toLocaleString(),
-												Number(active.total_estimated).toLocaleString(),
+												formatNumber(active.processed),
+												formatNumber(active.total_estimated),
 												percent
 											)}
 									</Text>

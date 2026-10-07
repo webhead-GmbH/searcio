@@ -4,11 +4,13 @@ import {Badge, Icon, Stack, Text} from '@wordpress/ui';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import {calendar, tag, trash} from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
+import {dateI18n, getSettings} from '@wordpress/date';
 
 import {DataViews} from '../../../../components/DataViews';
 import Modal from '../../../../components/Modal';
 import {showToast} from '../../../../toast';
 import {statusIntent, statusLabels} from '../../syncStatus';
+import {formatNumber} from '../../../../utils/number';
 
 const pluginData = window.webhead_search_cloudData || {};
 const CAN_RUN_SYNC = pluginData?.caps?.runSync !== false;
@@ -73,6 +75,9 @@ const withColumnStyles = (view) => ({
 	layout: {...(view.layout || {}), styles: COLUMN_STYLES},
 });
 
+// A date as the rest of wp-admin writes one: in the site's format and time
+// zone, with the month in the language of the screen. A bare
+// `toLocaleString()` writes it in the browser's language and calendar.
 const formatDate = (iso) => {
 	if (!iso) {
 		return '-';
@@ -80,7 +85,7 @@ const formatDate = (iso) => {
 
 	const date = new Date(iso);
 
-	return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
+	return Number.isNaN(date.getTime()) ? '-' : dateI18n(getSettings().formats.datetime, date);
 };
 
 const DEFAULT_VIEW = {
@@ -224,20 +229,20 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 					label: __('Processed', 'webhead-search-cloud'),
 					enableSorting: true,
 					filterBy: false,
-					render: ({item}) => Number(item.processed).toLocaleString(),
+					render: ({item}) => formatNumber(item.processed),
 				},
 				{
 					id: 'pushed',
 					label: __('Pushed', 'webhead-search-cloud'),
 					enableSorting: true,
 					filterBy: false,
-					render: ({item}) => Number(item.pushed).toLocaleString(),
+					render: ({item}) => formatNumber(item.pushed),
 				},
 				{
 					id: 'deleted',
 					label: __('Deleted', 'webhead-search-cloud'),
 					filterBy: false,
-					render: ({item}) => Number(item.deleted).toLocaleString(),
+					render: ({item}) => formatNumber(item.deleted),
 				},
 				{
 					id: 'created_at',
