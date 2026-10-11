@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **The package holds no `vendor` directory and no `composer.json`.** The plugin loaded its own classes through `vendor/autoload.php`, so every package carried a `vendor` that held Composer's autoloader and nothing else, and a `composer.json` beside it because Plugin Check asks for one wherever that autoloader is. It now loads itself through `includes/autoload.php`, which registers the plugin's namespace and loads the bundled framework from `includes/Dependencies`. A release is built from one `composer install`; the production install that emptied `vendor` is gone from `deploy.yml`. The plugin also runs on the same files where it is developed and where it is installed. The unit suite reads the files a package holds and fails on one that still asks for `vendor`.
+- Updated the webhead plugin framework to 1.5.0. Its helper functions are functions of the bundle's own namespace and no longer global; the plugin called none of them.
+
 ## 1.2.1
 
 - **The words of the settings screen's header stay once they are there.** The title and the description fade in word by word, and a frame after a word had arrived it was gone for one frame and back, which read as a flicker. The animation library ends a fade by taking the animation away and writing its last value as a style, and the release in the bundle did the two a frame apart. `motion` asks for a release that does not. The bundle held the one `@wordpress/components` brings instead, because the build read the top of `node_modules` only, and nothing said so: the build passed and `npm ls` was right. The build now gives a package the dependency npm installed for it, and bundles nothing from outside the plugin. Only the script of the settings screen changes, by about 14 KB; the storefront's script and every stylesheet are the same byte for byte. A new end-to-end test reads each word in the first task after its fade ends, with the animations the suite otherwise turns off.
