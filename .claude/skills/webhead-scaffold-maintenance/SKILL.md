@@ -14,6 +14,7 @@ Generated files are a framework-owned contract, but product plugins may customiz
 
 - `composer.json` keeps `webhead/wp-plugin-framework` in `require-dev`.
 - Mozart output lives in `includes/Dependencies` for release builds. The path comes from `extra.mozart.dep_directory` in `composer.json`; read it from there instead of assuming it.
+- The main plugin file loads `includes/autoload.php` and nothing from `vendor`. That file is framework-owned and rendered from `autoload.psr-4` and `extra.mozart.dep_directory` of `composer.json`: after changing either, run `composer framework:update`. In a plugin generated earlier, the update replaces the scaffolder's `vendor/autoload.php` line itself; when it cannot, it says why and `.distignore` keeps `vendor` in the package until the reason is gone.
 - `composer install` runs `vendor/bin/webhead bundle:prune` after Mozart. It removes the framework modules listed under `extra.webhead.exclude-modules` (`updates`, `command-runner`) and refuses to build while plugin code still uses one of them.
 - `package.json` may include product-specific custom dependencies and scripts.
 - `package.json` includes framework-owned npm overrides for vulnerable `@wordpress/scripts` transitive build tooling; preserve product-specific custom overrides. `scaffold:update` drops an override the framework has retired, but only when its value is still the one the framework wrote.

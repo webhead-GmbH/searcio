@@ -58,28 +58,22 @@ src
 webpack.config.js
 package.json
 package-lock.json
-composer.lock
-# composer.json ships. wordpress.org expects it beside a vendor directory, and
-# Plugin Check warns (missing_composer_json_file) when it is not there.
 
-# The framework itself is not shipped: Mozart rewrites it into
-# includes/Dependencies under this plugin's own namespace.
-vendor/webhead/wp-plugin-framework
-vendor/bin
-
-# NOTE: the remaining dev dependencies (PHPUnit, Mozart, Symfony, ...) are not
-# listed here because the list changes with every version. Build the release
-# from a production install instead:
+# Composer. WordPress loads this plugin through includes/autoload.php, which
+# asks Composer for nothing: the plugin's own classes come from the map in
+# that file, and the framework from includes/Dependencies, where Mozart wrote it
+# under this plugin's namespace. `vendor` holds what built and tested the
+# plugin, and a package has none of it.
 #
-#     composer install            # dev tree, so Mozart can build includes/Dependencies
-#     composer install --no-dev --no-scripts --optimize-autoloader
-#                                 # drop the dev tree before packaging;
-#                                 # --no-scripts because post-install-cmd
-#                                 # calls vendor/bin/mozart, which --no-dev
-#                                 # has just removed
+# Build the release from an installed tree, so that the bundle is there:
+#
+#     composer install
 #
 # Then confirm includes/Dependencies holds only `Webhead`, `League`, `Psr`, and the
 # prefixed composer autoloader.
+composer.json
+composer.lock
+vendor
 
 # Local secrets. These are gitignored, but .distignore governs an archive built
 # from the working tree, so an untracked .env would otherwise ship.

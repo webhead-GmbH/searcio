@@ -23,13 +23,9 @@ declare( strict_types=1 );
 // Prevent direct file access
 defined( 'ABSPATH' ) || exit;
 
-require_once __DIR__ . '/vendor/autoload.php';
-
-$webhead_search_cloud_prefixed_autoload_file = __DIR__ . '/includes/Dependencies/autoload.php';
-
-if ( is_readable( $webhead_search_cloud_prefixed_autoload_file ) ) {
-	require_once $webhead_search_cloud_prefixed_autoload_file;
-}
+// This plugin's classes and the runtime bundled with it. Composer's autoloader
+// is not asked: a release package has no `vendor` directory.
+require_once __DIR__ . '/includes/autoload.php';
 
 defined( 'Webhead\WP\SearchCloud\VERSION' ) || define(
 	'Webhead\WP\SearchCloud\VERSION',

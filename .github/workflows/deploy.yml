@@ -27,22 +27,17 @@ jobs:
         with:
           php-version: '8.3'
 
-      # The dev tree first: Mozart builds includes/Dependencies from it, and
-      # bundle:prune then takes out the framework modules composer.json excludes.
+      # One install, from the lockfile: Mozart builds includes/Dependencies from
+      # it, and bundle:prune then takes out the framework modules composer.json
+      # excludes. The plugin loads itself through includes/autoload.php and
+      # nothing from vendor, so vendor is not packed and needs no second,
+      # production install to empty it.
       # Scoped to this step: a job-level secret is visible to every step,
       # including third-party actions.
-      - name: Install composer dependencies (build phase)
+      - name: Install composer dependencies
         env:
           COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
         run: composer install
-
-      # From the lockfile, so the package holds the versions that were tested.
-      # --no-scripts because post-install-cmd calls vendor/bin/mozart, which
-      # --no-dev has just removed.
-      - name: Reinstall composer dependencies for production
-        env:
-          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-        run: composer install --no-dev --no-scripts --optimize-autoloader
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -56,9 +51,10 @@ jobs:
       - name: Build plugin
         run: npm run build
 
-      # .distignore is the one list of what stays out of a package. The three
-      # names after it are repository files that have no place in an installed
-      # plugin and that .distignore, a framework-managed file, does not name.
+      # .distignore is the one list of what stays out of a package, vendor and
+      # composer.json among it. The names after it are repository files that
+      # have no place in an installed plugin and that .distignore, a
+      # framework-managed file, does not name.
       - name: Prepare production package directory
         env:
           REPO_NAME: ${{ github.event.repository.name }}

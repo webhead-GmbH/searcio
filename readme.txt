@@ -91,7 +91,8 @@ To rebuild it, check the repository out and run `npm install` followed by
 - "How connecting works" names the link for another email address by its label, "Not this email?".
 - The Terms of Service, Privacy Policy and Data Processing Agreement links on the Connection tab lead to the documents at searcio.com when Search Cloud cannot be reached. They led to an address that asks for a password.
 - This readme says what connecting sends to Search Cloud, and what saving the Search Config tab sends.
-- Updated the webhead plugin framework to 1.4.1.
+- The plugin package no longer carries a `vendor` folder and a `composer.json`. The plugin loads its own files, and nothing changes in how it works.
+- Updated the webhead plugin framework to 1.5.0.
 
 = 1.2.0 =
 - Requires WordPress 6.8 or newer, up from 6.0. A site on an older WordPress keeps the version it has.
