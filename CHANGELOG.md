@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **A simple product's price is indexed with tax when the shop shows prices with tax**, as a variable product's always was. A variable product's range came from WooCommerce's display prices, and a simple product's price, regular price and sale price were the amounts as entered, so in a shop that enters prices without tax and shows them with tax, the search showed simple products without tax and variable ones with it, and the price filter compared the two. All three are now converted as WooCommerce converts them for the shop and rounded to its decimals, as a variation's are. The next full sync corrects the index, the scheduled one or *Start sync* on the Sync tab; it re-sends only the products whose price changes, and no forced sync is needed. A new integration test prices a simple product and a variation under every combination of the tax settings.
+
 ## 1.2.1
 
 - **The words of the settings screen's header stay once they are there.** The title and the description fade in word by word, and a frame after a word had arrived it was gone for one frame and back, which read as a flicker. The animation library ends a fade by taking the animation away and writing its last value as a style, and the release in the bundle did the two a frame apart. `motion` asks for a release that does not. The bundle held the one `@wordpress/components` brings instead, because the build read the top of `node_modules` only, and nothing said so: the build passed and `npm ls` was right. The build now gives a package the dependency npm installed for it, and bundles nothing from outside the plugin. Only the script of the settings screen changes, by about 14 KB; the storefront's script and every stylesheet are the same byte for byte. A new end-to-end test reads each word in the first task after its fade ends, with the animations the suite otherwise turns off.
