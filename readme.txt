@@ -4,7 +4,7 @@ Tags: search, woocommerce
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -83,6 +83,11 @@ To rebuild it, check the repository out and run `npm install` followed by
 `npm run build`.
 
 == Changelog ==
+
+= 1.2.2 =
+- Fixed simple products showing their price without tax in the search while variable products showed it with tax, in a shop that enters prices without tax and shows them with tax (and the other way round). Every price in the search is now the price your shop displays, with or without tax as set under WooCommerce > Settings > Tax > Display prices in the shop, and the price filter compares like with like. After updating, run a sync from the Sync tab, or wait for the daily one: it sends only the products whose price changes.
+- Grouped products show the range of their children's prices, each child with its own tax class, as your shop shows it.
+- The search prices are the same whoever runs the sync. A sync run with WP-CLI could price products for the address of the user it ran as.
 
 = 1.2.1 =
 - Fixed the words in the header of the settings screen flickering as they appear.

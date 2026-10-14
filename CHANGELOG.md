@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.2
 
 - **A simple product's price is indexed with tax when the shop shows prices with tax**, as a variable product's always was. A variable product's range came from WooCommerce's display prices, and a simple product's price, regular price and sale price were the amounts as entered, so in a shop that enters prices without tax and shows them with tax, the search showed simple products without tax and variable ones with it, and the price filter compared the two. All three are now converted as WooCommerce converts them for the shop and rounded to its decimals, as a variation's are. A grouped product is priced as WooCommerce shows it, from its published children's display prices, each with the child's own tax status and class, and carries their range. Every price is worked out for no shopper, whoever runs the sync: a sync run with WP-CLI used to price variable products for the address and VAT exemption of the user it ran as. The next full sync corrects the index, the scheduled one or *Start sync* on the Sync tab; it re-sends only the products whose price changes, and no forced sync is needed. A new integration test prices a simple product and a variation under every combination of the tax settings.
 
