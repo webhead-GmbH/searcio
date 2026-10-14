@@ -379,7 +379,8 @@ final class Woo {
 	 * @return array<string,mixed>
 	 */
 	private function grouped_price_fields( $product ): array {
-		$prices = [];
+		$prices  = [];
+		$on_sale = false;
 
 		// The children a shopper sees. WooCommerce's own filter also keeps the
 		// ones the current user may edit, which would price the product for
@@ -395,6 +396,10 @@ final class Woo {
 			if ( '' !== $price && null !== $price ) {
 				$prices[] = $this->display_price( $child, $price );
 			}
+
+			// As `WC_Product_Grouped::is_on_sale()` decides it, over the same
+			// children.
+			$on_sale = $on_sale || ( $child->is_purchasable() && ! $child->has_child() && $child->is_on_sale() );
 		}
 
 		if ( [] === $prices ) {
@@ -407,7 +412,7 @@ final class Woo {
 			'price_max'    => max( $prices ),
 			'product_type' => 'simple',
 			// A grouped product is "on sale" if a child is.
-			'on_sale'      => $product->is_on_sale(),
+			'on_sale'      => (bool) apply_filters( 'woocommerce_product_is_on_sale', $on_sale, $product ),
 		];
 	}
 

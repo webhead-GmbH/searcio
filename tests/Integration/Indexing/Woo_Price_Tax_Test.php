@@ -193,6 +193,16 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		$this->assertSame( 10.7, $grouped['price_min'] );
 		$this->assertSame( 178.5, $grouped['price_max'] );
 		$this->assertSame( 'simple', $grouped['product_type'] );
+		$this->assertFalse( $grouped['on_sale'] );
+	}
+
+	public function test_a_grouped_product_is_on_sale_when_a_child_is(): void {
+		$this->tax_shop( false, 'incl' );
+
+		$grouped = $this->fields( $this->grouped( [ $this->simple( '100' ), $this->simple( '50', '40' ) ] ) );
+
+		$this->assertTrue( $grouped['on_sale'] );
+		$this->assertSame( 47.6, $grouped['price_min'] );
 	}
 
 	/** Gross prices shown without tax: a child that is not taxable keeps its price. */
@@ -206,13 +216,14 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * Only the children a shopper sees count, whoever runs the sync: run as an
-	 * administrator, WooCommerce's own filter would also keep a draft.
+	 * Only the children a shopper sees count, for the price and for whether
+	 * the product is on sale, whoever runs the sync: run as an administrator,
+	 * WooCommerce's own filter would also keep a draft.
 	 */
 	public function test_a_grouped_product_is_priced_from_its_published_children_whoever_runs_the_sync(): void {
 		$this->tax_shop( false, 'incl' );
 
-		$draft = $this->simple( '20' );
+		$draft = $this->simple( '20', '10' );
 		$child = wc_get_product( $draft );
 		$child->set_status( 'draft' );
 		$child->save();
@@ -230,6 +241,7 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		}
 
 		$this->assertSame( 119.0, $as_nobody['price_min'] );
+		$this->assertFalse( $as_nobody['on_sale'] );
 		$this->assertSame( $as_nobody, $as_administrator );
 	}
 
