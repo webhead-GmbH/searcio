@@ -336,6 +336,10 @@ final class Woo {
 			];
 		}
 
+		if ( $product->is_type( 'grouped' ) ) {
+			return $this->grouped_price_fields( $product );
+		}
+
 		$price = $product->get_price();
 
 		if ( '' === $price || null === $price ) {
@@ -362,6 +366,42 @@ final class Woo {
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * A grouped product's price is its children's, each converted with the
+	 * child's own tax status and class, as WooCommerce displays it: the range
+	 * from the cheapest visible child that has a price to the dearest. The
+	 * grouped product's own price is the cheapest child's as entered, and its
+	 * own tax settings are WooCommerce's defaults, which the product screen
+	 * does not show, so it is not converted itself.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function grouped_price_fields( $product ): array {
+		$children = array_filter( array_map( 'wc_get_product', $product->get_children() ), 'wc_products_array_filter_visible_grouped' );
+		$prices   = [];
+
+		foreach ( $children as $child ) {
+			$price = $child->get_price();
+
+			if ( '' !== $price && null !== $price ) {
+				$prices[] = $this->display_price( $child, $price );
+			}
+		}
+
+		if ( [] === $prices ) {
+			return [];
+		}
+
+		return [
+			'price'        => min( $prices ),
+			'price_min'    => min( $prices ),
+			'price_max'    => max( $prices ),
+			'product_type' => 'simple',
+			// A grouped product is "on sale" if a child is.
+			'on_sale'      => $product->is_on_sale(),
+		];
 	}
 
 	/**

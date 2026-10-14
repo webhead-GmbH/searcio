@@ -18,6 +18,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Tests\Integration\Indexing;
 
+use WC_Product_Grouped;
 use WC_Product_Simple;
 use WC_Product_Variable;
 use WC_Product_Variation;
@@ -167,6 +168,53 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * A grouped product is shown at its children's prices, each converted with
+	 * the child's own tax status and class. The grouped product's own tax
+	 * settings are WooCommerce's defaults, which its product screen does not
+	 * show, so converting its price with them taxed a voucher at the standard
+	 * rate and a book at it in place of the reduced one.
+	 */
+	public function test_a_grouped_product_is_priced_from_its_childrens_display_prices(): void {
+		$this->tax_shop( false, 'incl' );
+		$this->reduced_rate();
+
+		$grouped = $this->fields(
+			$this->grouped(
+				[
+					$this->simple( '100', '', 'none' ),
+					$this->simple( '150' ),
+					$this->simple( '10', '', 'taxable', 'reduced-rate' ),
+					$this->simple( '' ),
+				]
+			)
+		);
+
+		$this->assertSame( 10.7, $grouped['price'] );
+		$this->assertSame( 10.7, $grouped['price_min'] );
+		$this->assertSame( 178.5, $grouped['price_max'] );
+		$this->assertSame( 'simple', $grouped['product_type'] );
+	}
+
+	/** Gross prices shown without tax: a child that is not taxable keeps its price. */
+	public function test_a_grouped_product_keeps_the_price_of_a_child_that_is_not_taxable(): void {
+		$this->tax_shop( true, 'excl' );
+
+		$grouped = $this->fields( $this->grouped( [ $this->simple( '119', '', 'none' ), $this->simple( '238' ) ] ) );
+
+		$this->assertSame( 119.0, $grouped['price_min'] );
+		$this->assertSame( 200.0, $grouped['price_max'] );
+	}
+
+	public function test_a_grouped_product_whose_children_have_no_price_has_none(): void {
+		$this->tax_shop( false, 'incl' );
+
+		$grouped = $this->fields( $this->grouped( [ $this->simple( '' ) ] ) );
+
+		$this->assertArrayNotHasKey( 'price', $grouped );
+		$this->assertArrayNotHasKey( 'price_min', $grouped );
+	}
+
+	/**
 	 * A sync run by WP-Cron has no customer: WooCommerce loads its cart only for
 	 * a frontend request. With WooCommerce's own defaults (tax based on the
 	 * customer's shipping address, default customer location the shop base) the
@@ -220,13 +268,39 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		$this->assertCount( 1, WC_Tax::get_rates(), 'The premise: the rate applies where the sync runs.' );
 	}
 
-	private function simple( string $regular, string $sale = '', string $tax_status = 'taxable' ): int {
+	/**
+	 * A 7% rate for WooCommerce's "Reduced rate" class in the shop base.
+	 */
+	private function reduced_rate(): void {
+		if ( ! in_array( 'reduced-rate', WC_Tax::get_tax_class_slugs(), true ) ) {
+			WC_Tax::create_tax_class( 'Reduced rate', 'reduced-rate' );
+		}
+
+		WC_Tax::_insert_tax_rate(
+			[
+				'tax_rate_country'  => 'DE',
+				'tax_rate_state'    => '',
+				'tax_rate'          => '7',
+				'tax_rate_name'     => 'MwSt. ermäßigt',
+				'tax_rate_priority' => 1,
+				'tax_rate_compound' => 0,
+				'tax_rate_shipping' => 1,
+				'tax_rate_order'    => 1,
+				'tax_rate_class'    => 'reduced-rate',
+			]
+		);
+
+		$this->assertCount( 1, WC_Tax::get_rates( 'reduced-rate' ), 'The premise: the reduced rate applies where the sync runs.' );
+	}
+
+	private function simple( string $regular, string $sale = '', string $tax_status = 'taxable', string $tax_class = '' ): int {
 		$product = new WC_Product_Simple();
 		$product->set_name( 'Rain Coat' );
 		$product->set_regular_price( $regular );
 		$product->set_sale_price( $sale );
 		$product->set_price( '' !== $sale ? $sale : $regular );
 		$product->set_tax_status( $tax_status );
+		$product->set_tax_class( $tax_class );
 		$product->set_status( 'publish' );
 		$product->save();
 
@@ -258,6 +332,19 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		wc_get_product( $variable->get_id() )->save();
 
 		return $variable->get_id();
+	}
+
+	/**
+	 * @param array<int,int> $children
+	 */
+	private function grouped( array $children ): int {
+		$grouped = new WC_Product_Grouped();
+		$grouped->set_name( 'Gift Set' );
+		$grouped->set_children( $children );
+		$grouped->set_status( 'publish' );
+		$grouped->save();
+
+		return $grouped->get_id();
 	}
 
 	/**
