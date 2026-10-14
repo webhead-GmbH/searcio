@@ -6,7 +6,8 @@
  * never fatals when WooCommerce is inactive or below the minimum version. All
  * product data is read through `wc_get_product()` (not raw meta). Variable
  * products are indexed as the parent only — price becomes a range and the
- * variation SKUs are collected into a searchable `skus` array.
+ * variation SKUs are collected into a searchable `skus` array. Prices are the
+ * shop's display prices, with or without tax as WooCommerce shows them.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -180,7 +181,7 @@ final class Woo {
 		$fields      = [];
 
 		if ( ! empty( $woo['price'] ) ) {
-			$fields += $this->price_fields( $product, $is_variable, ! empty( $woo['regular_sale'] ) );
+			$fields += $this->without_customer( fn () => $this->price_fields( $product, $is_variable, ! empty( $woo['regular_sale'] ) ) );
 		}
 
 		if ( ! empty( $woo['sku'] ) ) {
@@ -306,10 +307,18 @@ final class Woo {
 	}
 
 	/**
+	 * The prices as the shop displays them: with tax when WooCommerce is set to
+	 * show prices with tax in the shop, without when it is not, whichever way
+	 * they were entered. The index is shown to every shopper as it is, so it
+	 * carries the shop's own display price, and a variable product's range and
+	 * a simple product's price are on the same basis.
+	 *
 	 * @return array<string,mixed>
 	 */
 	private function price_fields( $product, bool $is_variable, bool $with_regular_sale ): array {
 		if ( $is_variable && method_exists( $product, 'get_variation_prices' ) ) {
+			// `true` asks for the display prices, already rounded to the shop's
+			// decimals.
 			$prices = $product->get_variation_prices( true );
 			$active = is_array( $prices['price'] ?? null ) ? array_map( 'floatval', $prices['price'] ) : [];
 
@@ -327,6 +336,10 @@ final class Woo {
 			];
 		}
 
+		if ( $product->is_type( 'grouped' ) ) {
+			return $this->grouped_price_fields( $product );
+		}
+
 		$price = $product->get_price();
 
 		if ( '' === $price || null === $price ) {
@@ -334,7 +347,7 @@ final class Woo {
 		}
 
 		$fields = [
-			'price'        => (float) $price,
+			'price'        => $this->display_price( $product, $price ),
 			'product_type' => 'simple',
 			'on_sale'      => $product->is_on_sale(),
 		];
@@ -344,15 +357,106 @@ final class Woo {
 			$sale    = $product->get_sale_price();
 
 			if ( '' !== $regular && null !== $regular ) {
-				$fields['regular_price'] = (float) $regular;
+				$fields['regular_price'] = $this->display_price( $product, $regular );
 			}
 
 			if ( '' !== $sale && null !== $sale ) {
-				$fields['sale_price'] = (float) $sale;
+				$fields['sale_price'] = $this->display_price( $product, $sale );
 			}
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * A grouped product's price is its children's, each converted with the
+	 * child's own tax status and class, as WooCommerce displays it: the range
+	 * from the cheapest visible child that has a price to the dearest. The
+	 * grouped product's own price is the cheapest child's as entered, and its
+	 * own tax settings are WooCommerce's defaults, which the product screen
+	 * does not show, so it is not converted itself.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function grouped_price_fields( $product ): array {
+		$prices  = [];
+		$on_sale = false;
+
+		// The children a shopper sees. WooCommerce's own filter also keeps the
+		// ones the current user may edit, which would price the product for
+		// whoever runs the sync.
+		$children = array_filter(
+			array_map( 'wc_get_product', $product->get_children() ),
+			static fn ( $child ): bool => $child instanceof \WC_Product && 'publish' === $child->get_status()
+		);
+
+		foreach ( $children as $child ) {
+			$price = $child->get_price();
+
+			if ( '' !== $price && null !== $price ) {
+				$prices[] = $this->display_price( $child, $price );
+			}
+
+			// As `WC_Product_Grouped::is_on_sale()` decides it, over the same
+			// children.
+			$on_sale = $on_sale || ( $child->is_purchasable() && ! $child->has_child() && $child->is_on_sale() );
+		}
+
+		if ( [] === $prices ) {
+			return [];
+		}
+
+		return [
+			'price'        => min( $prices ),
+			'price_min'    => min( $prices ),
+			'price_max'    => max( $prices ),
+			'product_type' => 'simple',
+			// A grouped product is "on sale" if a child is.
+			'on_sale'      => (bool) apply_filters( 'woocommerce_product_is_on_sale', $on_sale, $product ),
+		];
+	}
+
+	/**
+	 * Runs `$build` as a sync run by WP-Cron runs it: with no customer. WP-CLI
+	 * gives WooCommerce one, the user `--user` names or a guest, and WooCommerce
+	 * works the tax out for that customer's address and VAT exemption. The
+	 * index is shown to every shopper, so it is priced for none, whoever runs
+	 * the sync.
+	 *
+	 * @template T
+	 * @param  callable():T  $build
+	 * @return T
+	 */
+	private function without_customer( callable $build ) {
+		if ( ! function_exists( 'WC' ) || null === WC()->customer ) {
+			return $build();
+		}
+
+		$customer      = WC()->customer;
+		WC()->customer = null;
+
+		try {
+			return $build();
+		} finally {
+			WC()->customer = $customer;
+		}
+	}
+
+	/**
+	 * A price as entered, converted the way WooCommerce converts it for the
+	 * shop and rounded as it rounds a variation's display price, so the same
+	 * entered price is indexed the same for a simple product and a variation.
+	 *
+	 * Only a price that is there is converted: WooCommerce reads an empty one
+	 * as the product's active price.
+	 *
+	 * @param  int|float|string  $price
+	 */
+	private function display_price( $product, $price ): float {
+		return (float) wc_format_decimal(
+			wc_get_price_to_display( $product, [ 'price' => $price ] ),
+			wc_get_price_decimals()
+		);
 	}
 
 	/**
