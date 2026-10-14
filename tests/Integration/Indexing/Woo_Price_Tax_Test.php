@@ -205,6 +205,34 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		$this->assertSame( 200.0, $grouped['price_max'] );
 	}
 
+	/**
+	 * Only the children a shopper sees count, whoever runs the sync: run as an
+	 * administrator, WooCommerce's own filter would also keep a draft.
+	 */
+	public function test_a_grouped_product_is_priced_from_its_published_children_whoever_runs_the_sync(): void {
+		$this->tax_shop( false, 'incl' );
+
+		$draft = $this->simple( '20' );
+		$child = wc_get_product( $draft );
+		$child->set_status( 'draft' );
+		$child->save();
+
+		$grouped = $this->grouped( [ $this->simple( '100' ), $draft ] );
+
+		$as_nobody = $this->fields( $grouped );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
+
+		try {
+			$as_administrator = $this->fields( $grouped );
+		} finally {
+			wp_set_current_user( 0 );
+		}
+
+		$this->assertSame( 119.0, $as_nobody['price_min'] );
+		$this->assertSame( $as_nobody, $as_administrator );
+	}
+
 	public function test_a_grouped_product_whose_children_have_no_price_has_none(): void {
 		$this->tax_shop( false, 'incl' );
 
@@ -212,6 +240,44 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 
 		$this->assertArrayNotHasKey( 'price', $grouped );
 		$this->assertArrayNotHasKey( 'price_min', $grouped );
+	}
+
+	/**
+	 * WP-CLI gives WooCommerce a customer, the one `--user` names, and
+	 * WooCommerce works the tax out for that customer's address. The index is
+	 * priced for no shopper, as a sync run by WP-Cron prices it, so a customer
+	 * who ships abroad leaves no product without tax.
+	 */
+	public function test_prices_are_not_worked_out_for_the_customer_running_the_sync(): void {
+		$this->tax_shop( false, 'incl' );
+		update_option( 'woocommerce_tax_based_on', 'shipping' );
+		update_option( 'woocommerce_default_customer_address', 'base' );
+
+		$customer = new \WC_Customer();
+		$customer->set_billing_country( 'AT' );
+		$customer->set_shipping_country( 'AT' );
+		WC()->customer = $customer;
+
+		$this->assertCount( 0, WC_Tax::get_rates(), 'The premise: the customer is where the shop has no rate.' );
+
+		$this->assertSame( 119.0, $this->fields( $this->simple( '100' ) )['price'] );
+		$this->assertSame( 119.0, $this->fields( $this->variable( [ '100' ] ) )['price'] );
+		$this->assertSame( 119.0, $this->fields( $this->grouped( [ $this->simple( '100' ) ] ) )['price'] );
+		$this->assertSame( $customer, WC()->customer, 'The customer is put back.' );
+	}
+
+	/** Nor for a customer who is exempt from VAT. */
+	public function test_prices_are_not_worked_out_for_a_vat_exempt_customer_running_the_sync(): void {
+		$this->tax_shop( true, 'incl' );
+
+		$customer = new \WC_Customer();
+		$customer->set_billing_country( 'DE' );
+		$customer->set_shipping_country( 'DE' );
+		$customer->set_is_vat_exempt( true );
+		WC()->customer = $customer;
+
+		$this->assertSame( 119.0, $this->fields( $this->simple( '119' ) )['price'] );
+		$this->assertSame( 119.0, $this->fields( $this->variable( [ '119' ] ) )['price'] );
 	}
 
 	/**

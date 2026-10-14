@@ -181,7 +181,7 @@ final class Woo {
 		$fields      = [];
 
 		if ( ! empty( $woo['price'] ) ) {
-			$fields += $this->price_fields( $product, $is_variable, ! empty( $woo['regular_sale'] ) );
+			$fields += $this->without_customer( fn () => $this->price_fields( $product, $is_variable, ! empty( $woo['regular_sale'] ) ) );
 		}
 
 		if ( ! empty( $woo['sku'] ) ) {
@@ -379,8 +379,15 @@ final class Woo {
 	 * @return array<string,mixed>
 	 */
 	private function grouped_price_fields( $product ): array {
-		$children = array_filter( array_map( 'wc_get_product', $product->get_children() ), 'wc_products_array_filter_visible_grouped' );
-		$prices   = [];
+		$prices = [];
+
+		// The children a shopper sees. WooCommerce's own filter also keeps the
+		// ones the current user may edit, which would price the product for
+		// whoever runs the sync.
+		$children = array_filter(
+			array_map( 'wc_get_product', $product->get_children() ),
+			static fn ( $child ): bool => $child instanceof \WC_Product && 'publish' === $child->get_status()
+		);
 
 		foreach ( $children as $child ) {
 			$price = $child->get_price();
@@ -402,6 +409,32 @@ final class Woo {
 			// A grouped product is "on sale" if a child is.
 			'on_sale'      => $product->is_on_sale(),
 		];
+	}
+
+	/**
+	 * Runs `$build` as a sync run by WP-Cron runs it: with no customer. WP-CLI
+	 * gives WooCommerce one, the user `--user` names or a guest, and WooCommerce
+	 * works the tax out for that customer's address and VAT exemption. The
+	 * index is shown to every shopper, so it is priced for none, whoever runs
+	 * the sync.
+	 *
+	 * @template T
+	 * @param  callable():T  $build
+	 * @return T
+	 */
+	private function without_customer( callable $build ) {
+		if ( ! function_exists( 'WC' ) || null === WC()->customer ) {
+			return $build();
+		}
+
+		$customer      = WC()->customer;
+		WC()->customer = null;
+
+		try {
+			return $build();
+		} finally {
+			WC()->customer = $customer;
+		}
 	}
 
 	/**
