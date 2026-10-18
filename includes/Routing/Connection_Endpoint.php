@@ -48,6 +48,10 @@ final class Connection_Endpoint extends Rest_API {
 	public function test_connection( WP_REST_Request $request ): WP_REST_Response {
 		$response = $this->client->health();
 
+		// The storefront decides on the searcio logo from the tier, and asks
+		// nobody: it is kept whenever an admin screen checks the connection.
+		$this->connection_state->remember_plan( $response );
+
 		return new WP_REST_Response( $this->present( $response ) );
 	}
 

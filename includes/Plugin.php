@@ -282,7 +282,11 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'scheduled_sync_job',
 			static function () use ( $container ): Scheduled_Sync_Job {
-				return new Scheduled_Sync_Job( $container->get( 'sync_service' ) );
+				return new Scheduled_Sync_Job(
+					$container->get( 'sync_service' ),
+					$container->get( 'search_cloud_client' ),
+					$container->get( 'connection_state' )
+				);
 			}
 		);
 		$container->add(

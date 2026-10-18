@@ -61,6 +61,31 @@ final class Plugin_Settings_Test extends TestCase {
 		$this->assertTrue( $instance->show_in_rest );
 	}
 
+	/**
+	 * On until the shop turns it off, and saved with the General tab, whose own
+	 * card draws it.
+	 */
+	public function test_support_searcio_defaults_to_on_and_is_rest_exposed(): void {
+		$instance = $this->setting( 'SUPPORT_SEARCIO' );
+
+		$this->assertSame( 'boolean', $instance->type );
+		$this->assertTrue( $instance->default );
+		$this->assertTrue( $instance->show_in_rest );
+	}
+
+	/**
+	 * A mirror of what Search Cloud says, written by the plugin and never by a
+	 * settings form: an admin could otherwise call a Free plan paid.
+	 */
+	public function test_the_plan_tier_is_kept_out_of_rest_and_holds_only_a_tier(): void {
+		$instance = $this->setting( 'PLAN_TIER' );
+
+		$this->assertSame( 'string', $instance->type );
+		$this->assertSame( '', $instance->default );
+		$this->assertFalse( $instance->show_in_rest );
+		$this->assertSame( [ '', 'free', 'paid' ], $instance->schema['enum'] );
+	}
+
 	public function test_translated_schema_overrides_covers_every_setting_without_its_own_tab_component(): void {
 		$overrides = Plugin_Settings::translated_schema_overrides();
 
@@ -149,5 +174,13 @@ final class Plugin_Settings_Test extends TestCase {
 		}
 
 		return $settings;
+	}
+
+	private function setting( string $constant ): Setting {
+		$attributes = ( new ReflectionClassConstant( Plugin_Settings::class, $constant ) )->getAttributes( Setting::class );
+
+		$this->assertCount( 1, $attributes );
+
+		return $attributes[0]->newInstance();
 	}
 }

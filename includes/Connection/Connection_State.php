@@ -17,6 +17,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Connection;
 
+use Webhead\WP\SearchCloud\Enums\Plan_Tier;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 
@@ -111,5 +112,30 @@ final class Connection_State {
 		$this->settings->set( Plugin_Settings::SEARCH_KEY, '' );
 		$this->clear_pending_claim();
 		$this->settings->set( Plugin_Settings::CONNECT_IDEMPOTENCY_KEY, '' );
+		$this->settings->set( Plugin_Settings::PLAN_TIER, '' );
+	}
+
+	/**
+	 * The plan tier last seen, or null when none has been seen since the site
+	 * connected.
+	 */
+	public function plan_tier(): ?Plan_Tier {
+		return Plan_Tier::tryFrom( (string) $this->settings->get( Plugin_Settings::PLAN_TIER ) );
+	}
+
+	/**
+	 * Keeps the tier a `/health` answer names. An answer that failed, or names
+	 * no tier, leaves the one already kept.
+	 */
+	public function remember_plan( Api_Response $health ): void {
+		if ( $health->transport_error || ! $health->ok() ) {
+			return;
+		}
+
+		$tier = Plan_Tier::from_health( $health->body() );
+
+		if ( null !== $tier ) {
+			$this->settings->set( Plugin_Settings::PLAN_TIER, $tier->value );
+		}
 	}
 }

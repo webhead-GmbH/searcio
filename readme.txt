@@ -44,6 +44,8 @@ The plugin indexes your content into Search Cloud, keeps it in sync as content c
   sync that pushes edits shortly after they happen. A sync that cannot reach Search Cloud tries again by itself. Full
   sync history, pause/resume/cancel controls, and retention settings are all available from the dashboard.
 - **WP-CLI support** - run and monitor syncs from the command line for real system-cron setups.
+- **Support Searcio** - a small searcio logo, linked to searcio.com, at the bottom of the search window. It is always
+  shown on the Free plan; on a paid plan you can turn it off under Search Cloud > General.
 
 == Installation ==
 

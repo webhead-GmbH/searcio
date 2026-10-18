@@ -5,7 +5,7 @@
  * label and description twice - once in the card header, once on the control.
  */
 
-import { test, expect } from '../utils';
+import { test, expect, setConnected, setPlanTier } from '../utils';
 
 const GENERAL_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=general';
 
@@ -38,5 +38,79 @@ test.describe( 'General settings tab', () => {
 		// field's name for assistive tech.
 		await expect( page.getByRole( 'spinbutton', { name: 'Keep history for (days)' } ) ).toBeVisible();
 		await expect( page.getByRole( 'checkbox', { name: 'Delete plugin data on uninstall' } ) ).toBeAttached();
+	} );
+} );
+
+/**
+ * The connection check the card asks for the plan, answered here.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {Object}                          plan
+ */
+async function mockPlan( page, plan ) {
+	await page.route(
+		( url ) => decodeURIComponent( url.href ).includes( '/connection/test' ),
+		( route ) =>
+			route.fulfill( {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify( { ok: true, status: 200, plan } ),
+			} )
+	);
+}
+
+/**
+ * Support Searcio: the searcio logo in the search window. A paid plan can turn
+ * it off, and saves it with the rest of the tab; a Free plan always shows it,
+ * so its switch is on, cannot be moved, and the card says why.
+ */
+test.describe( 'Support Searcio', () => {
+	test.beforeAll( () => {
+		setConnected( true );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		setConnected( false );
+		setPlanTier( 'clear' );
+		await requestUtils.rest( {
+			path: '/webhead-search-cloud/v1/settings',
+			method: 'POST',
+			data: { settings: { support_searcio: true } },
+		} );
+	} );
+
+	const card = ( page ) => page.locator( '.whsc-settings-card' ).filter( { has: page.getByRole( 'heading', { name: 'Support Searcio' } ) } );
+	const toggle = ( page ) => card( page ).getByRole( 'checkbox', { name: 'Show the searcio logo in the search window' } );
+
+	test( 'a paid plan turns the logo off, and it stays off', async ( { page } ) => {
+		await mockPlan( page, { is_free: false, name: 'Pro', upgrade_url: '' } );
+		await page.goto( GENERAL_URL );
+
+		await expect( toggle( page ) ).toBeChecked( LOADED );
+		await expect( toggle( page ) ).toBeEnabled();
+
+		await toggle( page ).click();
+		await expect( toggle( page ) ).not.toBeChecked();
+		await page.getByRole( 'button', { name: 'Save Settings' } ).click();
+		await expect( page.getByRole( 'button', { name: 'Save Settings' } ) ).toBeDisabled( LOADED );
+
+		await page.reload();
+		await expect( toggle( page ) ).not.toBeChecked( LOADED );
+	} );
+
+	test( 'a Free plan keeps it on and says why, whatever was saved', async ( { page, requestUtils } ) => {
+		setPlanTier( 'free' );
+		await requestUtils.rest( {
+			path: '/webhead-search-cloud/v1/settings',
+			method: 'POST',
+			data: { settings: { support_searcio: false } },
+		} );
+		await mockPlan( page, { is_free: true, name: 'Free', upgrade_url: 'https://searcio.example/billing' } );
+		await page.goto( GENERAL_URL );
+
+		await expect( toggle( page ) ).toBeChecked( LOADED );
+		await expect( toggle( page ) ).toBeDisabled();
+		await expect( card( page ) ).toContainText( 'The Free plan always shows it. On a paid plan you can turn it off.' );
+		await expect( card( page ).getByRole( 'link', { name: 'Upgrade plan' } ) ).toHaveAttribute( 'href', 'https://searcio.example/billing' );
 	} );
 } );

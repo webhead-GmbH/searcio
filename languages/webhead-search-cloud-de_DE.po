@@ -2981,3 +2981,9 @@ msgstr "Produkttyp"
 #: src/frontend/search/components/QuizPane.js:333
 msgid "Your matches"
 msgstr "Deine Treffer"
+
+#. translators: %s: the name of the search service, "searcio".
+#: includes/Frontend/Frontend_Config.php:137
+#, php-format
+msgid "Search by %s (opens in a new tab)"
+msgstr "Suche von %s (öffnet in einem neuen Tab)"

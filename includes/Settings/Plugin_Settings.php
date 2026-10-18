@@ -225,6 +225,40 @@ final class Plugin_Settings {
 	public const DELETE_DATA_ON_UNINSTALL = 'delete_data_on_uninstall';
 
 	/**
+	 * Whether the search window shows the searcio logo, linked to searcio.com.
+	 * On a Free plan it is shown whatever this says, see
+	 * {@see \Webhead\WP\SearchCloud\Frontend\Frontend_Config}. The General
+	 * tab draws it in a card of its own, which knows the plan, so it is not one
+	 * of the settings the schema-driven grid renders.
+	 */
+	#[Setting(
+		type: 'boolean',
+		default: true,
+		option_key: 'webhead_search_cloud_support_searcio',
+		show_in_rest: true,
+		label: 'Support Searcio',
+		description: 'Show the searcio logo, linked to searcio.com, in the search window.'
+	)]
+	public const SUPPORT_SEARCIO = 'support_searcio';
+
+	/**
+	 * The plan tier Search Cloud last named in `/health`, `free` or `paid`, so a
+	 * storefront page can tell without asking the service. Empty until the
+	 * first health check after connecting, and again after disconnecting.
+	 * Written by {@see \Webhead\WP\SearchCloud\Connection\Connection_State::remember_plan()}.
+	 */
+	#[Setting(
+		type: 'string',
+		default: '',
+		option_key: 'webhead_search_cloud_plan_tier',
+		show_in_rest: false,
+		label: 'Plan tier',
+		description: 'Local mirror of the Search Cloud plan tier.',
+		schema: [ 'enum' => [ '', 'free', 'paid' ] ]
+	)]
+	public const PLAN_TIER = 'plan_tier';
+
+	/**
 	 * Translated label/description overrides for settings that render on the
 	 * generic schema-driven "General" tab. `#[Setting(label: ..., description:
 	 * ...)]` arguments must be compile-time constant expressions, so they can

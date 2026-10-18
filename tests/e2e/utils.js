@@ -372,6 +372,16 @@ export function setConnected( connected = true ) {
 }
 
 /**
+ * Set the plan tier the site keeps - 'free', 'paid', or 'clear' for none - which
+ * the storefront decides on the searcio logo from. See `seed-plan.php`.
+ *
+ * @param {string} tier
+ */
+export function setPlanTier( tier = 'clear' ) {
+	wpEvalFile( 'seed-plan.php', tier );
+}
+
+/**
  * Page object over the search trigger and its portalled modal.
  */
 export class SearchWidget {

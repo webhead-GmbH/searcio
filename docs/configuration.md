@@ -83,4 +83,5 @@ Rows use the same product cards as the search modal, in the plugin's default sty
 
 - **Keep history for (days)** — how long finished sync runs are kept before being pruned automatically. `0` keeps them forever.
 - **Delete plugin data on uninstall** — off by default. When enabled, deleting the plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud.
+- **Support Searcio** — on by default. Shows the searcio logo, small in the bottom corner of the search window, linked to searcio.com. On the Free plan it is always shown and the switch cannot be turned off; on a paid plan it can. The storefront takes the plan from what the site last heard from Search Cloud: every time an admin screen checks the connection, and once a day with the scheduled sync. So a plan that changes shows on the storefront within a day.
 - **Cache** — a **Clear cache** button that resets this plugin's own cached data and PHP's opcode cache, so a just-changed setting or template shows up immediately.

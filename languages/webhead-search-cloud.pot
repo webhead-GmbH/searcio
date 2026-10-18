@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-14T09:41:58+00:00\n"
+"POT-Creation-Date: 2026-10-18T06:30:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: webhead-search-cloud\n"
@@ -17,9 +17,9 @@ msgstr ""
 #. Plugin Name of the plugin
 #: webhead-search-cloud.php
 #: includes/Admin/Settings_Page.php:39
-#: includes/Admin/Settings_Page.php:109
-#: includes/Plugin.php:375
-#: src/admin/settings/components/SettingsPanel.js:173
+#: includes/Admin/Settings_Page.php:116
+#: includes/Plugin.php:379
+#: src/admin/settings/components/SettingsPanel.js:177
 msgid "webhead Search Cloud"
 msgstr ""
 
@@ -30,7 +30,7 @@ msgstr ""
 
 #. Description of the plugin
 #: webhead-search-cloud.php
-#: includes/Admin/Settings_Page.php:110
+#: includes/Admin/Settings_Page.php:117
 msgid "Connect WordPress and WooCommerce to webhead Search Cloud."
 msgstr ""
 
@@ -214,16 +214,16 @@ msgid "Placeholder text"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:153
-#: includes/Frontend/Frontend_Config.php:103
+#: includes/Frontend/Frontend_Config.php:123
 #: src/blocks/search/edit.js:120
 msgid "Search…"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:161
 #: src/frontend/search/components/SearchInput.js:32
-#: src/frontend/search/components/SearchModal.js:1086
-#: src/frontend/search/components/SearchModal.js:1107
-#: src/frontend/search/components/SearchModal.js:1176
+#: src/frontend/search/components/SearchModal.js:1087
+#: src/frontend/search/components/SearchModal.js:1108
+#: src/frontend/search/components/SearchModal.js:1177
 #: src/frontend/search/components/Trigger.js:22
 msgid "Search"
 msgstr ""
@@ -287,8 +287,8 @@ msgid "Hide"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:226
-#: src/frontend/search/components/SearchModal.js:1009
-#: src/frontend/search/components/SearchModal.js:1030
+#: src/frontend/search/components/SearchModal.js:1010
+#: src/frontend/search/components/SearchModal.js:1031
 msgid "Results"
 msgstr ""
 
@@ -824,7 +824,7 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:1081
 #: src/blocks/search/edit.js:319
-#: src/frontend/search/components/SearchModal.js:1120
+#: src/frontend/search/components/SearchModal.js:1121
 msgid "AI Assistant"
 msgstr ""
 
@@ -1051,66 +1051,72 @@ msgstr ""
 msgid "Dot color (active)"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:104
-#: src/frontend/search/components/SearchModal.js:1070
-#: src/frontend/search/components/SearchModal.js:1331
+#: includes/Frontend/Frontend_Config.php:124
+#: src/frontend/search/components/SearchModal.js:1071
+#: src/frontend/search/components/SearchModal.js:1332
 msgid "No results found."
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:105
-#: src/frontend/search/components/SearchModal.js:1316
+#: includes/Frontend/Frontend_Config.php:125
+#: src/frontend/search/components/SearchModal.js:1317
 msgid "Searching…"
 msgstr ""
 
 #. translators: shown before a variable product's lowest price, e.g. "from €42".
-#: includes/Frontend/Frontend_Config.php:107
+#: includes/Frontend/Frontend_Config.php:127
 msgctxt "variable product price prefix"
 msgid "from"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:108
+#: includes/Frontend/Frontend_Config.php:128
 #: src/frontend/search/components/templates.js:115
 msgid "Sale"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:109
-#: src/frontend/search/components/SearchModal.js:558
-#: src/frontend/search/components/SearchModal.js:827
+#: includes/Frontend/Frontend_Config.php:129
+#: src/frontend/search/components/SearchModal.js:559
+#: src/frontend/search/components/SearchModal.js:828
 msgid "Search is unavailable right now."
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:110
+#: includes/Frontend/Frontend_Config.php:130
 #: src/frontend/search/components/Browse.js:65
 msgid "Recent searches"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:111
+#: includes/Frontend/Frontend_Config.php:131
 #: src/admin/settings/components/tabs/SearchConfigTab.js:180
 #: src/admin/settings/components/tabs/SearchConfigTab.js:188
 #: src/frontend/search/components/Browse.js:98
 msgid "Popular searches"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:112
+#: includes/Frontend/Frontend_Config.php:132
 #: src/frontend/search/components/RangeFilters.js:134
 #: src/frontend/search/components/SearchInput.js:49
 msgid "Clear"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:113
-#: src/frontend/search/components/SearchModal.js:1146
-#: src/frontend/search/components/SearchModal.js:1209
+#: includes/Frontend/Frontend_Config.php:133
+#: src/frontend/search/components/SearchModal.js:1147
+#: src/frontend/search/components/SearchModal.js:1210
 msgid "Close search"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:114
-#: src/frontend/search/components/SearchModal.js:1197
+#: includes/Frontend/Frontend_Config.php:134
+#: src/frontend/search/components/SearchModal.js:1198
 msgid "Search by voice"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:115
-#: src/frontend/search/components/SearchModal.js:1245
+#: includes/Frontend/Frontend_Config.php:135
+#: src/frontend/search/components/SearchModal.js:1246
 msgid "All"
+msgstr ""
+
+#. translators: %s: the name of the search service, "searcio".
+#: includes/Frontend/Frontend_Config.php:137
+#, php-format
+msgid "Search by %s (opens in a new tab)"
 msgstr ""
 
 #: includes/Health/Health_Tests.php:80
@@ -1269,51 +1275,51 @@ msgstr ""
 msgid "Author"
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:94
+#: includes/Routing/Connection_Endpoint.php:98
 msgid "You must accept the Terms of Service and Privacy Policy to connect."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:147
+#: includes/Routing/Connection_Endpoint.php:151
 msgid "Could not reach Search Cloud. Try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:154
+#: includes/Routing/Connection_Endpoint.php:158
 msgid "Could not disconnect from Search Cloud. Try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:181
-#: includes/Routing/Connection_Endpoint.php:242
+#: includes/Routing/Connection_Endpoint.php:185
+#: includes/Routing/Connection_Endpoint.php:246
 #: includes/Routing/Search_Config_Endpoint.php:74
 msgid "Could not reach Search Cloud."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:292
+#: includes/Routing/Connection_Endpoint.php:296
 msgid "This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:296
+#: includes/Routing/Connection_Endpoint.php:300
 msgid "Too many connect attempts. Wait a while and try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:300
+#: includes/Routing/Connection_Endpoint.php:304
 msgid "Search Cloud cannot provision new accounts right now. Try again later."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:308
-#: includes/Routing/Connection_Endpoint.php:347
+#: includes/Routing/Connection_Endpoint.php:312
+#: includes/Routing/Connection_Endpoint.php:351
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:48
 msgid "Connection failed."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:344
+#: includes/Routing/Connection_Endpoint.php:348
 msgid "Invalid write credentials. Check the write key and secret."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:345
+#: includes/Routing/Connection_Endpoint.php:349
 msgid "Site is disabled in Search Cloud."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:346
+#: includes/Routing/Connection_Endpoint.php:350
 msgid "No site found for these credentials."
 msgstr ""
 
@@ -1350,19 +1356,19 @@ msgstr ""
 msgid "Not connected."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:243
+#: includes/Settings/Plugin_Settings.php:277
 msgid "Keep history for (days)"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:244
+#: includes/Settings/Plugin_Settings.php:278
 msgid "How long finished sync runs are kept. Use 0 to keep them forever."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:247
+#: includes/Settings/Plugin_Settings.php:281
 msgid "Delete plugin data on uninstall"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:248
+#: includes/Settings/Plugin_Settings.php:282
 msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud."
 msgstr ""
 
@@ -1470,53 +1476,53 @@ msgstr ""
 msgid "There is no active sync."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:92
+#: src/admin/settings/components/SettingsPanel.js:96
 #: src/admin/settings/components/tabs/SyncTab.js:176
 msgid "Sync"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:97
+#: src/admin/settings/components/SettingsPanel.js:101
 msgid "Indexing"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:101
+#: src/admin/settings/components/SettingsPanel.js:105
 msgid "Search Config"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:105
+#: src/admin/settings/components/SettingsPanel.js:109
 msgid "Connection"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:155
+#: src/admin/settings/components/SettingsPanel.js:159
 msgid "Settings saved successfully."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:160
+#: src/admin/settings/components/SettingsPanel.js:164
 msgid "Saving..."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:161
+#: src/admin/settings/components/SettingsPanel.js:165
 msgid "Save Settings"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:163
+#: src/admin/settings/components/SettingsPanel.js:167
 #: src/admin/settings/components/tabs/IndexingTab.js:558
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:86
 #: src/admin/settings/components/tabs/SearchConfigTab.js:714
 msgid "No unsaved changes."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:174
+#: src/admin/settings/components/SettingsPanel.js:178
 msgid "Configure the plugin settings from one shared admin surface."
 msgstr ""
 
 #. translators: %s: reason the settings request failed.
-#: src/admin/settings/components/SettingsPanel.js:203
+#: src/admin/settings/components/SettingsPanel.js:207
 #, js-format
 msgid "The settings could not be loaded: %s"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:209
+#: src/admin/settings/components/SettingsPanel.js:213
 #: src/admin/settings/components/tabs/IndexingTab.js:545
 #: src/admin/settings/components/tabs/SearchConfigTab.js:702
 #: src/frontend/search/components/AiAssistant.js:298
@@ -1524,7 +1530,7 @@ msgid "Try again"
 msgstr ""
 
 #. translators: %s: reason the settings could not be saved, as reported by the REST API.
-#: src/admin/settings/components/SettingsPanel.js:292
+#: src/admin/settings/components/SettingsPanel.js:301
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:143
 #, js-format
 msgid "The settings could not be saved: %s"
@@ -2403,6 +2409,27 @@ msgstr ""
 msgid "No settings are registered for this tab yet."
 msgstr ""
 
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:31
+msgid "Support Searcio"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:34
+msgid "Shows the searcio logo, small in the bottom corner of the search window, linked to searcio.com."
+msgstr ""
+
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:45
+msgid "Show the searcio logo in the search window"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:47
+msgid "The Free plan always shows it. On a paid plan you can turn it off."
+msgstr ""
+
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:62
+#: src/admin/settings/upgradeAction.js:25
+msgid "Upgrade plan"
+msgstr ""
+
 #: src/admin/settings/components/tabs/SyncHistory.js:45
 msgid "Manual"
 msgstr ""
@@ -2665,10 +2692,6 @@ msgstr ""
 
 #: src/admin/settings/syncStatus.js:13
 msgid "Cancelled"
-msgstr ""
-
-#: src/admin/settings/upgradeAction.js:53
-msgid "Upgrade plan"
 msgstr ""
 
 #: src/blocks/products/edit.js:26
@@ -3032,7 +3055,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:321
-#: src/frontend/search/components/SearchModal.js:1027
+#: src/frontend/search/components/SearchModal.js:1028
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -3145,7 +3168,7 @@ msgid "Your answers"
 msgstr ""
 
 #: src/frontend/search/components/QuizPane.js:403
-#: src/frontend/search/components/SearchModal.js:1056
+#: src/frontend/search/components/SearchModal.js:1057
 msgid "Loading…"
 msgstr ""
 
@@ -3185,78 +3208,78 @@ msgstr ""
 msgid "Clear %s filter"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:662
+#: src/frontend/search/components/SearchModal.js:663
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:664
+#: src/frontend/search/components/SearchModal.js:665
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:666
+#: src/frontend/search/components/SearchModal.js:667
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:668
+#: src/frontend/search/components/SearchModal.js:669
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:962
+#: src/frontend/search/components/SearchModal.js:963
 msgid "Your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:972
+#: src/frontend/search/components/SearchModal.js:973
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:988
-#: src/frontend/search/components/SearchModal.js:1003
+#: src/frontend/search/components/SearchModal.js:989
+#: src/frontend/search/components/SearchModal.js:1004
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1008
-#: src/frontend/search/components/SearchModal.js:1315
+#: src/frontend/search/components/SearchModal.js:1009
+#: src/frontend/search/components/SearchModal.js:1316
 msgid "Looking at your photo…"
 msgstr ""
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:1021
+#: src/frontend/search/components/SearchModal.js:1022
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1045
+#: src/frontend/search/components/SearchModal.js:1046
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1057
+#: src/frontend/search/components/SearchModal.js:1058
 msgid "Load more results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1069
+#: src/frontend/search/components/SearchModal.js:1070
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1094
+#: src/frontend/search/components/SearchModal.js:1095
 msgid "Search modes"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1134
+#: src/frontend/search/components/SearchModal.js:1135
 msgid "Product finder"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1238
+#: src/frontend/search/components/SearchModal.js:1239
 msgid "Filter by type"
 msgstr ""
 
 #. translators: 1: number of results shown. 2: total number of results found.
-#: src/frontend/search/components/SearchModal.js:1322
+#: src/frontend/search/components/SearchModal.js:1323
 #, js-format
 msgid "Showing %1$d of %2$d results."
 msgstr ""
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:1328
+#: src/frontend/search/components/SearchModal.js:1329
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."
