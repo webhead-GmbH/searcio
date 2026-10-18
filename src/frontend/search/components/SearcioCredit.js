@@ -6,8 +6,8 @@ import { getConfig } from '../../../utils/api';
  * Support Searcio on. The server decides (`credit` in the configuration, see
  * Frontend_Config::credit()); with none there is nothing here.
  *
- * The green field and the dark letters on it are the logo's own colours and
- * read on any background. The "io" outside the field is drawn in the colour of
+ * The brand-green field and the white letters on it are the logo's own colours
+ * and read on any background. The "io" outside the field is drawn in the colour of
  * the window's text, so it follows a light or a dark window.
  */
 const SearcioCredit = () => {
