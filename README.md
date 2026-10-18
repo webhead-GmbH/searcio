@@ -1,5 +1,8 @@
 <p align="center">
-    <img alt="Icon" src="icon.png" width="128" height="128">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset=".github/assets/searcio-dark.svg">
+        <img alt="searcio" src=".github/assets/searcio-light.svg" width="300">
+    </picture>
 </p>
 
 <h1 align="center">webhead Search Cloud</h1>
