@@ -32,6 +32,9 @@
     "src/admin/settings/components/tabs/SettingsGroupTab.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/tabs/SupportSearcioCard.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/tabs/SyncHistory.js": [
         "public/bundle.settings.js"
     ],

@@ -19,15 +19,6 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Settings_Page extends Page {
-	/**
-	 * The searcio mark in one colour: its green field with the "s" cut out.
-	 * WordPress paints every `fill` of a base64 SVG menu icon in the colour of
-	 * the admin scheme (wp-admin/js/svg-painter.js), so the mark's shape has to
-	 * come from the cut-out and not from a second colour, which would be painted
-	 * over. ASCII only: the painter decodes it with `atob()`.
-	 */
-	private const MENU_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="26 31 88 88"><path fill="#000" fill-rule="evenodd" d="M44 42h52a14 14 0 0 1 14 14v38a14 14 0 0 1-14 14H44a14 14 0 0 1-14-14V56a14 14 0 0 1 14-14ZM70.31 97.08q-8.83 0-13.86-3.68-5.02-3.67-5.35-10.29h10.83q.27 2.02 2.37 3.57t6.24 1.54q3.21 0 5.31-1.08t2.1-3.15q0-1.83-1.61-2.95-1.62-1.12-5.7-1.52l-3.27-.34q-7.49-.78-11.25-4.17-3.76-3.4-3.76-8.73 0-4.45 2.2-7.4 2.2-2.94 6.1-4.45 3.9-1.5 8.91-1.5 8.04 0 12.98 3.52t5.2 10.2H76.94q-.25-2.02-2.1-3.45-1.86-1.42-5.37-1.42-2.83 0-4.5 1.06-1.66 1.06-1.66 2.87 0 1.77 1.45 2.68 1.44.91 4.67 1.29l3.27.34q7.67.8 11.94 4.24t4.27 9.16q0 4.2-2.28 7.26-2.28 3.07-6.46 4.74-4.17 1.66-9.85 1.66"/></svg>';
-
 	public function __construct(
 		private Search_Cloud_Client $client,
 		private Connection_State $connection_state
@@ -72,8 +63,15 @@ final class Settings_Page extends Page {
 		return 'bundle.default';
 	}
 
+	/**
+	 * The searcio mark in one colour: its green field with the "s" cut out.
+	 * WordPress paints every `fill` of a base64 SVG menu icon in the colour of
+	 * the admin scheme (wp-admin/js/svg-painter.js), so the mark's shape has to
+	 * come from the cut-out and not from a second colour, which would be painted
+	 * over.
+	 */
 	protected function get_icon(): string {
-		return 'data:image/svg+xml;base64,' . base64_encode( self::MENU_ICON );
+		return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4OCIgaGVpZ2h0PSI4OCIgdmlld0JveD0iMjYgMzEgODggODgiPjxwYXRoIGZpbGw9IiMwMDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTQ0IDQyaDUyYTE0IDE0IDAgMCAxIDE0IDE0djM4YTE0IDE0IDAgMCAxLTE0IDE0SDQ0YTE0IDE0IDAgMCAxLTE0LTE0VjU2YTE0IDE0IDAgMCAxIDE0LTE0Wk03MC4zMSA5Ny4wOHEtOC44MyAwLTEzLjg2LTMuNjgtNS4wMi0zLjY3LTUuMzUtMTAuMjloMTAuODNxLjI3IDIuMDIgMi4zNyAzLjU3dDYuMjQgMS41NHEzLjIxIDAgNS4zMS0xLjA4dDIuMS0zLjE1cTAtMS44My0xLjYxLTIuOTUtMS42Mi0xLjEyLTUuNy0xLjUybC0zLjI3LS4zNHEtNy40OS0uNzgtMTEuMjUtNC4xNy0zLjc2LTMuNC0zLjc2LTguNzMgMC00LjQ1IDIuMi03LjQgMi4yLTIuOTQgNi4xLTQuNDUgMy45LTEuNSA4LjkxLTEuNSA4LjA0IDAgMTIuOTggMy41MnQ1LjIgMTAuMkg3Ni45NHEtLjI1LTIuMDItMi4xLTMuNDUtMS44Ni0xLjQyLTUuMzctMS40Mi0yLjgzIDAtNC41IDEuMDYtMS42NiAxLjA2LTEuNjYgMi44NyAwIDEuNzcgMS40NSAyLjY4IDEuNDQuOTEgNC42NyAxLjI5bDMuMjcuMzRxNy42Ny44IDExLjk0IDQuMjR0NC4yNyA5LjE2cTAgNC4yLTIuMjggNy4yNi0yLjI4IDMuMDctNi40NiA0Ljc0LTQuMTcgMS42Ni05Ljg1IDEuNjYiLz48L3N2Zz4=';
 	}
 
 	protected function get_position(): ?int {
@@ -121,6 +119,10 @@ final class Settings_Page extends Page {
 			// Drives the Connection tab's default-open behavior and its initial
 			// state before the settings/health REST calls resolve.
 			'connection' => [
+				// The tier last seen, so the Support Searcio card can say at once
+				// whether a Free plan keeps the logo on. The card asks Search
+				// Cloud again as the page opens.
+				'planTier'     => $this->connection_state->plan_tier()?->value ?? '',
 				'isConnected'  => $this->client->is_configured(),
 				'pendingClaim' => $pending,
 				'defaults'     => [

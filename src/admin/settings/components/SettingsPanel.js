@@ -3,7 +3,6 @@ import {Button} from '@wordpress/components';
 import {Notice, Skeleton, Stack, Tabs} from '@wordpress/ui';
 import {__, sprintf} from '@wordpress/i18n';
 import {addQueryArgs} from '@wordpress/url';
-import {settings as SettingsIcon} from '@wordpress/icons';
 import {motion} from 'motion/react';
 
 import AdminPage from '../../../components/AdminPage';
@@ -11,9 +10,11 @@ import {showToast} from '../../../toast';
 import {renderAnimatedTabTitle, useFadeInUpProps} from '../../../utils/animation';
 import SettingsContext from '../../../settings/store/context';
 import {useUpgradeAction} from '../upgradeAction';
+import searcioIcon from '../searcioIcon';
 import SettingsSkeleton from './SettingsSkeleton';
 import SettingsGroupTab from './tabs/SettingsGroupTab';
 import CacheClearCard from './tabs/CacheClearCard';
+import SupportSearcioCard from './tabs/SupportSearcioCard';
 import ConnectionTab from './tabs/ConnectionTab';
 import IndexingTab from './tabs/IndexingTab';
 import SyncTab from './tabs/SyncTab';
@@ -36,6 +37,8 @@ const CONNECTION_KEYS = pluginData.connectionKeys || [
 const POPULAR_SEARCHES_KEYS = pluginData.popularSearchesKeys || [
 	'popular_searches',
 ];
+// Drawn by its own card on the General tab, which knows the plan.
+const SUPPORT_SEARCIO_KEYS = ['support_searcio'];
 
 // Defaults to the Connection tab whenever the site isn't connected yet, so a
 // fresh install lands on "Connect" instead of an empty Sync tab.
@@ -74,9 +77,10 @@ const SettingsPanel = () => {
 	// (e.g. a shop manager granted only "run sync") only sees the Sync tab.
 	const canManageSettings = pluginData?.caps?.manageSettings !== false;
 
-	// Connection and Popular searches render in their own tabs; exclude them
-	// from the schema-driven groups so they aren't shown twice.
-	const excludedKeys = [...CONNECTION_KEYS, ...POPULAR_SEARCHES_KEYS];
+	// Connection and Popular searches render in their own tabs, and Support
+	// Searcio in its own card; exclude them from the schema-driven groups so
+	// they aren't shown twice.
+	const excludedKeys = [...CONNECTION_KEYS, ...POPULAR_SEARCHES_KEYS, ...SUPPORT_SEARCIO_KEYS];
 	const otherGroups = canManageSettings
 		? settingGroups
 			.map((group) => ({
@@ -172,7 +176,7 @@ const SettingsPanel = () => {
 			className="settings"
 			title={__('webhead Search Cloud', 'webhead-search-cloud')}
 			description={pluginData?.plugin?.description || __('Configure the plugin settings from one shared admin surface.', 'webhead-search-cloud')}
-			icon={SettingsIcon}
+			icon={searcioIcon}
 			actions={upgradeAction ? [upgradeAction] : undefined}
 			// The tab strip sits directly under the header. A load that failed has
 			// no strip, and its error notice wants the padding back.
@@ -269,7 +273,12 @@ const SettingsPanel = () => {
 									settings={settings}
 									updateSetting={updateSetting}
 								>
-									{'general' === group.name && <CacheClearCard/>}
+									{'general' === group.name && (
+										<>
+											<SupportSearcioCard settings={settings} updateSetting={updateSetting}/>
+											<CacheClearCard/>
+										</>
+									)}
 								</SettingsGroupTab>
 							</motion.div>
 						</Tabs.Panel>

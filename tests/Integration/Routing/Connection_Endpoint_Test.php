@@ -77,6 +77,29 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 'https://search.example.com/acme/billing', $data['plan']['upgrade_url'] );
 	}
 
+	/**
+	 * The storefront decides on the searcio logo from the tier and asks
+	 * nobody, so it is kept whenever an admin screen checks the connection.
+	 */
+	public function test_test_connection_keeps_the_plan_tier_for_the_storefront(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok( [ 'plan' => [ 'is_free' => true, 'name' => 'Free' ] ] ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+
+		$this->assertSame( 'free', $this->settings()->get( Plugin_Settings::PLAN_TIER ) );
+	}
+
+	public function test_test_connection_keeps_the_tier_it_had_when_the_answer_names_none(): void {
+		$this->login_admin();
+		$this->settings()->set( Plugin_Settings::PLAN_TIER, 'free' );
+		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 1, 'status' => 'connected' ] ] ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+
+		$this->assertSame( 'free', $this->settings()->get( Plugin_Settings::PLAN_TIER ) );
+	}
+
 	public function test_test_connection_surfaces_every_metered_allowance_not_just_documents(): void {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok(

@@ -18,6 +18,7 @@ import Browse from './Browse';
 import Carousel from './Carousel';
 import SearchResultsSkeleton from './SearchResultsSkeleton';
 import VisualSearchButton from './VisualSearchButton';
+import SearcioCredit from './SearcioCredit';
 
 const SUGGEST_DEBOUNCE = 200;
 const LIVE_SEARCH_DEBOUNCE = 300;
@@ -1358,6 +1359,8 @@ const SearchModal = ({
 						/>
 					</div>
 				)}
+
+				<SearcioCredit/>
 			</div>
 		</Modal>
 	);

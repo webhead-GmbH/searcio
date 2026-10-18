@@ -16,6 +16,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Frontend;
 
+use Webhead\WP\SearchCloud\Enums\Plan_Tier;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
@@ -67,6 +68,24 @@ final class Frontend_Config {
 		];
 	}
 
+	/**
+	 * The searcio logo the search window shows in its bottom corner, linked to
+	 * searcio.com, or null when it shows none. A Free plan always shows it;
+	 * on any other plan, or before the plan is known, Support Searcio decides,
+	 * and it is on until the shop turns it off.
+	 *
+	 * @return array{url:string}|null
+	 */
+	private function credit(): ?array {
+		$tier = Plan_Tier::tryFrom( (string) $this->settings->get( Plugin_Settings::PLAN_TIER ) );
+
+		if ( Plan_Tier::Free !== $tier && ! (bool) $this->settings->get( Plugin_Settings::SUPPORT_SEARCIO ) ) {
+			return null;
+		}
+
+		return [ 'url' => 'https://searcio.com/' ];
+	}
+
 	private function price_suffix(): string {
 		$suffix = (string) get_option( 'woocommerce_price_display_suffix', '' );
 
@@ -92,6 +111,7 @@ final class Frontend_Config {
 			'popularSearches' => array_values( (array) $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
 			'typeLabels'      => $this->index_config->indexable_post_type_labels(),
 			'currency'        => $this->currency_config(),
+			'credit'          => $this->credit(),
 			// Both gated by is_multilingual(), not just currentLang: Language_Config's
 			// mirror only refreshes when an admin opens/saves Search Config, so a site
 			// that deactivated WPML/Polylang after restricting languages would
@@ -113,6 +133,8 @@ final class Frontend_Config {
 				'close'           => __( 'Close search', 'webhead-search-cloud' ),
 				'voiceSearch'     => __( 'Search by voice', 'webhead-search-cloud' ),
 				'allTypes'        => __( 'All', 'webhead-search-cloud' ),
+				/* translators: %s: the name of the search service, "searcio". */
+				'credit'          => sprintf( __( 'Search by %s (opens in a new tab)', 'webhead-search-cloud' ), 'searcio' ),
 			],
 		];
 	}

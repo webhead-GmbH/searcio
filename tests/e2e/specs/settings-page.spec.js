@@ -149,6 +149,19 @@ test.describe( 'Settings screen', () => {
 		expect( entrance.gone ).toEqual( [] );
 	} );
 
+	test( 'shows the searcio icon in its header, in the colours of the logo', async ( { page } ) => {
+		await page.goto( SETTINGS_URL );
+
+		const icon = page.locator( '.webhead-search-cloud-admin-page__icon svg' );
+
+		await expect( icon ).toBeVisible( LOADED );
+		await expect( icon.locator( 'rect' ) ).toHaveAttribute( 'fill', '#B8F23A' );
+		await expect( icon.locator( 'path' ) ).toHaveAttribute( 'fill', '#0E1A2B' );
+		// The header colours its icon through `fill` on the `svg`; the shapes
+		// keep their own.
+		expect( await icon.locator( 'rect' ).evaluate( ( el ) => getComputedStyle( el ).fill ) ).toBe( 'rgb(184, 242, 58)' );
+	} );
+
 	test( 'names the page once, and the open tab under it', async ( { page } ) => {
 		await page.goto( `${ SETTINGS_URL }&tab=sync` );
 

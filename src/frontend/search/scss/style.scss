@@ -3234,4 +3234,62 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	min-height: 0;
 }
 
+
+/* -------------------------------------------------------------------------
+ * The searcio logo (Support Searcio)
+ *
+ * Last in the window, at the end of its line and below everything else, small
+ * and faded until it is pointed at: it is a credit, not a control the visitor
+ * came for. The field and the letters on it keep the logo's colours; the "io"
+ * outside the field takes the window's text colour, so a dark window keeps it
+ * readable. Every colour is stated here and not left to the SVG's attributes,
+ * which a site's `svg path {}` would outrank.
+ * ---------------------------------------------------------------------- */
+.whsc-modal .whsc-credit {
+	display: inline-flex;
+	align-self: end;
+	margin-top: calc(var(--whsc-gap) / -2);
+	border-radius: 4px;
+	color: var(--whsc-text);
+	line-height: 0;
+	text-decoration: none;
+	opacity: 0.6;
+	transition: opacity 0.15s ease;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 1;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+.whsc-modal .whsc-credit__mark {
+	display: block;
+	width: auto;
+	height: 16px;
+	overflow: visible;
+}
+
+.whsc-modal .whsc-credit__field {
+	fill: #b8f23a;
+}
+
+.whsc-modal .whsc-credit__ink {
+	fill: #0e1a2b;
+}
+
+.whsc-modal .whsc-credit__io {
+	fill: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.whsc-modal .whsc-credit {
+		transition: none;
+	}
+}
+
 }
