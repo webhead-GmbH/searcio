@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- The admin menu shows the searcio mark: the "s" cut out of its green field, in one colour, so WordPress paints it in the colour of every admin scheme, at rest, under the pointer and on its own page, as it paints its own icons. A unit test holds the icon to what WordPress's painter needs: one fill, the shape cut out of it, ASCII only and a square box.
+- **Support Searcio.** The search window ends with the searcio logo, small, faded until it is pointed at, at the end of its last line, and linked to searcio.com in a new tab (`rel="noopener nofollow"`). A Free plan always shows it. On any other plan, a new card on the General tab turns it off; it is on until it is. The storefront decides without asking Search Cloud: the site keeps the plan tier `/health` names (`webhead_search_cloud_plan_tier`) whenever an admin screen checks the connection and once a day in the scheduled sync, and forgets it on disconnecting. A tier the service does not name keeps the one kept, so an outage never takes a Free plan's logo away, and before any tier is known the setting decides. **This is not eligible for wordpress.org as it is:** guideline 10 asks that a credit on the public site be off until the user turns it on, and never be required.
+- The admin menu and the settings header show the searcio mark. The menu has it in one colour, the "s" cut out of its green field, so WordPress paints it in the colour of every admin scheme as it paints its own icons; a unit test holds it to what WordPress's painter needs. The header has it in its own colours, the navy "s" on the green field.
 
 ## 1.2.2
 
