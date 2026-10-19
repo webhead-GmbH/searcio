@@ -1,6 +1,6 @@
 /**
  * The settings header's "Upgrade plan" action. Runs authenticated as admin (the
- * default storage state — not overridden here), stores dummy credentials so the
+ * default storage state - not overridden here), stores dummy credentials so the
  * page reports as connected, and mocks the health check so the plan tier is
  * deterministic. Verifies the action only appears on a Free plan, is drawn by
  * the page shell like any other header action, and opens the billing URL.

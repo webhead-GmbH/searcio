@@ -2,7 +2,7 @@
  * Shared "no image" placeholder for result cards. A data URI (no network
  * request, so it can't add any latency) rather than swapping the element out
  * for a `<span>`/background-image the way the plugin's own built-in cards do
- * (`templates.js`'s `CardImage`) — server-designed card templates style the
+ * (`templates.js`'s `CardImage`) - server-designed card templates style the
  * `<img>` tag directly (sizing, `object-fit`, border-radius, etc.), and
  * keeping it a real `<img>` means that styling still applies to the
  * placeholder instead of silently doing nothing once the tag changes.

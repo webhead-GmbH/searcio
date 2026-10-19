@@ -21,7 +21,7 @@ export const micIcon = (
 );
 
 // Assistant avatar (lucide "sparkles"), and the composer send glyph (lucide
-// "send-horizontal") — neither exists in `@wordpress/icons`.
+// "send-horizontal") - neither exists in `@wordpress/icons`.
 export const sparkleIcon = (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +77,7 @@ export const gridIcon = (
 
 /*
  * Drawn symmetrically about the viewBox's vertical centre (y=12) and spanning
- * x 2.5–21.5, so it sits centred in the round send button. The previous glyph
+ * x 2.5-21.5, so it sits centred in the round send button. The previous glyph
  * was a stroked outline whose bounding box was offset within the viewBox, which
  * left it visibly high and right of centre.
  */

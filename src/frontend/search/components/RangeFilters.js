@@ -82,7 +82,7 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 								onChange={ ( event ) => setBound( field, 'min', event.target.value ) }
 								disabled={ busy }
 							/>
-							<span className="whsc-range__dash" aria-hidden="true">–</span>
+							<span className="whsc-range__dash" aria-hidden="true">-</span>
 							<input
 								type="number"
 								inputMode="decimal"

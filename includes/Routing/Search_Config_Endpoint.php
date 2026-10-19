@@ -2,7 +2,7 @@
 /**
  * Search configuration endpoint.
  *
- * Backs the "Search Config" admin tab. This is a thin proxy — Search Cloud's
+ * Backs the "Search Config" admin tab. This is a thin proxy - Search Cloud's
  * `/search-config` is the source of truth for searchable fields/weights, type
  * boosts, facet/suggest fields, synonyms and languages, unlike `Plugin_Settings`,
  * which owns plugin-local config. GET/PUT pass the API's own response straight

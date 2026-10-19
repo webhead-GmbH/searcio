@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * A fully custom-built search input (icon + plain `<input>` + clear button)
  * instead of `@wordpress/components`' `SearchControl`. `SearchControl`'s
  * built-in clear button renders a `Tooltip` directly over the small icon
- * target, which swallows the first click in some layouts — building this
+ * target, which swallows the first click in some layouts - building this
  * ourselves keeps every visual state (including the clear button) fully
  * under our control and themeable via CSS custom properties.
  */

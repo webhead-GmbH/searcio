@@ -7,7 +7,7 @@ const DRAG_THRESHOLD = 6;
 
 /**
  * Horizontal card carousel: drag-to-scroll (pointer), overlay prev/next
- * arrows for mouse users, dot pagination, and keyboard support — with the
+ * arrows for mouse users, dot pagination, and keyboard support - with the
  * native scrollbar hidden (see `style.scss`). Reused for the empty-state
  * highlights and for search results.
  *

@@ -9,9 +9,9 @@
  * Two sources, and the difference between them is only which request the
  * front-end makes:
  *
- * - `similar` — "more like this" for the product being viewed, from
+ * - `similar` - "more like this" for the product being viewed, from
  *   `GET /search/similar`.
- * - `category` — a search filtered to one facet value. That filter is what
+ * - `category` - a search filtered to one facet value. That filter is what
  *   makes a merchandising rule's category trigger fire at all: the rule
  *   applies to a request carrying `filter[field]=value`, so a listing rendered
  *   from the site's own database can never trigger one.

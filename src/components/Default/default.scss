@@ -226,8 +226,8 @@ body,
 
 	.wh-badge {
 		// Both `color-mix()` calls below read this. Without a default, a badge
-		// carrying any class other than `.front-end` or `.admin` — a bare one,
-		// or one written with the package's own intent names — made both
+		// carrying any class other than `.front-end` or `.admin` - a bare one,
+		// or one written with the package's own intent names - made both
 		// declarations invalid at computed-value time, and the chip vanished:
 		// no background, and text in whatever colour it inherited.
 		--base-color: var(--wpds-color-foreground-content-neutral);

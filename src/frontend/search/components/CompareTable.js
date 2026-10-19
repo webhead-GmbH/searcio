@@ -20,8 +20,8 @@ const HEADER_OR_INTERNAL = new Set( [
 ] );
 
 /**
- * The same attribute often reaches the index twice — once plainly (`color`) and
- * once prefixed by the WooCommerce attribute indexer (`attr_color`) — which
+ * The same attribute often reaches the index twice - once plainly (`color`) and
+ * once prefixed by the WooCommerce attribute indexer (`attr_color`) - which
  * would render two identical rows. Both humanize to the same label, so the
  * label is what decides: first key with a given label wins.
  */
@@ -48,7 +48,7 @@ const KNOWN_VALUES = () => ( {
 	onbackorder: __( 'On backorder', 'webhead-search-cloud' ),
 } );
 
-// Fields whose 1/0 is a flag, not a quantity — "Featured: 1" reads as a bug.
+// Fields whose 1/0 is a flag, not a quantity - "Featured: 1" reads as a bug.
 const BOOLEAN_FIELDS = new Set( [ 'featured', 'virtual', 'downloadable', 'backorders_allowed', 'sold_individually' ] );
 
 /**
@@ -58,7 +58,7 @@ const BOOLEAN_FIELDS = new Set( [ 'featured', 'virtual', 'downloadable', 'backor
  */
 const formatValue = ( value, field ) => {
 	if ( null === value || undefined === value || '' === value ) {
-		return '—';
+		return ' - ';
 	}
 
 	if ( field && BOOLEAN_FIELDS.has( field ) ) {
@@ -74,7 +74,7 @@ const formatValue = ( value, field ) => {
 	}
 
 	if ( Array.isArray( value ) ) {
-		return value.length > 0 ? value.join( ', ' ) : '—';
+		return value.length > 0 ? value.join( ', ' ) : ' - ';
 	}
 
 	if ( 'boolean' === typeof value ) {
@@ -122,7 +122,7 @@ export const comparisonRows = ( products ) => {
 /**
  * Side-by-side attribute comparison of the assistant's products. The rows are
  * the union of the products' own `source` fields (minus the ones shown in the
- * header), so it adapts to whatever the site indexes — no fixed schema.
+ * header), so it adapts to whatever the site indexes - no fixed schema.
  *
  * @param {Object}        props
  * @param {Array<Object>} props.products Assistant hits ({ id, source }).

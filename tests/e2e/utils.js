@@ -269,7 +269,7 @@ export async function isPluginActive( requestUtils, plugin ) {
  * @param {string} mode Trigger mode: 'icon' or 'box'.
  */
 // Run a seed script (tests/e2e/*.php) through WP-CLI on the same wp-env site the
-// browser targets: the tests site (`tests-cli`, :8889 — the default) or the dev
+// browser targets: the tests site (`tests-cli`, :8889 - the default) or the dev
 // site (`cli`, :8888) when WP_BASE_URL points there.
 function wpEvalFile( file, ...args ) {
 	const port = new URL( process.env.WP_BASE_URL || 'http://localhost:8889' ).port;
@@ -362,7 +362,7 @@ function seededUrl( output ) {
 
 /**
  * Store (or clear) dummy connection credentials so the settings page reports the
- * site as connected — the gate the header upgrade CTA checks before its health
+ * site as connected - the gate the header upgrade CTA checks before its health
  * request. See `seed-connection.php`.
  *
  * @param {boolean} connected

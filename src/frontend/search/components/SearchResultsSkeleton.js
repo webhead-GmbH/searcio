@@ -2,7 +2,7 @@ import ContentLoader from 'react-content-loader';
 
 // One loader per card, laid out in the same flex row as the real carousel and
 // clipped by `overflow: hidden`, so the placeholder matches the actual layout
-// at every width (≈2 cards on mobile, ≈6–7 on desktop) instead of squeezing a
+// at every width (≈2 cards on mobile, ≈6-7 on desktop) instead of squeezing a
 // fixed count of tiny cards onto small screens.
 const CARD_COUNT = 8;
 const CARD_W = 200;

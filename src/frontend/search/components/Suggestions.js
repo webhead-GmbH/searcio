@@ -15,8 +15,8 @@ export const optionId = ( id, index ) => `${ id }-option-${ index }`;
 
 /**
  * Floating, dismissible autocomplete dropdown anchored under the search
- * input. Never pushes page content — it's absolutely positioned by its
- * parent (a `position: relative` wrapper) — and closes on an explicit
+ * input. Never pushes page content - it's absolutely positioned by its
+ * parent (a `position: relative` wrapper) - and closes on an explicit
  * button, outside click, or Escape (captured before the modal's own Escape
  * handler so it dismisses the dropdown first, not the whole modal).
  *

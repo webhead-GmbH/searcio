@@ -3,7 +3,7 @@
  * Incremental sync failure reporting.
  *
  * A failed incremental run used to be written to the history with no reason at
- * all — `failed_count: 1`, `last_error: NULL` — and a non-plan-limit push
+ * all - `failed_count: 1`, `last_error: NULL` - and a non-plan-limit push
  * failure recorded nothing whatsoever. From the dashboard that is the hardest
  * kind of sync problem to diagnose, so every failure now says what went wrong.
  *

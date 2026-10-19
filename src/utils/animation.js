@@ -35,7 +35,7 @@ export const motionToken = {
  * Motion honours `prefers-reduced-motion` only where it is asked to.
  *
  * `useReducedMotion` reads the media query, so a caller that ignores it
- * animates for everyone — including people who have asked the operating system
+ * animates for everyone - including people who have asked the operating system
  * not to. These helpers collapse to the finished state instead of animating.
  */
 export const useMotionPreference = () => {
@@ -52,7 +52,7 @@ export const useMotionPreference = () => {
  *
  * This is a component rather than a plain function on purpose: reading the
  * preference means calling `useReducedMotion`, and a hook can only be called
- * from a component. As a function it could not ask, so it never did — a title
+ * from a component. As a function it could not ask, so it never did - a title
  * with five words still animated for about half a second with the operating
  * system's "reduce motion" setting on.
  */

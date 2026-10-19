@@ -2,7 +2,7 @@
 /**
  * Indexing configuration endpoint.
  *
- * Backs the Indexing admin tab. It does not invent a second settings store — the
+ * Backs the Indexing admin tab. It does not invent a second settings store - the
  * mapping lives in the `index_config` option owned by Plugin_Settings and is
  * read/written through Index_Config (which wraps the framework Settings_Manager).
  * GET returns the mapping plus the catalog the UI needs (post types, taxonomies,

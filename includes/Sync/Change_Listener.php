@@ -3,13 +3,13 @@
  * Incremental change listener (PLAN §5.4).
  *
  * Watches editorial events and enqueues the affected post into the change queue
- * — it never calls the API inline. A short-lived, coalescing drain job is then
+ * - it never calls the API inline. A short-lived, coalescing drain job is then
  * scheduled (debounced) to batch the changes. Status handling: a post that is
  * currently indexable is queued for upsert; one that left publish (or is no
  * longer indexable) but was previously indexed is queued for delete; deletions
  * are queued for delete.
  *
- * WooCommerce: variations are not indexed directly — a variation change maps to
+ * WooCommerce: variations are not indexed directly - a variation change maps to
  * its parent product so the parent document (price range, SKUs) stays fresh.
  *
  * Terms: a document carries term names (and, for product categories, every

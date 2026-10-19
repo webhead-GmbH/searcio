@@ -57,7 +57,7 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * `POST /connect` — the only endpoint with no key at all (see
+	 * `POST /connect` - the only endpoint with no key at all (see
 	 * docs/api/authentication-and-security.md "Connect credentials"). Uses the
 	 * same retry/backoff policy as every other call, just without the
 	 * write-key/secret headers.
@@ -69,7 +69,7 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * `DELETE /disconnect` — the mirror of {@see self::connect()}. Permanently
+	 * `DELETE /disconnect` - the mirror of {@see self::connect()}. Permanently
 	 * deletes the site and its index on Search Cloud's side; the caller is
 	 * responsible for clearing local credentials once this succeeds (see
 	 * docs/api/building-a-plugin.md "Disconnecting").
@@ -79,7 +79,7 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * `GET /connect` — consent-screen metadata (legal-document links), no auth
+	 * `GET /connect` - consent-screen metadata (legal-document links), no auth
 	 * required. Separate from {@see self::legal_links()} so callers that want
 	 * the raw response (status, errors) can still get it.
 	 */
@@ -166,7 +166,7 @@ final class Search_Cloud_Client {
 
 	/**
 	 * The Search Cloud host comes from a single hard-coded constant, overridable
-	 * per environment in wp-config.php. Key-relative — no site id in the path;
+	 * per environment in wp-config.php. Key-relative - no site id in the path;
 	 * the API resolves the site from the write key + secret sent in the request
 	 * headers below (see docs/api/README.md "Key-relative endpoints").
 	 */

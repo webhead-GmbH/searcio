@@ -1,7 +1,7 @@
 <?php
 /**
  * Lists every language configured in WPML/Polylang and resolves a specific
- * post's language — gaps the framework's `Language` facade doesn't cover (it
+ * post's language - gaps the framework's `Language` facade doesn't cover (it
  * only exposes the current request's language and the site default).
  *
  * Deliberately does not use `Compatibility_Manager::get_multilingual_provider()`
@@ -9,7 +9,7 @@
  * compatibility filters (`wpml_current_language`, etc.), so a WPML-first check
  * reports `'wpml'` even on a Polylang-only site. `wpml_active_languages` still
  * resolves through Polylang's emulation layer, but `wpml_element_language_details`
- * does not — so this class resolves the provider itself, Polylang-first.
+ * does not - so this class resolves the provider itself, Polylang-first.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -55,7 +55,7 @@ final class Multilingual_Support {
 		};
 	}
 
-	/** Polylang first — see the class docblock for why this can't be `Compatibility_Manager::get_multilingual_provider()`. */
+	/** Polylang first - see the class docblock for why this can't be `Compatibility_Manager::get_multilingual_provider()`. */
 	private function provider(): ?string {
 		if ( $this->compatibility->get_polylang()->is_active() ) {
 			return 'polylang';

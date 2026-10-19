@@ -12,7 +12,7 @@ import { matchTemplate, ServerCard } from './serverCards';
 /**
  * The price line for a product card: strikethrough regular + sale price when
  * on sale, a compact "from {min}" for variable products (the full range would
- * overflow a card), otherwise the single price — each followed by the store's
+ * overflow a card), otherwise the single price - each followed by the store's
  * small price suffix (e.g. "inkl. MwSt. zzgl. Versandkosten"). All formatting
  * comes from indexed structured fields + the localized currency config, so
  * card prices track the store without embedding server HTML.

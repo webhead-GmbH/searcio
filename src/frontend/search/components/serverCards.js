@@ -1,11 +1,11 @@
 /**
- * Client-side rendering engine for Search Cloud "card templates" — see
+ * Client-side rendering engine for Search Cloud "card templates" - see
  * `card-templates.md`. Templates are designed server-side (an Elementor-style
  * builder in the Search Cloud panel) and delivered as pre-compiled HTML + CSS;
  * this module implements the widget's half of the contract: matching a hit to
  * a template, substituting `{{field}}` placeholders, removing conditional
  * elements, wiring rating-bar CSS variables, and computing price components.
- * No rendering engine is shipped here — only string/DOM post-processing of
+ * No rendering engine is shipped here - only string/DOM post-processing of
  * markup the server already built and the site owner already trusts (it's
  * their own design).
  */
@@ -22,7 +22,7 @@ const injectedTemplateIds = new Set();
 
 /**
  * A hit's fields live under `source` (the stored document), with `id`/`score`
- * as the only other addressable top-level fields — used both for condition
+ * as the only other addressable top-level fields - used both for condition
  * fields and `{{placeholder}}` substitution.
  *
  * @param {Object} hit
@@ -53,7 +53,7 @@ const HTML_ESCAPES = {
  *                  contexts), '' for null/undefined.
  *
  * Escapes quotes as well as `<`/`>`/`&`. The substituted value lands inside
- * double-quoted attributes too (`src`/`href` — see `substitutePlaceholders`),
+ * double-quoted attributes too (`src`/`href` - see `substitutePlaceholders`),
  * so a value carrying a `"` would otherwise break out of the attribute and
  * inject arbitrary markup (e.g. an `onerror` handler). A `textContent` round
  * trip escapes only `<`/`>`/`&`, never quotes, so it is deliberately not used
@@ -66,7 +66,7 @@ export const escapeHtml = ( value ) => {
 };
 
 // URL-bearing attributes whose value can execute script via a `javascript:`
-// (or `vbscript:`/`data:`) scheme even after HTML-escaping — escaping quotes
+// (or `vbscript:`/`data:`) scheme even after HTML-escaping - escaping quotes
 // stops attribute breakout, but not a scheme sitting inside a legitimately
 // quoted `href`/`src`.
 const URL_ATTRIBUTES = [ 'href', 'src', 'xlink:href' ];
@@ -84,9 +84,9 @@ const DANGEROUS_URL_RE = /^\s*(?:javascript|vbscript|data|file):/i;
  * like `javascript:alert(1)` in an `href` must not survive to the live DOM.
  *
  * Each element's attributes are read by name rather than found with a
- * selector. `[xlink:href]` is not a selector a browser accepts — the colon has
+ * selector. `[xlink:href]` is not a selector a browser accepts - the colon has
  * to be escaped, and `querySelectorAll()` throws on it, which took the whole
- * modal down with it — and an escaped one still misses the attribute where it
+ * modal down with it - and an escaped one still misses the attribute where it
  * is actually written: on an inline `<svg>`, where the HTML parser puts it in
  * the XLink namespace.
  *
@@ -144,7 +144,7 @@ export const evaluateCondition = ( condition, hit ) => {
 };
 
 /**
- * Conditions are AND-ed — every one must match (per `card-templates.md`).
+ * Conditions are AND-ed - every one must match (per `card-templates.md`).
  * An empty/missing list matches unconditionally (the default template).
  *
  * @param {Array<Object>} [conditions]
@@ -157,7 +157,7 @@ export const evaluateConditions = ( conditions, hit ) =>
 /**
  * First template (already server-sorted: conditional templates before the
  * `is_default` one) whose `type` matches the hit and whose `conditions` all
- * pass. `null` when nothing matches — the caller falls back to the plugin's
+ * pass. `null` when nothing matches - the caller falls back to the plugin's
  * own built-in card for that hit.
  *
  * @param {Array<Object>} templates
@@ -173,11 +173,11 @@ export const matchTemplate = ( templates, hit ) => {
 
 /**
  * Replace every `{{field}}` in the template's HTML with the hit's value,
- * HTML-escaped — placeholders also appear inside `src`/`href` attributes, so
+ * HTML-escaped - placeholders also appear inside `src`/`href` attributes, so
  * this is a plain string substitution over the raw markup rather than a
  * DOM-attribute walk. Missing fields become `''`.
  *
- * Known WooCommerce price fields (`price`, `sale_price`, etc. — the exact
+ * Known WooCommerce price fields (`price`, `sale_price`, etc. - the exact
  * names this plugin's own indexer always uses, see `currency.js`) are run
  * through the site's WooCommerce currency format first, the same as the
  * plugin's own built-in product card: the API only ever returns bare numbers
@@ -200,7 +200,7 @@ export const substitutePlaceholders = ( html, hit ) =>
  * Currency position naming differs between this plugin's own WooCommerce
  * config (`left`/`left_space`/`right`/`right_space`, matching WooCommerce's
  * own option values) and a price component's `data-sc-currency-position`
- * (`before`/`before_space`/`after`/`after_space`, per `card-templates.md`) —
+ * (`before`/`before_space`/`after`/`after_space`, per `card-templates.md`) -
  * translate the latter into the former so both can share `formatPrice()`.
  */
 const CURRENCY_POSITION_MAP = {
@@ -213,10 +213,10 @@ const CURRENCY_POSITION_MAP = {
 /**
  * Step 7 of the contract: a `[data-sc-price]` wrapper computes its own
  * Range/Sale/Plain state from its field-mapping attributes and formats using
- * its own baked-in currency/decimals/separator attributes — set by the
+ * its own baked-in currency/decimals/separator attributes - set by the
  * Search Cloud panel when the template was designed, not the widget's local
  * WooCommerce config (unlike a bare `{{price}}` placeholder, which does use
- * the site's own config — see `substitutePlaceholders()`).
+ * the site's own config - see `substitutePlaceholders()`).
  *
  * @param {Element} root
  * @param {Object}  hit
@@ -272,7 +272,7 @@ const applyPriceComponents = ( root, hit ) => {
 
 		if ( isVariable ) {
 			// Range: only "current" (the min value) and "prefix" (its
-			// already-compiled text, e.g. "from" — never overwritten) show.
+			// already-compiled text, e.g. "from" - never overwritten) show.
 			showPart( parts.current, formatPrice( min, currency ) );
 			showPart( parts.prefix );
 			hidePart( parts.regular );
@@ -304,7 +304,7 @@ const applyPriceComponents = ( root, hit ) => {
  *   a link before the markup reaches the live DOM.
  * - Point any `<img>` with an empty/missing `src` (a `{{image}}` placeholder
  *   with nothing to substitute) at a neutral placeholder graphic instead of
- *   a broken-image icon — kept as a real `<img>` (a data URI, so this adds
+ *   a broken-image icon - kept as a real `<img>` (a data URI, so this adds
  *   no network request) rather than swapped for another element, so
  *   whatever sizing/fit/radius CSS the template already targets `img` with
  *   still applies.
@@ -327,7 +327,7 @@ export const postProcessMarkup = ( html, hit ) => {
 		try {
 			// An empty/missing condition list matches unconditionally (see
 			// `evaluateConditions`), so a parse failure must not fall through
-			// to that same empty-list path — that would show the element
+			// to that same empty-list path - that would show the element
 			// unconditionally instead of hiding it, the opposite of a safe
 			// default for markup we can no longer verify.
 			matches = evaluateConditions( JSON.parse( el.getAttribute( 'data-sc-if' ) ), hit );
@@ -361,7 +361,7 @@ export const postProcessMarkup = ( html, hit ) => {
 };
 
 /**
- * Full contract steps 4–7 in one call: substitute placeholders, then strip
+ * Full contract steps 4-7 in one call: substitute placeholders, then strip
  * conditional elements, set rating variables, fill in price components, and
  * fall back missing images. Returns markup ready for
  * `dangerouslySetInnerHTML`.
@@ -379,7 +379,7 @@ export const buildServerCardHtml = ( template, hit ) =>
 const TEMPLATE_WEIGHT = ':is(*, #whsc#whsc#whsc#whsc)';
 
 /**
- * A selector list split at its top-level commas — not the ones inside
+ * A selector list split at its top-level commas - not the ones inside
  * `:is(a, b)`, `[data-x="a,b"]` or a string.
  *
  * @param {string} list

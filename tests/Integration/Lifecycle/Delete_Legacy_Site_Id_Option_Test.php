@@ -3,7 +3,7 @@
  * Legacy site-id option removal.
  *
  * The option is dead since the connection went key-relative, but it stayed in
- * the database and went stale — a site reconnected to a different tenant kept
+ * the database and went stale - a site reconnected to a different tenant kept
  * reporting the old id. The upgrade step clears it on existing installs.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>

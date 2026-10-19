@@ -14,10 +14,10 @@ use Webhead\WP\SearchCloud\Sync\Sync_State;
 
 /**
  * `Sync_State::present()` is the only method on this class with no database
- * dependency at all, so it's the only one covered here — everything else
+ * dependency at all, so it's the only one covered here - everything else
  * (`create()`, `save()`, `finish()`, `apply_retention()`, ...) is a thin
  * pass-through to `Sync_Runs_Table` and belongs in wp-env integration tests.
- * `Sync_Runs_Table` is `final`, so it can't be mocked or subclassed — build
+ * `Sync_Runs_Table` is `final`, so it can't be mocked or subclassed - build
  * `Sync_State` via reflection instead of a real/fake table collaborator,
  * since `present()` never touches `$this->table`.
  */

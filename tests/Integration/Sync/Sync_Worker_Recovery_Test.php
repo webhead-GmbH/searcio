@@ -5,7 +5,7 @@
  * These pin the fix for a sync that "sticks" with no way back: the follow-up
  * tick used to be scheduled only at the very end of `tick()`, so a tick killed
  * mid-work (PHP's max_execution_time, an OOM, the worker being killed) left the
- * run Running with no worker — and because `run_scheduled()` bails whenever a
+ * run Running with no worker - and because `run_scheduled()` bails whenever a
  * run holds the active slot, every later scheduled sync became a silent no-op.
  * The trigger in the wild was a large prune queue: the API deletes one document
  * per request, so a batch of them can outlast the request on its own.
@@ -99,7 +99,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 		);
 	}
 
-	/** A badly overdue tick means cron stopped firing — also a dead worker. */
+	/** A badly overdue tick means cron stopped firing - also a dead worker. */
 	public function test_the_scheduled_sync_revives_a_run_whose_tick_is_overdue(): void {
 		$this->connect_client();
 		$this->enable_indexing( 'post' );
@@ -112,7 +112,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 		$this->assertGreaterThan( time(), $next, 'The stale tick must be replaced with a live one.' );
 	}
 
-	/** A healthy run is left alone — no second worker gets armed on top of it. */
+	/** A healthy run is left alone - no second worker gets armed on top of it. */
 	public function test_the_scheduled_sync_leaves_a_live_run_untouched(): void {
 		$this->connect_client();
 		$this->enable_indexing( 'post' );
@@ -164,7 +164,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 		$this->assertCount(
 			39,
 			$remaining,
-			'Only the document processed before the budget ran out may leave the queue — the rest must survive for the next tick.'
+			'Only the document processed before the budget ran out may leave the queue - the rest must survive for the next tick.'
 		);
 		$this->assertSame(
 			'post-2',
@@ -178,7 +178,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 	/**
 	 * A delete the API rejects must be counted and explained. It used to be
 	 * dropped from the queue silently, so a broken delete endpoint looked
-	 * exactly like a healthy prune — hours of "deleted 0" and no error.
+	 * exactly like a healthy prune - hours of "deleted 0" and no error.
 	 */
 	public function test_a_rejected_delete_is_counted_and_reported(): void {
 		$this->connect_client();
@@ -206,7 +206,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 		$this->assertSame(
 			Sync_Status::Completed->value,
 			$run['status'],
-			'The run still finishes — one unusable document must not wedge the queue behind it.'
+			'The run still finishes - one unusable document must not wedge the queue behind it.'
 		);
 	}
 }

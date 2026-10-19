@@ -20,7 +20,7 @@ use Webhead\WP\SearchCloud\Tests\Unit\Resets_Wp_Test_State;
  * Exercises the real framework `Compatibility_Manager` and its integration
  * classes (all final, all no-arg constructors) rather than mocking them, so
  * this also proves the Polylang-first provider resolution actually works
- * end-to-end — see the class docblock for the live incident that motivated
+ * end-to-end - see the class docblock for the live incident that motivated
  * checking Polylang before WPML.
  */
 final class Multilingual_Support_Test extends TestCase {
@@ -51,7 +51,7 @@ final class Multilingual_Support_Test extends TestCase {
 	}
 
 	public function test_active_languages_prefers_polylang_when_both_plugins_report_active(): void {
-		// Both WPML's compatibility filter AND Polylang report active — Polylang
+		// Both WPML's compatibility filter AND Polylang report active - Polylang
 		// must win, not WPML, even though WPML happens to have data too. This is
 		// the exact live bug this class's docblock documents: Polylang emulates
 		// WPML's filters, so checking WPML first silently calls the wrong API.

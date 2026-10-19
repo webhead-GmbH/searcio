@@ -7,7 +7,7 @@
  * REST-exposed schema + current values; POST partially updates only the
  * REST-exposed settings and returns the same shape so the client can re-sync
  * in one round trip. Read/write goes entirely through the framework
- * Settings_Manager — no parallel store.
+ * Settings_Manager - no parallel store.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -140,7 +140,7 @@ final class Settings_Endpoint extends Rest_API {
 	/**
 	 * WordPress's `update_option()`/`get_option()` round-trips a PHP `false` as the literal
 	 * string `''`. Left uncast, a boolean setting saved as `false` comes back from `GET` as
-	 * `''`, and resubmitting it fails `rest_is_boolean()` validation — breaking every settings
+	 * `''`, and resubmitting it fails `rest_is_boolean()` validation - breaking every settings
 	 * save on the page, not just that field.
 	 *
 	 * @param  array<string,mixed>  $payload

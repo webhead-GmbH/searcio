@@ -3,7 +3,7 @@
  * Recurring scheduled full sync.
  *
  * Daily, per-site, lock-aware. It also asks Search Cloud for the plan tier
- * once a day. It does not do the work itself — it asks the sync
+ * once a day. It does not do the work itself - it asks the sync
  * service to start a run when the site is connected and idle (and applies the
  * history retention policy). The heavy lifting happens in the resumable tick
  * worker so a single cron invocation never blocks.

@@ -125,7 +125,7 @@ const SearchModal = ({
 	const statusId = useId();
 
 	const [query, setQuery] = useState(initialQuery || '');
-	// A scope-locked instance never touches this — `buildTypeParam()` always
+	// A scope-locked instance never touches this - `buildTypeParam()` always
 	// prefers `scopeType` when it's set.
 	const [activeTypes, setActiveTypes] = useState([]);
 	// Per-field facet selections, e.g. {brand: ['Acme', 'Duff']}.
@@ -146,7 +146,7 @@ const SearchModal = ({
 	// The search_id of the highlights carousel, so clicks on it attribute to the
 	// same search the way result clicks attribute to `results.search_id`.
 	const [highlightsSearchId, setHighlightsSearchId] = useState('');
-	// Which of the extra modes this site may show — all read from
+	// Which of the extra modes this site may show - all read from
 	// /storefront-config, so an upgrade (or publishing a quiz) flips them on
 	// with no code change and nothing here ever offers a control the API would
 	// only answer 403 to.
@@ -215,11 +215,11 @@ const SearchModal = ({
 	// a single type.
 	const showFacets = '' === (scopeType || '') && facets.length > 0;
 	// Dynamic field facet groups (brand, color, ...) are orthogonal to a
-	// type-scope lock — they render whenever the site has any configured,
+	// type-scope lock - they render whenever the site has any configured,
 	// regardless of `scopeType`.
 	const facetGroupEntries = Object.entries(facetGroups);
 	const curatedPopularSearches = Array.isArray(config.popularSearches) ? config.popularSearches : [];
-	// Live queries from the API are the primary source — they reflect what
+	// Live queries from the API are the primary source - they reflect what
 	// visitors are actually searching for right now. The curated admin list
 	// is only a fallback, used when the live fetch hasn't returned anything
 	// yet, comes back empty, or errors out.
@@ -247,14 +247,14 @@ const SearchModal = ({
 	// `Modal` (`@wordpress/components`) always portals its frame straight to
 	// `document.body` and doesn't forward unrecognized props to it, so
 	// `data-webhead-frontend-root` can't be passed in as a prop like
-	// `className` above — it has to be set on the real DOM node once it
+	// `className` above - it has to be set on the real DOM node once it
 	// exists. Scopes the shared frontend reset
 	// (`src/components/Default/frontend-reset.scss`) to the modal, the same
 	// way `instanceClass` already reaches it despite not being a DOM
 	// descendant of the trigger.
 	//
 	// Set on `.whsc-modal-overlay` (via `overlayClassName` below), the actual
-	// parent of `.components-modal__frame.whsc-modal` — not on the frame
+	// parent of `.components-modal__frame.whsc-modal` - not on the frame
 	// itself. Every themed rule in `style.scss` is written as
 	// `.whsc-modal .whsc-facet` etc. (the attribute-boosted wrapper prepends
 	// a strict descendant combinator), and a `.whsc-modal .foo` selector can
@@ -269,7 +269,7 @@ const SearchModal = ({
 	}, []);
 
 	// Fetched once per modal session (not per query) per `card-templates.md`'s
-	// "fetch once per page load" guidance — `api.js`'s own TTL cache also
+	// "fetch once per page load" guidance - `api.js`'s own TTL cache also
 	// covers the case where the visitor closes and reopens the modal shortly
 	// after. A fetch failure just leaves the list empty, so every hit falls
 	// back to the plugin's own card rather than breaking the search.
@@ -326,7 +326,7 @@ const SearchModal = ({
 	}, []);
 
 	// The curated `popular_searches` setting is only a fallback for when this
-	// fetch returns nothing or fails — `popularSearches` above starts on the
+	// fetch returns nothing or fails - `popularSearches` above starts on the
 	// curated list and only stays there if the live list ends up empty.
 	useEffect(() => {
 		if (!isConfigured()) {
@@ -382,7 +382,7 @@ const SearchModal = ({
 			setHighlights(response.hits || []);
 			setHighlightsSearchId(response.search_id || '');
 			// Only refresh the type chip list when this request had no type
-			// filter applied — confirmed live that this API's `facets.types`
+			// filter applied - confirmed live that this API's `facets.types`
 			// collapses to just the active selection otherwise, which would
 			// erase every other chip a multi-select needs to stay clickable.
 			if ('' === type) {
@@ -403,7 +403,7 @@ const SearchModal = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- only on mount; facet/type changes reload explicitly.
 	}, []);
 
-	// Lightweight autocomplete — always runs while typing regardless of
+	// Lightweight autocomplete - always runs while typing regardless of
 	// `searchTrigger`; it's cheap and not metered as a search.
 	useEffect(() => {
 		window.clearTimeout(suggestTimer.current);
@@ -439,7 +439,7 @@ const SearchModal = ({
 		return () => window.clearTimeout(suggestTimer.current);
 	}, [trimmedQuery]);
 
-	// `facetsOverride` mirrors `loadHighlights()`'s param — used only by a
+	// `facetsOverride` mirrors `loadHighlights()`'s param - used only by a
 	// field-facet click, which needs its just-toggled selection applied before
 	// `activeFacets` state itself has re-rendered.
 	const runSearch = useCallback(async (q, type = buildTypeParam(scopeType, activeTypes), commit = true, facetsOverride, rangesOverride) => {
@@ -475,7 +475,7 @@ const SearchModal = ({
 		}
 
 		// An unsupported visitor language degrades exactly like an
-		// unconfigured/unreachable API — native search, not a Search Cloud
+		// unconfigured/unreachable API - native search, not a Search Cloud
 		// query scoped to the wrong (or no) content.
 		if (!isConfigured() || !isLanguageSupported()) {
 			window.location.href = nativeSearchUrl(trimmed);
@@ -515,8 +515,8 @@ const SearchModal = ({
 			 * Only a committed search navigates. In "search as you type" mode a
 			 * live search fires from the fourth character on, so a visitor
 			 * typing "sale shoes" on a site that redirects "sale" would be
-			 * thrown off the page mid-word. Pressing Enter — or clicking a
-			 * suggestion, chip or popular term — is an explicit "search for
+			 * thrown off the page mid-word. Pressing Enter - or clicking a
+			 * suggestion, chip or popular term - is an explicit "search for
 			 * exactly this", which is when the rule is meant to fire.
 			 */
 			const target = redirectTarget(response);
@@ -540,7 +540,7 @@ const SearchModal = ({
 			setVisualActive(false);
 			setVisualPreview('');
 
-			// See the matching comment in `loadHighlights()` — only refresh the
+			// See the matching comment in `loadHighlights()` - only refresh the
 			// type chip list from an unfiltered-by-type request.
 			if ('' === type) {
 				setFacets(response.facets?.types || []);
@@ -622,8 +622,8 @@ const SearchModal = ({
 		setResults(null);
 		// A photo search takes no filters, and its response carries no facets to
 		// re-render the chips from. Anything left over from a typed search would
-		// be describing results that are no longer on screen — the type chip
-		// still reading "product 4" over three photo matches — and a field
+		// be describing results that are no longer on screen - the type chip
+		// still reading "product 4" over three photo matches - and a field
 		// selection would sit invisible and silently narrow the next search.
 		setActiveFacets({});
 		setActiveTypes([]);
@@ -1066,7 +1066,7 @@ const SearchModal = ({
 			<p className="whsc-no-results">
 				{visualActive
 					// A photo that matched nothing is a photo problem, not a
-					// catalogue problem — say what to do about it.
+					// catalogue problem - say what to do about it.
 					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'webhead-search-cloud')
 					: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))}
 			</p>
@@ -1185,7 +1185,7 @@ const SearchModal = ({
 									// arrives as a pre-rendered, server-escaped HTML string; render
 									// it in place of the default outline mic glyph. Kept out of
 									// `.whsc-default-voice-icon` (see style.scss) so the forced
-									// `fill: none` on the built-in glyph never applies to it — a
+									// `fill: none` on the built-in glyph never applies to it - a
 									// custom icon may legitimately be a solid/filled design.
 									<span
 										className="whsc-custom-voice-icon"
@@ -1228,12 +1228,12 @@ const SearchModal = ({
 					// A merchandising rule can attach a banner to a search (or to a
 					// category listing). The plugin's own Search Config tab writes
 					// these, so not rendering them made the field look broken.
-					// Merchant-authored text, rendered as text — never as markup.
+					// Merchant-authored text, rendered as text - never as markup.
 					<p className="whsc-banner" role="status">{results.banner}</p>
 				)}
 
 				{showFacets && (
-					// A group of independent toggle buttons, not an ARIA tablist —
+					// A group of independent toggle buttons, not an ARIA tablist -
 					// multi-select means more than one can be "selected" at once,
 					// which the tablist/tab/aria-selected pattern assumes never happens.
 					<div className="whsc-facets" role="group" aria-label={__('Filter by type', 'webhead-search-cloud')}>

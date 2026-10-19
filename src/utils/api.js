@@ -5,7 +5,7 @@
  * - A tiny in-memory, TTL'd LRU caches identical GET responses for the current
  *   page view, so repeats (clicking the same recent/popular term, typing then
  *   backspacing, re-opening the modal) are instant and never re-hit the server.
- *   The cache is intentionally ephemeral — it lives only in this page's JS
+ *   The cache is intentionally ephemeral - it lives only in this page's JS
  *   memory, so a reload always starts fresh; entries also expire after a short
  *   TTL, so results/prices are never more than that stale. There is no manual
  *   purge to maintain: navigation and TTL are the only invalidation.
@@ -19,24 +19,24 @@ import { currentLangFilter as resolveCurrentLangFilter, isLanguageSupported as r
 
 const config = window.webheadSearchCloudFrontend || {};
 
-const SEARCH_TTL = 60000; // 60s — results/prices stay fresh within a minute.
-const SUGGEST_TTL = 30000; // 30s — autocomplete is cheaper and more transient.
-// Card templates are designed in the Search Cloud panel and change rarely —
+const SEARCH_TTL = 60000; // 60s - results/prices stay fresh within a minute.
+const SUGGEST_TTL = 30000; // 30s - autocomplete is cheaper and more transient.
+// Card templates are designed in the Search Cloud panel and change rarely -
 // per `card-templates.md`, fetch once per page load rather than per query.
 const CARD_TEMPLATES_TTL = 600000; // 10 minutes.
-// Matches the server's own 15-minute cache window (search.md) — popular
+// Matches the server's own 15-minute cache window (search.md) - popular
 // queries shift slowly over a 30-day window, so there's no reason to poll
 // more often than the data itself can actually change.
 const POPULAR_TTL = 900000; // 15 minutes.
 // Plan capabilities (whether the AI assistant tab may be shown) change only when
-// the account's plan does — cache generously for the page view.
+// the account's plan does - cache generously for the page view.
 const STOREFRONT_CONFIG_TTL = 600000; // 10 minutes.
 // The whole question graph arrives in one response, is served from a
 // server-side cache and is not metered as a search (quiz.md), so fetch it once
 // per page view rather than per question.
 const QUIZZES_TTL = 600000; // 10 minutes.
 // "More like this" changes only when the catalogue does, and it is not metered
-// as a search — so a visitor browsing several products pays for it once.
+// as a search - so a visitor browsing several products pays for it once.
 const SIMILAR_TTL = 600000; // 10 minutes.
 const CACHE_MAX = 60;
 
@@ -54,7 +54,7 @@ const buildUrl = ( path, params ) => {
 	/*
 	 * The search key travels in the query string, never as an `X-Search-Key`
 	 * header. A custom header would make every request non-simple, so the
-	 * browser would preflight it — and a preflight carries no custom headers,
+	 * browser would preflight it - and a preflight carries no custom headers,
 	 * leaving the API with no credential to resolve the site from and no way to
 	 * allow the request. The query parameter survives the preflight.
 	 */
@@ -126,7 +126,7 @@ export const search = ( q, options = {} ) => {
 	const params = { q, type: options.type, page: options.page || 1, per_page: options.perPage || 20 };
 
 	// Filterable fields must already be configured as facet fields server-side
-	// (search.md) — an unfiltered chip list never sends a field the API would
+	// (search.md) - an unfiltered chip list never sends a field the API would
 	// reject, since every chip only exists because a `/search` response
 	// already returned it as a facet.
 	Object.entries( options.filters || {} ).forEach( ( [ field, value ] ) => {
@@ -135,7 +135,7 @@ export const search = ( q, options = {} ) => {
 		}
 	} );
 
-	// `range[field]=min:max` — the same allow-list applies, so these fields
+	// `range[field]=min:max` - the same allow-list applies, so these fields
 	// also only ever come from a facet the response already returned. Either
 	// bound may be blank ("50:" is "at least 50").
 	Object.entries( options.ranges || {} ).forEach( ( [ field, value ] ) => {
@@ -226,7 +226,7 @@ export const fetchSimilar = ( id, options = {} ) =>
  * not a candidate for click attribution) and no `redirect` short-circuit (a
  * synthetic query never triggers a merchant's typed-term redirect).
  *
- * Not cached — the same photo picked twice is a new upload either way, and the
+ * Not cached - the same photo picked twice is a new upload either way, and the
  * cache is keyed by URL, which a multipart body never varies.
  *
  * @param {File}                   file      The image to search with (≤ 8 MB).
@@ -294,7 +294,7 @@ export const askAssistant = async ( message, history = [], options = {} ) => {
  * result, so the click-through rate can be attributed to the search that
  * produced it (see docs/api/search.md `POST /search/click`). Uses
  * `navigator.sendBeacon` so it survives the navigation the click triggers and
- * never blocks it. Best-effort — any failure is swallowed.
+ * never blocks it. Best-effort - any failure is swallowed.
  *
  * @param {string}        searchId   The `search_id` from the search response.
  * @param {string}        documentId The clicked hit's id.
@@ -315,7 +315,7 @@ export const trackClick = ( searchId, documentId, position ) => {
 		/*
 		 * Form-encoded, not JSON. `application/json` is not a CORS-safelisted
 		 * content type, so the browser has to preflight the beacon with an
-		 * OPTIONS request — and the API answers preflights without any CORS
+		 * OPTIONS request - and the API answers preflights without any CORS
 		 * headers (it emits them per site from the search-key middleware, which
 		 * a preflight never reaches). The beacon was therefore blocked before it
 		 * was ever sent and no click was ever recorded. A `URLSearchParams` body
@@ -341,7 +341,7 @@ export const isLanguageSupported = () =>
 	resolveLanguageSupported( config.enabledLanguages, config.currentLang );
 
 /**
- * `{lang: '<code>'}` merge-in for `search()`'s `filters` option — see
+ * `{lang: '<code>'}` merge-in for `search()`'s `filters` option - see
  * `language.js` for when this resolves to no filter at all.
  */
 export const currentLangFilter = () =>

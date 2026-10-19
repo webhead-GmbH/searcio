@@ -92,7 +92,7 @@ final class Connection_State {
 
 	/**
 	 * Saves the credentials `/connect` (or a manual paste) issued and clears
-	 * any pending-claim notice — a saved, working credential set supersedes it.
+	 * any pending-claim notice - a saved, working credential set supersedes it.
 	 */
 	public function save_credentials( string $write_key, string $write_secret, string $search_key ): void {
 		$this->settings->set( Plugin_Settings::WRITE_KEY, $write_key );

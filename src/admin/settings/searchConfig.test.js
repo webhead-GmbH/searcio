@@ -150,7 +150,7 @@ describe( 'normalizeConfig', () => {
 
 describe( 'toPayload', () => {
 	/**
-	 * `available` and `status` are reported by the server and ignored on write —
+	 * `available` and `status` are reported by the server and ignored on write -
 	 * sending them back would be claiming state we do not own.
 	 */
 	it( 'writes back only the enabled flag of each switch', () => {
@@ -259,7 +259,7 @@ describe( 'toPayload', () => {
 describe( 'listError', () => {
 	/**
 	 * The live API rejects an oversized id with the key
-	 * `merchandising.0.pinned.0` — per entry, while the UI edits the whole list
+	 * `merchandising.0.pinned.0` - per entry, while the UI edits the whole list
 	 * as one field. Without collecting these the message would never be shown.
 	 */
 	it( 'collects a per-entry error onto the field that owns the list', () => {

@@ -79,7 +79,7 @@ if ( ! function_exists( 'wp_remote_retrieve_header' ) ) {
  * Minimal fakes for the handful of WordPress runtime functions exercised by
  * pure-logic classes under test (`Dirty_Tracker`, `Multilingual_Support`).
  * Backed by `$GLOBALS['wp_test_state']` so each test can set up exactly the
- * state it needs and tear it down afterwards — see
+ * state it needs and tear it down afterwards - see
  * `Webhead\WP\SearchCloud\Tests\Unit\Resets_Wp_Test_State`.
  */
 $GLOBALS['wp_test_state'] = [
@@ -141,7 +141,7 @@ if ( ! function_exists( 'has_filter' ) ) {
 
 if ( ! function_exists( 'PLL' ) ) {
 	/**
-	 * Polylang's own global accessor — `Polylang_Integration::is_active()`
+	 * Polylang's own global accessor - `Polylang_Integration::is_active()`
 	 * checks `function_exists('PLL') && null !== PLL()`.
 	 */
 	function PLL() {
@@ -185,7 +185,7 @@ if ( ! function_exists( 'pll_get_post_language' ) ) {
 
 if ( ! class_exists( 'WP_Post' ) ) {
 	/**
-	 * Minimal stand-in for WordPress core's `WP_Post` — this bootstrap never
+	 * Minimal stand-in for WordPress core's `WP_Post` - this bootstrap never
 	 * loads `wp-includes`, so only the public properties the plugin's own
 	 * code actually reads are provided.
 	 */
@@ -209,7 +209,7 @@ if ( ! class_exists( 'WP_Post' ) ) {
 
 if ( ! class_exists( 'WP_Error' ) ) {
 	/**
-	 * Minimal stand-in for WordPress core's `WP_Error` — only the single
+	 * Minimal stand-in for WordPress core's `WP_Error` - only the single
 	 * accessor `Api_Response::from_transport_error()` actually calls.
 	 */
 	class WP_Error {

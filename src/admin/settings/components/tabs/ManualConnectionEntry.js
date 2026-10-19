@@ -59,7 +59,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 			setResult(response);
 
 			// A pasted-in credential set that just proved itself healthy
-			// supersedes the pending-claim notice — clear it so the tab shows
+			// supersedes the pending-claim notice - clear it so the tab shows
 			// the normal Connected state instead of "check your inbox" forever.
 			if (response.ok && pendingClaim) {
 				updateSetting('connect_pending_claim', false);
