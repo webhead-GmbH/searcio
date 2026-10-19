@@ -52,6 +52,7 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 * **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. The search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
 * **Multilingual** - works with WPML and Polylang, so visitors only see results in their language.
+* **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and Polish.
 * **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
 * **WP-CLI** - run and watch syncs from the command line or a real system cron.
 

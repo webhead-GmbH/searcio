@@ -162,6 +162,10 @@ final class Settings_Endpoint extends Rest_API {
 	 * {@see Plugin_Settings::translated_schema_overrides()} for the settings that lack a
 	 * hand-written translated tab component and render on the generic schema-driven tab.
 	 *
+	 * The name of that tab comes with every setting as its `section_label`, which the
+	 * framework writes in English, so the settings of the default section get it
+	 * translated as well.
+	 *
 	 * @param  array<string,mixed>  $payload
 	 * @return array<string,mixed>
 	 */
@@ -169,6 +173,12 @@ final class Settings_Endpoint extends Rest_API {
 		foreach ( Plugin_Settings::translated_schema_overrides() as $key => $override ) {
 			if ( isset( $payload['schema'][ $key ] ) ) {
 				$payload['schema'][ $key ] = array_merge( $payload['schema'][ $key ], $override );
+			}
+		}
+
+		foreach ( $payload['schema'] ?? [] as $key => $definition ) {
+			if ( is_array( $definition ) && 'general' === ( $definition['section'] ?? 'general' ) ) {
+				$payload['schema'][ $key ]['section_label'] = __( 'General', 'searcio' );
 			}
 		}
 
