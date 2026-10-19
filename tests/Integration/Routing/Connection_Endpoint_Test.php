@@ -78,7 +78,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The storefront decides on the searcio logo from the tier and asks
+	 * The storefront decides on the Searcio logo from the tier and asks
 	 * nobody, so it is kept whenever an admin screen checks the connection.
 	 */
 	public function test_test_connection_keeps_the_plan_tier_for_the_storefront(): void {

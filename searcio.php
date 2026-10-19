@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: searcio - Fast AI Product Search for WooCommerce
- * Plugin URI: https://github.com/webhead-GmbH/webhead-search-cloud
- * Description: Connect WordPress and WooCommerce to webhead Search Cloud.
+ * Plugin Name: Searcio - Fast AI Product Search for WooCommerce
+ * Plugin URI: https://wordpress.org/plugins/searcio/
+ * Description: Connect WordPress and WooCommerce to Searcio.
  * Version: 1.3.0
  * Author: webhead GmbH
  * Author URI: https://webhead.at
@@ -64,7 +64,7 @@ defined( 'Webhead\WP\SearchCloud\SERVICE_URL' )
 || define( 'Webhead\WP\SearchCloud\SERVICE_URL', 'https://searcio.com' );
 
 /**
- * Linked from the consent checkboxes on the Connection tab until Search Cloud
+ * Linked from the consent checkboxes on the Connection tab until Searcio
  * supplies its own, and whenever it cannot be reached. They are the documents
  * `GET /connect` names, at the address of the service.
  */

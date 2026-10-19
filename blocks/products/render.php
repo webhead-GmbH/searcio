@@ -1,6 +1,6 @@
 <?php
 /**
- * Search Cloud products block render template.
+ * Searcio products block render template.
  *
  * @var array<string,mixed> $attributes
  *

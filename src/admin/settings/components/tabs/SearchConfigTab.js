@@ -179,7 +179,7 @@ const PopularSearchesCard = () => {
 			<CardHeading
 				title={ __( 'Popular searches', 'searcio' ) }
 				description={ __(
-					"A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Search Cloud's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails.",
+					"A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Searcio's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails.",
 					'searcio'
 				) }
 			/>
@@ -187,7 +187,7 @@ const PopularSearchesCard = () => {
 				<TextareaControl
 					label={ __( 'Popular searches', 'searcio' ) }
 					hideLabelFromVision
-					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'searcio' ) }
+					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Searcio are unavailable or empty.', 'searcio' ) }
 					value={ popularSearchesText }
 					onValueChange={ ( value ) => {
 						setPopularSearchesText( value );
@@ -200,7 +200,7 @@ const PopularSearchesCard = () => {
 };
 
 /**
- * The three site-level switches Search Cloud reports under `features`. Each one
+ * The three site-level switches Searcio reports under `features`. Each one
  * is only offered when the plan and platform allow it - the API rejects
  * enabling an unavailable feature with a field error, so the checkbox says why
  * up front rather than letting the save fail.
@@ -220,7 +220,7 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 			<CardHeading
 				title={ __( 'AI & ranking', 'searcio' ) }
 				description={ __(
-					'Site-level switches that change how results are found and ordered. These are the same switches as in the Search Cloud panel.',
+					'Site-level switches that change how results are found and ordered. These are the same switches as in the Searcio panel.',
 					'searcio'
 				) }
 			/>
@@ -719,7 +719,7 @@ const SearchConfigTab = () => {
 			<TabIntro
 				title={ __( 'Search configuration', 'searcio' ) }
 				description={ __(
-					"Controls how Search Cloud itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Search Cloud's side, not in this plugin's own settings, so changes take effect on the very next search.",
+					"Controls how Searcio itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Searcio's side, not in this plugin's own settings, so changes take effect on the very next search.",
 					'searcio'
 				) }
 			/>

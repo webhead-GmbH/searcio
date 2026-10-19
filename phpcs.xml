@@ -4,7 +4,7 @@
     <description>PHPCS rules for webhead Search Cloud</description>
 
     <!-- The PHP this plugin ships and owns. -->
-    <file>webhead-search-cloud.php</file>
+    <file>searcio.php</file>
     <file>uninstall.php</file>
     <file>includes</file>
     <file>blocks</file>

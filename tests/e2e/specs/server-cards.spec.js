@@ -1,5 +1,5 @@
 /**
- * Server-designed cards. A placement whose card design is "Search Cloud" draws
+ * Server-designed cards. A placement whose card design is "Searcio" draws
  * each hit through the template the service compiled for it: markup with
  * `{{field}}` placeholders and a stylesheet of its own. The markup below is
  * what the service's compiler writes - a class per node, an icon as inline SVG

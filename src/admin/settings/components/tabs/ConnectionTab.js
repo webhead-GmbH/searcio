@@ -97,8 +97,8 @@ const ConnectionTab = () => {
 		}
 	}, [pendingClaim]);
 
-	// Live Search Cloud-configured legal links (GET /connect), fetched here
-	// rather than localized on page load so an unreachable Search Cloud never
+	// Live Searcio-configured legal links (GET /connect), fetched here
+	// rather than localized on page load so an unreachable Searcio never
 	// delays opening any other settings tab. The plugin's own constants keep
 	// the consents usable in the meantime.
 	useEffect(() => {
@@ -185,7 +185,7 @@ const ConnectionTab = () => {
 			setDpa(false);
 			setShowEmailOverride(false);
 
-			showToast(__('Disconnected from Search Cloud.', 'searcio'), 'success');
+			showToast(__('Disconnected from Searcio.', 'searcio'), 'success');
 		} catch (error) {
 			showToast(
 				error?.message || __('Could not disconnect.', 'searcio'),
@@ -199,7 +199,7 @@ const ConnectionTab = () => {
 	const connectDisabled = isConnecting || !termsPrivacy;
 	const connectLabel = isConnecting
 		? __('Connecting…', 'searcio')
-		: __('Connect to Search Cloud', 'searcio');
+		: __('Connect to Searcio', 'searcio');
 
 	// One disclosure for the pasted-keys path, whichever state the tab is in.
 	const manualEntry = (
@@ -222,9 +222,9 @@ const ConnectionTab = () => {
 	return (
 		<Stack direction="column" gap="lg" className="webhead-search-cloud-connection">
 			<TabIntro
-				title={__('Search Cloud connection', 'searcio')}
+				title={__('Searcio connection', 'searcio')}
 				description={__(
-					'Connect this site to webhead Search Cloud to start syncing content and enable search.',
+					'Connect this site to Searcio to start syncing content and enable search.',
 					'searcio'
 				)}
 			/>
@@ -261,7 +261,7 @@ const ConnectionTab = () => {
 								{sprintf(
 									/* translators: %s: the email address a confirmation link was sent to. */
 									__(
-										'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below.',
+										'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Searcio dashboard, then paste the resulting keys below.',
 										'searcio'
 									),
 									pendingClaimEmail
@@ -330,7 +330,7 @@ const ConnectionTab = () => {
 							{effectiveEmail
 								? sprintf(
 									/* translators: %s: the email address used to connect. */
-									__("You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'searcio'),
+									__("You'll connect using %s. A new Searcio account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'searcio'),
 									effectiveEmail
 								)
 								: __('An admin email is required to connect.', 'searcio')}
@@ -368,7 +368,7 @@ const ConnectionTab = () => {
 									/>
 									<InputControl
 										label={__('Company name (optional)', 'searcio')}
-										description={__('Used as the Search Cloud account name.', 'searcio')}
+										description={__('Used as the Searcio account name.', 'searcio')}
 										value={overrideCompanyName}
 										onValueChange={setOverrideCompanyName}
 									/>
@@ -381,13 +381,13 @@ const ConnectionTab = () => {
 				</>
 			)}
 
-			{/* Disconnecting deletes the site and its index on Search Cloud, which
+			{/* Disconnecting deletes the site and its index on Searcio, which
 			    no click undoes, so it is asked about in a dialog that only its own
 			    buttons close, and the one that goes ahead says what it deletes. */}
 			<Modal
 				isOpen={disconnectConfirmOpen}
 				onClose={() => setDisconnectConfirmOpen(false)}
-				title={__('Disconnect from Search Cloud?', 'searcio')}
+				title={__('Disconnect from Searcio?', 'searcio')}
 				size="small"
 				showCloseButton={false}
 				closeOnEscape={false}
@@ -407,7 +407,7 @@ const ConnectionTab = () => {
 			>
 				<Text>
 					{__(
-						"This removes the site from Search Cloud and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted.",
+						"This removes the site from Searcio and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted.",
 						'searcio'
 					)}
 				</Text>

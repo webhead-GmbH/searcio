@@ -109,7 +109,7 @@ final class Verify_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The token is an HMAC over Search Cloud's own application key, so the
+	 * The token is an HMAC over Searcio's own application key, so the
 	 * plugin can never check it - which is exactly why the window exists. A
 	 * present-but-meaningless token is still refused outside one.
 	 */

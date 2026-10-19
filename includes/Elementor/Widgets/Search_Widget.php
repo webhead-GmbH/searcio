@@ -1,6 +1,6 @@
 <?php
 /**
- * Elementor "Search Cloud" widget.
+ * Elementor "Searcio Search" widget.
  *
  * Mirrors the Gutenberg block's attributes/markup exactly (same trigger, same
  * runtime bundle) via {@see \Webhead\WP\SearchCloud\Frontend\Trigger_Markup}
@@ -65,7 +65,7 @@ final class Search_Widget extends Widget {
 	}
 
 	public function get_title(): string {
-		return __( 'Search Cloud', 'searcio' );
+		return __( 'Searcio Search', 'searcio' );
 	}
 
 	public function get_icon(): string {
@@ -234,9 +234,9 @@ final class Search_Widget extends Widget {
 				'default'     => 'plugin',
 				'options'     => [
 					'plugin' => __( 'Plugin templates', 'searcio' ),
-					'server' => __( 'Search Cloud templates', 'searcio' ),
+					'server' => __( 'Searcio templates', 'searcio' ),
 				],
-				'description' => __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'searcio' ),
+				'description' => __( "Design templates per content type in the Searcio panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'searcio' ),
 			]
 		);
 

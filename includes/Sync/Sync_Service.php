@@ -107,7 +107,7 @@ final class Sync_Service {
 		if ( ! $this->client->is_configured() ) {
 			return [
 				'ok'      => false,
-				'message' => __( 'Add and save your Search Cloud credentials before syncing.', 'searcio' ),
+				'message' => __( 'Add and save your Searcio credentials before syncing.', 'searcio' ),
 			];
 		}
 
@@ -882,7 +882,7 @@ final class Sync_Service {
 			);
 		}
 
-		return __( 'Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync.', 'searcio' );
+		return __( 'Your Searcio plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync.', 'searcio' );
 	}
 
 	/**
@@ -896,14 +896,14 @@ final class Sync_Service {
 		if ( $response->transport_error ) {
 			return sprintf(
 				/* translators: %s: a length of time, such as "5 mins". */
-				__( 'Could not reach Search Cloud. The sync tries again in %s.', 'searcio' ),
+				__( 'Could not reach Searcio. The sync tries again in %s.', 'searcio' ),
 				$wait
 			);
 		}
 
 		return sprintf(
 			/* translators: 1: HTTP status code, 2: a length of time, such as "5 mins". */
-			__( 'Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s.', 'searcio' ),
+			__( 'Searcio returned an error (HTTP %1$d). The sync tries again in %2$s.', 'searcio' ),
 			$response->status,
 			$wait
 		);
@@ -918,14 +918,14 @@ final class Sync_Service {
 		if ( $response->transport_error ) {
 			return sprintf(
 				/* translators: %d: number of tries. */
-				__( 'Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'searcio' ),
+				__( 'Could not reach Searcio in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Searcio answers.', 'searcio' ),
 				$tries
 			);
 		}
 
 		return sprintf(
 			/* translators: 1: HTTP status code, 2: number of tries. */
-			__( 'Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'searcio' ),
+			__( 'Searcio returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Searcio answers.', 'searcio' ),
 			$response->status,
 			$tries
 		);

@@ -2,7 +2,7 @@
 /**
  * Search configuration REST endpoint integration tests.
  *
- * The endpoint is a proxy: Search Cloud owns the configuration and this route
+ * The endpoint is a proxy: Searcio owns the configuration and this route
  * only forwards. That is exactly what makes it worth pinning - a section the
  * API adds (redirects, a new feature switch, merchandising's category trigger)
  * has to reach the admin UI without any change here, and a section the admin UI

@@ -122,7 +122,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							value={ cardSource }
 							items={ [
 								{ label: __( 'Plugin templates', 'searcio' ), value: 'plugin' },
-								{ label: __( 'Search Cloud templates', 'searcio' ), value: 'server' },
+								{ label: __( 'Searcio templates', 'searcio' ), value: 'server' },
 							] }
 							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
 						/>

@@ -13,7 +13,7 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 ## Project Snapshot
 
 - Plugin name: `webhead Search Cloud`
-- Main plugin file: `webhead-search-cloud.php`
+- Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
@@ -43,7 +43,7 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 
 ## Core Model
 
-- `webhead-search-cloud.php` is the WordPress bootstrap file and should stay thin.
+- `searcio.php` is the WordPress bootstrap file and should stay thin.
 - `includes/Plugin.php` is the runtime source of truth for services, hooks, admin pages, settings, capabilities, database tables, jobs, lifecycle, health checks, diagnostics, compatibility, and updates.
 - Generated `Example_*` classes and `blocks/example-notice` are reference scaffolds only. Keep their registration lines in `includes/Plugin.php` commented until you replace them with real plugin behavior and tests. An example the plugin is not going to build on is deleted, not kept for reference: remove the file, its test under `tests/`, its container binding and its commented registration in the same change.
 - The tree holds what the plugin uses and nothing else. A directory exists because a file with something in it is there: create it when you write its first file and remove it when its last file goes. Do not add a directory for later, a `.gitkeep`, or an `index.php` that only says "Silence is golden". The two placeholders that stay are the `index.php` in the plugin root and `languages/`, which the plugin header names as its `Domain Path`.

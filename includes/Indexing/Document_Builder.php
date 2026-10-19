@@ -2,7 +2,7 @@
 /**
  * Document builder.
  *
- * Turns a WP_Post into a Search Cloud document using the per-post-type mapping
+ * Turns a WP_Post into a Searcio document using the per-post-type mapping
  * ({@see Index_Config}) and the field source resolvers. Also produces a stable
  * payload hash used by the sync engine (Phase 3) for dirty detection - a post is
  * only re-pushed when its rendered document actually changes.

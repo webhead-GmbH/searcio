@@ -168,8 +168,8 @@ export const registerTemplate = ( type, Component ) => {
 /**
  * @param {Object}         props
  * @param {Object}         props.hit
- * @param {string}         [props.cardSource]      'server' to prefer a Search
- *                                                  Cloud-designed template.
+ * @param {string}         [props.cardSource]      'server' to prefer a
+ *                                                  Searcio-designed template.
  * @param {Array<Object>}  [props.serverTemplates]  Fetched once per modal
  *                                                   session by the caller.
  * @param {Function}       [props.onClick]          Fired when the card is opened,

@@ -174,7 +174,7 @@ const SettingsPanel = () => {
 		// particular to settings: the tabs and the save action.
 		<AdminPage
 			className="settings"
-			title={__('webhead Search Cloud', 'searcio')}
+			title={__('Searcio', 'searcio')}
 			description={pluginData?.plugin?.description || __('Configure the plugin settings from one shared admin surface.', 'searcio')}
 			icon={searcioIcon}
 			actions={upgradeAction ? [upgradeAction] : undefined}

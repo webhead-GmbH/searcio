@@ -1,5 +1,5 @@
 /**
- * The searcio logo the search window ends with. The server decides whether it
+ * The Searcio logo the search window ends with. The server decides whether it
  * is there (`credit` in the configuration); the component draws exactly what
  * it is told, and nothing without it.
  */
@@ -22,15 +22,15 @@ describe( 'SearcioCredit', () => {
 		expect( render() ).toBe( '' );
 	} );
 
-	it( 'links the logo to searcio, in a new tab, with a name that says so', () => {
-		mockConfig = { credit: { url: 'https://searcio.com/' }, i18n: { credit: 'Search by searcio (opens in a new tab)' } };
+	it( 'links the logo to Searcio, in a new tab, with a name that says so', () => {
+		mockConfig = { credit: { url: 'https://searcio.com/' }, i18n: { credit: 'Search by Searcio (opens in a new tab)' } };
 
 		const html = render();
 
 		expect( html ).toContain( 'href="https://searcio.com/"' );
 		expect( html ).toContain( 'target="_blank"' );
 		expect( html ).toContain( 'rel="noopener nofollow"' );
-		expect( html ).toContain( 'aria-label="Search by searcio (opens in a new tab)"' );
+		expect( html ).toContain( 'aria-label="Search by Searcio (opens in a new tab)"' );
 	} );
 
 	it( 'draws the logo as a picture the name already describes', () => {

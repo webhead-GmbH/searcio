@@ -1,6 +1,6 @@
 <?php
 /**
- * Seed a published Elementor page holding a single Search Cloud widget and print
+ * Seed a published Elementor page holding a single Searcio widget and print
  * its permalink, for the Elementor end-to-end test. Run through WP-CLI:
  *
  *   wp eval-file .../tests/e2e/seed-elementor.php <mode>

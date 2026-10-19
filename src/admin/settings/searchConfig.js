@@ -1,5 +1,5 @@
 /**
- * Mapping between Search Cloud's `/search-config` payload and the shape the
+ * Mapping between Searcio's `/search-config` payload and the shape the
  * Search Config tab edits. Kept out of the component so the contract can be
  * tested directly - every field here is defined by `docs/api/search-config.md`.
  */

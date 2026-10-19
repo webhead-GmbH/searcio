@@ -1,6 +1,6 @@
 {
     "name": "webhead/webhead-search-cloud",
-    "description": "Connect WordPress and WooCommerce to webhead Search Cloud.",
+    "description": "Connect WordPress and WooCommerce to Searcio.",
     "type": "wordpress-plugin",
     "license": "GPL-3.0-or-later",
     "autoload": {
@@ -20,8 +20,8 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/webhead-GmbH/webhead-search-cloud/issues",
-        "source": "https://github.com/webhead-GmbH/webhead-search-cloud"
+        "issues": "https://github.com/webhead-GmbH/searcio/issues",
+        "source": "https://github.com/webhead-GmbH/searcio"
     },
     "repositories": [
         {

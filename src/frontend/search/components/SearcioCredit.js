@@ -1,7 +1,7 @@
 import { getConfig } from '../../../utils/api';
 
 /**
- * The searcio logo, small in the bottom corner of the search window and linked
+ * The Searcio logo, small in the bottom corner of the search window and linked
  * to searcio.com: always on a Free plan, and otherwise while the shop leaves
  * Support Searcio on. The server decides (`credit` in the configuration, see
  * Frontend_Config::credit()); with none there is nothing here.
@@ -26,7 +26,7 @@ const SearcioCredit = () => {
 			// A link that every shop running this plugin carries: `nofollow`
 			// keeps it from reading to a search engine as a link scheme.
 			rel="noopener nofollow"
-			aria-label={ config.i18n?.credit || 'searcio' }
+			aria-label={ config.i18n?.credit || 'Searcio' }
 		>
 			<svg className="whsc-credit__mark" viewBox="0 0 451 144.5" aria-hidden="true" focusable="false">
 				<rect className="whsc-credit__field" x="20" y="23.79" width="305.83" height="100.74" rx="16" />

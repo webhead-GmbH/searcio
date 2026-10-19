@@ -1,7 +1,7 @@
 /**
  * Shared end-to-end helpers.
  *
- * The search UI talks to the hosted Search Cloud API, so these tests never hit
+ * The search UI talks to the hosted Searcio API, so these tests never hit
  * the real service: `mockSearchCloud()` intercepts every `…/api/v1/*` request
  * and answers with canned, deterministic data (with CORS headers, since the
  * front-end fetches cross-origin). `configureSearchKey()` makes the plugin
@@ -28,7 +28,7 @@ const PREFLIGHT_CORS = {
 export const SEARCH_KEY = 'sk_e2e_test_key';
 
 /**
- * One post hit shaped like a Search Cloud `/search` result.
+ * One post hit shaped like a Searcio `/search` result.
  *
  * @param {Object} source Overrides merged into `hit.source`.
  * @param {string} id     Hit id.
@@ -40,7 +40,7 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
 } );
 
 /**
- * Intercept the Search Cloud API for this page. All fields are optional; the
+ * Intercept the Searcio API for this page. All fields are optional; the
  * `/search` response defaults to a single "Hello World" post hit.
  *
  * @param {import('@playwright/test').Page} page
@@ -261,7 +261,7 @@ export async function isPluginActive( requestUtils, plugin ) {
 }
 
 /**
- * Publish an Elementor page holding a single Search Cloud widget and return its
+ * Publish an Elementor page holding a single Searcio widget and return its
  * permalink. Elementor renders the front end from `_elementor_data`, which is
  * not writable over REST, so this seeds the page through WP-CLI in the wp-env
  * container (see `seed-elementor.php`). Requires Elementor to be active.
@@ -373,7 +373,7 @@ export function setConnected( connected = true ) {
 
 /**
  * Set the plan tier the site keeps - 'free', 'paid', or 'clear' for none - which
- * the storefront decides on the searcio logo from. See `seed-plan.php`.
+ * the storefront decides on the Searcio logo from. See `seed-plan.php`.
  *
  * @param {string} tier
  */

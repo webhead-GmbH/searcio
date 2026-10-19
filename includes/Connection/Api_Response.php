@@ -1,6 +1,6 @@
 <?php
 /**
- * Normalized Search Cloud API response.
+ * Normalized Searcio API response.
  *
  * Wraps a wp_remote_request result so callers can branch on the two `429`
  * kinds (transient rate-limit with `Retry-After` vs. non-transient plan limit

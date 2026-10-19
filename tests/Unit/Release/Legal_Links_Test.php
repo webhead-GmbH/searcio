@@ -2,7 +2,7 @@
 /**
  * The legal documents the consent checkboxes link to on their own.
  *
- * Search Cloud supplies the links, and the plugin's three are what the
+ * Searcio supplies the links, and the plugin's three are what the
  * Connection tab shows until they arrive and whenever the service cannot be
  * reached. They are the service's documents, so they are at the service's
  * address. Nothing compared the two: the service moved to another host and the
@@ -40,7 +40,7 @@ final class Legal_Links_Test extends TestCase {
 	 * What the plugin file defines a constant of its namespace as.
 	 */
 	private function constant( string $name ): string {
-		return $this->find( "/SearchCloud." . $name . "',\s*'([^']+)'/", 'webhead-search-cloud.php' );
+		return $this->find( "/SearchCloud." . $name . "',\s*'([^']+)'/", 'searcio.php' );
 	}
 
 	/**

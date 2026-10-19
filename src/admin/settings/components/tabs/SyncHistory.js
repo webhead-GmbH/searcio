@@ -276,8 +276,8 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 							{sprintf(
 								/* translators: %d: number of sync runs. */
 								_n(
-									'%d run is removed from the history for good. What it sent to Search Cloud stays where it is.',
-									'%d runs are removed from the history for good. What they sent to Search Cloud stays where it is.',
+									'%d run is removed from the history for good. What it sent to Searcio stays where it is.',
+									'%d runs are removed from the history for good. What they sent to Searcio stays where it is.',
 									selected.length,
 									'searcio'
 								),
@@ -393,7 +393,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 			>
 				<Text>
 					{__(
-						'Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Search Cloud changes.',
+						'Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Searcio changes.',
 						'searcio'
 					)}
 				</Text>

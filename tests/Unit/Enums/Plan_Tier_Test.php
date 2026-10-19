@@ -19,7 +19,7 @@ final class Plan_Tier_Test extends TestCase {
 
 	/**
 	 * Reading an answer that says nothing about the plan as a paid one would
-	 * let a Free account turn the searcio logo off.
+	 * let a Free account turn the Searcio logo off.
 	 *
 	 * @dataProvider silent_bodies
 	 *

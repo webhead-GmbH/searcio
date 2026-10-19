@@ -48,7 +48,7 @@ final class Connection_Endpoint extends Rest_API {
 	public function test_connection( WP_REST_Request $request ): WP_REST_Response {
 		$response = $this->client->health();
 
-		// The storefront decides on the searcio logo from the tier, and asks
+		// The storefront decides on the Searcio logo from the tier, and asks
 		// nobody: it is kept whenever an admin screen checks the connection.
 		$this->connection_state->remember_plan( $response );
 
@@ -58,7 +58,7 @@ final class Connection_Endpoint extends Rest_API {
 	/**
 	 * Fetched by the Connection tab itself (not localized eagerly on page
 	 * load - see Settings_Page::get_localize_script_data()) so an unreachable
-	 * Search Cloud never delays opening any other settings tab.
+	 * Searcio never delays opening any other settings tab.
 	 */
 	#[Route( '/connection/legal', methods: 'GET', permission_callback: 'can_view' )]
 	public function legal(): WP_REST_Response {
@@ -109,7 +109,7 @@ final class Connection_Endpoint extends Rest_API {
 			platform: $this->woo->is_active() ? 'woocommerce' : 'wordpress',
 			site_name: '' !== $site_name ? $site_name : (string) get_bloginfo( 'name' ),
 			site_url: home_url(),
-			// Points Search Cloud's async domain-ownership ping straight at our
+			// Points Searcio's async domain-ownership ping straight at our
 			// own Verify_Endpoint instead of it having to guess a WordPress path.
 			verify_url: rest_url( 'search-cloud/v1/verify' ),
 			admin_email: '' !== $email ? $email : (string) get_option( 'admin_email' ),
@@ -134,7 +134,7 @@ final class Connection_Endpoint extends Rest_API {
 	/**
 	 * Mirrors `/connect` (docs/api/building-a-plugin.md "Disconnecting"):
 	 * `DELETE /disconnect` permanently deletes the site and its index on
-	 * Search Cloud's side, so it's called first. Local credentials are only
+	 * Searcio's side, so it's called first. Local credentials are only
 	 * cleared once that has actually happened - either it succeeded, or the
 	 * `401`/`404` response means there was never anything valid server-side to
 	 * begin with. Any other failure (network, `429`, `5xx`) keeps the local
@@ -148,14 +148,14 @@ final class Connection_Endpoint extends Rest_API {
 
 			if ( $response->transport_error ) {
 				return new WP_REST_Response(
-					[ 'ok' => false, 'message' => __( 'Could not reach Search Cloud. Try again.', 'searcio' ) ],
+					[ 'ok' => false, 'message' => __( 'Could not reach Searcio. Try again.', 'searcio' ) ],
 					502
 				);
 			}
 
 			if ( ! $response->ok() && ! in_array( $response->status, [ 401, 404 ], true ) ) {
 				return new WP_REST_Response(
-					[ 'ok' => false, 'message' => __( 'Could not disconnect from Search Cloud. Try again.', 'searcio' ) ],
+					[ 'ok' => false, 'message' => __( 'Could not disconnect from Searcio. Try again.', 'searcio' ) ],
 					502
 				);
 			}
@@ -182,7 +182,7 @@ final class Connection_Endpoint extends Rest_API {
 			return [
 				'ok'      => false,
 				'status'  => 0,
-				'message' => __( 'Could not reach Search Cloud.', 'searcio' ),
+				'message' => __( 'Could not reach Searcio.', 'searcio' ),
 			];
 		}
 
@@ -243,7 +243,7 @@ final class Connection_Endpoint extends Rest_API {
 				'ok'      => false,
 				'flow'    => 'error',
 				'status'  => 0,
-				'message' => __( 'Could not reach Search Cloud.', 'searcio' ),
+				'message' => __( 'Could not reach Searcio.', 'searcio' ),
 			];
 		}
 
@@ -293,7 +293,7 @@ final class Connection_Endpoint extends Rest_API {
 
 	private function connect_error_message( Api_Response $response ): string {
 		if ( 409 === $response->status ) {
-			return __( 'This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below.', 'searcio' );
+			return __( 'This domain is already connected. Log into the Searcio dashboard to retrieve your keys and paste them below.', 'searcio' );
 		}
 
 		if ( 429 === $response->status ) {
@@ -301,7 +301,7 @@ final class Connection_Endpoint extends Rest_API {
 		}
 
 		if ( 503 === $response->status ) {
-			return __( 'Search Cloud cannot provision new accounts right now. Try again later.', 'searcio' );
+			return __( 'Searcio cannot provision new accounts right now. Try again later.', 'searcio' );
 		}
 
 		$body    = $response->body();
@@ -346,7 +346,7 @@ final class Connection_Endpoint extends Rest_API {
 	private function error_message( int $status ): string {
 		return match ( $status ) {
 			401     => __( 'Invalid write credentials. Check the write key and secret.', 'searcio' ),
-			403     => __( 'Site is disabled in Search Cloud.', 'searcio' ),
+			403     => __( 'Site is disabled in Searcio.', 'searcio' ),
 			404     => __( 'No site found for these credentials.', 'searcio' ),
 			default => __( 'Connection failed.', 'searcio' ),
 		};

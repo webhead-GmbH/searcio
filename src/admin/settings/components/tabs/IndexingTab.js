@@ -306,7 +306,7 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 						)}
 						help={sprintf(
 							/* translators: %s: post type label. */
-							__('When on, your %s are sent to Search Cloud and appear in search results.', 'searcio'),
+							__('When on, your %s are sent to Searcio and appear in search results.', 'searcio'),
 							postType.label.toLowerCase()
 						)}
 						checked={Boolean(block.enabled)}
@@ -332,7 +332,7 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 									/>
 									<SelectControl
 										label={__('Body text', 'searcio')}
-										description={__('The text Search Cloud looks through for matches.', 'searcio')}
+										description={__('The text Searcio looks through for matches.', 'searcio')}
 										value={selected(block.content_source)}
 										items={sourceOptions(sources, postType.taxonomies, true)}
 										onValueChange={(val) => set('content_source', val ?? NONE)}

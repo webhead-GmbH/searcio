@@ -9,7 +9,7 @@
  *   wp eval-file .../tests/e2e/seed-connection.php clear   # remove them
  *
  * `wp eval-file` runs this through eval(), so it must not declare strict_types.
- * The keys never reach Search Cloud - the test intercepts the health request.
+ * The keys never reach Searcio - the test intercepts the health request.
  *
  * @var array<int,string> $args
  *

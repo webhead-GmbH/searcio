@@ -1,4 +1,4 @@
-=== searcio - Fast AI Product Search for WooCommerce ===
+=== Searcio - Fast AI Product Search for WooCommerce ===
 Contributors: webheadgmbh, mohammad425
 Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
@@ -14,7 +14,7 @@ Fast, AI-powered search for WordPress and WooCommerce: instant results as you ty
 
 **Fast search. Smart answers.**
 
-searcio gives your WordPress site and WooCommerce store a full-screen search that finds the right product while your visitors are still typing. Results come with images, prices, sale badges and stock status, and the search itself runs on searcio's cloud, not on your server. Your store stays fast, even when everyone is searching at once.
+Searcio gives your WordPress site and WooCommerce store a full-screen search that finds the right product while your visitors are still typing. Results come with images, prices, sale badges and stock status, and the search itself runs on Searcio's cloud, not on your server. Your store stays fast, even when everyone is searching at once.
 
 Shoppers who know exactly what they want find it in a keystroke. Shoppers who don't can answer a few questions in the product finder, ask the AI shopping assistant, or simply upload a photo.
 
@@ -24,7 +24,7 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 
 * **Instant results** - results appear as visitors type (or when they press Enter, if you prefer), with autocomplete suggestions they can pick with the arrow keys.
 * **Forgives typos** - a misspelled search still finds the right product.
-* **Light on your server** - every search goes from the visitor's browser straight to searcio. Your WordPress database is not queried for a single search, so checkout and the rest of your site keep all the server they need.
+* **Light on your server** - every search goes from the visitor's browser straight to Searcio. Your WordPress database is not queried for a single search, so checkout and the rest of your site keep all the server they need.
 * **Loads only where it is used** - the search code is added only to pages that show a search box or icon.
 * **Always up to date** - a background sync sends only what changed, in small batches, picks up edits shortly after you save them, and tries again by itself when the service cannot be reached.
 
@@ -58,44 +58,44 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 
 = Get started in minutes =
 
-1. Install the plugin and open **Search Cloud** in your WordPress admin.
-2. Click **Connect to Search Cloud**. Your free searcio account is set up for you in one click, or the one you already have is found.
+1. Install the plugin and open **Searcio** in your WordPress admin.
+2. Click **Connect to Searcio**. Your free Searcio account is set up for you in one click, or the one you already have is found.
 3. Choose what should be searchable on the **Indexing** tab.
 4. Start your first sync on the **Sync** tab.
-5. Add the **Search Cloud** block or Elementor widget where your visitors look for search.
+5. Add the **Searcio Search** block or Elementor widget where your visitors look for search.
 
 = Support Searcio =
 
-A small searcio logo, linked to searcio.com, sits at the bottom of the search window. It is always shown on the Free plan; on a paid plan you can turn it off under Search Cloud > General.
+A small Searcio logo, linked to searcio.com, sits at the bottom of the search window. It is always shown on the Free plan; on a paid plan you can turn it off under Searcio > General.
 
 👉 Rate us on [WordPress](https://wordpress.org/support/plugin/searcio/reviews/#new-post)
 
-💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/webhead-search-cloud)
+💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/searcio)
 
 == Installation ==
 
-1. In your WordPress admin, go to **Plugins > Add New Plugin**, search for **searcio**, then install and activate it. Or upload the plugin zip under **Plugins > Add New Plugin > Upload Plugin**.
-2. Go to **Search Cloud** in the WordPress admin menu. A site that is not connected yet opens on the **Connection** tab.
-3. Accept the terms and click **Connect to Search Cloud**. Your free searcio account is set up with your admin email address. If you already have keys for this site, enter them under **Advanced: manual key entry** instead.
+1. In your WordPress admin, go to **Plugins > Add New Plugin**, search for **Searcio**, then install and activate it. Or upload the plugin zip under **Plugins > Add New Plugin > Upload Plugin**.
+2. Go to **Searcio** in the WordPress admin menu. A site that is not connected yet opens on the **Connection** tab.
+3. Accept the terms and click **Connect to Searcio**. Your free Searcio account is set up with your admin email address. If you already have keys for this site, enter them under **Advanced: manual key entry** instead.
 4. Open the **Indexing** tab and choose which content should be searchable.
 5. Open the **Sync** tab and start your first sync.
-6. Add the **Search Cloud** block to a page or template part (or the **Search Cloud** widget in Elementor) to place the search box or icon anywhere on your site.
+6. Add the **Searcio Search** block to a page or template part (or the **Searcio Search** widget in Elementor) to place the search box or icon anywhere on your site.
 
 == Frequently Asked Questions ==
 
 = Is it free? =
 
-Yes. The core search is free forever on searcio's Free plan, and no payment details are needed: instant results, typo tolerance, autocomplete, filters, merchandising, search redirects and the product finder, for 1,000 searches a month and 500 indexed documents. That is enough for many small shops and blogs.
+Yes. The core search is free forever on Searcio's Free plan, and no payment details are needed: instant results, typo tolerance, autocomplete, filters, merchandising, search redirects and the product finder, for 1,000 searches a month and 500 indexed documents. That is enough for many small shops and blogs.
 
 When you want AI search, the AI shopping assistant, photo search or higher limits, upgrade to a paid plan whenever you like. [See the plans and pricing](https://searcio.com/preise).
 
 = Do I have to sign up somewhere? =
 
-No sign-up form. The search runs on searcio, a hosted service, and connecting from the plugin sets up your free searcio account in one click with your admin email address, or finds the one you already have.
+No sign-up form. The search runs on Searcio, a hosted service, and connecting from the plugin sets up your free Searcio account in one click with your admin email address, or finds the one you already have.
 
 = Will it slow down my site? =
 
-No. Searches go from the visitor's browser straight to searcio, so your WordPress server and database are not involved in a single search. The search code loads only on pages that show a search box or icon, and the sync runs in the background in small batches.
+No. Searches go from the visitor's browser straight to Searcio, so your WordPress server and database are not involved in a single search. The search code loads only on pages that show a search box or icon, and the sync runs in the background in small batches.
 
 = Do I need WooCommerce? =
 
@@ -103,11 +103,11 @@ No. It searches posts, pages and custom post types on any WordPress site. With W
 
 = What happens when my plan's searches run out? =
 
-Your visitors can still search: the search window falls back to WordPress's own search until your allowance renews or you upgrade. searcio emails you before you reach a limit, and the Connection tab shows what your plan has used this month.
+Your visitors can still search: the search window falls back to WordPress's own search until your allowance renews or you upgrade. Searcio emails you before you reach a limit, and the Connection tab shows what your plan has used this month.
 
 = Does it work with my theme and page builder? =
 
-Yes. Use the Search Cloud block in the block editor or the Site Editor, or the Search Cloud widget in Elementor. The search window keeps its own layout on any theme while following your site's font, text size and text color.
+Yes. Use the Searcio Search block in the block editor or the Site Editor, or the Searcio Search widget in Elementor. The search window keeps its own layout on any theme while following your site's font, text size and text color.
 
 = Can I change how it looks? =
 
@@ -131,7 +131,7 @@ Your search data is hosted in the EU. Visitors' IP addresses are never stored in
 
 = What happens if I uninstall the plugin? =
 
-By default your settings and sync history stay in WordPress. Turn on **Delete plugin data on uninstall** under Search Cloud > General to remove them when you delete the plugin. Uninstalling never deletes documents already sent to searcio; disconnecting does.
+By default your settings and sync history stay in WordPress. Turn on **Delete plugin data on uninstall** under Searcio > General to remove them when you delete the plugin. Uninstalling never deletes documents already sent to Searcio; disconnecting does.
 
 == Screenshots ==
 
@@ -143,7 +143,7 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 6. The product finder asks a few questions...
 7. ...and shows the products that match the answers.
 8. Search by photo: upload a picture and find products that look like it.
-9. The Search Cloud block and its settings in the block editor.
+9. The Searcio Search block and its settings in the block editor.
 10. Style every part of the search window from the block's Styles panel.
 11. Sync: the progress of the current sync and the history of past ones.
 12. Indexing: choose which content and which WooCommerce details are searchable.
@@ -153,11 +153,11 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 
 == External services ==
 
-This plugin sends data to searcio (webhead Search Cloud), the hosted service that powers the search. Search does not work without it.
+This plugin sends data to Searcio, the hosted service that powers the search. Search does not work without it.
 
-* **When you connect:** the site's name and address, and the email address and name of the admin who connects. Search Cloud uses them to create your account, or to find the one you have.
+* **When you connect:** the site's name and address, and the email address and name of the admin who connects. Searcio uses them to create your account, or to find the one you have.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
-* **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Search Cloud stores and applies.
+* **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Searcio stores and applies.
 * **When a visitor searches:** the search term, and which result they open. Their browser contacts the service directly, so their IP address is visible to it.
 * **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
 * **When a visitor searches by photo** (off unless you turn it on): the photo they upload.

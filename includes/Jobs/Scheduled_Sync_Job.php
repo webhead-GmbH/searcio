@@ -2,7 +2,7 @@
 /**
  * Recurring scheduled full sync.
  *
- * Daily, per-site, lock-aware. It also asks Search Cloud for the plan tier
+ * Daily, per-site, lock-aware. It also asks Searcio for the plan tier
  * once a day. It does not do the work itself - it asks the sync
  * service to start a run when the site is connected and idle (and applies the
  * history retention policy). The heavy lifting happens in the resumable tick
@@ -41,7 +41,7 @@ final class Scheduled_Sync_Job implements Job {
 	) {}
 
 	public function __invoke( mixed ...$args ): void {
-		// The plan tier decides whether the storefront shows the searcio
+		// The plan tier decides whether the storefront shows the Searcio
 		// logo, and an admin screen is not opened every day: a plan that
 		// changed is noticed here within a day.
 		if ( $this->client->is_configured() ) {

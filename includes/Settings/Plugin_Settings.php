@@ -3,7 +3,7 @@
  * Plugin Settings.
  *
  * Single source of truth for option keys, defaults, schema, and REST exposure.
- * The Search Cloud connection credentials live here as masked settings. The
+ * The Searcio connection credentials live here as masked settings. The
  * write key and write secret are encrypted at rest through an idempotent
  * sanitize callback (so a re-saved, unchanged masked value is not encrypted
  * twice) and decrypted at the point of use with {@see self::decrypt_secret()}.
@@ -80,7 +80,7 @@ final class Plugin_Settings {
 	public const CONNECT_IDEMPOTENCY_KEY = 'connect_idempotency_key';
 
 	/**
-	 * When this site last asked Search Cloud to connect it, as a Unix timestamp.
+	 * When this site last asked Searcio to connect it, as a Unix timestamp.
 	 *
 	 * The domain-ownership ping arrives a couple of minutes later and is the
 	 * only legitimate caller of the public `/verify` route, so this bounds how
@@ -97,7 +97,7 @@ final class Plugin_Settings {
 
 	/**
 	 * Set when `/connect` returns `pending_claim` (the admin email already has a
-	 * Search Cloud account) so the Connection tab can keep showing the
+	 * Searcio account) so the Connection tab can keep showing the
 	 * "check your inbox" notice across page reloads. Cleared once working
 	 * credentials are saved and pass a health check.
 	 */
@@ -137,7 +137,7 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_index_config',
 		show_in_rest: false,
 		label: 'Indexing configuration',
-		description: 'Per-post-type field mapping pushed to Search Cloud.'
+		description: 'Per-post-type field mapping pushed to Searcio.'
 	)]
 	public const INDEX_CONFIG = 'index_config';
 
@@ -173,7 +173,7 @@ final class Plugin_Settings {
 	public const SYNC_RETENTION_DAYS = 'sync_retention_days';
 
 	/**
-	 * Local mirror of Search Cloud's own `search-config.languages`, refreshed
+	 * Local mirror of Searcio's own `search-config.languages`, refreshed
 	 * by {@see \Webhead\WP\SearchCloud\Routing\Search_Config_Endpoint} on every
 	 * read/write of that resource. Kept out of REST since it isn't managed
 	 * directly on the generic settings screen; mirroring it locally lets
@@ -187,14 +187,14 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_enabled_languages',
 		show_in_rest: false,
 		label: 'Enabled languages',
-		description: "Local mirror of Search Cloud's configured languages.",
+		description: "Local mirror of Searcio's configured languages.",
 		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
 	)]
 	public const ENABLED_LANGUAGES = 'enabled_languages';
 
 	/**
 	 * Curated fallback queries shown in the modal's empty-query state until the
-	 * Search Cloud API ships a popular/trending-searches endpoint.
+	 * Searcio API ships a popular/trending-searches endpoint.
 	 */
 	#[Setting(
 		type: 'array',
@@ -212,7 +212,7 @@ final class Plugin_Settings {
 	 * Off by default: uninstalling the plugin keeps its settings, tables, and
 	 * per-post sync metadata untouched. Turning this on only affects data
 	 * stored in this WordPress site; it never deletes documents already sent
-	 * to Search Cloud.
+	 * to Searcio.
 	 */
 	#[Setting(
 		type: 'boolean',
@@ -220,12 +220,12 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_delete_data_on_uninstall',
 		show_in_rest: true,
 		label: 'Delete plugin data on uninstall',
-		description: 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud.'
+		description: 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio.'
 	)]
 	public const DELETE_DATA_ON_UNINSTALL = 'delete_data_on_uninstall';
 
 	/**
-	 * Whether the search window shows the searcio logo, linked to searcio.com.
+	 * Whether the search window shows the Searcio logo, linked to searcio.com.
 	 * On a Free plan it is shown whatever this says, see
 	 * {@see \Webhead\WP\SearchCloud\Frontend\Frontend_Config}. The General
 	 * tab draws it in a card of its own, which knows the plan, so it is not one
@@ -237,12 +237,12 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_support_searcio',
 		show_in_rest: true,
 		label: 'Support Searcio',
-		description: 'Show the searcio logo, linked to searcio.com, in the search window.'
+		description: 'Show the Searcio logo, linked to searcio.com, in the search window.'
 	)]
 	public const SUPPORT_SEARCIO = 'support_searcio';
 
 	/**
-	 * The plan tier Search Cloud last named in `/health`, `free` or `paid`, so a
+	 * The plan tier Searcio last named in `/health`, `free` or `paid`, so a
 	 * storefront page can tell without asking the service. Empty until the
 	 * first health check after connecting, and again after disconnecting.
 	 * Written by {@see \Webhead\WP\SearchCloud\Connection\Connection_State::remember_plan()}.
@@ -253,7 +253,7 @@ final class Plugin_Settings {
 		option_key: 'webhead_search_cloud_plan_tier',
 		show_in_rest: false,
 		label: 'Plan tier',
-		description: 'Local mirror of the Search Cloud plan tier.',
+		description: 'Local mirror of the Searcio plan tier.',
 		schema: [ 'enum' => [ '', 'free', 'paid' ] ]
 	)]
 	public const PLAN_TIER = 'plan_tier';
@@ -279,7 +279,7 @@ final class Plugin_Settings {
 			],
 			self::DELETE_DATA_ON_UNINSTALL => [
 				'label'       => __( 'Delete plugin data on uninstall', 'searcio' ),
-				'description' => __( 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud.', 'searcio' ),
+				'description' => __( 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio.', 'searcio' ),
 			],
 		];
 	}

@@ -96,11 +96,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						/>
 						<SelectControl
 							label={ __( 'Card source', 'searcio' ) }
-							description={ __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'searcio' ) }
+							description={ __( "Design templates per content type in the Searcio panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'searcio' ) }
 							value={ cardSource }
 							items={ [
 								{ value: 'plugin', label: __( 'Plugin templates', 'searcio' ) },
-								{ value: 'server', label: __( 'Search Cloud templates', 'searcio' ) },
+								{ value: 'server', label: __( 'Searcio templates', 'searcio' ) },
 							] }
 							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
 						/>
@@ -404,8 +404,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					<Icon icon={ SearchIcon } size={ 22 } />
 					<span>
 						{ 'box' === mode
-							? __( 'Search Cloud - search box', 'searcio' )
-							: __( 'Search Cloud - search icon', 'searcio' ) }
+							? __( 'Searcio - search box', 'searcio' )
+							: __( 'Searcio - search icon', 'searcio' ) }
 					</span>
 				</span>
 			</div>

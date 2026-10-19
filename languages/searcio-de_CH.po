@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: searcio - Fast AI Product Search for WooCommerce\n"
+"Project-Id-Version: Searcio - Fast AI Product Search for WooCommerce\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/searcio\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -10,48 +10,44 @@ msgstr ""
 "X-Domain: searcio\n"
 
 #. Plugin Name of the plugin
-#: webhead-search-cloud.php
-msgid "searcio - Fast AI Product Search for WooCommerce"
-msgstr "searcio - Schnelle KI-Produktsuche für WooCommerce"
+#: searcio.php
+msgid "Searcio - Fast AI Product Search for WooCommerce"
+msgstr "Searcio - Schnelle KI-Produktsuche für WooCommerce"
 
 #. Plugin URI of the plugin
-#: webhead-search-cloud.php
-msgid "https://github.com/webhead-GmbH/webhead-search-cloud"
-msgstr "https://github.com/webhead-GmbH/webhead-search-cloud"
+#: searcio.php
+msgid "https://wordpress.org/plugins/searcio/"
+msgstr "https://wordpress.org/plugins/searcio/"
 
 #. Description of the plugin
-#: webhead-search-cloud.php
+#: searcio.php
 #: includes/Admin/Settings_Page.php:127
-msgid "Connect WordPress and WooCommerce to webhead Search Cloud."
-msgstr "Verbindet WordPress und WooCommerce mit webhead Search Cloud."
+msgid "Connect WordPress and WooCommerce to Searcio."
+msgstr "Verbindet WordPress und WooCommerce mit Searcio."
 
 #. Author of the plugin
-#: webhead-search-cloud.php
+#: searcio.php
 msgid "webhead GmbH"
 msgstr "webhead GmbH"
 
 #. Author URI of the plugin
-#: webhead-search-cloud.php
+#: searcio.php
 msgid "https://webhead.at"
 msgstr "https://webhead.at"
 
 #: includes/Admin/Settings_Page.php:45
-#: includes/Elementor/Widgets/Search_Widget.php:68
-msgid "Search Cloud"
-msgstr "Search Cloud"
-
 #: includes/Admin/Settings_Page.php:49
 #: includes/Admin/Settings_Page.php:126
 #: includes/Plugin.php:419
 #: src/admin/settings/components/SettingsPanel.js:177
-msgid "webhead Search Cloud"
-msgstr "webhead Search Cloud"
+msgid "Searcio"
+msgstr "Searcio"
 
 #. translators: 1: detected WooCommerce version, 2: required minimum version.
 #: includes/Compatibility/Woo_Compatibility.php:58
 #, php-format
-msgid "webhead Search Cloud: WooCommerce %1$s is below the supported minimum %2$s. Product indexing is disabled until WooCommerce is updated; other content indexing still works."
-msgstr "webhead Search Cloud: WooCommerce %1$s liegt unter dem unterstützten Mindestwert %2$s. Die Produktindexierung ist deaktiviert, bis WooCommerce aktualisiert wird; die Indexierung anderer Inhalte funktioniert weiterhin."
+msgid "Searcio: WooCommerce %1$s is below the supported minimum %2$s. Product indexing is disabled until WooCommerce is updated; other content indexing still works."
+msgstr "Searcio: WooCommerce %1$s liegt unter dem unterstützten Mindestwert %2$s. Die Produktindexierung ist deaktiviert, bis WooCommerce aktualisiert wird; die Indexierung anderer Inhalte funktioniert weiterhin."
 
 #: includes/Compatibility/Woo_Compatibility.php:59
 #: src/admin/settings/components/tabs/IndexingTab.js:191
@@ -59,8 +55,8 @@ msgid "(unknown)"
 msgstr "(unbekannt)"
 
 #: includes/Elementor/Widgets/Products_Widget.php:37
-msgid "Search Cloud Products"
-msgstr "Search Cloud-Produkte"
+msgid "Searcio Products"
+msgstr "Searcio-Produkte"
 
 #: includes/Elementor/Widgets/Products_Widget.php:57
 #: src/blocks/products/edit.js:32
@@ -172,8 +168,12 @@ msgstr "Plugin-Vorlagen"
 #: includes/Elementor/Widgets/Search_Widget.php:237
 #: src/blocks/products/edit.js:125
 #: src/blocks/search/edit.js:103
-msgid "Search Cloud templates"
-msgstr "Search Cloud-Vorlagen"
+msgid "Searcio templates"
+msgstr "Searcio-Vorlagen"
+
+#: includes/Elementor/Widgets/Search_Widget.php:68
+msgid "Searcio Search"
+msgstr "Searcio-Suche"
 
 #: includes/Elementor/Widgets/Search_Widget.php:121
 #: includes/Elementor/Widgets/Search_Widget.php:362
@@ -292,8 +292,8 @@ msgstr "Ergebnisse"
 
 #: includes/Elementor/Widgets/Search_Widget.php:239
 #: src/blocks/search/edit.js:99
-msgid "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card."
-msgstr "Gestalte Vorlagen pro Inhaltstyp im Card-Builder des Search Cloud-Panels. Jeder Typ ohne veröffentlichte Vorlage dort verwendet stattdessen die eigene Karte dieses Plugins."
+msgid "Design templates per content type in the Searcio panel's card builder. Any type without a published template there falls back to this plugin's own card."
+msgstr "Gestalte Vorlagen pro Inhaltstyp im Card-Builder des Searcio-Panels. Jeder Typ ohne veröffentlichte Vorlage dort verwendet stattdessen die eigene Karte dieses Plugins."
 
 #: includes/Elementor/Widgets/Search_Widget.php:246
 #: src/blocks/search/edit.js:108
@@ -1111,40 +1111,41 @@ msgstr "Per Sprache suchen"
 msgid "All"
 msgstr "Alle"
 
-#. translators: %s: the name of the search service, "searcio".
+#. translators: %s: the name of the search service, "Searcio".
 #: includes/Frontend/Frontend_Config.php:137
 #, php-format
 msgid "Search by %s (opens in a new tab)"
 msgstr "Suche von %s (öffnet in einem neuen Tab)"
 
 #: includes/Health/Health_Tests.php:80
-msgid "webhead Search Cloud connection"
-msgstr "webhead Search Cloud-Verbindung"
+#: src/admin/settings/components/tabs/ConnectionTab.js:225
+msgid "Searcio connection"
+msgstr "Searcio-Verbindung"
 
 #: includes/Health/Health_Tests.php:81
-msgid "webhead Search Cloud reachability"
-msgstr "Erreichbarkeit von webhead Search Cloud"
+msgid "Searcio reachability"
+msgstr "Erreichbarkeit von Searcio"
 
 #: includes/Health/Health_Tests.php:82
-msgid "webhead Search Cloud indexing"
-msgstr "webhead Search Cloud-Indexierung"
+msgid "Searcio indexing"
+msgstr "Searcio-Indexierung"
 
 #: includes/Health/Health_Tests.php:83
-msgid "webhead Search Cloud language coverage"
-msgstr "Sprachabdeckung von webhead Search Cloud"
+msgid "Searcio language coverage"
+msgstr "Sprachabdeckung von Searcio"
 
 #: includes/Health/Health_Tests.php:102
 #: includes/Health/Health_Tests.php:123
-msgid "webhead Search Cloud is not connected yet"
-msgstr "webhead Search Cloud ist noch nicht verbunden"
+msgid "Searcio is not connected yet"
+msgstr "Searcio ist noch nicht verbunden"
 
 #: includes/Health/Health_Tests.php:104
 msgid "Add your site ID, write key, and write secret on the Connection tab before syncing content."
 msgstr "Trage Website-ID, Write Key und Write Secret im Tab \"Verbindung\" ein, bevor du Inhalte synchronisierst."
 
 #: includes/Health/Health_Tests.php:110
-msgid "webhead Search Cloud connection is configured"
-msgstr "webhead Search Cloud-Verbindung ist eingerichtet"
+msgid "Searcio connection is configured"
+msgstr "Searcio-Verbindung ist eingerichtet"
 
 #: includes/Health/Health_Tests.php:112
 msgid "Connection credentials are saved."
@@ -1155,16 +1156,16 @@ msgid "Connect the plugin on the Connection tab, then re-run this check."
 msgstr "Verbinde das Plugin im Tab \"Verbindung\" und führe diese Prüfung dann erneut aus."
 
 #: includes/Health/Health_Tests.php:134
-msgid "webhead Search Cloud could not be reached"
-msgstr "webhead Search Cloud konnte nicht erreicht werden"
+msgid "Searcio could not be reached"
+msgstr "Searcio konnte nicht erreicht werden"
 
 #: includes/Health/Health_Tests.php:136
-msgid "The health check to Search Cloud failed. Check the Connection tab and verify your credentials."
-msgstr "Der Health-Check zu Search Cloud ist fehlgeschlagen. Prüfe den Tab \"Verbindung\" und deine Zugangsdaten."
+msgid "The health check to Searcio failed. Check the Connection tab and verify your credentials."
+msgstr "Der Health-Check zu Searcio ist fehlgeschlagen. Prüfe den Tab \"Verbindung\" und deine Zugangsdaten."
 
 #: includes/Health/Health_Tests.php:142
-msgid "webhead Search Cloud is reachable"
-msgstr "webhead Search Cloud ist erreichbar"
+msgid "Searcio is reachable"
+msgstr "Searcio ist erreichbar"
 
 #: includes/Health/Health_Tests.php:144
 msgid "The last health check succeeded."
@@ -1235,8 +1236,8 @@ msgid "Enabled languages"
 msgstr "Aktivierte Sprachen"
 
 #: includes/Health/Runtime_Diagnostics.php:89
-msgid "webhead Search Cloud runtime"
-msgstr "webhead Search Cloud-Laufzeit"
+msgid "Searcio runtime"
+msgstr "Searcio-Laufzeit"
 
 #: includes/Health/Runtime_Diagnostics.php:90
 msgid "Connection, indexing, and sync state for support and debugging. Credentials are never included."
@@ -1278,30 +1279,30 @@ msgid "You must accept the Terms of Service and Privacy Policy to connect."
 msgstr "Du musst die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren, um die Verbindung herzustellen."
 
 #: includes/Routing/Connection_Endpoint.php:151
-msgid "Could not reach Search Cloud. Try again."
-msgstr "Search Cloud konnte nicht erreicht werden. Versuche es erneut."
+msgid "Could not reach Searcio. Try again."
+msgstr "Searcio konnte nicht erreicht werden. Versuche es erneut."
 
 #: includes/Routing/Connection_Endpoint.php:158
-msgid "Could not disconnect from Search Cloud. Try again."
-msgstr "Die Verbindung zu Search Cloud konnte nicht getrennt werden. Versuche es erneut."
+msgid "Could not disconnect from Searcio. Try again."
+msgstr "Die Verbindung zu Searcio konnte nicht getrennt werden. Versuche es erneut."
 
 #: includes/Routing/Connection_Endpoint.php:185
 #: includes/Routing/Connection_Endpoint.php:246
 #: includes/Routing/Search_Config_Endpoint.php:74
-msgid "Could not reach Search Cloud."
-msgstr "Search Cloud konnte nicht erreicht werden."
+msgid "Could not reach Searcio."
+msgstr "Searcio konnte nicht erreicht werden."
 
 #: includes/Routing/Connection_Endpoint.php:296
-msgid "This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below."
-msgstr "Diese Domain ist bereits verbunden. Melde dich im Search Cloud-Dashboard an, um deine Schlüssel abzurufen, und füge sie unten ein."
+msgid "This domain is already connected. Log into the Searcio dashboard to retrieve your keys and paste them below."
+msgstr "Diese Domain ist bereits verbunden. Melde dich im Searcio-Dashboard an, um deine Schlüssel abzurufen, und füge sie unten ein."
 
 #: includes/Routing/Connection_Endpoint.php:300
 msgid "Too many connect attempts. Wait a while and try again."
 msgstr "Zu viele Verbindungsversuche. Warte eine Weile und versuche es dann erneut."
 
 #: includes/Routing/Connection_Endpoint.php:304
-msgid "Search Cloud cannot provision new accounts right now. Try again later."
-msgstr "Search Cloud kann gerade keine neuen Konten anlegen. Versuche es später erneut."
+msgid "Searcio cannot provision new accounts right now. Try again later."
+msgstr "Searcio kann gerade keine neuen Konten anlegen. Versuche es später erneut."
 
 #: includes/Routing/Connection_Endpoint.php:312
 #: includes/Routing/Connection_Endpoint.php:351
@@ -1314,8 +1315,8 @@ msgid "Invalid write credentials. Check the write key and secret."
 msgstr "Ungültige Write-Zugangsdaten. Prüfe Write Key und Write Secret."
 
 #: includes/Routing/Connection_Endpoint.php:349
-msgid "Site is disabled in Search Cloud."
-msgstr "Die Website ist in Search Cloud deaktiviert."
+msgid "Site is disabled in Searcio."
+msgstr "Die Website ist in Searcio deaktiviert."
 
 #: includes/Routing/Connection_Endpoint.php:350
 msgid "No site found for these credentials."
@@ -1373,18 +1374,18 @@ msgid "Delete plugin data on uninstall"
 msgstr "Plugin-Daten bei Deinstallation löschen"
 
 #: includes/Settings/Plugin_Settings.php:282
-msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud."
-msgstr "Wenn aktiviert, entfernt das Löschen dieses Plugins auch dessen Einstellungen, Sync-Tabellen und Beitrags-Sync-Metadaten von dieser Website. Bereits an Search Cloud gesendete Dokumente werden dabei nie gelöscht."
+msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio."
+msgstr "Wenn aktiviert, entfernt das Löschen dieses Plugins auch dessen Einstellungen, Sync-Tabellen und Beitrags-Sync-Metadaten von dieser Website. Bereits an Searcio gesendete Dokumente werden dabei nie gelöscht."
 
 #: includes/Sync/Incremental_Service.php:209
-msgid "Incremental sync paused: your Search Cloud plan limit was reached."
-msgstr "Inkrementelle Synchronisierung pausiert: Dein Search Cloud-Tariflimit wurde erreicht."
+msgid "Incremental sync paused: your Searcio plan limit was reached."
+msgstr "Inkrementelle Synchronisierung pausiert: Dein Searcio-Tariflimit wurde erreicht."
 
 #. translators: %s: transport error message.
 #: includes/Sync/Incremental_Service.php:222
 #, php-format
-msgid "Could not reach Search Cloud: %s"
-msgstr "Search Cloud konnte nicht erreicht werden: %s"
+msgid "Could not reach Searcio: %s"
+msgstr "Searcio konnte nicht erreicht werden: %s"
 
 #. translators: 1: document id, 2: HTTP status code.
 #: includes/Sync/Incremental_Service.php:230
@@ -1396,12 +1397,12 @@ msgstr "%1$s konnte nicht aus dem Index entfernt werden (HTTP %2$d)."
 #. translators: %d: HTTP status code.
 #: includes/Sync/Incremental_Service.php:238
 #, php-format
-msgid "Search Cloud rejected the update (HTTP %d)."
-msgstr "Search Cloud hat die Aktualisierung abgelehnt (HTTP %d)."
+msgid "Searcio rejected the update (HTTP %d)."
+msgstr "Searcio hat die Aktualisierung abgelehnt (HTTP %d)."
 
 #: includes/Sync/Sync_Service.php:110
-msgid "Add and save your Search Cloud credentials before syncing."
-msgstr "Trage deine Search Cloud-Zugangsdaten ein und speichere sie, bevor du synchronisierst."
+msgid "Add and save your Searcio credentials before syncing."
+msgstr "Trage deine Searcio-Zugangsdaten ein und speichere sie, bevor du synchronisierst."
 
 #: includes/Sync/Sync_Service.php:119
 #: src/admin/settings/components/tabs/SyncTab.js:199
@@ -1423,32 +1424,32 @@ msgid "Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce wha
 msgstr "Tariflimit für %1$s erreicht (Limit %2$s). Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
 
 #: includes/Sync/Sync_Service.php:885
-msgid "Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
-msgstr "Dein Search Cloud-Tariflimit wurde erreicht. Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
+msgid "Your Searcio plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
+msgstr "Dein Searcio-Tariflimit wurde erreicht. Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
 
 #. translators: %s: a length of time, such as "5 mins".
 #: includes/Sync/Sync_Service.php:899
 #, php-format
-msgid "Could not reach Search Cloud. The sync tries again in %s."
-msgstr "Search Cloud konnte nicht erreicht werden. Die Synchronisierung versucht es in %s erneut."
+msgid "Could not reach Searcio. The sync tries again in %s."
+msgstr "Searcio konnte nicht erreicht werden. Die Synchronisierung versucht es in %s erneut."
 
 #. translators: 1: HTTP status code, 2: a length of time, such as "5 mins".
 #: includes/Sync/Sync_Service.php:906
 #, php-format
-msgid "Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s."
-msgstr "Search Cloud hat einen Fehler zurückgegeben (HTTP %1$d). Die Synchronisierung versucht es in %2$s erneut."
+msgid "Searcio returned an error (HTTP %1$d). The sync tries again in %2$s."
+msgstr "Searcio hat einen Fehler zurückgegeben (HTTP %1$d). Die Synchronisierung versucht es in %2$s erneut."
 
 #. translators: %d: number of tries.
 #: includes/Sync/Sync_Service.php:921
 #, php-format
-msgid "Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers."
-msgstr "Search Cloud konnte in %d Versuchen nicht erreicht werden, deshalb wurde diese Synchronisierung beendet. Die nächste geplante Synchronisierung beginnt von vorn; zwischenzeitliche Änderungen werden gesendet, sobald Search Cloud wieder antwortet."
+msgid "Could not reach Searcio in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Searcio answers."
+msgstr "Searcio konnte in %d Versuchen nicht erreicht werden, deshalb wurde diese Synchronisierung beendet. Die nächste geplante Synchronisierung beginnt von vorn; zwischenzeitliche Änderungen werden gesendet, sobald Searcio wieder antwortet."
 
 #. translators: 1: HTTP status code, 2: number of tries.
 #: includes/Sync/Sync_Service.php:928
 #, php-format
-msgid "Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers."
-msgstr "Search Cloud hat in %2$d Versuchen einen Fehler zurückgegeben (HTTP %1$d), deshalb wurde diese Synchronisierung beendet. Die nächste geplante Synchronisierung beginnt von vorn; zwischenzeitliche Änderungen werden gesendet, sobald Search Cloud wieder antwortet."
+msgid "Searcio returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Searcio answers."
+msgstr "Searcio hat in %2$d Versuchen einen Fehler zurückgegeben (HTTP %1$d), deshalb wurde diese Synchronisierung beendet. Die nächste geplante Synchronisierung beginnt von vorn; zwischenzeitliche Änderungen werden gesendet, sobald Searcio wieder antwortet."
 
 #: includes/WP_CLI/Sync_Command.php:125
 #: includes/WP_CLI/Sync_Command.php:199
@@ -1588,20 +1589,20 @@ msgid "How connecting works"
 msgstr "So funktioniert das Verbinden"
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:38
-msgid "How connecting to Search Cloud works"
-msgstr "So funktioniert die Verbindung mit Search Cloud"
+msgid "How connecting to Searcio works"
+msgstr "So funktioniert die Verbindung mit Searcio"
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:43
-msgid "Clicking Connect sends the email address shown on the Connection tab (or the one you enter under \"Not this email?\") to Search Cloud, along with this site's address."
-msgstr "Ein Klick auf \"Verbinden\" sendet die im Tab \"Verbindung\" angezeigte E-Mail-Adresse (oder die, die du unter \"Nicht diese E-Mail-Adresse?\" eingibst) zusammen mit der Adresse dieser Website an Search Cloud."
+msgid "Clicking Connect sends the email address shown on the Connection tab (or the one you enter under \"Not this email?\") to Searcio, along with this site's address."
+msgstr "Ein Klick auf \"Verbinden\" sendet die im Tab \"Verbindung\" angezeigte E-Mail-Adresse (oder die, die du unter \"Nicht diese E-Mail-Adresse?\" eingibst) zusammen mit der Adresse dieser Website an Searcio."
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:49
-msgid "If that email has no Search Cloud account yet, one is created automatically and this site is connected right away - no further steps."
-msgstr "Hat diese E-Mail-Adresse noch kein Search Cloud-Konto, wird automatisch eins erstellt und diese Website sofort verbunden - ohne weitere Schritte."
+msgid "If that email has no Searcio account yet, one is created automatically and this site is connected right away - no further steps."
+msgstr "Hat diese E-Mail-Adresse noch kein Searcio-Konto, wird automatisch eins erstellt und diese Website sofort verbunden - ohne weitere Schritte."
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:55
-msgid "If that email already has a Search Cloud account, nothing is created or changed yet. Search Cloud emails a confirmation link to that address; once its owner clicks it, they choose which account to connect this site to. Come back here afterwards and paste the resulting keys into \"Advanced: manual key entry\" below."
-msgstr "Hat diese E-Mail-Adresse bereits ein Search Cloud-Konto, wird vorerst nichts erstellt oder geändert. Search Cloud sendet einen Bestätigungslink an diese Adresse; nach dem Klick darauf lässt sich auswählen, mit welchem Konto diese Website verbunden wird. Komm danach hierher zurück und füge die erhaltenen Schlüssel unten unter \"Erweitert: Schlüssel manuell eingeben\" ein."
+msgid "If that email already has a Searcio account, nothing is created or changed yet. Searcio emails a confirmation link to that address; once its owner clicks it, they choose which account to connect this site to. Come back here afterwards and paste the resulting keys into \"Advanced: manual key entry\" below."
+msgstr "Hat diese E-Mail-Adresse bereits ein Searcio-Konto, wird vorerst nichts erstellt oder geändert. Searcio sendet einen Bestätigungslink an diese Adresse; nach dem Klick darauf lässt sich auswählen, mit welchem Konto diese Website verbunden wird. Komm danach hierher zurück und füge die erhaltenen Schlüssel unten unter \"Erweitert: Schlüssel manuell eingeben\" ein."
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:61
 msgid "Accepting the Terms of Service and Privacy Policy is required to continue. Accepting the Data Processing Agreement is optional."
@@ -1621,7 +1622,7 @@ msgstr "unbegrenzt"
 msgid "Connected."
 msgstr "Verbunden."
 
-#. translators: %d: the Search Cloud site id.
+#. translators: %d: the Searcio site id.
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:33
 #, js-format
 msgid " (site #%d)"
@@ -1637,8 +1638,8 @@ msgid "The test request failed."
 msgstr "Die Testanfrage ist fehlgeschlagen."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:188
-msgid "Disconnected from Search Cloud."
-msgstr "Verbindung zu Search Cloud getrennt."
+msgid "Disconnected from Searcio."
+msgstr "Verbindung zu Searcio getrennt."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:191
 msgid "Could not disconnect."
@@ -1649,8 +1650,8 @@ msgid "Connecting…"
 msgstr "Wird verbunden …"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:202
-msgid "Connect to Search Cloud"
-msgstr "Mit Search Cloud verbinden"
+msgid "Connect to Searcio"
+msgstr "Mit Searcio verbinden"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:213
 msgid "Advanced: manual key entry / rotate keys"
@@ -1660,13 +1661,9 @@ msgstr "Erweitert: Schlüssel manuell eingeben / erneuern"
 msgid "Advanced: manual key entry"
 msgstr "Erweitert: Schlüssel manuell eingeben"
 
-#: src/admin/settings/components/tabs/ConnectionTab.js:225
-msgid "Search Cloud connection"
-msgstr "Search Cloud-Verbindung"
-
 #: src/admin/settings/components/tabs/ConnectionTab.js:226
-msgid "Connect this site to webhead Search Cloud to start syncing content and enable search."
-msgstr "Verbinde diese Website mit webhead Search Cloud, um Inhalte zu synchronisieren und die Suche zu aktivieren."
+msgid "Connect this site to Searcio to start syncing content and enable search."
+msgstr "Verbinde diese Website mit Searcio, um Inhalte zu synchronisieren und die Suche zu aktivieren."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:250
 msgid "Disconnect"
@@ -1675,8 +1672,8 @@ msgstr "Trennen"
 #. translators: %s: the email address a confirmation link was sent to.
 #: src/admin/settings/components/tabs/ConnectionTab.js:263
 #, js-format
-msgid "An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below."
-msgstr "Für %s gibt es bereits ein Konto. Sieh in diesem Postfach nach dem Bestätigungslink, schliesse die Verbindung im Search Cloud-Dashboard ab und füge dann die erhaltenen Schlüssel unten ein."
+msgid "An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Searcio dashboard, then paste the resulting keys below."
+msgstr "Für %s gibt es bereits ein Konto. Sieh in diesem Postfach nach dem Bestätigungslink, schliesse die Verbindung im Searcio-Dashboard ab und füge dann die erhaltenen Schlüssel unten ein."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:291
 msgid "Accept the Terms of Service and Privacy Policy to continue."
@@ -1693,8 +1690,8 @@ msgstr "Ich akzeptiere den Auftragsverarbeitungsvertrag (optional)"
 #. translators: %s: the email address used to connect.
 #: src/admin/settings/components/tabs/ConnectionTab.js:333
 #, js-format
-msgid "You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account."
-msgstr "Du verbindest dich mit %s. Gibt es dafür noch kein Search Cloud-Konto, wird ein neues erstellt; andernfalls wird diese Website mit dem vorhandenen Konto verbunden."
+msgid "You'll connect using %s. A new Searcio account is created if it doesn't have one yet; otherwise this site connects to its existing account."
+msgstr "Du verbindest dich mit %s. Gibt es dafür noch kein Searcio-Konto, wird ein neues erstellt; andernfalls wird diese Website mit dem vorhandenen Konto verbunden."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:336
 msgid "An admin email is required to connect."
@@ -1721,12 +1718,12 @@ msgid "Company name (optional)"
 msgstr "Firmenname (optional)"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:371
-msgid "Used as the Search Cloud account name."
-msgstr "Wird als Name des Search Cloud-Kontos verwendet."
+msgid "Used as the Searcio account name."
+msgstr "Wird als Name des Searcio-Kontos verwendet."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:390
-msgid "Disconnect from Search Cloud?"
-msgstr "Verbindung zu Search Cloud trennen?"
+msgid "Disconnect from Searcio?"
+msgstr "Verbindung zu Searcio trennen?"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:397
 #: src/admin/settings/components/tabs/SyncHistory.js:289
@@ -1740,8 +1737,8 @@ msgid "Disconnect and delete the index"
 msgstr "Trennen und Index löschen"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:409
-msgid "This removes the site from Search Cloud and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted."
-msgstr "Dadurch wird die Website aus Search Cloud entfernt und ihr Suchindex dort endgültig gelöscht. Der Shop verwendet wieder die eigene Suche von WordPress, bis du dich erneut verbindest und eine Synchronisierung ausführst. In WordPress wird nichts gelöscht."
+msgid "This removes the site from Searcio and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted."
+msgstr "Dadurch wird die Website aus Searcio entfernt und ihr Suchindex dort endgültig gelöscht. Der Shop verwendet wieder die eigene Suche von WordPress, bis du dich erneut verbindest und eine Synchronisierung ausführst. In WordPress wird nichts gelöscht."
 
 #: src/admin/settings/components/tabs/IndexingSkeleton.js:9
 msgid "Loading the indexing configuration"
@@ -1887,8 +1884,8 @@ msgstr "%s zur Suche hinzufügen"
 #. translators: %s: post type label.
 #: src/admin/settings/components/tabs/IndexingTab.js:309
 #, js-format
-msgid "When on, your %s are sent to Search Cloud and appear in search results."
-msgstr "Wenn aktiviert, werden deine %s an Search Cloud gesendet und erscheinen in den Suchergebnissen."
+msgid "When on, your %s are sent to Searcio and appear in search results."
+msgstr "Wenn aktiviert, werden deine %s an Searcio gesendet und erscheinen in den Suchergebnissen."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:319
 msgid "What appears in results"
@@ -1912,8 +1909,8 @@ msgid "Body text"
 msgstr "Fliesstext"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:335
-msgid "The text Search Cloud looks through for matches."
-msgstr "Der Text, den Search Cloud nach Treffern durchsucht."
+msgid "The text Searcio looks through for matches."
+msgstr "Der Text, den Searcio nach Treffern durchsucht."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:341
 msgid "Result link"
@@ -2045,8 +2042,8 @@ msgid "Save connection"
 msgstr "Verbindung speichern"
 
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:92
-msgid "Enter the credentials from your site page in the Search Cloud app. The write key and secret are stored encrypted and never sent to the browser in clear text."
-msgstr "Gib die Zugangsdaten von der Seite deiner Website in der Search Cloud-App ein. Write Key und Write Secret werden verschlüsselt gespeichert und nie im Klartext an den Browser gesendet."
+msgid "Enter the credentials from your site page in the Searcio app. The write key and secret are stored encrypted and never sent to the browser in clear text."
+msgstr "Gib die Zugangsdaten von der Seite deiner Website in der Searcio-App ein. Write Key und Write Secret werden verschlüsselt gespeichert und nie im Klartext an den Browser gesendet."
 
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:98
 msgid "Search key"
@@ -2127,12 +2124,12 @@ msgid "Failed"
 msgstr "Fehlgeschlagen"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:181
-msgid "A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Search Cloud's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails."
-msgstr "Eine Ersatzliste von Suchanfragen, die im Such-Modal als Vorschläge erscheinen, bevor ein Besucher etwas eingibt. Die live ermittelten beliebten Suchanfragen von Search Cloud werden verwendet, wann immer sie verfügbar sind; diese Liste springt nur ein, wenn diese Anfrage leer zurückkommt oder fehlschlägt."
+msgid "A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Searcio's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails."
+msgstr "Eine Ersatzliste von Suchanfragen, die im Such-Modal als Vorschläge erscheinen, bevor ein Besucher etwas eingibt. Die live ermittelten beliebten Suchanfragen von Searcio werden verwendet, wann immer sie verfügbar sind; diese Liste springt nur ein, wenn diese Anfrage leer zurückkommt oder fehlschlägt."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:190
-msgid "One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty."
-msgstr "Eine Suchanfrage pro Zeile. Wird als Ersatz verwendet, wenn die live ermittelten beliebten Suchanfragen von Search Cloud nicht verfügbar oder leer sind."
+msgid "One query per line. Used as a fallback whenever live popular searches from Searcio are unavailable or empty."
+msgstr "Eine Suchanfrage pro Zeile. Wird als Ersatz verwendet, wenn die live ermittelten beliebten Suchanfragen von Searcio nicht verfügbar oder leer sind."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:216
 msgid "Your plan does not include this."
@@ -2143,8 +2140,8 @@ msgid "AI & ranking"
 msgstr "KI & Ranking"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:222
-msgid "Site-level switches that change how results are found and ordered. These are the same switches as in the Search Cloud panel."
-msgstr "Schalter für die gesamte Website, die bestimmen, wie Ergebnisse gefunden und sortiert werden. Es sind dieselben Schalter wie im Search Cloud-Panel."
+msgid "Site-level switches that change how results are found and ordered. These are the same switches as in the Searcio panel."
+msgstr "Schalter für die gesamte Website, die bestimmen, wie Ergebnisse gefunden und sortiert werden. Es sind dieselben Schalter wie im Searcio-Panel."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:233
 msgid "AI search"
@@ -2312,8 +2309,8 @@ msgid "Search configuration"
 msgstr "Sucheinstellungen"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:721
-msgid "Controls how Search Cloud itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Search Cloud's side, not in this plugin's own settings, so changes take effect on the very next search."
-msgstr "Steuert, wie Search Cloud selbst deine Inhalte rankt und filtert - welche Felder durchsucht werden und wie stark, Ranking-Boosts pro Typ, welche Felder Facetten und Vorschläge liefern, und Synonyme. Das meiste davon liegt bei Search Cloud, nicht in den Einstellungen dieses Plugins, daher wirken Änderungen schon bei der nächsten Suche."
+msgid "Controls how Searcio itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Searcio's side, not in this plugin's own settings, so changes take effect on the very next search."
+msgstr "Steuert, wie Searcio selbst deine Inhalte rankt und filtert - welche Felder durchsucht werden und wie stark, Ranking-Boosts pro Typ, welche Felder Facetten und Vorschläge liefern, und Synonyme. Das meiste davon liegt bei Searcio, nicht in den Einstellungen dieses Plugins, daher wirken Änderungen schon bei der nächsten Suche."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:741
 msgid "Searchable fields & weights"
@@ -2418,12 +2415,12 @@ msgid "Support Searcio"
 msgstr "Searcio unterstützen"
 
 #: src/admin/settings/components/tabs/SupportSearcioCard.js:34
-msgid "Shows the searcio logo, small in the bottom corner of the search window, linked to searcio.com."
-msgstr "Zeigt das searcio-Logo klein in der unteren Ecke des Suchfensters, verlinkt mit searcio.com."
+msgid "Shows the Searcio logo, small in the bottom corner of the search window, linked to searcio.com."
+msgstr "Zeigt das Searcio-Logo klein in der unteren Ecke des Suchfensters, verlinkt mit searcio.com."
 
 #: src/admin/settings/components/tabs/SupportSearcioCard.js:45
-msgid "Show the searcio logo in the search window"
-msgstr "Das searcio-Logo im Suchfenster anzeigen"
+msgid "Show the Searcio logo in the search window"
+msgstr "Das Searcio-Logo im Suchfenster anzeigen"
 
 #: src/admin/settings/components/tabs/SupportSearcioCard.js:47
 msgid "The Free plan always shows it. On a paid plan you can turn it off."
@@ -2487,10 +2484,10 @@ msgstr[1] "Diese Läufe löschen?"
 #. translators: %d: number of sync runs.
 #: src/admin/settings/components/tabs/SyncHistory.js:278
 #, js-format
-msgid "%d run is removed from the history for good. What it sent to Search Cloud stays where it is."
-msgid_plural "%d runs are removed from the history for good. What they sent to Search Cloud stays where it is."
-msgstr[0] "%d Lauf wird endgültig aus dem Verlauf entfernt. Was er an Search Cloud gesendet hat, bleibt erhalten."
-msgstr[1] "%d Läufe werden endgültig aus dem Verlauf entfernt. Was sie an Search Cloud gesendet haben, bleibt erhalten."
+msgid "%d run is removed from the history for good. What it sent to Searcio stays where it is."
+msgid_plural "%d runs are removed from the history for good. What they sent to Searcio stays where it is."
+msgstr[0] "%d Lauf wird endgültig aus dem Verlauf entfernt. Was er an Searcio gesendet hat, bleibt erhalten."
+msgstr[1] "%d Läufe werden endgültig aus dem Verlauf entfernt. Was sie an Searcio gesendet haben, bleibt erhalten."
 
 #: src/admin/settings/components/tabs/SyncHistory.js:308
 msgid "Delete permanently"
@@ -2521,8 +2518,8 @@ msgid "Clear permanently"
 msgstr "Endgültig entfernen"
 
 #: src/admin/settings/components/tabs/SyncHistory.js:395
-msgid "Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Search Cloud changes."
-msgstr "Alle abgeschlossenen, fehlgeschlagenen und abgebrochenen Läufe werden endgültig aus dem Verlauf entfernt. Ein gerade aktiver Lauf bleibt erhalten, und in Search Cloud ändert sich nichts."
+msgid "Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Searcio changes."
+msgstr "Alle abgeschlossenen, fehlgeschlagenen und abgebrochenen Läufe werden endgültig aus dem Verlauf entfernt. Ein gerade aktiver Lauf bleibt erhalten, und in Searcio ändert sich nichts."
 
 #: src/admin/settings/components/tabs/SyncSkeleton.js:14
 msgid "Loading the sync status"
@@ -2533,8 +2530,8 @@ msgid "Start sync?"
 msgstr "Synchronisierung starten?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:38
-msgid "This sends new and changed content to Search Cloud. Continue?"
-msgstr "Dadurch werden neue und geänderte Inhalte an Search Cloud gesendet. Fortfahren?"
+msgid "This sends new and changed content to Searcio. Continue?"
+msgstr "Dadurch werden neue und geänderte Inhalte an Searcio gesendet. Fortfahren?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:39
 #: src/admin/settings/components/tabs/SyncTab.js:297
@@ -2546,8 +2543,8 @@ msgid "Re-sync everything?"
 msgstr "Alles neu synchronisieren?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:43
-msgid "This re-sends your entire catalog to Search Cloud, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?"
-msgstr "Dadurch wird dein gesamter Katalog erneut an Search Cloud gesendet, unabhängig davon, was bereits indexiert ist. Das kann eine Weile dauern und verbraucht mehr von deinem Dokumentkontingent. Fortfahren?"
+msgid "This re-sends your entire catalog to Searcio, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?"
+msgstr "Dadurch wird dein gesamter Katalog erneut an Searcio gesendet, unabhängig davon, was bereits indexiert ist. Das kann eine Weile dauern und verbraucht mehr von deinem Dokumentkontingent. Fortfahren?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:44
 #: src/admin/settings/components/tabs/SyncTab.js:306
@@ -2575,12 +2572,12 @@ msgid "Full re-sync started."
 msgstr "Vollständige Neusynchronisierung gestartet."
 
 #: src/admin/settings/components/tabs/SyncTab.js:177
-msgid "Send your content to Search Cloud. Only new and changed items are sent on each run, so repeat syncs are fast."
-msgstr "Sende deine Inhalte an Search Cloud. Bei jedem Lauf werden nur neue und geänderte Inhalte gesendet, daher sind wiederholte Synchronisierungen schnell."
+msgid "Send your content to Searcio. Only new and changed items are sent on each run, so repeat syncs are fast."
+msgstr "Sende deine Inhalte an Searcio. Bei jedem Lauf werden nur neue und geänderte Inhalte gesendet, daher sind wiederholte Synchronisierungen schnell."
 
 #: src/admin/settings/components/tabs/SyncTab.js:186
-msgid "Add and save your Search Cloud credentials first."
-msgstr "Trage zuerst deine Search Cloud-Zugangsdaten ein und speichere sie."
+msgid "Add and save your Searcio credentials first."
+msgstr "Trage zuerst deine Searcio-Zugangsdaten ein und speichere sie."
 
 #: src/admin/settings/components/tabs/SyncTab.js:190
 msgid "Go to Connection"
@@ -2615,8 +2612,8 @@ msgid "Skipped"
 msgstr "Übersprungen"
 
 #: src/admin/settings/components/tabs/SyncTab.js:264
-msgid "While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before."
-msgstr "Solange eine Synchronisierung pausiert ist, werden Änderungen in deinem Shop nicht an Search Cloud gesendet. Die nächste geplante Synchronisierung setzt sie fort, falls niemand sie vorher fortsetzt."
+msgid "While a sync is paused, changes in your shop are not sent to Searcio. The next scheduled sync continues it, if nobody resumes it before."
+msgstr "Solange eine Synchronisierung pausiert ist, werden Änderungen in deinem Shop nicht an Searcio gesendet. Die nächste geplante Synchronisierung setzt sie fort, falls niemand sie vorher fortsetzt."
 
 #: src/admin/settings/components/tabs/SyncTab.js:272
 msgid "Pause"
@@ -2989,12 +2986,12 @@ msgid "Price / meta"
 msgstr "Preis / Meta"
 
 #: src/blocks/search/edit.js:407
-msgid "Search Cloud - search box"
-msgstr "Search Cloud - Suchfeld"
+msgid "Searcio - search box"
+msgstr "Searcio - Suchfeld"
 
 #: src/blocks/search/edit.js:408
-msgid "Search Cloud - search icon"
-msgstr "Search Cloud - Suchsymbol"
+msgid "Searcio - search icon"
+msgstr "Searcio - Suchsymbol"
 
 #: src/components/AdminPage.js:112
 msgid "More actions"
@@ -3324,20 +3321,20 @@ msgstr "Produkttyp"
 
 #: blocks/products/block.json
 msgctxt "block title"
-msgid "Search Cloud Products"
-msgstr "Search Cloud-Produkte"
+msgid "Searcio Products"
+msgstr "Searcio-Produkte"
 
 #: blocks/products/block.json
 msgctxt "block description"
-msgid "A row of products from webhead Search Cloud: similar products on a product page, or a curated listing on a category page."
-msgstr "Eine Produktreihe aus webhead Search Cloud: ähnliche Produkte auf einer Produktseite oder eine kuratierte Liste auf einer Kategorieseite."
+msgid "A row of products from Searcio: similar products on a product page, or a curated listing on a category page."
+msgstr "Eine Produktreihe aus Searcio: ähnliche Produkte auf einer Produktseite oder eine kuratierte Liste auf einer Kategorieseite."
 
 #: blocks/search/block.json
 msgctxt "block title"
-msgid "Search Cloud"
-msgstr "Search Cloud"
+msgid "Searcio Search"
+msgstr "Searcio-Suche"
 
 #: blocks/search/block.json
 msgctxt "block description"
-msgid "A full-screen search box or icon powered by webhead Search Cloud."
-msgstr "Ein bildschirmfüllendes Suchfeld oder Suchsymbol mit webhead Search Cloud."
+msgid "A full-screen search box or icon powered by Searcio."
+msgstr "Ein bildschirmfüllendes Suchfeld oder Suchsymbol mit Searcio."

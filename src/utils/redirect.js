@@ -20,7 +20,7 @@ export const isRedirect = ( response ) => 'string' === typeof response?.redirect
 /**
  * The destination, or an empty string when it is not one we will navigate to.
  *
- * The value is the merchant's own, written through their Search Cloud account,
+ * The value is the merchant's own, written through their Searcio account,
  * and the API already constrains it to `http://`, `https://` or `/`. We check
  * again here because this string is about to be assigned to
  * `window.location.href`: a scheme that slipped through anywhere upstream

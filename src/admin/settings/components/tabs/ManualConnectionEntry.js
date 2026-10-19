@@ -14,7 +14,7 @@ const SECRET_PLACEHOLDER = '••••••••••••';
 /**
  * Manual credential entry: paste the site's write key/secret/search key
  * directly instead of using the zero-friction Connect button. Needed for the
- * `pending_claim` flow (the owner finishes on the Search Cloud dashboard and
+ * `pending_claim` flow (the owner finishes on the Searcio dashboard and
  * copies the resulting keys back here) and for key rotation. Collapsed by
  * default; the parent expands it automatically on `pending_claim` or a `409`.
  */
@@ -90,7 +90,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 		<Stack direction="column" gap="lg" className="webhead-search-cloud-manual-entry">
 			<Text render={<p/>} variant="body-sm">
 				{__(
-					'Enter the credentials from your site page in the Search Cloud app. The write key and secret are stored encrypted and never sent to the browser in clear text.',
+					'Enter the credentials from your site page in the Searcio app. The write key and secret are stored encrypted and never sent to the browser in clear text.',
 					'searcio'
 				)}
 			</Text>

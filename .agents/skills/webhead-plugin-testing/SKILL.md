@@ -103,7 +103,7 @@ If this plugin was scaffolded before the harness existed, `.gitignore` may still
 - Run `npm run env:start` then `npm run test:integration` for activation, options, capabilities, REST, cron, tables, or hook timing.
 - Run `npm run test:integration:multisite` when the change touches options, tables, activation, blog switching, or capability sync.
 - Run `npm run test:e2e` for admin screens, block rendering, or anything only a browser can observe.
-- Lint changed PHP files with `php -l` and include `webhead-search-cloud.php` and `includes/Plugin.php` in that pass.
+- Lint changed PHP files with `php -l` and include `searcio.php` and `includes/Plugin.php` in that pass.
 - Confirm the plugin header still reflects minimum WordPress, minimum PHP, and required-plugin slugs.
 - Confirm Site Health and admin notices report unmet requirements when a required plugin is missing or inactive.
 - Validate multisite behavior when changes touch options, database tables, activation, blog switching, or capability sync.

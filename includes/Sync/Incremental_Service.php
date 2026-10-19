@@ -206,7 +206,7 @@ final class Incremental_Service {
 	}
 
 	private function plan_limit_message(): string {
-		return __( 'Incremental sync paused: your Search Cloud plan limit was reached.', 'searcio' );
+		return __( 'Incremental sync paused: your Searcio plan limit was reached.', 'searcio' );
 	}
 
 	/**
@@ -219,7 +219,7 @@ final class Incremental_Service {
 		if ( $response->transport_error ) {
 			return sprintf(
 				/* translators: %s: transport error message. */
-				__( 'Could not reach Search Cloud: %s', 'searcio' ),
+				__( 'Could not reach Searcio: %s', 'searcio' ),
 				$response->error_message
 			);
 		}
@@ -235,7 +235,7 @@ final class Incremental_Service {
 
 		return sprintf(
 			/* translators: %d: HTTP status code. */
-			__( 'Search Cloud rejected the update (HTTP %d).', 'searcio' ),
+			__( 'Searcio rejected the update (HTTP %d).', 'searcio' ),
 			$response->status
 		);
 	}

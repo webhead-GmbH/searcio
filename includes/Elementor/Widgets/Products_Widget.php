@@ -1,6 +1,6 @@
 <?php
 /**
- * Elementor widget: a row of products from Search Cloud.
+ * Elementor widget: a row of products from Searcio.
  *
  * The Elementor twin of the `webhead-search-cloud/products` block. Both render
  * through {@see \Webhead\WP\SearchCloud\Frontend\Product_List_Markup}, so the
@@ -34,7 +34,7 @@ final class Products_Widget extends Widget {
 	}
 
 	public function get_title(): string {
-		return __( 'Search Cloud Products', 'searcio' );
+		return __( 'Searcio Products', 'searcio' );
 	}
 
 	public function get_icon(): string {
@@ -154,7 +154,7 @@ final class Products_Widget extends Widget {
 				'default' => 'plugin',
 				'options' => [
 					'plugin' => __( 'Plugin templates', 'searcio' ),
-					'server' => __( 'Search Cloud templates', 'searcio' ),
+					'server' => __( 'Searcio templates', 'searcio' ),
 				],
 			]
 		);
