@@ -185,11 +185,40 @@ describe( 'applyOption', () => {
 } );
 
 describe( 'quizProgress', () => {
-	it( 'counts the question being answered, capped at the quiz length', () => {
+	const question = ( id, ...next ) => ( {
+		id,
+		text: id,
+		options: next.map( ( to, i ) => ( { id: `${ id }-${ i }`, label: String( to ), next_question_id: to, tags_matched: [] } ) ),
+	} );
+	const quizOf = ( ...questions ) => normalizeQuiz( { id: 9, name: 'Q', questions } );
+
+	it( 'counts the question being answered against the questions on the way', () => {
 		const quiz = normalizeQuiz( QUIZ );
 
 		expect( quizProgress( quiz, 0 ) ).toEqual( { current: 1, total: 2 } );
-		expect( quizProgress( quiz, 1 ) ).toEqual( { current: 2, total: 2 } );
-		expect( quizProgress( quiz, 5 ) ).toEqual( { current: 2, total: 2 } );
+		expect( quizProgress( quiz, 1, findQuestion( quiz, 'size' ) ) ).toEqual( { current: 2, total: 2 } );
+	} );
+
+	it( 'does not count the questions of a branch the visitor cannot reach', () => {
+		// Three questions, two on any path: what, then either kind or colour.
+		const quiz = quizOf( question( 'what', 'kind', 'colour' ), question( 'kind', null ), question( 'colour', null ) );
+
+		expect( quizProgress( quiz, 0 ) ).toEqual( { current: 1, total: 2 } );
+		expect( quizProgress( quiz, 1, findQuestion( quiz, 'kind' ) ) ).toEqual( { current: 2, total: 2 } );
+	} );
+
+	it( 'promises the longest branch, and shrinks once a shorter one is taken', () => {
+		const quiz = quizOf( question( 'start', 'short', 'long' ), question( 'short', null ), question( 'long', 'last' ), question( 'last', null ) );
+
+		expect( quizProgress( quiz, 0 ) ).toEqual( { current: 1, total: 3 } );
+		expect( quizProgress( quiz, 1, findQuestion( quiz, 'short' ) ) ).toEqual( { current: 2, total: 2 } );
+		expect( quizProgress( quiz, 1, findQuestion( quiz, 'long' ) ) ).toEqual( { current: 2, total: 3 } );
+		expect( quizProgress( quiz, 2, findQuestion( quiz, 'last' ) ) ).toEqual( { current: 3, total: 3 } );
+	} );
+
+	it( 'gives a number for a quiz that loops', () => {
+		const quiz = quizOf( question( 'a', 'b' ), question( 'b', 'a' ) );
+
+		expect( quizProgress( quiz, 0 ) ).toEqual( { current: 1, total: 2 } );
 	} );
 } );

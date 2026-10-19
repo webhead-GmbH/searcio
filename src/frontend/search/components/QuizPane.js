@@ -266,7 +266,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	}
 
 	const answers = Object.entries( tags );
-	const progress = quizProgress( quiz, history.length );
+	const progress = quizProgress( quiz, history.length, question );
 	const hits = results?.hits || [];
 	// The quiz always searches with an empty term, which the service answers on
 	// its lexical path - so unlike a typed search, `total` here is a real count

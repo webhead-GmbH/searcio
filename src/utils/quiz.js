@@ -140,15 +140,54 @@ export const nextQuestion = ( quiz, option, visited = [] ) => {
 };
 
 /**
- * How far through the quiz the visitor is. The graph branches, so this counts
- * questions actually answered against the longest the quiz could run - it is a
- * "you are making progress" cue, not an exact prediction.
+ * How many questions a visitor can still be asked from `question` on, itself
+ * included: the longest run of answers from there to the end of the quiz.
  *
- * @param {Object} quiz
- * @param {number} answered
+ * A question already on the run ends it, as `nextQuestion()` ends a visit, so
+ * a quiz that ships a loop still gives a number.
+ *
+ * @param {Object}      quiz
+ * @param {Object|null} question
+ * @return {number} 0 when there is no question.
+ */
+const questionsFrom = ( quiz, question ) => {
+	const longest = new Map();
+	const onRun = new Set();
+
+	const walk = ( current ) => {
+		if ( ! current || onRun.has( current.id ) ) {
+			return 0;
+		}
+
+		if ( longest.has( current.id ) ) {
+			return longest.get( current.id );
+		}
+
+		onRun.add( current.id );
+		const after = Math.max( 0, ...( current.options || [] ).map( ( option ) => walk( nextQuestion( quiz, option ) ) ) );
+		onRun.delete( current.id );
+		longest.set( current.id, 1 + after );
+
+		return 1 + after;
+	};
+
+	return walk( question );
+};
+
+/**
+ * How far through the quiz the visitor is: the question on screen against the
+ * questions answered so far plus the longest way on from this one. The graph
+ * branches, so a quiz holds questions a visitor never sees, and counting them
+ * all promised a "Question 3 of 3" that never came. The total can only shrink
+ * as answers rule branches out; it is a "you are making progress" cue, exact
+ * once the remaining path no longer branches.
+ *
+ * @param {Object}      quiz
+ * @param {number}      answered
+ * @param {Object|null} [question] The question on screen; the first one by default.
  * @return {{current: number, total: number}}
  */
-export const quizProgress = ( quiz, answered ) => ( {
-	current: Math.min( answered + 1, ( quiz?.questions || [] ).length ),
-	total: ( quiz?.questions || [] ).length,
+export const quizProgress = ( quiz, answered, question = firstQuestion( quiz ) ) => ( {
+	current: answered + 1,
+	total: answered + Math.max( 1, questionsFrom( quiz, question ) ),
 } );

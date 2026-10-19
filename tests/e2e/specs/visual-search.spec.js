@@ -97,6 +97,29 @@ test.describe( 'search by photo', () => {
 	 * Centred, the photo floated beside the middle of four wrapped rows of tags
 	 * on a phone. It lines up with the first row; a single row stays centred.
 	 */
+	/**
+	 * The camera came wrapped in a span, whose svg sat on a line of text: 4px
+	 * above the close icon beside it.
+	 */
+	test( 'keeps the camera on the line of the close icon', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { visualSearch: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await expect( widget.photoButton ).toBeVisible();
+
+		const middle = async ( locator ) => {
+			const box = await locator.boundingBox();
+
+			return box.y + ( box.height / 2 );
+		};
+		const camera = await middle( widget.photoButton.locator( 'svg' ) );
+		const close = await middle( widget.modal.locator( '.whsc-modal-close svg' ) );
+
+		expect( Math.abs( camera - close ) ).toBeLessThanOrEqual( 1 );
+	} );
+
 	test( 'lines the photo up with the first row of tags', async ( { page, requestUtils } ) => {
 		await page.setViewportSize( { width: 320, height: 640 } );
 		await mockSearchCloud( page, {
