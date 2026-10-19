@@ -24,7 +24,7 @@ use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Site_Health_Registration_Test extends Integration_Test_Case {
-	private const DOMAIN = 'webhead-search-cloud';
+	private const DOMAIN = 'searcio';
 
 	/**
 	 * The suite booted the plugin during its bootstrap, before any test could

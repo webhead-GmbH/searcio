@@ -6,7 +6,7 @@ import { Skeleton, Stack } from '@wordpress/ui';
  * then one placeholder per card. The region is what says "loading"; the blocks
  * in it are decorative.
  */
-const IndexingSkeleton = ( { label = __( 'Loading the indexing configuration', 'webhead-search-cloud' ) } ) => (
+const IndexingSkeleton = ( { label = __( 'Loading the indexing configuration', 'searcio' ) } ) => (
 	<div className="whsc-skeleton" role="status" aria-busy="true" aria-label={ label }>
 		<Stack direction="column" gap="lg">
 			<Stack direction="column" gap="sm">

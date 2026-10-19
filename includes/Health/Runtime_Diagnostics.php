@@ -64,13 +64,13 @@ final class Runtime_Diagnostics {
 		$this->diagnostics_manager->add_deferred_fields(
 			self::SECTION_ID,
 			fn (): array => [
-				'connection_configured'    => [ __( 'Connection configured', 'webhead-search-cloud' ), $this->client->is_configured() ],
-				'indexable_post_types'     => [ __( 'Indexable content types', 'webhead-search-cloud' ), $this->index_config->indexable_post_types() ],
-				'sync_retention_days'      => [ __( 'Sync history retention (days)', 'webhead-search-cloud' ), (int) $this->settings->get( Plugin_Settings::SYNC_RETENTION_DAYS ) ],
-				'active_sync_status'       => [ __( 'Active sync run status', 'webhead-search-cloud' ), $this->sync_service->status()['active']['status'] ?? null ],
-				'delete_data_on_uninstall' => [ __( 'Delete data on uninstall', 'webhead-search-cloud' ), (bool) $this->settings->get( Plugin_Settings::DELETE_DATA_ON_UNINSTALL ) ],
-				'multilingual_active'      => [ __( 'WPML/Polylang active', 'webhead-search-cloud' ), $this->multilingual->is_active() ],
-				'enabled_languages'        => [ __( 'Enabled languages', 'webhead-search-cloud' ), $this->language_config->enabled_languages() ],
+				'connection_configured'    => [ __( 'Connection configured', 'searcio' ), $this->client->is_configured() ],
+				'indexable_post_types'     => [ __( 'Indexable content types', 'searcio' ), $this->index_config->indexable_post_types() ],
+				'sync_retention_days'      => [ __( 'Sync history retention (days)', 'searcio' ), (int) $this->settings->get( Plugin_Settings::SYNC_RETENTION_DAYS ) ],
+				'active_sync_status'       => [ __( 'Active sync run status', 'searcio' ), $this->sync_service->status()['active']['status'] ?? null ],
+				'delete_data_on_uninstall' => [ __( 'Delete data on uninstall', 'searcio' ), (bool) $this->settings->get( Plugin_Settings::DELETE_DATA_ON_UNINSTALL ) ],
+				'multilingual_active'      => [ __( 'WPML/Polylang active', 'searcio' ), $this->multilingual->is_active() ],
+				'enabled_languages'        => [ __( 'Enabled languages', 'searcio' ), $this->language_config->enabled_languages() ],
 			]
 		);
 	}
@@ -86,8 +86,8 @@ final class Runtime_Diagnostics {
 	public function translate_section( array $info ): array {
 		$this->diagnostics_manager->register_section(
 			self::SECTION_ID,
-			__( 'webhead Search Cloud runtime', 'webhead-search-cloud' ),
-			__( 'Connection, indexing, and sync state for support and debugging. Credentials are never included.', 'webhead-search-cloud' ),
+			__( 'webhead Search Cloud runtime', 'searcio' ),
+			__( 'Connection, indexing, and sync state for support and debugging. Credentials are never included.', 'searcio' ),
 			true
 		);
 

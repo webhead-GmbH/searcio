@@ -20,14 +20,14 @@ const HISTORY_CONTENT_MAX = 4000;
 
 const errorFor = ( status ) => {
 	if ( 403 === status ) {
-		return __( 'The assistant is not available on this plan.', 'webhead-search-cloud' );
+		return __( 'The assistant is not available on this plan.', 'searcio' );
 	}
 
 	if ( 429 === status ) {
-		return __( 'The assistant has reached its limit for now. Please try again later.', 'webhead-search-cloud' );
+		return __( 'The assistant has reached its limit for now. Please try again later.', 'searcio' );
 	}
 
-	return __( 'The assistant is unavailable right now. Try searching instead.', 'webhead-search-cloud' );
+	return __( 'The assistant is unavailable right now. Try searching instead.', 'searcio' );
 };
 
 const Message = ( { role, content } ) => {
@@ -109,9 +109,9 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	// Store-agnostic openers for the empty state. Kept short so all three sit on
 	// one row rather than wrapping into a lopsided 2 + 1.
 	const STARTERS = [
-		__( "What's popular?", 'webhead-search-cloud' ),
-		__( 'Help me find a gift', 'webhead-search-cloud' ),
-		__( "What's on sale?", 'webhead-search-cloud' ),
+		__( "What's popular?", 'searcio' ),
+		__( 'Help me find a gift', 'searcio' ),
+		__( "What's on sale?", 'searcio' ),
 	];
 
 	const send = useCallback( async ( preset ) => {
@@ -208,8 +208,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 				className="whsc-assistant__input"
 				value={ input }
 				maxLength={ MESSAGE_MAX }
-				placeholder={ __( 'Write what you need', 'webhead-search-cloud' ) }
-				aria-label={ __( 'Message the assistant', 'webhead-search-cloud' ) }
+				placeholder={ __( 'Write what you need', 'searcio' ) }
+				aria-label={ __( 'Message the assistant', 'searcio' ) }
 				onChange={ ( event ) => setInput( event.target.value ) }
 				disabled={ isSending }
 			/>
@@ -217,7 +217,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 				type="submit"
 				className="whsc-assistant__send"
 				icon={ sendIcon }
-				label={ __( 'Send', 'webhead-search-cloud' ) }
+				label={ __( 'Send', 'searcio' ) }
 				disabled={ isSending || '' === input.trim() }
 			/>
 		</form>
@@ -235,7 +235,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 							<p className="whsc-assistant__intro-text">
 								{ __(
 									"Describe what you're looking for and I'll find it in this store.",
-									'webhead-search-cloud'
+									'searcio'
 								) }
 							</p>
 							{ /* A blank chat box gives no clue what it can do, so offer
@@ -272,7 +272,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 							</span>
 							<p className="whsc-assistant__thinking" role="status">
 								<span className="whsc-assistant__thinking-text">
-									{ __( 'Thinking', 'webhead-search-cloud' ) }
+									{ __( 'Thinking', 'searcio' ) }
 								</span>
 								<span className="whsc-assistant__dots" aria-hidden="true">
 									<i /><i /><i />
@@ -295,7 +295,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 										className="whsc-assistant__retry"
 										onClick={ retry }
 									>
-										{ __( 'Try again', 'webhead-search-cloud' ) }
+										{ __( 'Try again', 'searcio' ) }
 									</button>
 								) }
 							</div>
@@ -313,12 +313,12 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 							{ comparing
 								? sprintf(
 									/* translators: %d: number of products being compared. */
-									_n( 'Comparing %d product', 'Comparing %d products', products.length, 'webhead-search-cloud' ),
+									_n( 'Comparing %d product', 'Comparing %d products', products.length, 'searcio' ),
 									products.length
 								)
 								: sprintf(
 									/* translators: %d: number of products. */
-									_n( '%d result', '%d results', products.length, 'webhead-search-cloud' ),
+									_n( '%d result', '%d results', products.length, 'searcio' ),
 									products.length
 								) }
 						</span>
@@ -333,8 +333,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 									{ comparing ? gridIcon : compareIcon }
 								</span>
 								{ comparing
-									? __( 'Back to list', 'webhead-search-cloud' )
-									: __( 'Compare', 'webhead-search-cloud' ) }
+									? __( 'Back to list', 'searcio' )
+									: __( 'Compare', 'searcio' ) }
 							</button>
 						) }
 					</div>

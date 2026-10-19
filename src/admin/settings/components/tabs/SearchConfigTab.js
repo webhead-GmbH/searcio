@@ -78,7 +78,7 @@ const unindexedFacetMessage = ( quoted, count ) => sprintf(
 		'No document on this site has a %s field, so its facet will always be empty. Choose a field from the list, or start indexing it in the Indexing tab.',
 		'No document on this site has the fields %s, so their facets will always be empty. Choose fields from the list, or start indexing them in the Indexing tab.',
 		count,
-		'webhead-search-cloud'
+		'searcio'
 	),
 	quoted
 );
@@ -89,7 +89,7 @@ const unindexedSuggestMessage = ( quoted, count ) => sprintf(
 		'No document on this site has a %s field, so it will never add a suggestion. Choose a field from the list, or start indexing it in the Indexing tab.',
 		'No document on this site has the fields %s, so they will never add a suggestion. Choose fields from the list, or start indexing them in the Indexing tab.',
 		count,
-		'webhead-search-cloud'
+		'searcio'
 	),
 	quoted
 );
@@ -122,10 +122,10 @@ const featureError = ( errors, key ) => {
 };
 
 const AI_STATUS_LABELS = () => ( {
-	pending: __( 'Preparing…', 'webhead-search-cloud' ),
-	indexing: __( 'Indexing…', 'webhead-search-cloud' ),
-	ready: __( 'Ready', 'webhead-search-cloud' ),
-	failed: __( 'Failed', 'webhead-search-cloud' ),
+	pending: __( 'Preparing…', 'searcio' ),
+	indexing: __( 'Indexing…', 'searcio' ),
+	ready: __( 'Ready', 'searcio' ),
+	failed: __( 'Failed', 'searcio' ),
 } );
 
 const toPopularSearchesText = ( value ) => ( Array.isArray( value ) ? value.join( '\n' ) : '' );
@@ -177,17 +177,17 @@ const PopularSearchesCard = () => {
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<CardHeading
-				title={ __( 'Popular searches', 'webhead-search-cloud' ) }
+				title={ __( 'Popular searches', 'searcio' ) }
 				description={ __(
 					"A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Search Cloud's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails.",
-					'webhead-search-cloud'
+					'searcio'
 				) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
 				<TextareaControl
-					label={ __( 'Popular searches', 'webhead-search-cloud' ) }
+					label={ __( 'Popular searches', 'searcio' ) }
 					hideLabelFromVision
-					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'webhead-search-cloud' ) }
+					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Search Cloud are unavailable or empty.', 'searcio' ) }
 					value={ popularSearchesText }
 					onValueChange={ ( value ) => {
 						setPopularSearchesText( value );
@@ -213,15 +213,15 @@ const PopularSearchesCard = () => {
 const FeaturesCard = ( { features, errors, onChange } ) => {
 	const statusLabels = AI_STATUS_LABELS();
 	const ai = features.ai_search;
-	const unavailable = __( 'Your plan does not include this.', 'webhead-search-cloud' );
+	const unavailable = __( 'Your plan does not include this.', 'searcio' );
 
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<CardHeading
-				title={ __( 'AI & ranking', 'webhead-search-cloud' ) }
+				title={ __( 'AI & ranking', 'searcio' ) }
 				description={ __(
 					'Site-level switches that change how results are found and ordered. These are the same switches as in the Search Cloud panel.',
-					'webhead-search-cloud'
+					'searcio'
 				) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
@@ -230,13 +230,13 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 					     as its description, so it reads as live state. */ }
 					<Stack direction="column" gap="xs">
 						<CheckboxControl
-							label={ __( 'AI search', 'webhead-search-cloud' ) }
+							label={ __( 'AI search', 'searcio' ) }
 							description={
 								featureError( errors, 'ai_search' )
 								|| ( ai.available
 									? __(
 										'Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working.',
-										'webhead-search-cloud'
+										'searcio'
 									)
 									: unavailable )
 							}
@@ -249,7 +249,7 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 							<Text variant="body-sm" className="whsc-search-config-status">
 								{ sprintf(
 									/* translators: %s: index status, e.g. "Ready". */
-									__( 'Index status: %s', 'webhead-search-cloud' ),
+									__( 'Index status: %s', 'searcio' ),
 									statusLabels[ ai.status ] || ai.status
 								) }
 							</Text>
@@ -257,13 +257,13 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 					</Stack>
 
 					<CheckboxControl
-						label={ __( 'AI visual tagging', 'webhead-search-cloud' ) }
+						label={ __( 'AI visual tagging', 'searcio' ) }
 						description={
 							featureError( errors, 'visual_tagging' )
 							|| ( features.visual_tagging.available
 								? __(
 									'A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync - re-sync to tag products already indexed.',
-									'webhead-search-cloud'
+									'searcio'
 								)
 								: unavailable )
 						}
@@ -273,13 +273,13 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 					/>
 
 					<CheckboxControl
-						label={ __( 'Search by photo', 'webhead-search-cloud' ) }
+						label={ __( 'Search by photo', 'searcio' ) }
 						description={
 							featureError( errors, 'visual_search' )
 							|| ( features.visual_search.available
 								? __(
 									'Shoppers can upload a photo instead of typing: a vision model describes what it sees and searches for that. A camera button appears in the search box once this is on.',
-									'webhead-search-cloud'
+									'searcio'
 								)
 								: unavailable )
 						}
@@ -289,12 +289,12 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 					/>
 
 					<CheckboxControl
-						label={ __( 'Rank results by what visitors click', 'webhead-search-cloud' ) }
+						label={ __( 'Rank results by what visitors click', 'searcio' ) }
 						description={
 							featureError( errors, 'personalization' )
 							|| __(
 								'Results people click most for a search rise for everyone searching it. Relevance still leads - popular results are only nudged up.',
-								'webhead-search-cloud'
+								'searcio'
 							)
 						}
 						checked={ Boolean( features.personalization.enabled ) }
@@ -329,10 +329,10 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
 			<CardHeading
-				title={ __( 'Merchandising rules', 'webhead-search-cloud' ) }
+				title={ __( 'Merchandising rules', 'searcio' ) }
 				description={ __(
 					'Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere.',
-					'webhead-search-cloud'
+					'searcio'
 				) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
@@ -346,7 +346,7 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 									<Card.Title render={ <h4 /> }>
 										{ sprintf(
 											/* translators: %d: the rule's position in the list. */
-											__( 'Rule %d', 'webhead-search-cloud' ),
+											__( 'Rule %d', 'searcio' ),
 											index + 1
 										) }
 									</Card.Title>
@@ -355,7 +355,7 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 										icon={ trash }
 										isDestructive
 										variant="tertiary"
-										label={ __( 'Remove rule', 'webhead-search-cloud' ) }
+										label={ __( 'Remove rule', 'searcio' ) }
 										onClick={ () => remove( index ) }
 									/>
 								</Stack>
@@ -363,10 +363,10 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 							<Card.Content className="whsc-card__content">
 								<Stack direction="column" gap="md">
 									<InputControl
-										label={ __( 'Trigger (search term contains)', 'webhead-search-cloud' ) }
+										label={ __( 'Trigger (search term contains)', 'searcio' ) }
 										description={ rowError( errors, 'merchandising', index, 'query' )
 											|| ( '' === rule.query
-												? __( 'Empty: this rule applies to every search on the site.', 'webhead-search-cloud' )
+												? __( 'Empty: this rule applies to every search on the site.', 'searcio' )
 												: undefined ) }
 										value={ rule.query }
 										onValueChange={ ( query ) => update( index, { ...rule, query } ) }
@@ -375,19 +375,19 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 									     for either to mean anything, so they sit together. */ }
 									<Grid auto={ 220 } gap="var(--wpds-dimension-gap-md)" align="start">
 										<InputControl
-											label={ __( 'Also require filter (field)', 'webhead-search-cloud' ) }
+											label={ __( 'Also require filter (field)', 'searcio' ) }
 											list="whsc-field-suggestions"
 											description={ rowError( errors, 'merchandising', index, 'filter_field' )
-												|| __( 'Optional. A facet field, e.g. "categories".', 'webhead-search-cloud' ) }
+												|| __( 'Optional. A facet field, e.g. "categories".', 'searcio' ) }
 											value={ rule.filter_field }
 											onValueChange={ ( filter_field ) => update( index, { ...rule, filter_field } ) }
 										/>
 										<InputControl
-											label={ __( 'Filter value', 'webhead-search-cloud' ) }
+											label={ __( 'Filter value', 'searcio' ) }
 											description={ rowError( errors, 'merchandising', index, 'filter_value' )
 												|| __(
 													'With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself.',
-													'webhead-search-cloud'
+													'searcio'
 												) }
 											value={ rule.filter_value }
 											onValueChange={ ( filter_value ) => update( index, { ...rule, filter_value } ) }
@@ -395,24 +395,24 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 									</Grid>
 									<Grid auto={ 220 } gap="var(--wpds-dimension-gap-md)" align="start">
 										<InputControl
-											label={ __( 'Pin to top (document ids)', 'webhead-search-cloud' ) }
+											label={ __( 'Pin to top (document ids)', 'searcio' ) }
 											description={ listError( errors, 'merchandising', index, 'pinned' )
-												|| __( 'Comma-separated, in the order they should appear.', 'webhead-search-cloud' ) }
+												|| __( 'Comma-separated, in the order they should appear.', 'searcio' ) }
 											value={ idsToText( rule.pinned ) }
 											onValueChange={ ( value ) => update( index, { ...rule, pinned: textToIds( value ) } ) }
 										/>
 										<InputControl
-											label={ __( 'Hide (document ids)', 'webhead-search-cloud' ) }
+											label={ __( 'Hide (document ids)', 'searcio' ) }
 											description={ listError( errors, 'merchandising', index, 'hidden' )
-												|| __( 'Comma-separated. Kept out of the results entirely.', 'webhead-search-cloud' ) }
+												|| __( 'Comma-separated. Kept out of the results entirely.', 'searcio' ) }
 											value={ idsToText( rule.hidden ) }
 											onValueChange={ ( value ) => update( index, { ...rule, hidden: textToIds( value ) } ) }
 										/>
 									</Grid>
 									<InputControl
-										label={ __( 'Promotional banner', 'webhead-search-cloud' ) }
+										label={ __( 'Promotional banner', 'searcio' ) }
 										description={ rowError( errors, 'merchandising', index, 'banner' )
-											|| __( 'Optional message returned with the results for this search.', 'webhead-search-cloud' ) }
+											|| __( 'Optional message returned with the results for this search.', 'searcio' ) }
 										value={ rule.banner }
 										onValueChange={ ( banner ) => update( index, { ...rule, banner } ) }
 									/>
@@ -422,7 +422,7 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 					) ) }
 					<Stack direction="row" gap="sm">
 						<Button __next40pxDefaultSize variant="secondary" onClick={ add }>
-							{ __( 'Add a rule', 'webhead-search-cloud' ) }
+							{ __( 'Add a rule', 'searcio' ) }
 						</Button>
 					</Stack>
 				</Stack>
@@ -449,10 +449,10 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
 			<CardHeading
-				title={ __( 'Search redirects', 'webhead-search-cloud' ) }
+				title={ __( 'Search redirects', 'searcio' ) }
 				description={ __(
 					'Send a search straight to a page instead of showing results. The term has to match exactly - capitalisation and surrounding spaces are ignored, but "black friday" will not fire on "black friday deals".',
-					'webhead-search-cloud'
+					'searcio'
 				) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
@@ -462,15 +462,15 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 					{ rules.map( ( rule, index ) => (
 						<div className="whsc-redirect-rule" key={ index }>
 							<InputControl
-								label={ __( 'Search term (exact)', 'webhead-search-cloud' ) }
+								label={ __( 'Search term (exact)', 'searcio' ) }
 								description={ rowError( errors, 'redirects', index, 'query' ) }
 								value={ rule.query }
 								onValueChange={ ( query ) => update( index, { ...rule, query } ) }
 							/>
 							<InputControl
-								label={ __( 'Send them to', 'webhead-search-cloud' ) }
+								label={ __( 'Send them to', 'searcio' ) }
 								description={ rowError( errors, 'redirects', index, 'url' )
-									|| __( 'A full URL, or a path on this site starting with /.', 'webhead-search-cloud' ) }
+									|| __( 'A full URL, or a path on this site starting with /.', 'searcio' ) }
 								value={ rule.url }
 								onValueChange={ ( url ) => update( index, { ...rule, url } ) }
 							/>
@@ -480,7 +480,7 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 									icon={ trash }
 									isDestructive
 									variant="tertiary"
-									label={ __( 'Remove redirect', 'webhead-search-cloud' ) }
+									label={ __( 'Remove redirect', 'searcio' ) }
 									onClick={ () => remove( index ) }
 								/>
 							</div>
@@ -488,7 +488,7 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 					) ) }
 					<Stack direction="row" gap="sm">
 						<Button __next40pxDefaultSize variant="secondary" onClick={ add }>
-							{ __( 'Add a redirect', 'webhead-search-cloud' ) }
+							{ __( 'Add a redirect', 'searcio' ) }
 						</Button>
 					</Stack>
 				</Stack>
@@ -498,7 +498,7 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 };
 
 const reasonOf = ( error ) =>
-	error?.message || __( 'the request to the REST API failed.', 'webhead-search-cloud' );
+	error?.message || __( 'the request to the REST API failed.', 'searcio' );
 
 const SearchConfigTab = () => {
 	// The Popular Searches card persists through the plugin's own settings
@@ -651,7 +651,7 @@ const SearchConfigTab = () => {
 			} catch ( error ) {
 				failures.push( sprintf(
 					/* translators: %s: reason the save failed, as reported by the REST API. */
-					__( 'The search configuration could not be saved: %s', 'webhead-search-cloud' ),
+					__( 'The search configuration could not be saved: %s', 'searcio' ),
 					reasonOf( error )
 				) );
 				setFieldErrors( error?.errors && 'object' === typeof error.errors ? error.errors : {} );
@@ -662,14 +662,14 @@ const SearchConfigTab = () => {
 			if ( await savePopularSearches() ) {
 				savedSomething = true;
 			} else {
-				failures.push( __( 'The popular searches could not be saved.', 'webhead-search-cloud' ) );
+				failures.push( __( 'The popular searches could not be saved.', 'searcio' ) );
 			}
 		}
 
 		setIsSaving( false );
 
 		if ( 0 === failures.length ) {
-			showToast( __( 'Search configuration saved.', 'webhead-search-cloud' ), 'success' );
+			showToast( __( 'Search configuration saved.', 'searcio' ), 'success' );
 
 			return;
 		}
@@ -678,13 +678,13 @@ const SearchConfigTab = () => {
 		// the rest was stored.
 		setSaveError(
 			savedSomething
-				? [ ...failures, __( 'Everything else was saved.', 'webhead-search-cloud' ) ].join( ' ' )
+				? [ ...failures, __( 'Everything else was saved.', 'searcio' ) ].join( ' ' )
 				: failures.join( ' ' )
 		);
 	};
 
 	if ( isLoading ) {
-		return <IndexingSkeleton label={ __( 'Loading the search configuration', 'webhead-search-cloud' ) } />;
+		return <IndexingSkeleton label={ __( 'Loading the search configuration', 'searcio' ) } />;
 	}
 
 	if ( loadError || ! config ) {
@@ -693,13 +693,13 @@ const SearchConfigTab = () => {
 				<Notice.Description>
 					{ sprintf(
 						/* translators: %s: reason the request failed. */
-						__( 'The search configuration could not be loaded: %s', 'webhead-search-cloud' ),
-						loadError || __( 'the request to the REST API failed.', 'webhead-search-cloud' )
+						__( 'The search configuration could not be loaded: %s', 'searcio' ),
+						loadError || __( 'the request to the REST API failed.', 'searcio' )
 					) }
 				</Notice.Description>
 				<Notice.Actions>
 					<Notice.ActionButton onClick={ () => setLoadAttempt( ( attempt ) => attempt + 1 ) }>
-						{ __( 'Try again', 'webhead-search-cloud' ) }
+						{ __( 'Try again', 'searcio' ) }
 					</Notice.ActionButton>
 				</Notice.Actions>
 			</Notice.Root>
@@ -708,19 +708,19 @@ const SearchConfigTab = () => {
 
 	const saveDisabled = isSaving || ! hasUnsavedChanges;
 	const saveLabel = isSaving
-		? __( 'Saving…', 'webhead-search-cloud' )
-		: __( 'Save search configuration', 'webhead-search-cloud' );
+		? __( 'Saving…', 'searcio' )
+		: __( 'Save search configuration', 'searcio' );
 	const saveDescription = ! isSaving && ! hasUnsavedChanges
-		? __( 'No unsaved changes.', 'webhead-search-cloud' )
+		? __( 'No unsaved changes.', 'searcio' )
 		: undefined;
 
 	return (
 		<Stack direction="column" gap="lg" className="webhead-search-cloud-search-config">
 			<TabIntro
-				title={ __( 'Search configuration', 'webhead-search-cloud' ) }
+				title={ __( 'Search configuration', 'searcio' ) }
 				description={ __(
 					"Controls how Search Cloud itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Search Cloud's side, not in this plugin's own settings, so changes take effect on the very next search.",
-					'webhead-search-cloud'
+					'searcio'
 				) }
 			/>
 
@@ -738,10 +738,10 @@ const SearchConfigTab = () => {
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
-						title={ __( 'Searchable fields & weights', 'webhead-search-cloud' ) }
+						title={ __( 'Searchable fields & weights', 'searcio' ) }
 						description={ __(
 							'Which fields full-text search matches, and how much each one counts (1-100). A higher weight on "title" makes title matches outrank body-text matches, for example.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
@@ -749,7 +749,7 @@ const SearchConfigTab = () => {
 							{ config.searchable_fields.map( ( row, index ) => (
 								<div className="whsc-search-config-row" key={ index }>
 									<InputControl
-										label={ __( 'Field', 'webhead-search-cloud' ) }
+										label={ __( 'Field', 'searcio' ) }
 										list="whsc-field-suggestions"
 										value={ row.field }
 										description={ rowError( fieldErrors, 'searchable_fields', index, 'field' ) }
@@ -758,7 +758,7 @@ const SearchConfigTab = () => {
 									<RangeControl
 										__next40pxDefaultSize
 										__nextHasNoMarginBottom
-										label={ __( 'Weight', 'webhead-search-cloud' ) }
+										label={ __( 'Weight', 'searcio' ) }
 										min={ 1 }
 										max={ 100 }
 										value={ row.weight }
@@ -769,14 +769,14 @@ const SearchConfigTab = () => {
 										icon={ trash }
 										isDestructive
 										variant="tertiary"
-										label={ __( 'Remove field', 'webhead-search-cloud' ) }
+										label={ __( 'Remove field', 'searcio' ) }
 										onClick={ () => removeSearchableField( index ) }
 									/>
 								</div>
 							) ) }
 							<Stack direction="row" gap="sm">
 								<Button __next40pxDefaultSize variant="secondary" onClick={ addSearchableField }>
-									{ __( 'Add a field', 'webhead-search-cloud' ) }
+									{ __( 'Add a field', 'searcio' ) }
 								</Button>
 							</Stack>
 						</Stack>
@@ -785,10 +785,10 @@ const SearchConfigTab = () => {
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
-						title={ __( 'Type boosts', 'webhead-search-cloud' ) }
+						title={ __( 'Type boosts', 'searcio' ) }
 						description={ __(
 							'Ranking boost per content type (0.1-100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
@@ -801,7 +801,7 @@ const SearchConfigTab = () => {
 										     input rather than as a name. */ }
 										<Stack direction="column" gap="xs" className="whsc-search-config-type-label">
 											<Text variant="body-sm" className="whsc-search-config-type-label__caption">
-												{ __( 'Type', 'webhead-search-cloud' ) }
+												{ __( 'Type', 'searcio' ) }
 											</Text>
 											<Text className="whsc-search-config-type-label__value">
 												{ typeLabels[ row.type ] || row.type }
@@ -810,7 +810,7 @@ const SearchConfigTab = () => {
 										<RangeControl
 											__next40pxDefaultSize
 											__nextHasNoMarginBottom
-											label={ __( 'Boost', 'webhead-search-cloud' ) }
+											label={ __( 'Boost', 'searcio' ) }
 											min={ 0.1 }
 											max={ 100 }
 											step={ 0.1 }
@@ -826,7 +826,7 @@ const SearchConfigTab = () => {
 								<Notice.Description>
 									{ __(
 										'Enable at least one content type in the Indexing tab to set a type boost.',
-										'webhead-search-cloud'
+										'searcio'
 									) }
 								</Notice.Description>
 							</Notice.Root>
@@ -836,10 +836,10 @@ const SearchConfigTab = () => {
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
-						title={ __( 'Facet fields', 'webhead-search-cloud' ) }
+						title={ __( 'Facet fields', 'searcio' ) }
 						description={ __(
 							'Fields returned as facets on search results and allowed as filters. Click the field to browse every available field, or type to search.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
@@ -848,7 +848,7 @@ const SearchConfigTab = () => {
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								__experimentalExpandOnFocus
-								label={ __( 'Facet fields', 'webhead-search-cloud' ) }
+								label={ __( 'Facet fields', 'searcio' ) }
 								hideLabelFromVision
 								value={ config.facet_fields }
 								suggestions={ pool }
@@ -864,10 +864,10 @@ const SearchConfigTab = () => {
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
-						title={ __( 'Suggest fields', 'webhead-search-cloud' ) }
+						title={ __( 'Suggest fields', 'searcio' ) }
 						description={ __(
 							'Fields queried for search-as-you-type suggestions. Defaults to "title" when left empty. Click to browse, or type to search.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
@@ -876,7 +876,7 @@ const SearchConfigTab = () => {
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								__experimentalExpandOnFocus
-								label={ __( 'Suggest fields', 'webhead-search-cloud' ) }
+								label={ __( 'Suggest fields', 'searcio' ) }
 								hideLabelFromVision
 								value={ config.suggest_fields }
 								suggestions={ pool }
@@ -892,17 +892,17 @@ const SearchConfigTab = () => {
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
-						title={ __( 'Synonyms', 'webhead-search-cloud' ) }
+						title={ __( 'Synonyms', 'searcio' ) }
 						description={ __(
 							'Treats words as interchangeable during search, even when the exact word a visitor types never appears in a result. For example, a line with "sneaker, trainer" means searching "sneaker" also matches results that only mention "trainer", and vice versa - useful for regional spelling or naming differences.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
 						<TextareaControl
-							label={ __( 'Synonyms', 'webhead-search-cloud' ) }
+							label={ __( 'Synonyms', 'searcio' ) }
 							hideLabelFromVision
-							description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'webhead-search-cloud' ) }
+							description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'searcio' ) }
 							value={ config.synonyms.join( '\n' ) }
 							onValueChange={ ( value ) =>
 								set(
@@ -916,16 +916,16 @@ const SearchConfigTab = () => {
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
-						title={ __( 'Languages', 'webhead-search-cloud' ) }
+						title={ __( 'Languages', 'searcio' ) }
 						description={ catalog?.languages?.active
 							? ( null !== languageLimit
 								? sprintf(
 									/* translators: %d: number of languages the plan allows. */
-									__( 'Which of this site\'s languages to index and search. Your plan allows up to %d.', 'webhead-search-cloud' ),
+									__( 'Which of this site\'s languages to index and search. Your plan allows up to %d.', 'searcio' ),
 									languageLimit
 								)
-								: __( 'Which of this site\'s languages to index and search. Leave every language unchecked for unrestricted.', 'webhead-search-cloud' ) )
-							: __( 'No WPML/Polylang installation was detected, so languages can only be entered manually here. Leave empty for unrestricted.', 'webhead-search-cloud' ) }
+								: __( 'Which of this site\'s languages to index and search. Leave every language unchecked for unrestricted.', 'searcio' ) )
+							: __( 'No WPML/Polylang installation was detected, so languages can only be entered manually here. Leave empty for unrestricted.', 'searcio' ) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
 						<Stack direction="column" gap="md">
@@ -943,9 +943,9 @@ const SearchConfigTab = () => {
 								</Grid>
 							) : (
 								<InputControl
-									label={ __( 'Languages', 'webhead-search-cloud' ) }
+									label={ __( 'Languages', 'searcio' ) }
 									hideLabelFromVision
-									description={ __( 'Comma-separated ISO language codes, e.g. "de, en".', 'webhead-search-cloud' ) }
+									description={ __( 'Comma-separated ISO language codes, e.g. "de, en".', 'searcio' ) }
 									value={ config.languages.join( ', ' ) }
 									onValueChange={ ( value ) =>
 										set(

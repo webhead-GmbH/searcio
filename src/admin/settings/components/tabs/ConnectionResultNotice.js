@@ -20,17 +20,17 @@ const ConnectionResultNotice = ({result}) => {
 			docs.used !== null && docs.used !== undefined
 				? sprintf(
 					/* translators: 1: used documents, 2: document limit. */
-					__('Connected - %1$s / %2$s documents indexed.', 'webhead-search-cloud'),
+					__('Connected - %1$s / %2$s documents indexed.', 'searcio'),
 					formatNumber(docs.used),
 					docs.limit === null || docs.limit === undefined
-						? __('unlimited', 'webhead-search-cloud')
+						? __('unlimited', 'searcio')
 						: formatNumber(docs.limit)
 				)
-				: __('Connected.', 'webhead-search-cloud');
+				: __('Connected.', 'searcio');
 		const siteIdSuffix = result.site_id
 			? sprintf(
 				/* translators: %d: the Search Cloud site id. */
-				__(' (site #%d)', 'webhead-search-cloud'),
+				__(' (site #%d)', 'searcio'),
 				result.site_id
 			)
 			: '';
@@ -45,7 +45,7 @@ const ConnectionResultNotice = ({result}) => {
 	return (
 		<Notice.Root intent="error">
 			<Notice.Description>
-				{result.message || __('Connection failed.', 'webhead-search-cloud')}
+				{result.message || __('Connection failed.', 'searcio')}
 			</Notice.Description>
 		</Notice.Root>
 	);

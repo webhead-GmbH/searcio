@@ -23,9 +23,9 @@ const CacheClearCard = () => {
 		try {
 			await apiFetch( { path: CACHE_CLEAR_PATH, method: 'POST' } );
 
-			showToast( __( 'Cache cleared.', 'webhead-search-cloud' ), 'success' );
+			showToast( __( 'Cache cleared.', 'searcio' ), 'success' );
 		} catch ( error ) {
-			showToast( __( 'Could not clear the cache.', 'webhead-search-cloud' ), 'error' );
+			showToast( __( 'Could not clear the cache.', 'searcio' ), 'error' );
 		} finally {
 			setIsClearing( false );
 		}
@@ -36,12 +36,12 @@ const CacheClearCard = () => {
 			<Card.Header className="whsc-settings-card-header">
 				<div className="whsc-settings-card-copy">
 					<Card.Title render={ <h2 /> }>
-						{ __( 'Cache', 'webhead-search-cloud' ) }
+						{ __( 'Cache', 'searcio' ) }
 					</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
 							"Clears this plugin's own cached data and PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own.",
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					</Text>
 				</div>
@@ -55,7 +55,7 @@ const CacheClearCard = () => {
 						disabled={ isClearing }
 						onClick={ onClear }
 					>
-						{ isClearing ? __( 'Clearing…', 'webhead-search-cloud' ) : __( 'Clear cache', 'webhead-search-cloud' ) }
+						{ isClearing ? __( 'Clearing…', 'searcio' ) : __( 'Clear cache', 'searcio' ) }
 					</Button>
 				</Stack>
 			</Card.Content>

@@ -29,7 +29,7 @@ const SearchInput = forwardRef( ( {
 			className="whsc-search-input__field"
 			value={ value }
 			placeholder={ placeholder }
-			aria-label={ placeholder || __( 'Search', 'webhead-search-cloud' ) }
+			aria-label={ placeholder || __( 'Search', 'searcio' ) }
 			role="combobox"
 			aria-autocomplete="list"
 			aria-expanded={ !! suggestionsOpen }
@@ -46,7 +46,7 @@ const SearchInput = forwardRef( ( {
 			<Button
 				className="whsc-search-input__clear"
 				icon={ closeSmall }
-				label={ __( 'Clear', 'webhead-search-cloud' ) }
+				label={ __( 'Clear', 'searcio' ) }
 				showTooltip={ false }
 				onClick={ () => onChange( '' ) }
 			/>

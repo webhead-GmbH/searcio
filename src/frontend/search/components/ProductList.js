@@ -165,7 +165,7 @@ const ProductList = ( {
 								onClick={ () => trackClick( searchId, hit.id, index + 1 ) }
 							/>
 						) }
-						ariaLabel={ heading || __( 'Products', 'webhead-search-cloud' ) }
+						ariaLabel={ heading || __( 'Products', 'searcio' ) }
 					/>
 				)
 			) }

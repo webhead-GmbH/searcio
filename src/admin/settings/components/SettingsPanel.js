@@ -93,20 +93,20 @@ const SettingsPanel = () => {
 	const tabs = [
 		{
 			name: SYNC_TAB,
-			title: renderAnimatedTabTitle(__('Sync', 'webhead-search-cloud'), '', 0.08),
+			title: renderAnimatedTabTitle(__('Sync', 'searcio'), '', 0.08),
 		},
 		...(canManageSettings ? [
 			{
 				name: INDEXING_TAB,
-				title: renderAnimatedTabTitle(__('Indexing', 'webhead-search-cloud'), '', 0.04),
+				title: renderAnimatedTabTitle(__('Indexing', 'searcio'), '', 0.04),
 			},
 			{
 				name: SEARCH_CONFIG_TAB,
-				title: renderAnimatedTabTitle(__('Search Config', 'webhead-search-cloud'), '', 0.16),
+				title: renderAnimatedTabTitle(__('Search Config', 'searcio'), '', 0.16),
 			},
 			{
 				name: CONNECTION_TAB,
-				title: renderAnimatedTabTitle(__('Connection', 'webhead-search-cloud')),
+				title: renderAnimatedTabTitle(__('Connection', 'searcio')),
 			},
 		] : []),
 		...otherGroups.map((group, index) => ({
@@ -156,15 +156,15 @@ const SettingsPanel = () => {
 			return;
 		}
 
-		showToast(__('Settings saved successfully.', 'webhead-search-cloud'), 'success');
+		showToast(__('Settings saved successfully.', 'searcio'), 'success');
 	};
 
 	const isSaveDisabled = isSaving || isLoading || !hasUnsavedChanges;
 	const saveButtonLabel = isSaving
-		? __('Saving...', 'webhead-search-cloud')
-		: __('Save Settings', 'webhead-search-cloud');
+		? __('Saving...', 'searcio')
+		: __('Save Settings', 'searcio');
 	const saveButtonDescription = !isLoading && !isSaving && !hasUnsavedChanges
-		? __('No unsaved changes.', 'webhead-search-cloud')
+		? __('No unsaved changes.', 'searcio')
 		: undefined;
 	const hasSaveButton = !isLoading && !loadError && isKnownTab && !SELF_MANAGED_TABS.includes(activeTab);
 
@@ -174,8 +174,8 @@ const SettingsPanel = () => {
 		// particular to settings: the tabs and the save action.
 		<AdminPage
 			className="settings"
-			title={__('webhead Search Cloud', 'webhead-search-cloud')}
-			description={pluginData?.plugin?.description || __('Configure the plugin settings from one shared admin surface.', 'webhead-search-cloud')}
+			title={__('webhead Search Cloud', 'searcio')}
+			description={pluginData?.plugin?.description || __('Configure the plugin settings from one shared admin surface.', 'searcio')}
 			icon={searcioIcon}
 			actions={upgradeAction ? [upgradeAction] : undefined}
 			// The tab strip sits directly under the header. A load that failed has
@@ -204,13 +204,13 @@ const SettingsPanel = () => {
 					<Notice.Description>
 						{sprintf(
 							/* translators: %s: reason the settings request failed. */
-							__('The settings could not be loaded: %s', 'webhead-search-cloud'),
+							__('The settings could not be loaded: %s', 'searcio'),
 							loadError
 						)}
 					</Notice.Description>
 					<Notice.Actions>
 						<Notice.ActionButton onClick={retryLoad}>
-							{__('Try again', 'webhead-search-cloud')}
+							{__('Try again', 'searcio')}
 						</Notice.ActionButton>
 					</Notice.Actions>
 				</Notice.Root>
@@ -298,7 +298,7 @@ const SettingsPanel = () => {
 							<Notice.Description>
 								{sprintf(
 									/* translators: %s: reason the settings could not be saved, as reported by the REST API. */
-									__('The settings could not be saved: %s', 'webhead-search-cloud'),
+									__('The settings could not be saved: %s', 'searcio'),
 									saveError
 								)}
 							</Notice.Description>

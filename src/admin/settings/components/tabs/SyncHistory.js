@@ -42,9 +42,9 @@ const storeView = (view) => {
 const ACTIVE = ['queued', 'running', 'paused'];
 
 const TRIGGER_ELEMENTS = [
-	{value: 'manual', label: __('Manual', 'webhead-search-cloud')},
-	{value: 'scheduled', label: __('Scheduled', 'webhead-search-cloud')},
-	{value: 'incremental', label: __('Incremental', 'webhead-search-cloud')},
+	{value: 'manual', label: __('Manual', 'searcio')},
+	{value: 'scheduled', label: __('Scheduled', 'searcio')},
+	{value: 'incremental', label: __('Incremental', 'searcio')},
 ];
 
 // DataViews sort fields → sync_runs columns the REST endpoint accepts.
@@ -195,7 +195,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 			return [
 				{
 					id: 'id',
-					label: __('Run', 'webhead-search-cloud'),
+					label: __('Run', 'searcio'),
 					enableSorting: true,
 					enableHiding: false,
 					filterBy: false,
@@ -203,8 +203,8 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 				},
 				{
 					id: 'status',
-					label: __('Status', 'webhead-search-cloud'),
-					header: renderFieldHeaderWithIcon(__('Status', 'webhead-search-cloud'), tag),
+					label: __('Status', 'searcio'),
+					header: renderFieldHeaderWithIcon(__('Status', 'searcio'), tag),
 					enableSorting: true,
 					elements: statusElements,
 					filterBy: {operators: ['is']},
@@ -216,7 +216,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 				},
 				{
 					id: 'trigger',
-					label: __('Trigger', 'webhead-search-cloud'),
+					label: __('Trigger', 'searcio'),
 					enableSorting: true,
 					elements: TRIGGER_ELEMENTS,
 					filterBy: {operators: ['is']},
@@ -226,28 +226,28 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 				},
 				{
 					id: 'processed',
-					label: __('Processed', 'webhead-search-cloud'),
+					label: __('Processed', 'searcio'),
 					enableSorting: true,
 					filterBy: false,
 					render: ({item}) => formatNumber(item.processed),
 				},
 				{
 					id: 'pushed',
-					label: __('Pushed', 'webhead-search-cloud'),
+					label: __('Pushed', 'searcio'),
 					enableSorting: true,
 					filterBy: false,
 					render: ({item}) => formatNumber(item.pushed),
 				},
 				{
 					id: 'deleted',
-					label: __('Deleted', 'webhead-search-cloud'),
+					label: __('Deleted', 'searcio'),
 					filterBy: false,
 					render: ({item}) => formatNumber(item.deleted),
 				},
 				{
 					id: 'created_at',
-					label: __('Started', 'webhead-search-cloud'),
-					header: renderFieldHeaderWithIcon(__('Started', 'webhead-search-cloud'), calendar),
+					label: __('Started', 'searcio'),
+					header: renderFieldHeaderWithIcon(__('Started', 'searcio'), calendar),
 					enableSorting: true,
 					filterBy: false,
 					render: ({item}) => formatDate(item.created_at),
@@ -261,12 +261,12 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 		() => [
 			{
 				id: 'delete',
-				label: __('Delete', 'webhead-search-cloud'),
+				label: __('Delete', 'searcio'),
 				icon: trash,
 				isDestructive: true,
 				supportsBulk: true,
 				isEligible: (item) => CAN_RUN_SYNC && !ACTIVE.includes(item.status),
-				modalHeader: (selected) => _n('Delete this run?', 'Delete these runs?', selected.length, 'webhead-search-cloud'),
+				modalHeader: (selected) => _n('Delete this run?', 'Delete these runs?', selected.length, 'searcio'),
 				modalSize: 'small',
 				// A deleted run cannot be brought back, so the table asks first
 				// and the button says what it does.
@@ -279,14 +279,14 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 									'%d run is removed from the history for good. What it sent to Search Cloud stays where it is.',
 									'%d runs are removed from the history for good. What they sent to Search Cloud stays where it is.',
 									selected.length,
-									'webhead-search-cloud'
+									'searcio'
 								),
 								selected.length
 							)}
 						</Text>
 						<Stack direction="row" gap="sm" justify="flex-end">
 							<Button __next40pxDefaultSize variant="tertiary" onClick={closeModal}>
-								{__('Cancel', 'webhead-search-cloud')}
+								{__('Cancel', 'searcio')}
 							</Button>
 							<Button
 								__next40pxDefaultSize
@@ -305,7 +305,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 									onChanged?.();
 								}}
 							>
-								{__('Delete permanently', 'webhead-search-cloud')}
+								{__('Delete permanently', 'searcio')}
 							</Button>
 						</Stack>
 					</Stack>
@@ -318,12 +318,12 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 	const clearFinished = async () => {
 		try {
 			await apiFetch({path: `${apiBase}/history`, method: 'DELETE'});
-			showToast(__('Finished runs cleared.', 'webhead-search-cloud'), 'success');
+			showToast(__('Finished runs cleared.', 'searcio'), 'success');
 			setReload((value) => value + 1);
 			onChanged?.();
 		} catch (error) {
 			showToast(
-				error?.message || __('Could not clear the history.', 'webhead-search-cloud'),
+				error?.message || __('Could not clear the history.', 'searcio'),
 				'error'
 			);
 		}
@@ -333,7 +333,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 		<Stack direction="column" gap="md" className="whsc-sync-history">
 			<Stack direction="row" gap="md" justify="space-between" align="center" wrap="wrap">
 				<Text render={<h3/>} variant="heading-md" className="whsc-sync-history__title">
-					{__('Sync history', 'webhead-search-cloud')}
+					{__('Sync history', 'searcio')}
 				</Text>
 				<Button
 					__next40pxDefaultSize
@@ -342,7 +342,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 					onClick={() => setIsClearOpen(true)}
 					disabled={total === 0 || !CAN_RUN_SYNC}
 				>
-					{__('Clear finished', 'webhead-search-cloud')}
+					{__('Clear finished', 'searcio')}
 				</Button>
 			</Stack>
 
@@ -373,18 +373,18 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 			<Modal
 				isOpen={isClearOpen}
 				onClose={() => setIsClearOpen(false)}
-				title={__('Clear the finished runs?', 'webhead-search-cloud')}
+				title={__('Clear the finished runs?', 'searcio')}
 				size="small"
 				showCloseButton={false}
 				closeOnEscape={false}
 				closeOnBackdropClick={false}
 				actions={[
 					{
-						label: __('Cancel', 'webhead-search-cloud'),
+						label: __('Cancel', 'searcio'),
 						variant: 'tertiary',
 					},
 					{
-						label: __('Clear permanently', 'webhead-search-cloud'),
+						label: __('Clear permanently', 'searcio'),
 						variant: 'primary',
 						isDestructive: true,
 						onClick: clearFinished,
@@ -394,7 +394,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 				<Text>
 					{__(
 						'Every completed, failed and cancelled run is removed from the history for good. A run in progress is kept, and nothing in Search Cloud changes.',
-						'webhead-search-cloud'
+						'searcio'
 					)}
 				</Text>
 			</Modal>

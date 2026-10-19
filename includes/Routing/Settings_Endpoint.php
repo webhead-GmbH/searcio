@@ -67,7 +67,7 @@ final class Settings_Endpoint extends Rest_API {
 
 		if ( ! is_array( $incoming ) ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'Invalid settings payload.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'Invalid settings payload.', 'searcio' ) ],
 				400
 			);
 		}

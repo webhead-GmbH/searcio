@@ -11,7 +11,7 @@ msgstr ""
 "PO-Revision-Date: 2026-07-06\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Domain: webhead-search-cloud\n"
+"X-Domain: searcio\n"
 "X-Generator: WP-CLI 2.12.0\n"
 
 #. Plugin Name of the plugin

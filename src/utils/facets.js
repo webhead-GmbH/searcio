@@ -60,18 +60,18 @@ export const buildFilterParams = ( activeFacets, extra = {} ) => {
  * has no name here and is humanized from its key.
  */
 const KNOWN_FIELD_LABELS = () => ( {
-	categories: __( 'Categories', 'webhead-search-cloud' ),
-	product_tags: __( 'Tags', 'webhead-search-cloud' ),
-	stock_status: __( 'Stock status', 'webhead-search-cloud' ),
-	in_stock: __( 'In stock', 'webhead-search-cloud' ),
-	on_sale: __( 'On sale', 'webhead-search-cloud' ),
-	featured: __( 'Featured', 'webhead-search-cloud' ),
-	sku: __( 'SKU', 'webhead-search-cloud' ),
-	skus: __( 'SKUs', 'webhead-search-cloud' ),
-	price: __( 'Price', 'webhead-search-cloud' ),
-	price_min: __( 'Lowest price', 'webhead-search-cloud' ),
-	price_max: __( 'Highest price', 'webhead-search-cloud' ),
-	product_type: __( 'Product type', 'webhead-search-cloud' ),
+	categories: __( 'Categories', 'searcio' ),
+	product_tags: __( 'Tags', 'searcio' ),
+	stock_status: __( 'Stock status', 'searcio' ),
+	in_stock: __( 'In stock', 'searcio' ),
+	on_sale: __( 'On sale', 'searcio' ),
+	featured: __( 'Featured', 'searcio' ),
+	sku: __( 'SKU', 'searcio' ),
+	skus: __( 'SKUs', 'searcio' ),
+	price: __( 'Price', 'searcio' ),
+	price_min: __( 'Lowest price', 'searcio' ),
+	price_max: __( 'Highest price', 'searcio' ),
+	product_type: __( 'Product type', 'searcio' ),
 } );
 
 /**

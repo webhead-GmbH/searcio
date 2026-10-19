@@ -51,7 +51,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const scopeOptions = [
 		// The item whose value is null is what the select shows for "nothing
 		// chosen"; an empty string would show its placeholder instead.
-		{ value: null, label: __( 'All types', 'webhead-search-cloud' ) },
+		{ value: null, label: __( 'All types', 'searcio' ) },
 		...postTypes
 			.filter( ( postType ) => postType.config?.enabled )
 			.map( ( postType ) => ( { value: postType.slug, label: postType.label } ) ),
@@ -77,81 +77,81 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Search settings', 'webhead-search-cloud' ) }>
+				<PanelBody title={ __( 'Search settings', 'searcio' ) }>
 					<InspectorStack>
 						<RadioControl
-							label={ __( 'Trigger style', 'webhead-search-cloud' ) }
+							label={ __( 'Trigger style', 'searcio' ) }
 							selected={ mode }
 							options={ [
-								{ label: __( 'Search box', 'webhead-search-cloud' ), value: 'box' },
-								{ label: __( 'Icon button', 'webhead-search-cloud' ), value: 'icon' },
+								{ label: __( 'Search box', 'searcio' ), value: 'box' },
+								{ label: __( 'Icon button', 'searcio' ), value: 'icon' },
 							] }
 							onChange={ ( value ) => setAttributes( { mode: value } ) }
 						/>
 						<SelectControl
-							label={ __( 'Restrict to type', 'webhead-search-cloud' ) }
+							label={ __( 'Restrict to type', 'searcio' ) }
 							value={ scopeType || null }
 							items={ scopeOptions }
 							onValueChange={ ( value ) => setAttributes( { scopeType: value ?? '' } ) }
 						/>
 						<SelectControl
-							label={ __( 'Card source', 'webhead-search-cloud' ) }
-							description={ __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'webhead-search-cloud' ) }
+							label={ __( 'Card source', 'searcio' ) }
+							description={ __( "Design templates per content type in the Search Cloud panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'searcio' ) }
 							value={ cardSource }
 							items={ [
-								{ value: 'plugin', label: __( 'Plugin templates', 'webhead-search-cloud' ) },
-								{ value: 'server', label: __( 'Search Cloud templates', 'webhead-search-cloud' ) },
+								{ value: 'plugin', label: __( 'Plugin templates', 'searcio' ) },
+								{ value: 'server', label: __( 'Search Cloud templates', 'searcio' ) },
 							] }
 							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
 						/>
 						<SelectControl
-							label={ __( 'Highlights source', 'webhead-search-cloud' ) }
-							description={ __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'webhead-search-cloud' ) }
+							label={ __( 'Highlights source', 'searcio' ) }
+							description={ __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'searcio' ) }
 							value={ highlightsSource }
 							items={ [
-								{ value: 'newest', label: __( 'Newest', 'webhead-search-cloud' ) },
-								{ value: 'featured', label: __( 'Featured', 'webhead-search-cloud' ) },
+								{ value: 'newest', label: __( 'Newest', 'searcio' ) },
+								{ value: 'featured', label: __( 'Featured', 'searcio' ) },
 							] }
 							onValueChange={ ( value ) => setAttributes( { highlightsSource: value } ) }
 						/>
 						<InputControl
-							label={ __( 'Placeholder text', 'webhead-search-cloud' ) }
+							label={ __( 'Placeholder text', 'searcio' ) }
 							value={ placeholder }
-							placeholder={ __( 'Search…', 'webhead-search-cloud' ) }
+							placeholder={ __( 'Search…', 'searcio' ) }
 							onValueChange={ ( value ) => setAttributes( { placeholder: value } ) }
 						/>
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ __( 'Enable voice search', 'webhead-search-cloud' ) }
-							help={ __( 'Shows a microphone button in the modal (browser support required).', 'webhead-search-cloud' ) }
+							label={ __( 'Enable voice search', 'searcio' ) }
+							help={ __( 'Shows a microphone button in the modal (browser support required).', 'searcio' ) }
 							checked={ Boolean( enableVoice ) }
 							onChange={ ( value ) => setAttributes( { enableVoice: value } ) }
 						/>
 						<RadioControl
-							label={ __( 'When to search', 'webhead-search-cloud' ) }
-							help={ __( "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button.", 'webhead-search-cloud' ) }
+							label={ __( 'When to search', 'searcio' ) }
+							help={ __( "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button.", 'searcio' ) }
 							selected={ searchTrigger }
 							options={ [
-								{ label: __( 'On submit (Enter / button)', 'webhead-search-cloud' ), value: 'submit' },
-								{ label: __( 'While typing', 'webhead-search-cloud' ), value: 'type' },
+								{ label: __( 'On submit (Enter / button)', 'searcio' ), value: 'submit' },
+								{ label: __( 'While typing', 'searcio' ), value: 'type' },
 							] }
 							onChange={ ( value ) => setAttributes( { searchTrigger: value } ) }
 						/>
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ __( 'Show result count on filters', 'webhead-search-cloud' ) }
+							label={ __( 'Show result count on filters', 'searcio' ) }
 							checked={ Boolean( showCount ) }
 							onChange={ ( value ) => setAttributes( { showCount: value } ) }
 						/>
 						<SelectControl
-							label={ __( 'Open animation', 'webhead-search-cloud' ) }
+							label={ __( 'Open animation', 'searcio' ) }
 							value={ animation }
 							items={ [
-								{ value: 'none', label: __( 'None', 'webhead-search-cloud' ) },
-								{ value: 'fade', label: __( 'Fade', 'webhead-search-cloud' ) },
-								{ value: 'slide-down', label: __( 'Slide down', 'webhead-search-cloud' ) },
-								{ value: 'slide-up', label: __( 'Slide up', 'webhead-search-cloud' ) },
-								{ value: 'zoom', label: __( 'Zoom', 'webhead-search-cloud' ) },
+								{ value: 'none', label: __( 'None', 'searcio' ) },
+								{ value: 'fade', label: __( 'Fade', 'searcio' ) },
+								{ value: 'slide-down', label: __( 'Slide down', 'searcio' ) },
+								{ value: 'slide-up', label: __( 'Slide up', 'searcio' ) },
+								{ value: 'zoom', label: __( 'Zoom', 'searcio' ) },
 							] }
 							onValueChange={ ( value ) => setAttributes( { animation: value } ) }
 						/>
@@ -159,7 +159,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							<RangeControl
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
-								label={ __( 'Animation duration (ms)', 'webhead-search-cloud' ) }
+								label={ __( 'Animation duration (ms)', 'searcio' ) }
 								value={ animationDuration ?? undefined }
 								onChange={ setSize( 'animationDuration' ) }
 								min={ 0 }
@@ -174,214 +174,214 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 			<InspectorControls group="styles">
 				<PanelColorSettings
-					title={ __( 'Trigger', 'webhead-search-cloud' ) }
+					title={ __( 'Trigger', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'triggerIconColor', __( 'Icon color', 'webhead-search-cloud' ) ),
-						color( 'triggerIconColorHover', __( 'Icon color (hover)', 'webhead-search-cloud' ) ),
-						color( 'triggerBg', __( 'Background', 'webhead-search-cloud' ) ),
-						color( 'triggerBgHover', __( 'Background (hover)', 'webhead-search-cloud' ) ),
+						color( 'triggerIconColor', __( 'Icon color', 'searcio' ) ),
+						color( 'triggerIconColorHover', __( 'Icon color (hover)', 'searcio' ) ),
+						color( 'triggerBg', __( 'Background', 'searcio' ) ),
+						color( 'triggerBgHover', __( 'Background (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'triggerIconSize', __( 'Icon size', 'webhead-search-cloud' ), 60, 12 ) }
-					{ sizeControl( 'triggerBtnSize', __( 'Button size', 'webhead-search-cloud' ), 96, 28 ) }
-					{ sizeControl( 'triggerRadius', __( 'Border radius', 'webhead-search-cloud' ), 100 ) }
+					{ sizeControl( 'triggerIconSize', __( 'Icon size', 'searcio' ), 60, 12 ) }
+					{ sizeControl( 'triggerBtnSize', __( 'Button size', 'searcio' ), 96, 28 ) }
+					{ sizeControl( 'triggerRadius', __( 'Border radius', 'searcio' ), 100 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Modal', 'webhead-search-cloud' ) }
+					title={ __( 'Modal', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'bgColor', __( 'Background', 'webhead-search-cloud' ) ),
-						color( 'textColor', __( 'Text', 'webhead-search-cloud' ) ),
-						color( 'accentColor', __( 'Accent', 'webhead-search-cloud' ) ),
+						color( 'bgColor', __( 'Background', 'searcio' ) ),
+						color( 'textColor', __( 'Text', 'searcio' ) ),
+						color( 'accentColor', __( 'Accent', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'radiusPanel', __( 'Corner radius', 'webhead-search-cloud' ), 40 ) }
-					{ sizeControl( 'modalPadding', __( 'Padding', 'webhead-search-cloud' ), 80 ) }
-					{ sizeControl( 'modalGap', __( 'Section spacing', 'webhead-search-cloud' ), 80 ) }
+					{ sizeControl( 'radiusPanel', __( 'Corner radius', 'searcio' ), 40 ) }
+					{ sizeControl( 'modalPadding', __( 'Padding', 'searcio' ), 80 ) }
+					{ sizeControl( 'modalGap', __( 'Section spacing', 'searcio' ), 80 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Search field', 'webhead-search-cloud' ) }
+					title={ __( 'Search field', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'inputBgColor', __( 'Background', 'webhead-search-cloud' ) ),
-						color( 'inputTextColor', __( 'Text', 'webhead-search-cloud' ) ),
-						color( 'inputIconColor', __( 'Icon', 'webhead-search-cloud' ) ),
-						color( 'inputPlaceholderColor', __( 'Placeholder', 'webhead-search-cloud' ) ),
-						color( 'inputBorderColor', __( 'Border', 'webhead-search-cloud' ) ),
-						color( 'inputBorderFocusColor', __( 'Border (focus)', 'webhead-search-cloud' ) ),
+						color( 'inputBgColor', __( 'Background', 'searcio' ) ),
+						color( 'inputTextColor', __( 'Text', 'searcio' ) ),
+						color( 'inputIconColor', __( 'Icon', 'searcio' ) ),
+						color( 'inputPlaceholderColor', __( 'Placeholder', 'searcio' ) ),
+						color( 'inputBorderColor', __( 'Border', 'searcio' ) ),
+						color( 'inputBorderFocusColor', __( 'Border (focus)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'inputRadius', __( 'Border radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'inputRadius', __( 'Border radius', 'searcio' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Buttons', 'webhead-search-cloud' ) }
+					title={ __( 'Buttons', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'btnBg', __( 'Search button bg', 'webhead-search-cloud' ) ),
-						color( 'btnBgHover', __( 'Search button bg (hover)', 'webhead-search-cloud' ) ),
-						color( 'btnText', __( 'Search button text', 'webhead-search-cloud' ) ),
-						color( 'btnTextHover', __( 'Search button text (hover)', 'webhead-search-cloud' ) ),
-						color( 'iconColor', __( 'Icon buttons', 'webhead-search-cloud' ) ),
-						color( 'iconColorHover', __( 'Icon buttons (hover)', 'webhead-search-cloud' ) ),
-						color( 'iconBgHover', __( 'Icon button bg (hover)', 'webhead-search-cloud' ) ),
-						color( 'voiceColor', __( 'Voice icon', 'webhead-search-cloud' ) ),
-						color( 'voiceColorHover', __( 'Voice icon (hover)', 'webhead-search-cloud' ) ),
-						color( 'voiceBg', __( 'Voice bg', 'webhead-search-cloud' ) ),
-						color( 'voiceBgHover', __( 'Voice bg (hover)', 'webhead-search-cloud' ) ),
-						color( 'closeColor', __( 'Close icon', 'webhead-search-cloud' ) ),
-						color( 'closeColorHover', __( 'Close icon (hover)', 'webhead-search-cloud' ) ),
-						color( 'closeBg', __( 'Close bg', 'webhead-search-cloud' ) ),
-						color( 'closeBgHover', __( 'Close bg (hover)', 'webhead-search-cloud' ) ),
-						color( 'visualColor', __( 'Photo icon', 'webhead-search-cloud' ) ),
-						color( 'visualColorHover', __( 'Photo icon (hover)', 'webhead-search-cloud' ) ),
-						color( 'visualBg', __( 'Photo bg', 'webhead-search-cloud' ) ),
-						color( 'visualBgHover', __( 'Photo bg (hover)', 'webhead-search-cloud' ) ),
-						color( 'clearBtnColor', __( 'Clear icon', 'webhead-search-cloud' ) ),
-						color( 'clearBtnColorHover', __( 'Clear icon (hover)', 'webhead-search-cloud' ) ),
-						color( 'clearBtnBg', __( 'Clear bg', 'webhead-search-cloud' ) ),
-						color( 'clearBtnBgHover', __( 'Clear bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'btnBg', __( 'Search button bg', 'searcio' ) ),
+						color( 'btnBgHover', __( 'Search button bg (hover)', 'searcio' ) ),
+						color( 'btnText', __( 'Search button text', 'searcio' ) ),
+						color( 'btnTextHover', __( 'Search button text (hover)', 'searcio' ) ),
+						color( 'iconColor', __( 'Icon buttons', 'searcio' ) ),
+						color( 'iconColorHover', __( 'Icon buttons (hover)', 'searcio' ) ),
+						color( 'iconBgHover', __( 'Icon button bg (hover)', 'searcio' ) ),
+						color( 'voiceColor', __( 'Voice icon', 'searcio' ) ),
+						color( 'voiceColorHover', __( 'Voice icon (hover)', 'searcio' ) ),
+						color( 'voiceBg', __( 'Voice bg', 'searcio' ) ),
+						color( 'voiceBgHover', __( 'Voice bg (hover)', 'searcio' ) ),
+						color( 'closeColor', __( 'Close icon', 'searcio' ) ),
+						color( 'closeColorHover', __( 'Close icon (hover)', 'searcio' ) ),
+						color( 'closeBg', __( 'Close bg', 'searcio' ) ),
+						color( 'closeBgHover', __( 'Close bg (hover)', 'searcio' ) ),
+						color( 'visualColor', __( 'Photo icon', 'searcio' ) ),
+						color( 'visualColorHover', __( 'Photo icon (hover)', 'searcio' ) ),
+						color( 'visualBg', __( 'Photo bg', 'searcio' ) ),
+						color( 'visualBgHover', __( 'Photo bg (hover)', 'searcio' ) ),
+						color( 'clearBtnColor', __( 'Clear icon', 'searcio' ) ),
+						color( 'clearBtnColorHover', __( 'Clear icon (hover)', 'searcio' ) ),
+						color( 'clearBtnBg', __( 'Clear bg', 'searcio' ) ),
+						color( 'clearBtnBgHover', __( 'Clear bg (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'btnRadius', __( 'Search button radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'btnRadius', __( 'Search button radius', 'searcio' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Suggestions', 'webhead-search-cloud' ) }
+					title={ __( 'Suggestions', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'panelBg', __( 'Panel background', 'webhead-search-cloud' ) ),
-						color( 'panelBorder', __( 'Panel border', 'webhead-search-cloud' ) ),
-						color( 'suggestionText', __( 'Item text', 'webhead-search-cloud' ) ),
-						color( 'suggestionTextHover', __( 'Item text (hover)', 'webhead-search-cloud' ) ),
-						color( 'suggestionBgHover', __( 'Item background (hover)', 'webhead-search-cloud' ) ),
+						color( 'panelBg', __( 'Panel background', 'searcio' ) ),
+						color( 'panelBorder', __( 'Panel border', 'searcio' ) ),
+						color( 'suggestionText', __( 'Item text', 'searcio' ) ),
+						color( 'suggestionTextHover', __( 'Item text (hover)', 'searcio' ) ),
+						color( 'suggestionBgHover', __( 'Item background (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'panelRadius', __( 'Panel radius', 'webhead-search-cloud' ), 40 ) }
+					{ sizeControl( 'panelRadius', __( 'Panel radius', 'searcio' ), 40 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Recent & popular', 'webhead-search-cloud' ) }
+					title={ __( 'Recent & popular', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'titleColor', __( 'Section title', 'webhead-search-cloud' ) ),
-						color( 'chipBg', __( 'Chip background', 'webhead-search-cloud' ) ),
-						color( 'chipText', __( 'Chip text', 'webhead-search-cloud' ) ),
-						color( 'chipBorder', __( 'Chip border', 'webhead-search-cloud' ) ),
-						color( 'chipBgHover', __( 'Chip background (hover)', 'webhead-search-cloud' ) ),
-						color( 'chipTextHover', __( 'Chip text (hover)', 'webhead-search-cloud' ) ),
-						color( 'chipBorderHover', __( 'Chip border (hover)', 'webhead-search-cloud' ) ),
-						color( 'clearText', __( 'Clear all', 'webhead-search-cloud' ) ),
-						color( 'clearTextHover', __( 'Clear all (hover)', 'webhead-search-cloud' ) ),
-						color( 'clearTextActive', __( 'Clear all (active)', 'webhead-search-cloud' ) ),
-						color( 'popularText', __( 'Popular text', 'webhead-search-cloud' ) ),
-						color( 'popularTextHover', __( 'Popular text (hover)', 'webhead-search-cloud' ) ),
-						color( 'popularBgHover', __( 'Popular bg (hover)', 'webhead-search-cloud' ) ),
+						color( 'titleColor', __( 'Section title', 'searcio' ) ),
+						color( 'chipBg', __( 'Chip background', 'searcio' ) ),
+						color( 'chipText', __( 'Chip text', 'searcio' ) ),
+						color( 'chipBorder', __( 'Chip border', 'searcio' ) ),
+						color( 'chipBgHover', __( 'Chip background (hover)', 'searcio' ) ),
+						color( 'chipTextHover', __( 'Chip text (hover)', 'searcio' ) ),
+						color( 'chipBorderHover', __( 'Chip border (hover)', 'searcio' ) ),
+						color( 'clearText', __( 'Clear all', 'searcio' ) ),
+						color( 'clearTextHover', __( 'Clear all (hover)', 'searcio' ) ),
+						color( 'clearTextActive', __( 'Clear all (active)', 'searcio' ) ),
+						color( 'popularText', __( 'Popular text', 'searcio' ) ),
+						color( 'popularTextHover', __( 'Popular text (hover)', 'searcio' ) ),
+						color( 'popularBgHover', __( 'Popular bg (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'chipRadius', __( 'Chip radius', 'webhead-search-cloud' ), 999 ) }
-					{ sizeControl( 'popularGap', __( 'Popular item spacing', 'webhead-search-cloud' ), 24 ) }
-					{ sizeControl( 'popularRadius', __( 'Popular item radius', 'webhead-search-cloud' ), 40 ) }
+					{ sizeControl( 'chipRadius', __( 'Chip radius', 'searcio' ), 999 ) }
+					{ sizeControl( 'popularGap', __( 'Popular item spacing', 'searcio' ), 24 ) }
+					{ sizeControl( 'popularRadius', __( 'Popular item radius', 'searcio' ), 40 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Type filters', 'webhead-search-cloud' ) }
+					title={ __( 'Type filters', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'facetBg', __( 'Background', 'webhead-search-cloud' ) ),
-						color( 'facetText', __( 'Text', 'webhead-search-cloud' ) ),
-						color( 'facetBgHover', __( 'Background (hover)', 'webhead-search-cloud' ) ),
-						color( 'facetTextHover', __( 'Text (hover)', 'webhead-search-cloud' ) ),
-						color( 'facetBgActive', __( 'Background (active)', 'webhead-search-cloud' ) ),
-						color( 'facetTextActive', __( 'Text (active)', 'webhead-search-cloud' ) ),
-						color( 'facetCount', __( 'Count', 'webhead-search-cloud' ) ),
+						color( 'facetBg', __( 'Background', 'searcio' ) ),
+						color( 'facetText', __( 'Text', 'searcio' ) ),
+						color( 'facetBgHover', __( 'Background (hover)', 'searcio' ) ),
+						color( 'facetTextHover', __( 'Text (hover)', 'searcio' ) ),
+						color( 'facetBgActive', __( 'Background (active)', 'searcio' ) ),
+						color( 'facetTextActive', __( 'Text (active)', 'searcio' ) ),
+						color( 'facetCount', __( 'Count', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'facetRadius', __( 'Border radius', 'webhead-search-cloud' ), 999 ) }
-					{ sizeControl( 'facetsMaxHeight', __( 'Max height (px)', 'webhead-search-cloud' ), 400, 60 ) }
+					{ sizeControl( 'facetRadius', __( 'Border radius', 'searcio' ), 999 ) }
+					{ sizeControl( 'facetsMaxHeight', __( 'Max height (px)', 'searcio' ), 400, 60 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Modal tabs', 'webhead-search-cloud' ) }
+					title={ __( 'Modal tabs', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'tabText', __( 'Tab text', 'webhead-search-cloud' ) ),
-						color( 'tabTextActive', __( 'Tab text (active)', 'webhead-search-cloud' ) ),
-						color( 'tabIndicator', __( 'Active indicator', 'webhead-search-cloud' ) ),
-						color( 'tabBorder', __( 'Divider', 'webhead-search-cloud' ) ),
+						color( 'tabText', __( 'Tab text', 'searcio' ) ),
+						color( 'tabTextActive', __( 'Tab text (active)', 'searcio' ) ),
+						color( 'tabIndicator', __( 'Active indicator', 'searcio' ) ),
+						color( 'tabBorder', __( 'Divider', 'searcio' ) ),
 					] }
 				/>
 
 				<PanelColorSettings
-					title={ __( 'AI Assistant', 'webhead-search-cloud' ) }
+					title={ __( 'AI Assistant', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'assistantAccent', __( 'Accent (avatar, dots)', 'webhead-search-cloud' ) ),
-						color( 'assistantText', __( 'Reply text', 'webhead-search-cloud' ) ),
-						color( 'assistantUserBg', __( 'Your message background', 'webhead-search-cloud' ) ),
-						color( 'assistantUserText', __( 'Your message text', 'webhead-search-cloud' ) ),
-						color( 'assistantRowBg', __( 'Compare row shading', 'webhead-search-cloud' ) ),
+						color( 'assistantAccent', __( 'Accent (avatar, dots)', 'searcio' ) ),
+						color( 'assistantText', __( 'Reply text', 'searcio' ) ),
+						color( 'assistantUserBg', __( 'Your message background', 'searcio' ) ),
+						color( 'assistantUserText', __( 'Your message text', 'searcio' ) ),
+						color( 'assistantRowBg', __( 'Compare row shading', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'assistantInputRadius', __( 'Message field radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'assistantInputRadius', __( 'Message field radius', 'searcio' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Promotional banner', 'webhead-search-cloud' ) }
+					title={ __( 'Promotional banner', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'bannerBg', __( 'Background', 'webhead-search-cloud' ) ),
-						color( 'bannerText', __( 'Text', 'webhead-search-cloud' ) ),
+						color( 'bannerBg', __( 'Background', 'searcio' ) ),
+						color( 'bannerText', __( 'Text', 'searcio' ) ),
 					] }
 				/>
 
 				<PanelColorSettings
-					title={ __( 'Guided quiz', 'webhead-search-cloud' ) }
+					title={ __( 'Guided quiz', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'quizQuestion', __( 'Question text', 'webhead-search-cloud' ) ),
-						color( 'quizOptionBg', __( 'Answer background', 'webhead-search-cloud' ) ),
-						color( 'quizOptionText', __( 'Answer text', 'webhead-search-cloud' ) ),
-						color( 'quizOptionBorder', __( 'Answer border', 'webhead-search-cloud' ) ),
-						color( 'quizOptionBgHover', __( 'Answer background (hover)', 'webhead-search-cloud' ) ),
-						color( 'quizOptionTextHover', __( 'Answer text (hover)', 'webhead-search-cloud' ) ),
-						color( 'quizOptionBorderHover', __( 'Answer border (hover)', 'webhead-search-cloud' ) ),
+						color( 'quizQuestion', __( 'Question text', 'searcio' ) ),
+						color( 'quizOptionBg', __( 'Answer background', 'searcio' ) ),
+						color( 'quizOptionText', __( 'Answer text', 'searcio' ) ),
+						color( 'quizOptionBorder', __( 'Answer border', 'searcio' ) ),
+						color( 'quizOptionBgHover', __( 'Answer background (hover)', 'searcio' ) ),
+						color( 'quizOptionTextHover', __( 'Answer text (hover)', 'searcio' ) ),
+						color( 'quizOptionBorderHover', __( 'Answer border (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'quizOptionRadius', __( 'Answer radius', 'webhead-search-cloud' ), 999 ) }
+					{ sizeControl( 'quizOptionRadius', __( 'Answer radius', 'searcio' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Result cards', 'webhead-search-cloud' ) }
+					title={ __( 'Result cards', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'cardBg', __( 'Background', 'webhead-search-cloud' ) ),
-						color( 'cardBorder', __( 'Border', 'webhead-search-cloud' ) ),
-						color( 'cardBorderHover', __( 'Border (hover)', 'webhead-search-cloud' ) ),
-						color( 'cardTitle', __( 'Title', 'webhead-search-cloud' ) ),
-						color( 'priceColor', __( 'Price / meta', 'webhead-search-cloud' ) ),
-						color( 'stockInColor', __( 'In stock', 'webhead-search-cloud' ) ),
-						color( 'stockOutColor', __( 'Out of stock', 'webhead-search-cloud' ) ),
+						color( 'cardBg', __( 'Background', 'searcio' ) ),
+						color( 'cardBorder', __( 'Border', 'searcio' ) ),
+						color( 'cardBorderHover', __( 'Border (hover)', 'searcio' ) ),
+						color( 'cardTitle', __( 'Title', 'searcio' ) ),
+						color( 'priceColor', __( 'Price / meta', 'searcio' ) ),
+						color( 'stockInColor', __( 'In stock', 'searcio' ) ),
+						color( 'stockOutColor', __( 'Out of stock', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'cardRadius', __( 'Border radius', 'webhead-search-cloud' ), 40 ) }
-					{ sizeControl( 'cardPadding', __( 'Padding', 'webhead-search-cloud' ), 40 ) }
+					{ sizeControl( 'cardRadius', __( 'Border radius', 'searcio' ), 40 ) }
+					{ sizeControl( 'cardPadding', __( 'Padding', 'searcio' ), 40 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Carousel', 'webhead-search-cloud' ) }
+					title={ __( 'Carousel', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'arrowColor', __( 'Arrow color', 'webhead-search-cloud' ) ),
-						color( 'arrowBg', __( 'Arrow background', 'webhead-search-cloud' ) ),
-						color( 'dotColor', __( 'Dot color', 'webhead-search-cloud' ) ),
-						color( 'dotColorActive', __( 'Dot color (active)', 'webhead-search-cloud' ) ),
+						color( 'arrowColor', __( 'Arrow color', 'searcio' ) ),
+						color( 'arrowBg', __( 'Arrow background', 'searcio' ) ),
+						color( 'dotColor', __( 'Dot color', 'searcio' ) ),
+						color( 'dotColorActive', __( 'Dot color (active)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'carouselGap', __( 'Spacing between items', 'webhead-search-cloud' ), 48 ) }
+					{ sizeControl( 'carouselGap', __( 'Spacing between items', 'searcio' ), 48 ) }
 				</PanelColorSettings>
 			</InspectorControls>
 
@@ -404,8 +404,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					<Icon icon={ SearchIcon } size={ 22 } />
 					<span>
 						{ 'box' === mode
-							? __( 'Search Cloud - search box', 'webhead-search-cloud' )
-							: __( 'Search Cloud - search icon', 'webhead-search-cloud' ) }
+							? __( 'Search Cloud - search box', 'searcio' )
+							: __( 'Search Cloud - search icon', 'searcio' ) }
 					</span>
 				</span>
 			</div>

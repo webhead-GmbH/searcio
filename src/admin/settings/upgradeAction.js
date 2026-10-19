@@ -22,7 +22,7 @@ export const useUpgradeAction = () => {
 
 	return {
 		key: 'upgrade',
-		label: __( 'Upgrade plan', 'webhead-search-cloud' ),
+		label: __( 'Upgrade plan', 'searcio' ),
 		icon: trendingUp,
 		onClick: () => window.open( plan.upgrade_url, '_blank', 'noopener,noreferrer' ),
 	};

@@ -43,9 +43,9 @@ const dedupeByLabel = ( keys ) => {
 
 // Machine values WooCommerce stores that a shopper should never be shown raw.
 const KNOWN_VALUES = () => ( {
-	instock: __( 'In stock', 'webhead-search-cloud' ),
-	outofstock: __( 'Out of stock', 'webhead-search-cloud' ),
-	onbackorder: __( 'On backorder', 'webhead-search-cloud' ),
+	instock: __( 'In stock', 'searcio' ),
+	outofstock: __( 'Out of stock', 'searcio' ),
+	onbackorder: __( 'On backorder', 'searcio' ),
 } );
 
 // Fields whose 1/0 is a flag, not a quantity - "Featured: 1" reads as a bug.
@@ -63,8 +63,8 @@ const formatValue = ( value, field ) => {
 
 	if ( field && BOOLEAN_FIELDS.has( field ) ) {
 		return ( '1' === String( value ) || true === value )
-			? __( 'Yes', 'webhead-search-cloud' )
-			: __( 'No', 'webhead-search-cloud' );
+			? __( 'Yes', 'searcio' )
+			: __( 'No', 'searcio' );
 	}
 
 	const known = KNOWN_VALUES()[ String( value ).toLowerCase() ];
@@ -78,7 +78,7 @@ const formatValue = ( value, field ) => {
 	}
 
 	if ( 'boolean' === typeof value ) {
-		return value ? __( 'Yes', 'webhead-search-cloud' ) : __( 'No', 'webhead-search-cloud' );
+		return value ? __( 'Yes', 'searcio' ) : __( 'No', 'searcio' );
 	}
 
 	return String( value );

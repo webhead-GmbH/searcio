@@ -38,7 +38,7 @@ const PriceLine = ( { source } ) => {
 
 		body = (
 			<>
-				<span className="whsc-card__price-from">{ i18n.priceFrom || __( 'from', 'webhead-search-cloud' ) }</span>{ ' ' }
+				<span className="whsc-card__price-from">{ i18n.priceFrom || __( 'from', 'searcio' ) }</span>{ ' ' }
 				<span className="whsc-card__price-current">{ min }</span>
 			</>
 		);
@@ -98,7 +98,7 @@ const StockStatus = ( { inStock } ) => {
 
 	return (
 		<span className={ `whsc-card__stock ${ inStock ? 'is-in-stock' : 'is-out-of-stock' }` }>
-			{ inStock ? __( 'In stock', 'webhead-search-cloud' ) : __( 'Out of stock', 'webhead-search-cloud' ) }
+			{ inStock ? __( 'In stock', 'searcio' ) : __( 'Out of stock', 'searcio' ) }
 		</span>
 	);
 };
@@ -112,7 +112,7 @@ const ProductCard = ( { hit, onClick } ) => {
 			<span className="whsc-card__media">
 				<CardImage src={ source.image } />
 				{ Boolean( source.on_sale ) && (
-					<span className="whsc-card__badge">{ i18n.onSale || __( 'Sale', 'webhead-search-cloud' ) }</span>
+					<span className="whsc-card__badge">{ i18n.onSale || __( 'Sale', 'searcio' ) }</span>
 				) }
 			</span>
 			<span className="whsc-card__body">

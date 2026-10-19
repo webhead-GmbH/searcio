@@ -28,12 +28,12 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 			<Card.Header className="whsc-settings-card-header">
 				<div className="whsc-settings-card-copy">
 					<Card.Title render={ <h2 /> }>
-						{ __( 'Support Searcio', 'webhead-search-cloud' ) }
+						{ __( 'Support Searcio', 'searcio' ) }
 					</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
 							'Shows the searcio logo, small in the bottom corner of the search window, linked to searcio.com.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					</Text>
 				</div>
@@ -42,9 +42,9 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 				<Stack direction="column" gap="md">
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show the searcio logo in the search window', 'webhead-search-cloud' ) }
+						label={ __( 'Show the searcio logo in the search window', 'searcio' ) }
 						help={ isFree
-							? __( 'The Free plan always shows it. On a paid plan you can turn it off.', 'webhead-search-cloud' )
+							? __( 'The Free plan always shows it. On a paid plan you can turn it off.', 'searcio' )
 							: undefined }
 						checked={ isFree || false !== settings?.[ KEY ] }
 						disabled={ isFree }
@@ -59,7 +59,7 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{ __( 'Upgrade plan', 'webhead-search-cloud' ) }
+								{ __( 'Upgrade plan', 'searcio' ) }
 							</Button>
 						</Stack>
 					) }

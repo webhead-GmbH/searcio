@@ -55,8 +55,8 @@ final class Woo_Compatibility {
 			esc_html(
 				sprintf(
 					/* translators: 1: detected WooCommerce version, 2: required minimum version. */
-					__( 'webhead Search Cloud: WooCommerce %1$s is below the supported minimum %2$s. Product indexing is disabled until WooCommerce is updated; other content indexing still works.', 'webhead-search-cloud' ),
-					'' !== $this->woo->version() ? $this->woo->version() : __( '(unknown)', 'webhead-search-cloud' ),
+					__( 'webhead Search Cloud: WooCommerce %1$s is below the supported minimum %2$s. Product indexing is disabled until WooCommerce is updated; other content indexing still works.', 'searcio' ),
+					'' !== $this->woo->version() ? $this->woo->version() : __( '(unknown)', 'searcio' ),
 					Woo::MIN_VERSION
 				)
 			)

@@ -67,7 +67,7 @@ The AI Assistant, search by photo and the quiz appear when your Search Cloud pla
 ## Installation
 
 1. Install and activate the plugin like any other WordPress plugin. The package is the
-   `webhead-search-cloud-<version>.zip` attached to each
+   `searcio-<version>.zip` attached to each
    [release](https://github.com/webhead-GmbH/webhead-search-cloud/releases).
 2. Go to **Search Cloud** in the WordPress admin menu. A site that is not connected yet opens on the **Connection**
    tab.

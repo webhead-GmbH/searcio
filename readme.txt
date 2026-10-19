@@ -67,7 +67,7 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 
 A small searcio logo, linked to searcio.com, sits at the bottom of the search window. It is always shown on the Free plan; on a paid plan you can turn it off under Search Cloud > General.
 
-👉 Rate us on [WordPress](https://wordpress.org/support/plugin/webhead-search-cloud/reviews/#new-post)
+👉 Rate us on [WordPress](https://wordpress.org/support/plugin/searcio/reviews/#new-post)
 
 💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/webhead-search-cloud)
 

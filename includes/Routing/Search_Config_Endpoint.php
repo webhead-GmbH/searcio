@@ -52,7 +52,7 @@ final class Search_Config_Endpoint extends Rest_API {
 
 		if ( ! is_array( $payload ) ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'Invalid search configuration payload.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'Invalid search configuration payload.', 'searcio' ) ],
 				400
 			);
 		}
@@ -71,7 +71,7 @@ final class Search_Config_Endpoint extends Rest_API {
 	private function respond( Api_Response $response ): WP_REST_Response {
 		if ( $response->transport_error ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'Could not reach Search Cloud.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'Could not reach Search Cloud.', 'searcio' ) ],
 				502
 			);
 		}

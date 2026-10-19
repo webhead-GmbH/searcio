@@ -21,11 +21,11 @@ import { formatNumber } from '../../../../utils/number';
  * than disappearing because this list has not caught up.
  */
 const LABELS = () => ( {
-	searches: __( 'Searches', 'webhead-search-cloud' ),
-	documents: __( 'Indexed documents', 'webhead-search-cloud' ),
-	ai_messages: __( 'AI assistant messages', 'webhead-search-cloud' ),
-	visual_searches: __( 'Photo searches', 'webhead-search-cloud' ),
-	visual_tags: __( 'AI image tagging', 'webhead-search-cloud' ),
+	searches: __( 'Searches', 'searcio' ),
+	documents: __( 'Indexed documents', 'searcio' ),
+	ai_messages: __( 'AI assistant messages', 'searcio' ),
+	visual_searches: __( 'Photo searches', 'searcio' ),
+	visual_tags: __( 'AI image tagging', 'searcio' ),
 } );
 
 const ORDER = [ 'searches', 'documents', 'ai_messages', 'visual_searches', 'visual_tags' ];
@@ -60,11 +60,11 @@ const UsageCard = ( { usage } ) => {
 				<div className="whsc-settings-card-copy">
 					{ /* An h3: the card is a section of the connection tab, whose
 					     heading is the h2 under the page title. */ }
-					<Card.Title render={ <h3 /> }>{ __( 'This month', 'webhead-search-cloud' ) }</Card.Title>
+					<Card.Title render={ <h3 /> }>{ __( 'This month', 'searcio' ) }</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
 							'What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					</Text>
 				</div>
@@ -82,7 +82,7 @@ const UsageCard = ( { usage } ) => {
 									<Text className="whsc-usage__count">
 										{ sprintf(
 											/* translators: 1: amount used. 2: the plan's allowance. */
-											__( '%1$s of %2$s', 'webhead-search-cloud' ),
+											__( '%1$s of %2$s', 'searcio' ),
 											formatNumber( metric.used || 0 ),
 											formatNumber( metric.limit )
 										) }
@@ -97,7 +97,7 @@ const UsageCard = ( { usage } ) => {
 									role="img"
 									aria-label={ sprintf(
 										/* translators: 1: allowance name. 2: percentage used. */
-										__( '%1$s: %2$d%% used', 'webhead-search-cloud' ),
+										__( '%1$s: %2$d%% used', 'searcio' ),
 										labels[ key ] || humanize( key ),
 										percent
 									) }
@@ -106,12 +106,12 @@ const UsageCard = ( { usage } ) => {
 								</div>
 								{ metric.exceeded && (
 									<Text variant="body-sm" className="whsc-usage__note">
-										{ __( 'Spent for this month. Upgrade to keep this working.', 'webhead-search-cloud' ) }
+										{ __( 'Spent for this month. Upgrade to keep this working.', 'searcio' ) }
 									</Text>
 								) }
 								{ ! metric.exceeded && metric.near_limit && (
 									<Text variant="body-sm" className="whsc-usage__note">
-										{ __( 'Close to the limit.', 'webhead-search-cloud' ) }
+										{ __( 'Close to the limit.', 'searcio' ) }
 									</Text>
 								) }
 							</Stack>

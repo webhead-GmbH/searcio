@@ -24,7 +24,7 @@ use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Storefront_Entry_Test extends Integration_Test_Case {
-	private const DOMAIN = 'webhead-search-cloud';
+	private const DOMAIN = 'searcio';
 
 	public function set_up(): void {
 		parent::set_up();

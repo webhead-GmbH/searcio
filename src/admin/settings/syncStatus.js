@@ -5,12 +5,12 @@ import { __ } from '@wordpress/i18n';
  * history table.
  */
 export const statusLabels = () => ( {
-	queued: __( 'Queued', 'webhead-search-cloud' ),
-	running: __( 'Running', 'webhead-search-cloud' ),
-	paused: __( 'Paused', 'webhead-search-cloud' ),
-	completed: __( 'Completed', 'webhead-search-cloud' ),
-	failed: __( 'Failed', 'webhead-search-cloud' ),
-	cancelled: __( 'Cancelled', 'webhead-search-cloud' ),
+	queued: __( 'Queued', 'searcio' ),
+	running: __( 'Running', 'searcio' ),
+	paused: __( 'Paused', 'searcio' ),
+	completed: __( 'Completed', 'searcio' ),
+	failed: __( 'Failed', 'searcio' ),
+	cancelled: __( 'Cancelled', 'searcio' ),
 } );
 
 /**

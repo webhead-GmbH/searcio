@@ -206,7 +206,7 @@ final class Incremental_Service {
 	}
 
 	private function plan_limit_message(): string {
-		return __( 'Incremental sync paused: your Search Cloud plan limit was reached.', 'webhead-search-cloud' );
+		return __( 'Incremental sync paused: your Search Cloud plan limit was reached.', 'searcio' );
 	}
 
 	/**
@@ -219,7 +219,7 @@ final class Incremental_Service {
 		if ( $response->transport_error ) {
 			return sprintf(
 				/* translators: %s: transport error message. */
-				__( 'Could not reach Search Cloud: %s', 'webhead-search-cloud' ),
+				__( 'Could not reach Search Cloud: %s', 'searcio' ),
 				$response->error_message
 			);
 		}
@@ -227,7 +227,7 @@ final class Incremental_Service {
 		if ( null !== $doc_id ) {
 			return sprintf(
 				/* translators: 1: document id, 2: HTTP status code. */
-				__( 'Could not remove %1$s from the index (HTTP %2$d).', 'webhead-search-cloud' ),
+				__( 'Could not remove %1$s from the index (HTTP %2$d).', 'searcio' ),
 				$doc_id,
 				$response->status
 			);
@@ -235,7 +235,7 @@ final class Incremental_Service {
 
 		return sprintf(
 			/* translators: %d: HTTP status code. */
-			__( 'Search Cloud rejected the update (HTTP %d).', 'webhead-search-cloud' ),
+			__( 'Search Cloud rejected the update (HTTP %d).', 'searcio' ),
 			$response->status
 		);
 	}

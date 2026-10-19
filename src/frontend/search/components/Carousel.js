@@ -185,7 +185,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			<Button
 				className="whsc-carousel-arrow whsc-carousel-arrow--prev"
 				icon={ isRtl ? chevronRight : chevronLeft }
-				label={ __( 'Previous', 'webhead-search-cloud' ) }
+				label={ __( 'Previous', 'searcio' ) }
 				showTooltip={ false }
 				disabled={ ! canPrev }
 				onClick={ () => scrollByPage( -1 ) }
@@ -213,13 +213,13 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 			<Button
 				className="whsc-carousel-arrow whsc-carousel-arrow--next"
 				icon={ isRtl ? chevronLeft : chevronRight }
-				label={ __( 'Next', 'webhead-search-cloud' ) }
+				label={ __( 'Next', 'searcio' ) }
 				showTooltip={ false }
 				disabled={ ! canNext }
 				onClick={ () => scrollByPage( 1 ) }
 			/>
 			{ pageCount > 1 && (
-				<div className="whsc-carousel-dots" role="tablist" aria-label={ __( 'Pages', 'webhead-search-cloud' ) }>
+				<div className="whsc-carousel-dots" role="tablist" aria-label={ __( 'Pages', 'searcio' ) }>
 					{ Array.from( { length: pageCount } ).map( ( _, page ) => (
 						<button
 							key={ page }
@@ -229,7 +229,7 @@ const Carousel = ( { items, getKey, renderItem, ariaLabel } ) => {
 							aria-selected={ page === activePage }
 							aria-label={ sprintf(
 								/* translators: %d: page number. */
-								__( 'Go to page %d', 'webhead-search-cloud' ),
+								__( 'Go to page %d', 'searcio' ),
 								page + 1
 							) }
 							onClick={ () => scrollToPage( page ) }

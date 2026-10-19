@@ -556,7 +556,7 @@ const SearchModal = ({
 				return;
 			}
 
-			setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
+			setError(i18n.error || __('Search is unavailable right now.', 'searcio'));
 
 			// Handing the visitor over to native search is right for a search
 			// they asked for. It is wrong for a keystroke: in "search as you
@@ -660,13 +660,13 @@ const SearchModal = ({
 			if (403 === e.status) {
 				// The capability said yes but the site has since turned it off.
 				setVisualEnabled(false);
-				setError(__('Photo search is not available on this store.', 'webhead-search-cloud'));
+				setError(__('Photo search is not available on this store.', 'searcio'));
 			} else if (422 === e.status) {
-				setError(__('That file is not an image we can read. Try a JPEG or PNG under 8 MB.', 'webhead-search-cloud'));
+				setError(__('That file is not an image we can read. Try a JPEG or PNG under 8 MB.', 'searcio'));
 			} else if (429 === e.status) {
-				setError(__('Photo search has reached its limit for now. Please try again later.', 'webhead-search-cloud'));
+				setError(__('Photo search has reached its limit for now. Please try again later.', 'searcio'));
 			} else {
-				setError(__('That photo search failed. Try another photo.', 'webhead-search-cloud'));
+				setError(__('That photo search failed. Try another photo.', 'searcio'));
 			}
 		} finally {
 			if (isLatest()) {
@@ -825,7 +825,7 @@ const SearchModal = ({
 			}));
 		} catch (e) {
 			if ('AbortError' !== e.name && seq === searchSeq.current) {
-				setError(i18n.error || __('Search is unavailable right now.', 'webhead-search-cloud'));
+				setError(i18n.error || __('Search is unavailable right now.', 'searcio'));
 			}
 		} finally {
 			// Released unconditionally, unlike the results above. A new search
@@ -960,7 +960,7 @@ const SearchModal = ({
 				key={visualPreview}
 				className="whsc-visual-query__photo"
 				src={visualPreview}
-				alt={__('Your photo', 'webhead-search-cloud')}
+				alt={__('Your photo', 'searcio')}
 				// A file that is not an image gets as far as the server before it
 				// is refused; until then, no broken-image glyph.
 				onError={(event) => {
@@ -970,7 +970,7 @@ const SearchModal = ({
 			{!isSearching && visualTags.length > 0 && (
 				<div className="whsc-visual-tags">
 					<span className="whsc-visual-tags__label">
-						{__('From your photo', 'webhead-search-cloud')}
+						{__('From your photo', 'searcio')}
 					</span>
 					<div className="whsc-visual-tags__list">
 						{visualTags.map((tag) => (
@@ -986,7 +986,7 @@ const SearchModal = ({
 	// (submit mode, before Enter). That state used to show their title over a
 	// skeleton, which looked like a search loading that never finished.
 	if (showEmptyState || (!isSearching && !results)) {
-		mainTitle = __('Current highlights', 'webhead-search-cloud');
+		mainTitle = __('Current highlights', 'searcio');
 		mainContent = isLoadingHighlights ? (
 			<SearchResultsSkeleton/>
 		) : (
@@ -1001,13 +1001,13 @@ const SearchModal = ({
 						onClick={() => trackClick(highlightsSearchId, hit.id, index + 1)}
 					/>
 				)}
-				ariaLabel={__('Current highlights', 'webhead-search-cloud')}
+				ariaLabel={__('Current highlights', 'searcio')}
 			/>
 		);
 	} else if (isSearching) {
 		mainTitle = 'photo' === pendingKind
-			? __('Looking at your photo…', 'webhead-search-cloud')
-			: __('Results', 'webhead-search-cloud');
+			? __('Looking at your photo…', 'searcio')
+			: __('Results', 'searcio');
 		mainContent = (
 			<>
 				{'photo' === pendingKind && photoQuery}
@@ -1019,16 +1019,16 @@ const SearchModal = ({
 			? (exactTotal && hasMore
 				? sprintf(
 					/* translators: 1: number of results loaded so far. 2: total number of results. */
-					__('%1$d of %2$d results', 'webhead-search-cloud'),
+					__('%1$d of %2$d results', 'searcio'),
 					resultsHits.length,
 					totalResults
 				)
 				: sprintf(
 					/* translators: %d: number of results. */
-					_n('%d result', '%d results', shownTotal, 'webhead-search-cloud'),
+					_n('%d result', '%d results', shownTotal, 'searcio'),
 					shownTotal
 				))
-			: __('Results', 'webhead-search-cloud');
+			: __('Results', 'searcio');
 		mainContent = resultsHits.length > 0 ? (
 			<>
 			{photoQuery}
@@ -1043,7 +1043,7 @@ const SearchModal = ({
 						onClick={() => trackClick(results?.search_id, hit.id, index + 1)}
 					/>
 				)}
-				ariaLabel={__('Search results', 'webhead-search-cloud')}
+				ariaLabel={__('Search results', 'searcio')}
 			/>
 			{hasMore && (
 				<div className="whsc-load-more">
@@ -1054,8 +1054,8 @@ const SearchModal = ({
 						disabled={isLoadingMore}
 					>
 						{isLoadingMore
-							? __('Loading…', 'webhead-search-cloud')
-							: __('Load more results', 'webhead-search-cloud')}
+							? __('Loading…', 'searcio')
+							: __('Load more results', 'searcio')}
 					</button>
 				</div>
 			)}
@@ -1067,8 +1067,8 @@ const SearchModal = ({
 				{visualActive
 					// A photo that matched nothing is a photo problem, not a
 					// catalogue problem - say what to do about it.
-					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'webhead-search-cloud')
-					: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))}
+					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'searcio')
+					: (i18n.noResults || __('No results found.', 'searcio'))}
 			</p>
 			</>
 		);
@@ -1084,7 +1084,7 @@ const SearchModal = ({
 			// properties are set on it, and the overlay is the frame's parent,
 			// so it would never see the frame's own copy (e.g. its colour).
 			overlayClassName={`whsc-modal-overlay${instanceClass ? ` ${instanceClass}` : ''}`}
-			contentLabel={i18n.placeholder || __('Search', 'webhead-search-cloud')}
+			contentLabel={i18n.placeholder || __('Search', 'searcio')}
 		>
 			<div className="whsc-modal-body">
 				{hasTabs && (
@@ -1092,7 +1092,7 @@ const SearchModal = ({
 					<div
 						className="whsc-modal-tabs"
 						role="tablist"
-						aria-label={__('Search modes', 'webhead-search-cloud')}
+						aria-label={__('Search modes', 'searcio')}
 						ref={tabListRef}
 						// Tabbing onto a tab the row cuts off does not scroll it: the
 						// browser leaves a partly visible element where it is.
@@ -1105,7 +1105,7 @@ const SearchModal = ({
 							className={`whsc-modal-tab${'search' === activeTab ? ' is-active' : ''}`}
 							onClick={() => setActiveTab('search')}
 						>
-							{__('Search', 'webhead-search-cloud')}
+							{__('Search', 'searcio')}
 						</button>
 						{assistantEnabled && (
 							<button
@@ -1118,7 +1118,7 @@ const SearchModal = ({
 									setActiveTab('assistant');
 								}}
 							>
-								{__('AI Assistant', 'webhead-search-cloud')}
+								{__('AI Assistant', 'searcio')}
 							</button>
 						)}
 						{quizEnabled && (
@@ -1132,7 +1132,7 @@ const SearchModal = ({
 									setActiveTab('quiz');
 								}}
 							>
-								{__('Product finder', 'webhead-search-cloud')}
+								{__('Product finder', 'searcio')}
 							</button>
 						)}
 					</div>
@@ -1144,7 +1144,7 @@ const SearchModal = ({
 						<Button
 							className="whsc-modal-close whsc-modal-close--tabbed"
 							icon={closeSmall}
-							label={i18n.close || __('Close search', 'webhead-search-cloud')}
+							label={i18n.close || __('Close search', 'searcio')}
 							showTooltip={false}
 							onClick={onRequestClose}
 						/>
@@ -1174,7 +1174,7 @@ const SearchModal = ({
 							>
 								{/* On a phone only the icon shows; the label stays the name. */}
 								<Icon icon={searchIcon} className="whsc-submit-btn__icon"/>
-								<span className="whsc-submit-btn__label">{__('Search', 'webhead-search-cloud')}</span>
+								<span className="whsc-submit-btn__label">{__('Search', 'searcio')}</span>
 							</Button>
 						)}
 						{enableVoice && supportsVoice() && (
@@ -1195,7 +1195,7 @@ const SearchModal = ({
 								) : (
 									<span className="whsc-default-voice-icon">{micIcon}</span>
 								)}
-								label={i18n.voiceSearch || __('Search by voice', 'webhead-search-cloud')}
+								label={i18n.voiceSearch || __('Search by voice', 'searcio')}
 								showTooltip={false}
 								isPressed={isListening}
 								onClick={onVoiceClick}
@@ -1207,7 +1207,7 @@ const SearchModal = ({
 						<Button
 							className="whsc-modal-close"
 							icon={closeSmall}
-							label={i18n.close || __('Close search', 'webhead-search-cloud')}
+							label={i18n.close || __('Close search', 'searcio')}
 							showTooltip={false}
 							onClick={onRequestClose}
 						/>
@@ -1236,14 +1236,14 @@ const SearchModal = ({
 					// A group of independent toggle buttons, not an ARIA tablist -
 					// multi-select means more than one can be "selected" at once,
 					// which the tablist/tab/aria-selected pattern assumes never happens.
-					<div className="whsc-facets" role="group" aria-label={__('Filter by type', 'webhead-search-cloud')}>
+					<div className="whsc-facets" role="group" aria-label={__('Filter by type', 'searcio')}>
 						<button
 							type="button"
 							aria-pressed={0 === activeTypes.length}
 							className={`whsc-facet${0 === activeTypes.length ? ' is-active' : ''}`}
 							onClick={() => onTypeFacetClick('')}
 						>
-							<span className="whsc-facet__label">{i18n.allTypes || __('All', 'webhead-search-cloud')}</span>
+							<span className="whsc-facet__label">{i18n.allTypes || __('All', 'searcio')}</span>
 						</button>
 						{facets.map((facet) => (
 							<button
@@ -1313,23 +1313,23 @@ const SearchModal = ({
 
 				<p id={statusId} className="whsc-visually-hidden" role="status" aria-live="polite">
 					{isSearching && ('photo' === pendingKind
-						? __('Looking at your photo…', 'webhead-search-cloud')
-						: (i18n.searching || __('Searching…', 'webhead-search-cloud')))}
+						? __('Looking at your photo…', 'searcio')
+						: (i18n.searching || __('Searching…', 'searcio')))}
 					{!isSearching && results && (
 						resultsHits.length > 0
 							? (exactTotal && hasMore
 								? sprintf(
 									/* translators: 1: number of results shown. 2: total number of results found. */
-									__('Showing %1$d of %2$d results.', 'webhead-search-cloud'),
+									__('Showing %1$d of %2$d results.', 'searcio'),
 									resultsHits.length,
 									totalResults
 								)
 								: sprintf(
 									/* translators: %d: number of results found. */
-									_n('%d result found.', '%d results found.', shownTotal, 'webhead-search-cloud'),
+									_n('%d result found.', '%d results found.', shownTotal, 'searcio'),
 									shownTotal
 								))
-							: (i18n.noResults || __('No results found.', 'webhead-search-cloud'))
+							: (i18n.noResults || __('No results found.', 'searcio'))
 					)}
 				</p>
 					</>

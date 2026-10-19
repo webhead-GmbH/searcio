@@ -22,17 +22,17 @@ const NONE = '';
 const selected = (value) => ('' === value || undefined === value ? null : value);
 
 const KIND_OPTIONS = [
-	{value: 'meta', label: __('Custom field', 'webhead-search-cloud')},
-	{value: 'taxonomy', label: __('Taxonomy', 'webhead-search-cloud')},
-	{value: 'property', label: __('Built-in field', 'webhead-search-cloud')},
+	{value: 'meta', label: __('Custom field', 'searcio')},
+	{value: 'taxonomy', label: __('Taxonomy', 'searcio')},
+	{value: 'property', label: __('Built-in field', 'searcio')},
 ];
 
 const PROPERTY_OPTIONS = [
-	{value: 'author', label: __('Author', 'webhead-search-cloud')},
-	{value: 'date', label: __('Published date', 'webhead-search-cloud')},
-	{value: 'modified', label: __('Modified date', 'webhead-search-cloud')},
-	{value: 'excerpt', label: __('Excerpt', 'webhead-search-cloud')},
-	{value: 'slug', label: __('Slug', 'webhead-search-cloud')},
+	{value: 'author', label: __('Author', 'searcio')},
+	{value: 'date', label: __('Published date', 'searcio')},
+	{value: 'modified', label: __('Modified date', 'searcio')},
+	{value: 'excerpt', label: __('Excerpt', 'searcio')},
+	{value: 'slug', label: __('Slug', 'searcio')},
 ];
 
 /** Options for the recognised-field selects: properties + the type's taxonomies. */
@@ -47,14 +47,14 @@ const sourceOptions = (sources, taxonomies, allowNone) => {
 			value: `taxonomy:${taxonomy.slug}`,
 			label: sprintf(
 				/* translators: %s: taxonomy label. */
-				__('Taxonomy: %s', 'webhead-search-cloud'),
+				__('Taxonomy: %s', 'searcio'),
 				taxonomy.label
 			),
 		});
 	});
 
 	if (allowNone) {
-		return [{value: null, label: __('- Do not send -', 'webhead-search-cloud')}, ...options];
+		return [{value: null, label: __('- Do not send -', 'searcio')}, ...options];
 	}
 
 	return options;
@@ -100,10 +100,10 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 		if (kind === 'property') {
 			return (
 				<SelectControl
-					label={__('Value', 'webhead-search-cloud')}
+					label={__('Value', 'searcio')}
 					value={selected(value)}
 					items={[
-						{value: null, label: __('- Select -', 'webhead-search-cloud')},
+						{value: null, label: __('- Select -', 'searcio')},
 						...PROPERTY_OPTIONS,
 					]}
 					onValueChange={setValue}
@@ -114,10 +114,10 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 		if (kind === 'taxonomy' && taxonomies.length > 0) {
 			return (
 				<SelectControl
-					label={__('Taxonomy', 'webhead-search-cloud')}
+					label={__('Taxonomy', 'searcio')}
 					value={selected(value)}
 					items={[
-						{value: null, label: __('- Select -', 'webhead-search-cloud')},
+						{value: null, label: __('- Select -', 'searcio')},
 						...taxonomies.map((taxonomy) => ({
 							value: taxonomy.slug,
 							label: taxonomy.label,
@@ -131,8 +131,8 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 		return (
 			<InputControl
 				label={kind === 'taxonomy'
-					? __('Taxonomy slug', 'webhead-search-cloud')
-					: __('Meta key', 'webhead-search-cloud')}
+					? __('Taxonomy slug', 'searcio')
+					: __('Meta key', 'searcio')}
 				placeholder={kind === 'taxonomy' ? 'product_brand' : '_my_field'}
 				value={value}
 				onValueChange={setValue}
@@ -143,13 +143,13 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 	return (
 		<div className="whsc-custom-field-row">
 			<InputControl
-				label={__('Send as', 'webhead-search-cloud')}
+				label={__('Send as', 'searcio')}
 				placeholder="brand"
 				value={field.as}
 				onValueChange={(next) => onChange({...field, as: next})}
 			/>
 			<SelectControl
-				label={__('From', 'webhead-search-cloud')}
+				label={__('From', 'searcio')}
 				value={kind}
 				items={KIND_OPTIONS}
 				onValueChange={setKind}
@@ -160,7 +160,7 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 				icon={trash}
 				isDestructive
 				variant="tertiary"
-				label={__('Remove field', 'webhead-search-cloud')}
+				label={__('Remove field', 'searcio')}
 				onClick={onRemove}
 			/>
 		</div>
@@ -172,7 +172,7 @@ const WooSection = ({woo, block, onChange}) => {
 		return (
 			<Notice.Root intent="info">
 				<Notice.Description>
-					{__('Activate WooCommerce to index product data.', 'webhead-search-cloud')}
+					{__('Activate WooCommerce to index product data.', 'searcio')}
 				</Notice.Description>
 			</Notice.Root>
 		);
@@ -186,9 +186,9 @@ const WooSection = ({woo, block, onChange}) => {
 						/* translators: 1: current version, 2: minimum version. */
 						__(
 							'WooCommerce %1$s is below the supported minimum %2$s. Product fields are disabled until WooCommerce is updated.',
-							'webhead-search-cloud'
+							'searcio'
 						),
-						woo.version || __('(unknown)', 'webhead-search-cloud'),
+						woo.version || __('(unknown)', 'searcio'),
 						woo.minimum
 					)}
 				</Notice.Description>
@@ -200,16 +200,16 @@ const WooSection = ({woo, block, onChange}) => {
 	const setWoo = (key, val) => onChange({...block, woo: {...wooConfig, [key]: val}});
 
 	const toggleLabels = {
-		price: __('Price', 'webhead-search-cloud'),
-		regular_sale: __('Regular & sale price', 'webhead-search-cloud'),
-		sku: __('SKU', 'webhead-search-cloud'),
-		skus: __('Variation SKUs', 'webhead-search-cloud'),
-		stock_status: __('Stock status', 'webhead-search-cloud'),
-		categories: __('Categories', 'webhead-search-cloud'),
-		tags: __('Tags', 'webhead-search-cloud'),
-		featured: __('Featured', 'webhead-search-cloud'),
-		rating: __('Average rating', 'webhead-search-cloud'),
-		review_count: __('Review count', 'webhead-search-cloud'),
+		price: __('Price', 'searcio'),
+		regular_sale: __('Regular & sale price', 'searcio'),
+		sku: __('SKU', 'searcio'),
+		skus: __('Variation SKUs', 'searcio'),
+		stock_status: __('Stock status', 'searcio'),
+		categories: __('Categories', 'searcio'),
+		tags: __('Tags', 'searcio'),
+		featured: __('Featured', 'searcio'),
+		rating: __('Average rating', 'searcio'),
+		review_count: __('Review count', 'searcio'),
 	};
 
 	const toggleAttribute = (slug, checked) => {
@@ -223,16 +223,16 @@ const WooSection = ({woo, block, onChange}) => {
 	return (
 		<>
 			<Section
-				title={__('Product details', 'webhead-search-cloud')}
+				title={__('Product details', 'searcio')}
 				description={__(
 					'Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range.',
-					'webhead-search-cloud'
+					'searcio'
 				)}
 			>
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={__('Only index published, visible products', 'webhead-search-cloud')}
-					help={__('Recommended. Hidden or draft products stay out of search.', 'webhead-search-cloud')}
+					label={__('Only index published, visible products', 'searcio')}
+					help={__('Recommended. Hidden or draft products stay out of search.', 'searcio')}
 					checked={wooConfig.only_visible !== false}
 					onChange={(val) => setWoo('only_visible', val)}
 				/>
@@ -251,10 +251,10 @@ const WooSection = ({woo, block, onChange}) => {
 
 			{woo.attributes.length > 0 && (
 				<Section
-					title={__('Product attributes', 'webhead-search-cloud')}
+					title={__('Product attributes', 'searcio')}
 					description={__(
 						'Each selected attribute is sent as its own field (attr_{name}) so it can be made searchable.',
-						'webhead-search-cloud'
+						'searcio'
 					)}
 				>
 					<Grid auto={170} rowGap="var(--wpds-dimension-gap-sm)" columnGap="var(--wpds-dimension-gap-xl)" align="start">
@@ -301,12 +301,12 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 						className="whsc-enable-toggle"
 						label={sprintf(
 							/* translators: %s: post type label. */
-							__('Add %s to search', 'webhead-search-cloud'),
+							__('Add %s to search', 'searcio'),
 							postType.label
 						)}
 						help={sprintf(
 							/* translators: %s: post type label. */
-							__('When on, your %s are sent to Search Cloud and appear in search results.', 'webhead-search-cloud'),
+							__('When on, your %s are sent to Search Cloud and appear in search results.', 'searcio'),
 							postType.label.toLowerCase()
 						)}
 						checked={Boolean(block.enabled)}
@@ -316,37 +316,37 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 					{block.enabled && (
 						<>
 							<Section
-								title={__('What appears in results', 'webhead-search-cloud')}
+								title={__('What appears in results', 'searcio')}
 								description={__(
 									'Choose where each part of a search result comes from. The defaults work for most sites.',
-									'webhead-search-cloud'
+									'searcio'
 								)}
 							>
 								<Grid auto={260} rowGap="var(--wpds-dimension-gap-lg)" columnGap="var(--wpds-dimension-gap-xl)" align="start">
 									<SelectControl
-										label={__('Title', 'webhead-search-cloud')}
-										description={__('The main heading of each result. Required.', 'webhead-search-cloud')}
+										label={__('Title', 'searcio')}
+										description={__('The main heading of each result. Required.', 'searcio')}
 										value={block.title_source}
 										items={sourceOptions(sources, postType.taxonomies, false)}
 										onValueChange={(val) => set('title_source', val)}
 									/>
 									<SelectControl
-										label={__('Body text', 'webhead-search-cloud')}
-										description={__('The text Search Cloud looks through for matches.', 'webhead-search-cloud')}
+										label={__('Body text', 'searcio')}
+										description={__('The text Search Cloud looks through for matches.', 'searcio')}
 										value={selected(block.content_source)}
 										items={sourceOptions(sources, postType.taxonomies, true)}
 										onValueChange={(val) => set('content_source', val ?? NONE)}
 									/>
 									<SelectControl
-										label={__('Result link', 'webhead-search-cloud')}
-										description={__('Where clicking a result takes the visitor.', 'webhead-search-cloud')}
+										label={__('Result link', 'searcio')}
+										description={__('Where clicking a result takes the visitor.', 'searcio')}
 										value={selected(block.url_source)}
 										items={sourceOptions(sources, postType.taxonomies, true)}
 										onValueChange={(val) => set('url_source', val ?? NONE)}
 									/>
 									<SelectControl
-										label={__('Thumbnail image', 'webhead-search-cloud')}
-										description={__('Image shown next to each result.', 'webhead-search-cloud')}
+										label={__('Thumbnail image', 'searcio')}
+										description={__('Image shown next to each result.', 'searcio')}
 										value={selected(block.image_source)}
 										items={sourceOptions(sources, postType.taxonomies, true)}
 										onValueChange={(val) => set('image_source', val ?? NONE)}
@@ -354,18 +354,18 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 								</Grid>
 							</Section>
 
-							<Section title={__('Options', 'webhead-search-cloud')}>
+							<Section title={__('Options', 'searcio')}>
 								<Grid auto={240} rowGap="var(--wpds-dimension-gap-md)" columnGap="var(--wpds-dimension-gap-2xl)" align="start">
 									<ToggleControl
 										__nextHasNoMarginBottom
-										label={__('Include a short summary (excerpt)', 'webhead-search-cloud')}
+										label={__('Include a short summary (excerpt)', 'searcio')}
 										checked={Boolean(block.include_excerpt)}
 										onChange={(val) => set('include_excerpt', val)}
 									/>
 									<ToggleControl
 										__nextHasNoMarginBottom
-										label={__('Also index private & password-protected items', 'webhead-search-cloud')}
-										help={__('Off by default.', 'webhead-search-cloud')}
+										label={__('Also index private & password-protected items', 'searcio')}
+										help={__('Off by default.', 'searcio')}
 										checked={Boolean(block.include_private)}
 										onChange={(val) => set('include_private', val)}
 									/>
@@ -383,32 +383,32 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 									aria-expanded={showAdvanced}
 								>
 									{showAdvanced
-										? __('Hide advanced options', 'webhead-search-cloud')
-										: __('Show advanced options', 'webhead-search-cloud')}
+										? __('Hide advanced options', 'searcio')
+										: __('Show advanced options', 'searcio')}
 								</Button>
 							</Stack>
 
 							{showAdvanced && (
 								<>
 									<Section
-										title={__('Type label', 'webhead-search-cloud')}
+										title={__('Type label', 'searcio')}
 										description={__(
 											'How this content is grouped and filtered in search. Most sites can leave this as the default.',
-											'webhead-search-cloud'
+											'searcio'
 										)}
 									>
 										<InputControl
-											label={__('Type', 'webhead-search-cloud')}
+											label={__('Type', 'searcio')}
 											value={block.type || ''}
 											onValueChange={(val) => set('type', val)}
 										/>
 									</Section>
 
 									<Section
-										title={__('Extra fields', 'webhead-search-cloud')}
+										title={__('Extra fields', 'searcio')}
 										description={__(
 											'Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose.',
-											'webhead-search-cloud'
+											'searcio'
 										)}
 									>
 										{fields.length > 0 && (
@@ -426,7 +426,7 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 										)}
 										<Stack direction="row" gap="sm">
 											<Button __next40pxDefaultSize variant="secondary" onClick={addField}>
-												{__('Add a field', 'webhead-search-cloud')}
+												{__('Add a field', 'searcio')}
 											</Button>
 										</Stack>
 									</Section>
@@ -480,7 +480,7 @@ const IndexingTab = () => {
 				// Left uncaught, a load that failed kept the placeholder on screen
 				// for good, with nothing to say why and nothing to try.
 				if (isCurrentAttempt) {
-					setLoadError(error?.message || __('the request to the REST API failed.', 'webhead-search-cloud'));
+					setLoadError(error?.message || __('the request to the REST API failed.', 'searcio'));
 				}
 			} finally {
 				if (isCurrentAttempt) {
@@ -517,10 +517,10 @@ const IndexingTab = () => {
 			setCatalog(response);
 			setConfig(nextConfig);
 			setPersistedConfig(nextConfig);
-			showToast(__('Indexing configuration saved.', 'webhead-search-cloud'), 'success');
+			showToast(__('Indexing configuration saved.', 'searcio'), 'success');
 		} catch (error) {
 			// Beside the button that failed, with the reason the REST API gave.
-			setSaveError(error?.message || __('the request to the REST API failed.', 'webhead-search-cloud'));
+			setSaveError(error?.message || __('the request to the REST API failed.', 'searcio'));
 		} finally {
 			setIsSaving(false);
 		}
@@ -536,13 +536,13 @@ const IndexingTab = () => {
 				<Notice.Description>
 					{sprintf(
 						/* translators: %s: reason the request failed. */
-						__('The indexing configuration could not be loaded: %s', 'webhead-search-cloud'),
-						loadError || __('the request to the REST API failed.', 'webhead-search-cloud')
+						__('The indexing configuration could not be loaded: %s', 'searcio'),
+						loadError || __('the request to the REST API failed.', 'searcio')
 					)}
 				</Notice.Description>
 				<Notice.Actions>
 					<Notice.ActionButton onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
-						{__('Try again', 'webhead-search-cloud')}
+						{__('Try again', 'searcio')}
 					</Notice.ActionButton>
 				</Notice.Actions>
 			</Notice.Root>
@@ -552,19 +552,19 @@ const IndexingTab = () => {
 	const enabledCount = Object.values(config).filter((block) => block?.enabled).length;
 	const indexingSaveDisabled = isSaving || !hasUnsavedChanges;
 	const indexingSaveLabel = isSaving
-		? __('Saving…', 'webhead-search-cloud')
-		: __('Save indexing configuration', 'webhead-search-cloud');
+		? __('Saving…', 'searcio')
+		: __('Save indexing configuration', 'searcio');
 	const indexingSaveDescription = !isSaving && !hasUnsavedChanges
-		? __('No unsaved changes.', 'webhead-search-cloud')
+		? __('No unsaved changes.', 'searcio')
 		: undefined;
 
 	return (
 		<Stack direction="column" gap="lg" className="webhead-search-cloud-indexing">
 			<TabIntro
-				title={__('What to index', 'webhead-search-cloud')}
+				title={__('What to index', 'searcio')}
 				description={__(
 					'Turn on the content you want to be searchable and choose which information is sent for each. Changes take effect after the next sync.',
-					'webhead-search-cloud'
+					'searcio'
 				)}
 			/>
 
@@ -572,7 +572,7 @@ const IndexingTab = () => {
 				<Notice.Description>
 					{__(
 						'Sending a field here makes the data available. To let visitors search by it, also enable that field (with a weight) in the Search Config tab.',
-						'webhead-search-cloud'
+						'searcio'
 					)}
 				</Notice.Description>
 			</Notice.Root>
@@ -595,7 +595,7 @@ const IndexingTab = () => {
 					<Notice.Description>
 						{sprintf(
 							/* translators: %s: reason the save failed, as reported by the REST API. */
-							__('The indexing configuration could not be saved: %s', 'webhead-search-cloud'),
+							__('The indexing configuration could not be saved: %s', 'searcio'),
 							saveError
 						)}
 					</Notice.Description>
@@ -624,7 +624,7 @@ const IndexingTab = () => {
 							'%d content type will be indexed.',
 							'%d content types will be indexed.',
 							enabledCount,
-							'webhead-search-cloud'
+							'searcio'
 						),
 						enabledCount
 					)}
