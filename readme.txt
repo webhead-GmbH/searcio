@@ -4,7 +4,7 @@ Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.2.2
+Stable tag: 1.3.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -169,6 +169,15 @@ Legal notice and terms: https://searcio.com/impressum
 Data Processing Agreement: https://searcio.com/data-processing-agreement
 
 == Changelog ==
+
+= 1.3.0 =
+- **The plugin is now "searcio - Fast AI Product Search for WooCommerce"**, and its slug and text domain are `searcio`, its name on wordpress.org. The release is `searcio-1.3.0.zip` and installs in a `searcio/` folder. **A site that installed an earlier release** has the plugin in `webhead-search-cloud/`, which WordPress takes for another plugin: check that "Delete plugin data on uninstall" under Search Cloud > General is off, deactivate and delete the old copy, then install and activate this one. The settings, the sync history and the connection stay; nothing has to be synced again.
+- New: Support Searcio. A small searcio logo, linked to searcio.com, ends the search window, faded until it is pointed at. It is always shown on the Free plan; on a paid plan it can be turned off under Search Cloud > General.
+- New: French, Spanish, Italian and Polish translations, and the German one is complete. German also ships for Austria and Switzerland, whose sites WordPress did not give the German of Germany.
+- The General tab of the settings screen is named in the language of the screen.
+- The admin menu and the settings header show the searcio mark.
+- The compare table marks a missing value with "-", and the price filter separates its two fields with "-".
+- The readme describes the plugin for its page on wordpress.org.
 
 = 1.2.2 =
 - Fixed simple products showing their price without tax in the search while variable products showed it with tax, in a shop that enters prices without tax and shows them with tax (and the other way round). Every price in the search is now the price your shop displays, with or without tax as set under WooCommerce > Settings > Tax > Display prices in the shop, and the price filter compares like with like. After updating, run a sync from the Sync tab, or wait for the daily one: it sends only the products whose price changes.
