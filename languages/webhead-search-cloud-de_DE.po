@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: webhead Search Cloud\n"
+"Project-Id-Version: searcio - Fast AI Product Search for WooCommerce\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -16,9 +16,13 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: webhead-search-cloud.php
+msgid "searcio - Fast AI Product Search for WooCommerce"
+msgstr "searcio - Schnelle KI-Produktsuche für WooCommerce"
+
 #: includes/Admin/Settings_Page.php:39
-#: includes/Admin/Settings_Page.php:109
-#: src/admin/settings/components/SettingsPanel.js:168
+#: includes/Admin/Settings_Page.php:116
+#: includes/Plugin.php:379
+#: src/admin/settings/components/SettingsPanel.js:177
 msgid "webhead Search Cloud"
 msgstr "webhead Search Cloud"
 

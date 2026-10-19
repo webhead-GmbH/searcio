@@ -5,7 +5,7 @@
     </picture>
 </p>
 
-<h1 align="center">webhead Search Cloud</h1>
+<h1 align="center">searcio - Fast AI Product Search for WooCommerce</h1>
 
 <p align="center">
 	Connect WordPress and WooCommerce to <strong>webhead Search Cloud</strong> - a fast, hosted search service - and give visitors an instant, full-screen search experience for your posts, pages, and products.

@@ -1,6 +1,6 @@
 # Developer Guide
 
-This plugin is built on the `webhead/wp-plugin-framework` scaffold. `includes/Plugin.php` is the runtime source of truth for service registration, hooks, settings, capabilities, database tables, jobs, lifecycle, health checks, diagnostics, and compatibility. If you're changing plugin behavior, also read the relevant skill file under `.agents/skills/` (or `.claude/skills/`) before editing — they describe the architectural conventions this codebase follows.
+This plugin is built on the `webhead/wp-plugin-framework` scaffold. `includes/Plugin.php` is the runtime source of truth for service registration, hooks, settings, capabilities, database tables, jobs, lifecycle, health checks, diagnostics, and compatibility. If you're changing plugin behavior, also read the relevant skill file under `.agents/skills/` (or `.claude/skills/`) before editing - they describe the architectural conventions this codebase follows.
 
 ## Building from source
 
@@ -10,7 +10,7 @@ npm install
 npm run build
 ```
 
-`composer install` also runs Mozart, which copies the framework runtime into `includes/Dependencies` under the `Webhead\WP\SearchCloud\Dependencies\` namespace. The framework itself (`webhead/wp-plugin-framework`) is a `require-dev` dependency only — it must never ship in a release; `includes/Dependencies` is the runtime copy that does.
+`composer install` also runs Mozart, which copies the framework runtime into `includes/Dependencies` under the `Webhead\WP\SearchCloud\Dependencies\` namespace. The framework itself (`webhead/wp-plugin-framework`) is a `require-dev` dependency only - it must never ship in a release; `includes/Dependencies` is the runtime copy that does.
 
 WordPress loads the plugin through `includes/autoload.php` and never through Composer's autoloader. That file registers the plugin's namespace as `autoload.psr-4` of `composer.json` names it, loads the autoloader of the bundle, and loads the framework's helper functions, which are functions of the bundle's namespace (`use function Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Helpersrr_get;`). It is the framework's file: change the namespace map in `composer.json` and run `composer framework:update`. `vendor/autoload.php` is for the test suites, whose bootstraps load it themselves. So the plugin runs on the same files where it is developed and where it is installed, and nothing in `includes/`, the main file or `uninstall.php` may ask for `vendor`: a release package has none.
 
@@ -30,7 +30,7 @@ npm run build
 
 ### Settings
 
-`includes/Settings/Plugin_Settings.php` is the single source of truth for every setting: option key, type, default, REST exposure, and (for two of them) masking/encryption. Settings are declared with the framework's `#[Setting(...)]` PHP attribute. Because attribute arguments must be compile-time constants, their `label`/`description` can never be wrapped in `__()` directly — settings with a hand-written place of their own in the admin (the Connection, Indexing and Search Config tabs, the last with its Popular searches list) render translated labels client-side instead; the two settings that only render on the generic schema-driven tab (`SYNC_RETENTION_DAYS`, `DELETE_DATA_ON_UNINSTALL`) get their translated label/description merged in server-side via `Plugin_Settings::translated_schema_overrides()` and `Settings_Endpoint::translate_schema()`. Follow the same pattern if you add a setting with no dedicated tab.
+`includes/Settings/Plugin_Settings.php` is the single source of truth for every setting: option key, type, default, REST exposure, and (for two of them) masking/encryption. Settings are declared with the framework's `#[Setting(...)]` PHP attribute. Because attribute arguments must be compile-time constants, their `label`/`description` can never be wrapped in `__()` directly - settings with a hand-written place of their own in the admin (the Connection, Indexing and Search Config tabs, the last with its Popular searches list) render translated labels client-side instead; the two settings that only render on the generic schema-driven tab (`SYNC_RETENTION_DAYS`, `DELETE_DATA_ON_UNINSTALL`) get their translated label/description merged in server-side via `Plugin_Settings::translated_schema_overrides()` and `Settings_Endpoint::translate_schema()`. Follow the same pattern if you add a setting with no dedicated tab.
 
 Write key and write secret are encrypted at rest with AES-256-GCM, keyed from WordPress's own secure-auth salt (`Plugin_Settings::encrypt_secret()` / `decrypt_secret()`), and the sanitize callback is idempotent so re-saving an already-encrypted value doesn't double-encrypt it.
 
@@ -55,33 +55,33 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 | `/sync/history` | DELETE | run_sync | Clear all finished history |
 | `/cache/clear` | POST | manage_settings | Invalidate the plugin's cache group and reset OPcache |
 
-One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret), and only while a verification this site started is still open: connecting opens a one-hour window, and outside it the route answers `404`. The window is the protection. The ping's `?token=` is an HMAC over Search Cloud's own application key, which the plugin cannot check, so requiring it alone proved nothing — appending `?token=x` used to return the write key. A tokenless request is still rejected with `400`, and a closed window or an unconnected site with `404`. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
+One route lives outside this table and namespace: `GET /wp-json/search-cloud/v1/verify` is **public** (no capability), used by Search Cloud's async domain-ownership ping. It echoes only the write key (never the write secret), and only while a verification this site started is still open: connecting opens a one-hour window, and outside it the route answers `404`. The window is the protection. The ping's `?token=` is an HMAC over Search Cloud's own application key, which the plugin cannot check, so requiring it alone proved nothing - appending `?token=x` used to return the write key. A tokenless request is still rejected with `400`, and a closed window or an unconnected site with `404`. It is deliberately registered under `search-cloud/v1`, not the plugin namespace, so the `verify_url` sent on `/connect` stays stable across a plugin-slug change.
 
 ### WP-CLI
 
 ```bash
 wp webhead-search-cloud sync status [--format=table|json]
-wp webhead-search-cloud sync run [--force]     # blocking, ticks to completion — good for real system cron; waits out a failing index as the background sync does, exits non-zero unless the run completed
+wp webhead-search-cloud sync run [--force]     # blocking, ticks to completion - good for real system cron; waits out a failing index as the background sync does, exits non-zero unless the run completed
 wp webhead-search-cloud sync start [--force]   # non-blocking, cron-driven ticks
 wp webhead-search-cloud sync pause
 wp webhead-search-cloud sync resume
 wp webhead-search-cloud sync cancel
 ```
 
-Framework-managed runtime commands are also exposed under the plugin slug (`wp webhead-search-cloud capabilities sync|revoke|restore`, `settings dump|validate`, `jobs list|run`, `upgrades run`, `health check`, `cache clear`) — see the framework's own CLI docs for those. `vendor/bin/webhead` is scaffolding-only; runtime maintenance always goes through `wp webhead-search-cloud ...`.
+Framework-managed runtime commands are also exposed under the plugin slug (`wp webhead-search-cloud capabilities sync|revoke|restore`, `settings dump|validate`, `jobs list|run`, `upgrades run`, `health check`, `cache clear`) - see the framework's own CLI docs for those. `vendor/bin/webhead` is scaffolding-only; runtime maintenance always goes through `wp webhead-search-cloud ...`.
 
 ### Database tables
 
-Both tables are managed through `Database_Manager` and registered `Table` classes (`includes/Database/Tables/`) — never query them with raw `$wpdb` SQL.
+Both tables are managed through `Database_Manager` and registered `Table` classes (`includes/Database/Tables/`) - never query them with raw `$wpdb` SQL.
 
-- **`sync_runs`** — one row per sync run (the single active row is live state; finished rows are history). Tracks status, trigger, progress counters, a resumable cursor, and between-batch pause/cancel signals.
-- **`change_queue`** — incremental-sync queue. Editorial hooks (save/trash/delete/status-transition) enqueue a coalesced row per post (edit-then-delete collapses to a single delete); the drain job processes and clears them in batches.
+- **`sync_runs`** - one row per sync run (the single active row is live state; finished rows are history). Tracks status, trigger, progress counters, a resumable cursor, and between-batch pause/cancel signals.
+- **`change_queue`** - incremental-sync queue. Editorial hooks (save/trash/delete/status-transition) enqueue a coalesced row per post (edit-then-delete collapses to a single delete); the drain job processes and clears them in batches.
 
 ### Jobs
 
-- **`Scheduled_Sync_Job`** — daily, lock-protected; starts a sync if idle and applies the history-retention policy. A run is the only one that can be active, and while one is, the drain sends nothing, so the job never leaves one standing: it re-arms a running one whose worker died and resumes a paused one.
-- **`Sync_Tick_Job`** — the resumable full-sync worker; one-off, self-rescheduling while work remains. A batch the index did not take (after the client's own three tries within seconds) leaves the run `running`: the cursor counts the failure in `retries`, `last_error` says when the next try is, and the tick is scheduled 1, 2, 5, 10, 15 and then 30 minutes ahead (`Sync_Service::RETRY_DELAYS`). The seventh failure in a row ends the run as `failed`. A batch that is taken sets `retries` back to 0. Nothing of a batch that failed is counted; its documents are added to `failed_count` once, when the run gives up.
-- **`Change_Drain_Job`** — the incremental-sync worker; drains `change_queue` in batches, self-rescheduling while non-empty.
+- **`Scheduled_Sync_Job`** - daily, lock-protected; starts a sync if idle and applies the history-retention policy. A run is the only one that can be active, and while one is, the drain sends nothing, so the job never leaves one standing: it re-arms a running one whose worker died and resumes a paused one.
+- **`Sync_Tick_Job`** - the resumable full-sync worker; one-off, self-rescheduling while work remains. A batch the index did not take (after the client's own three tries within seconds) leaves the run `running`: the cursor counts the failure in `retries`, `last_error` says when the next try is, and the tick is scheduled 1, 2, 5, 10, 15 and then 30 minutes ahead (`Sync_Service::RETRY_DELAYS`). The seventh failure in a row ends the run as `failed`. A batch that is taken sets `retries` back to 0. Nothing of a batch that failed is counted; its documents are added to `failed_count` once, when the run gives up.
+- **`Change_Drain_Job`** - the incremental-sync worker; drains `change_queue` in batches, self-rescheduling while non-empty.
 
 ### Capabilities
 
@@ -89,7 +89,7 @@ Both tables are managed through `Database_Manager` and registered `Table` classe
 
 ### Multilingual support
 
-`includes/Compatibility/Multilingual_Support.php` deliberately checks **Polylang before WPML** — Polylang registers WPML's own compatibility filters, so WPML-first detection would misidentify a Polylang-only site as running WPML. See the class docblock for the specific live bug this avoided, and [`multilingual.md`](multilingual.md) for user-facing behavior.
+`includes/Compatibility/Multilingual_Support.php` deliberately checks **Polylang before WPML** - Polylang registers WPML's own compatibility filters, so WPML-first detection would misidentify a Polylang-only site as running WPML. See the class docblock for the specific live bug this avoided, and [`multilingual.md`](multilingual.md) for user-facing behavior.
 
 ### Frontend display
 
@@ -115,7 +115,7 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
 
 ### Filters
 
-- **`webhead_search_cloud/index/allow_protected_meta`** — `(bool $allow, string $meta_key, WP_Post $post)`. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
+- **`webhead_search_cloud/index/allow_protected_meta`** - `(bool $allow, string $meta_key, WP_Post $post)`. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
 
   ```php
   add_filter( 'webhead_search_cloud/index/allow_protected_meta', function ( $allow, $key ) {
@@ -123,33 +123,33 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
   }, 10, 2 );
   ```
 
-- **`woocommerce_product_is_visible`** — WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs — WP-Cron, WP-CLI or REST — so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
+- **`woocommerce_product_is_visible`** - WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs - WP-Cron, WP-CLI or REST - so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
 
 ## Testing
 
 There are two PHP suites, the JS unit suite, and a Playwright end-to-end suite:
 
 ```bash
-composer test:unit          # PHPUnit — fast, DB-free pure-logic classes (tests/Unit)
-npm run test:integration    # PHPUnit — real WordPress + database via wp-env (tests/Integration)
-npm run test:js             # Jest, through `wp-scripts test-unit-jest` — pure-logic JS utilities
-npm run test:e2e            # Playwright — real browser, desktop + mobile (tests/e2e)
+composer test:unit          # PHPUnit - fast, DB-free pure-logic classes (tests/Unit)
+npm run test:integration    # PHPUnit - real WordPress + database via wp-env (tests/Integration)
+npm run test:js             # Jest, through `wp-scripts test-unit-jest` - pure-logic JS utilities
+npm run test:e2e            # Playwright - real browser, desktop + mobile (tests/e2e)
 ```
 
-The **unit suite** (`tests/Unit`, `phpunit.xml.dist`) is intentionally scoped to pure logic — enums, DTOs, response/state normalization, dirty-tracking, multilingual provider resolution, currency/facet/language helpers, card-template evaluation, the request cache, and local-storage-backed recent searches, plus one test of another kind, `Release\Version_Test`, which reads the repository's own files and compares the version, and the WordPress and PHP the plugin asks for, wherever they are written. `tests/bootstrap.php` polyfills a small, explicit set of WordPress functions (translation no-ops, post-meta as an in-memory store, a minimal filter registry, `WP_Post`/`WP_Error` stand-ins) rather than loading all of WordPress, so it stays fast and needs no database.
+The **unit suite** (`tests/Unit`, `phpunit.xml.dist`) is intentionally scoped to pure logic - enums, DTOs, response/state normalization, dirty-tracking, multilingual provider resolution, currency/facet/language helpers, card-template evaluation, the request cache, and local-storage-backed recent searches, plus one test of another kind, `Release\Version_Test`, which reads the repository's own files and compares the version, and the WordPress and PHP the plugin asks for, wherever they are written. `tests/bootstrap.php` polyfills a small, explicit set of WordPress functions (translation no-ops, post-meta as an in-memory store, a minimal filter registry, `WP_Post`/`WP_Error` stand-ins) rather than loading all of WordPress, so it stays fast and needs no database.
 
-The **integration suite** (`tests/Integration`, `phpunit-integration.xml.dist`) boots a real WordPress and database through `wp-phpunit` and runs inside the wp-env `tests-cli` container. It covers the WordPress-runtime layer the unit suite can't reach: activation and custom-table creation (`Activation_Test`), the resumable full-sync engine start→tick→complete/pause/cancel workflow with the Search Cloud HTTP layer faked out (`Sync_Workflow_Test`), the sync control surface — including the "stuck in Running" recovery when the tick worker is dead (`Sync_Control_Test`) — what a run does when the index does not take a batch: wait, try again, give up, and never stand in the way of the changes or of the next scheduled sync (`Sync_Retry_Test`), `sync run` waiting for each next try and ending with an error when the sync was given up (`WP_CLI\Sync_Command_Test`, against a stand-in for the `WP_CLI` class), the `sync/*` REST routes' capability split and payloads (`Sync_Endpoint_Test`), the block editor render (`Frontend\Block_Render_Test`), when a page receives the storefront bundle (`Frontend\Storefront_Entry_Test`), what the plugin does while it boots (`Lifecycle\Boot_Test`), the Elementor widget registration and contract (`Elementor\Widgets_Test`), and WooCommerce product indexing against real product objects (`Indexing\Woo_Test`).
+The **integration suite** (`tests/Integration`, `phpunit-integration.xml.dist`) boots a real WordPress and database through `wp-phpunit` and runs inside the wp-env `tests-cli` container. It covers the WordPress-runtime layer the unit suite can't reach: activation and custom-table creation (`Activation_Test`), the resumable full-sync engine start→tick→complete/pause/cancel workflow with the Search Cloud HTTP layer faked out (`Sync_Workflow_Test`), the sync control surface - including the "stuck in Running" recovery when the tick worker is dead (`Sync_Control_Test`) - what a run does when the index does not take a batch: wait, try again, give up, and never stand in the way of the changes or of the next scheduled sync (`Sync_Retry_Test`), `sync run` waiting for each next try and ending with an error when the sync was given up (`WP_CLI\Sync_Command_Test`, against a stand-in for the `WP_CLI` class), the `sync/*` REST routes' capability split and payloads (`Sync_Endpoint_Test`), the block editor render (`Frontend\Block_Render_Test`), when a page receives the storefront bundle (`Frontend\Storefront_Entry_Test`), what the plugin does while it boots (`Lifecycle\Boot_Test`), the Elementor widget registration and contract (`Elementor\Widgets_Test`), and WooCommerce product indexing against real product objects (`Indexing\Woo_Test`).
 
-The Elementor and WooCommerce suites need those plugins loaded. `.wp-env.json` installs both, and `tests/Integration/bootstrap-extra.php` loads their main files on `muplugins_loaded` and creates WooCommerce's tables on `setup_theme`. That file is the plugin's own; `tests/Integration/bootstrap.php`, which requires it, is the framework's and is refreshed by `composer framework:update`. Both plugins are optional — the two suites skip themselves when they are absent (e.g. a bare host run), so the rest of the integration suite still runs. The same suite runs again as a network with `npm run test:integration:multisite`.
+The Elementor and WooCommerce suites need those plugins loaded. `.wp-env.json` installs both, and `tests/Integration/bootstrap-extra.php` loads their main files on `muplugins_loaded` and creates WooCommerce's tables on `setup_theme`. That file is the plugin's own; `tests/Integration/bootstrap.php`, which requires it, is the framework's and is refreshed by `composer framework:update`. Both plugins are optional - the two suites skip themselves when they are absent (e.g. a bare host run), so the rest of the integration suite still runs. The same suite runs again as a network with `npm run test:integration:multisite`.
 
 ```bash
 npm run wp-env -- start     # boot the Docker environment first
 npm run test:integration    # unit + integration together: npm run test:php
 ```
 
-Both PHP suites run in CI (`.github/workflows/run-tests.yml`): the unit suite across the full PHP × WordPress compatibility matrix (8.3/8.4 × latest/6.8), and the integration suite, single site and multisite, on WordPress `latest` only — the `wp-phpunit` test framework targets current WordPress. Because of that gating, the CI "latest" leg installs current Elementor + WooCommerce while the "6.8" leg, the oldest WordPress the plugin supports, installs the plugin alone: it runs the unit suite only, and current WooCommerce (which needs WP 6.9+) would abort `wp-env start` there. If the integration suite is ever extended to the 6.8 leg, pin a WooCommerce release that still supports it.
+Both PHP suites run in CI (`.github/workflows/run-tests.yml`): the unit suite across the full PHP × WordPress compatibility matrix (8.3/8.4 × latest/6.8), and the integration suite, single site and multisite, on WordPress `latest` only - the `wp-phpunit` test framework targets current WordPress. Because of that gating, the CI "latest" leg installs current Elementor + WooCommerce while the "6.8" leg, the oldest WordPress the plugin supports, installs the plugin alone: it runs the unit suite only, and current WooCommerce (which needs WP 6.9+) would abort `wp-env start` there. If the integration suite is ever extended to the 6.8 leg, pin a WooCommerce release that still supports it.
 
-The **end-to-end suite** (`tests/e2e`, `playwright.config.js`) drives the real, built front-end in a browser via Playwright and `@wordpress/scripts test-playwright`. Every spec runs twice — a desktop and a mobile (`Pixel 5`) project — so the search modal is proven in both layouts. The hosted Search Cloud API is never contacted: `mockSearchCloud()` (`tests/e2e/utils.js`) intercepts every `…/api/v1/*` request with deterministic, CORS-headed responses, and `configureSearchKey()` sets the plugin's public key so the front end runs a real query instead of degrading to native `?s=` search. Coverage spans opening the modal from both trigger styles, running a query and rendering result cards, the no-results and API-error fallback, type facets, the pre-query browse state (highlights / popular / recent), focus and keyboard behaviour, responsive layout, the unconfigured fallback, cards designed in Search Cloud drawn from a template shaped like the service's compiler output (`server-cards.spec.js` - the unit tests read that markup through jsdom, which accepts selectors a browser refuses), the storefront on a site whose kit and stylesheet style every element (`site-styles.spec.js`), the carousel in a page written right to left (`right-to-left.spec.js`; `rightToLeft()` serves the page as WordPress does on such a site, since the test site has no such language), what the Sync tab says about a run that is waiting to try again and about one that is paused (`sync-tab.spec.js`, on a mocked `/sync/status`), and an Elementor smoke test that skips when Elementor is not active.
+The **end-to-end suite** (`tests/e2e`, `playwright.config.js`) drives the real, built front-end in a browser via Playwright and `@wordpress/scripts test-playwright`. Every spec runs twice - a desktop and a mobile (`Pixel 5`) project - so the search modal is proven in both layouts. The hosted Search Cloud API is never contacted: `mockSearchCloud()` (`tests/e2e/utils.js`) intercepts every `…/api/v1/*` request with deterministic, CORS-headed responses, and `configureSearchKey()` sets the plugin's public key so the front end runs a real query instead of degrading to native `?s=` search. Coverage spans opening the modal from both trigger styles, running a query and rendering result cards, the no-results and API-error fallback, type facets, the pre-query browse state (highlights / popular / recent), focus and keyboard behaviour, responsive layout, the unconfigured fallback, cards designed in Search Cloud drawn from a template shaped like the service's compiler output (`server-cards.spec.js` - the unit tests read that markup through jsdom, which accepts selectors a browser refuses), the storefront on a site whose kit and stylesheet style every element (`site-styles.spec.js`), the carousel in a page written right to left (`right-to-left.spec.js`; `rightToLeft()` serves the page as WordPress does on such a site, since the test site has no such language), what the Sync tab says about a run that is waiting to try again and about one that is paused (`sync-tab.spec.js`, on a mocked `/sync/status`), and an Elementor smoke test that skips when Elementor is not active.
 
 ```bash
 npm run build               # E2E drives the built bundle, so build first
@@ -174,12 +174,12 @@ wp i18n make-json languages languages --use-map=languages/script-translation-map
 
 Rules of thumb:
 
-- Every string sent to the browser via `wp_localize_script()` / inline script data must be wrapped in `__()` at the PHP call site — a raw literal there bypasses gettext entirely, even though it renders identically to a wrapped string in English until a second locale is tested.
-- `#[Setting(label:..., description:...)]` values can never be `__()`-wrapped — see "Settings" above for the established workaround.
+- Every string sent to the browser via `wp_localize_script()` / inline script data must be wrapped in `__()` at the PHP call site - a raw literal there bypasses gettext entirely, even though it renders identically to a wrapped string in English until a second locale is tested.
+- `#[Setting(label:..., description:...)]` values can never be `__()`-wrapped - see "Settings" above for the established workaround.
 - A number in the React admin goes through `formatNumber()` (`src/utils/number.js`) and a date through `dateI18n()` from `@wordpress/date`, never through a bare `toLocaleString()`. That one follows the browser, which is often set to another language than the user's WordPress profile, and the sentence around the number is in the profile's. The end-to-end suite runs in `en-US`, the one browser that cannot show the difference: a spec about it sets `test.use( { locale: 'fa-IR' } )`.
 - If your `wp` CLI has no `i18n-command` package installed, run the same commands through a full `wp-cli.phar` instead (`php /path/to/wp-cli.phar i18n ...`). If `make-pot` fails on an SSL error fetching WordPress core's `block-i18n.json`, pass a current CA bundle explicitly (`-d curl.cainfo="<path>"`) rather than editing global PHP config.
 - `make-pot` takes the plugin's slug from the name of the directory it runs in, and writes it into the template's `Report-Msgid-Bugs-To`. In a checkout that is not named `webhead-search-cloud`, a git worktree for one, add `--slug=webhead-search-cloud`.
-- Don't trust `wp i18n update-po` to preserve every existing translation when re-merging a PO file that already has `msgctxt`-scoped entries — verify with `msgfmt --check` after merging, and be ready to refill `msgstr` values from your own translation source of truth if entries came back empty.
+- Don't trust `wp i18n update-po` to preserve every existing translation when re-merging a PO file that already has `msgctxt`-scoped entries - verify with `msgfmt --check` after merging, and be ready to refill `msgstr` values from your own translation source of truth if entries came back empty.
 
 ## Releasing
 
@@ -193,9 +193,11 @@ wp plugin check webhead-search-cloud --error-severity=7 --warning-severity=6 --i
 
 `includes/Dependencies` must hold `Webhead`, `League`, `Psr` and the prefixed `composer` autoloader, and nothing else.
 
+`.wordpress-org` holds the plugin's page on wordpress.org: `icon.svg`, `icon-128x128.png` and `icon-256x256.png`, `banner-772x250.png` and `banner-1544x500.png`, and `screenshot-N.png`, numbered as the **Screenshots** section of `readme.txt` captions them. They go in the `assets/` folder of the wordpress.org SVN repository, never in the plugin: `.distignore` leaves every hidden folder out of the package. A screenshot that is added, removed or reordered changes its caption in `readme.txt` in the same change.
+
 ## Contributing
 
-1. Identify the affected public contracts first: settings option keys, REST routes, capability names, table names — these are stable identifiers, not internal details.
+1. Identify the affected public contracts first: settings option keys, REST routes, capability names, table names - these are stable identifiers, not internal details.
 2. Implement inside the existing framework patterns (settings via `Plugin_Settings`, REST via the framework's `Rest_API` base class, tables via `Database_Manager`/`Table`) rather than a parallel system.
 3. Add or update the narrowest useful test in the same change.
 4. Run `php -l` on changed PHP files, `composer test:unit`, `npm run test:js`, and `npm run build`.

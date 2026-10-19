@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: webhead Search Cloud
+ * Plugin Name: searcio - Fast AI Product Search for WooCommerce
  * Plugin URI: https://github.com/webhead-GmbH/webhead-search-cloud
  * Description: Connect WordPress and WooCommerce to webhead Search Cloud.
  * Version: 1.2.2

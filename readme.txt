@@ -1,6 +1,6 @@
-=== webhead Search Cloud ===
+=== searcio - Fast AI Product Search for WooCommerce ===
 Contributors: webheadgmbh, mohammad425
-Tags: search, woocommerce
+Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
@@ -8,60 +8,151 @@ Stable tag: 1.2.2
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Instant full-screen search for your posts, pages and products, powered by the hosted webhead Search Cloud service.
+Fast, AI-powered search for WordPress and WooCommerce: instant results as you type, smart filters, an AI shopping assistant and photo search.
 
 == Description ==
 
-Connect WordPress and WooCommerce to `webhead Search Cloud` - a fast, hosted search service - and give visitors an instant, full-screen search experience for your posts, pages, and products.
+**Fast search. Smart answers.**
 
-The plugin indexes your content into Search Cloud, keeps it in sync as content changes, and renders a client-side search modal (via a Gutenberg block or an Elementor widget) that searches, filters, and displays results without a page reload.
+searcio gives your WordPress site and WooCommerce store a full-screen search that finds the right product while your visitors are still typing. Results come with images, prices, sale badges and stock status, and the search itself runs on searcio's cloud, not on your server. Your store stays fast, even when everyone is searching at once.
 
-### Key Features:
-- **Full-screen search modal** - a fast, keyboard-friendly overlay with search-as-you-type, autocomplete suggestions,
-  recent and popular searches, and an empty-state highlights carousel.
-- **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, tags,
-  and so on), with a minimum/maximum for numeric fields such as price or rating.
-- **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
-  cards show formatted prices, sale badges, and stock status.
-- **Gutenberg block and Elementor widget** - the same search experience, fully themeable (colors, radius, typography,
-  spacing) from either editor, with no code required.
-- **Server-designed result cards** - optionally use card templates designed in the Search Cloud dashboard instead of the
-  plugin's built-in card layout.
-- **Configurable indexing** - choose which post types and WooCommerce products to index, and map custom fields,
-  taxonomies, and built-in properties to searchable data.
-- **Search relevance control** - tune searchable fields and weights, per-type ranking boosts, facet and suggestion
-  fields, and synonyms - all from Search Cloud's own configuration, editable from the plugin's admin screen.
-- **AI Assistant** - a chat tab that answers in prose and shows the products it is talking about, with a table to
-  compare them.
-- **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
-- **Guided quiz** - a few questions that narrow the catalogue down for shoppers who know what they want but not what it is called.
-- **Search redirects** - send well-known terms straight to a page instead of showing results.
-- **Similar products** - a "you may also like" row on product pages, matched by meaning rather than by shared tags.
-- **Category merchandising** - curate a category listing: pin products to the top, keep products out, show a banner.
-- **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
-  results in their current language.
-- **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental
-  sync that pushes edits shortly after they happen. A sync that cannot reach Search Cloud tries again by itself. Full
-  sync history, pause/resume/cancel controls, and retention settings are all available from the dashboard.
-- **WP-CLI support** - run and monitor syncs from the command line for real system-cron setups.
-- **Support Searcio** - a small searcio logo, linked to searcio.com, at the bottom of the search window. It is always
-  shown on the Free plan; on a paid plan you can turn it off under Search Cloud > General.
+Shoppers who know exactly what they want find it in a keystroke. Shoppers who don't can answer a few questions in the product finder, ask the AI shopping assistant, or simply upload a photo.
+
+**Free to start.** The core search is free forever, with no payment details needed. Add AI when your shop is ready for it.
+
+= Lightning-fast, by design =
+
+* **Instant results** - results appear as visitors type (or when they press Enter, if you prefer), with autocomplete suggestions they can pick with the arrow keys.
+* **Forgives typos** - a misspelled search still finds the right product.
+* **Light on your server** - every search goes from the visitor's browser straight to searcio. Your WordPress database is not queried for a single search, so checkout and the rest of your site keep all the server they need.
+* **Loads only where it is used** - the search code is added only to pages that show a search box or icon.
+* **Always up to date** - a background sync sends only what changed, in small batches, picks up edits shortly after you save them, and tries again by itself when the service cannot be reached.
+
+= Built for WooCommerce =
+
+* **Product cards that sell** - images, prices as your shop shows them (with or without tax), sale badges, stock status and price ranges for variable and grouped products.
+* **Smart filters** - narrow results by content type, category, tags, attributes such as color or size, and a price range.
+* **Product finder** - a short guided quiz that turns a few answers into a list of matching products.
+* **Merchandising** - pin products to the top of a search or a category page, keep products out, and show a promotional banner.
+* **Search redirects** - send searches like "shipping" or "returns" straight to the right page.
+* **Relevance you control** - field weights, per-type boosts, synonyms and suggestion fields, all from your WordPress admin. Results that visitors click most can rise for everyone, without cookies.
+
+= Smarter answers with AI =
+
+* **AI search** - hybrid keyword and semantic results that understand what a search means, not just the words in it.
+* **AI shopping assistant** - shoppers describe what they need in their own words. The assistant answers and shows the products it means, with a table to compare them.
+* **Search by photo** - shoppers upload a photo instead of typing and find products that look like it.
+* **Similar products** - a "you may also like" row on product pages, matched by meaning rather than by shared tags.
+
+AI search comes with every paid plan, and the AI shopping assistant and photo search with the Pro and Business plans. [Compare the plans](https://searcio.com/preise).
+
+= Fits your site =
+
+* **Gutenberg block and Elementor widgets** - put a search box or a search icon anywhere, for example in your header, and a row of products on any page.
+* **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. The search follows your site's font and text color.
+* **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
+* **Multilingual** - works with WPML and Polylang, so visitors only see results in their language.
+* **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
+* **WP-CLI** - run and watch syncs from the command line or a real system cron.
+
+= Get started in minutes =
+
+1. Install the plugin and open **Search Cloud** in your WordPress admin.
+2. Click **Connect to Search Cloud**. Your free searcio account is set up for you in one click, or the one you already have is found.
+3. Choose what should be searchable on the **Indexing** tab.
+4. Start your first sync on the **Sync** tab.
+5. Add the **Search Cloud** block or Elementor widget where your visitors look for search.
+
+= Support Searcio =
+
+A small searcio logo, linked to searcio.com, sits at the bottom of the search window. It is always shown on the Free plan; on a paid plan you can turn it off under Search Cloud > General.
+
+👉 Rate us on [WordPress](https://wordpress.org/support/plugin/webhead-search-cloud/reviews/#new-post)
+
+💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/webhead-search-cloud)
 
 == Installation ==
 
-1. Install and activate the plugin like any other WordPress plugin.
-2. Go to **Search Cloud** in the WordPress admin menu. A site that is not connected yet opens on the **Connection**
-   tab.
-3. Accept the terms and click **Connect to Search Cloud**. If you already have keys for this site, enter them under
-   **Advanced: manual key entry** instead.
+1. In your WordPress admin, go to **Plugins > Add New Plugin**, search for **searcio**, then install and activate it. Or upload the plugin zip under **Plugins > Add New Plugin > Upload Plugin**.
+2. Go to **Search Cloud** in the WordPress admin menu. A site that is not connected yet opens on the **Connection** tab.
+3. Accept the terms and click **Connect to Search Cloud**. Your free searcio account is set up with your admin email address. If you already have keys for this site, enter them under **Advanced: manual key entry** instead.
 4. Open the **Indexing** tab and choose which content should be searchable.
 5. Open the **Sync** tab and start your first sync.
-6. Add the **Search Cloud** block to a page (or the **Search Cloud** widget in Elementor) to place the search trigger
-   anywhere on your site.
+6. Add the **Search Cloud** block to a page or template part (or the **Search Cloud** widget in Elementor) to place the search box or icon anywhere on your site.
+
+== Frequently Asked Questions ==
+
+= Is it free? =
+
+Yes. The core search is free forever on searcio's Free plan, and no payment details are needed: instant results, typo tolerance, autocomplete, filters, merchandising, search redirects and the product finder, for 1,000 searches a month and 500 indexed documents. That is enough for many small shops and blogs.
+
+When you want AI search, the AI shopping assistant, photo search or higher limits, upgrade to a paid plan whenever you like. [See the plans and pricing](https://searcio.com/preise).
+
+= Do I have to sign up somewhere? =
+
+No sign-up form. The search runs on searcio, a hosted service, and connecting from the plugin sets up your free searcio account in one click with your admin email address, or finds the one you already have.
+
+= Will it slow down my site? =
+
+No. Searches go from the visitor's browser straight to searcio, so your WordPress server and database are not involved in a single search. The search code loads only on pages that show a search box or icon, and the sync runs in the background in small batches.
+
+= Do I need WooCommerce? =
+
+No. It searches posts, pages and custom post types on any WordPress site. With WooCommerce active, products are searchable too, with prices, stock, filters and the shopping features.
+
+= What happens when my plan's searches run out? =
+
+Your visitors can still search: the search window falls back to WordPress's own search until your allowance renews or you upgrade. searcio emails you before you reach a limit, and the Connection tab shows what your plan has used this month.
+
+= Does it work with my theme and page builder? =
+
+Yes. Use the Search Cloud block in the block editor or the Site Editor, or the Search Cloud widget in Elementor. The search window keeps its own layout on any theme while following your site's font, text size and text color.
+
+= Can I change how it looks? =
+
+Yes. The block and the Elementor widget let you style the search box, the window, the filters, the result cards, the AI assistant and more. Developers can also theme it with `--whsc-*` CSS custom properties.
+
+= Does it support multilingual sites? =
+
+Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You can also limit which languages are indexed.
+
+= When do changes in my shop show up in the search? =
+
+An edit is sent shortly after you save it, and a scheduled sync runs every day. Changes on the Indexing tab take effect with the next sync; changes on the Search Config tab apply to the very next search.
+
+= Can I run the sync from the command line? =
+
+Yes: `wp webhead-search-cloud sync run` runs a sync and waits for it, and `status`, `start`, `pause`, `resume` and `cancel` manage it.
+
+= Where is the data hosted? Is it GDPR compliant? =
+
+Your search data is hosted in the EU. Visitors' IP addresses are never stored in plain text, a [Data Processing Agreement](https://searcio.com/data-processing-agreement) is available, and when you ask for your data to be deleted, the search index goes with it. Only when you turn on AI features does the AI provider named in the agreement process content and searches. See **External services** below for everything the plugin sends.
+
+= What happens if I uninstall the plugin? =
+
+By default your settings and sync history stay in WordPress. Turn on **Delete plugin data on uninstall** under Search Cloud > General to remove them when you delete the plugin. Uninstalling never deletes documents already sent to searcio; disconnecting does.
+
+== Screenshots ==
+
+1. The search box in your theme's header, on a WooCommerce shop.
+2. Results with product images, prices and sale badges, and filters for type, category, color and price.
+3. Before a search: current highlights, recent searches and popular searches.
+4. One click on a filter narrows the results.
+5. The AI shopping assistant answers in words and shows the products it means.
+6. The product finder asks a few questions...
+7. ...and shows the products that match the answers.
+8. Search by photo: upload a picture and find products that look like it.
+9. The Search Cloud block and its settings in the block editor.
+10. Style every part of the search window from the block's Styles panel.
+11. Sync: the progress of the current sync and the history of past ones.
+12. Indexing: choose which content and which WooCommerce details are searchable.
+13. Search Config: AI search, field weights, filters, suggestions and synonyms.
+14. Connection: what your plan has used this month.
+15. General settings, including Support Searcio.
 
 == External services ==
 
-This plugin sends data to webhead Search Cloud, the hosted service that powers the search. Search does not work without it.
+This plugin sends data to searcio (webhead Search Cloud), the hosted service that powers the search. Search does not work without it.
 
 * **When you connect:** the site's name and address, and the email address and name of the admin who connects. Search Cloud uses them to create your account, or to find the one you have.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
@@ -73,16 +164,8 @@ This plugin sends data to webhead Search Cloud, the hosted service that powers t
 Nothing else is sent, and no visitor accounts are created.
 
 Service: https://searcio.com - Privacy policy: https://searcio.com/datenschutz
-
-== Source code ==
-
-The JavaScript in `public/` is built with webpack. The unminified source it is
-built from lives in `src/` in the plugin's repository:
-
-https://github.com/webhead-GmbH/webhead-search-cloud
-
-To rebuild it, check the repository out and run `npm install` followed by
-`npm run build`.
+Legal notice and terms: https://searcio.com/impressum
+Data Processing Agreement: https://searcio.com/data-processing-agreement
 
 == Changelog ==
 
