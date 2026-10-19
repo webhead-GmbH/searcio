@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-19T06:24:56+00:00\n"
+"POT-Creation-Date: 2026-10-19T08:16:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: searcio\n"
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Description of the plugin
 #: webhead-search-cloud.php
-#: includes/Admin/Settings_Page.php:117
+#: includes/Admin/Settings_Page.php:127
 msgid "Connect WordPress and WooCommerce to webhead Search Cloud."
 msgstr ""
 
@@ -40,13 +40,13 @@ msgstr ""
 msgid "https://webhead.at"
 msgstr ""
 
-#: includes/Admin/Settings_Page.php:35
+#: includes/Admin/Settings_Page.php:45
 #: includes/Elementor/Widgets/Search_Widget.php:68
 msgid "Search Cloud"
 msgstr ""
 
-#: includes/Admin/Settings_Page.php:39
-#: includes/Admin/Settings_Page.php:116
+#: includes/Admin/Settings_Page.php:49
+#: includes/Admin/Settings_Page.php:126
 #: includes/Plugin.php:419
 #: src/admin/settings/components/SettingsPanel.js:177
 msgid "webhead Search Cloud"
@@ -1338,6 +1338,12 @@ msgstr ""
 msgid "Invalid settings payload."
 msgstr ""
 
+#: includes/Routing/Settings_Endpoint.php:181
+#: src/settings/store/provider.js:48
+#: src/settings/store/provider.js:89
+msgid "General"
+msgstr ""
+
 #: includes/Routing/Sync_Endpoint.php:120
 msgid "That run could not be deleted. The active run is protected."
 msgstr ""
@@ -1985,7 +1991,7 @@ msgstr ""
 #: src/admin/settings/components/tabs/IndexingTab.js:540
 #: src/admin/settings/components/tabs/SearchConfigTab.js:501
 #: src/admin/settings/components/tabs/SearchConfigTab.js:697
-#: src/settings/store/provider.js:93
+#: src/settings/store/provider.js:95
 msgid "the request to the REST API failed."
 msgstr ""
 
@@ -3299,10 +3305,6 @@ msgstr ""
 
 #: src/frontend/search/components/templates.js:41
 msgid "from"
-msgstr ""
-
-#: src/settings/store/provider.js:87
-msgid "General"
 msgstr ""
 
 #: src/utils/facets.js:67

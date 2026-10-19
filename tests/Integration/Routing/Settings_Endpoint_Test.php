@@ -162,6 +162,27 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 'test-write-key', Plugin_Settings::decrypt_secret( $this->stored()[0] ) );
 	}
 
+	/**
+	 * The settings of the default section name their tab, and the framework
+	 * names it in English. The screen showed "General" in every language.
+	 */
+	public function test_the_tab_of_the_default_section_is_named_in_the_language_of_the_screen(): void {
+		$this->as_admin();
+
+		$polish = static fn ( string $translation, string $text ): string => 'General' === $text ? 'Ogólne' : $translation;
+		add_filter( 'gettext_searcio', $polish, 10, 2 );
+
+		try {
+			$schema = $this->read()->get_data()['schema'];
+		} finally {
+			remove_filter( 'gettext_searcio', $polish, 10 );
+		}
+
+		$this->assertSame( 'general', $schema[ Plugin_Settings::SYNC_RETENTION_DAYS ]['section'] );
+		$this->assertSame( 'Ogólne', $schema[ Plugin_Settings::SYNC_RETENTION_DAYS ]['section_label'] );
+		$this->assertSame( 'Ogólne', $schema[ Plugin_Settings::SUPPORT_SEARCIO ]['section_label'] );
+	}
+
 	private function read(): WP_REST_Response {
 		return $this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
 	}

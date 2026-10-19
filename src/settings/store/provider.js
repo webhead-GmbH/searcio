@@ -34,7 +34,7 @@ const titleFromSlug = ( slug ) =>
  * keyed by a slug such as `constructor` resolves truthy against
  * Object.prototype and its group would never be created.
  */
-const groupSettings = ( schema ) => {
+export const groupSettings = ( schema ) => {
 	const groups = new Map();
 
 	Object.entries( schema || {} ).forEach( ( [ key, definition ], index ) => {
@@ -43,7 +43,9 @@ const groupSettings = ( schema ) => {
 		if ( ! groups.has( section ) ) {
 			groups.set( section, {
 				name: section,
-				title: definition?.section_label || titleFromSlug( section ),
+				// The default section has a translated name. Titled from its
+				// slug it said "General" in every language.
+				title: definition?.section_label || ( DEFAULT_SECTION === section ? __( 'General', 'searcio' ) : titleFromSlug( section ) ),
 				fields: [],
 			} );
 		}
