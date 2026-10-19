@@ -66,7 +66,7 @@ final class Sync_Service {
 	/**
 	 * Wall-clock budget for one tick. A prune batch costs one HTTP round trip
 	 * per document (the API has no bulk delete), so a batch count alone can't
-	 * keep a tick inside PHP's execution limit — a large prune queue would run
+	 * keep a tick inside PHP's execution limit - a large prune queue would run
 	 * hundreds of blocking requests in a single invocation and get killed.
 	 */
 	private const TICK_BUDGET = 20;
@@ -176,7 +176,7 @@ final class Sync_Service {
 
 		/*
 		 * Dead man's switch. Every clean exit below either reschedules or clears
-		 * this, so it only ever fires when the tick itself died — PHP's
+		 * this, so it only ever fires when the tick itself died - PHP's
 		 * max_execution_time, an OOM, or the worker being killed mid-batch. That
 		 * used to orphan the run: the follow-up tick was scheduled at the very
 		 * end of this method, so a tick that never reached the end left a run
@@ -367,7 +367,7 @@ final class Sync_Service {
 
 		// A live tick honours the signal cleanly at the next batch boundary. If
 		// the worker is dead (cron not firing, or a fatal killed the tick) no
-		// tick will ever read that signal, so pause the run directly — the cursor
+		// tick will ever read that signal, so pause the run directly - the cursor
 		// is already persisted, so a later resume continues where it left off.
 		// A run that is waiting to try a batch again has no tick at work either:
 		// its next one is minutes away, and is not needed once it is paused.
@@ -416,8 +416,8 @@ final class Sync_Service {
 		}
 
 		// A running run with a live tick stops cleanly at the next batch boundary
-		// via the control signal. A paused/queued run — or a running run whose
-		// tick worker is dead (cron not firing, a fatal killed it) — has no tick
+		// via the control signal. A paused/queued run - or a running run whose
+		// tick worker is dead (cron not firing, a fatal killed it) - has no tick
 		// in flight to honour that signal, so finish it directly: clear any stray
 		// scheduled tick and free the single active slot so a new sync can start.
 		if ( Sync_Status::Running === $status && $this->worker_alive() && ! $this->awaits_retry( $run ) ) {
@@ -692,7 +692,7 @@ final class Sync_Service {
 			 * dropping it silently, as this used to) is what makes a broken
 			 * delete endpoint visible: the dashboard otherwise showed a prune
 			 * running for hours with "deleted 0" and no error to explain it.
-			 * The queue still advances — one unusable document must not wedge
+			 * The queue still advances - one unusable document must not wedge
 			 * the run behind it forever.
 			 */
 			$refused[] = $doc_id;
@@ -729,7 +729,7 @@ final class Sync_Service {
 		$this->cleanup_options();
 
 		// `finish()` writes `last_error` unconditionally, so carry forward what
-		// the run already recorded — a completed run that could not remove some
+		// the run already recorded - a completed run that could not remove some
 		// documents still has to say why.
 		$run   = $this->state->find( $id );
 		$error = isset( $run['last_error'] ) ? (string) $run['last_error'] : '';

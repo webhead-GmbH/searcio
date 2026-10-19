@@ -260,7 +260,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 					) ) }
 
 					{ /* A bare spinner reads as "something is loading", not as the
-					     assistant working on an answer — so say so, and animate it
+					     assistant working on an answer - so say so, and animate it
 					     so the wait feels alive rather than frozen. */ }
 					{ isSending && (
 						<div className="whsc-assistant__msg whsc-assistant__msg--assistant">

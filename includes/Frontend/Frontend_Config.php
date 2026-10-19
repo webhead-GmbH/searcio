@@ -116,7 +116,7 @@ final class Frontend_Config {
 			// mirror only refreshes when an admin opens/saves Search Config, so a site
 			// that deactivated WPML/Polylang after restricting languages would
 			// otherwise keep serving a stale enabledLanguages with no currentLang to
-			// ever match it — sending every visitor to native-search fallback.
+			// ever match it - sending every visitor to native-search fallback.
 			'currentLang'     => $this->language->is_multilingual() ? $this->language->current_language() : '',
 			'enabledLanguages' => $this->language->is_multilingual() ? $this->language_config->enabled_languages() : [],
 			'i18n'            => [

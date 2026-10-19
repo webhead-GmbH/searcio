@@ -2,7 +2,7 @@
 /**
  * Local mirror of Search Cloud's `search-config.languages`.
  *
- * A thin wrapper around the {@see Plugin_Settings::ENABLED_LANGUAGES} option —
+ * A thin wrapper around the {@see Plugin_Settings::ENABLED_LANGUAGES} option -
  * deliberately never calls the Search Cloud API itself, since
  * `Document_Builder` reads this on every document build and the front-end
  * language filter reads it on every page load.

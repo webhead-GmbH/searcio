@@ -49,8 +49,8 @@ final class Runtime_Diagnostics {
 
 	/**
 	 * The fields are a callback, called only when Site Health Info or the
-	 * `health` WP-CLI command reads the section, so the reads behind them — the
-	 * sync status is a database query — and their translated labels cost
+	 * `health` WP-CLI command reads the section, so the reads behind them - the
+	 * sync status is a database query - and their translated labels cost
 	 * nothing on the requests that never show it.
 	 */
 	public function register(): void {

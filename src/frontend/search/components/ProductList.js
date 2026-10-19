@@ -12,10 +12,10 @@ import SearchResultsSkeleton from './SearchResultsSkeleton';
  * search modal. Two sources, one component because everything after the fetch
  * is identical:
  *
- * - `similar` — "more like this" for the product being viewed
+ * - `similar` - "more like this" for the product being viewed
  *   (`GET /search/similar`). Semantic, so a site without AI search answers with
  *   an empty list and the row simply does not appear.
- * - `category` — a filtered search standing in for a category listing, which is
+ * - `category` - a filtered search standing in for a category listing, which is
  *   what makes a merchandising rule's category trigger fire: the rule only
  *   applies to a request that actually carries `filter[field]=value`
  *   (`docs/api/search-config.md`, "Merchandising rules"). Pinned products come

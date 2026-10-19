@@ -237,7 +237,7 @@ test.describe( 'AI Assistant tab', () => {
 
 	/**
 	 * A failure is the assistant answering, so it gets the same avatar and row
-	 * as a reply — and offers to re-send rather than making the visitor retype.
+	 * as a reply - and offers to re-send rather than making the visitor retype.
 	 */
 	test( 'a failed turn can be retried without retyping', async ( { page, requestUtils } ) => {
 		let attempts = 0;

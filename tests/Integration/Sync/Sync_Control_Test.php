@@ -3,8 +3,8 @@
  * Sync control (pause / resume / cancel) integration tests.
  *
  * These pin the fix for the "stuck in Running" bug: when the tick worker is
- * dead — WP-Cron not firing, or a fatal killed the tick so no future tick is
- * scheduled — pausing or cancelling used to only park a between-batch signal
+ * dead - WP-Cron not firing, or a fatal killed the tick so no future tick is
+ * scheduled - pausing or cancelling used to only park a between-batch signal
  * that no live tick would ever read, leaving the run Running forever and
  * blocking every future sync. Cancel/pause must now act directly in that case
  * while still deferring to a genuinely live tick for a clean batch-boundary stop.

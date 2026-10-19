@@ -1,8 +1,8 @@
 /**
  * The Search Config tab. Runs authenticated as admin (the default storage
  * state) and mocks the plugin's own `/search-config` proxy so the sections the
- * API added — redirects, merchandising's category trigger, the photo-search
- * switch — are deterministic.
+ * API added - redirects, merchandising's category trigger, the photo-search
+ * switch - are deterministic.
  *
  * The point of pinning these in a browser rather than only in the mapping unit
  * tests: the tab is the only writer of these sections, so a control that never
@@ -297,7 +297,7 @@ test.describe( 'Search Config tab', () => {
 
 	/**
 	 * The half-written cases are the ones worth proving, because the API drops
-	 * them silently rather than rejecting them — so a form that sent one would
+	 * them silently rather than rejecting them - so a form that sent one would
 	 * show a row that vanished on the next read.
 	 */
 	test( 'drops an untouched redirect row and an unpaired category trigger on save', async ( { page } ) => {

@@ -4,7 +4,7 @@
  *
  * The connection used to ask for (and store) a Search Cloud site id. Since the
  * switch to key-relative endpoints the credential identifies the tenant on its
- * own, and nothing reads this option any more — the connection screen shows the
+ * own, and nothing reads this option any more - the connection screen shows the
  * id straight from the API's response instead. What was left behind is a value
  * that silently goes stale: on a site reconnected to a different tenant it
  * still held `5` while the API reported site `4`, which is misleading to anyone

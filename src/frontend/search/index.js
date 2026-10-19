@@ -39,7 +39,7 @@ const render = () => {
  * anything changed. A page builder (Elementor's editor canvas, Elementor Pro
  * popups, any AJAX-loaded content) can add or replace `[data-whsc-trigger]`
  * nodes long after this script's first run, so a one-time
- * `querySelectorAll` at boot would miss them — a persistent `MutationObserver`
+ * `querySelectorAll` at boot would miss them - a persistent `MutationObserver`
  * keeps hydrating new ones and drops stale references to removed ones.
  */
 const collect = ( selector, mounted ) => {

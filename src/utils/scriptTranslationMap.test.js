@@ -2,7 +2,7 @@
  * Guards `languages/script-translation-map.json`.
  *
  * The map tells `wp i18n make-json` which built bundle each source file ends up
- * in. A file missing from it is silently untranslatable in the browser — its
+ * in. A file missing from it is silently untranslatable in the browser - its
  * strings are extracted into the POT and can be translated in the PO, but they
  * never reach the JS translation JSON, so the UI stays English however complete
  * the translation is. That is exactly what happened to the whole AI Assistant

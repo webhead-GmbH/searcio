@@ -3,8 +3,8 @@
  * WooCommerce compatibility wiring.
  *
  * WooCommerce is a soft dependency. This hookable declares HPOS (custom order
- * tables) compatibility — best practice even though the plugin only indexes
- * products, never orders — and surfaces an admin notice when WooCommerce is
+ * tables) compatibility - best practice even though the plugin only indexes
+ * products, never orders - and surfaces an admin notice when WooCommerce is
  * active but below the supported minimum, in which case the product indexing
  * section is disabled while WP-content indexing keeps working.
  *

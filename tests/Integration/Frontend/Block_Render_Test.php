@@ -141,7 +141,7 @@ final class Block_Render_Test extends Integration_Test_Case {
 		);
 
 		$this->assertStringNotContainsString( '<script>', $html );
-		// Exactly one closing tag — the legitimate scoped `<style>` block — which
+		// Exactly one closing tag - the legitimate scoped `<style>` block - which
 		// means the injected `</style>` was stripped rather than passed through.
 		$this->assertSame( 1, substr_count( $html, '</style>' ) );
 	}

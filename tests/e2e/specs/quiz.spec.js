@@ -1,7 +1,7 @@
 /**
  * The guided quiz. The whole question graph arrives in one `/quizzes` response,
  * so the walk happens in the browser and the network is only touched again for
- * the filtered `/search` the answers add up to — which is the thing worth
+ * the filtered `/search` the answers add up to - which is the thing worth
  * pinning here: that the accumulated answers actually reach the query.
  */
 

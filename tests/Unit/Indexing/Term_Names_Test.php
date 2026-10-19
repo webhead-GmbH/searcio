@@ -26,7 +26,7 @@ final class Term_Names_Test extends TestCase {
 	 */
 	public function test_decode_resolves_named_and_numeric_entities(): void {
 		$this->assertSame( 'Café', Term_Names::decode( 'Caf&eacute;' ) );
-		$this->assertSame( "Kids' – Shoes", Term_Names::decode( 'Kids&#039; &#8211; Shoes' ) );
+		$this->assertSame( "Kids' \u{2013} Shoes", Term_Names::decode( 'Kids&#039; &#8211; Shoes' ) );
 	}
 
 	public function test_decode_leaves_a_plain_name_alone(): void {

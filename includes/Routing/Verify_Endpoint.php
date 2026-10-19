@@ -5,7 +5,7 @@
  * `Connection_Endpoint::connect()` sends this route's URL as `verify_url` on
  * `POST /connect`. After a new-account connect, Search Cloud pings
  * `GET {verify_url}?token=<hmac>` in the background and expects
- * `{"write_key": "<the write key you were issued>"}` back — see
+ * `{"write_key": "<the write key you were issued>"}` back - see
  * docs/api/building-a-plugin.md "Domain ownership verification (informational)".
  * The `token` proves itself on Search Cloud's side when it compares our
  * response against its own record of the write key it issued; this plugin

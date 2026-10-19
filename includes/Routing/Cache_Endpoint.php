@@ -4,7 +4,7 @@
  *
  * Backs the General settings tab's "Clear cache" button. Clears two things:
  * PHP's opcode cache and this plugin's cache group. `opcache_reset()` only
- * clears the current PHP worker's own cache — under a busy multi-worker setup
+ * clears the current PHP worker's own cache - under a busy multi-worker setup
  * other workers still hold their own copy until they next revalidate, so this
  * is a best-effort nudge, not a guaranteed instant site-wide clear.
  *

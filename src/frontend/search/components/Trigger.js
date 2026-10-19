@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  * Icon mode only ever opens the shared modal. Box mode is a real, working
  * input: typing in it (`onBoxChange`) updates the shared query and opens the
  * modal so typing continues seamlessly into the full search experience.
- * Opening is wired to `onClick` rather than `onFocus` on purpose — the modal
+ * Opening is wired to `onClick` rather than `onFocus` on purpose - the modal
  * covers the box while open, and when it closes we restore focus to the box
  * programmatically (`el.focus()`), which fires a native focus event but not
  * a click; using `onFocus` here would immediately reopen the modal the

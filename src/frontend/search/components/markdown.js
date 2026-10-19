@@ -1,7 +1,7 @@
 /**
  * Minimal Markdown renderer for assistant replies.
  *
- * The assistant is an LLM, so its answers come back as Markdown — `**bold**`,
+ * The assistant is an LLM, so its answers come back as Markdown - `**bold**`,
  * numbered and bulleted lists, paragraphs. Rendered as plain text those markers
  * show up literally ("**Price:** $16"), which is what a visitor sees today.
  *
@@ -187,7 +187,7 @@ export const renderMarkdown = ( markdown ) => {
 
 			if ( ! list || list.ordered ) {
 				// An indented dash under a numbered item is a sub-detail of that
-				// item, not a new list — fold it into the item it belongs to so
+				// item, not a new list - fold it into the item it belongs to so
 				// the numbering doesn't restart mid-answer.
 				if ( list && list.ordered && /^\s+/.test( raw ) ) {
 					const last = list.items.length - 1;

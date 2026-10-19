@@ -13,7 +13,7 @@
 
 /**
  * The API is the source of truth, but a malformed quiz must not be able to
- * crash the modal — every field is defaulted rather than trusted.
+ * crash the modal - every field is defaulted rather than trusted.
  *
  * @param {Object} raw One entry from `/quizzes`.
  * @return {Object|null} A quiz with at least one question, or null.
@@ -28,7 +28,7 @@ export const normalizeQuiz = ( raw ) => {
 			options: ( Array.isArray( question.options ) ? question.options : [] ).map( ( option ) => ( {
 				id: undefined === option?.id || null === option?.id ? '' : String( option.id ),
 				label: 'string' === typeof option?.label ? option.label : '',
-				// `null` is meaningful here — it is what ends the quiz — so a
+				// `null` is meaningful here - it is what ends the quiz - so a
 				// missing pointer has to normalize to null, never to ''.
 				next_question_id:
 					undefined === option?.next_question_id || null === option?.next_question_id
@@ -85,7 +85,7 @@ export const findQuestion = ( quiz, id ) =>
  * contract" steps 3 and 5):
  *
  * - One answer carrying several values for the same field means "any of
- *   these" — a "Clothing" answer tagging both `clothing` and `tshirts` is
+ *   these" - a "Clothing" answer tagging both `clothing` and `tshirts` is
  *   asking for either. They are comma-joined, which is how `/search` spells
  *   OR for a filter.
  * - A *later* answer for a field replaces whatever an earlier one put there,

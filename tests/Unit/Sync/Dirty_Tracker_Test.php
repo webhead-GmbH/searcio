@@ -53,7 +53,7 @@ final class Dirty_Tracker_Test extends TestCase {
 
 		$this->tracker->mark_synced( 5, 'hash-a', 2 );
 
-		// Same hash, but the mapping changed since — must re-push regardless.
+		// Same hash, but the mapping changed since - must re-push regardless.
 		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-a', 3 ) );
 	}
 
@@ -78,7 +78,7 @@ final class Dirty_Tracker_Test extends TestCase {
 	public function test_clear_for_document_uses_the_last_hyphen_for_a_hyphenated_type_name(): void {
 		$this->tracker->mark_synced( 77, 'hash-a', 1 );
 
-		// A type name that itself contains a hyphen must not confuse the split —
+		// A type name that itself contains a hyphen must not confuse the split -
 		// only the ID after the *last* hyphen matters.
 		$this->tracker->clear_for_document( 'custom-post-type-77' );
 
@@ -90,7 +90,7 @@ final class Dirty_Tracker_Test extends TestCase {
 
 		$this->tracker->clear_for_document( 'malformed' );
 
-		// Nothing should have been touched — the post is still marked synced.
+		// Nothing should have been touched - the post is still marked synced.
 		$this->assertTrue( $this->tracker->was_indexed( 5 ) );
 	}
 }

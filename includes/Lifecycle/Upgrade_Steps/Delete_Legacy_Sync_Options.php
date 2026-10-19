@@ -7,7 +7,7 @@
  * flags, a handful of "last run" timestamps, and a sync interval). The current
  * engine keeps all of that in the `sync_runs` table and
  * {@see \Webhead\WP\SearchCloud\Sync\Sync_Keys}, so nothing reads or writes
- * these keys anymore — they just sit in `wp_options` on sites that were set up
+ * these keys anymore - they just sit in `wp_options` on sites that were set up
  * under the old flow, where a stale value such as a `discovery_status` stuck on
  * `running` can still be read by curious eyes and mistaken for live state.
  *
@@ -85,7 +85,7 @@ final class Delete_Legacy_Sync_Options implements Upgrade_Step {
 	/**
 	 * Deletes from the current site only. Lifecycle state is per-site (the
 	 * framework does not opt into network lifecycle state), so on multisite the
-	 * upgrade runner already executes inside each blog's context — switching
+	 * upgrade runner already executes inside each blog's context - switching
 	 * blogs here would delete other sites' rows off-schedule and let the local
 	 * "step completed" marker lie about them.
 	 *

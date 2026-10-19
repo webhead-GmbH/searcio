@@ -1,6 +1,6 @@
 /**
  * Assistant replies arrive as Markdown. Rendered as plain text the markers show
- * up literally — a real reply read "**Price:** $16 (on sale...)" on screen.
+ * up literally - a real reply read "**Price:** $16 (on sale...)" on screen.
  */
 import { renderMarkdown } from './markdown';
 

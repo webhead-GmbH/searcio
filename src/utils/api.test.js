@@ -189,7 +189,7 @@ describe( 'trackClick', () => {
 
 	/**
 	 * A JSON body would make this a non-safelisted request, so the browser would
-	 * preflight it — and the API answers preflights without CORS headers, which
+	 * preflight it - and the API answers preflights without CORS headers, which
 	 * silently dropped every click. Form encoding keeps the beacon safelisted.
 	 */
 	it( 'sends a form-encoded body so the beacon never needs a CORS preflight', () => {

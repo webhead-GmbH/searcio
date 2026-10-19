@@ -58,7 +58,7 @@ final class Trigger_Markup {
 		// The instance class is applied to the trigger itself (so Elementor's
 		// Style-tab selectors, which target the trigger's ancestor wrapper,
 		// still resolve) and is also read by the front-end JS via
-		// `data-instance-class` so it can be re-applied to the modal — the
+		// `data-instance-class` so it can be re-applied to the modal - the
 		// modal is portalled to `document.body`, so it is not a DOM descendant
 		// of this trigger and needs the class copied onto it explicitly for
 		// per-instance CSS custom properties to reach it.

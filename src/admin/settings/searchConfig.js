@@ -1,7 +1,7 @@
 /**
  * Mapping between Search Cloud's `/search-config` payload and the shape the
  * Search Config tab edits. Kept out of the component so the contract can be
- * tested directly — every field here is defined by `docs/api/search-config.md`.
+ * tested directly - every field here is defined by `docs/api/search-config.md`.
  */
 
 /**
@@ -97,7 +97,7 @@ export const normalizeConfig = ( raw ) => ( {
 
 /**
  * The payload for `PUT /search-config`. Feature switches are reduced to their
- * `enabled` flag — `available` and `status` are the server's to report, and
+ * `enabled` flag - `available` and `status` are the server's to report, and
  * echoing them back would be describing state we do not own.
  *
  * @param {Object} config The tab's working copy.
@@ -148,7 +148,7 @@ export const textToIds = ( text ) => text
 /**
  * A merchandising rule's id lists are validated per entry
  * (`merchandising.0.pinned.2`), but the UI edits the whole list as one
- * comma-separated field — so collect every entry's error onto that field
+ * comma-separated field - so collect every entry's error onto that field
  * rather than dropping the ones that have no input of their own.
  *
  * @param {Object} errors  The API's `errors` envelope.

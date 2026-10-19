@@ -201,7 +201,7 @@ const PopularSearchesCard = () => {
 
 /**
  * The three site-level switches Search Cloud reports under `features`. Each one
- * is only offered when the plan and platform allow it — the API rejects
+ * is only offered when the plan and platform allow it - the API rejects
  * enabling an unavailable feature with a field error, so the checkbox says why
  * up front rather than letting the save fail.
  *
@@ -567,7 +567,7 @@ const SearchConfigTab = () => {
 					setLanguageLimit( connection.languages?.limit ?? null );
 				}
 			} catch ( error ) {
-				// Non-fatal — the language picker just stays uncapped client-side
+				// Non-fatal - the language picker just stays uncapped client-side
 				// until a successful connection test reports the plan's limit.
 			}
 		};

@@ -5,15 +5,15 @@
  * `Button`) with their base styles loaded via the `wp-components` handle
  * enqueued alongside this stylesheet (`Frontend_Assets::register()`).
  * Everything visual below is driven by a comprehensive CSS custom property
- * set so each placement can be themed independently — set per-placement by
+ * set so each placement can be themed independently - set per-placement by
  * the Gutenberg block (`render.php`) or the Elementor Style tab
  * (`Search_Widget`), both scoped to the same `.whsc-instance-{id}` class
  * applied to the trigger AND the portalled modal (the modal is rendered via
  * `createPortal` to `document.body`, so it is not a DOM descendant of the
  * trigger and cannot inherit variables through ancestry).
  *
- * Hover/active variables always fall back to their normal counterpart —
- * `var(--x-hover, var(--x, default))` — so a hover state never overrides the
+ * Hover/active variables always fall back to their normal counterpart -
+ * `var(--x-hover, var(--x, default))` - so a hover state never overrides the
  * user's configured normal value unless they explicitly set a hover value.
  */
 
@@ -55,7 +55,7 @@
 	--whsc-btn-text: #ffffff;
 	--whsc-btn-radius: 999px;
 
-	/* Icon buttons — shared defaults; each button can override below. */
+	/* Icon buttons - shared defaults; each button can override below. */
 	--whsc-icon-color: #6b7177;
 	--whsc-icon-bg-hover: rgba(0, 0, 0, 0.06);
 
@@ -438,7 +438,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 	/*
 	 * `@wordpress/components`' `SearchControl` wraps the icon and the
-	 * `<input>` in a shared `.components-input-control__container` — that
+	 * `<input>` in a shared `.components-input-control__container` - that
 	 * container, not the `<input>` itself, is the actual visual "box" (it
 	 * draws the border/radius around both the icon and the field). Styling
 	 * only the `<input>` left the icon sitting on the container's own
@@ -497,7 +497,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 	/*
 	 * The leading search icon paints via `fill="currentColor"`, inheriting
-	 * `color` from wherever it sits — with no color of its own set, it just
+	 * `color` from wherever it sits - with no color of its own set, it just
 	 * inherited the input's text color, so there was no way to style it
 	 * independently.
 	 */
@@ -507,7 +507,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /* -------------------------------------------------------------------------
- * Modal shell — full-width, top-docked, height fits content (never full).
+ * Modal shell - full-width, top-docked, height fits content (never full).
  * A placement can make it a narrower, centred dialog set down from the top
  * instead (`--whsc-modal-width`, `--whsc-modal-offset`); the top corners are
  * square unless it asks for them rounded too, since docked to the edge they
@@ -543,8 +543,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 /*
  * Every element in the flex column needs `min-width: 0` so an oversized
- * descendant (the results carousel) can never force the column — and with
- * it the whole modal — wider than the viewport.
+ * descendant (the results carousel) can never force the column - and with
+ * it the whole modal - wider than the viewport.
  */
 .whsc-modal-body {
 	display: flex;
@@ -587,7 +587,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	flex-wrap: nowrap;
 
 	/*
-	 * Keep the input and its buttons on a single row at every width — the
+	 * Keep the input and its buttons on a single row at every width - the
 	 * input shrinks (min-width: 0) instead of the buttons wrapping to a second
 	 * line under the field (which looked broken on phones).
 	 */
@@ -862,14 +862,14 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * The mic glyph (`icons.js`) is a stroke-only outline (`fill="none"`,
  * `stroke="currentColor"`). `fill="none"` is only a presentation attribute,
  * which core's `.components-button svg { fill: currentColor }` overrides and
- * fills into a solid blob — force it back. Scoped to the built-in mic glyph
+ * fills into a solid blob - force it back. Scoped to the built-in mic glyph
  * specifically (`.whsc-default-voice-icon`, set only when no custom icon is
- * chosen) so a custom SVG selected via the Elementor icon picker — which may
- * legitimately need its own fill — is never forced to `fill: none`.
+ * chosen) so a custom SVG selected via the Elementor icon picker - which may
+ * legitimately need its own fill - is never forced to `fill: none`.
  *
  * Targets the `svg` itself, not just the wrapping span: `fill`/`stroke` are
  * inherited properties, and an inherited value always loses to any rule that
- * matches the element directly (regardless of specificity) — so setting
+ * matches the element directly (regardless of specificity) - so setting
  * `fill: none` on `.whsc-default-voice-icon` alone never wins against the
  * reset's `.components-button svg { fill: currentColor }`, which targets the
  * `svg` node explicitly.
@@ -1018,7 +1018,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /*
  * Box-model properties (radius, padding, border, margin, sizing) are declared
  * once and never re-declared per state, so a theme's `button:hover` reset
- * can't distort the pill shape on hover — only colors change between states.
+ * can't distort the pill shape on hover - only colors change between states.
  * These pills carry `role="tab"`, which the shared reset also resets
  * (background/border/box-shadow/color/cursor) at the same boosted
  * specificity this file now uses throughout, so every property the reset
@@ -1077,7 +1077,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /*
- * Dynamic field facet groups (PLAN.md §3.1) — one per configured facet field
+ * Dynamic field facet groups (PLAN.md §3.1) - one per configured facet field
  * other than the built-in type filters above. Reuses the same `.whsc-facets`
  * / `.whsc-facet` chip styling; only the group label + stacking is new here.
  */
@@ -1100,7 +1100,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 /*
  * Numeric facet fields (price, rating, review count) get two bounds instead of
- * chips — see `RangeFilters`. Reuses the search input's own custom properties
+ * chips - see `RangeFilters`. Reuses the search input's own custom properties
  * so a themed placement themes these too without another set of variables.
  */
 .whsc-modal .whsc-range__row {
@@ -1190,7 +1190,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /* -------------------------------------------------------------------------
- * Browse (empty / results) layout — recent row on top, popular aside + main.
+ * Browse (empty / results) layout - recent row on top, popular aside + main.
  * ---------------------------------------------------------------------- */
 /* One grid for all three parts, so Browse.js can move the helpers round the
  * results without the results ever changing parent: recent searches span the
@@ -1307,7 +1307,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /*
  * Every property is pinned across every state (incl. `:active`) so a theme's
  * `button` / `button:hover` / `button:active` reset (background, font,
- * letter-spacing, color) can't distort the chip — only the text color changes,
+ * letter-spacing, color) can't distort the chip - only the text color changes,
  * and only to our configured hover/active value.
  */
 .whsc-modal .whsc-chip__label,
@@ -1499,7 +1499,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /* -------------------------------------------------------------------------
- * Carousel — draggable, hidden scrollbar, overlay arrows, dot pagination.
+ * Carousel - draggable, hidden scrollbar, overlay arrows, dot pagination.
  * ---------------------------------------------------------------------- */
 .whsc-carousel {
 	position: relative;
@@ -2027,7 +2027,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 /*
  * `@keyframes` can't be nested inside a selector block, so these stay at the
- * top level — referencing them by name from inside the wrapper above works
+ * top level - referencing them by name from inside the wrapper above works
  * regardless of where they're defined.
  */
 @keyframes whsc-overlay-in {
@@ -2076,7 +2076,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 /*
  * The tab bar and the assistant sit after the top-level `@keyframes` above,
- * so they need their own copy of the wrapper and its weight — without it these
+ * so they need their own copy of the wrapper and its weight - without it these
  * rules lose to the shared frontend reset (which is why the compare toggle
  * rendered as bare text and the tabs took the theme's body type).
  */
@@ -2163,7 +2163,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * AI Assistant: chat pane (left) + results pane (right)
  * ------------------------------------------------------------------------ */
 /* The assistant stays mounted while the Search tab is shown, so the wrapper has
- * to disappear from layout entirely — both when hidden and when visible. */
+ * to disappear from layout entirely - both when hidden and when visible. */
 .whsc-assistant-pane {
 	display: contents;
 
@@ -2562,7 +2562,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	@media screen and (max-width: 782px) {
 		flex: 1 1 auto;
 		/* Capped so the thread, the results and the composer all stay within
-		 * roughly one screen — otherwise four full-width cards push the input
+		 * roughly one screen - otherwise four full-width cards push the input
 		 * far below the fold. */
 		max-height: 48vh;
 		padding: 16px 0 0;
@@ -2688,7 +2688,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	border-bottom-width: 2px;
 }
 
-/* The row labels stay put while the product columns scroll sideways — on a
+/* The row labels stay put while the product columns scroll sideways - on a
  * phone the table is always wider than the pane, and without this you lose
  * track of which attribute you are reading. */
 .whsc-compare__corner,

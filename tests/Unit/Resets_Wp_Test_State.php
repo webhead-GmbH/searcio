@@ -10,7 +10,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit;
 
 /**
  * Resets the shared `$GLOBALS['wp_test_state']` fake (post meta, filters,
- * Polylang stand-ins — see `tests/bootstrap.php`) before every test so one
+ * Polylang stand-ins - see `tests/bootstrap.php`) before every test so one
  * test's setup can never leak into another.
  */
 trait Resets_Wp_Test_State {

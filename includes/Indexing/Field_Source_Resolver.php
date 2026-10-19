@@ -3,13 +3,13 @@
  * Field source resolver.
  *
  * Resolves a mapping "source" string against a WP_Post into a value suitable for
- * a Search Cloud document field. Three source schemes are supported (v1 scope —
+ * a Search Cloud document field. Three source schemes are supported (v1 scope -
  * ACF is post meta, so it is covered by `meta:`):
  *
- * - `meta:{key}`        — a single post meta value (custom field).
- * - `taxonomy:{tax}`    — the post's term names for a taxonomy (array of strings,
+ * - `meta:{key}`        - a single post meta value (custom field).
+ * - `taxonomy:{tax}`    - the post's term names for a taxonomy (array of strings,
  *                         HTML entities decoded).
- * - `property:{name}`   — an internal object property (`title`, `content`,
+ * - `property:{name}`   - an internal object property (`title`, `content`,
  *                         `excerpt`, `permalink`, `thumbnail`, `date`,
  *                         `modified`, `author`, `slug`).
  *

@@ -3,7 +3,7 @@
  *
  * When a visitor's term exactly matches a rule the merchant configured, the
  * `/search` response replaces the usual payload with
- * `{query, redirect}` — no `hits`, no `total`, no `facets` — and the visitor
+ * `{query, redirect}` - no `hits`, no `total`, no `facets` - and the visitor
  * should be sent to that URL instead of being shown a results list.
  */
 import { safeHref } from './url';

@@ -3,7 +3,7 @@
  *
  * Two sources, and the thing worth pinning is what each one actually asks the
  * API for: "similar" must send the id of the product being viewed, and
- * "category" must send `filter[field]=value` — that filter is the only reason a
+ * "category" must send `filter[field]=value` - that filter is the only reason a
  * merchandising rule's category trigger ever fires.
  */
 
@@ -95,7 +95,7 @@ test.describe( 'product rows', () => {
 
 	/**
 	 * A site without AI search answers `/search/similar` with an empty list
-	 * rather than an error — an empty box left on the page would be worse than
+	 * rather than an error - an empty box left on the page would be worse than
 	 * no row at all.
 	 */
 	test( 'renders nothing when there is nothing to show', async ( { page, requestUtils } ) => {

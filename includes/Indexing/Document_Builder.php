@@ -4,7 +4,7 @@
  *
  * Turns a WP_Post into a Search Cloud document using the per-post-type mapping
  * ({@see Index_Config}) and the field source resolvers. Also produces a stable
- * payload hash used by the sync engine (Phase 3) for dirty detection — a post is
+ * payload hash used by the sync engine (Phase 3) for dirty detection - a post is
  * only re-pushed when its rendered document actually changes.
  *
  * Document identity is deterministic and type-prefixed (`{post_type}-{ID}`) so

@@ -5,7 +5,7 @@
  * WooCommerce is a *soft* dependency: every entry point is guarded so the plugin
  * never fatals when WooCommerce is inactive or below the minimum version. All
  * product data is read through `wc_get_product()` (not raw meta). Variable
- * products are indexed as the parent only — price becomes a range and the
+ * products are indexed as the parent only - price becomes a range and the
  * variation SKUs are collected into a searchable `skus` array. Prices are the
  * shop's display prices, with or without tax as WooCommerce shows them.
  *

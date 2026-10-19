@@ -66,7 +66,7 @@ final class Plugin_Settings {
 	 * runs (see {@see \Webhead\WP\SearchCloud\Connection\Connection_State}) and
 	 * reused on every retry, per docs/api/building-a-plugin.md: "Generate
 	 * idempotency_key once per site and store it alongside the keys." Kept out
-	 * of REST — it is never read or written by the browser.
+	 * of REST - it is never read or written by the browser.
 	 */
 	#[Setting(
 		type: 'string',
@@ -160,7 +160,7 @@ final class Plugin_Settings {
 	 * Sync-history retention in days. `0` keeps history forever. REST-exposed
 	 * so it renders on the generic schema-driven "General" settings tab;
 	 * applied by {@see \Webhead\WP\SearchCloud\Sync\Sync_Service::run_scheduled()}
-	 * on every scheduled sync (not eagerly on save — see Sync_Service).
+	 * on every scheduled sync (not eagerly on save - see Sync_Service).
 	 */
 	#[Setting(
 		type: 'integer',
@@ -262,7 +262,7 @@ final class Plugin_Settings {
 	 * Translated label/description overrides for settings that render on the
 	 * generic schema-driven "General" tab. `#[Setting(label: ..., description:
 	 * ...)]` arguments must be compile-time constant expressions, so they can
-	 * never be wrapped in `__()` at the point where they're declared above —
+	 * never be wrapped in `__()` at the point where they're declared above -
 	 * PHP raises a fatal error for a function call in an attribute argument.
 	 * Every other REST-exposed setting has a hand-written, translated tab
 	 * component that overrides the generic rendering; these two do not, so

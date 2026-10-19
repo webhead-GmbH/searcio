@@ -334,7 +334,7 @@ describe( 'postProcessMarkup', () => {
 	} );
 } );
 
-describe( 'postProcessMarkup — price components (data-sc-price)', () => {
+describe( 'postProcessMarkup - price components (data-sc-price)', () => {
 	const priceComponent = (
 		'<div data-sc-price data-sc-price-field="price" data-sc-regular-field="regular_price" '
 		+ 'data-sc-sale-field="sale_price" data-sc-min-field="price_min" data-sc-max-field="price_max" '

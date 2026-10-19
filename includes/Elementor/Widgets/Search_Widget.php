@@ -15,7 +15,7 @@
  * write CSS custom properties too (`--whsc-trigger-*`), for the same reason:
  * `style.scss`'s own trigger rules carry the three ids of weight that put them
  * above the shared frontend reset, which is more than a plain
- * `{{WRAPPER}} .whsc-trigger-*` selector has — a direct property there would
+ * `{{WRAPPER}} .whsc-trigger-*` selector has - a direct property there would
  * lose to this file's own base rule.
  * Only `Group_Control_Border`/`Group_Control_Typography` output (which can't
  * be redirected to a custom property) still uses a direct selector, and every
@@ -321,7 +321,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/**
-	 * Restrict-to-type options — only the post types actually enabled for
+	 * Restrict-to-type options - only the post types actually enabled for
 	 * indexing (read from the same `index_config` option the settings screen
 	 * and the block's config endpoint use), plus an "All types" default. Falls
 	 * back to nothing extra when the option is unset.
@@ -353,7 +353,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Trigger (lives inside {{WRAPPER}}, styled directly)
+	 * Style - Trigger (lives inside {{WRAPPER}}, styled directly)
 	 * ------------------------------------------------------------------ */
 	private function register_trigger_style_controls(): void {
 		$this->start_controls_section(
@@ -388,7 +388,7 @@ final class Search_Widget extends Widget {
 		// `height`/`border-radius` directly: this file's own base rule for
 		// `.whsc-trigger-icon-button` carries the three ids of weight that
 		// put it above the shared frontend reset, which is more than a
-		// plain `{{WRAPPER}} .whsc-trigger-icon-button` selector has — a direct
+		// plain `{{WRAPPER}} .whsc-trigger-icon-button` selector has - a direct
 		// property here would silently lose to that base rule. Custom
 		// properties sidestep the specificity fight entirely: a rule that
 		// matches the element directly always wins over an inherited value
@@ -481,7 +481,7 @@ final class Search_Widget extends Widget {
 		// custom properties (see `style.scss`) for the same specificity
 		// reason as the icon-mode controls above. Kept separate from the
 		// `--whsc-input-*` vars the modal's own "Search field" style section
-		// writes — both fall back to that shared baseline by default, but
+		// writes - both fall back to that shared baseline by default, but
 		// setting one must not silently overwrite the other.
 		$this->add_responsive_control(
 			'trigger_box_width',
@@ -532,7 +532,7 @@ final class Search_Widget extends Widget {
 				// properties (it has no custom-property output mode), so it
 				// can't sidestep the specificity fight the same way the
 				// controls above do, and is boosted instead. Targets the
-				// container, not the `<input>` itself —
+				// container, not the `<input>` itself -
 				// `@wordpress/components`' `SearchControl` draws the visible
 				// border/box around that shared container, not the input.
 				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__container' ),
@@ -561,7 +561,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Modal (general shell)
+	 * Style - Modal (general shell)
 	 * ------------------------------------------------------------------ */
 	private function register_modal_style_controls(): void {
 		$this->start_controls_section(
@@ -672,7 +672,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Mode tabs (Search / AI Assistant / Product finder). Only drawn
+	 * Style - Mode tabs (Search / AI Assistant / Product finder). Only drawn
 	 * when a second mode is on for the site, and they sit above every mode,
 	 * so they are not the assistant's own.
 	 * ------------------------------------------------------------------ */
@@ -719,7 +719,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Search field
+	 * Style - Search field
 	 * ------------------------------------------------------------------ */
 	private function register_field_style_controls(): void {
 		$this->start_controls_section(
@@ -759,7 +759,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Buttons (submit + icon buttons)
+	 * Style - Buttons (submit + icon buttons)
 	 * ------------------------------------------------------------------ */
 	private function register_button_style_controls(): void {
 		$this->start_controls_section(
@@ -854,7 +854,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Suggestions dropdown
+	 * Style - Suggestions dropdown
 	 * ------------------------------------------------------------------ */
 	private function register_suggestion_style_controls(): void {
 		$this->start_controls_section(
@@ -892,7 +892,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Recent & popular
+	 * Style - Recent & popular
 	 * ------------------------------------------------------------------ */
 	private function register_browse_style_controls(): void {
 		$this->start_controls_section(
@@ -984,7 +984,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Filters: the content-type chips and every facet group
+	 * Style - Filters: the content-type chips and every facet group
 	 * (categories, brands, ...) share one look.
 	 * ------------------------------------------------------------------ */
 	private function register_facet_style_controls(): void {
@@ -1070,7 +1070,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — the assistant pane. Shown only when the plan includes the
+	 * Style - the assistant pane. Shown only when the plan includes the
 	 * assistant, but the controls are always available so a site can theme it
 	 * ahead of enabling it.
 	 * ------------------------------------------------------------------ */
@@ -1158,7 +1158,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Result cards
+	 * Style - Result cards
 	 * ------------------------------------------------------------------ */
 	private function register_card_style_controls(): void {
 		$this->start_controls_section(
@@ -1299,7 +1299,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style — Carousel
+	 * Style - Carousel
 	 * ------------------------------------------------------------------ */
 	private function register_carousel_style_controls(): void {
 		$this->start_controls_section(
@@ -1369,7 +1369,7 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Control helpers — set a CSS custom property on the per-instance class,
+	 * Control helpers - set a CSS custom property on the per-instance class,
 	 * which reaches both the trigger and the portalled modal.
 	 * ------------------------------------------------------------------ */
 	private function var_color( string $name, string $label, string $var, array $extra = [] ): void {
@@ -1410,7 +1410,7 @@ final class Search_Widget extends Widget {
 	 * plain front-end request in this Elementor version it can come back empty
 	 * even though the stored element data still has a real `id`. `get_data(
 	 * 'id' )` reads that raw data independently, so it survives whatever drops
-	 * `$this->id` — keeping the `.whsc-instance-{id}` class matched to the ID
+	 * `$this->id` - keeping the `.whsc-instance-{id}` class matched to the ID
 	 * Elementor's own compiled CSS uses for `.whsc-instance-{{ID}}` selectors.
 	 */
 	private function resolve_instance_id(): string {
@@ -1427,7 +1427,7 @@ final class Search_Widget extends Widget {
 	 * Render a chosen icon (Font Awesome or uploaded SVG) to an HTML string via
 	 * Elementor's own sanitized icon renderer, so it can be threaded to the
 	 * React trigger/modal. Returns '' when no icon is set for that field (the
-	 * default glyph is used) — shared between `trigger_icon` and `voice_icon`.
+	 * default glyph is used) - shared between `trigger_icon` and `voice_icon`.
 	 */
 	private function render_icon_html( array $settings, string $field ): string {
 		$icon = $settings[ $field ] ?? [];

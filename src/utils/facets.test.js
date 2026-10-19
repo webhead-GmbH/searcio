@@ -166,7 +166,7 @@ describe( 'humanizeFieldLabel prefixes', () => {
 		expect( humanizeFieldLabel( 'skudo_rating' ) ).toBe( 'Skudo rating' );
 	} );
 
-	/** Only a real prefix is stripped — not a word that merely starts with it. */
+	/** Only a real prefix is stripped - not a word that merely starts with it. */
 	it( 'does not eat a field whose name begins with the prefix letters', () => {
 		expect( humanizeFieldLabel( 'attributes' ) ).toBe( 'Attributes' );
 		expect( humanizeFieldLabel( 'package_size' ) ).toBe( 'Package size' );

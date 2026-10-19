@@ -37,7 +37,7 @@ export const extractFieldFacets = ( facets ) => {
 /**
  * `filter[field]=v1,v2` values from the active per-field selections, with any
  * forced extra filters (e.g. `{featured: 'true'}` for curated highlights,
- * §3.3) merged in on top — a forced value always wins over an active
+ * §3.3) merged in on top - a forced value always wins over an active
  * selection for the same field.
  */
 export const buildFilterParams = ( activeFacets, extra = {} ) => {
@@ -89,7 +89,7 @@ export const humanizeFieldLabel = ( field ) => {
 
 	// WooCommerce product attributes reach the index prefixed (`attr_color`,
 	// `pa_size`). The prefix is an indexing detail, not something to show a
-	// shopper — "Attr color" is not a label anyone would write.
+	// shopper - "Attr color" is not a label anyone would write.
 	const text = String( field || '' )
 		.replace( /^(attr|pa|meta|tax)[_-]+/i, '' )
 		.replace( /[_-]+/g, ' ' )
@@ -112,7 +112,7 @@ export const humanizeFieldLabel = ( field ) => {
  * a field's own applied filter (confirmed live: selecting one type value
  * collapses `facets.types` down to just that value), so blindly overwriting
  * a chip group's option list on every response would make multi-select
- * impossible — picking one value would hide every other value you could
+ * impossible - picking one value would hide every other value you could
  * still add. A field with its own active filter keeps whatever option list
  * it last showed (frozen from the last response where that field was
  * unfiltered); every other field always takes the fresh list, since it's

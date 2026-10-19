@@ -429,7 +429,7 @@ final class Plugin extends Base_Plugin {
 		 * carry: the pre-key-relative `SITE_ID`, and the standalone sync and
 		 * onboarding progress keys the current engine replaced. Upgrade steps
 		 * remove these, but a site uninstalled without ever reactivating never
-		 * runs an upgrade step — so the opt-in "delete my data" path clears them
+		 * runs an upgrade step - so the opt-in "delete my data" path clears them
 		 * too. Framework settings cleanup doesn't know about them.
 		 */
 		$uninstall_manager->register_cleanup(
