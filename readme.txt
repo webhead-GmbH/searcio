@@ -174,6 +174,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 - **After updating from 1.3.0, activate the plugin again** under Plugins. Its main file is now `searcio.php`, the name wordpress.org gives it, and WordPress finds a plugin by its main file, so it switches the plugin off once. The settings, the sync history and the connection stay; nothing has to be synced again.
 - The plugin calls itself Searcio everywhere: the admin menu, the settings screen, "Connect to Searcio", the "Searcio Search" and "Searcio Products" blocks and Elementor widgets, Site Health and all seven translations.
 - The plugin's link in the plugin list goes to its page on wordpress.org.
+- A post's excerpt on a search result ends at a whole word, with "…" when it was shortened, instead of stopping in the middle of a word.
 
 = 1.3.0 =
 - **The plugin is now "searcio - Fast AI Product Search for WooCommerce"**, and its slug and text domain are `searcio`, its name on wordpress.org. The release is `searcio-1.3.0.zip` and installs in a `searcio/` folder. **A site that installed an earlier release** has the plugin in `webhead-search-cloud/`, which WordPress takes for another plugin: check that "Delete plugin data on uninstall" under Search Cloud > General is off, deactivate and delete the old copy, then install and activate this one. The settings, the sync history and the connection stay; nothing has to be synced again.
