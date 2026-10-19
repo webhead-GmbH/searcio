@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.3.0
 
 - **Translated into French, Spanish, Italian and Polish, and the German is complete**: every string of the settings screens, the block editor, the Elementor widgets and the search window, where German had 270 of 720. German also ships for Austria (`de_AT`) and Switzerland (`de_CH`, with ss for ß), whose sites WordPress does not give the German of Germany. A German entry for a string the plugin no longer has is gone. `Translations_Test` reads every PO file against the template: placeholders, HTML tags, the number of plural forms, no dash, the header, and a compiled MO and script translations for each language.
 - The General tab of the settings screen is named in the language of the screen. The framework sends the name of the default section in English with every setting, and the screen built it from the section's slug when it had none, so it said "General" in German as well; the settings endpoint now sends it translated.
