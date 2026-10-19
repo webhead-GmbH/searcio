@@ -124,17 +124,81 @@ const ProductCard = ( { hit, onClick } ) => {
 	);
 };
 
+const EXCERPT_LENGTH = 120;
+
+// A space, a dash, an opening bracket or the punctuation that leads on to more
+// text ("the zipper,…") is taken off before the ellipsis. Persian and Arabic,
+// Chinese and Japanese write their own commas and stops. Quotes stay: which
+// one opens and which one closes differs from language to language.
+const EXCERPT_TRAILING = /[\s\p{Pd}\p{Ps}.,;:!?،؛؟、。，；：！？…]+$/u;
+
+const segmenters = {};
+
+/**
+ * Where each segment of a text begins, in UTF-16 units, followed by where the
+ * text ends: the places it may be cut at.
+ *
+ * `Intl.Segmenter` knows a character as the reader sees it (a letter with its
+ * marks, an emoji with its modifiers) and a word in a script written without
+ * spaces. Without it, a character is a code point, which never parts a
+ * surrogate pair, and a word ends at a space.
+ *
+ * @param {string}            text
+ * @param {'grapheme'|'word'} granularity
+ * @return {Array<number>} Ascending offsets, the last one the text's length.
+ */
+const boundaries = ( text, granularity ) => {
+	let starts;
+
+	if ( 'function' === typeof Intl.Segmenter ) {
+		segmenters[ granularity ] ??= new Intl.Segmenter( undefined, { granularity } );
+		starts = Array.from( segmenters[ granularity ].segment( text ), ( { index } ) => index );
+	} else {
+		starts = Array.from( text.matchAll( 'word' === granularity ? /\s+|\S+/g : /./gsu ), ( { index } ) => index );
+	}
+
+	return [ ...starts, text.length ];
+};
+
+/**
+ * A post's text, cut for a card: at most `limit` characters, ending at a word
+ * and with an ellipsis when something was left out. The cut is made here and
+ * only here; the stylesheet does not clamp the excerpt as well.
+ *
+ * Runs of white space count as the one space the browser draws of them. The
+ * ellipsis is the last character of the text and takes the direction of the
+ * card, so it ends a right-to-left excerpt on its left.
+ *
+ * @param {*}      text
+ * @param {number} [limit]
+ * @return {string} The excerpt; empty for a text with nothing to show.
+ */
+export const trimExcerpt = ( text, limit = EXCERPT_LENGTH ) => {
+	const clean = String( text ?? '' ).replace( /[\t\n\f\r ]+/g, ' ' ).trim();
+	const characters = boundaries( clean, 'grapheme' );
+
+	if ( characters.length - 1 <= limit ) {
+		return clean;
+	}
+
+	const end = characters[ limit ];
+	const cut = boundaries( clean, 'word' ).filter( ( offset ) => offset <= end ).pop();
+	const kept = clean.slice( 0, cut ).replace( EXCERPT_TRAILING, '' );
+
+	// A first word longer than the limit has no end to cut at before it.
+	return ( kept || clean.slice( 0, end ) ) + '…';
+};
+
 const PostCard = ( { hit, onClick } ) => {
 	const source = hit.source || {};
+	const excerpt = trimExcerpt( source.content );
 
 	return (
 		<a className="whsc-card whsc-card--post" href={ source.url || '#' } onClick={ onClick }>
 			<CardImage src={ source.image } />
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
-				{ source.content && (
-					<span className="whsc-card__excerpt">{ String( source.content ).slice( 0, 120 ) }</span>
-				) }
+				{ excerpt && <span className="whsc-card__excerpt">{ excerpt }</span> }
 				{ source.date && <span className="whsc-card__date">{ source.date }</span> }
 			</span>
 		</a>

@@ -1935,10 +1935,14 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+/* The text is cut in `templates.js`, at a word and with an ellipsis; a line
+ * clamp here would cut it a second time. A word longer than the card is wide,
+ * such as a link, breaks rather than running out of the card. */
 .whsc-card__excerpt {
 	font-size: 13px;
 	line-height: 1.4;
 	color: var(--whsc-price-color);
+	overflow-wrap: anywhere;
 }
 
 .whsc-no-results {
