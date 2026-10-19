@@ -87,7 +87,9 @@ dist
 /public/
 /includes/Dependencies/
 
-# Machine-local: wp-env's per-developer override (core pin, ports) and the
-# Playwright MCP browser tool's session logs.
+# Machine-local: wp-env's per-developer override (core pin, ports), the
+# Playwright MCP browser tool's session logs, and the lock Claude Code keeps
+# while it runs scheduled tasks.
 /.wp-env.override.json
 /.playwright-mcp/
+/.claude/scheduled_tasks.lock
