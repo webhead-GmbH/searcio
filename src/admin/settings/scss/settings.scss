@@ -247,18 +247,9 @@
   grid-template-columns: 2fr 1fr auto;
   align-items: end;
 
-  &.whsc-search-config-row--boost {
-    grid-template-columns: 1fr 2fr;
-  }
-
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
   }
-}
-
-.whsc-search-config-type-label__caption,
-.whsc-search-config-status {
-  color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 // A site with many indexed fields turns these token lists into a tall block

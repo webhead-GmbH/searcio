@@ -296,6 +296,41 @@ test.describe( 'Search Config tab', () => {
 	} );
 
 	/**
+	 * The index status is live state of the AI search switch, set under its
+	 * description. It used to sit at the card's edge, out of line with the
+	 * description above it, which starts under the switch's label.
+	 */
+	test( 'lines up the index status with the AI search switch\'s description', async ( { page } ) => {
+		await mockSearchConfig( page );
+		await page.goto( SETTINGS_URL );
+
+		const status = page.locator( SCREEN ).getByText( 'Index status: Ready', { exact: true } );
+		await expect( status ).toBeVisible( LOADED );
+
+		const description = page.locator( SCREEN ).getByText( /^Searches return hybrid keyword/ );
+		const [ under, above ] = await Promise.all( [ status.boundingBox(), description.boundingBox() ] );
+
+		expect( Math.round( under.x ) ).toBe( Math.round( above.x ) );
+		expect( under.y ).toBeGreaterThanOrEqual( above.y + above.height );
+	} );
+
+	/**
+	 * A type boost is a slider named by its content type. It was a "Boost"
+	 * slider beside a "Type" caption and the type's name, which stood out of
+	 * line with the slider's label and its track.
+	 */
+	test( 'names each type boost by its content type', async ( { page } ) => {
+		await mockSearchConfig( page );
+		await mockCatalog( page );
+		await page.goto( SETTINGS_URL );
+
+		const boosts = card( page, 'Type boosts' );
+		await expect( boosts.getByRole( 'slider', { name: 'Products', exact: true } ) ).toBeVisible( LOADED );
+		await expect( boosts.getByRole( 'spinbutton', { name: 'Products', exact: true } ) ).toBeVisible();
+		await expect( boosts.getByText( 'Type', { exact: true } ) ).toHaveCount( 0 );
+	} );
+
+	/**
 	 * The half-written cases are the ones worth proving, because the API drops
 	 * them silently rather than rejecting them - so a form that sent one would
 	 * show a row that vanished on the next read.

@@ -226,35 +226,33 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 			/>
 			<Card.Content className="whsc-settings-card-content">
 				<Stack direction="column" gap="lg" className="whsc-feature-switches">
-					{ /* The index status is reported under its checkbox rather than
-					     as its description, so it reads as live state. */ }
-					<Stack direction="column" gap="xs">
-						<CheckboxControl
-							label={ __( 'AI search', 'searcio' ) }
-							description={
-								featureError( errors, 'ai_search' )
-								|| ( ai.available
-									? __(
-										'Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working.',
-										'searcio'
-									)
-									: unavailable )
-							}
-							checked={ Boolean( ai.enabled ) }
-							disabled={ ! ai.available && ! ai.enabled }
-							onCheckedChange={ ( enabled ) => onChange( 'ai_search', Boolean( enabled ) ) }
-						/>
-
-						{ ai.enabled && '' !== ai.status && (
-							<Text variant="body-sm" className="whsc-search-config-status">
-								{ sprintf(
+					{ /* The index status is the checkbox's details, not part of its
+					     description: it is live state, set under the description in
+					     the same column as the label and in the same type. */ }
+					<CheckboxControl
+						label={ __( 'AI search', 'searcio' ) }
+						description={
+							featureError( errors, 'ai_search' )
+							|| ( ai.available
+								? __(
+									'Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working.',
+									'searcio'
+								)
+								: unavailable )
+						}
+						details={
+							ai.enabled && '' !== ai.status
+								? sprintf(
 									/* translators: %s: index status, e.g. "Ready". */
 									__( 'Index status: %s', 'searcio' ),
 									statusLabels[ ai.status ] || ai.status
-								) }
-							</Text>
-						) }
-					</Stack>
+								)
+								: undefined
+						}
+						checked={ Boolean( ai.enabled ) }
+						disabled={ ! ai.available && ! ai.enabled }
+						onCheckedChange={ ( enabled ) => onChange( 'ai_search', Boolean( enabled ) ) }
+					/>
 
 					<CheckboxControl
 						label={ __( 'AI visual tagging', 'searcio' ) }
@@ -794,31 +792,23 @@ const SearchConfigTab = () => {
 					<Card.Content className="whsc-settings-card-content">
 						{ config.type_boosts.length > 0 ? (
 							<Stack direction="column" gap="md">
+								{ /* Each slider is named by its content type: the card says
+								     these are boosts. A "Type" column beside a "Boost"
+								     slider stood out of line with it, its caption level with
+								     nothing and its name below the slider's middle. */ }
 								{ config.type_boosts.map( ( row, index ) => (
-									<div className="whsc-search-config-row whsc-search-config-row--boost" key={ row.type }>
-										{ /* A caption and a value standing in for the read-only
-										     "Type" column: a disabled field reads as a broken
-										     input rather than as a name. */ }
-										<Stack direction="column" gap="xs" className="whsc-search-config-type-label">
-											<Text variant="body-sm" className="whsc-search-config-type-label__caption">
-												{ __( 'Type', 'searcio' ) }
-											</Text>
-											<Text className="whsc-search-config-type-label__value">
-												{ typeLabels[ row.type ] || row.type }
-											</Text>
-										</Stack>
-										<RangeControl
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
-											label={ __( 'Boost', 'searcio' ) }
-											min={ 0.1 }
-											max={ 100 }
-											step={ 0.1 }
-											value={ row.boost }
-											help={ rowError( fieldErrors, 'type_boosts', index, 'boost' ) }
-											onChange={ ( boost ) => updateTypeBoost( index, boost ) }
-										/>
-									</div>
+									<RangeControl
+										key={ row.type }
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={ typeLabels[ row.type ] || row.type }
+										min={ 0.1 }
+										max={ 100 }
+										step={ 0.1 }
+										value={ row.boost }
+										help={ rowError( fieldErrors, 'type_boosts', index, 'boost' ) }
+										onChange={ ( boost ) => updateTypeBoost( index, boost ) }
+									/>
 								) ) }
 							</Stack>
 						) : (

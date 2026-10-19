@@ -843,6 +843,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	stroke: currentColor;
 }
 
+/* The camera comes wrapped in a span, and an svg in a line of text sits on its
+ * baseline: the camera stood 4px above the clear and close icons beside it. */
+.whsc-visual-btn .whsc-visual-icon {
+	display: flex;
+}
+
 /* The real control is the button; the input only exists to open the picker.
  * Hidden by clipping rather than `display: none` so browsers that ignore a
  * programmatic click on an undisplayed input still open it. */

@@ -183,9 +183,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'triggerBgHover', __( 'Background (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'triggerIconSize', __( 'Icon size', 'searcio' ), 60, 12 ) }
-					{ sizeControl( 'triggerBtnSize', __( 'Button size', 'searcio' ), 96, 28 ) }
-					{ sizeControl( 'triggerRadius', __( 'Border radius', 'searcio' ), 100 ) }
+					<InspectorStack>
+						{ sizeControl( 'triggerIconSize', __( 'Icon size', 'searcio' ), 60, 12 ) }
+						{ sizeControl( 'triggerBtnSize', __( 'Button size', 'searcio' ), 96, 28 ) }
+						{ sizeControl( 'triggerRadius', __( 'Border radius', 'searcio' ), 100 ) }
+					</InspectorStack>
 				</PanelColorSettings>
 
 				<PanelColorSettings
@@ -197,9 +199,11 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'accentColor', __( 'Accent', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'radiusPanel', __( 'Corner radius', 'searcio' ), 40 ) }
-					{ sizeControl( 'modalPadding', __( 'Padding', 'searcio' ), 80 ) }
-					{ sizeControl( 'modalGap', __( 'Section spacing', 'searcio' ), 80 ) }
+					<InspectorStack>
+						{ sizeControl( 'radiusPanel', __( 'Corner radius', 'searcio' ), 40 ) }
+						{ sizeControl( 'modalPadding', __( 'Padding', 'searcio' ), 80 ) }
+						{ sizeControl( 'modalGap', __( 'Section spacing', 'searcio' ), 80 ) }
+					</InspectorStack>
 				</PanelColorSettings>
 
 				<PanelColorSettings
