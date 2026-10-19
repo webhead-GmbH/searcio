@@ -73,7 +73,7 @@ final class Search_Widget extends Widget {
 	}
 
 	public function get_keywords(): array {
-		return [ 'search', 'search cloud', 'webhead' ];
+		return [ 'search', 'searcio', 'webhead' ];
 	}
 
 	/**
