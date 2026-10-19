@@ -33,7 +33,7 @@ final class Brand_Test extends TestCase {
 	 */
 	private const LOWER_CASE = '/(?<![\w.\/@#$`=\\\\-])searcio(?![\w\/\\\\]|-(?![A-ZÄÖÜ])|\.[A-Za-z0-9_])/u';
 
-	private const OLD_NAME = '/Search Cloud/';
+	private const OLD_NAME = '/search cloud/i';
 
 	public function test_the_plugin_carries_its_name(): void {
 		$this->assertSame( self::NAME, $this->find( '/^ \* Plugin Name:\s*(.+?)\s*$/m', 'searcio.php' ) );
