@@ -11,7 +11,7 @@ const SyncSkeleton = () => (
 		className="whsc-skeleton"
 		role="status"
 		aria-busy="true"
-		aria-label={ __( 'Loading the sync status', 'webhead-search-cloud' ) }
+		aria-label={ __( 'Loading the sync status', 'searcio' ) }
 	>
 		<Stack direction="column" gap="lg">
 			<Stack direction="column" gap="sm">

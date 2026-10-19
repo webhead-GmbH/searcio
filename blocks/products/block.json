@@ -7,7 +7,7 @@
 	"category": "widgets",
 	"icon": "screenoptions",
 	"description": "A row of products from webhead Search Cloud: similar products on a product page, or a curated listing on a category page.",
-	"textdomain": "webhead-search-cloud",
+	"textdomain": "searcio",
 	"editorScript": "file:../../public/bundle.products-block-editor.js",
 	"render": "file:./render.php",
 	"attributes": {

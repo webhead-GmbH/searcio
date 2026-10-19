@@ -248,7 +248,7 @@ function Modal( {
 									__next40pxDefaultSize
 									className="webhead-search-cloud-modal__close"
 									icon={ CloseIcon }
-									label={ __( 'Close', 'webhead-search-cloud' ) }
+									label={ __( 'Close', 'searcio' ) }
 									onClick={ handleClose }
 								/>
 							) }

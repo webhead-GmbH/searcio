@@ -109,7 +109,7 @@ function HeaderActions( { actions } ) {
 							variant="tertiary"
 							className="webhead-search-cloud-admin-page__action webhead-search-cloud-admin-page__action--ghost"
 							icon={ moreVertical }
-							label={ __( 'More actions', 'webhead-search-cloud' ) }
+							label={ __( 'More actions', 'searcio' ) }
 							aria-expanded={ isOpen }
 							onClick={ onToggle }
 						/>

@@ -62,9 +62,9 @@ const Browse = ( {
 	const recentSearches = recent.length > 0 && (
 		<div className="whsc-recent">
 			<div className="whsc-recent__head">
-				<h3 className="whsc-section-title">{ __( 'Recent searches', 'webhead-search-cloud' ) }</h3>
+				<h3 className="whsc-section-title">{ __( 'Recent searches', 'searcio' ) }</h3>
 				<button type="button" className="whsc-clear-all" onClick={ onClearRecent } disabled={ busy }>
-					{ __( 'Clear all', 'webhead-search-cloud' ) }
+					{ __( 'Clear all', 'searcio' ) }
 				</button>
 			</div>
 			<div className="whsc-chip-row">
@@ -82,7 +82,7 @@ const Browse = ( {
 						<Button
 							className="whsc-chip__remove"
 							icon={ closeSmall }
-							label={ __( 'Remove from recent searches', 'webhead-search-cloud' ) }
+							label={ __( 'Remove from recent searches', 'searcio' ) }
 							showTooltip={ false }
 							onClick={ () => onRemoveRecent( label ) }
 							disabled={ busy }
@@ -95,7 +95,7 @@ const Browse = ( {
 
 	const popular = hasPopular && (
 		<div className="whsc-browse__aside">
-			<h3 className="whsc-section-title">{ __( 'Popular searches', 'webhead-search-cloud' ) }</h3>
+			<h3 className="whsc-section-title">{ __( 'Popular searches', 'searcio' ) }</h3>
 			<ul className="whsc-popular-list">
 				{ popularSearches.map( ( label ) => (
 					<li key={ label }>

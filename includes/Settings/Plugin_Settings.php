@@ -274,12 +274,12 @@ final class Plugin_Settings {
 	public static function translated_schema_overrides(): array {
 		return [
 			self::SYNC_RETENTION_DAYS => [
-				'label'       => __( 'Keep history for (days)', 'webhead-search-cloud' ),
-				'description' => __( 'How long finished sync runs are kept. Use 0 to keep them forever.', 'webhead-search-cloud' ),
+				'label'       => __( 'Keep history for (days)', 'searcio' ),
+				'description' => __( 'How long finished sync runs are kept. Use 0 to keep them forever.', 'searcio' ),
 			],
 			self::DELETE_DATA_ON_UNINSTALL => [
-				'label'       => __( 'Delete plugin data on uninstall', 'webhead-search-cloud' ),
-				'description' => __( 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud.', 'webhead-search-cloud' ),
+				'label'       => __( 'Delete plugin data on uninstall', 'searcio' ),
+				'description' => __( 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Search Cloud.', 'searcio' ),
 			],
 		];
 	}

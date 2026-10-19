@@ -56,7 +56,7 @@ const JsonFieldControl = ( { settingKey, definition, value, updateSetting } ) =>
 			<TextareaControl
 				label={ definition.label || settingKey }
 				hideLabelFromVision
-				description={ __( 'Edit the JSON value for this setting.', 'webhead-search-cloud' ) }
+				description={ __( 'Edit the JSON value for this setting.', 'searcio' ) }
 				value={ draft }
 				onValueChange={ ( nextValue ) => {
 					setDraft( nextValue );
@@ -79,7 +79,7 @@ const JsonFieldControl = ( { settingKey, definition, value, updateSetting } ) =>
 					<Notice.Description>
 						{ __(
 							'This is not valid JSON yet, so the change has not been applied. Finish the value to save it.',
-							'webhead-search-cloud'
+							'searcio'
 						) }
 					</Notice.Description>
 				</Notice.Root>
@@ -192,7 +192,7 @@ const SettingsGroupTab = ( { fields, settings, updateSetting, children } ) => {
 		return (
 			<Notice.Root intent="info">
 				<Notice.Description>
-					{ __( 'No settings are registered for this tab yet.', 'webhead-search-cloud' ) }
+					{ __( 'No settings are registered for this tab yet.', 'searcio' ) }
 				</Notice.Description>
 			</Notice.Root>
 		);

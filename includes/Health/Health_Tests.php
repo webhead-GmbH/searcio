@@ -77,10 +77,10 @@ final class Health_Tests {
 	#[Filter( 'site_status_tests', priority: 11 )]
 	public function translate_labels( array $tests ): array {
 		$labels = [
-			'webhead_search_cloud_connection_configured' => __( 'webhead Search Cloud connection', 'webhead-search-cloud' ),
-			'webhead_search_cloud_connection_reachable'  => __( 'webhead Search Cloud reachability', 'webhead-search-cloud' ),
-			'webhead_search_cloud_indexing_configured'   => __( 'webhead Search Cloud indexing', 'webhead-search-cloud' ),
-			'webhead_search_cloud_language_coverage'     => __( 'webhead Search Cloud language coverage', 'webhead-search-cloud' ),
+			'webhead_search_cloud_connection_configured' => __( 'webhead Search Cloud connection', 'searcio' ),
+			'webhead_search_cloud_connection_reachable'  => __( 'webhead Search Cloud reachability', 'searcio' ),
+			'webhead_search_cloud_indexing_configured'   => __( 'webhead Search Cloud indexing', 'searcio' ),
+			'webhead_search_cloud_language_coverage'     => __( 'webhead Search Cloud language coverage', 'searcio' ),
 		];
 
 		foreach ( $tests as $type => $of_type ) {
@@ -99,17 +99,17 @@ final class Health_Tests {
 		if ( ! $this->client->is_configured() ) {
 			return Health_Result::recommended(
 				test: 'webhead_search_cloud_connection_configured',
-				label: __( 'webhead Search Cloud is not connected yet', 'webhead-search-cloud' ),
+				label: __( 'webhead Search Cloud is not connected yet', 'searcio' ),
 				badge_label: 'Search Cloud',
-				description: '<p>' . esc_html__( 'Add your site ID, write key, and write secret on the Connection tab before syncing content.', 'webhead-search-cloud' ) . '</p>'
+				description: '<p>' . esc_html__( 'Add your site ID, write key, and write secret on the Connection tab before syncing content.', 'searcio' ) . '</p>'
 			)->to_wordpress_result();
 		}
 
 		return Health_Result::good(
 			test: 'webhead_search_cloud_connection_configured',
-			label: __( 'webhead Search Cloud connection is configured', 'webhead-search-cloud' ),
+			label: __( 'webhead Search Cloud connection is configured', 'searcio' ),
 			badge_label: 'Search Cloud',
-			description: '<p>' . esc_html__( 'Connection credentials are saved.', 'webhead-search-cloud' ) . '</p>'
+			description: '<p>' . esc_html__( 'Connection credentials are saved.', 'searcio' ) . '</p>'
 		)->to_wordpress_result();
 	}
 
@@ -120,9 +120,9 @@ final class Health_Tests {
 		if ( ! $this->client->is_configured() ) {
 			return Health_Result::recommended(
 				test: 'webhead_search_cloud_connection_reachable',
-				label: __( 'webhead Search Cloud is not connected yet', 'webhead-search-cloud' ),
+				label: __( 'webhead Search Cloud is not connected yet', 'searcio' ),
 				badge_label: 'Search Cloud',
-				description: '<p>' . esc_html__( 'Connect the plugin on the Connection tab, then re-run this check.', 'webhead-search-cloud' ) . '</p>'
+				description: '<p>' . esc_html__( 'Connect the plugin on the Connection tab, then re-run this check.', 'searcio' ) . '</p>'
 			)->to_wordpress_result();
 		}
 
@@ -131,17 +131,17 @@ final class Health_Tests {
 		if ( $response->transport_error || ! $response->ok() ) {
 			return Health_Result::critical(
 				test: 'webhead_search_cloud_connection_reachable',
-				label: __( 'webhead Search Cloud could not be reached', 'webhead-search-cloud' ),
+				label: __( 'webhead Search Cloud could not be reached', 'searcio' ),
 				badge_label: 'Search Cloud',
-				description: '<p>' . esc_html__( 'The health check to Search Cloud failed. Check the Connection tab and verify your credentials.', 'webhead-search-cloud' ) . '</p>'
+				description: '<p>' . esc_html__( 'The health check to Search Cloud failed. Check the Connection tab and verify your credentials.', 'searcio' ) . '</p>'
 			)->to_wordpress_result();
 		}
 
 		return Health_Result::good(
 			test: 'webhead_search_cloud_connection_reachable',
-			label: __( 'webhead Search Cloud is reachable', 'webhead-search-cloud' ),
+			label: __( 'webhead Search Cloud is reachable', 'searcio' ),
 			badge_label: 'Search Cloud',
-			description: '<p>' . esc_html__( 'The last health check succeeded.', 'webhead-search-cloud' ) . '</p>'
+			description: '<p>' . esc_html__( 'The last health check succeeded.', 'searcio' ) . '</p>'
 		)->to_wordpress_result();
 	}
 
@@ -154,19 +154,19 @@ final class Health_Tests {
 		if ( [] === $indexable ) {
 			return Health_Result::recommended(
 				test: 'webhead_search_cloud_indexing_configured',
-				label: __( 'No content types are enabled for indexing', 'webhead-search-cloud' ),
+				label: __( 'No content types are enabled for indexing', 'searcio' ),
 				badge_label: 'Search Cloud',
-				description: '<p>' . esc_html__( 'Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send.', 'webhead-search-cloud' ) . '</p>'
+				description: '<p>' . esc_html__( 'Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send.', 'searcio' ) . '</p>'
 			)->to_wordpress_result();
 		}
 
 		return Health_Result::good(
 			test: 'webhead_search_cloud_indexing_configured',
-			label: __( 'Content types are enabled for indexing', 'webhead-search-cloud' ),
+			label: __( 'Content types are enabled for indexing', 'searcio' ),
 			badge_label: 'Search Cloud',
 			description: sprintf(
 				/* translators: %d: number of enabled content types. */
-				'<p>' . esc_html__( '%d content type(s) are enabled for indexing.', 'webhead-search-cloud' ) . '</p>',
+				'<p>' . esc_html__( '%d content type(s) are enabled for indexing.', 'searcio' ) . '</p>',
 				count( $indexable )
 			)
 		)->to_wordpress_result();
@@ -186,19 +186,19 @@ final class Health_Tests {
 				test: 'webhead_search_cloud_language_coverage',
 				label: sprintf(
 					/* translators: %d: number of posts skipped. */
-					__( '%d post(s) were skipped from the last sync due to language', 'webhead-search-cloud' ),
+					__( '%d post(s) were skipped from the last sync due to language', 'searcio' ),
 					$skipped
 				),
 				badge_label: 'Search Cloud',
-				description: '<p>' . esc_html__( "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally.", 'webhead-search-cloud' ) . '</p>'
+				description: '<p>' . esc_html__( "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally.", 'searcio' ) . '</p>'
 			)->to_wordpress_result();
 		}
 
 		return Health_Result::good(
 			test: 'webhead_search_cloud_language_coverage',
-			label: __( 'No content was skipped due to language', 'webhead-search-cloud' ),
+			label: __( 'No content was skipped due to language', 'searcio' ),
 			badge_label: 'Search Cloud',
-			description: '<p>' . esc_html__( 'Every indexable post is in an enabled language, or the site has not restricted languages.', 'webhead-search-cloud' ) . '</p>'
+			description: '<p>' . esc_html__( 'Every indexable post is in an enabled language, or the site has not restricted languages.', 'searcio' ) . '</p>'
 		)->to_wordpress_result();
 	}
 }

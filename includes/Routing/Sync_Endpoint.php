@@ -117,7 +117,7 @@ final class Sync_Endpoint extends Rest_API {
 
 		if ( ! $deleted ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'That run could not be deleted. The active run is protected.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'That run could not be deleted. The active run is protected.', 'searcio' ) ],
 				409
 			);
 		}
@@ -155,7 +155,7 @@ final class Sync_Endpoint extends Rest_API {
 
 		if ( ! $ok ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'That action is not available for the current run state.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'That action is not available for the current run state.', 'searcio' ) ],
 				409
 			);
 		}

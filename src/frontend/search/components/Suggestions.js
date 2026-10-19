@@ -78,7 +78,7 @@ const Suggestions = ( { id, suggestions, activeIndex = -1, onSelect, onDismiss }
 			<Button
 				className="whsc-suggestions__close"
 				icon={ closeSmall }
-				label={ __( 'Dismiss suggestions', 'webhead-search-cloud' ) }
+				label={ __( 'Dismiss suggestions', 'searcio' ) }
 				showTooltip={ false }
 				onClick={ onDismiss }
 			/>
@@ -86,7 +86,7 @@ const Suggestions = ( { id, suggestions, activeIndex = -1, onSelect, onDismiss }
 				id={ id }
 				className="whsc-suggestions__list"
 				role="listbox"
-				aria-label={ __( 'Search suggestions', 'webhead-search-cloud' ) }
+				aria-label={ __( 'Search suggestions', 'searcio' ) }
 			>
 				{ suggestions.map( ( label, index ) => (
 					<li key={ label } role="presentation">

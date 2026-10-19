@@ -84,13 +84,13 @@ const groupSettings = ( schema ) => {
 
 	return [ ...groups.values() ].map( ( group ) => ( {
 		...group,
-		title: group.title || __( 'General', 'webhead-search-cloud' ),
+		title: group.title || __( 'General', 'searcio' ),
 		fields: [ ...group.fields ].sort( byOrderThenDeclaration ),
 	} ) );
 };
 
 const reasonOf = ( error ) =>
-	error?.message || __( 'the request to the REST API failed.', 'webhead-search-cloud' );
+	error?.message || __( 'the request to the REST API failed.', 'searcio' );
 
 const SettingsProvider = ( { children } ) => {
 	const [ schema, setSchema ] = useState( {} );

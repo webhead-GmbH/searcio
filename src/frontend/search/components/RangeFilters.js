@@ -76,7 +76,7 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 								placeholder={ String( span.min ) }
 								aria-label={ sprintf(
 									/* translators: %s: field name, e.g. "Price". */
-									__( 'Minimum %s', 'webhead-search-cloud' ),
+									__( 'Minimum %s', 'searcio' ),
 									label
 								) }
 								onChange={ ( event ) => setBound( field, 'min', event.target.value ) }
@@ -92,7 +92,7 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 								placeholder={ String( span.max ) }
 								aria-label={ sprintf(
 									/* translators: %s: field name, e.g. "Price". */
-									__( 'Maximum %s', 'webhead-search-cloud' ),
+									__( 'Maximum %s', 'searcio' ),
 									label
 								) }
 								onChange={ ( event ) => setBound( field, 'max', event.target.value ) }
@@ -109,12 +109,12 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 								className="whsc-range__apply"
 								aria-label={ sprintf(
 									/* translators: %s: field name, e.g. "Price". */
-									__( 'Apply %s filter', 'webhead-search-cloud' ),
+									__( 'Apply %s filter', 'searcio' ),
 									label
 								) }
 								disabled={ busy }
 							>
-								{ __( 'Apply', 'webhead-search-cloud' ) }
+								{ __( 'Apply', 'searcio' ) }
 							</button>
 							{ hasApplied && (
 								<button
@@ -122,7 +122,7 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 									className="whsc-range__clear"
 									aria-label={ sprintf(
 										/* translators: %s: field name, e.g. "Price". */
-										__( 'Clear %s filter', 'webhead-search-cloud' ),
+										__( 'Clear %s filter', 'searcio' ),
 										label
 									) }
 									onClick={ () => {
@@ -131,7 +131,7 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 									} }
 									disabled={ busy }
 								>
-									{ __( 'Clear', 'webhead-search-cloud' ) }
+									{ __( 'Clear', 'searcio' ) }
 								</button>
 							) }
 						</div>

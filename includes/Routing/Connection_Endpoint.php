@@ -95,7 +95,7 @@ final class Connection_Endpoint extends Rest_API {
 					'ok'      => false,
 					'flow'    => 'error',
 					'status'  => 422,
-					'message' => __( 'You must accept the Terms of Service and Privacy Policy to connect.', 'webhead-search-cloud' ),
+					'message' => __( 'You must accept the Terms of Service and Privacy Policy to connect.', 'searcio' ),
 				],
 				422
 			);
@@ -148,14 +148,14 @@ final class Connection_Endpoint extends Rest_API {
 
 			if ( $response->transport_error ) {
 				return new WP_REST_Response(
-					[ 'ok' => false, 'message' => __( 'Could not reach Search Cloud. Try again.', 'webhead-search-cloud' ) ],
+					[ 'ok' => false, 'message' => __( 'Could not reach Search Cloud. Try again.', 'searcio' ) ],
 					502
 				);
 			}
 
 			if ( ! $response->ok() && ! in_array( $response->status, [ 401, 404 ], true ) ) {
 				return new WP_REST_Response(
-					[ 'ok' => false, 'message' => __( 'Could not disconnect from Search Cloud. Try again.', 'webhead-search-cloud' ) ],
+					[ 'ok' => false, 'message' => __( 'Could not disconnect from Search Cloud. Try again.', 'searcio' ) ],
 					502
 				);
 			}
@@ -182,7 +182,7 @@ final class Connection_Endpoint extends Rest_API {
 			return [
 				'ok'      => false,
 				'status'  => 0,
-				'message' => __( 'Could not reach Search Cloud.', 'webhead-search-cloud' ),
+				'message' => __( 'Could not reach Search Cloud.', 'searcio' ),
 			];
 		}
 
@@ -243,7 +243,7 @@ final class Connection_Endpoint extends Rest_API {
 				'ok'      => false,
 				'flow'    => 'error',
 				'status'  => 0,
-				'message' => __( 'Could not reach Search Cloud.', 'webhead-search-cloud' ),
+				'message' => __( 'Could not reach Search Cloud.', 'searcio' ),
 			];
 		}
 
@@ -293,15 +293,15 @@ final class Connection_Endpoint extends Rest_API {
 
 	private function connect_error_message( Api_Response $response ): string {
 		if ( 409 === $response->status ) {
-			return __( 'This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below.', 'webhead-search-cloud' );
+			return __( 'This domain is already connected. Log into the Search Cloud dashboard to retrieve your keys and paste them below.', 'searcio' );
 		}
 
 		if ( 429 === $response->status ) {
-			return __( 'Too many connect attempts. Wait a while and try again.', 'webhead-search-cloud' );
+			return __( 'Too many connect attempts. Wait a while and try again.', 'searcio' );
 		}
 
 		if ( 503 === $response->status ) {
-			return __( 'Search Cloud cannot provision new accounts right now. Try again later.', 'webhead-search-cloud' );
+			return __( 'Search Cloud cannot provision new accounts right now. Try again later.', 'searcio' );
 		}
 
 		$body    = $response->body();
@@ -309,7 +309,7 @@ final class Connection_Endpoint extends Rest_API {
 
 		return is_string( $message ) && '' !== $message
 			? $message
-			: __( 'Connection failed.', 'webhead-search-cloud' );
+			: __( 'Connection failed.', 'searcio' );
 	}
 
 	/**
@@ -345,10 +345,10 @@ final class Connection_Endpoint extends Rest_API {
 
 	private function error_message( int $status ): string {
 		return match ( $status ) {
-			401     => __( 'Invalid write credentials. Check the write key and secret.', 'webhead-search-cloud' ),
-			403     => __( 'Site is disabled in Search Cloud.', 'webhead-search-cloud' ),
-			404     => __( 'No site found for these credentials.', 'webhead-search-cloud' ),
-			default => __( 'Connection failed.', 'webhead-search-cloud' ),
+			401     => __( 'Invalid write credentials. Check the write key and secret.', 'searcio' ),
+			403     => __( 'Site is disabled in Search Cloud.', 'searcio' ),
+			404     => __( 'No site found for these credentials.', 'searcio' ),
+			default => __( 'Connection failed.', 'searcio' ),
 		};
 	}
 }

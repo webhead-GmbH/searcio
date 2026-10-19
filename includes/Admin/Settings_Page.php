@@ -12,6 +12,7 @@ use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Page;
+use Webhead\WP\SearchCloud\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,16 +28,25 @@ final class Settings_Page extends Page {
 		return 'webhead-search-cloud';
 	}
 
+	/**
+	 * The framework translates a page's script under its menu slug, which is
+	 * the plugin's first slug and stays in the page's address. Its strings are
+	 * translated under the plugin's text domain.
+	 */
+	protected function get_text_domain(): string {
+		return Plugin::TEXT_DOMAIN;
+	}
+
 	protected function get_menu_parent(): ?string {
 		return null;
 	}
 
 	protected function get_menu_title(): string {
-		return __( 'Search Cloud', 'webhead-search-cloud' );
+		return __( 'Search Cloud', 'searcio' );
 	}
 
 	protected function get_page_title(): string {
-		return __( 'webhead Search Cloud', 'webhead-search-cloud' );
+		return __( 'webhead Search Cloud', 'searcio' );
 	}
 
 	public function get_capability(): string {
@@ -113,8 +123,8 @@ final class Settings_Page extends Page {
 			],
 			'popularSearchesKeys' => [ 'popular_searches' ],
 			'plugin' => [
-				'name'        => __( 'webhead Search Cloud', 'webhead-search-cloud' ),
-				'description' => __( 'Connect WordPress and WooCommerce to webhead Search Cloud.', 'webhead-search-cloud' ),
+				'name'        => __( 'webhead Search Cloud', 'searcio' ),
+				'description' => __( 'Connect WordPress and WooCommerce to webhead Search Cloud.', 'searcio' ),
 			],
 			// Drives the Connection tab's default-open behavior and its initial
 			// state before the settings/health REST calls resolve.

@@ -41,7 +41,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 		setWriteKey('');
 		setWriteSecret('');
 
-		showToast(__('Connection settings saved.', 'webhead-search-cloud'), 'success');
+		showToast(__('Connection settings saved.', 'searcio'), 'success');
 	};
 
 	const onTest = async () => {
@@ -71,7 +71,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				ok: false,
 				message:
 					error?.message ||
-					__('The test request failed.', 'webhead-search-cloud'),
+					__('The test request failed.', 'searcio'),
 			});
 		} finally {
 			setIsTesting(false);
@@ -80,10 +80,10 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 
 	const connectionSaveDisabled = isSaving || isLoading || !hasUnsavedChanges;
 	const connectionSaveLabel = isSaving
-		? __('Saving…', 'webhead-search-cloud')
-		: __('Save connection', 'webhead-search-cloud');
+		? __('Saving…', 'searcio')
+		: __('Save connection', 'searcio');
 	const connectionSaveDescription = !isLoading && !isSaving && !hasUnsavedChanges
-		? __('No unsaved changes.', 'webhead-search-cloud')
+		? __('No unsaved changes.', 'searcio')
 		: undefined;
 
 	return (
@@ -91,24 +91,24 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 			<Text render={<p/>} variant="body-sm">
 				{__(
 					'Enter the credentials from your site page in the Search Cloud app. The write key and secret are stored encrypted and never sent to the browser in clear text.',
-					'webhead-search-cloud'
+					'searcio'
 				)}
 			</Text>
 			<InputControl
-				label={__('Search key', 'webhead-search-cloud')}
-				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'webhead-search-cloud')}
+				label={__('Search key', 'searcio')}
+				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'searcio')}
 				value={settings.search_key ?? ''}
 				onValueChange={(value) => updateSetting('search_key', value)}
 			/>
 			<InputControl
 				type="password"
 				autoComplete="off"
-				label={__('Write key', 'webhead-search-cloud')}
+				label={__('Write key', 'searcio')}
 				placeholder={hasStored('write_key') ? SECRET_PLACEHOLDER : ''}
 				description={
 					hasStored('write_key')
-						? __('A write key is saved. Leave blank to keep it, or enter a new one to rotate.', 'webhead-search-cloud')
-						: __('Server-side write key (wk_...).', 'webhead-search-cloud')
+						? __('A write key is saved. Leave blank to keep it, or enter a new one to rotate.', 'searcio')
+						: __('Server-side write key (wk_...).', 'searcio')
 				}
 				value={writeKey}
 				onValueChange={(value) => {
@@ -119,12 +119,12 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 			<InputControl
 				type="password"
 				autoComplete="off"
-				label={__('Write secret', 'webhead-search-cloud')}
+				label={__('Write secret', 'searcio')}
 				placeholder={hasStored('write_secret') ? SECRET_PLACEHOLDER : ''}
 				description={
 					hasStored('write_secret')
-						? __('A write secret is saved. Leave blank to keep it, or enter a new one to rotate.', 'webhead-search-cloud')
-						: __('Server-side write secret.', 'webhead-search-cloud')
+						? __('A write secret is saved. Leave blank to keep it, or enter a new one to rotate.', 'searcio')
+						: __('Server-side write secret.', 'searcio')
 				}
 				value={writeSecret}
 				onValueChange={(value) => {
@@ -140,7 +140,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 					<Notice.Description>
 						{sprintf(
 							/* translators: %s: reason the settings could not be saved, as reported by the REST API. */
-							__('The settings could not be saved: %s', 'webhead-search-cloud'),
+							__('The settings could not be saved: %s', 'searcio'),
 							saveError
 						)}
 					</Notice.Description>
@@ -176,11 +176,11 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 					onClick={onTest}
 				>
 					{isTesting
-						? __('Testing…', 'webhead-search-cloud')
-						: __('Test connection', 'webhead-search-cloud')}
+						? __('Testing…', 'searcio')
+						: __('Test connection', 'searcio')}
 				</Button>
 				<Text render={<span/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
-					{__('Test uses your saved credentials - save first.', 'webhead-search-cloud')}
+					{__('Test uses your saved credentials - save first.', 'searcio')}
 				</Text>
 			</Stack>
 		</Stack>

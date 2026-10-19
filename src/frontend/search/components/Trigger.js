@@ -19,7 +19,7 @@ const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange } ) 
 	// An icon button has no text of its own, so its label is its only name. The
 	// placeholder is optional in the block and the widget, and left empty it
 	// rendered `aria-label=""`: a screen reader announced just "button".
-	const name = placeholder || __( 'Search', 'webhead-search-cloud' );
+	const name = placeholder || __( 'Search', 'searcio' );
 
 	if ( 'box' === mode ) {
 		return (

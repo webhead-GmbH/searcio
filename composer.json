@@ -98,6 +98,6 @@
             "\"vendor/bin/webhead\" bundle:prune --path=."
         ],
         "framework:update": "\"vendor/bin/webhead\" scaffold:update --path=.",
-        "make-pot": "wp i18n make-pot . languages/webhead-search-cloud.pot --domain=webhead-search-cloud --exclude=.agents,.claude,.codex,tests,docs,node_modules,vendor,public,languages,includes/Dependencies,includes/classes"
+        "make-pot": "wp i18n make-pot . languages/searcio.pot --domain=searcio --slug=searcio --exclude=.agents,.claude,.codex,tests,docs,node_modules,vendor,public,languages,includes/Dependencies,includes/classes"
     }
 }

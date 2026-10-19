@@ -163,11 +163,11 @@ Add or update the narrowest useful test for every behavior change. `npm run buil
 
 ## Translations
 
-Text domain: `webhead-search-cloud`. `Domain Path: /languages` in the main plugin header. `languages/script-translation-map.json` maps JS source files to their built bundle for `wp i18n make-json`.
+Text domain: `searcio`, the plugin's slug on wordpress.org, which installs it in a `searcio/` folder and files its translations under that name. Only the translations follow it: the hook prefix, the cache group, the options, the asset handles, the admin page, the REST namespace and the WP-CLI command keep the first slug, `webhead-search-cloud`, which the main file sets as `PLUGIN_SLUG` whatever folder the plugin is in. `Plugin::get_text_domain()` returns `searcio`; `Plugin` also keeps the framework's lifecycle keys at their earlier names (the framework names them after the text domain, and a renamed key makes a site that ran an earlier release look new) and loads `languages/` from the folder the plugin is installed in. `Domain Path: /languages` in the main plugin header. `languages/script-translation-map.json` maps JS source files to their built bundle for `wp i18n make-json`.
 
 ```bash
-wp i18n make-pot . languages/webhead-search-cloud.pot --domain=webhead-search-cloud --exclude=.agents,.claude,.codex,tests,docs,node_modules,vendor,public,languages,includes/Dependencies,includes/classes
-wp i18n update-po languages/webhead-search-cloud.pot languages
+wp i18n make-pot . languages/searcio.pot --domain=searcio --slug=searcio --exclude=.agents,.claude,.codex,tests,docs,node_modules,vendor,public,languages,includes/Dependencies,includes/classes
+wp i18n update-po languages/searcio.pot languages
 wp i18n make-mo languages languages
 wp i18n make-json languages languages --use-map=languages/script-translation-map.json --update-mo-files
 ```
@@ -178,20 +178,22 @@ Rules of thumb:
 - `#[Setting(label:..., description:...)]` values can never be `__()`-wrapped - see "Settings" above for the established workaround.
 - A number in the React admin goes through `formatNumber()` (`src/utils/number.js`) and a date through `dateI18n()` from `@wordpress/date`, never through a bare `toLocaleString()`. That one follows the browser, which is often set to another language than the user's WordPress profile, and the sentence around the number is in the profile's. The end-to-end suite runs in `en-US`, the one browser that cannot show the difference: a spec about it sets `test.use( { locale: 'fa-IR' } )`.
 - If your `wp` CLI has no `i18n-command` package installed, run the same commands through a full `wp-cli.phar` instead (`php /path/to/wp-cli.phar i18n ...`). If `make-pot` fails on an SSL error fetching WordPress core's `block-i18n.json`, pass a current CA bundle explicitly (`-d curl.cainfo="<path>"`) rather than editing global PHP config.
-- `make-pot` takes the plugin's slug from the name of the directory it runs in, and writes it into the template's `Report-Msgid-Bugs-To`. In a checkout that is not named `webhead-search-cloud`, a git worktree for one, add `--slug=webhead-search-cloud`.
+- `make-pot` takes the plugin's slug from the name of the directory it runs in, and writes it into the template's `Report-Msgid-Bugs-To`. The checkout is not named `searcio`, so always pass `--slug=searcio`.
 - Don't trust `wp i18n update-po` to preserve every existing translation when re-merging a PO file that already has `msgctxt`-scoped entries - verify with `msgfmt --check` after merging, and be ready to refill `msgstr` values from your own translation source of truth if entries came back empty.
 
 ## Releasing
 
 The version is written in the plugin header and the `VERSION` constant of `webhead-search-cloud.php`, in `Stable tag` and the first changelog block of `readme.txt`, in `CHANGELOG.md` (the `Unreleased` heading becomes the version), in `package.json` and twice in `package-lock.json`, in both `blocks/*/block.json`, in the translation template's `Project-Id-Version` (regenerate it) and in the version badge of `README.md`. The README and `docs/installation.md` also repeat what the header asks for - the WordPress and PHP minimums - and the README's last badge the *Tested up to* of `readme.txt`. `tests/Unit/Release/Version_Test.php` compares all of them, so a place that was missed fails the unit suite. None of this changes the build: `public/` comes out the same.
 
-A release is a GitHub release on the merge commit of `master`, tagged with the version (no `v`), with `webhead-search-cloud-<version>.zip` attached. `.github/workflows/deploy.yml` builds that package when a release is published - the release build above, a copy of the tree without what `.distignore` and the workflow name, without `languages/*.po` and `*.pot`, zipped with `webhead-search-cloud/` as its only root folder. When the workflow cannot run, build the package the same way by hand and attach it to the release. Before publishing, install the zip on a clean WordPress with `WP_DEBUG` on and run Plugin Check against it as wordpress.org does:
+A release is a GitHub release on the merge commit of `master`, tagged with the version (no `v`), with `searcio-<version>.zip` attached. `.github/workflows/deploy.yml` builds that package when a release is published - the release build above, a copy of the tree without what `.distignore` and the workflow name, without `languages/*.po` and `*.pot`, zipped with `searcio/` as its only root folder, the folder wordpress.org installs the plugin in. When the workflow cannot run, build the package the same way by hand and attach it to the release. Before publishing, install the zip on a clean WordPress with `WP_DEBUG` on and run Plugin Check against it as wordpress.org does:
 
 ```bash
-wp plugin check webhead-search-cloud --error-severity=7 --warning-severity=6 --include-low-severity-errors --exclude-checks=prefixing --categories=plugin_repo
+wp plugin check searcio --error-severity=7 --warning-severity=6 --include-low-severity-errors --exclude-checks=prefixing --categories=plugin_repo
 ```
 
 `includes/Dependencies` must hold `Webhead`, `League`, `Psr` and the prefixed `composer` autoloader, and nothing else.
+
+Do not run `scaffold:update` (`composer framework:update`) until the framework resolves a plugin's slug from somewhere other than its `Text Domain` header. It reads the slug from that header first and derives the hook prefix, the cache group, the REST namespace and the admin page's class names from it, so today it would rewrite the managed files for a plugin named `searcio`. The text domain of the two strings in `src/components/AdminPage.js` and `src/components/Modal.js` is already the one it writes.
 
 `.wordpress-org` holds the plugin's page on wordpress.org: `icon.svg`, `icon-128x128.png` and `icon-256x256.png`, `banner-772x250.png` and `banner-1544x500.png`, and `screenshot-N.png`, numbered as the **Screenshots** section of `readme.txt` captions them. They go in the `assets/` folder of the wordpress.org SVN repository, never in the plugin: `.distignore` leaves every hidden folder out of the package. A screenshot that is added, removed or reordered changes its caption in `readme.txt` in the same change.
 

@@ -34,19 +34,19 @@ const Counter = ({label, value}) => (
 // Cancel actually run.
 const CONFIRM_COPY = {
 	start: {
-		title: __('Start sync?', 'webhead-search-cloud'),
-		body: __('This sends new and changed content to Search Cloud. Continue?', 'webhead-search-cloud'),
-		confirmLabel: __('Start sync', 'webhead-search-cloud'),
+		title: __('Start sync?', 'searcio'),
+		body: __('This sends new and changed content to Search Cloud. Continue?', 'searcio'),
+		confirmLabel: __('Start sync', 'searcio'),
 	},
 	force: {
-		title: __('Re-sync everything?', 'webhead-search-cloud'),
-		body: __('This re-sends your entire catalog to Search Cloud, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?', 'webhead-search-cloud'),
-		confirmLabel: __('Re-sync everything', 'webhead-search-cloud'),
+		title: __('Re-sync everything?', 'searcio'),
+		body: __('This re-sends your entire catalog to Search Cloud, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?', 'searcio'),
+		confirmLabel: __('Re-sync everything', 'searcio'),
 	},
 	cancel: {
-		title: __('Cancel this sync?', 'webhead-search-cloud'),
-		body: __('This stops the current run. Progress made so far is kept, and you can start a new sync anytime. Continue?', 'webhead-search-cloud'),
-		confirmLabel: __('Cancel sync', 'webhead-search-cloud'),
+		title: __('Cancel this sync?', 'searcio'),
+		body: __('This stops the current run. Progress made so far is kept, and you can start a new sync anytime. Continue?', 'searcio'),
+		confirmLabel: __('Cancel sync', 'searcio'),
 	},
 };
 
@@ -117,7 +117,7 @@ const SyncTab = () => {
 			return response;
 		} catch (error) {
 			showToast(
-				error?.message || __('That action could not be completed.', 'webhead-search-cloud'),
+				error?.message || __('That action could not be completed.', 'searcio'),
 				'error'
 			);
 
@@ -148,8 +148,8 @@ const SyncTab = () => {
 			'/start',
 			{force: 'force' === action.type},
 			'force' === action.type
-				? __('Full re-sync started.', 'webhead-search-cloud')
-				: __('Sync started.', 'webhead-search-cloud')
+				? __('Full re-sync started.', 'searcio')
+				: __('Sync started.', 'searcio')
 		);
 	};
 
@@ -173,21 +173,21 @@ const SyncTab = () => {
 		<>
 			<Stack direction="column" gap="lg" className="webhead-search-cloud-sync">
 				<TabIntro
-					title={__('Sync', 'webhead-search-cloud')}
+					title={__('Sync', 'searcio')}
 					description={__(
 						'Send your content to Search Cloud. Only new and changed items are sent on each run, so repeat syncs are fast.',
-						'webhead-search-cloud'
+						'searcio'
 					)}
 				/>
 
 				{!configured && (
 					<Notice.Root intent="warning">
 						<Notice.Description>
-							{__('Add and save your Search Cloud credentials first.', 'webhead-search-cloud')}
+							{__('Add and save your Search Cloud credentials first.', 'searcio')}
 						</Notice.Description>
 						<Notice.Actions>
 							<Notice.ActionLink href={tabUrl('connection')}>
-								{__('Go to Connection', 'webhead-search-cloud')}
+								{__('Go to Connection', 'searcio')}
 							</Notice.ActionLink>
 						</Notice.Actions>
 					</Notice.Root>
@@ -196,11 +196,11 @@ const SyncTab = () => {
 				{configured && !hasTypes && (
 					<Notice.Root intent="info">
 						<Notice.Description>
-							{__('No content types are enabled for indexing yet.', 'webhead-search-cloud')}
+							{__('No content types are enabled for indexing yet.', 'searcio')}
 						</Notice.Description>
 						<Notice.Actions>
 							<Notice.ActionLink href={tabUrl('indexing')}>
-								{__('Go to Indexing', 'webhead-search-cloud')}
+								{__('Go to Indexing', 'searcio')}
 							</Notice.ActionLink>
 						</Notice.Actions>
 					</Notice.Root>
@@ -210,13 +210,13 @@ const SyncTab = () => {
 					<Card.Root className="whsc-card whsc-card--dotted whsc-sync-run">
 						<Card.Header className="whsc-card__header">
 							<Stack direction="row" gap="md" justify="space-between" align="center" wrap="wrap">
-								<Card.Title render={<h3/>}>{__('Current run', 'webhead-search-cloud')}</Card.Title>
+								<Card.Title render={<h3/>}>{__('Current run', 'searcio')}</Card.Title>
 								<Stack direction="row" gap="sm" align="center">
 									<Badge intent={statusIntent(active.status)}>
 										{labels[active.status] || String(active.status)}
 									</Badge>
 									{active.force && (
-										<Badge>{__('Full re-sync', 'webhead-search-cloud')}</Badge>
+										<Badge>{__('Full re-sync', 'searcio')}</Badge>
 									)}
 								</Stack>
 							</Stack>
@@ -229,12 +229,12 @@ const SyncTab = () => {
 										{percent === null
 											? sprintf(
 												/* translators: %d: processed item count. */
-												__('%d items processed…', 'webhead-search-cloud'),
+												__('%d items processed…', 'searcio'),
 												active.processed
 											)
 											: sprintf(
 												/* translators: 1: processed, 2: estimated total, 3: percentage. */
-												__('%1$s of ~%2$s processed (%3$d%%)', 'webhead-search-cloud'),
+												__('%1$s of ~%2$s processed (%3$d%%)', 'searcio'),
 												formatNumber(active.processed),
 												formatNumber(active.total_estimated),
 												percent
@@ -243,10 +243,10 @@ const SyncTab = () => {
 								</Stack>
 
 								<Grid auto={{base: 120, md: 160}} gap="var(--wpds-dimension-gap-md)" align="start">
-									<Counter label={__('Pushed', 'webhead-search-cloud')} value={active.pushed}/>
-									<Counter label={__('Skipped', 'webhead-search-cloud')} value={active.skipped}/>
-									<Counter label={__('Deleted', 'webhead-search-cloud')} value={active.deleted}/>
-									<Counter label={__('Failed', 'webhead-search-cloud')} value={active.failed_count}/>
+									<Counter label={__('Pushed', 'searcio')} value={active.pushed}/>
+									<Counter label={__('Skipped', 'searcio')} value={active.skipped}/>
+									<Counter label={__('Deleted', 'searcio')} value={active.deleted}/>
+									<Counter label={__('Failed', 'searcio')} value={active.failed_count}/>
 								</Grid>
 
 								{active.last_error && (
@@ -261,7 +261,7 @@ const SyncTab = () => {
 								{active.status === 'paused' && (
 									<Notice.Root intent="info">
 										<Notice.Description>
-											{__('While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before.', 'webhead-search-cloud')}
+											{__('While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before.', 'searcio')}
 										</Notice.Description>
 									</Notice.Root>
 								)}
@@ -269,17 +269,17 @@ const SyncTab = () => {
 								<Stack direction="row" gap="sm" align="center" wrap="wrap">
 									{active.status === 'running' && (
 										<Button __next40pxDefaultSize variant="secondary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/pause', {}, null)}>
-											{__('Pause', 'webhead-search-cloud')}
+											{__('Pause', 'searcio')}
 										</Button>
 									)}
 									{active.status === 'paused' && (
 										<Button __next40pxDefaultSize variant="primary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/resume', {}, null)}>
-											{__('Resume', 'webhead-search-cloud')}
+											{__('Resume', 'searcio')}
 										</Button>
 									)}
 									<Button __next40pxDefaultSize variant="tertiary" isDestructive isBusy={busy} disabled={busy || !CAN_RUN_SYNC}
 									        onClick={() => setConfirmAction({type: 'cancel'})}>
-										{__('Cancel', 'webhead-search-cloud')}
+										{__('Cancel', 'searcio')}
 									</Button>
 								</Stack>
 							</Stack>
@@ -294,7 +294,7 @@ const SyncTab = () => {
 							disabled={busy || !configured || !hasTypes || !CAN_RUN_SYNC}
 							onClick={() => setConfirmAction({type: 'start'})}
 						>
-							{__('Start sync', 'webhead-search-cloud')}
+							{__('Start sync', 'searcio')}
 						</Button>
 						<Button
 							variant="secondary"
@@ -303,7 +303,7 @@ const SyncTab = () => {
 							disabled={busy || !configured || !hasTypes || !CAN_RUN_SYNC}
 							onClick={() => setConfirmAction({type: 'force'})}
 						>
-							{__('Re-sync everything', 'webhead-search-cloud')}
+							{__('Re-sync everything', 'searcio')}
 						</Button>
 					</Stack>
 				)}
@@ -320,7 +320,7 @@ const SyncTab = () => {
 				onConfirm={runConfirmedAction}
 				onCancel={() => setConfirmAction(null)}
 				confirmButtonText={confirmAction ? CONFIRM_COPY[confirmAction.type].confirmLabel : undefined}
-				cancelButtonText={__('Not now', 'webhead-search-cloud')}
+				cancelButtonText={__('Not now', 'searcio')}
 			>
 				{confirmAction && (
 					<Stack direction="column" gap="sm">

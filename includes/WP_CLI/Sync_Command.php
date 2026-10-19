@@ -122,7 +122,7 @@ final class Sync_Command {
 			$result = $this->service->start( Sync_Trigger::Manual, null, $force );
 
 			if ( empty( $result['ok'] ) ) {
-				\WP_CLI::error( (string) ( $result['message'] ?? __( 'Could not start the sync.', 'webhead-search-cloud' ) ) );
+				\WP_CLI::error( (string) ( $result['message'] ?? __( 'Could not start the sync.', 'searcio' ) ) );
 			}
 
 			$id = (int) ( $result['run']['id'] ?? 0 );
@@ -176,7 +176,7 @@ final class Sync_Command {
 			\WP_CLI::warning( $error );
 		}
 
-		\WP_CLI::success( __( 'Sync completed.', 'webhead-search-cloud' ) );
+		\WP_CLI::success( __( 'Sync completed.', 'searcio' ) );
 	}
 
 	/**
@@ -196,10 +196,10 @@ final class Sync_Command {
 		$result = $this->service->start( Sync_Trigger::Manual, null, isset( $assoc_args['force'] ) );
 
 		if ( empty( $result['ok'] ) ) {
-			\WP_CLI::error( (string) ( $result['message'] ?? __( 'Could not start the sync.', 'webhead-search-cloud' ) ) );
+			\WP_CLI::error( (string) ( $result['message'] ?? __( 'Could not start the sync.', 'searcio' ) ) );
 		}
 
-		\WP_CLI::success( __( 'Sync started.', 'webhead-search-cloud' ) );
+		\WP_CLI::success( __( 'Sync started.', 'searcio' ) );
 	}
 
 	/**
@@ -211,7 +211,7 @@ final class Sync_Command {
 	 * @param array<string,string> $assoc_args
 	 */
 	public function pause( array $args, array $assoc_args ): void {
-		$this->act( fn( int $id ): bool => $this->service->pause( $id ), __( 'Sync paused.', 'webhead-search-cloud' ) );
+		$this->act( fn( int $id ): bool => $this->service->pause( $id ), __( 'Sync paused.', 'searcio' ) );
 	}
 
 	/**
@@ -223,7 +223,7 @@ final class Sync_Command {
 	 * @param array<string,string> $assoc_args
 	 */
 	public function resume( array $args, array $assoc_args ): void {
-		$this->act( fn( int $id ): bool => $this->service->resume( $id ), __( 'Sync resumed.', 'webhead-search-cloud' ) );
+		$this->act( fn( int $id ): bool => $this->service->resume( $id ), __( 'Sync resumed.', 'searcio' ) );
 	}
 
 	/**
@@ -235,18 +235,18 @@ final class Sync_Command {
 	 * @param array<string,string> $assoc_args
 	 */
 	public function cancel( array $args, array $assoc_args ): void {
-		$this->act( fn( int $id ): bool => $this->service->cancel( $id ), __( 'Sync cancelled.', 'webhead-search-cloud' ) );
+		$this->act( fn( int $id ): bool => $this->service->cancel( $id ), __( 'Sync cancelled.', 'searcio' ) );
 	}
 
 	private function act( callable $callback, string $success ): void {
 		$active = $this->state->active();
 
 		if ( null === $active ) {
-			\WP_CLI::error( __( 'There is no active sync.', 'webhead-search-cloud' ) );
+			\WP_CLI::error( __( 'There is no active sync.', 'searcio' ) );
 		}
 
 		if ( ! $callback( (int) $active['id'] ) ) {
-			\WP_CLI::error( __( 'That action is not available for the current run state.', 'webhead-search-cloud' ) );
+			\WP_CLI::error( __( 'That action is not available for the current run state.', 'searcio' ) );
 		}
 
 		\WP_CLI::success( $success );

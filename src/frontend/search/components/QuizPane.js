@@ -84,7 +84,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			.catch( () => {
 				if ( ! cancelled ) {
 					setQuizzes( [] );
-					setError( __( 'The quiz is unavailable right now.', 'webhead-search-cloud' ) );
+					setError( __( 'The quiz is unavailable right now.', 'searcio' ) );
 				}
 			} );
 
@@ -128,7 +128,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			setResults( response );
 		} catch ( e ) {
 			if ( 'AbortError' !== e.name ) {
-				setError( __( 'We could not load your matches. Please try again.', 'webhead-search-cloud' ) );
+				setError( __( 'We could not load your matches. Please try again.', 'searcio' ) );
 			}
 		} finally {
 			setIsSearching( false );
@@ -157,7 +157,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 				hits: appendHits( current?.hits, response.hits ),
 			} ) );
 		} catch ( e ) {
-			setError( __( 'We could not load more matches. Please try again.', 'webhead-search-cloud' ) );
+			setError( __( 'We could not load more matches. Please try again.', 'searcio' ) );
 		} finally {
 			setIsLoadingMore( false );
 		}
@@ -246,7 +246,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			<div className="whsc-quiz">
 				<div className="whsc-quiz__stage">
 					<h3 className="whsc-quiz__question">
-						{ __( 'Which one would you like to take?', 'webhead-search-cloud' ) }
+						{ __( 'Which one would you like to take?', 'searcio' ) }
 					</h3>
 					<div className="whsc-quiz__options">
 						{ quizzes.map( ( entry, index ) => (
@@ -256,7 +256,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 								className="whsc-quiz__option"
 								onClick={ () => chooseQuiz( entry ) }
 							>
-								{ entry.name || __( 'Start the quiz', 'webhead-search-cloud' ) }
+								{ entry.name || __( 'Start the quiz', 'searcio' ) }
 							</button>
 						) ) }
 					</div>
@@ -282,14 +282,14 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 						<span className="whsc-quiz__progress">
 							{ sprintf(
 								/* translators: 1: current question number. 2: total questions in the quiz. */
-								__( 'Question %1$d of %2$d', 'webhead-search-cloud' ),
+								__( 'Question %1$d of %2$d', 'searcio' ),
 								progress.current,
 								progress.total
 							) }
 						</span>
 						{ history.length > 0 && (
 							<button type="button" className="whsc-quiz__back" onClick={ back }>
-								{ __( 'Back', 'webhead-search-cloud' ) }
+								{ __( 'Back', 'searcio' ) }
 							</button>
 						) }
 					</div>
@@ -329,35 +329,35 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 							// were never searched.
 							aria-live={ '' === error ? 'polite' : undefined }
 						>
-							{ isSearching && __( 'Finding your matches…', 'webhead-search-cloud' ) }
-							{ ! isSearching && ! results && __( 'Your matches', 'webhead-search-cloud' ) }
+							{ isSearching && __( 'Finding your matches…', 'searcio' ) }
+							{ ! isSearching && ! results && __( 'Your matches', 'searcio' ) }
 							{ ! isSearching && results && ( hasMore
 									? sprintf(
 										/* translators: 1: number of matches loaded so far. 2: total number of matches. */
-										__( '%1$d of %2$d matches', 'webhead-search-cloud' ),
+										__( '%1$d of %2$d matches', 'searcio' ),
 										hits.length,
 										totalMatches
 									)
 									: sprintf(
 										/* translators: %d: number of matching products. */
-										_n( '%d match', '%d matches', totalMatches, 'webhead-search-cloud' ),
+										_n( '%d match', '%d matches', totalMatches, 'searcio' ),
 										totalMatches
 									) ) }
 						</h3>
 						<div className="whsc-quiz__results-actions">
 							{ history.length > 0 && (
 								<button type="button" className="whsc-quiz__back" onClick={ back }>
-									{ __( 'Back', 'webhead-search-cloud' ) }
+									{ __( 'Back', 'searcio' ) }
 								</button>
 							) }
 							<button type="button" className="whsc-quiz__restart" onClick={ restart }>
-								{ __( 'Start over', 'webhead-search-cloud' ) }
+								{ __( 'Start over', 'searcio' ) }
 							</button>
 						</div>
 					</div>
 
 					{ answers.length > 0 && (
-						<ul className="whsc-quiz__answers" aria-label={ __( 'Your answers', 'webhead-search-cloud' ) }>
+						<ul className="whsc-quiz__answers" aria-label={ __( 'Your answers', 'searcio' ) }>
 							{ answers.map( ( [ field, value ] ) => (
 								<li className="whsc-quiz__answer" key={ field }>
 									<span className="whsc-quiz__answer-field">{ humanizeFieldLabel( field ) }</span>
@@ -400,8 +400,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 								disabled={ isLoadingMore }
 							>
 								{ isLoadingMore
-									? __( 'Loading…', 'webhead-search-cloud' )
-									: __( 'Load more matches', 'webhead-search-cloud' ) }
+									? __( 'Loading…', 'searcio' )
+									: __( 'Load more matches', 'searcio' ) }
 							</button>
 						</div>
 					) }
@@ -410,7 +410,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 						<p className="whsc-quiz__empty">
 							{ __(
 								'Nothing matched every answer. Go back a step and try a different one.',
-								'webhead-search-cloud'
+								'searcio'
 							) }
 						</p>
 					) }

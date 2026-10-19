@@ -23,46 +23,46 @@ const Edit = ( { attributes, setAttributes } ) => {
 	const isSimilar = 'similar' === source;
 
 	const subject = isSimilar
-		? ( documentId || __( 'the product being viewed', 'webhead-search-cloud' ) )
-		: `${ filterField || 'categories' } = ${ filterValue || __( 'the category being browsed', 'webhead-search-cloud' ) }`;
+		? ( documentId || __( 'the product being viewed', 'searcio' ) )
+		: `${ filterField || 'categories' } = ${ filterValue || __( 'the category being browsed', 'searcio' ) }`;
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Products', 'webhead-search-cloud' ) }>
+				<PanelBody title={ __( 'Products', 'searcio' ) }>
 					<InspectorStack>
 						<SelectControl
-							label={ __( 'Show', 'webhead-search-cloud' ) }
+							label={ __( 'Show', 'searcio' ) }
 							value={ source }
 							items={ [
-								{ label: __( 'Similar products', 'webhead-search-cloud' ), value: 'similar' },
-								{ label: __( 'Category listing', 'webhead-search-cloud' ), value: 'category' },
+								{ label: __( 'Similar products', 'searcio' ), value: 'similar' },
+								{ label: __( 'Category listing', 'searcio' ), value: 'category' },
 							] }
 							description={ isSimilar
 								? __(
 									'Products close in meaning to the one being viewed. Needs AI search on your plan; without it the row stays hidden.',
-									'webhead-search-cloud'
+									'searcio'
 								)
 								: __(
 									'A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out.',
-									'webhead-search-cloud'
+									'searcio'
 								) }
 							onValueChange={ ( value ) => setAttributes( { source: value } ) }
 						/>
 
 						<InputControl
-							label={ __( 'Heading', 'webhead-search-cloud' ) }
-							description={ __( 'Optional. Left empty, the row has no title.', 'webhead-search-cloud' ) }
+							label={ __( 'Heading', 'searcio' ) }
+							description={ __( 'Optional. Left empty, the row has no title.', 'searcio' ) }
 							value={ heading }
 							onValueChange={ ( value ) => setAttributes( { heading: value } ) }
 						/>
 
 						{ isSimilar && (
 							<InputControl
-								label={ __( 'Product', 'webhead-search-cloud' ) }
+								label={ __( 'Product', 'searcio' ) }
 								description={ __(
 									'Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template.',
-									'webhead-search-cloud'
+									'searcio'
 								) }
 								value={ documentId }
 								onValueChange={ ( value ) => setAttributes( { documentId: value } ) }
@@ -72,24 +72,24 @@ const Edit = ( { attributes, setAttributes } ) => {
 						{ ! isSimilar && (
 							<InspectorStack>
 								<InputControl
-									label={ __( 'Filter field', 'webhead-search-cloud' ) }
-									description={ __( 'A facet field. Defaults to "categories", which is how product categories are indexed.', 'webhead-search-cloud' ) }
+									label={ __( 'Filter field', 'searcio' ) }
+									description={ __( 'A facet field. Defaults to "categories", which is how product categories are indexed.', 'searcio' ) }
 									value={ filterField }
 									onValueChange={ ( value ) => setAttributes( { filterField: value } ) }
 								/>
 								<InputControl
-									label={ __( 'Filter value', 'webhead-search-cloud' ) }
+									label={ __( 'Filter value', 'searcio' ) }
 									description={ __(
 										'Leave empty to use whichever category the visitor is browsing.',
-										'webhead-search-cloud'
+										'searcio'
 									) }
 									value={ filterValue }
 									onValueChange={ ( value ) => setAttributes( { filterValue: value } ) }
 								/>
 								<ToggleControl
 									__nextHasNoMarginBottom
-									label={ __( 'Show the merchandising banner', 'webhead-search-cloud' ) }
-									help={ __( 'Shown only when a rule for this category actually carries one.', 'webhead-search-cloud' ) }
+									label={ __( 'Show the merchandising banner', 'searcio' ) }
+									help={ __( 'Shown only when a rule for this category actually carries one.', 'searcio' ) }
 									checked={ showBanner }
 									onChange={ ( value ) => setAttributes( { showBanner: value } ) }
 								/>
@@ -97,11 +97,11 @@ const Edit = ( { attributes, setAttributes } ) => {
 						) }
 
 						<SelectControl
-							label={ __( 'Layout', 'webhead-search-cloud' ) }
+							label={ __( 'Layout', 'searcio' ) }
 							value={ layout }
 							items={ [
-								{ label: __( 'Carousel', 'webhead-search-cloud' ), value: 'carousel' },
-								{ label: __( 'Grid', 'webhead-search-cloud' ), value: 'grid' },
+								{ label: __( 'Carousel', 'searcio' ), value: 'carousel' },
+								{ label: __( 'Grid', 'searcio' ), value: 'grid' },
 							] }
 							onValueChange={ ( value ) => setAttributes( { layout: value } ) }
 						/>
@@ -109,7 +109,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 						<RangeControl
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'How many products', 'webhead-search-cloud' ) }
+							label={ __( 'How many products', 'searcio' ) }
 							value={ limit ?? ( isSimilar ? 6 : 12 ) }
 							min={ 1 }
 							// `/search/similar` validates limit at 1-20.
@@ -118,11 +118,11 @@ const Edit = ( { attributes, setAttributes } ) => {
 						/>
 
 						<SelectControl
-							label={ __( 'Card source', 'webhead-search-cloud' ) }
+							label={ __( 'Card source', 'searcio' ) }
 							value={ cardSource }
 							items={ [
-								{ label: __( 'Plugin templates', 'webhead-search-cloud' ), value: 'plugin' },
-								{ label: __( 'Search Cloud templates', 'webhead-search-cloud' ), value: 'server' },
+								{ label: __( 'Plugin templates', 'searcio' ), value: 'plugin' },
+								{ label: __( 'Search Cloud templates', 'searcio' ), value: 'server' },
 							] }
 							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
 						/>
@@ -140,8 +140,8 @@ const Edit = ( { attributes, setAttributes } ) => {
 					     here. The values reproduce what the muted Text drew. */ }
 					<p style={ { margin: 0 } }>
 						{ isSimilar
-							? __( 'Similar products', 'webhead-search-cloud' )
-							: __( 'Category listing', 'webhead-search-cloud' ) }
+							? __( 'Similar products', 'searcio' )
+							: __( 'Category listing', 'searcio' ) }
 					</p>
 					<p style={ { margin: 0, color: '#757575' } }>{ subject }</p>
 				</div>

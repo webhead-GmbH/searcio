@@ -7,7 +7,7 @@
 	"category": "widgets",
 	"icon": "search",
 	"description": "A full-screen search box or icon powered by webhead Search Cloud.",
-	"textdomain": "webhead-search-cloud",
+	"textdomain": "searcio",
 	"editorScript": "file:../../public/bundle.search-block-editor.js",
 	"render": "file:./render.php",
 	"attributes": {

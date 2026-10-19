@@ -49,7 +49,7 @@ final class Indexing_Endpoint extends Rest_API {
 
 		if ( ! is_array( $incoming ) ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'Invalid indexing configuration payload.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'Invalid indexing configuration payload.', 'searcio' ) ],
 				400
 			);
 		}

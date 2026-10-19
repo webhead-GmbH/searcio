@@ -27,7 +27,7 @@ const FALLBACK_LEGAL_LINKS = {
 	dpaUrl: pluginData?.legal?.dpaUrl || '',
 };
 
-const GENERIC_CONNECT_ERROR = __('The connection request failed.', 'webhead-search-cloud');
+const GENERIC_CONNECT_ERROR = __('The connection request failed.', 'searcio');
 
 /**
  * Connection tab: zero-friction Connect (docs/api/building-a-plugin.md
@@ -79,7 +79,7 @@ const ConnectionTab = () => {
 				if (!cancelled) {
 					setConnectedResult({
 						ok: false,
-						message: error?.message || __('The test request failed.', 'webhead-search-cloud'),
+						message: error?.message || __('The test request failed.', 'searcio'),
 					});
 				}
 			}
@@ -185,10 +185,10 @@ const ConnectionTab = () => {
 			setDpa(false);
 			setShowEmailOverride(false);
 
-			showToast(__('Disconnected from Search Cloud.', 'webhead-search-cloud'), 'success');
+			showToast(__('Disconnected from Search Cloud.', 'searcio'), 'success');
 		} catch (error) {
 			showToast(
-				error?.message || __('Could not disconnect.', 'webhead-search-cloud'),
+				error?.message || __('Could not disconnect.', 'searcio'),
 				'error'
 			);
 		} finally {
@@ -198,8 +198,8 @@ const ConnectionTab = () => {
 
 	const connectDisabled = isConnecting || !termsPrivacy;
 	const connectLabel = isConnecting
-		? __('Connecting…', 'webhead-search-cloud')
-		: __('Connect to Search Cloud', 'webhead-search-cloud');
+		? __('Connecting…', 'searcio')
+		: __('Connect to Search Cloud', 'searcio');
 
 	// One disclosure for the pasted-keys path, whichever state the tab is in.
 	const manualEntry = (
@@ -210,8 +210,8 @@ const ConnectionTab = () => {
 		>
 			<CollapsibleCard.Header render={<h3/>}>
 				{isConnected
-					? __('Advanced: manual key entry / rotate keys', 'webhead-search-cloud')
-					: __('Advanced: manual key entry', 'webhead-search-cloud')}
+					? __('Advanced: manual key entry / rotate keys', 'searcio')
+					: __('Advanced: manual key entry', 'searcio')}
 			</CollapsibleCard.Header>
 			<CollapsibleCard.Content className="whsc-card__content">
 				<ManualConnectionEntry pendingClaim={!isConnected && pendingClaim}/>
@@ -222,10 +222,10 @@ const ConnectionTab = () => {
 	return (
 		<Stack direction="column" gap="lg" className="webhead-search-cloud-connection">
 			<TabIntro
-				title={__('Search Cloud connection', 'webhead-search-cloud')}
+				title={__('Search Cloud connection', 'searcio')}
 				description={__(
 					'Connect this site to webhead Search Cloud to start syncing content and enable search.',
-					'webhead-search-cloud'
+					'searcio'
 				)}
 			/>
 
@@ -247,7 +247,7 @@ const ConnectionTab = () => {
 							disabled={isDisconnecting}
 							onClick={() => setDisconnectConfirmOpen(true)}
 						>
-							{__('Disconnect', 'webhead-search-cloud')}
+							{__('Disconnect', 'searcio')}
 						</Button>
 					</Stack>
 
@@ -262,7 +262,7 @@ const ConnectionTab = () => {
 									/* translators: %s: the email address a confirmation link was sent to. */
 									__(
 										'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Search Cloud dashboard, then paste the resulting keys below.',
-										'webhead-search-cloud'
+										'searcio'
 									),
 									pendingClaimEmail
 								)}
@@ -288,7 +288,7 @@ const ConnectionTab = () => {
 							disabled={connectDisabled}
 							description={
 								!termsPrivacy
-									? __('Accept the Terms of Service and Privacy Policy to continue.', 'webhead-search-cloud')
+									? __('Accept the Terms of Service and Privacy Policy to continue.', 'searcio')
 									: undefined
 							}
 							showTooltip={!termsPrivacy}
@@ -300,12 +300,12 @@ const ConnectionTab = () => {
 
 						<Stack direction="column" gap="md" className="webhead-search-cloud-connect-consents">
 							<CheckboxControl
-								label={__('I accept the Terms of Service and Privacy Policy (required)', 'webhead-search-cloud')}
+								label={__('I accept the Terms of Service and Privacy Policy (required)', 'searcio')}
 								details={
 									<LegalLinks
 										links={[
-											{url: legalLinks.termsUrl, label: __('Terms of Service', 'webhead-search-cloud')},
-											{url: legalLinks.privacyUrl, label: __('Privacy Policy', 'webhead-search-cloud')},
+											{url: legalLinks.termsUrl, label: __('Terms of Service', 'searcio')},
+											{url: legalLinks.privacyUrl, label: __('Privacy Policy', 'searcio')},
 										]}
 									/>
 								}
@@ -313,11 +313,11 @@ const ConnectionTab = () => {
 								onCheckedChange={(checked) => setTermsPrivacy(Boolean(checked))}
 							/>
 							<CheckboxControl
-								label={__('I accept the Data Processing Agreement (optional)', 'webhead-search-cloud')}
+								label={__('I accept the Data Processing Agreement (optional)', 'searcio')}
 								details={
 									<LegalLinks
 										links={[
-											{url: legalLinks.dpaUrl, label: __('Data Processing Agreement', 'webhead-search-cloud')},
+											{url: legalLinks.dpaUrl, label: __('Data Processing Agreement', 'searcio')},
 										]}
 									/>
 								}
@@ -330,10 +330,10 @@ const ConnectionTab = () => {
 							{effectiveEmail
 								? sprintf(
 									/* translators: %s: the email address used to connect. */
-									__("You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'webhead-search-cloud'),
+									__("You'll connect using %s. A new Search Cloud account is created if it doesn't have one yet; otherwise this site connects to its existing account.", 'searcio'),
 									effectiveEmail
 								)
-								: __('An admin email is required to connect.', 'webhead-search-cloud')}
+								: __('An admin email is required to connect.', 'searcio')}
 						</Text>
 
 						<Stack direction="row" gap="lg" justify="center" align="center" wrap="wrap">
@@ -344,8 +344,8 @@ const ConnectionTab = () => {
 								onClick={() => setShowEmailOverride((open) => !open)}
 							>
 								{showEmailOverride
-									? __('Use the default email instead', 'webhead-search-cloud')
-									: __('Not this email?', 'webhead-search-cloud')}
+									? __('Use the default email instead', 'searcio')
+									: __('Not this email?', 'searcio')}
 							</Button>
 							<ConnectionExplainer legal={legalLinks}/>
 						</Stack>
@@ -357,18 +357,18 @@ const ConnectionTab = () => {
 								<Grid minColumnWidth={{base: 200, md: 220}} gap="var(--wpds-dimension-gap-md)" align="start">
 									<InputControl
 										type="email"
-										label={__('Email', 'webhead-search-cloud')}
+										label={__('Email', 'searcio')}
 										value={overrideEmail}
 										onValueChange={setOverrideEmail}
 									/>
 									<InputControl
-										label={__('Your name (optional)', 'webhead-search-cloud')}
+										label={__('Your name (optional)', 'searcio')}
 										value={overrideAdminName}
 										onValueChange={setOverrideAdminName}
 									/>
 									<InputControl
-										label={__('Company name (optional)', 'webhead-search-cloud')}
-										description={__('Used as the Search Cloud account name.', 'webhead-search-cloud')}
+										label={__('Company name (optional)', 'searcio')}
+										description={__('Used as the Search Cloud account name.', 'searcio')}
 										value={overrideCompanyName}
 										onValueChange={setOverrideCompanyName}
 									/>
@@ -387,18 +387,18 @@ const ConnectionTab = () => {
 			<Modal
 				isOpen={disconnectConfirmOpen}
 				onClose={() => setDisconnectConfirmOpen(false)}
-				title={__('Disconnect from Search Cloud?', 'webhead-search-cloud')}
+				title={__('Disconnect from Search Cloud?', 'searcio')}
 				size="small"
 				showCloseButton={false}
 				closeOnEscape={false}
 				closeOnBackdropClick={false}
 				actions={[
 					{
-						label: __('Cancel', 'webhead-search-cloud'),
+						label: __('Cancel', 'searcio'),
 						variant: 'tertiary',
 					},
 					{
-						label: __('Disconnect and delete the index', 'webhead-search-cloud'),
+						label: __('Disconnect and delete the index', 'searcio'),
 						variant: 'primary',
 						isDestructive: true,
 						onClick: onDisconnect,
@@ -408,7 +408,7 @@ const ConnectionTab = () => {
 				<Text>
 					{__(
 						"This removes the site from Search Cloud and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted.",
-						'webhead-search-cloud'
+						'searcio'
 					)}
 				</Text>
 			</Modal>

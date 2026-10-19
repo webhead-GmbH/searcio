@@ -66,18 +66,18 @@ final class Verify_Endpoint extends Rest_API {
 		 * still expecting it, and is closed the rest of the time.
 		 */
 		if ( '' === trim( (string) $request->get_param( 'token' ) ) ) {
-			return new WP_REST_Response( [ 'message' => __( 'Missing verification token.', 'webhead-search-cloud' ) ], 400 );
+			return new WP_REST_Response( [ 'message' => __( 'Missing verification token.', 'searcio' ) ], 400 );
 		}
 
 		if ( ! $this->connection_state->verification_window_is_open() ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'No verification is in progress.', 'webhead-search-cloud' ) ],
+				[ 'message' => __( 'No verification is in progress.', 'searcio' ) ],
 				404
 			);
 		}
 
 		if ( ! $this->client->is_configured() ) {
-			return new WP_REST_Response( [ 'message' => __( 'Not connected.', 'webhead-search-cloud' ) ], 404 );
+			return new WP_REST_Response( [ 'message' => __( 'Not connected.', 'searcio' ) ], 404 );
 		}
 
 		return new WP_REST_Response( [ 'write_key' => $this->client->write_key() ] );

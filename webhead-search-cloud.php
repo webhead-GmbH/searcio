@@ -6,7 +6,7 @@
  * Version: 1.2.2
  * Author: webhead GmbH
  * Author URI: https://webhead.at
- * Text Domain: webhead-search-cloud
+ * Text Domain: searcio
  * Domain Path: /languages
  * Requires at least: 6.8
  * Requires PHP: 8.3
@@ -47,9 +47,15 @@ defined( 'Webhead\WP\SearchCloud\PLUGIN_URL' ) || define(
 	'Webhead\WP\SearchCloud\PLUGIN_URL',
 	plugin_dir_url( \Webhead\WP\SearchCloud\PLUGIN_FILE )
 );
+/**
+ * The name the framework gives everything after: the hook prefix, the cache
+ * group, the asset handles, the admin page. It is the plugin's first slug and
+ * stays, whatever folder the plugin is installed in: wordpress.org installs it
+ * as `searcio/`, the text domain (see Plugin::TEXT_DOMAIN).
+ */
 defined( 'Webhead\WP\SearchCloud\PLUGIN_SLUG' ) || define(
 	'Webhead\WP\SearchCloud\PLUGIN_SLUG',
-	dirname( \Webhead\WP\SearchCloud\PLUGIN_BASE )
+	'webhead-search-cloud'
 );
 defined( 'Webhead\WP\SearchCloud\CACHE_GROUP' )
 || define( 'Webhead\WP\SearchCloud\CACHE_GROUP', 'webhead_search_cloud' );

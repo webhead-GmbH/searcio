@@ -40,7 +40,7 @@ const VisualSearchButton = ( { onSelect, busy } ) => {
 			<Button
 				className="whsc-visual-btn"
 				icon={ <span className="whsc-visual-icon">{ cameraIcon }</span> }
-				label={ __( 'Search by photo', 'webhead-search-cloud' ) }
+				label={ __( 'Search by photo', 'searcio' ) }
 				showTooltip={ false }
 				disabled={ busy }
 				onClick={ () => inputRef.current?.click() }

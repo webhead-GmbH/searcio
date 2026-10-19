@@ -10,7 +10,7 @@
 
 ## 1. Install the plugin
 
-Install the package of a release, `webhead-search-cloud-<version>.zip`, with **Upload Plugin** on the screen where WordPress adds a plugin, or extract it into `wp-content/plugins/webhead-search-cloud`, then activate it.
+Install the package of a release, `searcio-<version>.zip`, with **Upload Plugin** on the screen where WordPress adds a plugin, or extract it into `wp-content/plugins/webhead-search-cloud`, then activate it.
 
 ## 2. Connect to Search Cloud
 

@@ -286,31 +286,31 @@ final class Index_Config {
 		return [
 			[
 				'value' => 'property:title',
-				'label' => __( 'Post title', 'webhead-search-cloud' ),
+				'label' => __( 'Post title', 'searcio' ),
 			],
 			[
 				'value' => 'property:content',
-				'label' => __( 'Post content', 'webhead-search-cloud' ),
+				'label' => __( 'Post content', 'searcio' ),
 			],
 			[
 				'value' => 'property:excerpt',
-				'label' => __( 'Excerpt', 'webhead-search-cloud' ),
+				'label' => __( 'Excerpt', 'searcio' ),
 			],
 			[
 				'value' => 'property:permalink',
-				'label' => __( 'Permalink (URL)', 'webhead-search-cloud' ),
+				'label' => __( 'Permalink (URL)', 'searcio' ),
 			],
 			[
 				'value' => 'property:thumbnail',
-				'label' => __( 'Featured image', 'webhead-search-cloud' ),
+				'label' => __( 'Featured image', 'searcio' ),
 			],
 			[
 				'value' => 'property:date',
-				'label' => __( 'Published date', 'webhead-search-cloud' ),
+				'label' => __( 'Published date', 'searcio' ),
 			],
 			[
 				'value' => 'property:author',
-				'label' => __( 'Author', 'webhead-search-cloud' ),
+				'label' => __( 'Author', 'searcio' ),
 			],
 		];
 	}

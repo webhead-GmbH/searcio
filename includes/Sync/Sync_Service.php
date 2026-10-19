@@ -107,7 +107,7 @@ final class Sync_Service {
 		if ( ! $this->client->is_configured() ) {
 			return [
 				'ok'      => false,
-				'message' => __( 'Add and save your Search Cloud credentials before syncing.', 'webhead-search-cloud' ),
+				'message' => __( 'Add and save your Search Cloud credentials before syncing.', 'searcio' ),
 			];
 		}
 
@@ -116,14 +116,14 @@ final class Sync_Service {
 		if ( [] === $types ) {
 			return [
 				'ok'      => false,
-				'message' => __( 'No content types are enabled for indexing yet.', 'webhead-search-cloud' ),
+				'message' => __( 'No content types are enabled for indexing yet.', 'searcio' ),
 			];
 		}
 
 		if ( null !== $this->state->active() ) {
 			return [
 				'ok'      => false,
-				'message' => __( 'A sync is already in progress.', 'webhead-search-cloud' ),
+				'message' => __( 'A sync is already in progress.', 'searcio' ),
 			];
 		}
 
@@ -142,7 +142,7 @@ final class Sync_Service {
 		if ( $id <= 0 ) {
 			return [
 				'ok'      => false,
-				'message' => __( 'Could not start the sync run.', 'webhead-search-cloud' ),
+				'message' => __( 'Could not start the sync run.', 'searcio' ),
 			];
 		}
 
@@ -701,7 +701,7 @@ final class Sync_Service {
 			if ( null === $error ) {
 				$error = sprintf(
 					/* translators: 1: document id, 2: HTTP status code. */
-					__( 'Could not remove %1$s from the index (HTTP %2$d).', 'webhead-search-cloud' ),
+					__( 'Could not remove %1$s from the index (HTTP %2$d).', 'searcio' ),
 					$doc_id,
 					$response->status
 				);
@@ -876,13 +876,13 @@ final class Sync_Service {
 		if ( '' !== $metric && $limit > 0 ) {
 			return sprintf(
 				/* translators: 1: plan metric name, 2: plan limit. */
-				__( 'Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync.', 'webhead-search-cloud' ),
+				__( 'Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync.', 'searcio' ),
 				$metric,
 				number_format_i18n( $limit )
 			);
 		}
 
-		return __( 'Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync.', 'webhead-search-cloud' );
+		return __( 'Your Search Cloud plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync.', 'searcio' );
 	}
 
 	/**
@@ -896,14 +896,14 @@ final class Sync_Service {
 		if ( $response->transport_error ) {
 			return sprintf(
 				/* translators: %s: a length of time, such as "5 mins". */
-				__( 'Could not reach Search Cloud. The sync tries again in %s.', 'webhead-search-cloud' ),
+				__( 'Could not reach Search Cloud. The sync tries again in %s.', 'searcio' ),
 				$wait
 			);
 		}
 
 		return sprintf(
 			/* translators: 1: HTTP status code, 2: a length of time, such as "5 mins". */
-			__( 'Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s.', 'webhead-search-cloud' ),
+			__( 'Search Cloud returned an error (HTTP %1$d). The sync tries again in %2$s.', 'searcio' ),
 			$response->status,
 			$wait
 		);
@@ -918,14 +918,14 @@ final class Sync_Service {
 		if ( $response->transport_error ) {
 			return sprintf(
 				/* translators: %d: number of tries. */
-				__( 'Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'webhead-search-cloud' ),
+				__( 'Could not reach Search Cloud in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'searcio' ),
 				$tries
 			);
 		}
 
 		return sprintf(
 			/* translators: 1: HTTP status code, 2: number of tries. */
-			__( 'Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'webhead-search-cloud' ),
+			__( 'Search Cloud returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Search Cloud answers.', 'searcio' ),
 			$response->status,
 			$tries
 		);

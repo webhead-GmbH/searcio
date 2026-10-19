@@ -34,7 +34,7 @@ final class Version_Test extends TestCase {
 			'the root package of package-lock.json' => $this->json( 'package-lock.json' )['packages']['']['version'] ?? null,
 			'blocks/search/block.json'             => $this->json( 'blocks/search/block.json' )['version'] ?? null,
 			'blocks/products/block.json'           => $this->json( 'blocks/products/block.json' )['version'] ?? null,
-			'Project-Id-Version of the POT'        => $this->find( '/"Project-Id-Version: searcio - Fast AI Product Search for WooCommerce (\S+?)\\\\n"/', 'languages/webhead-search-cloud.pot' ),
+			'Project-Id-Version of the POT'        => $this->find( '/"Project-Id-Version: searcio - Fast AI Product Search for WooCommerce (\S+?)\\\\n"/', 'languages/searcio.pot' ),
 			'the version badge of README.md'       => $this->find( '/img\.shields\.io\/badge\/plugin-v([0-9.]+)-/', 'README.md' ),
 		];
 
