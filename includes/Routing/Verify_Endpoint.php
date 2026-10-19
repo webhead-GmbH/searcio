@@ -3,13 +3,13 @@
  * Domain-ownership verification callback for the zero-friction connect flow.
  *
  * `Connection_Endpoint::connect()` sends this route's URL as `verify_url` on
- * `POST /connect`. After a new-account connect, Search Cloud pings
+ * `POST /connect`. After a new-account connect, Searcio pings
  * `GET {verify_url}?token=<hmac>` in the background and expects
  * `{"write_key": "<the write key you were issued>"}` back - see
  * docs/api/building-a-plugin.md "Domain ownership verification (informational)".
- * The `token` proves itself on Search Cloud's side when it compares our
+ * The `token` proves itself on Searcio's side when it compares our
  * response against its own record of the write key it issued; this plugin
- * has no way to recompute it (it's derived from Search Cloud's own secret)
+ * has no way to recompute it (it's derived from Searcio's own secret)
  * and doesn't need to try - which is also why its presence protects nothing:
  * `?token=x` passes that check. What keeps the write key from a scanner is the
  * verification window {@see Connection_State::open_verification_window()}
@@ -54,7 +54,7 @@ final class Verify_Endpoint extends Rest_API {
 	#[Route( '/verify', methods: 'GET', permission_callback: 'is_public', args: [ 'token' => [ 'type' => 'string' ] ] )]
 	public function verify( WP_REST_Request $request ): WP_REST_Response {
 		/*
-		 * The only legitimate caller is Search Cloud's domain-ownership ping,
+		 * The only legitimate caller is Searcio's domain-ownership ping,
 		 * which carries `?token=<hmac>`. That HMAC is computed over the
 		 * service's own application key, so no plugin can ever recompute it -
 		 * requiring the parameter proves nothing about who is asking, and on

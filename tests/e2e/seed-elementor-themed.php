@@ -1,6 +1,6 @@
 <?php
 /**
- * Seed a published Elementor page whose Search Cloud widget has the new style
+ * Seed a published Elementor page whose Searcio widget has the new style
  * controls actually set, and print its permalink. Used to prove the Elementor
  * path end to end: a value saved on the widget reaches the storefront, either
  * as the `--whsc-*` custom property the modal reads or, for typography, as a

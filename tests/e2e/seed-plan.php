@@ -6,8 +6,8 @@
  *   wp eval-file .../tests/e2e/seed-plan.php paid    # any other plan
  *   wp eval-file .../tests/e2e/seed-plan.php clear   # no tier known
  *
- * The tier is a mirror of what Search Cloud says and has no REST route, so a
- * spec sets it here. The storefront decides on the searcio logo from it.
+ * The tier is a mirror of what Searcio says and has no REST route, so a
+ * spec sets it here. The storefront decides on the Searcio logo from it.
  *
  * `wp eval-file` runs this through eval(), so it must not declare strict_types.
  *

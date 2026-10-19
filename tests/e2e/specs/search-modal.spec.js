@@ -317,7 +317,7 @@ test.describe( 'Search modal', () => {
 		await widget.openModal();
 		await widget.search( 'boots' );
 
-		// A failed Search Cloud query degrades to WordPress's own ?s= search.
+		// A failed Searcio query degrades to WordPress's own ?s= search.
 		await page.waitForURL( /[?&]s=boots/ );
 	} );
 } );

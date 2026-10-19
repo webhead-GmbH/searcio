@@ -416,7 +416,7 @@ final class Plugin extends Base_Plugin {
 	 */
 	protected function register_elementor( Elementor_Manager $elementor_manager, Container $container ): void {
 		$elementor_manager
-			->set_category( static fn (): string => __( 'webhead Search Cloud', 'searcio' ), 'eicon-search' )
+			->set_category( static fn (): string => __( 'Searcio', 'searcio' ), 'eicon-search' )
 			->register_widget( Search_Widget::class )
 			->register_widget( Products_Widget::class );
 	}
@@ -435,7 +435,7 @@ final class Plugin extends Base_Plugin {
 	 * Default policy is "keep data", so uninstalling with the opt-in setting
 	 * off touches nothing registered here. Turning it on removes this plugin's
 	 * tables, options, and per-post metadata locally; it never calls the
-	 * Search Cloud API, so already-synced documents remain in the remote index.
+	 * Searcio API, so already-synced documents remain in the remote index.
 	 *
 	 * The policy itself is chosen in {@see self::uninstall_current_site()}: this
 	 * method runs on every request of the site, and the setting is only worth

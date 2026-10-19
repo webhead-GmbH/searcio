@@ -7,7 +7,7 @@ import { usePlan } from '../../plan';
 const KEY = 'support_searcio';
 
 /**
- * Support Searcio: the searcio logo, small in the bottom corner of the search
+ * Support Searcio: the Searcio logo, small in the bottom corner of the search
  * window and linked to searcio.com.
  *
  * Its own card rather than a field of the schema-driven grid, because it
@@ -32,7 +32,7 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 					</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
-							'Shows the searcio logo, small in the bottom corner of the search window, linked to searcio.com.',
+							'Shows the Searcio logo, small in the bottom corner of the search window, linked to searcio.com.',
 							'searcio'
 						) }
 					</Text>
@@ -42,7 +42,7 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 				<Stack direction="column" gap="md">
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show the searcio logo in the search window', 'searcio' ) }
+						label={ __( 'Show the Searcio logo in the search window', 'searcio' ) }
 						help={ isFree
 							? __( 'The Free plan always shows it. On a paid plan you can turn it off.', 'searcio' )
 							: undefined }

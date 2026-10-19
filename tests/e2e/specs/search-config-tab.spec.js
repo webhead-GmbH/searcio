@@ -45,7 +45,7 @@ const CONFIG = {
 
 // The tab loads its configuration, the indexing catalogue and a connection test
 // before it renders anything, and the connection test is a real round trip to
-// Search Cloud - slow to fail against dummy credentials. Give the first
+// Searcio - slow to fail against dummy credentials. Give the first
 // assertion room rather than racing it.
 const LOADED = { timeout: 20000 };
 
@@ -194,14 +194,14 @@ test.describe( 'Search Config tab', () => {
 				return route.fulfill( {
 					status: 502,
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify( { code: 'upstream', message: 'Search Cloud did not answer.' } ),
+					body: JSON.stringify( { code: 'upstream', message: 'Searcio did not answer.' } ),
 				} );
 			}
 		);
 		await page.goto( SETTINGS_URL );
 
 		await expect(
-			page.locator( SCREEN ).getByText( 'The search configuration could not be loaded: Search Cloud did not answer.' )
+			page.locator( SCREEN ).getByText( 'The search configuration could not be loaded: Searcio did not answer.' )
 		).toBeVisible( LOADED );
 
 		fail = false;

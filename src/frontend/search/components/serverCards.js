@@ -1,7 +1,7 @@
 /**
- * Client-side rendering engine for Search Cloud "card templates" - see
+ * Client-side rendering engine for Searcio "card templates" - see
  * `card-templates.md`. Templates are designed server-side (an Elementor-style
- * builder in the Search Cloud panel) and delivered as pre-compiled HTML + CSS;
+ * builder in the Searcio panel) and delivered as pre-compiled HTML + CSS;
  * this module implements the widget's half of the contract: matching a hit to
  * a template, substituting `{{field}}` placeholders, removing conditional
  * elements, wiring rating-bar CSS variables, and computing price components.
@@ -214,7 +214,7 @@ const CURRENCY_POSITION_MAP = {
  * Step 7 of the contract: a `[data-sc-price]` wrapper computes its own
  * Range/Sale/Plain state from its field-mapping attributes and formats using
  * its own baked-in currency/decimals/separator attributes - set by the
- * Search Cloud panel when the template was designed, not the widget's local
+ * Searcio panel when the template was designed, not the widget's local
  * WooCommerce config (unlike a bare `{{price}}` placeholder, which does use
  * the site's own config - see `substitutePlaceholders()`).
  *
@@ -450,7 +450,7 @@ const liftRules = ( rules ) => {
  * (`.sct-12-title`), which is less than nearly everything else on the page: a
  * theme's or an Elementor kit's `.elementor-kit-7 h3 {}` outweighs it, and so
  * do the storefront's own reset and the base it gives a card (see "A card
- * designed in Search Cloud" in `scss/style.scss`). So once the browser has
+ * designed in Searcio" in `scss/style.scss`). So once the browser has
  * parsed them their selectors are rewritten to weigh more than all of those.
  * What a rule matches does not change, and neither does one rule's order
  * against another's.

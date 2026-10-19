@@ -27,7 +27,7 @@ const LOADED = { timeout: 30000 };
 const TABS = [
 	{ tab: 'sync', ready: ( page ) => page.getByRole( 'heading', { level: 3, name: 'Sync history' } ) },
 	{ tab: 'indexing', ready: ( page ) => page.getByRole( 'button', { name: 'Save indexing configuration' } ) },
-	{ tab: 'connection', ready: ( page ) => page.getByRole( 'button', { name: 'Connect to Search Cloud' } ) },
+	{ tab: 'connection', ready: ( page ) => page.getByRole( 'button', { name: 'Connect to Searcio' } ) },
 	{ tab: 'general', ready: ( page ) => page.getByRole( 'button', { name: 'Save Settings' } ) },
 ];
 
@@ -149,7 +149,7 @@ test.describe( 'Settings screen', () => {
 		expect( entrance.gone ).toEqual( [] );
 	} );
 
-	test( 'shows the searcio icon in its header, in the colours of the logo', async ( { page } ) => {
+	test( 'shows the Searcio icon in its header, in the colours of the logo', async ( { page } ) => {
 		await page.goto( SETTINGS_URL );
 
 		const icon = page.locator( '.webhead-search-cloud-admin-page__icon svg' );
@@ -165,7 +165,7 @@ test.describe( 'Settings screen', () => {
 	test( 'names the page once, and the open tab under it', async ( { page } ) => {
 		await page.goto( `${ SETTINGS_URL }&tab=sync` );
 
-		await expect( page.getByRole( 'heading', { level: 1, name: 'webhead Search Cloud' } ) ).toBeVisible( LOADED );
+		await expect( page.getByRole( 'heading', { level: 1, name: 'Searcio' } ) ).toBeVisible( LOADED );
 		await expect( page.locator( '#webhead-search-cloud-root h1' ) ).toHaveCount( 1 );
 		await expect( page.getByRole( 'heading', { level: 2, name: 'Sync', exact: true } ) ).toBeVisible( LOADED );
 	} );

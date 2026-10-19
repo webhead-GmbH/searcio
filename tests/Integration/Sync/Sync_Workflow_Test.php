@@ -3,7 +3,7 @@
  * End-to-end sync workflow integration tests.
  *
  * Exercises the resumable tick engine against a real database and posts with
- * the Search Cloud HTTP layer faked out: a full run indexes the catalogue and
+ * the Searcio HTTP layer faked out: a full run indexes the catalogue and
  * completes, a running tick honours pause/cancel signals at the batch
  * boundary, and the prune phase removes every document this site pushed that
  * is no longer indexable, whether a full sync or the incremental drain pushed

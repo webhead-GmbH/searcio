@@ -3,7 +3,7 @@
  * Field source resolver.
  *
  * Resolves a mapping "source" string against a WP_Post into a value suitable for
- * a Search Cloud document field. Three source schemes are supported (v1 scope -
+ * a Searcio document field. Three source schemes are supported (v1 scope -
  * ACF is post meta, so it is covered by `meta:`):
  *
  * - `meta:{key}`        - a single post meta value (custom field).
@@ -72,7 +72,7 @@ final class Field_Source_Resolver {
 	/**
 	 * WordPress treats `_`-prefixed keys as protected meta: internal values
 	 * hidden from the custom-fields UI (order internals, plugin bookkeeping,
-	 * transient handshakes). They are never pushed to Search Cloud by default so
+	 * transient handshakes). They are never pushed to Searcio by default so
 	 * an over-broad mapping cannot silently leak internal data into public
 	 * search. A site that deliberately needs one indexed can allow it per key
 	 * through the `webhead_search_cloud/index/allow_protected_meta` filter.

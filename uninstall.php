@@ -10,7 +10,7 @@ declare( strict_types=1 );
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-require_once __DIR__ . '/webhead-search-cloud.php';
+require_once __DIR__ . '/searcio.php';
 
 // In a function of its own: WordPress includes this file inside
 // uninstall_plugin(), whose own variable is called $plugin.

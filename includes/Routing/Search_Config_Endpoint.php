@@ -2,7 +2,7 @@
 /**
  * Search configuration endpoint.
  *
- * Backs the "Search Config" admin tab. This is a thin proxy - Search Cloud's
+ * Backs the "Search Config" admin tab. This is a thin proxy - Searcio's
  * `/search-config` is the source of truth for searchable fields/weights, type
  * boosts, facet/suggest fields, synonyms and languages, unlike `Plugin_Settings`,
  * which owns plugin-local config. GET/PUT pass the API's own response straight
@@ -71,7 +71,7 @@ final class Search_Config_Endpoint extends Rest_API {
 	private function respond( Api_Response $response ): WP_REST_Response {
 		if ( $response->transport_error ) {
 			return new WP_REST_Response(
-				[ 'message' => __( 'Could not reach Search Cloud.', 'searcio' ) ],
+				[ 'message' => __( 'Could not reach Searcio.', 'searcio' ) ],
 				502
 			);
 		}

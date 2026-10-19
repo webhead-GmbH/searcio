@@ -1,6 +1,6 @@
 <?php
 /**
- * The searcio logo in the search window.
+ * The Searcio logo in the search window.
  *
  * The storefront is told whether to show it in its configuration
  * (`credit`), decided from the plan tier the site keeps and Support Searcio:
@@ -24,7 +24,7 @@ final class Searcio_Credit_Test extends Integration_Test_Case {
 		$config = $this->config();
 
 		$this->assertSame( [ 'url' => 'https://searcio.com/' ], $config['credit'] );
-		$this->assertStringContainsString( 'searcio', $config['i18n']['credit'] );
+		$this->assertStringContainsString( 'Searcio', $config['i18n']['credit'] );
 	}
 
 	/**

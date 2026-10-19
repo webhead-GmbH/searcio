@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **The plugin calls itself Searcio everywhere a person reads its name**, where the screens, the messages and the guides still said webhead Search Cloud or Search Cloud: the admin menu and the settings screen are Searcio, the button is "Connect to Searcio", the search block and the Elementor search widget are "Searcio Search", the products block and widget "Searcio Products", and Elementor lists both under Searcio. Site Health, the WP-CLI help, the readmes, the guides and all seven translations follow. The name starts with a capital, as it does in "Searcio - Fast AI Product Search for WooCommerce"; the slug, the text domain, the folder and searcio.com stay `searcio`. Nothing else is renamed: the options, the REST routes, the admin page, the saved blocks and `wp webhead-search-cloud` keep their names, so a site that runs 1.3.0 has nothing to do. `tests/Unit/Release/Brand_Test.php` reads the template, every translation, the blocks and the readmes for the old name and for the name written in lower case.
+- **The main file is `searcio.php`**, named after the slug as wordpress.org expects (`searcio/searcio.php`); it was `webhead-search-cloud.php`. WordPress finds a plugin by its folder and main file, so a site that runs 1.3.0 finds the plugin deactivated after the update and activates it again under Plugins. The settings, the sync history and the connection stay. The test bootstrap, `phpcs.xml` and the guides load and name the new file.
+- The plugin's address in its header is its page on wordpress.org, https://wordpress.org/plugins/searcio/. The repository is `webhead-GmbH/searcio`: the readmes and `composer.json` point there.
+
 ## 1.3.0
 
 - **Translated into French, Spanish, Italian and Polish, and the German is complete**: every string of the settings screens, the block editor, the Elementor widgets and the search window, where German had 270 of 720. German also ships for Austria (`de_AT`) and Switzerland (`de_CH`, with ss for ß), whose sites WordPress does not give the German of Germany. A German entry for a string the plugin no longer has is gone. `Translations_Test` reads every PO file against the template: placeholders, HTML tags, the number of plural forms, no dash, the header, and a compiled MO and script translations for each language.

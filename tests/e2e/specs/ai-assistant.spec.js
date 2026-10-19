@@ -2,7 +2,7 @@
  * The AI Assistant tab. It's gated by `/storefront-config`'s
  * `capabilities.assistant`, so it appears only when the plan includes it; a chat
  * turn calls `/assistant` and renders the reply plus the products, and a Compare
- * button turns those products into an attribute table. The Search Cloud API is
+ * button turns those products into an attribute table. The Searcio API is
  * mocked (see mockSearchCloud) so both the capability flag and the assistant
  * reply are deterministic.
  */

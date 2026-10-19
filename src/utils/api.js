@@ -1,5 +1,5 @@
 /**
- * Thin fetch wrapper around the Search Cloud public search API.
+ * Thin fetch wrapper around the Searcio public search API.
  *
  * Performance model (search speed is the whole point of this plugin):
  * - A tiny in-memory, TTL'd LRU caches identical GET responses for the current
@@ -21,7 +21,7 @@ const config = window.webheadSearchCloudFrontend || {};
 
 const SEARCH_TTL = 60000; // 60s - results/prices stay fresh within a minute.
 const SUGGEST_TTL = 30000; // 30s - autocomplete is cheaper and more transient.
-// Card templates are designed in the Search Cloud panel and change rarely -
+// Card templates are designed in the Searcio panel and change rarely -
 // per `card-templates.md`, fetch once per page load rather than per query.
 const CARD_TEMPLATES_TTL = 600000; // 10 minutes.
 // Matches the server's own 15-minute cache window (search.md) - popular
@@ -290,7 +290,7 @@ export const askAssistant = async ( message, history = [], options = {} ) => {
 };
 
 /**
- * Fire-and-forget click beacon: tells Search Cloud that a visitor opened a
+ * Fire-and-forget click beacon: tells Searcio that a visitor opened a
  * result, so the click-through rate can be attributed to the search that
  * produced it (see docs/api/search.md `POST /search/click`). Uses
  * `navigator.sendBeacon` so it survives the navigation the click triggers and

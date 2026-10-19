@@ -326,7 +326,7 @@ async function walk( page, url ) {
 	await keep( 'product finder, pointer on an answer' );
 	await away();
 
-	// The second placement, whose cards are designed in Search Cloud.
+	// The second placement, whose cards are designed in Searcio.
 	await widget.close();
 	await expect( widget.modal ).toBeHidden();
 	await triggers.nth( 1 ).locator( 'input' ).click();
@@ -416,7 +416,7 @@ const PARTS = {
 		'assistant, focus on a link of the reply',
 	],
 	'the product finder': [ 'product finder', 'product finder, pointer on an answer' ],
-	'a card designed in Search Cloud': [ 'designed cards', 'designed cards, pointer on a card' ],
+	'a card designed in Searcio': [ 'designed cards', 'designed cards, pointer on a card' ],
 };
 
 test.describe( 'On a site that styles every element', () => {

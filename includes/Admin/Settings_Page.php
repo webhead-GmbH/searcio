@@ -42,11 +42,11 @@ final class Settings_Page extends Page {
 	}
 
 	protected function get_menu_title(): string {
-		return __( 'Search Cloud', 'searcio' );
+		return __( 'Searcio', 'searcio' );
 	}
 
 	protected function get_page_title(): string {
-		return __( 'webhead Search Cloud', 'searcio' );
+		return __( 'Searcio', 'searcio' );
 	}
 
 	public function get_capability(): string {
@@ -74,7 +74,7 @@ final class Settings_Page extends Page {
 	}
 
 	/**
-	 * The searcio mark in one colour: its green field with the "s" cut out.
+	 * The Searcio mark in one colour: its green field with the "s" cut out.
 	 * WordPress paints every `fill` of a base64 SVG menu icon in the colour of
 	 * the admin scheme (wp-admin/js/svg-painter.js), so the mark's shape has to
 	 * come from the cut-out and not from a second colour, which would be painted
@@ -123,15 +123,15 @@ final class Settings_Page extends Page {
 			],
 			'popularSearchesKeys' => [ 'popular_searches' ],
 			'plugin' => [
-				'name'        => __( 'webhead Search Cloud', 'searcio' ),
-				'description' => __( 'Connect WordPress and WooCommerce to webhead Search Cloud.', 'searcio' ),
+				'name'        => __( 'Searcio', 'searcio' ),
+				'description' => __( 'Connect WordPress and WooCommerce to Searcio.', 'searcio' ),
 			],
 			// Drives the Connection tab's default-open behavior and its initial
 			// state before the settings/health REST calls resolve.
 			'connection' => [
 				// The tier last seen, so the Support Searcio card can say at once
-				// whether a Free plan keeps the logo on. The card asks Search
-				// Cloud again as the page opens.
+				// whether a Free plan keeps the logo on. The card asks Searcio
+				// again as the page opens.
 				'planTier'     => $this->connection_state->plan_tier()?->value ?? '',
 				'isConnected'  => $this->client->is_configured(),
 				'pendingClaim' => $pending,
@@ -142,7 +142,7 @@ final class Settings_Page extends Page {
 				],
 			],
 			// Synchronous, no-network fallback shown until the Connection tab's
-			// own GET /connection/legal call resolves with Search Cloud's live
+			// own GET /connection/legal call resolves with Searcio's live
 			// links (see Search_Cloud_Client::legal_links()) - kept a plain
 			// constant here, like Site Health's reachability test, so opening
 			// *any* settings tab never blocks on an outbound HTTP call.

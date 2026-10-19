@@ -1,9 +1,9 @@
 <?php
 /**
- * Local mirror of Search Cloud's `search-config.languages`.
+ * Local mirror of Searcio's `search-config.languages`.
  *
  * A thin wrapper around the {@see Plugin_Settings::ENABLED_LANGUAGES} option -
- * deliberately never calls the Search Cloud API itself, since
+ * deliberately never calls the Searcio API itself, since
  * `Document_Builder` reads this on every document build and the front-end
  * language filter reads it on every page load.
  * {@see \Webhead\WP\SearchCloud\Routing\Search_Config_Endpoint} refreshes this

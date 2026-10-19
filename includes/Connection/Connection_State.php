@@ -49,7 +49,7 @@ final class Connection_State {
 
 	/**
 	 * Open the window in which the public `/verify` route will answer. Called
-	 * when this site asks Search Cloud to connect it, because the ownership
+	 * when this site asks Searcio to connect it, because the ownership
 	 * ping that follows is the only caller that route exists for.
 	 */
 	public function open_verification_window(): void {
@@ -104,7 +104,7 @@ final class Connection_State {
 	/**
 	 * Clears local credentials and pending-claim state and regenerates the
 	 * idempotency key so a subsequent `/connect` isn't rejected as a replay of
-	 * the disconnected attempt. Never touches the Search Cloud account itself.
+	 * the disconnected attempt. Never touches the Searcio account itself.
 	 */
 	public function disconnect(): void {
 		$this->settings->set( Plugin_Settings::WRITE_KEY, '' );

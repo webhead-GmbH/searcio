@@ -111,7 +111,7 @@ test.describe( 'Connection tab allowances', () => {
 		// The card is a section of the connection tab, whose heading is the h2
 		// under the page title.
 		await expect( page.getByRole( 'heading', { level: 3, name: 'This month' } ) ).toBeVisible( LOADED );
-		await expect( page.getByRole( 'heading', { level: 2, name: 'Search Cloud connection' } ) ).toBeVisible();
+		await expect( page.getByRole( 'heading', { level: 2, name: 'Searcio connection' } ) ).toBeVisible();
 	} );
 
 	test( 'leaves a gap between everything the connected tab stacks', async ( { page } ) => {
@@ -124,7 +124,7 @@ test.describe( 'Connection tab allowances', () => {
 	} );
 
 	/**
-	 * Disconnecting deletes the site and its index on Search Cloud, which no
+	 * Disconnecting deletes the site and its index on Searcio, which no
 	 * click undoes, so it is asked about in a dialog only its own buttons close.
 	 */
 	test( 'asks before it disconnects, and does nothing when told not to', async ( { page } ) => {
@@ -143,7 +143,7 @@ test.describe( 'Connection tab allowances', () => {
 
 		await page.getByRole( 'button', { name: 'Disconnect' } ).click( LOADED );
 
-		const dialog = page.getByRole( 'dialog', { name: 'Disconnect from Search Cloud?' } );
+		const dialog = page.getByRole( 'dialog', { name: 'Disconnect from Searcio?' } );
 
 		await expect( dialog ).toBeVisible();
 		await page.keyboard.press( 'Escape' );
@@ -151,7 +151,7 @@ test.describe( 'Connection tab allowances', () => {
 
 		// What is lost, what search does meanwhile and what is kept - and the
 		// button that goes ahead is named for what it deletes.
-		await expect( dialog ).toContainText( 'removes the site from Search Cloud and permanently deletes its search index there' );
+		await expect( dialog ).toContainText( 'removes the site from Searcio and permanently deletes its search index there' );
 		await expect( dialog ).toContainText( "falls back to WordPress's own search until you connect again and run a sync" );
 		await expect( dialog ).toContainText( 'Nothing in WordPress is deleted.' );
 		await expect( dialog.getByRole( 'button', { name: 'Disconnect and delete the index' } ) ).toBeVisible();
@@ -201,7 +201,7 @@ test.describe( 'Connection tab before the site is connected', () => {
 	 * has to call that control what the tab calls it.
 	 */
 	test( 'explains connecting with the label the email link has', async ( { page } ) => {
-		// The legal links are a real round trip to Search Cloud otherwise.
+		// The legal links are a real round trip to Searcio otherwise.
 		await page.route(
 			( url ) => decodeURIComponent( url.href ).includes( '/connection/legal' ),
 			( route ) => route.fulfill( { status: 200, headers: { 'Content-Type': 'application/json' }, body: '{}' } )
@@ -212,7 +212,7 @@ test.describe( 'Connection tab before the site is connected', () => {
 
 		await page.getByRole( 'button', { name: 'How connecting works' } ).click();
 
-		await expect( page.getByRole( 'dialog', { name: 'How connecting to Search Cloud works' } ) )
+		await expect( page.getByRole( 'dialog', { name: 'How connecting to Searcio works' } ) )
 			.toContainText( 'under "Not this email?"' );
 	} );
 } );

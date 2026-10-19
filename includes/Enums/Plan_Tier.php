@@ -1,6 +1,6 @@
 <?php
 /**
- * The kind of Search Cloud plan the connected account is on.
+ * The kind of Searcio plan the connected account is on.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -22,7 +22,7 @@ enum Plan_Tier: string {
 	/**
 	 * The tier a `/health` body names in `plan.is_free`, or null when it names
 	 * none: a body without it says nothing about the plan, and reading it as
-	 * paid would let a Free account turn the searcio logo off.
+	 * paid would let a Free account turn the Searcio logo off.
 	 *
 	 * @param array<string,mixed> $body
 	 */

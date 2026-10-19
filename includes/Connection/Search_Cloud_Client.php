@@ -1,6 +1,6 @@
 <?php
 /**
- * HTTP client for the webhead Search Cloud ingest + health API.
+ * HTTP client for the Searcio ingest + health API.
  *
  * Server-side only. Reads connection credentials from the framework
  * Settings_Manager (the single source of truth) and decrypts the write key and
@@ -70,7 +70,7 @@ final class Search_Cloud_Client {
 
 	/**
 	 * `DELETE /disconnect` - the mirror of {@see self::connect()}. Permanently
-	 * deletes the site and its index on Search Cloud's side; the caller is
+	 * deletes the site and its index on Searcio's side; the caller is
 	 * responsible for clearing local credentials once this succeeds (see
 	 * docs/api/building-a-plugin.md "Disconnecting").
 	 */
@@ -89,7 +89,7 @@ final class Search_Cloud_Client {
 
 	/**
 	 * Cached, always-present shape for the consent checkboxes' links. Falls
-	 * back to the plugin's own constants when Search Cloud is unreachable or
+	 * back to the plugin's own constants when Searcio is unreachable or
 	 * hasn't configured a given document - "fail safe" per
 	 * docs/api/authentication-and-security.md "Best practices for integrators".
 	 *
@@ -165,7 +165,7 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * The Search Cloud host comes from a single hard-coded constant, overridable
+	 * The Searcio host comes from a single hard-coded constant, overridable
 	 * per environment in wp-config.php. Key-relative - no site id in the path;
 	 * the API resolves the site from the write key + secret sent in the request
 	 * headers below (see docs/api/README.md "Key-relative endpoints").

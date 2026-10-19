@@ -4,7 +4,7 @@
  *
  * Single owner of the `webhead_search_cloud_index_config` option (stored through
  * the framework Settings_Manager, the single source of truth). One block per post
- * type describes which fields are pushed to Search Cloud. A global
+ * type describes which fields are pushed to Searcio. A global
  * `config_version` integer is bumped on every save so the sync engine can detect
  * mapping changes and re-push affected documents.
  *
@@ -83,7 +83,7 @@ final class Index_Config {
 
 	/**
 	 * Slug => plural label, so front-ends (the search modal's type filters) can
-	 * show a human-readable name instead of the raw slug the Search Cloud API's
+	 * show a human-readable name instead of the raw slug the Searcio API's
 	 * facets return.
 	 *
 	 * @return array<string,string>

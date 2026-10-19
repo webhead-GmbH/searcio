@@ -2,7 +2,7 @@
 /**
  * Remove the leftover site-id option.
  *
- * The connection used to ask for (and store) a Search Cloud site id. Since the
+ * The connection used to ask for (and store) a Searcio site id. Since the
  * switch to key-relative endpoints the credential identifies the tenant on its
  * own, and nothing reads this option any more - the connection screen shows the
  * id straight from the API's response instead. What was left behind is a value

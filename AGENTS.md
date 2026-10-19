@@ -5,7 +5,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 ## Project Snapshot
 
 - Plugin name: `webhead Search Cloud`
-- Main plugin file: `webhead-search-cloud.php`
+- Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
@@ -62,7 +62,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 
 ## Important Paths
 
-- `webhead-search-cloud.php` is the WordPress entrypoint that loads Composer and boots the plugin class.
+- `searcio.php` is the WordPress entrypoint that loads Composer and boots the plugin class.
 - `includes/Plugin.php` is the runtime source of truth for services, hooks, settings, capabilities, jobs, lifecycle, health checks, diagnostics, compatibility, and updates.
 - `includes/Capabilities/Plugin_Capabilities.php` is the default capability map for admin, REST, and optional network-admin guards.
 - `includes/Settings/Plugin_Settings.php` is the single source of truth for settings metadata, defaults, schema, and REST exposure.
@@ -86,7 +86,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 
 ## Working Model
 
-- `webhead-search-cloud.php` is only the WordPress entrypoint and bootstrap file.
+- `searcio.php` is only the WordPress entrypoint and bootstrap file.
 - `includes/Plugin.php` is the runtime source of truth for services, hooks, database tables, compatibility integrations, and multisite behavior.
 - The framework already provides abstractions for hooks, REST routing, database tables, options, compatibility, and multisite support. Reuse those abstractions before introducing new patterns.
 - Compatibility with multisite, WPML, Polylang, and Wordfence is mandatory and must survive every change.
@@ -175,7 +175,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Run `npm run env:start` then `npm run test:integration` for activation, options, capabilities, REST, cron, tables, or hook timing.
 - Run `npm run test:integration:multisite` when the change touches options, tables, activation, blog switching, or capability sync.
 - Run `npm run test:e2e` for admin screens, block rendering, or anything only a browser can observe.
-- Lint changed PHP files with `php -l` and include `webhead-search-cloud.php` and `includes/Plugin.php` in that pass.
+- Lint changed PHP files with `php -l` and include `searcio.php` and `includes/Plugin.php` in that pass.
 - Confirm the plugin header still reflects minimum WordPress, minimum PHP, and required-plugin slugs.
 - Confirm Site Health and admin notices report unmet requirements when a required plugin is missing or inactive.
 - Validate multisite behavior when changes touch options, database tables, activation, blog switching, or capability sync.

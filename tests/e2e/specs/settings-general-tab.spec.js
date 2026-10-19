@@ -60,7 +60,7 @@ async function mockPlan( page, plan ) {
 }
 
 /**
- * Support Searcio: the searcio logo in the search window. A paid plan can turn
+ * Support Searcio: the Searcio logo in the search window. A paid plan can turn
  * it off, and saves it with the rest of the tab; a Free plan always shows it,
  * so its switch is on, cannot be moved, and the card says why.
  */
@@ -80,7 +80,7 @@ test.describe( 'Support Searcio', () => {
 	} );
 
 	const card = ( page ) => page.locator( '.whsc-settings-card' ).filter( { has: page.getByRole( 'heading', { name: 'Support Searcio' } ) } );
-	const toggle = ( page ) => card( page ).getByRole( 'checkbox', { name: 'Show the searcio logo in the search window' } );
+	const toggle = ( page ) => card( page ).getByRole( 'checkbox', { name: 'Show the Searcio logo in the search window' } );
 
 	test( 'a paid plan turns the logo off, and it stays off', async ( { page } ) => {
 		await mockPlan( page, { is_free: false, name: 'Pro', upgrade_url: '' } );

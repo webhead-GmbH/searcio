@@ -4,8 +4,8 @@ The plugin works with either **WPML** or **Polylang** to scope indexing and sear
 
 ## How it works
 
-- Which languages are enabled for indexing/search is configured in the **Search Config** tab's **Languages** section, which reads from your Search Cloud account.
-- During a sync, each post's language (resolved through WPML/Polylang) is tagged on its document. A post whose language isn't in your enabled set is skipped entirely - it's never sent to Search Cloud, so it never spends indexing quota and never appears in search.
+- Which languages are enabled for indexing/search is configured in the **Search Config** tab's **Languages** section, which reads from your Searcio account.
+- During a sync, each post's language (resolved through WPML/Polylang) is tagged on its document. A post whose language isn't in your enabled set is skipped entirely - it's never sent to Searcio, so it never spends indexing quota and never appears in search.
 - A post whose language can't be resolved (a multilingual plugin is active, but the post itself has no language assigned) is treated as unrestricted rather than excluded, since there's nothing concrete to exclude it for.
 - On the front end, the search modal automatically scopes results to the visitor's current language. If the visitor's language isn't one of the enabled languages, search falls back to WordPress's native search instead of returning empty or wrongly-scoped results.
 - Leaving the enabled-languages list empty means the site is unrestricted - every language is searchable, matching the default single-language behavior.

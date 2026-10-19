@@ -173,7 +173,7 @@ final class Sync_Retry_Test extends Integration_Test_Case {
 
 		$id = $this->make_running_run();
 		$this->clear_tick();
-		$this->sync_state()->save( $id, [ 'last_error' => 'Could not reach Search Cloud. The sync is paused and will retry.' ] );
+		$this->sync_state()->save( $id, [ 'last_error' => 'Could not reach Searcio. The sync is paused and will retry.' ] );
 		$this->sync_state()->set_status( $id, Sync_Status::Paused );
 
 		$this->sync_service()->run_scheduled();

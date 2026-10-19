@@ -1,5 +1,5 @@
 /**
- * The searcio icon, as an icon element for the page header: its field in the
+ * The Searcio icon, as an icon element for the page header: its field in the
  * brand green and the white "s" on it, in the logo's own colours. The header colours an
  * icon through `fill` on the `svg`; these shapes state their own, so it does
  * not reach them.

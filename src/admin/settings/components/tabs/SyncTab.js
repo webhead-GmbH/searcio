@@ -35,12 +35,12 @@ const Counter = ({label, value}) => (
 const CONFIRM_COPY = {
 	start: {
 		title: __('Start sync?', 'searcio'),
-		body: __('This sends new and changed content to Search Cloud. Continue?', 'searcio'),
+		body: __('This sends new and changed content to Searcio. Continue?', 'searcio'),
 		confirmLabel: __('Start sync', 'searcio'),
 	},
 	force: {
 		title: __('Re-sync everything?', 'searcio'),
-		body: __('This re-sends your entire catalog to Search Cloud, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?', 'searcio'),
+		body: __('This re-sends your entire catalog to Searcio, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?', 'searcio'),
 		confirmLabel: __('Re-sync everything', 'searcio'),
 	},
 	cancel: {
@@ -175,7 +175,7 @@ const SyncTab = () => {
 				<TabIntro
 					title={__('Sync', 'searcio')}
 					description={__(
-						'Send your content to Search Cloud. Only new and changed items are sent on each run, so repeat syncs are fast.',
+						'Send your content to Searcio. Only new and changed items are sent on each run, so repeat syncs are fast.',
 						'searcio'
 					)}
 				/>
@@ -183,7 +183,7 @@ const SyncTab = () => {
 				{!configured && (
 					<Notice.Root intent="warning">
 						<Notice.Description>
-							{__('Add and save your Search Cloud credentials first.', 'searcio')}
+							{__('Add and save your Searcio credentials first.', 'searcio')}
 						</Notice.Description>
 						<Notice.Actions>
 							<Notice.ActionLink href={tabUrl('connection')}>
@@ -261,7 +261,7 @@ const SyncTab = () => {
 								{active.status === 'paused' && (
 									<Notice.Root intent="info">
 										<Notice.Description>
-											{__('While a sync is paused, changes in your shop are not sent to Search Cloud. The next scheduled sync continues it, if nobody resumes it before.', 'searcio')}
+											{__('While a sync is paused, changes in your shop are not sent to Searcio. The next scheduled sync continues it, if nobody resumes it before.', 'searcio')}
 										</Notice.Description>
 									</Notice.Root>
 								)}

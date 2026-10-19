@@ -1,7 +1,7 @@
 /**
  * Graceful degradation when the plugin has no search key: the trigger and modal
  * still work, but submitting a query hands off to WordPress's native `?s=`
- * search instead of calling Search Cloud. Restores the key afterwards so the
+ * search instead of calling Searcio. Restores the key afterwards so the
  * other specs are unaffected regardless of run order.
  */
 

@@ -92,7 +92,7 @@ const revealTab = (list, tab) => {
  * @param {string}   [props.voiceIconHtml] Custom icon chosen for the voice button (Elementor icon picker); falls back to the built-in mic glyph when empty.
  * @param {string}   props.searchTrigger  'type' (auto-search past 3 chars) or 'submit' (Enter/button only).
  * @param {string}   props.instanceClass  Per-placement class so per-instance colors reach the portalled modal.
- * @param {string}   [props.cardSource]   'server' to render result cards from Search Cloud-designed templates
+ * @param {string}   [props.cardSource]   'server' to render result cards from Searcio-designed templates
  *                                        (falls back to the plugin's own card per hit when no template matches).
  * @param {string}   [props.highlightsSource] 'featured' to source the empty-query highlights carousel from
  *                                            `filter[featured]=true` instead of a plain match-all (default 'newest').
@@ -475,7 +475,7 @@ const SearchModal = ({
 		}
 
 		// An unsupported visitor language degrades exactly like an
-		// unconfigured/unreachable API - native search, not a Search Cloud
+		// unconfigured/unreachable API - native search, not a Searcio
 		// query scoped to the wrong (or no) content.
 		if (!isConfigured() || !isLanguageSupported()) {
 			window.location.href = nativeSearchUrl(trimmed);

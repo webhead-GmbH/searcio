@@ -4,8 +4,8 @@
  *
  * Gives every integration test typed access to the booted plugin container and
  * its sync services, plus small helpers for the things sync tests repeatedly
- * need: a persisted run row, control over the tick cron schedule, faked Search
- * Cloud HTTP responses, and a connected/indexable configuration. Extends the
+ * need: a persisted run row, control over the tick cron schedule, faked
+ * Searcio HTTP responses, and a connected/indexable configuration. Extends the
  * framework's `Framework_Test_Case`, which reaches the booted plugin, its
  * container and its settings, and through it `WP_UnitTestCase`, so each test
  * runs inside a rolled-back transaction and the `sync_runs` / `change_queue`

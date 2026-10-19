@@ -86,7 +86,7 @@ function notice( run, words ) {
 
 test.describe( 'Sync tab', () => {
 	test( 'says when a run that could not write tries again, and leaves it running', async ( { page } ) => {
-		const waiting = 'Could not reach Search Cloud. The sync tries again in 2 mins.';
+		const waiting = 'Could not reach Searcio. The sync tries again in 2 mins.';
 
 		await mockActiveRun( page, {
 			cursor: { ...RUN.cursor, retries: 2 },
@@ -117,7 +117,7 @@ test.describe( 'Sync tab', () => {
 		await page.goto( SETTINGS_URL );
 
 		const run = page.locator( RUN_CARD );
-		const hint = notice( run, /changes in your shop are not sent to Search Cloud/ );
+		const hint = notice( run, /changes in your shop are not sent to Searcio/ );
 
 		await expect( run.getByText( 'Paused', { exact: true } ) ).toBeVisible();
 		await expect( hint ).toBeVisible();

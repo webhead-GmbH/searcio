@@ -1,6 +1,6 @@
 /**
  * Addresses that did not come from this plugin's own code: a redirect a
- * merchant configured in Search Cloud, a link the assistant wrote into a reply.
+ * merchant configured in Searcio, a link the assistant wrote into a reply.
  * Each is about to become an `href` or be handed to `window.location`, where a
  * scheme other than the web's would run in the visitor's page.
  */

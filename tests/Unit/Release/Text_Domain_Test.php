@@ -29,7 +29,7 @@ final class Text_Domain_Test extends TestCase {
 	private const FUNCTIONS = '__|_e|_x|_ex|_n|_nx|_n_noop|_nx_noop|esc_html__|esc_attr__|esc_html_e|esc_attr_e|esc_html_x|esc_attr_x';
 
 	public function test_the_plugin_header_names_it(): void {
-		$this->assertSame( self::DOMAIN, $this->find( '/^ \* Text Domain:\s*(\S+)\s*$/m', 'webhead-search-cloud.php' ) );
+		$this->assertSame( self::DOMAIN, $this->find( '/^ \* Text Domain:\s*(\S+)\s*$/m', 'searcio.php' ) );
 	}
 
 	public function test_the_blocks_are_translated_under_it(): void {
@@ -89,9 +89,25 @@ final class Text_Domain_Test extends TestCase {
 		$this->assertGreaterThan( 500, $calls );
 	}
 
+	/**
+	 * wordpress.org knows a plugin as `slug/slug.php`, and its page is at the
+	 * slug. The test bootstrap loads the main file and PHPCS lints it, both by
+	 * name, so they name it too. The first slug went with the old name of the
+	 * file: a site that had it active finds it gone and activates the plugin
+	 * again.
+	 */
+	public function test_the_main_file_is_named_after_it(): void {
+		$this->assertFileExists( $this->root() . '/' . self::DOMAIN . '.php' );
+		$this->assertFileDoesNotExist( $this->root() . '/webhead-search-cloud.php' );
+		$this->assertSame( 'https://wordpress.org/plugins/' . self::DOMAIN . '/', $this->find( '/^ \* Plugin URI:\s*(\S+)\s*$/m', self::DOMAIN . '.php' ) );
+		$this->assertStringContainsString( "require dirname( __DIR__, 2 ) . '/" . self::DOMAIN . ".php';", (string) file_get_contents( $this->root() . '/tests/Integration/bootstrap.php' ) );
+		$this->assertStringContainsString( '<file>' . self::DOMAIN . '.php</file>', (string) file_get_contents( $this->root() . '/phpcs.xml' ) );
+		$this->assertStringContainsString( "require_once __DIR__ . '/" . self::DOMAIN . ".php';", (string) file_get_contents( $this->root() . '/uninstall.php' ) );
+	}
+
 	public function test_everything_else_keeps_the_first_slug(): void {
-		$this->assertSame( 'webhead-search-cloud', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\PLUGIN_SLUG',\s*'([^']+)'/", 'webhead-search-cloud.php' ) );
-		$this->assertSame( 'webhead_search_cloud', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\CACHE_GROUP', '([^']+)'/", 'webhead-search-cloud.php' ) );
+		$this->assertSame( 'webhead-search-cloud', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\PLUGIN_SLUG',\s*'([^']+)'/", 'searcio.php' ) );
+		$this->assertSame( 'webhead_search_cloud', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\CACHE_GROUP', '([^']+)'/", 'searcio.php' ) );
 	}
 
 	/**
@@ -182,7 +198,7 @@ final class Text_Domain_Test extends TestCase {
 	 * @return string[]
 	 */
 	private function sources(): array {
-		$files = [ $this->root() . '/webhead-search-cloud.php', $this->root() . '/uninstall.php' ];
+		$files = [ $this->root() . '/searcio.php', $this->root() . '/uninstall.php' ];
 
 		foreach ( [ 'includes', 'src' ] as $directory ) {
 			$tree = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $this->root() . '/' . $directory, \FilesystemIterator::SKIP_DOTS ) );

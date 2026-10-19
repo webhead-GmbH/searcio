@@ -23,7 +23,7 @@ use Webhead\WP\SearchCloud\Sync\Sync_State;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Manage webhead Search Cloud syncs.
+ * Manage Searcio syncs.
  *
  * @since 1.0.0
  */
@@ -100,7 +100,7 @@ final class Sync_Command {
 	 * Run a full sync synchronously to completion.
 	 *
 	 * Best for a real system-cron entry. If a run is already active it is resumed.
-	 * When Search Cloud does not take a batch the command waits and sends it
+	 * When Searcio does not take a batch the command waits and sends it
 	 * again, as the background sync does, for a little over an hour in all; it
 	 * exits with an error when the sync does not complete.
 	 *
@@ -151,7 +151,7 @@ final class Sync_Command {
 				return;
 			}
 
-			// Search Cloud did not take a batch. The run has scheduled its next
+			// Searcio did not take a batch. The run has scheduled its next
 			// try; nothing but this loop runs it here, so the wait is ours.
 			$wait = null === $active ? 0 : $this->service->seconds_until_retry();
 
@@ -162,7 +162,7 @@ final class Sync_Command {
 		} while ( null !== $active && $guard < 100000 );
 
 		// The run is no longer active, which is not the same as done: a plan
-		// limit, or a Search Cloud that stayed down, ends it as failed.
+		// limit, or a Searcio that stayed down, ends it as failed.
 		$finished = $this->state->find( $id );
 		$status   = (string) ( $finished['status'] ?? '' );
 		$error    = (string) ( $finished['last_error'] ?? '' );

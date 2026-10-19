@@ -44,7 +44,7 @@ final class Frontend_Config {
 
 	/**
 	 * Currency symbol, position and decimal count, sourced from WooCommerce so
-	 * result-card prices (returned by the Search Cloud API as bare numbers) are
+	 * result-card prices (returned by the Searcio API as bare numbers) are
 	 * formatted client-side to match the store. Falls back to no symbol when
 	 * WooCommerce is inactive.
 	 *
@@ -69,7 +69,7 @@ final class Frontend_Config {
 	}
 
 	/**
-	 * The searcio logo the search window shows in its bottom corner, linked to
+	 * The Searcio logo the search window shows in its bottom corner, linked to
 	 * searcio.com, or null when it shows none. A Free plan always shows it;
 	 * on any other plan, or before the plan is known, Support Searcio decides,
 	 * and it is on until the shop turns it off.
@@ -133,8 +133,8 @@ final class Frontend_Config {
 				'close'           => __( 'Close search', 'searcio' ),
 				'voiceSearch'     => __( 'Search by voice', 'searcio' ),
 				'allTypes'        => __( 'All', 'searcio' ),
-				/* translators: %s: the name of the search service, "searcio". */
-				'credit'          => sprintf( __( 'Search by %s (opens in a new tab)', 'searcio' ), 'searcio' ),
+				/* translators: %s: the name of the search service, "Searcio". */
+				'credit'          => sprintf( __( 'Search by %s (opens in a new tab)', 'searcio' ), 'Searcio' ),
 			],
 		];
 	}

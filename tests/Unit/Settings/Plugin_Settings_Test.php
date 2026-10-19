@@ -74,7 +74,7 @@ final class Plugin_Settings_Test extends TestCase {
 	}
 
 	/**
-	 * A mirror of what Search Cloud says, written by the plugin and never by a
+	 * A mirror of what Searcio says, written by the plugin and never by a
 	 * settings form: an admin could otherwise call a Free plan paid.
 	 */
 	public function test_the_plan_tier_is_kept_out_of_rest_and_holds_only_a_tier(): void {

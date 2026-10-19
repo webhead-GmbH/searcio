@@ -56,7 +56,7 @@ final class Runtime_Diagnostics {
 	public function register(): void {
 		$this->diagnostics_manager->register_section(
 			self::SECTION_ID,
-			'webhead Search Cloud runtime',
+			'Searcio runtime',
 			'Connection, indexing, and sync state for support and debugging. Credentials are never included.',
 			true
 		);
@@ -86,7 +86,7 @@ final class Runtime_Diagnostics {
 	public function translate_section( array $info ): array {
 		$this->diagnostics_manager->register_section(
 			self::SECTION_ID,
-			__( 'webhead Search Cloud runtime', 'searcio' ),
+			__( 'Searcio runtime', 'searcio' ),
 			__( 'Connection, indexing, and sync state for support and debugging. Credentials are never included.', 'searcio' ),
 			true
 		);

@@ -1,7 +1,7 @@
 {
     "name": "webhead-search-cloud",
     "version": "1.3.0",
-    "description": "Connect WordPress and WooCommerce to webhead Search Cloud.",
+    "description": "Connect WordPress and WooCommerce to Searcio.",
     "main": "src/admin/settings/index.js",
     "scripts": {
         "start": "wp-scripts start",

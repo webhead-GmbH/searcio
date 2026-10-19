@@ -35,25 +35,25 @@ const ConnectionExplainer = ({legal}) => {
 			<Modal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
-				title={__('How connecting to Search Cloud works', 'searcio')}
+				title={__('How connecting to Searcio works', 'searcio')}
 				size="medium"
 				className="webhead-search-cloud-connection-explainer-modal"
 			>
 				<Text render={<p/>} variant="body-md">
 					{__(
-						'Clicking Connect sends the email address shown on the Connection tab (or the one you enter under "Not this email?") to Search Cloud, along with this site\'s address.',
+						'Clicking Connect sends the email address shown on the Connection tab (or the one you enter under "Not this email?") to Searcio, along with this site\'s address.',
 						'searcio'
 					)}
 				</Text>
 				<Text render={<p/>} variant="body-md">
 					{__(
-						'If that email has no Search Cloud account yet, one is created automatically and this site is connected right away - no further steps.',
+						'If that email has no Searcio account yet, one is created automatically and this site is connected right away - no further steps.',
 						'searcio'
 					)}
 				</Text>
 				<Text render={<p/>} variant="body-md">
 					{__(
-						'If that email already has a Search Cloud account, nothing is created or changed yet. Search Cloud emails a confirmation link to that address; once its owner clicks it, they choose which account to connect this site to. Come back here afterwards and paste the resulting keys into "Advanced: manual key entry" below.',
+						'If that email already has a Searcio account, nothing is created or changed yet. Searcio emails a confirmation link to that address; once its owner clicks it, they choose which account to connect this site to. Come back here afterwards and paste the resulting keys into "Advanced: manual key entry" below.',
 						'searcio'
 					)}
 				</Text>

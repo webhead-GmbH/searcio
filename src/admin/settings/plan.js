@@ -24,7 +24,7 @@ const askForPlan = () => {
 };
 
 /**
- * The plan the connected account is on. Until Search Cloud answers, it is the
+ * The plan the connected account is on. Until Searcio answers, it is the
  * tier the site last kept (`connection.planTier`), so a Free plan is known as
  * one before the request returns. Null when the site is not connected, or no
  * tier is known.

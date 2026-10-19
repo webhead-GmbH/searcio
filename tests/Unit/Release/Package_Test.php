@@ -33,7 +33,7 @@ final class Package_Test extends TestCase {
 	public function test_the_plugin_file_loads_the_plugins_own_autoloader(): void {
 		$this->assertStringContainsString(
 			"require_once __DIR__ . '/includes/autoload.php';",
-			(string) file_get_contents( $this->root() . '/webhead-search-cloud.php' )
+			(string) file_get_contents( $this->root() . '/searcio.php' )
 		);
 	}
 
@@ -63,7 +63,7 @@ final class Package_Test extends TestCase {
 	 * @return string[]
 	 */
 	private function shipped_php(): array {
-		$files = [ $this->root() . '/webhead-search-cloud.php', $this->root() . '/uninstall.php' ];
+		$files = [ $this->root() . '/searcio.php', $this->root() . '/uninstall.php' ];
 
 		foreach ( [ 'includes', 'blocks' ] as $directory ) {
 			$found = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $this->root() . '/' . $directory, RecursiveDirectoryIterator::SKIP_DOTS ) );

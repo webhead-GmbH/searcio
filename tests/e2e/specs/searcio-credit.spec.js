@@ -1,5 +1,5 @@
 /**
- * The searcio logo the search window ends with, linked to searcio.com: small,
+ * The Searcio logo the search window ends with, linked to searcio.com: small,
  * at the end of the last line, below everything the window holds. A Free plan
  * always shows it; on any other plan Support Searcio decides, and it is on
  * until the shop turns it off.
@@ -58,7 +58,7 @@ const measure = ( modal ) => modal.evaluate( ( frame ) => {
 	};
 } );
 
-test.describe( 'The searcio logo in the search window', () => {
+test.describe( 'The Searcio logo in the search window', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await configureSearchKey( requestUtils );
 	} );
@@ -68,7 +68,7 @@ test.describe( 'The searcio logo in the search window', () => {
 		await setSupport( requestUtils, true );
 	} );
 
-	test( 'ends the window, small, in its corner, and links to searcio in a new tab', async ( { page, requestUtils } ) => {
+	test( 'ends the window, small, in its corner, and links to Searcio in a new tab', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			hits: [ postHit( { title: 'Blue Sneakers' } ), postHit( { title: 'Red Boots' }, 'post-2' ) ],
 		} );
@@ -79,7 +79,7 @@ test.describe( 'The searcio logo in the search window', () => {
 		await widget.search( 'footwear' );
 		await expect( widget.cards ).toHaveCount( 2 );
 
-		const credit = widget.modal.getByRole( 'link', { name: 'Search by searcio (opens in a new tab)' } );
+		const credit = widget.modal.getByRole( 'link', { name: 'Search by Searcio (opens in a new tab)' } );
 
 		await expect( credit ).toBeVisible();
 		await expect( credit ).toHaveAttribute( 'href', 'https://searcio.com/' );
@@ -149,7 +149,7 @@ test.describe( 'The searcio logo in the search window', () => {
 		const widget = new SearchWidget( page );
 		await widget.openModal();
 
-		await expect( widget.modal.getByRole( 'link', { name: 'Search by searcio (opens in a new tab)' } ) ).toBeVisible();
+		await expect( widget.modal.getByRole( 'link', { name: 'Search by Searcio (opens in a new tab)' } ) ).toBeVisible();
 	} );
 
 	test( 'sits at the left end in a right-to-left page', async ( { page, requestUtils } ) => {

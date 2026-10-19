@@ -29,7 +29,7 @@ const ConnectionResultNotice = ({result}) => {
 				: __('Connected.', 'searcio');
 		const siteIdSuffix = result.site_id
 			? sprintf(
-				/* translators: %d: the Search Cloud site id. */
+				/* translators: %d: the Searcio site id. */
 				__(' (site #%d)', 'searcio'),
 				result.site_id
 			)

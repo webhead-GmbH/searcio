@@ -5,7 +5,7 @@ import { usePlan } from './plan';
 
 /**
  * The header action offered only when the connected account is on a Free plan:
- * it opens the Search Cloud billing page so the owner can buy a plan. The plan
+ * it opens the Searcio billing page so the owner can buy a plan. The plan
  * tier and billing URL come from the /health check (`plan.is_free` /
  * `plan.upgrade_url`, surfaced by Connection_Endpoint::present()).
  *

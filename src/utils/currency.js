@@ -1,5 +1,5 @@
 /**
- * Shared currency-formatting helper. The Search Cloud API always returns
+ * Shared currency-formatting helper. The Searcio API always returns
  * prices as bare numbers - both in a hit's own fields, and (for
  * server-designed card templates, `card-templates.md`) as `{{price}}`-style
  * placeholder values or as a "price component"'s field mapping. Currency
