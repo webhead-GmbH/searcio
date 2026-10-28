@@ -11,7 +11,9 @@
  *                         HTML entities decoded).
  * - `property:{name}`   - an internal object property (`title`, `content`,
  *                         `excerpt`, `permalink`, `thumbnail`, `date`,
- *                         `modified`, `author`, `slug`).
+ *                         `modified`, `author`, `slug`). The text ones
+ *                         (`title`, `content`, `excerpt`, `author`) are plain
+ *                         text, HTML entities decoded.
  *
  * Unknown or empty schemes resolve to `null` so the document builder can skip
  * the field cleanly.
@@ -104,7 +106,7 @@ final class Field_Source_Resolver {
 
 	private function resolve_property( string $name, WP_Post $post ): mixed {
 		return match ( strtolower( $name ) ) {
-			'title', 'post_title'       => $this->clean( get_the_title( $post ) ),
+			'title', 'post_title'       => $this->clean( (string) $post->post_title ),
 			'content', 'post_content'   => $this->render_content( $post ),
 			'excerpt', 'post_excerpt'   => $this->clean( $this->excerpt( $post ) ),
 			'permalink', 'url'          => $this->permalink( $post ),
@@ -165,9 +167,7 @@ final class Field_Source_Resolver {
 	}
 
 	private function author( WP_Post $post ): ?string {
-		$name = get_the_author_meta( 'display_name', (int) $post->post_author );
-
-		return '' === trim( (string) $name ) ? null : (string) $name;
+		return $this->clean( (string) get_the_author_meta( 'display_name', (int) $post->post_author ) );
 	}
 
 	private function date( string $gmt ): ?string {
@@ -178,8 +178,26 @@ final class Field_Source_Resolver {
 		return gmdate( 'c', (int) strtotime( $gmt . ' UTC' ) );
 	}
 
+	/**
+	 * Text as a reader sees it on the site, without markup or HTML entities.
+	 *
+	 * WordPress hands its text back HTML-encoded in more than one way: kses
+	 * stores the `&` of a title saved without `unfiltered_html` as `&amp;`,
+	 * the block editor saves a typed `&` as `&amp;` and a hard space as
+	 * `&nbsp;`, and a display name is stored escaped. A result card prints a
+	 * field as text, so an entity left in reached the shopper as written, and
+	 * nothing a shopper types contains one. The title is read from the post
+	 * rather than through `get_the_title()`, whose display filters write
+	 * quotes, dashes and ellipses as entities and put "Private:" before the
+	 * title of a private post: the index holds the title as it was typed.
+	 *
+	 * Tags are stripped before entities are decoded, so `&lt;b&gt;` stays the
+	 * text it is. A hard space becomes a space, which a search tokenizer splits
+	 * words on.
+	 */
 	private function clean( string $value ): ?string {
-		$value = trim( wp_strip_all_tags( $value ) );
+		$value = html_entity_decode( wp_strip_all_tags( $value ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$value = trim( str_replace( "\u{00A0}", ' ', $value ) );
 
 		return '' === $value ? null : $value;
 	}

@@ -171,9 +171,10 @@ final class Document_Builder {
 			return $title;
 		}
 
-		$fallback = trim( wp_strip_all_tags( get_the_title( $post ) ) );
+		// The post's own title, decoded as the default source decodes it.
+		$fallback = $this->resolver->resolve( 'property:title', $post );
 
-		return '' !== $fallback ? $fallback : '#' . $post->ID;
+		return is_string( $fallback ) ? $fallback : '#' . $post->ID;
 	}
 
 	/**
