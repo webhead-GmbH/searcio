@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { search as SearchIcon } from '@wordpress/icons';
 
+import { selectProps } from '../../utils/select';
 import InspectorStack from '../InspectorStack';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
@@ -90,29 +91,35 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						/>
 						<SelectControl
 							label={ __( 'Restrict to type', 'searcio' ) }
-							value={ scopeType || null }
-							items={ scopeOptions }
-							onValueChange={ ( value ) => setAttributes( { scopeType: value ?? '' } ) }
+							{ ...selectProps(
+								scopeOptions,
+								scopeType,
+								( value ) => setAttributes( { scopeType: value ?? '' } )
+							) }
 						/>
 						<SelectControl
 							label={ __( 'Card source', 'searcio' ) }
 							description={ __( "Design templates per content type in the Searcio panel's card builder. Any type without a published template there falls back to this plugin's own card.", 'searcio' ) }
-							value={ cardSource }
-							items={ [
-								{ value: 'plugin', label: __( 'Plugin templates', 'searcio' ) },
-								{ value: 'server', label: __( 'Searcio templates', 'searcio' ) },
-							] }
-							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
+							{ ...selectProps(
+								[
+									{ value: 'plugin', label: __( 'Plugin templates', 'searcio' ) },
+									{ value: 'server', label: __( 'Searcio templates', 'searcio' ) },
+								],
+								cardSource,
+								( value ) => setAttributes( { cardSource: value } )
+							) }
 						/>
 						<SelectControl
 							label={ __( 'Highlights source', 'searcio' ) }
 							description={ __( 'What the empty-query "highlights" carousel shows. "Featured" only works once a boolean "featured" custom field is pushed for this type (Indexing tab).', 'searcio' ) }
-							value={ highlightsSource }
-							items={ [
-								{ value: 'newest', label: __( 'Newest', 'searcio' ) },
-								{ value: 'featured', label: __( 'Featured', 'searcio' ) },
-							] }
-							onValueChange={ ( value ) => setAttributes( { highlightsSource: value } ) }
+							{ ...selectProps(
+								[
+									{ value: 'newest', label: __( 'Newest', 'searcio' ) },
+									{ value: 'featured', label: __( 'Featured', 'searcio' ) },
+								],
+								highlightsSource,
+								( value ) => setAttributes( { highlightsSource: value } )
+							) }
 						/>
 						<InputControl
 							label={ __( 'Placeholder text', 'searcio' ) }
@@ -145,15 +152,17 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						/>
 						<SelectControl
 							label={ __( 'Open animation', 'searcio' ) }
-							value={ animation }
-							items={ [
-								{ value: 'none', label: __( 'None', 'searcio' ) },
-								{ value: 'fade', label: __( 'Fade', 'searcio' ) },
-								{ value: 'slide-down', label: __( 'Slide down', 'searcio' ) },
-								{ value: 'slide-up', label: __( 'Slide up', 'searcio' ) },
-								{ value: 'zoom', label: __( 'Zoom', 'searcio' ) },
-							] }
-							onValueChange={ ( value ) => setAttributes( { animation: value } ) }
+							{ ...selectProps(
+								[
+									{ value: 'none', label: __( 'None', 'searcio' ) },
+									{ value: 'fade', label: __( 'Fade', 'searcio' ) },
+									{ value: 'slide-down', label: __( 'Slide down', 'searcio' ) },
+									{ value: 'slide-up', label: __( 'Slide up', 'searcio' ) },
+									{ value: 'zoom', label: __( 'Zoom', 'searcio' ) },
+								],
+								animation,
+								( value ) => setAttributes( { animation: value } )
+							) }
 						/>
 						{ 'none' !== animation && (
 							<RangeControl

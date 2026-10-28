@@ -8,6 +8,7 @@ import { Icon, InputControl, SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { grid as GridIcon } from '@wordpress/icons';
 
+import { selectProps } from '../../utils/select';
 import InspectorStack from '../InspectorStack';
 
 /**
@@ -33,11 +34,14 @@ const Edit = ( { attributes, setAttributes } ) => {
 					<InspectorStack>
 						<SelectControl
 							label={ __( 'Show', 'searcio' ) }
-							value={ source }
-							items={ [
-								{ label: __( 'Similar products', 'searcio' ), value: 'similar' },
-								{ label: __( 'Category listing', 'searcio' ), value: 'category' },
-							] }
+							{ ...selectProps(
+								[
+									{ label: __( 'Similar products', 'searcio' ), value: 'similar' },
+									{ label: __( 'Category listing', 'searcio' ), value: 'category' },
+								],
+								source,
+								( value ) => setAttributes( { source: value } )
+							) }
 							description={ isSimilar
 								? __(
 									'Products close in meaning to the one being viewed. Needs AI search on your plan; without it the row stays hidden.',
@@ -47,7 +51,6 @@ const Edit = ( { attributes, setAttributes } ) => {
 									'A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out.',
 									'searcio'
 								) }
-							onValueChange={ ( value ) => setAttributes( { source: value } ) }
 						/>
 
 						<InputControl
@@ -98,12 +101,14 @@ const Edit = ( { attributes, setAttributes } ) => {
 
 						<SelectControl
 							label={ __( 'Layout', 'searcio' ) }
-							value={ layout }
-							items={ [
-								{ label: __( 'Carousel', 'searcio' ), value: 'carousel' },
-								{ label: __( 'Grid', 'searcio' ), value: 'grid' },
-							] }
-							onValueChange={ ( value ) => setAttributes( { layout: value } ) }
+							{ ...selectProps(
+								[
+									{ label: __( 'Carousel', 'searcio' ), value: 'carousel' },
+									{ label: __( 'Grid', 'searcio' ), value: 'grid' },
+								],
+								layout,
+								( value ) => setAttributes( { layout: value } )
+							) }
 						/>
 
 						<RangeControl
@@ -119,12 +124,14 @@ const Edit = ( { attributes, setAttributes } ) => {
 
 						<SelectControl
 							label={ __( 'Card source', 'searcio' ) }
-							value={ cardSource }
-							items={ [
-								{ label: __( 'Plugin templates', 'searcio' ), value: 'plugin' },
-								{ label: __( 'Searcio templates', 'searcio' ), value: 'server' },
-							] }
-							onValueChange={ ( value ) => setAttributes( { cardSource: value } ) }
+							{ ...selectProps(
+								[
+									{ label: __( 'Plugin templates', 'searcio' ), value: 'plugin' },
+									{ label: __( 'Searcio templates', 'searcio' ), value: 'server' },
+								],
+								cardSource,
+								( value ) => setAttributes( { cardSource: value } )
+							) }
 						/>
 					</InspectorStack>
 				</PanelBody>
