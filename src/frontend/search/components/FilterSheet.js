@@ -36,7 +36,10 @@ const FilterSheet = ( { variant, title, selection, single = false, instanceClass
 	useLayoutEffect( () => {
 		document.querySelectorAll( '.whsc-sheet-overlay' ).forEach( ( overlay ) => overlay.setAttribute( 'data-webhead-frontend-root', '' ) );
 
-		const first = tabbables( bodyRef.current )[ 0 ];
+		// The first value rather than the field that searches the values: on a
+		// phone a focused text field opens the keyboard over half the sheet.
+		const items = tabbables( bodyRef.current );
+		const first = items.find( ( node ) => ! node.matches( 'input[type="search"], input[type="text"]' ) ) || items[ 0 ];
 
 		first?.focus( { preventScroll: true } );
 	}, [] );
