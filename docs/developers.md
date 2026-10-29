@@ -113,6 +113,17 @@ An error the modal shows is the surface's own element (`.whsc-search-error`, wit
 
 The search window's filters are one bar under the search field (`FilterBar`), a group's values in a popover on a tablet or a desktop (`FilterPopover`) or a sheet on a phone, and every group in "All filters", a drawer or a sheet (`FilterSheet`, a `Modal` nested in the search modal); `FilterPanel` draws a group's values in all of them. The bar's order is the order Search Config lists the facet fields in, which the plugin keeps a copy of (`Facet_Config`, refreshed with the languages whenever an admin reads or writes the search configuration) and hands over as `facets` in the storefront config; without the copy, the groups the results carry most come first. Every control is a `.whsc-facet` and reads `--whsc-filter-*` with the `--whsc-facet-*` property of the same part as its fallback, so styling written for the old filter chips reaches it. The layout follows the modal's own width (the `whsc-modal` container query, 640px), not the viewport's.
 
+**What a search tells Searcio for the site's statistics.** Every `/search` the storefront sends carries hints that never change its results (`searchHints()` in `src/utils/api.js`):
+
+- `surface`: where its results are shown. `overlay` is the search window's results, including "load more" and a listing by a filter alone; `highlights` is the window's empty-field carousel; `category` is a category product row; `quiz` is the product finder.
+- `live=1`: a search as you type in `type` mode that the visitor has not settled on. Searcio leaves it out of the counts unless one of its results is clicked. A settled search is sent without it, so it never answers from the cache the live request for the same words left behind.
+- `origin`: how a settled search was started, one of `typed` (Enter or the Search button), `suggestion`, `popular`, `recent`, `voice` and `filter` (a filter picked with words in the field).
+- `preview=1`, also on `/search/similar`: the page is a page builder's editor. `Frontend_Config` tells the storefront so (`preview`) for Elementor, Divi, Beaver Builder, Oxygen, WPBakery's frontend editor, Bricks and the Customizer, and Elementor's frontend says so itself.
+
+`live` and `origin` are only sent on page one of a search with words: a listing without them and "load more" are never counted. Only a settled search outside an editor is saved as a recent search.
+
+A click on a result sends `POST /search/click` with the `search_id` of the list it was in and its 1-based position there. This covers the search window's results and highlights, a category row, a similar-products row, a photo search, the product finder, and the assistant's cards and compare table. Each assistant product carries the `search_id` of the catalogue search that found it, and its position counts among the products of that search (`positionInSearch()` in `src/utils/clicks.js`). A middle click, which opens a result in a new tab without a `click` event, sends one too (`openHandlers()`). A service that returns no `search_id` for a list gets no beacon from it.
+
 The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-out-color`. The search block (`stockInColor` / `stockOutColor`) and the Elementor search widget (`card_stock_in_color` / `card_stock_out_color`) set them for their modal; product rows (the products block and widget) have no style controls and take the defaults or site-wide CSS.
 
 ### Filters
@@ -134,6 +145,14 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
   ```
 
 - **`webhead_search_cloud/storefront/facet_colors`** - `(array $colors, string $field, string $taxonomy)`. Value => hex colour for a field's values, in the language of the page. The plugin fills it for a WooCommerce attribute whose terms a swatches plugin has coloured (`product_attribute_color` of "Variation Swatches for WooCommerce" by GetWooPlugins, `cfvsw_color` of the one by CartFlows); `$taxonomy` is empty for a field that is not an attribute. A value without a valid hex colour is dropped.
+
+- **`webhead_search_cloud/storefront/is_preview`** - `(bool $is_preview)`. Whether the page is a page builder's editor, whose searches Searcio meters but keeps out of the site's statistics. The plugin knows Elementor, Divi, Beaver Builder, Oxygen, WPBakery's frontend editor and Bricks by their editor's address, and the Customizer; return `true` for another editor:
+
+  ```php
+  add_filter( 'webhead_search_cloud/storefront/is_preview', function ( $is_preview ) {
+      return $is_preview || isset( $_GET['my_builder_edit'] );
+  } );
+  ```
 
 - **`woocommerce_product_is_visible`** - WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs - WP-Cron, WP-CLI or REST - so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
 

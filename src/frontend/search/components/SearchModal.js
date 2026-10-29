@@ -3,7 +3,7 @@ import {Button, Icon, Modal} from '@wordpress/components';
 import {chevronDown, closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
-import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick, visualSearch} from '../../../utils/api';
+import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
 import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
@@ -497,7 +497,7 @@ const SearchModal = ({
 		const ranges = buildRangeParams(appliedRanges);
 
 		try {
-			const response = await search('', {type, filters, ranges, perPage: 12});
+			const response = await search('', {type, filters, ranges, perPage: 12, surface: 'highlights'});
 
 			if (!isLatest()) {
 				return;
@@ -592,14 +592,26 @@ const SearchModal = ({
 	 * @param {Object}   [options.ranges]
 	 * @param {boolean}  [options.commit] An explicit search, see below.
 	 * @param {boolean}  [options.keep]   Keep the results on screen while it loads.
+	 * @param {boolean}  [options.live]   A search as you type the visitor has not settled on: the
+	 *                                    service leaves it out of the counts unless a result is clicked.
+	 * @param {string}   [options.origin] How a settled search was started (`typed`, `suggestion`,
+	 *                                    `popular`, `recent`, `voice`, `filter`), for the statistics.
 	 */
-	const runSearch = useCallback(async (q, {types, facets: facetsOverride, ranges: rangesOverride, commit = true, keep = false} = {}) => {
+	const runSearch = useCallback(async (q, {types, facets: facetsOverride, ranges: rangesOverride, commit = true, keep = false, live = false, origin} = {}) => {
 		const trimmed = q.trim();
 		const appliedTypes = types ?? activeTypes;
 		const appliedFacets = facetsOverride ?? activeFacets;
 		const appliedRanges = rangesOverride ?? activeRanges;
 		const type = buildTypeParam(scopeType, appliedTypes);
 		const browseCatalogue = '' === trimmed && (appliedTypes.length > 0 || activeFilterCount(appliedFacets, appliedRanges) > 0);
+		// Only a search the visitor settled on is one to come back to. A live
+		// search is a word on its way ("jack" before "jacket"), and one in a
+		// page builder's editor is nobody's.
+		const remember = (term) => {
+			if (!live && !editorPreview && !isPreview()) {
+				setRecent(addRecentSearch(term));
+			}
+		};
 
 		setQuery(q);
 
@@ -665,7 +677,7 @@ const SearchModal = ({
 		const ranges = buildRangeParams(appliedRanges);
 
 		try {
-			const response = await search(trimmed, {type, filters, ranges, signal: controller.signal});
+			const response = await search(trimmed, {type, filters, ranges, live, origin, surface: 'overlay', signal: controller.signal});
 
 			if (!isLatest()) {
 				return;
@@ -687,7 +699,7 @@ const SearchModal = ({
 
 			if ('' !== target) {
 				if (commit) {
-					setRecent(addRecentSearch(trimmed));
+					remember(trimmed);
 					window.location.href = target;
 
 					return;
@@ -716,7 +728,7 @@ const SearchModal = ({
 			setGroupsVersion((version) => version + 1);
 
 			if ('' !== trimmed) {
-				setRecent(addRecentSearch(trimmed));
+				remember(trimmed);
 			}
 		} catch (e) {
 			// A superseded/cancelled request must not touch state or navigate.
@@ -743,7 +755,7 @@ const SearchModal = ({
 				}
 			}
 		}
-	}, [activeTypes, activeFacets, activeRanges, i18n.error, scopeType]);
+	}, [activeTypes, activeFacets, activeRanges, editorPreview, i18n.error, scopeType]);
 
 	/**
 	 * Search by photo. A vision model turns the image into tags and runs those
@@ -862,7 +874,7 @@ const SearchModal = ({
 		}
 
 		liveSearchTimer.current = window.setTimeout(() => {
-			void runSearch(query, {commit: false});
+			void runSearch(query, {commit: false, live: true});
 		}, LIVE_SEARCH_DEBOUNCE);
 
 		return () => window.clearTimeout(liveSearchTimer.current);
@@ -927,7 +939,9 @@ const SearchModal = ({
 				return;
 			}
 
-			void runSearch(q, {...latest, commit: false, keep: true});
+			// A pick narrows the search on screen: with words in the field it is
+			// a settled search of its own, started by the filter.
+			void runSearch(q, {...latest, commit: false, keep: true, origin: 'filter'});
 		};
 
 		if (immediate) {
@@ -1212,7 +1226,7 @@ const SearchModal = ({
 
 	const onSelectSuggestion = (label) => {
 		setSuggestionsDismissed(true);
-		void runSearch(label);
+		void runSearch(label, {origin: 'suggestion'});
 	};
 
 	/**
@@ -1246,6 +1260,7 @@ const SearchModal = ({
 				filters: buildFilterParams(activeFacets, currentLangFilter()),
 				ranges: buildRangeParams(activeRanges),
 				page: nextPage,
+				surface: 'overlay',
 				signal: controller.signal,
 			});
 
@@ -1297,7 +1312,7 @@ const SearchModal = ({
 		recognition.onresult = (event) => {
 			const transcript = event.results?.[0]?.[0]?.transcript || '';
 
-			void runSearch(transcript);
+			void runSearch(transcript, {origin: 'voice'});
 		};
 		recognition.start();
 	};
@@ -1370,7 +1385,7 @@ const SearchModal = ({
 				return;
 			}
 
-			void runSearch(query);
+			void runSearch(query, {origin: 'typed'});
 		}
 	};
 
@@ -1782,7 +1797,7 @@ const SearchModal = ({
 							<Button
 								variant="primary"
 								className="whsc-submit-btn"
-								onClick={() => void runSearch(query)}
+								onClick={() => void runSearch(query, {origin: 'typed'})}
 							>
 								{/* On a phone only the icon shows; the label stays the name. */}
 								<Icon icon={searchIcon} className="whsc-submit-btn__icon"/>
@@ -1916,7 +1931,7 @@ const SearchModal = ({
 					// highlights back on screen, with the searches beside them.
 					helpers={helpers}
 					headingRef={resultsHeadingRef}
-					onSelect={(label) => void runSearch(label)}
+					onSelect={(label, kind) => void runSearch(label, {origin: kind})}
 					onRemoveRecent={onRemoveRecent}
 					onClearRecent={onClearRecent}
 				/>

@@ -27,7 +27,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * @param {boolean}    props.busy
  * @param {string}     [props.helpers]   `all`, `popular` or `none`.
  * @param {{current: ?HTMLElement}} [props.headingRef]
- * @param {(label: string) => void} props.onSelect
+ * @param {(label: string, kind: string) => void} props.onSelect Called with the term and `recent` or `popular`.
  * @param {(label: string) => void} props.onRemoveRecent
  * @param {() => void}              props.onClearRecent
  */
@@ -83,7 +83,7 @@ const Browse = ( {
 							type="button"
 							className="whsc-chip__label"
 							title={ label }
-							onClick={ () => onSelect( label ) }
+							onClick={ () => onSelect( label, 'recent' ) }
 							disabled={ busy }
 						>
 							{ label }
@@ -112,7 +112,7 @@ const Browse = ( {
 							type="button"
 							className="whsc-popular-item"
 							title={ label }
-							onClick={ () => onSelect( label ) }
+							onClick={ () => onSelect( label, 'popular' ) }
 							disabled={ busy }
 						>
 							{ label }

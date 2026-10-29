@@ -4,6 +4,7 @@ import { getConfig } from '../../../utils/api';
 import { formatPrice, PRICE_FIELDS } from '../../../utils/currency';
 import { humanizeFieldLabel } from '../../../utils/facets';
 import { PLACEHOLDER_IMAGE_DATA_URI } from '../../../utils/placeholderImage';
+import { openHandlers } from '../../../utils/clicks';
 
 // Fields shown in the column header (title/image/price) or otherwise not useful
 // as comparison rows. Everything else a product carries becomes a row.
@@ -138,8 +139,9 @@ export const comparisonRows = ( products, labels = getConfig().fieldLabels ) => 
  *
  * @param {Object}        props
  * @param {Array<Object>} props.products Assistant hits ({ id, source }).
+ * @param {Function}      [props.onOpen] Called with a product and its index when its link is opened.
  */
-const CompareTable = ( { products } ) => {
+const CompareTable = ( { products, onOpen } ) => {
 	const labels = getConfig().fieldLabels;
 	const rows = comparisonRows( products, labels );
 
@@ -149,12 +151,16 @@ const CompareTable = ( { products } ) => {
 				<thead>
 					<tr>
 						<th className="whsc-compare__corner" />
-						{ products.map( ( product ) => {
+						{ products.map( ( product, index ) => {
 							const source = product.source || {};
 
 							return (
 								<th key={ product.id } scope="col">
-									<a className="whsc-compare__product" href={ source.url || '#' }>
+									<a
+										className="whsc-compare__product"
+										href={ source.url || '#' }
+										{ ...openHandlers( onOpen && ( () => onOpen( product, index ) ) ) }
+									>
 										<img
 											className="whsc-compare__image"
 											src={ source.image || PLACEHOLDER_IMAGE_DATA_URI }

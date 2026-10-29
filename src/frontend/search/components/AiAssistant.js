@@ -2,7 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@word
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { askAssistant } from '../../../utils/api';
+import { askAssistant, trackClick } from '../../../utils/api';
+import { positionInSearch } from '../../../utils/clicks';
 import { NARROW, useMediaQuery } from '../../../utils/mediaQuery';
 import CompareTable, { comparisonRows } from './CompareTable';
 import Markdown from './markdown';
@@ -100,6 +101,10 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		( message ) => 'assistant' === message.role && ( message.products || [] ).length > 0
 	);
 	const products = withProducts?.products || [];
+	// Each product was found by a catalogue search of its own, whose
+	// `search_id` it carries; its click counts in that search's list.
+	const openProduct = ( index ) =>
+		trackClick( products[ index ]?.search_id, products[ index ]?.id, positionInSearch( products, index ) );
 	// Offered only when the table would have a row: products that carry just a
 	// title, link, image and price opened a table with a header and no body.
 	const canCompare = products.length >= 2 && comparisonRows( products ).length > 0;
@@ -340,15 +345,16 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 					</div>
 
 					{ comparing ? (
-						<CompareTable products={ products } />
+						<CompareTable products={ products } onOpen={ ( product, index ) => openProduct( index ) } />
 					) : (
 						<div className="whsc-assistant__grid">
-							{ products.map( ( hit ) => (
+							{ products.map( ( hit, index ) => (
 								<ResultCard
 									key={ hit.id }
 									hit={ hit }
 									cardSource={ cardSource }
 									serverTemplates={ serverTemplates }
+									onClick={ () => openProduct( index ) }
 								/>
 							) ) }
 						</div>

@@ -37,6 +37,13 @@ final class Frontend_Config {
 	/** The global the entry's script reads this configuration from. */
 	public const OBJECT_NAME = 'webheadSearchCloudFrontend';
 
+	/**
+	 * The query parameter each page builder's editor canvas is loaded with:
+	 * Elementor, Divi's Visual Builder, Beaver Builder, Oxygen, WPBakery's
+	 * frontend editor and Bricks.
+	 */
+	private const EDITOR_QUERY_ARGS = [ 'elementor-preview', 'et_fb', 'fl_builder', 'ct_builder', 'vc_editable', 'bricks' ];
+
 	public function __construct(
 		private Settings_Manager $settings,
 		private Index_Config $index_config,
@@ -44,6 +51,28 @@ final class Frontend_Config {
 		private Language_Config $language_config,
 		private Facet_Config $facet_config
 	) {}
+
+	/**
+	 * Whether this page is a page builder's editor or the Customizer's
+	 * preview. Its searches are the person editing it, not a visitor, so the
+	 * storefront marks them `preview`, which Searcio meters but does not count
+	 * in the site's search statistics.
+	 *
+	 * Filterable through `webhead_search_cloud/storefront/is_preview` for an
+	 * editor this list does not know.
+	 */
+	private function is_preview(): bool {
+		$editor = is_customize_preview();
+
+		foreach ( self::EDITOR_QUERY_ARGS as $arg ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only reads which page this is.
+			if ( isset( $_GET[ $arg ] ) ) {
+				$editor = true;
+			}
+		}
+
+		return (bool) apply_filters( 'webhead_search_cloud/storefront/is_preview', $editor );
+	}
 
 	/**
 	 * Currency symbol, position and decimal count, sourced from WooCommerce so
@@ -131,6 +160,7 @@ final class Frontend_Config {
 			// ever match it - sending every visitor to native-search fallback.
 			'currentLang'     => $this->language->is_multilingual() ? $this->language->current_language() : '',
 			'enabledLanguages' => $this->language->is_multilingual() ? $this->language_config->enabled_languages() : [],
+			'preview'         => $this->is_preview(),
 			'i18n'            => [
 				'placeholder'     => __( 'Search…', 'searcio' ),
 				'noResults'       => __( 'No results found.', 'searcio' ),
