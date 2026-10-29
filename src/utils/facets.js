@@ -77,20 +77,38 @@ const KNOWN_FIELD_LABELS = () => ( {
 /**
  * "review_count" -> "Review count". Field facets carry no separate
  * human-readable label from the API, so the field name itself is the only
- * thing available for a chip group's heading - unless it is one of the
- * plugin's own fields, which have translated names.
+ * thing available for a chip group's heading - unless the site names the
+ * field (`labels`), or it is one of the plugin's own fields, which have
+ * translated names.
+ *
+ * @param {string}                field
+ * @param {Object<string,string>} [labels] The site's own names for its fields,
+ *                                         in the page's language: `fieldLabels`
+ *                                         of the storefront config, e.g.
+ *                                         `{ attr_color: 'Farbe' }`.
+ * @return {string}
  */
-export const humanizeFieldLabel = ( field ) => {
-	const known = KNOWN_FIELD_LABELS()[ String( field || '' ) ];
+export const humanizeFieldLabel = ( field, labels ) => {
+	const key = String( field || '' );
 
-	if ( known ) {
-		return known;
+	// Own properties only: a field called "constructor" is not named by
+	// `Object.prototype`.
+	const named = ( names ) => {
+		const name = names && Object.prototype.hasOwnProperty.call( names, key ) ? names[ key ] : '';
+
+		return 'string' === typeof name ? name.trim() : '';
+	};
+
+	const name = named( labels ) || named( KNOWN_FIELD_LABELS() );
+
+	if ( '' !== name ) {
+		return name;
 	}
 
 	// WooCommerce product attributes reach the index prefixed (`attr_color`,
 	// `pa_size`). The prefix is an indexing detail, not something to show a
 	// shopper - "Attr color" is not a label anyone would write.
-	const text = String( field || '' )
+	const text = key
 		.replace( /^(attr|pa|meta|tax)[_-]+/i, '' )
 		.replace( /[_-]+/g, ' ' )
 		.trim();

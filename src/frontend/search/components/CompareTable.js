@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
+import { getConfig } from '../../../utils/api';
 import { formatPrice, PRICE_FIELDS } from '../../../utils/currency';
 import { humanizeFieldLabel } from '../../../utils/facets';
 import { PLACEHOLDER_IMAGE_DATA_URI } from '../../../utils/placeholderImage';
@@ -24,18 +25,27 @@ const HEADER_OR_INTERNAL = new Set( [
  * once prefixed by the WooCommerce attribute indexer (`attr_color`) - which
  * would render two identical rows. Both humanize to the same label, so the
  * label is what decides: first key with a given label wins.
+ *
+ * The site may name only one of them ("Farbe" for `attr_color`), so a key is
+ * known by its humanized key as well as by its name, and a key the site names
+ * is taken first: the row is the one that reads "Farbe", not "Color".
+ *
+ * @param {string[]}              keys
+ * @param {Object<string,string>} [labels] The site's own field names.
  */
-const dedupeByLabel = ( keys ) => {
+const dedupeByLabel = ( keys, labels ) => {
 	const seen = new Set();
+	const isNamed = ( key ) => humanizeFieldLabel( key, labels ) !== humanizeFieldLabel( key );
+	const ordered = [ ...keys.filter( isNamed ), ...keys.filter( ( key ) => ! isNamed( key ) ) ];
 
-	return keys.filter( ( key ) => {
-		const label = humanizeFieldLabel( key ).toLowerCase();
+	return ordered.filter( ( key ) => {
+		const names = [ humanizeFieldLabel( key ), humanizeFieldLabel( key, labels ) ].map( ( name ) => name.toLowerCase() );
 
-		if ( seen.has( label ) ) {
+		if ( names.some( ( name ) => seen.has( name ) ) ) {
 			return false;
 		}
 
-		seen.add( label );
+		names.forEach( ( name ) => seen.add( name ) );
 
 		return true;
 	} );
@@ -90,10 +100,12 @@ const formatValue = ( value, field ) => {
  * with the rows that differ first. Empty when the products carry nothing but a
  * title, a link, an image and a price - there is then nothing to compare.
  *
- * @param {Array<Object>} products Assistant hits ({ id, source }).
+ * @param {Array<Object>}         products Assistant hits ({ id, source }).
+ * @param {Object<string,string>} [labels] The site's own field names; the
+ *                                         storefront config's by default.
  * @return {string[]} Field keys, in display order.
  */
-export const comparisonRows = ( products ) => {
+export const comparisonRows = ( products, labels = getConfig().fieldLabels ) => {
 	const candidates = [];
 
 	products.forEach( ( product ) => {
@@ -112,10 +124,10 @@ export const comparisonRows = ( products ) => {
 		return values.some( ( value ) => value !== values[ 0 ] );
 	};
 
-	return dedupeByLabel( candidates ).sort( ( a, b ) => {
+	return dedupeByLabel( candidates, labels ).sort( ( a, b ) => {
 		const diff = Number( differs( b ) ) - Number( differs( a ) );
 
-		return 0 !== diff ? diff : humanizeFieldLabel( a ).localeCompare( humanizeFieldLabel( b ) );
+		return 0 !== diff ? diff : humanizeFieldLabel( a, labels ).localeCompare( humanizeFieldLabel( b, labels ) );
 	} );
 };
 
@@ -128,7 +140,8 @@ export const comparisonRows = ( products ) => {
  * @param {Array<Object>} props.products Assistant hits ({ id, source }).
  */
 const CompareTable = ( { products } ) => {
-	const rows = comparisonRows( products );
+	const labels = getConfig().fieldLabels;
+	const rows = comparisonRows( products, labels );
 
 	return (
 		<div className="whsc-compare">
@@ -161,7 +174,7 @@ const CompareTable = ( { products } ) => {
 				<tbody>
 					{ rows.map( ( key ) => (
 						<tr key={ key }>
-							<th scope="row" className="whsc-compare__label">{ humanizeFieldLabel( key ) }</th>
+							<th scope="row" className="whsc-compare__label">{ humanizeFieldLabel( key, labels ) }</th>
 							{ products.map( ( product ) => (
 								<td key={ product.id }>{ formatValue( product.source?.[ key ], key ) }</td>
 							) ) }

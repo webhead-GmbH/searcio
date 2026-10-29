@@ -121,6 +121,7 @@ const SearchModal = ({
 	const config = getConfig();
 	const i18n = config.i18n || {};
 	const typeLabels = config.typeLabels || {};
+	const fieldLabels = config.fieldLabels || {};
 	const suggestionsId = useId();
 	const statusId = useId();
 
@@ -1262,8 +1263,8 @@ const SearchModal = ({
 
 				{facetGroupEntries.length > 0 && facetGroupEntries.map(([field, values]) => (
 					<div className="whsc-facet-group" key={field}>
-						<span className="whsc-facet-group__label">{humanizeFieldLabel(field)}</span>
-						<div className="whsc-facets" role="group" aria-label={humanizeFieldLabel(field)}>
+						<span className="whsc-facet-group__label">{humanizeFieldLabel(field, fieldLabels)}</span>
+						<div className="whsc-facets" role="group" aria-label={humanizeFieldLabel(field, fieldLabels)}>
 							{values.map((entry) => (
 								<button
 									key={entry.value}
@@ -1286,6 +1287,7 @@ const SearchModal = ({
 						active={activeRanges}
 						onApply={onRangeApply}
 						busy={isSearching}
+						labels={fieldLabels}
 					/>
 				)}
 

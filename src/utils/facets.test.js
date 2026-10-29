@@ -139,6 +139,46 @@ describe( 'humanizeFieldLabel for the plugin\'s own fields', () => {
 	} );
 } );
 
+describe( 'humanizeFieldLabel with the site\'s own names', () => {
+	/**
+	 * `fieldLabels` of the storefront config: the attribute's name and the
+	 * mapped taxonomy's name, in the page's language. Humanized from the key, a
+	 * German shop's facet headings read "Color", "Size" and "Brand".
+	 */
+	const labels = { attr_color: 'Farbe', 'attr_shoe-size': 'Schuhgröße', brand: 'Marke' };
+
+	it( 'names an attribute and a mapped taxonomy as the site does', () => {
+		expect( humanizeFieldLabel( 'attr_color', labels ) ).toBe( 'Farbe' );
+		expect( humanizeFieldLabel( 'attr_shoe-size', labels ) ).toBe( 'Schuhgröße' );
+		expect( humanizeFieldLabel( 'brand', labels ) ).toBe( 'Marke' );
+	} );
+
+	it( 'prefers the site\'s name to the plugin\'s own', () => {
+		expect( humanizeFieldLabel( 'categories', { categories: 'Kategorie' } ) ).toBe( 'Kategorie' );
+	} );
+
+	it( 'falls back to the plugin\'s name and then to the key for a field the site does not name', () => {
+		expect( humanizeFieldLabel( 'categories', labels ) ).toBe( 'Categories' );
+		expect( humanizeFieldLabel( 'attr_material', labels ) ).toBe( 'Material' );
+	} );
+
+	it( 'ignores a name that is empty or not text', () => {
+		expect( humanizeFieldLabel( 'attr_color', { attr_color: '  ' } ) ).toBe( 'Color' );
+		expect( humanizeFieldLabel( 'attr_color', { attr_color: 7 } ) ).toBe( 'Color' );
+	} );
+
+	/** PHP sends an empty map as `[]`, and the config may not carry one at all. */
+	it( 'takes an empty list or no names at all', () => {
+		expect( humanizeFieldLabel( 'attr_color', [] ) ).toBe( 'Color' );
+		expect( humanizeFieldLabel( 'attr_color', undefined ) ).toBe( 'Color' );
+	} );
+
+	it( 'does not take a name from the object prototype', () => {
+		expect( humanizeFieldLabel( 'constructor', {} ) ).toBe( 'Constructor' );
+		expect( humanizeFieldLabel( 'constructor' ) ).toBe( 'Constructor' );
+	} );
+} );
+
 describe( 'humanizeFieldLabel prefixes', () => {
 	/**
 	 * WooCommerce attributes reach the index prefixed. Showing "Attr color" as a

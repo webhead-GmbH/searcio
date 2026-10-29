@@ -297,6 +297,43 @@ final class Woo {
 	}
 
 	/**
+	 * The attribute fields this mapping writes, each with the attribute's name
+	 * as the shop shows it to the current visitor (see {@see self::attribute_label()}).
+	 *
+	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
+	 * @return array<string,string>
+	 */
+	public function attribute_labels( array $woo ): array {
+		$labels = [];
+
+		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
+			$label = taxonomy_exists( $taxonomy ) ? $this->attribute_label( $taxonomy ) : '';
+
+			if ( '' !== $label ) {
+				$labels[ $this->attribute_field( $taxonomy ) ] = $label;
+			}
+		}
+
+		return $labels;
+	}
+
+	/**
+	 * A global attribute's name in the language of the current request: "Farbe"
+	 * for `pa_color` on a German page. It is read through `wc_attribute_label()`,
+	 * whose `woocommerce_attribute_label` filter is where WooCommerce
+	 * Multilingual, Polylang for WooCommerce and a shop's own code name an
+	 * attribute per language. Empty for a taxonomy that is not a WooCommerce
+	 * attribute, or when WooCommerce is inactive.
+	 */
+	public function attribute_label( string $taxonomy ): string {
+		if ( ! $this->is_active() || ! function_exists( 'taxonomy_is_product_attribute' ) || ! taxonomy_is_product_attribute( $taxonomy ) ) {
+			return '';
+		}
+
+		return trim( Term_Names::decode( (string) wc_attribute_label( $taxonomy ) ) );
+	}
+
+	/**
 	 * @param  array<string,mixed>  $woo
 	 * @return array<int,string>
 	 */

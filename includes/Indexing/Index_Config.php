@@ -121,6 +121,48 @@ final class Index_Config {
 		return array_values( array_unique( $fields ) );
 	}
 
+	/**
+	 * Field => the name the site gives what it holds, in the language of the
+	 * current request, for the fields a storefront would otherwise have to name
+	 * from their key: a WooCommerce attribute ("Farbe" for `attr_color`) and a
+	 * field mapped from a taxonomy ("Marke" for a `brand` field read from
+	 * `product_brand`). A field read from post meta or a post property has no
+	 * name anywhere but its key, and is left out.
+	 *
+	 * A field the WooCommerce mapping writes keeps the name the storefront
+	 * gives it, whatever a post type maps under the same name: one index holds
+	 * every type's documents, so the demo shop's `categories` facet lists
+	 * product categories and the journal's categories together, and a product's
+	 * own field overwrites a mapped one in its document (see
+	 * {@see Document_Builder::build()}).
+	 *
+	 * @return array<string,string>
+	 */
+	public function field_labels(): array {
+		$blocks = array_filter( $this->all(), static fn ( array $block ): bool => ! empty( $block['enabled'] ) );
+		$woo    = $blocks[ Woo::POST_TYPE ]['woo'] ?? null;
+		$taken  = null === $woo ? [] : $this->woo->field_names( $woo );
+		$labels = [];
+
+		foreach ( $blocks as $block ) {
+			foreach ( $block['fields'] as $field ) {
+				$as = (string) $field['as'];
+
+				if ( isset( $labels[ $as ] ) || in_array( $as, $taken, true ) ) {
+					continue;
+				}
+
+				$label = $this->source_label( (string) $field['source'] );
+
+				if ( '' !== $label ) {
+					$labels[ $as ] = $label;
+				}
+			}
+		}
+
+		return null === $woo ? $labels : array_merge( $labels, $this->woo->attribute_labels( $woo ) );
+	}
+
 	public function config_version(): int {
 		return (int) $this->settings->get( Plugin_Settings::CONFIG_VERSION );
 	}
@@ -277,6 +319,58 @@ final class Index_Config {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * The name of what a `taxonomy:` source reads, for {@see self::field_labels()}:
+	 * the attribute's name for a WooCommerce attribute, otherwise the
+	 * taxonomy's singular name, which a heading over a list of its terms reads
+	 * as ("Marke", where the plural is "Produktmarken"). Empty for any other
+	 * source, and for a taxonomy with no name of its own.
+	 */
+	private function source_label( string $source ): string {
+		[ $scheme, $taxonomy ] = array_pad( explode( ':', $source, 2 ), 2, '' );
+		$object                = get_taxonomy( trim( $taxonomy ) );
+
+		if ( 'taxonomy' !== strtolower( trim( $scheme ) ) || ! $object instanceof \WP_Taxonomy ) {
+			return '';
+		}
+
+		$label = $this->woo->attribute_label( $object->name );
+
+		if ( '' !== $label ) {
+			return $label;
+		}
+
+		if ( $this->is_unnamed_taxonomy( $object ) ) {
+			return '';
+		}
+
+		$label = (string) ( $object->labels->singular_name ?? '' );
+
+		if ( '' === $label ) {
+			$label = (string) ( $object->labels->name ?? '' );
+		}
+
+		return trim( Term_Names::decode( $label ) );
+	}
+
+	/**
+	 * Whether a taxonomy was registered without a name of its own. WordPress
+	 * then names it "Tags" or "Categories", after its own two, which says
+	 * nothing about what it holds - the field's key says more. Those two are
+	 * named by them.
+	 */
+	private function is_unnamed_taxonomy( \WP_Taxonomy $object ): bool {
+		if ( in_array( $object->name, [ 'category', 'post_tag' ], true ) ) {
+			return false;
+		}
+
+		$defaults = \WP_Taxonomy::get_default_labels();
+		$kind     = $object->hierarchical ? 1 : 0;
+
+		return ( $defaults['name'][ $kind ] ?? null ) === ( $object->labels->name ?? null )
+			&& ( $defaults['singular_name'][ $kind ] ?? null ) === ( $object->labels->singular_name ?? null );
 	}
 
 	/**

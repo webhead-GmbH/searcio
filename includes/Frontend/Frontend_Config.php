@@ -110,6 +110,11 @@ final class Frontend_Config {
 			'siteHome'        => home_url( '/' ),
 			'popularSearches' => array_values( (array) $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
 			'typeLabels'      => $this->index_config->indexable_post_type_labels(),
+			// Facet headings, comparison rows and quiz answers for the fields the
+			// site names itself (WooCommerce attributes, mapped taxonomies), in
+			// the language of the page being built - which is why this is read
+			// here, per request, and not stored with the index configuration.
+			'fieldLabels'     => $this->index_config->field_labels(),
 			'currency'        => $this->currency_config(),
 			'credit'          => $this->credit(),
 			// Both gated by is_multilingual(), not just currentLang: Language_Config's

@@ -21,8 +21,9 @@ import { humanizeFieldLabel } from '../../../utils/facets';
  * @param {Object<string,{min: string, max: string}>} props.active  Bounds currently applied.
  * @param {(field: string, bound: {min: string, max: string}) => void} props.onApply
  * @param {boolean}  props.busy
+ * @param {Object<string,string>} [props.labels] The site's own field names.
  */
-const RangeFilters = ( { fields, active, onApply, busy } ) => {
+const RangeFilters = ( { fields, active, onApply, busy, labels } ) => {
 	const entries = Object.entries( fields || {} );
 	const [ drafts, setDrafts ] = useState( {} );
 	const activeCount = Object.keys( active || {} ).length;
@@ -51,7 +52,7 @@ const RangeFilters = ( { fields, active, onApply, busy } ) => {
 	return (
 		<>
 			{ entries.map( ( [ field, span ] ) => {
-				const label = humanizeFieldLabel( field );
+				const label = humanizeFieldLabel( field, labels );
 				const draft = draftFor( field );
 				const applied = active?.[ field ] || {};
 				const hasApplied = '' !== ( applied.min || '' ) || '' !== ( applied.max || '' );

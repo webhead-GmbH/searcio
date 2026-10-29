@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { currentLangFilter, fetchQuizzes, search, trackClick } from '../../../utils/api';
+import { currentLangFilter, fetchQuizzes, getConfig, search, trackClick } from '../../../utils/api';
 import { appendHits, buildFilterParams, hasMorePages, humanizeFieldLabel } from '../../../utils/facets';
 import { applyOption, firstQuestion, nextQuestion, normalizeQuizzes, quizProgress } from '../../../utils/quiz';
 import { ResultCard } from './templates';
@@ -360,7 +360,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 						<ul className="whsc-quiz__answers" aria-label={ __( 'Your answers', 'searcio' ) }>
 							{ answers.map( ( [ field, value ] ) => (
 								<li className="whsc-quiz__answer" key={ field }>
-									<span className="whsc-quiz__answer-field">{ humanizeFieldLabel( field ) }</span>
+									<span className="whsc-quiz__answer-field">{ humanizeFieldLabel( field, getConfig().fieldLabels ) }</span>
 									<span className="whsc-quiz__answer-value">{ answerLabels[ field ] || value }</span>
 								</li>
 							) ) }
