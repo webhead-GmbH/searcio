@@ -10,11 +10,15 @@
 module.exports = {
 	preset: '@wordpress/jest-preset-default',
 	transform: {
-		'\\.[jt]sx?$': [
+		'\\.m?[jt]sx?$': [
 			'babel-jest',
 			{ presets: [ '@wordpress/babel-preset-default' ] },
 		],
 	},
+	// `@wordpress/ui` loads `@wordpress/theme`, which is published as ES
+	// modules only. Compiled, it lets a test draw the real controls instead
+	// of a stand-in that cannot show how they hand over a value.
+	transformIgnorePatterns: [ '/node_modules/(?!@wordpress/theme/)' ],
 	// A checkout holds other checkouts under `.claude/worktrees`, each with a
 	// suite of its own; the end-to-end specs are Playwright's.
 	testPathIgnorePatterns: [

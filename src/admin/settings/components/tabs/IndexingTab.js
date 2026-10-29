@@ -7,6 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 import {Grid} from '../../../../components/Layout';
 import {showToast} from '../../../../toast';
+import {selectProps} from '../../../../utils/select';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 
@@ -15,11 +16,6 @@ const CONFIG_PATH =
 	pluginData?.api?.indexingConfigPath || '/webhead-search-cloud/v1/indexing/config';
 
 const NONE = '';
-
-// `SelectControl` shows its placeholder for an empty string. The option that
-// stands for "nothing" is the item whose value is null, so the stored empty
-// string is handed over as null and taken back as the empty string.
-const selected = (value) => ('' === value || undefined === value ? null : value);
 
 const KIND_OPTIONS = [
 	{value: 'meta', label: __('Custom field', 'searcio')},
@@ -90,7 +86,7 @@ const Section = ({title, description, children}) => (
 	</Stack>
 );
 
-const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
+export const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 	const {kind, value} = parseSource(field.source);
 
 	const setKind = (nextKind) => onChange({...field, source: `${nextKind}:`});
@@ -101,12 +97,11 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 			return (
 				<SelectControl
 					label={__('Value', 'searcio')}
-					value={selected(value)}
-					items={[
-						{value: null, label: __('- Select -', 'searcio')},
-						...PROPERTY_OPTIONS,
-					]}
-					onValueChange={setValue}
+					{...selectProps(
+						[{value: null, label: __('- Select -', 'searcio')}, ...PROPERTY_OPTIONS],
+						value,
+						setValue
+					)}
 				/>
 			);
 		}
@@ -115,15 +110,17 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 			return (
 				<SelectControl
 					label={__('Taxonomy', 'searcio')}
-					value={selected(value)}
-					items={[
-						{value: null, label: __('- Select -', 'searcio')},
-						...taxonomies.map((taxonomy) => ({
-							value: taxonomy.slug,
-							label: taxonomy.label,
-						})),
-					]}
-					onValueChange={setValue}
+					{...selectProps(
+						[
+							{value: null, label: __('- Select -', 'searcio')},
+							...taxonomies.map((taxonomy) => ({
+								value: taxonomy.slug,
+								label: taxonomy.label,
+							})),
+						],
+						value,
+						setValue
+					)}
 				/>
 			);
 		}
@@ -150,9 +147,7 @@ const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 			/>
 			<SelectControl
 				label={__('From', 'searcio')}
-				value={kind}
-				items={KIND_OPTIONS}
-				onValueChange={setKind}
+				{...selectProps(KIND_OPTIONS, kind, setKind)}
 			/>
 			{renderValue()}
 			<Button
@@ -326,30 +321,38 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 									<SelectControl
 										label={__('Title', 'searcio')}
 										description={__('The main heading of each result. Required.', 'searcio')}
-										value={block.title_source}
-										items={sourceOptions(sources, postType.taxonomies, false)}
-										onValueChange={(val) => set('title_source', val)}
+										{...selectProps(
+											sourceOptions(sources, postType.taxonomies, false),
+											block.title_source,
+											(val) => set('title_source', val)
+										)}
 									/>
 									<SelectControl
 										label={__('Body text', 'searcio')}
 										description={__('The text Searcio looks through for matches.', 'searcio')}
-										value={selected(block.content_source)}
-										items={sourceOptions(sources, postType.taxonomies, true)}
-										onValueChange={(val) => set('content_source', val ?? NONE)}
+										{...selectProps(
+											sourceOptions(sources, postType.taxonomies, true),
+											block.content_source,
+											(val) => set('content_source', val ?? NONE)
+										)}
 									/>
 									<SelectControl
 										label={__('Result link', 'searcio')}
 										description={__('Where clicking a result takes the visitor.', 'searcio')}
-										value={selected(block.url_source)}
-										items={sourceOptions(sources, postType.taxonomies, true)}
-										onValueChange={(val) => set('url_source', val ?? NONE)}
+										{...selectProps(
+											sourceOptions(sources, postType.taxonomies, true),
+											block.url_source,
+											(val) => set('url_source', val ?? NONE)
+										)}
 									/>
 									<SelectControl
 										label={__('Thumbnail image', 'searcio')}
 										description={__('Image shown next to each result.', 'searcio')}
-										value={selected(block.image_source)}
-										items={sourceOptions(sources, postType.taxonomies, true)}
-										onValueChange={(val) => set('image_source', val ?? NONE)}
+										{...selectProps(
+											sourceOptions(sources, postType.taxonomies, true),
+											block.image_source,
+											(val) => set('image_source', val ?? NONE)
+										)}
 									/>
 								</Grid>
 							</Section>
