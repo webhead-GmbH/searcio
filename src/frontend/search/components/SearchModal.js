@@ -63,6 +63,23 @@ const nativeSearchUrl = (query) => {
 };
 
 /**
+ * Whether this run of a typing effect is the one a committed search caused
+ * by putting `skipRef.current` in the field. The mark is used up by the first
+ * run either way, so a later query is never skipped for it.
+ *
+ * @param {{current: ?string}} skipRef
+ * @param {string}             trimmedQuery
+ * @return {boolean}
+ */
+const takeSkip = (skipRef, trimmedQuery) => {
+	const marked = skipRef.current;
+
+	skipRef.current = null;
+
+	return marked === trimmedQuery;
+};
+
+/**
  * Scroll one tab fully into the sideways-scrolling tab row, by the least
  * distance that does it.
  *
@@ -196,21 +213,27 @@ const SearchModal = ({
 	const liveSearchTimer = useRef(null);
 	const recognitionRef = useRef(null);
 	const inputRef = useRef(null);
-	// Set true by an explicit (committed) search so the very next run of the
-	// autocomplete effect skips re-fetching/re-opening the dropdown over the
-	// results. Live "while typing" searches leave it false so suggestions keep
-	// updating as the visitor types.
-	const skipSuggestRef = useRef(false);
+	// Set by an explicit (committed) search to the query it put in the field, so
+	// the run of the autocomplete effect that query causes skips
+	// re-fetching/re-opening the dropdown over the results. Live "while typing"
+	// searches leave it alone so suggestions keep updating as the visitor types.
+	// It holds the query rather than a yes: a committed search for what the
+	// field already holds (Enter) changes nothing, so the effect does not run
+	// for it, and a yes stayed set and swallowed the visitor's next keystroke.
+	const skipSuggestRef = useRef(null);
 	// Like `skipSuggestRef`, but stops the "while typing" live-search effect
 	// from firing a second, redundant request right after a committed search
 	// (clicking a recent/popular/suggestion item sets the query, which would
 	// otherwise trigger the live effect too).
-	const skipLiveSearchRef = useRef(false);
+	const skipLiveSearchRef = useRef(null);
 	// Aborts the previous in-flight search when a newer one starts, and a
 	// monotonic id so only the latest search may update state (rapid clicks no
 	// longer race stale responses onto the screen).
 	const abortRef = useRef(null);
 	const searchSeq = useRef(0);
+	// The same for the highlights: a newer load replaces what an older one
+	// would still write.
+	const highlightsSeq = useRef(0);
 
 	// Type filters only make sense when the placement isn't already locked to
 	// a single type.
@@ -363,6 +386,15 @@ const SearchModal = ({
 			return;
 		}
 
+		const seq = ++highlightsSeq.current;
+		const isLatest = () => seq === highlightsSeq.current;
+		// The chips, the field facets and the ranges are the search's once one
+		// has started: they describe the results on screen. The first, empty
+		// request of a modal can take seconds, and its answer for the whole
+		// catalogue replaced the chips over the results of the query typed
+		// meanwhile ("Products 152" over 20 results).
+		const searchBefore = searchSeq.current;
+
 		setIsLoadingHighlights(true);
 		const started = Date.now();
 
@@ -380,8 +412,17 @@ const SearchModal = ({
 		try {
 			const response = await search('', {type, filters, ranges, perPage: 12});
 
+			if (!isLatest()) {
+				return;
+			}
+
 			setHighlights(response.hits || []);
 			setHighlightsSearchId(response.search_id || '');
+
+			if (searchBefore !== searchSeq.current) {
+				return;
+			}
+
 			// Only refresh the type chip list when this request had no type
 			// filter applied - confirmed live that this API's `facets.types`
 			// collapses to just the active selection otherwise, which would
@@ -392,10 +433,15 @@ const SearchModal = ({
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
 			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 		} catch (e) {
-			setHighlights([]);
+			if (isLatest()) {
+				setHighlights([]);
+			}
 		} finally {
 			await delay(Math.max(0, MIN_LOADING - (Date.now() - started)));
-			setIsLoadingHighlights(false);
+
+			if (isLatest()) {
+				setIsLoadingHighlights(false);
+			}
 		}
 	}, [activeFacets, activeRanges, highlightsSource]);
 
@@ -409,9 +455,7 @@ const SearchModal = ({
 	useEffect(() => {
 		window.clearTimeout(suggestTimer.current);
 
-		if (skipSuggestRef.current) {
-			skipSuggestRef.current = false;
-
+		if (takeSkip(skipSuggestRef, trimmedQuery)) {
 			return;
 		}
 
@@ -455,12 +499,12 @@ const SearchModal = ({
 		if (commit) {
 			setSuggestions([]);
 			setSuggestionsDismissed(true);
-			skipSuggestRef.current = true;
+			skipSuggestRef.current = trimmed;
 			// A committed query also arrives at the live-search effect; skip its
-			// next run and cancel any already-scheduled live-search timer so the
-			// same query isn't fetched a second time (which also defeats the
-			// response cache).
-			skipLiveSearchRef.current = true;
+			// run for this query and cancel any already-scheduled live-search
+			// timer so the same query isn't fetched a second time (which also
+			// defeats the response cache).
+			skipLiveSearchRef.current = trimmed;
 			window.clearTimeout(liveSearchTimer.current);
 		}
 
@@ -602,8 +646,8 @@ const SearchModal = ({
 
 		// Clear the typed query so the results on screen are unambiguously the
 		// photo's, and stop the live-search effect reacting to that change.
-		skipLiveSearchRef.current = true;
-		skipSuggestRef.current = true;
+		skipLiveSearchRef.current = '';
+		skipSuggestRef.current = '';
 		setQuery('');
 		setSuggestions([]);
 		setSuggestionsDismissed(true);
@@ -682,9 +726,7 @@ const SearchModal = ({
 		window.clearTimeout(liveSearchTimer.current);
 
 		// A committed search already ran this query; don't duplicate it here.
-		if (skipLiveSearchRef.current) {
-			skipLiveSearchRef.current = false;
-
+		if (takeSkip(skipLiveSearchRef, trimmedQuery)) {
 			return;
 		}
 
@@ -710,7 +752,7 @@ const SearchModal = ({
 	useEffect(() => {
 		if (editorPreview && '' !== trimmedQuery) {
 			setSuggestionsDismissed(true);
-			skipSuggestRef.current = true;
+			skipSuggestRef.current = trimmedQuery;
 			void runSearch(query, buildTypeParam(scopeType, activeTypes), false);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the preview opens.

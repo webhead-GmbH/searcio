@@ -252,6 +252,115 @@ test.describe( 'Search modal', () => {
 	} );
 
 	/**
+	 * A committed search marks the run of the typing effects that its own
+	 * query causes. Enter on what the field already holds causes none, and the
+	 * mark stayed and swallowed the next key: "hoodies" was neither searched
+	 * nor suggested, and only the key after it was.
+	 */
+	test( 'the key typed after Enter searches and suggests as the keys before it did', async ( { page, requestUtils } ) => {
+		const searched = [];
+		const suggested = [];
+
+		await mockSearchCloud( page, {
+			suggestions: [ 'Hoodie' ],
+			onSearch: ( url ) => searched.push( url.searchParams.get( 'q' ) ),
+		} );
+		page.on( 'request', ( request ) => {
+			const url = new URL( request.url() );
+
+			if ( url.pathname.endsWith( '/search/suggest' ) ) {
+				suggested.push( url.searchParams.get( 'q' ) );
+			}
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon', searchTrigger: 'type' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'hoodie' );
+		await expect( widget.cards ).toHaveCount( 1 );
+
+		await page.keyboard.type( 's' );
+
+		await expect.poll( () => searched ).toContain( 'hoodies' );
+		await expect.poll( () => suggested ).toContain( 'hoodies' );
+	} );
+
+	/**
+	 * The first, empty request of a modal can take seconds on a cold index.
+	 * Its answer, for the whole catalogue, replaced the chips over the results
+	 * of the query typed meanwhile.
+	 */
+	test( 'a slow highlights answer leaves the chips of the search typed meanwhile', async ( { page, requestUtils } ) => {
+		// Marks that the highlights answer has been read, a frame and a task
+		// after the modal had it: anything it was going to overwrite has been
+		// overwritten by then.
+		await page.addInitScript( () => {
+			const fetch = window.fetch;
+
+			window.fetch = async ( ...args ) => {
+				const response = await fetch( ...args );
+				const url = new URL( String( args[ 0 ] ), window.location.href );
+
+				if ( url.pathname.endsWith( '/api/v1/search' ) && ! url.searchParams.get( 'q' ) ) {
+					const json = response.json.bind( response );
+
+					response.json = async () => {
+						const data = await json();
+
+						window.requestAnimationFrame( () => window.setTimeout( () => {
+							window.whscHighlightsRead = true;
+						} ) );
+
+						return data;
+					};
+				}
+
+				return response;
+			};
+		} );
+		await mockSearchCloud( page, {
+			facets: ( url ) => ( url.searchParams.get( 'q' )
+				? { types: [ { value: 'post', count: 2 } ] }
+				: { types: [ { value: 'post', count: 152 }, { value: 'page', count: 16 } ] } ),
+			searchDelay: ( url ) => ( url.searchParams.get( 'q' ) ? 0 : 1500 ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		const counts = widget.modal.locator( '.whsc-facets .whsc-facet__count' );
+
+		await widget.openModal();
+		await widget.search( 'guide' );
+		await expect( counts ).toHaveText( [ '2' ] );
+
+		await page.waitForFunction( () => window.whscHighlightsRead );
+
+		await expect( counts ).toHaveText( [ '2' ] );
+	} );
+
+	/**
+	 * Titles reach the index as they were typed, quotes and ampersands
+	 * included, where they used to arrive as HTML entities. The suggestion
+	 * and the card print them as text.
+	 */
+	test( 'prints a title with quotes, an apostrophe and an ampersand as it was typed', async ( { page, requestUtils } ) => {
+		const title = 'Fjellmark Women\'s "Storm" Jacket - Salt & Pepper';
+
+		await mockSearchCloud( page, { hits: [ postHit( { title } ) ], suggestions: [ title ] } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.input.fill( 'storm' );
+
+		await expect( widget.modal.getByRole( 'option', { name: title } ) ).toBeVisible();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect( widget.cards.locator( '.whsc-card__title' ) ).toHaveText( title );
+	} );
+
+	/**
 	 * The stock line was the one card colour no placement could change: a fixed
 	 * green and red. The defaults stay those colours; a placement's own win.
 	 */

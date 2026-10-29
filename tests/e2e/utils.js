@@ -46,7 +46,7 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {import('@playwright/test').Page} page
  * @param {Object} options
  * @param {Array|Function} [options.hits]        `/search` hits, or a `(URL) => hits` function.
- * @param {Object}         [options.facets]      `/search` facets ({ types: [...] , field: [...] }).
+ * @param {Object|Function} [options.facets]     `/search` facets ({ types: [...] , field: [...] }), or a `(URL) => facets` function.
  * @param {Array}          [options.suggestions] `/search/suggest` suggestions.
  * @param {Array}          [options.popular]     `/search/popular` items ({ query }).
  * @param {Array}          [options.templates]   `/card-templates` templates.
@@ -189,7 +189,7 @@ export async function mockSearchCloud( page, options = {} ) {
 				total: null === total ? list.length : ( 'function' === typeof total ? total( url ) : total ),
 				page: Number( url.searchParams.get( 'page' ) || 1 ),
 				per_page: Number( url.searchParams.get( 'per_page' ) || 20 ),
-				facets,
+				facets: 'function' === typeof facets ? facets( url ) : facets,
 				banner,
 			} );
 		}
