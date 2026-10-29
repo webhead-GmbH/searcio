@@ -21,6 +21,7 @@ use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\DTO\Floating_Button;
 use Webhead\WP\SearchCloud\DTO\Placement_Options;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -57,6 +58,16 @@ final class Placement_Preview {
 			'url'   => add_query_arg( self::QUERY, '1', home_url( '/' ) ),
 			'nonce' => wp_create_nonce( self::NONCE ),
 		];
+	}
+
+	/**
+	 * The preview's searches are the admin's, not a visitor's: the storefront
+	 * marks them `preview`, which Searcio meters but keeps out of the site's
+	 * search statistics.
+	 */
+	#[Filter( 'webhead_search_cloud/storefront/is_preview' )]
+	public function mark_preview( mixed $is_preview ): bool {
+		return self::is_preview() || (bool) $is_preview;
 	}
 
 	#[Action( 'template_redirect', priority: 1 )]

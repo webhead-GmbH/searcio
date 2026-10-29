@@ -178,6 +178,18 @@ final class Site_Placement_Test extends Integration_Test_Case {
 		$this->assertStringNotContainsString( 'data-whsc-trigger', get_search_form( [ 'echo' => false ] ) );
 	}
 
+	/**
+	 * Its searches are the admin's: once the storefront config carries the
+	 * flag, they are marked `preview` and left out of the search statistics.
+	 */
+	public function test_the_preview_marks_its_searches_as_a_preview(): void {
+		$this->assertFalse( (bool) apply_filters( 'webhead_search_cloud/storefront/is_preview', false ) );
+
+		$_GET[ Placement_Preview::QUERY ] = '1';
+
+		$this->assertTrue( (bool) apply_filters( 'webhead_search_cloud/storefront/is_preview', false ) );
+	}
+
 	public function test_the_storefront_is_told_the_selectors_only_while_they_are_on(): void {
 		$this->config()->save( [ 'selectors' => [ '.search-toggle-open' ], 'shortcut' => true ] );
 		$this->assertSame( [ 'selectors' => [], 'shortcut' => true ], $this->storefront_placement() );
