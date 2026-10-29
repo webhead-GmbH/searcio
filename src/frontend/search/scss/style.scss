@@ -2136,6 +2136,18 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	&::-webkit-scrollbar {
 		display: none;
 	}
+
+	/* More to the end: the row fades out there, as the filter row does on a
+	 * phone, so a tab cut at the edge reads as cut. */
+	&.has-more {
+		-webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+		mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+	}
+
+	&.has-more:dir(rtl) {
+		-webkit-mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent);
+		mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent);
+	}
 }
 
 .whsc-modal-tab {
@@ -3459,6 +3471,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	background: transparent;
 }
 
+/* An empty type inside the switch is dimmed like an empty tile, without the
+ * tile's outline: the switch draws the frame around all of its buttons. */
+.whsc-modal .whsc-facet.whsc-type.is-empty {
+	box-shadow: none;
+}
+
 /* --------------------------------------------------------------------------
  * The popover
  * ------------------------------------------------------------------------ */
@@ -4325,6 +4343,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 	.whsc-modal .whsc-facet.whsc-type:not(.is-active) {
 		background: var(--whsc-filter-bg, var(--whsc-facet-bg));
+	}
+
+	/* A pill of its own: an empty one is outlined, as an empty tile is. */
+	.whsc-modal .whsc-facet.whsc-type.is-empty {
+		background: transparent;
+		box-shadow: inset 0 0 0 1px var(--whsc-input-border);
 	}
 
 	/* The bar's labels and the count on "Filters" show the selection, so the
