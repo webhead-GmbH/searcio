@@ -17,6 +17,8 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Frontend;
 
 use Webhead\WP\SearchCloud\Enums\Plan_Tier;
+use Webhead\WP\SearchCloud\DTO\Storefront_Facet;
+use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
@@ -39,7 +41,8 @@ final class Frontend_Config {
 		private Settings_Manager $settings,
 		private Index_Config $index_config,
 		private Language $language,
-		private Language_Config $language_config
+		private Language_Config $language_config,
+		private Facet_Config $facet_config
 	) {}
 
 	/**
@@ -115,6 +118,10 @@ final class Frontend_Config {
 			// the language of the page being built - which is why this is read
 			// here, per request, and not stored with the index configuration.
 			'fieldLabels'     => $this->index_config->field_labels(),
+			// The filters of the search window in the order Search Config lists
+			// them, with how each is drawn and the colours of a coloured
+			// attribute's values. Named from `fieldLabels` above.
+			'facets'          => array_map( static fn ( Storefront_Facet $facet ): array => $facet->to_array(), $this->facet_config->storefront() ),
 			'currency'        => $this->currency_config(),
 			'credit'          => $this->credit(),
 			// Both gated by is_multilingual(), not just currentLang: Language_Config's

@@ -1,15 +1,28 @@
 import {
+	activeFilterCount,
 	appendHits,
 	buildFilterParams,
 	buildRangeParams,
 	buildTypeParam,
+	compareFacetValues,
+	detectFacetDisplay,
 	extractFieldFacets,
 	extractRangeFields,
+	facetCoverage,
+	filterButtonLabel,
+	fitFilterButtons,
+	formatCount,
+	freezeValueOrder,
 	hasMorePages,
 	humanizeFieldLabel,
 	mergeFieldFacets,
 	mergeRangeFields,
+	orderFacetGroups,
+	parseAmount,
+	rangeLabel,
+	summarizeSelection,
 	toggleSelection,
+	topValues,
 	totalIsExact,
 } from './facets';
 
@@ -343,5 +356,239 @@ describe( 'hasMorePages', () => {
 	it( 'offers nothing when there are no results at all', () => {
 		expect( hasMorePages( { total: 0, per_page: 20, pageCount: 0 }, 0, false ) ).toBe( false );
 		expect( hasMorePages( null, 0, true ) ).toBe( false );
+	} );
+} );
+
+describe( 'formatCount', () => {
+	it( 'compacts thousands and millions, and leaves the rest as it is', () => {
+		expect( formatCount( 7 ) ).toBe( '7' );
+		expect( formatCount( 32494 ) ).toBe( '32K+' );
+		expect( formatCount( 2500000 ) ).toBe( '2M+' );
+		expect( formatCount( 'x' ) ).toBe( '0' );
+	} );
+} );
+
+describe( 'facetCoverage', () => {
+	it( 'is the share of the loaded hits that carry a field', () => {
+		const hits = [
+			{ source: { attr_color: [ 'Oliv' ], attr_size: [ 'M' ] } },
+			{ source: { attr_color: [ 'Schwarz' ] } },
+			{ source: { attr_color: [] } },
+			{ source: {} },
+		];
+
+		expect( facetCoverage( { attr_color: [], attr_size: [] }, hits, 4 ) ).toEqual( { attr_color: 0.5, attr_size: 0.25 } );
+	} );
+
+	it( 'is at least what the most common value covers of the whole match set', () => {
+		expect( facetCoverage( { brand: [ { value: 'Acme', count: 30 } ] }, [], 100 ) ).toEqual( { brand: 0.3 } );
+	} );
+} );
+
+describe( 'orderFacetGroups', () => {
+	const coverage = { categories: 1, brand: 1, attr_color: 0.9, attr_size: 0.35, attr_storage: 0.05 };
+
+	it( 'keeps the order Search Config lists the fields in', () => {
+		expect(
+			orderFacetGroups( [ 'attr_size', 'brand', 'attr_color', 'categories' ], {
+				configuredOrder: [ 'categories', 'brand', 'attr_color', 'attr_size' ],
+				coverage,
+			} )
+		).toEqual( [ 'categories', 'brand', 'attr_color', 'attr_size' ] );
+	} );
+
+	it( 'moves a group that few results carry behind the rest', () => {
+		expect(
+			orderFacetGroups( [ 'categories', 'attr_storage', 'brand' ], {
+				configuredOrder: [ 'categories', 'attr_storage', 'brand' ],
+				coverage,
+			} )
+		).toEqual( [ 'categories', 'brand', 'attr_storage' ] );
+	} );
+
+	it( 'keeps an active group in its place, even when no result carries it', () => {
+		expect(
+			orderFacetGroups( [ 'categories', 'brand' ], {
+				configuredOrder: [ 'categories', 'attr_storage', 'brand' ],
+				coverage: { ...coverage, attr_storage: 0 },
+				active: [ 'attr_storage' ],
+			} )
+		).toEqual( [ 'categories', 'attr_storage', 'brand' ] );
+	} );
+
+	it( 'puts a field Search Config does not list after the ones it does', () => {
+		expect(
+			orderFacetGroups( [ 'price', 'brand', 'categories' ], { configuredOrder: [ 'categories', 'brand' ], coverage: { ...coverage, price: 1 } } )
+		).toEqual( [ 'categories', 'brand', 'price' ] );
+	} );
+
+	it( 'orders by coverage when no order is configured, keeping ties as they came', () => {
+		expect(
+			orderFacetGroups( [ 'attr_size', 'brand', 'attr_color', 'categories' ], { coverage } )
+		).toEqual( [ 'brand', 'categories', 'attr_color', 'attr_size' ] );
+	} );
+
+	it( 'gives the same order for the same input', () => {
+		const input = [ [ 'attr_size', 'brand', 'attr_storage', 'categories' ], { configuredOrder: [ 'brand' ], coverage, active: [ 'attr_size' ] } ];
+
+		expect( orderFacetGroups( ...input ) ).toEqual( orderFacetGroups( ...input ) );
+	} );
+} );
+
+describe( 'fitFilterButtons', () => {
+	const widths = [ [ 'categories', 110 ], [ 'brand', 90 ], [ 'price', 80 ], [ 'attr_color', 100 ], [ 'attr_size', 70 ] ];
+
+	it( 'takes groups in order until the room runs out', () => {
+		expect( fitFilterButtons( { widths, available: 320, limit: 5, gap: 8 } ) ).toEqual( [ 'categories', 'brand', 'price' ] );
+	} );
+
+	it( 'stops at the first that does not fit, never skipping to a shorter one', () => {
+		// After categories, brand and price 106px are left: attr_color (108)
+		// does not fit, attr_size (78) would - and is not taken.
+		expect( fitFilterButtons( { widths, available: 410, limit: 5, gap: 8 } ) ).toEqual( [ 'categories', 'brand', 'price' ] );
+	} );
+
+	it( 'always keeps a pinned group, in its place in the bar', () => {
+		expect( fitFilterButtons( { widths, available: 200, pinned: [ 'attr_size' ], limit: 5, gap: 8 } ) ).toEqual( [ 'categories', 'attr_size' ] );
+	} );
+
+	it( 'shows no more than the limit', () => {
+		expect( fitFilterButtons( { widths, available: 2000, limit: 2, gap: 8 } ) ).toEqual( [ 'categories', 'brand' ] );
+	} );
+
+	it( 'shows none at a limit of 0, pinned ones included', () => {
+		expect( fitFilterButtons( { widths, available: 2000, pinned: [ 'brand' ], limit: 0, gap: 8 } ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'topValues', () => {
+	const values = [ 'a', 'b', 'c', 'd', 'e' ].map( ( value ) => ( { value } ) );
+
+	it( 'keeps the first n and any selected value further down, in order, once', () => {
+		expect( topValues( values, [ 'e', 'a', 'd' ], 2 ).map( ( entry ) => entry.value ) ).toEqual( [ 'a', 'b', 'd', 'e' ] );
+	} );
+
+	it( 'keeps everything when there are no more than n', () => {
+		expect( topValues( values, [], 8 ) ).toHaveLength( 5 );
+	} );
+} );
+
+describe( 'compareFacetValues', () => {
+	const sorted = ( list ) => [ ...list ].sort( ( a, b ) => compareFacetValues( a, b, 'de' ) );
+
+	it( 'puts clothing sizes in their natural order', () => {
+		expect( sorted( [ 'XL', 'S', 'XXL', 'M', 'XS', 'L' ] ) ).toEqual( [ 'XS', 'S', 'M', 'L', 'XL', 'XXL' ] );
+	} );
+
+	it( 'sorts numbers as numbers', () => {
+		expect( sorted( [ '10', '9', '38,5', '38' ] ) ).toEqual( [ '9', '10', '38', '38,5' ] );
+	} );
+
+	it( 'sorts capacities by size', () => {
+		expect( sorted( [ '2 TB', '512 GB', '256 GB', '1 TB' ] ) ).toEqual( [ '256 GB', '512 GB', '1 TB', '2 TB' ] );
+	} );
+
+	it( 'sorts words as the language does', () => {
+		expect( sorted( [ 'Zebra', 'Ölzeug', 'Apfel' ] ) ).toEqual( [ 'Apfel', 'Ölzeug', 'Zebra' ] );
+	} );
+
+	it( 'puts sizes before numbers, numbers before capacities, and those before words', () => {
+		expect( sorted( [ 'Beige', '1 TB', '42', 'M' ] ) ).toEqual( [ 'M', '42', '1 TB', 'Beige' ] );
+	} );
+} );
+
+describe( 'freezeValueOrder', () => {
+	it( 'orders by count, then by name, and keeps a selected value without a count', () => {
+		expect( freezeValueOrder( [ 'Grau', 'Oliv', 'Braun' ], { Grau: 4, Oliv: 4, Braun: 9 }, [ 'Rot' ] ) ).toEqual( [ 'Braun', 'Grau', 'Oliv', 'Rot' ] );
+	} );
+
+	it( 'orders tiles naturally', () => {
+		expect( freezeValueOrder( [ 'L', 'S', 'M' ], { L: 9, S: 1, M: 4 }, [], { natural: true } ) ).toEqual( [ 'S', 'M', 'L' ] );
+	} );
+} );
+
+describe( 'detectFacetDisplay', () => {
+	it( 'draws sizes, shoe sizes and capacities as tiles', () => {
+		expect( detectFacetDisplay( 'attr_size', [ 'XS', 'S', 'M', 'L', 'XL', 'XXL' ] ) ).toBe( 'tiles' );
+		expect( detectFacetDisplay( 'attr_shoe-size', [ '36', '38', '40', '42', '44', '46' ] ) ).toBe( 'tiles' );
+		expect( detectFacetDisplay( 'attr_storage', [ '256 GB', '512 GB', '1 TB', '2 TB' ] ) ).toBe( 'tiles' );
+	} );
+
+	it( 'draws colours when every value has one', () => {
+		expect( detectFacetDisplay( 'attr_color', [ 'Oliv', 'Schwarz' ], { colors: { Oliv: '#6f7a3a', Schwarz: '#1f1f1f' } } ) ).toBe( 'color' );
+	} );
+
+	it( 'draws a list when one value has no colour', () => {
+		expect( detectFacetDisplay( 'attr_color', [ 'Oliv', 'Sand' ], { colors: { Oliv: '#6f7a3a' } } ) ).toBe( 'list' );
+	} );
+
+	it( 'draws words, and words mixed with sizes, as a list', () => {
+		expect( detectFacetDisplay( 'brand', [ 'Fjellmark', 'Maison Lune' ] ) ).toBe( 'list' );
+		expect( detectFacetDisplay( 'attr_size', [ 'M', 'Einheitsgröße' ] ) ).toBe( 'list' );
+	} );
+
+	it( 'follows the display the site set, but never colours without colours', () => {
+		expect( detectFacetDisplay( 'attr_size', [ 'S', 'M' ], { display: 'list' } ) ).toBe( 'list' );
+		expect( detectFacetDisplay( 'brand', [ 'Acme' ], { display: 'tiles' } ) ).toBe( 'tiles' );
+		expect( detectFacetDisplay( 'brand', [ 'Acme' ], { display: 'color' } ) ).toBe( 'list' );
+	} );
+} );
+
+describe( 'parseAmount', () => {
+	it( 'reads a number the way the shop writes it', () => {
+		expect( parseAmount( '1.299,50', ',' ) ).toBe( '1299.5' );
+		expect( parseAmount( '1,299.50', '.' ) ).toBe( '1299.5' );
+		expect( parseAmount( '1.299', ',' ) ).toBe( '1299' );
+		expect( parseAmount( '100 €', ',' ) ).toBe( '100' );
+	} );
+
+	it( 'takes the other separator as a decimal point when no group of three follows it', () => {
+		expect( parseAmount( '12,5', '.' ) ).toBe( '12.5' );
+		expect( parseAmount( '12.5', ',' ) ).toBe( '12.5' );
+	} );
+
+	it( 'is empty for text without a number', () => {
+		expect( parseAmount( '', ',' ) ).toBe( '' );
+		expect( parseAmount( 'abc', ',' ) ).toBe( '' );
+	} );
+} );
+
+describe( 'filterButtonLabel', () => {
+	it( 'is the name alone with nothing selected', () => {
+		expect( filterButtonLabel( 'Farbe', [] ) ).toEqual( { text: 'Farbe', name: 'Farbe', value: '', more: 0, hidden: '' } );
+	} );
+
+	it( 'shows the first value and counts the rest, which the name reads out', () => {
+		expect( filterButtonLabel( 'Farbe', [ 'Oliv' ] ) ).toMatchObject( { text: 'Farbe: Oliv', value: 'Oliv', more: 0, hidden: '' } );
+		expect( filterButtonLabel( 'Farbe', [ 'Oliv', 'Schwarz', 'Grau' ] ) ).toMatchObject( { text: 'Farbe: Oliv', more: 2, hidden: ', Schwarz, Grau' } );
+	} );
+
+	it( 'shows a bound on either side or both', () => {
+		const euro = ( value ) => `${ value } €`;
+
+		expect( filterButtonLabel( 'Preis', [], { min: '50', max: '' }, euro ).text ).toBe( 'Preis: from 50 €' );
+		expect( filterButtonLabel( 'Preis', [], { min: '', max: '200' }, euro ).text ).toBe( 'Preis: up to 200 €' );
+		expect( filterButtonLabel( 'Preis', [], { min: '50', max: '200' }, euro ).text ).toBe( 'Preis: 50 € - 200 €' );
+	} );
+} );
+
+describe( 'summarizeSelection and rangeLabel', () => {
+	it( 'lists the values, or says the bound', () => {
+		expect( summarizeSelection( [ 'Oliv' ] ) ).toBe( 'Oliv' );
+		expect( summarizeSelection( [ 'Oliv', 'Schwarz' ] ) ).toBe( 'Oliv, Schwarz' );
+		expect( summarizeSelection( [], { min: '100', max: '' } ) ).toBe( 'from 100' );
+		expect( summarizeSelection( [] ) ).toBe( '' );
+	} );
+
+	it( 'is empty for a bound with neither side', () => {
+		expect( rangeLabel( { min: '', max: '' } ) ).toBe( '' );
+		expect( rangeLabel( undefined ) ).toBe( '' );
+	} );
+} );
+
+describe( 'activeFilterCount', () => {
+	it( 'counts every selected value and every bound', () => {
+		expect( activeFilterCount( { attr_color: [ 'Oliv', 'Schwarz' ], brand: [] }, { price: { min: '50', max: '' }, rating: { min: '', max: '' } } ) ).toBe( 3 );
+		expect( activeFilterCount( {}, {} ) ).toBe( 0 );
 	} );
 } );

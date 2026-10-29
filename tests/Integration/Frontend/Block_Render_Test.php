@@ -123,6 +123,48 @@ final class Block_Render_Test extends Integration_Test_Case {
 		}
 	}
 
+	/**
+	 * The block styles the filter bar as the Elementor widget does, and says
+	 * how many group buttons the bar shows.
+	 */
+	public function test_emits_the_filter_bar_settings_for_a_named_instance(): void {
+		$html = $this->render_search_block(
+			[
+				'instanceId'      => 'filters1',
+				'facetBarLimit'   => 3,
+				'filterHeight'    => 36,
+				'filterBadgeBg'   => '#7c2d12',
+				'filterBadgeText' => '#ffffff',
+				'popoverWidth'    => 420,
+				'popoverRadius'   => 6,
+				'drawerWidth'     => 480,
+				'sheetRadius'     => 12,
+			]
+		);
+
+		$this->assertStringContainsString( 'data-facet-bar-limit="3"', $html );
+
+		foreach ( [
+			'--whsc-filter-height:36px',
+			'--whsc-filter-badge-bg:#7c2d12',
+			'--whsc-filter-badge-text:#ffffff',
+			'--whsc-popover-width:420px',
+			'--whsc-popover-radius:6px',
+			'--whsc-drawer-width:480px',
+			'--whsc-sheet-radius:12px',
+		] as $declaration ) {
+			$this->assertStringContainsString( $declaration, $html );
+		}
+	}
+
+	public function test_the_filter_bar_shows_five_buttons_by_default(): void {
+		$this->assertStringContainsString( 'data-facet-bar-limit="5"', $this->render_search_block( [] ) );
+
+		$attributes = WP_Block_Type_Registry::get_instance()->get_registered( self::BLOCK )->attributes;
+
+		$this->assertSame( [ 'type' => 'number', 'default' => 5 ], $attributes['facetBarLimit'] ?? null );
+	}
+
 	public function test_strips_unsafe_characters_from_the_instance_id(): void {
 		$html = $this->render_search_block( [ 'instanceId' => 'a<b>"c', 'bgColor' => '#fff' ] );
 

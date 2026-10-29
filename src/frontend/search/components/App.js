@@ -103,6 +103,9 @@ const App = ( { triggerElements, listElements = [] } ) => {
 					instanceClass={ activeEl.dataset.instanceClass || '' }
 					showCount={ '0' !== activeEl.dataset.showCount }
 					animation={ activeEl.dataset.animation || 'fade' }
+					// Absent on a trigger printed before the setting existed (a cached
+					// page): the default, not 0, which would hide every group.
+					facetBarLimit={ /^\d+$/.test( activeEl.dataset.facetBarLimit || '' ) ? Number( activeEl.dataset.facetBarLimit ) : undefined }
 					editorPreview={ '1' === activeEl.dataset.editorPreview }
 					initialQuery={ query }
 					onQueryChange={ setQuery }

@@ -38,7 +38,7 @@ msgstr "https://webhead.at"
 #: includes/Admin/Settings_Page.php:45
 #: includes/Admin/Settings_Page.php:49
 #: includes/Admin/Settings_Page.php:126
-#: includes/Plugin.php:419
+#: includes/Plugin.php:432
 #: src/admin/settings/components/SettingsPanel.js:177
 msgid "Searcio"
 msgstr "Searcio"
@@ -50,7 +50,7 @@ msgid "Searcio: WooCommerce %1$s is below the supported minimum %2$s. Product in
 msgstr "Searcio : la version %1$s de WooCommerce est inférieure au minimum pris en charge (%2$s). L’indexation des produits est désactivée jusqu’à la mise à jour de WooCommerce ; l’indexation des autres contenus fonctionne toujours."
 
 #: includes/Compatibility/Woo_Compatibility.php:59
-#: src/admin/settings/components/tabs/IndexingTab.js:191
+#: src/admin/settings/components/tabs/IndexingTab.js:186
 msgid "(unknown)"
 msgstr "(inconnue)"
 
@@ -59,42 +59,42 @@ msgid "Searcio Products"
 msgstr "Produits Searcio"
 
 #: includes/Elementor/Widgets/Products_Widget.php:57
-#: src/blocks/products/edit.js:32
+#: src/blocks/products/edit.js:33
 #: src/frontend/search/components/ProductList.js:168
 msgid "Products"
 msgstr "Produits"
 
 #: includes/Elementor/Widgets/Products_Widget.php:63
 #: includes/Elementor/Widgets/Search_Widget.php:216
-#: includes/Elementor/Widgets/Search_Widget.php:1285
-#: src/blocks/products/edit.js:35
+#: includes/Elementor/Widgets/Search_Widget.php:1325
+#: src/blocks/products/edit.js:36
 msgid "Show"
 msgstr "Afficher"
 
 #: includes/Elementor/Widgets/Products_Widget.php:67
-#: src/blocks/products/edit.js:38
-#: src/blocks/products/edit.js:143
+#: src/blocks/products/edit.js:39
+#: src/blocks/products/edit.js:150
 msgid "Similar products"
 msgstr "Produits similaires"
 
 #: includes/Elementor/Widgets/Products_Widget.php:68
-#: src/blocks/products/edit.js:39
-#: src/blocks/products/edit.js:144
+#: src/blocks/products/edit.js:40
+#: src/blocks/products/edit.js:151
 msgid "Category listing"
 msgstr "Liste d’une catégorie"
 
 #: includes/Elementor/Widgets/Products_Widget.php:76
-#: src/blocks/products/edit.js:54
+#: src/blocks/products/edit.js:57
 msgid "Heading"
 msgstr "Titre"
 
 #: includes/Elementor/Widgets/Products_Widget.php:78
-#: src/blocks/products/edit.js:55
+#: src/blocks/products/edit.js:58
 msgid "Optional. Left empty, the row has no title."
 msgstr "Facultatif. Laissé vide, la rangée n’a pas de titre."
 
 #: includes/Elementor/Widgets/Products_Widget.php:85
-#: src/blocks/products/edit.js:62
+#: src/blocks/products/edit.js:65
 msgid "Product"
 msgstr "Produit"
 
@@ -103,71 +103,71 @@ msgid "Leave empty to use whichever product the visitor is viewing."
 msgstr "Laissez vide pour utiliser le produit que le visiteur consulte."
 
 #: includes/Elementor/Widgets/Products_Widget.php:95
-#: src/blocks/products/edit.js:75
+#: src/blocks/products/edit.js:78
 msgid "Filter field"
 msgstr "Champ de filtre"
 
 #: includes/Elementor/Widgets/Products_Widget.php:98
-#: src/blocks/products/edit.js:76
+#: src/blocks/products/edit.js:79
 msgid "A facet field. Defaults to \"categories\", which is how product categories are indexed."
 msgstr "Un champ de facette. Par défaut « categories », le champ sous lequel les catégories de produits sont indexées."
 
 #: includes/Elementor/Widgets/Products_Widget.php:106
 #: src/admin/settings/components/tabs/SearchConfigTab.js:384
-#: src/blocks/products/edit.js:81
+#: src/blocks/products/edit.js:84
 msgid "Filter value"
 msgstr "Valeur du filtre"
 
 #: includes/Elementor/Widgets/Products_Widget.php:108
-#: src/blocks/products/edit.js:82
+#: src/blocks/products/edit.js:85
 msgid "Leave empty to use whichever category the visitor is browsing."
 msgstr "Laissez vide pour utiliser la catégorie que le visiteur parcourt."
 
 #: includes/Elementor/Widgets/Products_Widget.php:116
-#: src/blocks/products/edit.js:91
+#: src/blocks/products/edit.js:94
 msgid "Show the merchandising banner"
 msgstr "Afficher la bannière de merchandising"
 
 #: includes/Elementor/Widgets/Products_Widget.php:126
-#: src/blocks/products/edit.js:100
+#: src/blocks/products/edit.js:103
 msgid "Layout"
 msgstr "Mise en page"
 
 #: includes/Elementor/Widgets/Products_Widget.php:130
-#: includes/Elementor/Widgets/Search_Widget.php:1308
-#: src/blocks/products/edit.js:103
-#: src/blocks/search/edit.js:379
+#: includes/Elementor/Widgets/Search_Widget.php:1348
+#: src/blocks/products/edit.js:106
+#: src/blocks/search/edit.js:409
 msgid "Carousel"
 msgstr "Carrousel"
 
 #: includes/Elementor/Widgets/Products_Widget.php:131
-#: src/blocks/products/edit.js:104
+#: src/blocks/products/edit.js:107
 msgid "Grid"
 msgstr "Grille"
 
 #: includes/Elementor/Widgets/Products_Widget.php:139
-#: src/blocks/products/edit.js:112
+#: src/blocks/products/edit.js:117
 msgid "How many products"
 msgstr "Nombre de produits"
 
 #: includes/Elementor/Widgets/Products_Widget.php:152
-#: includes/Elementor/Widgets/Search_Widget.php:232
-#: src/blocks/products/edit.js:121
-#: src/blocks/search/edit.js:98
+#: includes/Elementor/Widgets/Search_Widget.php:245
+#: src/blocks/products/edit.js:126
+#: src/blocks/search/edit.js:101
 msgid "Card source"
 msgstr "Source des cartes"
 
 #: includes/Elementor/Widgets/Products_Widget.php:156
-#: includes/Elementor/Widgets/Search_Widget.php:236
-#: src/blocks/products/edit.js:124
-#: src/blocks/search/edit.js:102
+#: includes/Elementor/Widgets/Search_Widget.php:249
+#: src/blocks/products/edit.js:129
+#: src/blocks/search/edit.js:105
 msgid "Plugin templates"
 msgstr "Modèles de l’extension"
 
 #: includes/Elementor/Widgets/Products_Widget.php:157
-#: includes/Elementor/Widgets/Search_Widget.php:237
-#: src/blocks/products/edit.js:125
-#: src/blocks/search/edit.js:103
+#: includes/Elementor/Widgets/Search_Widget.php:250
+#: src/blocks/products/edit.js:130
+#: src/blocks/search/edit.js:106
 msgid "Searcio templates"
 msgstr "Modèles Searcio"
 
@@ -176,29 +176,29 @@ msgid "Searcio Search"
 msgstr "Recherche Searcio"
 
 #: includes/Elementor/Widgets/Search_Widget.php:121
-#: includes/Elementor/Widgets/Search_Widget.php:362
+#: includes/Elementor/Widgets/Search_Widget.php:375
 #: src/admin/settings/components/tabs/SyncHistory.js:219
-#: src/blocks/search/edit.js:177
+#: src/blocks/search/edit.js:198
 msgid "Trigger"
 msgstr "Déclencheur"
 
 #: includes/Elementor/Widgets/Search_Widget.php:127
-#: src/blocks/search/edit.js:83
+#: src/blocks/search/edit.js:84
 msgid "Trigger style"
 msgstr "Style du déclencheur"
 
 #: includes/Elementor/Widgets/Search_Widget.php:131
-#: src/blocks/search/edit.js:86
+#: src/blocks/search/edit.js:87
 msgid "Search box"
 msgstr "Barre de recherche"
 
 #: includes/Elementor/Widgets/Search_Widget.php:132
-#: src/blocks/search/edit.js:87
+#: src/blocks/search/edit.js:88
 msgid "Icon button"
 msgstr "Bouton icône"
 
 #: includes/Elementor/Widgets/Search_Widget.php:140
-#: src/blocks/search/edit.js:215
+#: src/blocks/search/edit.js:236
 msgid "Icon"
 msgstr "Icône"
 
@@ -207,47 +207,47 @@ msgid "Leave empty to use the default search icon."
 msgstr "Laissez vide pour utiliser l’icône de recherche par défaut."
 
 #: includes/Elementor/Widgets/Search_Widget.php:150
-#: src/blocks/search/edit.js:118
+#: src/blocks/search/edit.js:125
 msgid "Placeholder text"
 msgstr "Texte indicatif"
 
 #: includes/Elementor/Widgets/Search_Widget.php:153
-#: includes/Frontend/Frontend_Config.php:123
-#: src/blocks/search/edit.js:120
+#: includes/Frontend/Frontend_Config.php:135
+#: src/blocks/search/edit.js:127
 msgid "Search…"
 msgstr "Rechercher…"
 
 #: includes/Elementor/Widgets/Search_Widget.php:161
 #: src/frontend/search/components/SearchInput.js:32
-#: src/frontend/search/components/SearchModal.js:1087
-#: src/frontend/search/components/SearchModal.js:1108
-#: src/frontend/search/components/SearchModal.js:1177
+#: src/frontend/search/components/SearchModal.js:1680
+#: src/frontend/search/components/SearchModal.js:1712
+#: src/frontend/search/components/SearchModal.js:1786
 #: src/frontend/search/components/Trigger.js:22
 msgid "Search"
 msgstr "Rechercher"
 
 #: includes/Elementor/Widgets/Search_Widget.php:167
-#: src/blocks/search/edit.js:92
+#: src/blocks/search/edit.js:93
 msgid "Restrict to type"
 msgstr "Limiter à un type"
 
 #: includes/Elementor/Widgets/Search_Widget.php:177
-#: src/blocks/search/edit.js:125
+#: src/blocks/search/edit.js:132
 msgid "Enable voice search"
 msgstr "Activer la recherche vocale"
 
 #: includes/Elementor/Widgets/Search_Widget.php:180
-#: includes/Elementor/Widgets/Search_Widget.php:300
+#: includes/Elementor/Widgets/Search_Widget.php:313
 msgid "On"
 msgstr "Activé"
 
 #: includes/Elementor/Widgets/Search_Widget.php:181
-#: includes/Elementor/Widgets/Search_Widget.php:301
+#: includes/Elementor/Widgets/Search_Widget.php:314
 msgid "Off"
 msgstr "Désactivé"
 
 #: includes/Elementor/Widgets/Search_Widget.php:189
-#: src/blocks/search/edit.js:235
+#: src/blocks/search/edit.js:256
 msgid "Voice icon"
 msgstr "Icône vocale"
 
@@ -256,17 +256,17 @@ msgid "Leave empty to use the default microphone icon."
 msgstr "Laissez vide pour utiliser l’icône de micro par défaut."
 
 #: includes/Elementor/Widgets/Search_Widget.php:199
-#: src/blocks/search/edit.js:131
+#: src/blocks/search/edit.js:138
 msgid "When to search"
 msgstr "Moment de la recherche"
 
 #: includes/Elementor/Widgets/Search_Widget.php:203
-#: src/blocks/search/edit.js:135
+#: src/blocks/search/edit.js:142
 msgid "On submit (Enter / button)"
 msgstr "À la validation (Entrée / bouton)"
 
 #: includes/Elementor/Widgets/Search_Widget.php:204
-#: src/blocks/search/edit.js:136
+#: src/blocks/search/edit.js:143
 msgid "While typing"
 msgstr "Pendant la saisie"
 
@@ -275,844 +275,841 @@ msgid "'While typing' searches automatically after 3 characters."
 msgstr "« Pendant la saisie » lance la recherche automatiquement après 3 caractères."
 
 #: includes/Elementor/Widgets/Search_Widget.php:213
-#: src/blocks/search/edit.js:142
+#: src/blocks/search/edit.js:149
 msgid "Show result count on filters"
 msgstr "Afficher le nombre de résultats sur les filtres"
 
 #: includes/Elementor/Widgets/Search_Widget.php:217
-#: includes/Elementor/Widgets/Search_Widget.php:1290
+#: includes/Elementor/Widgets/Search_Widget.php:1330
 msgid "Hide"
 msgstr "Masquer"
 
-#: includes/Elementor/Widgets/Search_Widget.php:226
-#: src/frontend/search/components/SearchModal.js:1010
-#: src/frontend/search/components/SearchModal.js:1031
+#: includes/Elementor/Widgets/Search_Widget.php:239
+#: src/frontend/search/components/SearchModal.js:1457
+#: src/frontend/search/components/SearchModal.js:1478
 msgid "Results"
 msgstr "Résultats"
 
-#: includes/Elementor/Widgets/Search_Widget.php:239
-#: src/blocks/search/edit.js:99
+#: includes/Elementor/Widgets/Search_Widget.php:252
+#: src/blocks/search/edit.js:102
 msgid "Design templates per content type in the Searcio panel's card builder. Any type without a published template there falls back to this plugin's own card."
 msgstr "Concevez des modèles par type de contenu dans le générateur de cartes du panneau Searcio. Tout type sans modèle publié là-bas utilise la carte propre à cette extension."
 
-#: includes/Elementor/Widgets/Search_Widget.php:246
-#: src/blocks/search/edit.js:108
+#: includes/Elementor/Widgets/Search_Widget.php:259
+#: src/blocks/search/edit.js:113
 msgid "Highlights source"
 msgstr "Source de la sélection"
 
-#: includes/Elementor/Widgets/Search_Widget.php:250
-#: src/blocks/search/edit.js:112
+#: includes/Elementor/Widgets/Search_Widget.php:263
+#: src/blocks/search/edit.js:117
 msgid "Newest"
 msgstr "Plus récents"
 
-#: includes/Elementor/Widgets/Search_Widget.php:251
-#: src/admin/settings/components/tabs/IndexingTab.js:210
-#: src/blocks/search/edit.js:113
+#: includes/Elementor/Widgets/Search_Widget.php:264
+#: src/admin/settings/components/tabs/IndexingTab.js:205
+#: src/blocks/search/edit.js:118
 #: src/utils/facets.js:68
 msgid "Featured"
 msgstr "Mis en avant"
 
-#: includes/Elementor/Widgets/Search_Widget.php:253
-#: src/blocks/search/edit.js:109
+#: includes/Elementor/Widgets/Search_Widget.php:266
+#: src/blocks/search/edit.js:114
 msgid "What the empty-query \"highlights\" carousel shows. \"Featured\" only works once a boolean \"featured\" custom field is pushed for this type (Indexing tab)."
 msgstr "Ce que montre le carrousel « sélection » quand la recherche est vide. « Mis en avant » ne fonctionne qu’une fois qu’un champ personnalisé booléen « featured » est envoyé pour ce type (onglet Indexation)."
 
-#: includes/Elementor/Widgets/Search_Widget.php:261
-#: includes/Elementor/Widgets/Search_Widget.php:570
-#: src/blocks/search/edit.js:194
+#: includes/Elementor/Widgets/Search_Widget.php:274
+#: includes/Elementor/Widgets/Search_Widget.php:583
+#: src/blocks/search/edit.js:215
 msgid "Modal"
 msgstr "Fenêtre modale"
 
-#: includes/Elementor/Widgets/Search_Widget.php:267
-#: src/blocks/search/edit.js:147
+#: includes/Elementor/Widgets/Search_Widget.php:280
+#: src/blocks/search/edit.js:166
 msgid "Open animation"
 msgstr "Animation d’ouverture"
 
-#: includes/Elementor/Widgets/Search_Widget.php:271
-#: includes/Elementor/Widgets/Search_Widget.php:1347
-#: src/blocks/search/edit.js:150
+#: includes/Elementor/Widgets/Search_Widget.php:284
+#: includes/Elementor/Widgets/Search_Widget.php:1387
+#: src/blocks/search/edit.js:169
 msgid "None"
 msgstr "Aucune"
 
-#: includes/Elementor/Widgets/Search_Widget.php:272
-#: src/blocks/search/edit.js:151
+#: includes/Elementor/Widgets/Search_Widget.php:285
+#: src/blocks/search/edit.js:170
 msgid "Fade"
 msgstr "Fondu"
 
-#: includes/Elementor/Widgets/Search_Widget.php:273
-#: src/blocks/search/edit.js:152
+#: includes/Elementor/Widgets/Search_Widget.php:286
+#: src/blocks/search/edit.js:171
 msgid "Slide down"
 msgstr "Glissement vers le bas"
 
-#: includes/Elementor/Widgets/Search_Widget.php:274
-#: src/blocks/search/edit.js:153
+#: includes/Elementor/Widgets/Search_Widget.php:287
+#: src/blocks/search/edit.js:172
 msgid "Slide up"
 msgstr "Glissement vers le haut"
 
-#: includes/Elementor/Widgets/Search_Widget.php:275
-#: src/blocks/search/edit.js:154
+#: includes/Elementor/Widgets/Search_Widget.php:288
+#: src/blocks/search/edit.js:173
 msgid "Zoom"
 msgstr "Zoom"
 
-#: includes/Elementor/Widgets/Search_Widget.php:283
-#: src/blocks/search/edit.js:162
+#: includes/Elementor/Widgets/Search_Widget.php:296
+#: src/blocks/search/edit.js:183
 msgid "Animation duration (ms)"
 msgstr "Durée de l’animation (ms)"
 
-#: includes/Elementor/Widgets/Search_Widget.php:297
+#: includes/Elementor/Widgets/Search_Widget.php:310
 msgid "Keep open while editing"
 msgstr "Garder ouverte pendant l’édition"
 
-#: includes/Elementor/Widgets/Search_Widget.php:304
+#: includes/Elementor/Widgets/Search_Widget.php:317
 msgid "Shows the modal in the editor so you can see the Style settings as you change them. Visitors never see it open by itself."
 msgstr "Affiche la fenêtre modale dans l’éditeur pour que vous voyiez l’effet des réglages de style pendant que vous les modifiez. Les visiteurs ne la voient jamais s’ouvrir d’elle-même."
 
-#: includes/Elementor/Widgets/Search_Widget.php:311
+#: includes/Elementor/Widgets/Search_Widget.php:324
 msgid "Preview search"
 msgstr "Recherche d’aperçu"
 
-#: includes/Elementor/Widgets/Search_Widget.php:314
+#: includes/Elementor/Widgets/Search_Widget.php:327
 msgid "e.g. shirt"
 msgstr "ex. : chemise"
 
-#: includes/Elementor/Widgets/Search_Widget.php:316
+#: includes/Elementor/Widgets/Search_Widget.php:329
 msgid "Runs this search in the preview, so result cards, filters and prices are there to style. Leave empty to style the empty state: recent and popular searches, and the highlights."
 msgstr "Lance cette recherche dans l’aperçu, pour que les cartes de résultats, les filtres et les prix soient là à styliser. Laissez vide pour styliser l’état vide : recherches récentes et populaires, et la sélection."
 
-#: includes/Elementor/Widgets/Search_Widget.php:332
-#: src/blocks/search/edit.js:54
+#: includes/Elementor/Widgets/Search_Widget.php:345
+#: src/blocks/search/edit.js:55
 msgid "All types"
 msgstr "Tous les types"
 
-#: includes/Elementor/Widgets/Search_Widget.php:372
+#: includes/Elementor/Widgets/Search_Widget.php:385
 msgid "Alignment"
 msgstr "Alignement"
 
-#: includes/Elementor/Widgets/Search_Widget.php:375
+#: includes/Elementor/Widgets/Search_Widget.php:388
 msgid "Left"
 msgstr "Gauche"
 
-#: includes/Elementor/Widgets/Search_Widget.php:376
+#: includes/Elementor/Widgets/Search_Widget.php:389
 msgid "Center"
 msgstr "Centre"
 
-#: includes/Elementor/Widgets/Search_Widget.php:377
+#: includes/Elementor/Widgets/Search_Widget.php:390
 msgid "Right"
 msgstr "Droite"
 
-#: includes/Elementor/Widgets/Search_Widget.php:399
-#: src/blocks/search/edit.js:187
+#: includes/Elementor/Widgets/Search_Widget.php:412
+#: src/blocks/search/edit.js:208
 msgid "Icon size"
 msgstr "Taille de l’icône"
 
-#: includes/Elementor/Widgets/Search_Widget.php:412
-#: src/blocks/search/edit.js:188
+#: includes/Elementor/Widgets/Search_Widget.php:425
+#: src/blocks/search/edit.js:209
 msgid "Button size"
 msgstr "Taille du bouton"
 
-#: includes/Elementor/Widgets/Search_Widget.php:425
-#: includes/Elementor/Widgets/Search_Widget.php:544
-#: includes/Elementor/Widgets/Search_Widget.php:747
-#: includes/Elementor/Widgets/Search_Widget.php:797
-#: includes/Elementor/Widgets/Search_Widget.php:841
-#: includes/Elementor/Widgets/Search_Widget.php:1014
-#: includes/Elementor/Widgets/Search_Widget.php:1183
-#: includes/Elementor/Widgets/Search_Widget.php:1222
-#: includes/Elementor/Widgets/Search_Widget.php:1230
-#: src/blocks/search/edit.js:189
-#: src/blocks/search/edit.js:221
-#: src/blocks/search/edit.js:307
-#: src/blocks/search/edit.js:374
+#: includes/Elementor/Widgets/Search_Widget.php:438
+#: includes/Elementor/Widgets/Search_Widget.php:557
+#: includes/Elementor/Widgets/Search_Widget.php:760
+#: includes/Elementor/Widgets/Search_Widget.php:810
+#: includes/Elementor/Widgets/Search_Widget.php:854
+#: includes/Elementor/Widgets/Search_Widget.php:1037
+#: includes/Elementor/Widgets/Search_Widget.php:1223
+#: includes/Elementor/Widgets/Search_Widget.php:1262
+#: includes/Elementor/Widgets/Search_Widget.php:1270
+#: src/blocks/search/edit.js:210
+#: src/blocks/search/edit.js:242
+#: src/blocks/search/edit.js:331
+#: src/blocks/search/edit.js:404
 msgid "Border radius"
 msgstr "Arrondi des bordures"
 
-#: includes/Elementor/Widgets/Search_Widget.php:438
-#: includes/Elementor/Widgets/Search_Widget.php:698
-#: includes/Elementor/Widgets/Search_Widget.php:739
-#: includes/Elementor/Widgets/Search_Widget.php:787
-#: includes/Elementor/Widgets/Search_Widget.php:831
-#: includes/Elementor/Widgets/Search_Widget.php:873
-#: includes/Elementor/Widgets/Search_Widget.php:911
-#: includes/Elementor/Widgets/Search_Widget.php:929
-#: includes/Elementor/Widgets/Search_Widget.php:955
-#: includes/Elementor/Widgets/Search_Widget.php:1000
-#: includes/Elementor/Widgets/Search_Widget.php:1143
-#: includes/Elementor/Widgets/Search_Widget.php:1175
-#: includes/Elementor/Widgets/Search_Widget.php:1328
+#: includes/Elementor/Widgets/Search_Widget.php:451
+#: includes/Elementor/Widgets/Search_Widget.php:711
+#: includes/Elementor/Widgets/Search_Widget.php:752
+#: includes/Elementor/Widgets/Search_Widget.php:800
+#: includes/Elementor/Widgets/Search_Widget.php:844
+#: includes/Elementor/Widgets/Search_Widget.php:886
+#: includes/Elementor/Widgets/Search_Widget.php:924
+#: includes/Elementor/Widgets/Search_Widget.php:942
+#: includes/Elementor/Widgets/Search_Widget.php:968
+#: includes/Elementor/Widgets/Search_Widget.php:1023
+#: includes/Elementor/Widgets/Search_Widget.php:1183
+#: includes/Elementor/Widgets/Search_Widget.php:1215
+#: includes/Elementor/Widgets/Search_Widget.php:1368
 msgid "Normal"
 msgstr "Normal"
 
-#: includes/Elementor/Widgets/Search_Widget.php:442
-#: includes/Elementor/Widgets/Search_Widget.php:461
-#: includes/Elementor/Widgets/Search_Widget.php:511
-#: includes/Elementor/Widgets/Search_Widget.php:736
-#: includes/Elementor/Widgets/Search_Widget.php:832
-#: includes/Elementor/Widgets/Search_Widget.php:836
-#: src/blocks/search/edit.js:180
+#: includes/Elementor/Widgets/Search_Widget.php:455
+#: includes/Elementor/Widgets/Search_Widget.php:474
+#: includes/Elementor/Widgets/Search_Widget.php:524
+#: includes/Elementor/Widgets/Search_Widget.php:749
+#: includes/Elementor/Widgets/Search_Widget.php:845
+#: includes/Elementor/Widgets/Search_Widget.php:849
+#: src/blocks/search/edit.js:201
 msgid "Icon color"
 msgstr "Couleur de l’icône"
 
-#: includes/Elementor/Widgets/Search_Widget.php:450
-#: includes/Elementor/Widgets/Search_Widget.php:469
-#: includes/Elementor/Widgets/Search_Widget.php:575
-#: includes/Elementor/Widgets/Search_Widget.php:733
-#: includes/Elementor/Widgets/Search_Widget.php:788
-#: includes/Elementor/Widgets/Search_Widget.php:792
-#: includes/Elementor/Widgets/Search_Widget.php:833
-#: includes/Elementor/Widgets/Search_Widget.php:837
-#: includes/Elementor/Widgets/Search_Widget.php:912
-#: includes/Elementor/Widgets/Search_Widget.php:917
-#: includes/Elementor/Widgets/Search_Widget.php:934
-#: includes/Elementor/Widgets/Search_Widget.php:960
-#: includes/Elementor/Widgets/Search_Widget.php:1001
-#: includes/Elementor/Widgets/Search_Widget.php:1005
-#: includes/Elementor/Widgets/Search_Widget.php:1009
-#: includes/Elementor/Widgets/Search_Widget.php:1120
-#: includes/Elementor/Widgets/Search_Widget.php:1144
-#: includes/Elementor/Widgets/Search_Widget.php:1149
-#: includes/Elementor/Widgets/Search_Widget.php:1172
-#: includes/Elementor/Widgets/Search_Widget.php:1221
-#: includes/Elementor/Widgets/Search_Widget.php:1228
-#: src/blocks/search/edit.js:182
-#: src/blocks/search/edit.js:197
-#: src/blocks/search/edit.js:213
-#: src/blocks/search/edit.js:298
-#: src/blocks/search/edit.js:340
-#: src/blocks/search/edit.js:365
+#: includes/Elementor/Widgets/Search_Widget.php:463
+#: includes/Elementor/Widgets/Search_Widget.php:482
+#: includes/Elementor/Widgets/Search_Widget.php:588
+#: includes/Elementor/Widgets/Search_Widget.php:746
+#: includes/Elementor/Widgets/Search_Widget.php:801
+#: includes/Elementor/Widgets/Search_Widget.php:805
+#: includes/Elementor/Widgets/Search_Widget.php:846
+#: includes/Elementor/Widgets/Search_Widget.php:850
+#: includes/Elementor/Widgets/Search_Widget.php:925
+#: includes/Elementor/Widgets/Search_Widget.php:930
+#: includes/Elementor/Widgets/Search_Widget.php:947
+#: includes/Elementor/Widgets/Search_Widget.php:973
+#: includes/Elementor/Widgets/Search_Widget.php:1024
+#: includes/Elementor/Widgets/Search_Widget.php:1028
+#: includes/Elementor/Widgets/Search_Widget.php:1032
+#: includes/Elementor/Widgets/Search_Widget.php:1045
+#: includes/Elementor/Widgets/Search_Widget.php:1160
+#: includes/Elementor/Widgets/Search_Widget.php:1184
+#: includes/Elementor/Widgets/Search_Widget.php:1189
+#: includes/Elementor/Widgets/Search_Widget.php:1212
+#: includes/Elementor/Widgets/Search_Widget.php:1261
+#: includes/Elementor/Widgets/Search_Widget.php:1268
+#: src/blocks/search/edit.js:203
+#: src/blocks/search/edit.js:218
+#: src/blocks/search/edit.js:234
+#: src/blocks/search/edit.js:319
+#: src/blocks/search/edit.js:370
+#: src/blocks/search/edit.js:395
 msgid "Background"
 msgstr "Arrière-plan"
 
-#: includes/Elementor/Widgets/Search_Widget.php:457
-#: includes/Elementor/Widgets/Search_Widget.php:791
-#: includes/Elementor/Widgets/Search_Widget.php:835
-#: includes/Elementor/Widgets/Search_Widget.php:876
-#: includes/Elementor/Widgets/Search_Widget.php:916
-#: includes/Elementor/Widgets/Search_Widget.php:932
-#: includes/Elementor/Widgets/Search_Widget.php:958
-#: includes/Elementor/Widgets/Search_Widget.php:1004
-#: includes/Elementor/Widgets/Search_Widget.php:1148
-#: includes/Elementor/Widgets/Search_Widget.php:1178
-#: includes/Elementor/Widgets/Search_Widget.php:1332
+#: includes/Elementor/Widgets/Search_Widget.php:470
+#: includes/Elementor/Widgets/Search_Widget.php:804
+#: includes/Elementor/Widgets/Search_Widget.php:848
+#: includes/Elementor/Widgets/Search_Widget.php:889
+#: includes/Elementor/Widgets/Search_Widget.php:929
+#: includes/Elementor/Widgets/Search_Widget.php:945
+#: includes/Elementor/Widgets/Search_Widget.php:971
+#: includes/Elementor/Widgets/Search_Widget.php:1027
+#: includes/Elementor/Widgets/Search_Widget.php:1188
+#: includes/Elementor/Widgets/Search_Widget.php:1218
+#: includes/Elementor/Widgets/Search_Widget.php:1372
 msgid "Hover"
 msgstr "Survol"
 
-#: includes/Elementor/Widgets/Search_Widget.php:489
+#: includes/Elementor/Widgets/Search_Widget.php:502
 msgid "Width"
 msgstr "Largeur"
 
-#: includes/Elementor/Widgets/Search_Widget.php:501
-#: includes/Elementor/Widgets/Search_Widget.php:576
-#: includes/Elementor/Widgets/Search_Widget.php:734
+#: includes/Elementor/Widgets/Search_Widget.php:514
+#: includes/Elementor/Widgets/Search_Widget.php:589
+#: includes/Elementor/Widgets/Search_Widget.php:747
 msgid "Text color"
 msgstr "Couleur du texte"
 
-#: includes/Elementor/Widgets/Search_Widget.php:520
+#: includes/Elementor/Widgets/Search_Widget.php:533
 msgid "Background color"
 msgstr "Couleur d’arrière-plan"
 
-#: includes/Elementor/Widgets/Search_Widget.php:579
+#: includes/Elementor/Widgets/Search_Widget.php:592
 msgid "Accent color"
 msgstr "Couleur d’accentuation"
 
-#: includes/Elementor/Widgets/Search_Widget.php:581
+#: includes/Elementor/Widgets/Search_Widget.php:594
 msgid "Selected states, focus rings, links and the default button colour. Anything set more specifically in another section wins."
 msgstr "États sélectionnés, contours de focus, liens et couleur par défaut des boutons. Tout réglage plus précis dans une autre section l’emporte."
 
-#: includes/Elementor/Widgets/Search_Widget.php:585
+#: includes/Elementor/Widgets/Search_Widget.php:598
 msgid "Overlay"
 msgstr "Superposition"
 
-#: includes/Elementor/Widgets/Search_Widget.php:587
+#: includes/Elementor/Widgets/Search_Widget.php:600
 msgid "Covers the page behind the open modal. A colour with transparency keeps the page visible."
 msgstr "Couvre la page derrière la fenêtre modale ouverte. Une couleur avec de la transparence laisse voir la page."
 
-#: includes/Elementor/Widgets/Search_Widget.php:595
+#: includes/Elementor/Widgets/Search_Widget.php:608
 msgid "Font family"
 msgstr "Famille de police"
 
-#: includes/Elementor/Widgets/Search_Widget.php:600
+#: includes/Elementor/Widgets/Search_Widget.php:613
 msgid "Used by all text in the modal and in the search box trigger. Leave empty to use the page font."
 msgstr "Utilisée par tout le texte de la fenêtre modale et de la barre de recherche qui l’ouvre. Laissez vide pour utiliser la police de la page."
 
-#: includes/Elementor/Widgets/Search_Widget.php:604
-#: src/blocks/search/edit.js:203
+#: includes/Elementor/Widgets/Search_Widget.php:617
+#: src/blocks/search/edit.js:224
 msgid "Corner radius"
 msgstr "Arrondi des angles"
 
-#: includes/Elementor/Widgets/Search_Widget.php:610
+#: includes/Elementor/Widgets/Search_Widget.php:623
 msgid "Round the top corners too"
 msgstr "Arrondir aussi les angles supérieurs"
 
-#: includes/Elementor/Widgets/Search_Widget.php:615
+#: includes/Elementor/Widgets/Search_Widget.php:628
 msgid "For a modal set down from the top of the screen."
 msgstr "Pour une fenêtre modale placée à distance du haut de l’écran."
 
-#: includes/Elementor/Widgets/Search_Widget.php:618
-#: includes/Elementor/Widgets/Search_Widget.php:846
-#: includes/Elementor/Widgets/Search_Widget.php:943
-#: includes/Elementor/Widgets/Search_Widget.php:1184
-#: src/blocks/search/edit.js:204
-#: src/blocks/search/edit.js:375
+#: includes/Elementor/Widgets/Search_Widget.php:631
+#: includes/Elementor/Widgets/Search_Widget.php:859
+#: includes/Elementor/Widgets/Search_Widget.php:956
+#: includes/Elementor/Widgets/Search_Widget.php:1224
+#: src/blocks/search/edit.js:225
+#: src/blocks/search/edit.js:405
 msgid "Padding"
 msgstr "Marge interne"
 
-#: includes/Elementor/Widgets/Search_Widget.php:619
-#: src/blocks/search/edit.js:205
+#: includes/Elementor/Widgets/Search_Widget.php:632
+#: src/blocks/search/edit.js:226
 msgid "Section spacing"
 msgstr "Espacement des sections"
 
-#: includes/Elementor/Widgets/Search_Widget.php:624
+#: includes/Elementor/Widgets/Search_Widget.php:637
 msgid "Modal width"
 msgstr "Largeur de la fenêtre modale"
 
-#: includes/Elementor/Widgets/Search_Widget.php:630
+#: includes/Elementor/Widgets/Search_Widget.php:643
 msgid "Leave empty for a full-width modal docked to the top of the screen. A narrower one is centred."
 msgstr "Laissez vide pour une fenêtre modale pleine largeur ancrée en haut de l’écran. Une fenêtre plus étroite est centrée."
 
-#: includes/Elementor/Widgets/Search_Widget.php:633
+#: includes/Elementor/Widgets/Search_Widget.php:646
 msgid "Distance from top"
 msgstr "Distance depuis le haut"
 
-#: includes/Elementor/Widgets/Search_Widget.php:640
+#: includes/Elementor/Widgets/Search_Widget.php:653
 msgid "Content width"
 msgstr "Largeur du contenu"
 
-#: includes/Elementor/Widgets/Search_Widget.php:645
+#: includes/Elementor/Widgets/Search_Widget.php:658
 msgid "The widest the content grows inside the full-width modal. Use your theme's container width to line it up with the page."
 msgstr "La largeur maximale du contenu dans la fenêtre modale pleine largeur. Utilisez la largeur de conteneur de votre thème pour l’aligner sur la page."
 
-#: includes/Elementor/Widgets/Search_Widget.php:651
+#: includes/Elementor/Widgets/Search_Widget.php:664
 msgid "Section titles"
 msgstr "Titres de section"
 
-#: includes/Elementor/Widgets/Search_Widget.php:657
+#: includes/Elementor/Widgets/Search_Widget.php:670
 msgid "Headings such as \"Recent searches\", \"Popular searches\" and the results count. Filter group names have their own, under Filters."
 msgstr "Les titres comme « Recherches récentes », « Recherches populaires » et le nombre de résultats. Les noms des groupes de filtres ont leurs propres réglages, sous Filtres."
 
-#: includes/Elementor/Widgets/Search_Widget.php:661
-#: includes/Elementor/Widgets/Search_Widget.php:1056
+#: includes/Elementor/Widgets/Search_Widget.php:674
+#: includes/Elementor/Widgets/Search_Widget.php:1096
 msgid "Color"
 msgstr "Couleur"
 
-#: includes/Elementor/Widgets/Search_Widget.php:666
-#: includes/Elementor/Widgets/Search_Widget.php:713
-#: includes/Elementor/Widgets/Search_Widget.php:802
-#: includes/Elementor/Widgets/Search_Widget.php:1064
+#: includes/Elementor/Widgets/Search_Widget.php:679
+#: includes/Elementor/Widgets/Search_Widget.php:726
+#: includes/Elementor/Widgets/Search_Widget.php:815
+#: includes/Elementor/Widgets/Search_Widget.php:1104
 msgid "Typography"
 msgstr "Typographie"
 
-#: includes/Elementor/Widgets/Search_Widget.php:683
+#: includes/Elementor/Widgets/Search_Widget.php:696
 msgid "Mode tabs"
 msgstr "Onglets de mode"
 
-#: includes/Elementor/Widgets/Search_Widget.php:692
+#: includes/Elementor/Widgets/Search_Widget.php:705
 msgid "The row of tabs above the search box. It only appears when the AI assistant or a guided quiz is on for your site."
 msgstr "La rangée d’onglets au-dessus du champ de recherche. Elle n’apparaît que si l’assistant IA ou un quiz guidé est activé sur votre site."
 
-#: includes/Elementor/Widgets/Search_Widget.php:699
-#: includes/Elementor/Widgets/Search_Widget.php:702
-#: src/blocks/search/edit.js:315
+#: includes/Elementor/Widgets/Search_Widget.php:712
+#: includes/Elementor/Widgets/Search_Widget.php:715
+#: src/blocks/search/edit.js:345
 msgid "Tab text"
 msgstr "Texte des onglets"
 
-#: includes/Elementor/Widgets/Search_Widget.php:701
-#: includes/Elementor/Widgets/Search_Widget.php:936
-#: includes/Elementor/Widgets/Search_Widget.php:1008
+#: includes/Elementor/Widgets/Search_Widget.php:714
+#: includes/Elementor/Widgets/Search_Widget.php:949
+#: includes/Elementor/Widgets/Search_Widget.php:1031
 msgid "Active"
 msgstr "Actif"
 
-#: includes/Elementor/Widgets/Search_Widget.php:703
+#: includes/Elementor/Widgets/Search_Widget.php:716
 msgid "Underline"
 msgstr "Soulignement"
 
-#: includes/Elementor/Widgets/Search_Widget.php:707
-#: src/blocks/search/edit.js:318
+#: includes/Elementor/Widgets/Search_Widget.php:720
+#: src/blocks/search/edit.js:348
 msgid "Divider"
 msgstr "Séparateur"
 
-#: includes/Elementor/Widgets/Search_Widget.php:728
-#: src/blocks/search/edit.js:210
+#: includes/Elementor/Widgets/Search_Widget.php:741
+#: src/blocks/search/edit.js:231
 msgid "Search field"
 msgstr "Champ de recherche"
 
-#: includes/Elementor/Widgets/Search_Widget.php:735
+#: includes/Elementor/Widgets/Search_Widget.php:748
 msgid "Placeholder color"
 msgstr "Couleur du texte indicatif"
 
-#: includes/Elementor/Widgets/Search_Widget.php:740
-#: includes/Elementor/Widgets/Search_Widget.php:743
+#: includes/Elementor/Widgets/Search_Widget.php:753
+#: includes/Elementor/Widgets/Search_Widget.php:756
 msgid "Border color"
 msgstr "Couleur de la bordure"
 
-#: includes/Elementor/Widgets/Search_Widget.php:742
+#: includes/Elementor/Widgets/Search_Widget.php:755
 msgid "Focus"
 msgstr "Focus"
 
-#: includes/Elementor/Widgets/Search_Widget.php:768
-#: src/blocks/search/edit.js:225
+#: includes/Elementor/Widgets/Search_Widget.php:781
+#: src/blocks/search/edit.js:246
 msgid "Buttons"
 msgstr "Boutons"
 
-#: includes/Elementor/Widgets/Search_Widget.php:775
+#: includes/Elementor/Widgets/Search_Widget.php:788
 msgid "Primary buttons"
 msgstr "Boutons principaux"
 
-#: includes/Elementor/Widgets/Search_Widget.php:781
+#: includes/Elementor/Widgets/Search_Widget.php:794
 msgid "The Search button, \"Load more\" under the results and the price filter's Apply."
 msgstr "Le bouton Rechercher, « Charger plus » sous les résultats et le bouton Appliquer du filtre de prix."
 
-#: includes/Elementor/Widgets/Search_Widget.php:789
-#: includes/Elementor/Widgets/Search_Widget.php:793
-#: includes/Elementor/Widgets/Search_Widget.php:913
-#: includes/Elementor/Widgets/Search_Widget.php:918
-#: includes/Elementor/Widgets/Search_Widget.php:930
-#: includes/Elementor/Widgets/Search_Widget.php:933
-#: includes/Elementor/Widgets/Search_Widget.php:937
-#: includes/Elementor/Widgets/Search_Widget.php:956
-#: includes/Elementor/Widgets/Search_Widget.php:959
-#: includes/Elementor/Widgets/Search_Widget.php:1002
-#: includes/Elementor/Widgets/Search_Widget.php:1006
-#: includes/Elementor/Widgets/Search_Widget.php:1010
-#: includes/Elementor/Widgets/Search_Widget.php:1121
-#: includes/Elementor/Widgets/Search_Widget.php:1145
-#: includes/Elementor/Widgets/Search_Widget.php:1150
-#: includes/Elementor/Widgets/Search_Widget.php:1229
-#: src/blocks/search/edit.js:198
-#: src/blocks/search/edit.js:214
-#: src/blocks/search/edit.js:299
-#: src/blocks/search/edit.js:341
+#: includes/Elementor/Widgets/Search_Widget.php:802
+#: includes/Elementor/Widgets/Search_Widget.php:806
+#: includes/Elementor/Widgets/Search_Widget.php:926
+#: includes/Elementor/Widgets/Search_Widget.php:931
+#: includes/Elementor/Widgets/Search_Widget.php:943
+#: includes/Elementor/Widgets/Search_Widget.php:946
+#: includes/Elementor/Widgets/Search_Widget.php:950
+#: includes/Elementor/Widgets/Search_Widget.php:969
+#: includes/Elementor/Widgets/Search_Widget.php:972
+#: includes/Elementor/Widgets/Search_Widget.php:1025
+#: includes/Elementor/Widgets/Search_Widget.php:1029
+#: includes/Elementor/Widgets/Search_Widget.php:1033
+#: includes/Elementor/Widgets/Search_Widget.php:1046
+#: includes/Elementor/Widgets/Search_Widget.php:1161
+#: includes/Elementor/Widgets/Search_Widget.php:1185
+#: includes/Elementor/Widgets/Search_Widget.php:1190
+#: includes/Elementor/Widgets/Search_Widget.php:1269
+#: src/blocks/search/edit.js:219
+#: src/blocks/search/edit.js:235
+#: src/blocks/search/edit.js:320
+#: src/blocks/search/edit.js:371
 msgid "Text"
 msgstr "Texte"
 
-#: includes/Elementor/Widgets/Search_Widget.php:811
+#: includes/Elementor/Widgets/Search_Widget.php:824
 msgid "Voice button"
 msgstr "Bouton vocal"
 
-#: includes/Elementor/Widgets/Search_Widget.php:812
+#: includes/Elementor/Widgets/Search_Widget.php:825
 msgid "Photo search button"
 msgstr "Bouton de recherche par photo"
 
-#: includes/Elementor/Widgets/Search_Widget.php:813
+#: includes/Elementor/Widgets/Search_Widget.php:826
 msgid "Close button"
 msgstr "Bouton de fermeture"
 
-#: includes/Elementor/Widgets/Search_Widget.php:814
+#: includes/Elementor/Widgets/Search_Widget.php:827
 msgid "Clear button"
 msgstr "Bouton d’effacement"
 
-#: includes/Elementor/Widgets/Search_Widget.php:863
-#: src/blocks/search/edit.js:257
+#: includes/Elementor/Widgets/Search_Widget.php:876
+#: src/blocks/search/edit.js:278
 msgid "Suggestions"
 msgstr "Suggestions"
 
-#: includes/Elementor/Widgets/Search_Widget.php:868
-#: src/blocks/search/edit.js:260
+#: includes/Elementor/Widgets/Search_Widget.php:881
+#: src/blocks/search/edit.js:281
 msgid "Panel background"
 msgstr "Arrière-plan du panneau"
 
-#: includes/Elementor/Widgets/Search_Widget.php:869
-#: src/blocks/search/edit.js:261
+#: includes/Elementor/Widgets/Search_Widget.php:882
+#: src/blocks/search/edit.js:282
 msgid "Panel border"
 msgstr "Bordure du panneau"
 
-#: includes/Elementor/Widgets/Search_Widget.php:870
-#: src/blocks/search/edit.js:267
+#: includes/Elementor/Widgets/Search_Widget.php:883
+#: src/blocks/search/edit.js:288
 msgid "Panel radius"
 msgstr "Arrondi du panneau"
 
-#: includes/Elementor/Widgets/Search_Widget.php:874
-#: includes/Elementor/Widgets/Search_Widget.php:877
-#: src/blocks/search/edit.js:262
+#: includes/Elementor/Widgets/Search_Widget.php:887
+#: includes/Elementor/Widgets/Search_Widget.php:890
+#: src/blocks/search/edit.js:283
 msgid "Item text"
 msgstr "Texte des éléments"
 
-#: includes/Elementor/Widgets/Search_Widget.php:878
+#: includes/Elementor/Widgets/Search_Widget.php:891
 msgid "Item background"
 msgstr "Arrière-plan des éléments"
 
-#: includes/Elementor/Widgets/Search_Widget.php:886
+#: includes/Elementor/Widgets/Search_Widget.php:899
 msgid "Item typography"
 msgstr "Typographie des éléments"
 
-#: includes/Elementor/Widgets/Search_Widget.php:901
-#: src/blocks/search/edit.js:271
+#: includes/Elementor/Widgets/Search_Widget.php:914
+#: src/blocks/search/edit.js:292
 msgid "Recent & popular"
 msgstr "Récentes et populaires"
 
-#: includes/Elementor/Widgets/Search_Widget.php:908
+#: includes/Elementor/Widgets/Search_Widget.php:921
 msgid "Recent chips"
 msgstr "Pastilles récentes"
 
-#: includes/Elementor/Widgets/Search_Widget.php:914
-#: includes/Elementor/Widgets/Search_Widget.php:919
-#: includes/Elementor/Widgets/Search_Widget.php:1146
-#: includes/Elementor/Widgets/Search_Widget.php:1151
-#: includes/Elementor/Widgets/Search_Widget.php:1176
-#: includes/Elementor/Widgets/Search_Widget.php:1179
-#: src/blocks/search/edit.js:217
-#: src/blocks/search/edit.js:366
+#: includes/Elementor/Widgets/Search_Widget.php:927
+#: includes/Elementor/Widgets/Search_Widget.php:932
+#: includes/Elementor/Widgets/Search_Widget.php:1186
+#: includes/Elementor/Widgets/Search_Widget.php:1191
+#: includes/Elementor/Widgets/Search_Widget.php:1216
+#: includes/Elementor/Widgets/Search_Widget.php:1219
+#: src/blocks/search/edit.js:238
+#: src/blocks/search/edit.js:396
 msgid "Border"
 msgstr "Bordure"
 
-#: includes/Elementor/Widgets/Search_Widget.php:922
+#: includes/Elementor/Widgets/Search_Widget.php:935
 msgid "Radius"
 msgstr "Arrondi"
 
-#: includes/Elementor/Widgets/Search_Widget.php:926
+#: includes/Elementor/Widgets/Search_Widget.php:939
 msgid "\"Clear all\" link"
 msgstr "Lien « Tout effacer »"
 
-#: includes/Elementor/Widgets/Search_Widget.php:952
+#: includes/Elementor/Widgets/Search_Widget.php:965
 msgid "Popular items"
 msgstr "Éléments populaires"
 
-#: includes/Elementor/Widgets/Search_Widget.php:963
-#: includes/Elementor/Widgets/Search_Widget.php:1322
-#: src/blocks/search/edit.js:388
+#: includes/Elementor/Widgets/Search_Widget.php:976
+#: includes/Elementor/Widgets/Search_Widget.php:1362
+#: src/blocks/search/edit.js:418
 msgid "Spacing between items"
 msgstr "Espacement entre les éléments"
 
-#: includes/Elementor/Widgets/Search_Widget.php:964
+#: includes/Elementor/Widgets/Search_Widget.php:977
 msgid "Item radius"
 msgstr "Arrondi des éléments"
 
-#: includes/Elementor/Widgets/Search_Widget.php:968
+#: includes/Elementor/Widgets/Search_Widget.php:981
 msgid "Item padding"
 msgstr "Marge interne des éléments"
 
-#: includes/Elementor/Widgets/Search_Widget.php:978
+#: includes/Elementor/Widgets/Search_Widget.php:991
 msgid "Popular typography"
 msgstr "Typographie des populaires"
 
-#: includes/Elementor/Widgets/Search_Widget.php:994
+#: includes/Elementor/Widgets/Search_Widget.php:1008
+#: src/blocks/search/edit.js:316
+#: src/frontend/search/components/FilterBar.js:212
+#: src/frontend/search/components/FilterBar.js:236
+#: src/frontend/search/components/SearchModal.js:1977
 msgid "Filters"
 msgstr "Filtres"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1015
+#: includes/Elementor/Widgets/Search_Widget.php:1039
 msgid "Max height"
 msgstr "Hauteur max."
 
-#: includes/Elementor/Widgets/Search_Widget.php:1015
-msgid "Caps a long filter list and lets it scroll instead of stretching the modal."
-msgstr "Limite la hauteur d’une longue liste de filtres et la fait défiler au lieu d’agrandir la fenêtre modale."
-
-#: includes/Elementor/Widgets/Search_Widget.php:1021
+#: includes/Elementor/Widgets/Search_Widget.php:1061
 msgid "Label typography"
 msgstr "Typographie des libellés"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1028
+#: includes/Elementor/Widgets/Search_Widget.php:1068
 msgid "Result count"
 msgstr "Nombre de résultats"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1030
+#: includes/Elementor/Widgets/Search_Widget.php:1070
 msgid "Count color"
 msgstr "Couleur du nombre"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1035
+#: includes/Elementor/Widgets/Search_Widget.php:1075
 msgid "Count typography"
 msgstr "Typographie du nombre"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1042
+#: includes/Elementor/Widgets/Search_Widget.php:1082
 msgid "Group names"
 msgstr "Noms des groupes"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1048
-msgid "The small title above each group of filters, such as \"Categories\" or \"Price\"."
-msgstr "Le petit titre au-dessus de chaque groupe de filtres, comme « Catégories » ou « Prix »."
-
-#: includes/Elementor/Widgets/Search_Widget.php:1081
-#: src/blocks/search/edit.js:323
-#: src/frontend/search/components/SearchModal.js:1121
+#: includes/Elementor/Widgets/Search_Widget.php:1121
+#: src/blocks/search/edit.js:353
+#: src/frontend/search/components/SearchModal.js:1726
 msgid "AI Assistant"
 msgstr "Assistant IA"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1086
-#: src/blocks/search/edit.js:326
+#: includes/Elementor/Widgets/Search_Widget.php:1126
+#: src/blocks/search/edit.js:356
 msgid "Accent (avatar, dots)"
 msgstr "Accent (avatar, points)"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1087
-#: src/blocks/search/edit.js:327
+#: includes/Elementor/Widgets/Search_Widget.php:1127
+#: src/blocks/search/edit.js:357
 msgid "Reply text"
 msgstr "Texte des réponses"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1088
-#: src/blocks/search/edit.js:328
+#: includes/Elementor/Widgets/Search_Widget.php:1128
+#: src/blocks/search/edit.js:358
 msgid "Your message background"
 msgstr "Arrière-plan de vos messages"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1089
-#: src/blocks/search/edit.js:329
+#: includes/Elementor/Widgets/Search_Widget.php:1129
+#: src/blocks/search/edit.js:359
 msgid "Your message text"
 msgstr "Texte de vos messages"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1090
-#: src/blocks/search/edit.js:330
+#: includes/Elementor/Widgets/Search_Widget.php:1130
+#: src/blocks/search/edit.js:360
 msgid "Compare row shading"
 msgstr "Ombrage des lignes de comparaison"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1091
-#: src/blocks/search/edit.js:333
+#: includes/Elementor/Widgets/Search_Widget.php:1131
+#: src/blocks/search/edit.js:363
 msgid "Message field radius"
 msgstr "Arrondi du champ de message"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1106
+#: includes/Elementor/Widgets/Search_Widget.php:1146
 #: src/admin/settings/components/tabs/SearchConfigTab.js:411
-#: src/blocks/search/edit.js:337
+#: src/blocks/search/edit.js:367
 msgid "Promotional banner"
 msgstr "Bannière promotionnelle"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1115
+#: includes/Elementor/Widgets/Search_Widget.php:1155
 msgid "Shown above the results when a merchandising rule attaches a banner to the search."
 msgstr "Affichée au-dessus des résultats lorsqu’une règle de merchandising associe une bannière à la recherche."
 
-#: includes/Elementor/Widgets/Search_Widget.php:1130
-#: src/blocks/search/edit.js:346
+#: includes/Elementor/Widgets/Search_Widget.php:1170
+#: src/blocks/search/edit.js:376
 msgid "Guided quiz"
 msgstr "Quiz guidé"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1135
-#: src/blocks/search/edit.js:349
+#: includes/Elementor/Widgets/Search_Widget.php:1175
+#: src/blocks/search/edit.js:379
 msgid "Question text"
 msgstr "Texte des questions"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1139
+#: includes/Elementor/Widgets/Search_Widget.php:1179
 msgid "Answers"
 msgstr "Réponses"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1155
-#: src/blocks/search/edit.js:358
+#: includes/Elementor/Widgets/Search_Widget.php:1195
+#: src/blocks/search/edit.js:388
 msgid "Answer radius"
 msgstr "Arrondi des réponses"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1167
-#: src/blocks/search/edit.js:362
+#: includes/Elementor/Widgets/Search_Widget.php:1207
+#: src/blocks/search/edit.js:392
 msgid "Result cards"
 msgstr "Cartes de résultats"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1188
+#: includes/Elementor/Widgets/Search_Widget.php:1228
 msgid "Image"
 msgstr "Image"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1193
+#: includes/Elementor/Widgets/Search_Widget.php:1233
 msgid "Aspect ratio"
 msgstr "Proportions"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1197
+#: includes/Elementor/Widgets/Search_Widget.php:1237
 msgid "Square (default)"
 msgstr "Carré (par défaut)"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1198
+#: includes/Elementor/Widgets/Search_Widget.php:1238
 msgid "Portrait 4:5"
 msgstr "Portrait 4:5"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1199
+#: includes/Elementor/Widgets/Search_Widget.php:1239
 msgid "Portrait 3:4"
 msgstr "Portrait 3:4"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1200
+#: includes/Elementor/Widgets/Search_Widget.php:1240
 msgid "Tall 2:3"
 msgstr "Haut 2:3"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1201
+#: includes/Elementor/Widgets/Search_Widget.php:1241
 msgid "Landscape 4:3"
 msgstr "Paysage 4:3"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1202
+#: includes/Elementor/Widgets/Search_Widget.php:1242
 msgid "Wide 16:9"
 msgstr "Large 16:9"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1210
+#: includes/Elementor/Widgets/Search_Widget.php:1250
 msgid "Fit"
 msgstr "Ajustement"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1214
+#: includes/Elementor/Widgets/Search_Widget.php:1254
 msgid "Fill and crop (default)"
 msgstr "Remplir et recadrer (par défaut)"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1215
+#: includes/Elementor/Widgets/Search_Widget.php:1255
 msgid "Show the whole image"
 msgstr "Afficher l’image entière"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1217
+#: includes/Elementor/Widgets/Search_Widget.php:1257
 msgid "\"Show the whole image\" keeps packshots on a plain background uncropped; the background below fills the space around them."
 msgstr "« Afficher l’image entière » garde sans recadrage les photos de produits sur fond uni ; l’arrière-plan ci-dessous remplit l’espace autour d’elles."
 
-#: includes/Elementor/Widgets/Search_Widget.php:1226
+#: includes/Elementor/Widgets/Search_Widget.php:1266
 msgid "Sale badge"
 msgstr "Badge Promo"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1234
+#: includes/Elementor/Widgets/Search_Widget.php:1274
 msgid "Title and price"
 msgstr "Titre et prix"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1236
+#: includes/Elementor/Widgets/Search_Widget.php:1276
 msgid "Title color"
 msgstr "Couleur du titre"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1241
+#: includes/Elementor/Widgets/Search_Widget.php:1281
 msgid "Title typography"
 msgstr "Typographie du titre"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1248
+#: includes/Elementor/Widgets/Search_Widget.php:1288
 msgid "Title lines"
 msgstr "Lignes du titre"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1255
+#: includes/Elementor/Widgets/Search_Widget.php:1295
 msgid "A longer title is cut off with an ellipsis after this many lines, so cards line up."
 msgstr "Au-delà de ce nombre de lignes, un titre plus long est coupé par des points de suspension, pour que les cartes restent alignées."
 
-#: includes/Elementor/Widgets/Search_Widget.php:1258
+#: includes/Elementor/Widgets/Search_Widget.php:1298
 msgid "Price / meta color"
 msgstr "Couleur du prix / des métadonnées"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1265
+#: includes/Elementor/Widgets/Search_Widget.php:1305
 msgid "Price typography"
 msgstr "Typographie du prix"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1273
+#: includes/Elementor/Widgets/Search_Widget.php:1313
 msgid "Price suffix / \"from\" typography"
 msgstr "Typographie du suffixe de prix / « à partir de »"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1280
-#: src/admin/settings/components/tabs/IndexingTab.js:207
+#: includes/Elementor/Widgets/Search_Widget.php:1320
+#: src/admin/settings/components/tabs/IndexingTab.js:202
 #: src/utils/facets.js:65
 msgid "Stock status"
 msgstr "État du stock"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1289
+#: includes/Elementor/Widgets/Search_Widget.php:1329
 msgid "Show (default)"
 msgstr "Afficher (par défaut)"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1295
-#: src/blocks/search/edit.js:370
-#: src/frontend/search/components/CompareTable.js:46
+#: includes/Elementor/Widgets/Search_Widget.php:1335
+#: src/blocks/search/edit.js:400
+#: src/frontend/search/components/CompareTable.js:56
 #: src/frontend/search/components/templates.js:101
 #: src/utils/facets.js:66
 msgid "In stock"
 msgstr "En stock"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1296
-#: src/blocks/search/edit.js:371
-#: src/frontend/search/components/CompareTable.js:47
+#: includes/Elementor/Widgets/Search_Widget.php:1336
+#: src/blocks/search/edit.js:401
+#: src/frontend/search/components/CompareTable.js:57
 #: src/frontend/search/components/templates.js:101
 msgid "Out of stock"
 msgstr "En rupture de stock"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1315
+#: includes/Elementor/Widgets/Search_Widget.php:1355
 msgid "Card width"
 msgstr "Largeur des cartes"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1320
+#: includes/Elementor/Widgets/Search_Widget.php:1360
 msgid "How wide each result card is, and so how many fit side by side. Set it per device with the responsive switch."
 msgstr "La largeur de chaque carte de résultat, et donc le nombre de cartes côte à côte. Réglez-la par appareil avec le sélecteur responsive."
 
-#: includes/Elementor/Widgets/Search_Widget.php:1325
+#: includes/Elementor/Widgets/Search_Widget.php:1365
 msgid "Arrows"
 msgstr "Flèches"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1329
-#: includes/Elementor/Widgets/Search_Widget.php:1333
-#: src/blocks/search/edit.js:382
+#: includes/Elementor/Widgets/Search_Widget.php:1369
+#: includes/Elementor/Widgets/Search_Widget.php:1373
+#: src/blocks/search/edit.js:412
 msgid "Arrow color"
 msgstr "Couleur des flèches"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1330
-#: includes/Elementor/Widgets/Search_Widget.php:1334
-#: src/blocks/search/edit.js:383
+#: includes/Elementor/Widgets/Search_Widget.php:1370
+#: includes/Elementor/Widgets/Search_Widget.php:1374
+#: src/blocks/search/edit.js:413
 msgid "Arrow background"
 msgstr "Arrière-plan des flèches"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1337
+#: includes/Elementor/Widgets/Search_Widget.php:1377
 msgid "Arrow size"
 msgstr "Taille des flèches"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1338
+#: includes/Elementor/Widgets/Search_Widget.php:1378
 msgid "Arrow radius"
 msgstr "Arrondi des flèches"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1342
+#: includes/Elementor/Widgets/Search_Widget.php:1382
 msgid "Arrow shadow"
 msgstr "Ombre des flèches"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1346
+#: includes/Elementor/Widgets/Search_Widget.php:1386
 msgid "Soft (default)"
 msgstr "Douce (par défaut)"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1352
-#: src/blocks/search/edit.js:384
+#: includes/Elementor/Widgets/Search_Widget.php:1392
+#: src/blocks/search/edit.js:414
 msgid "Dot color"
 msgstr "Couleur des points"
 
-#: includes/Elementor/Widgets/Search_Widget.php:1353
-#: src/blocks/search/edit.js:385
+#: includes/Elementor/Widgets/Search_Widget.php:1393
+#: src/blocks/search/edit.js:415
 msgid "Dot color (active)"
 msgstr "Couleur des points (actif)"
 
-#: includes/Frontend/Frontend_Config.php:124
-#: src/frontend/search/components/SearchModal.js:1071
-#: src/frontend/search/components/SearchModal.js:1332
+#: includes/Frontend/Frontend_Config.php:136
+#: src/frontend/search/components/SearchModal.js:1519
+#: src/frontend/search/components/SearchModal.js:1939
 msgid "No results found."
 msgstr "Aucun résultat trouvé."
 
-#: includes/Frontend/Frontend_Config.php:125
-#: src/frontend/search/components/SearchModal.js:1317
+#: includes/Frontend/Frontend_Config.php:137
+#: src/frontend/search/components/SearchModal.js:1924
 msgid "Searching…"
 msgstr "Recherche en cours…"
 
 #. translators: shown before a variable product's lowest price, e.g. "from €42".
-#: includes/Frontend/Frontend_Config.php:127
+#: includes/Frontend/Frontend_Config.php:139
 msgctxt "variable product price prefix"
 msgid "from"
 msgstr "à partir de"
 
-#: includes/Frontend/Frontend_Config.php:128
+#: includes/Frontend/Frontend_Config.php:140
 #: src/frontend/search/components/templates.js:115
 msgid "Sale"
 msgstr "Promo"
 
-#: includes/Frontend/Frontend_Config.php:129
-#: src/frontend/search/components/SearchModal.js:559
-#: src/frontend/search/components/SearchModal.js:828
+#: includes/Frontend/Frontend_Config.php:141
+#: src/frontend/search/components/SearchModal.js:724
+#: src/frontend/search/components/SearchModal.js:1267
 msgid "Search is unavailable right now."
 msgstr "La recherche est indisponible pour le moment."
 
-#: includes/Frontend/Frontend_Config.php:130
-#: src/frontend/search/components/Browse.js:65
+#: includes/Frontend/Frontend_Config.php:142
+#: src/frontend/search/components/Browse.js:74
 msgid "Recent searches"
 msgstr "Recherches récentes"
 
-#: includes/Frontend/Frontend_Config.php:131
+#: includes/Frontend/Frontend_Config.php:143
 #: src/admin/settings/components/tabs/SearchConfigTab.js:180
 #: src/admin/settings/components/tabs/SearchConfigTab.js:188
-#: src/frontend/search/components/Browse.js:98
+#: src/frontend/search/components/Browse.js:107
 msgid "Popular searches"
 msgstr "Recherches populaires"
 
-#: includes/Frontend/Frontend_Config.php:132
-#: src/frontend/search/components/RangeFilters.js:134
+#: includes/Frontend/Frontend_Config.php:144
 #: src/frontend/search/components/SearchInput.js:49
 msgid "Clear"
 msgstr "Effacer"
 
-#: includes/Frontend/Frontend_Config.php:133
-#: src/frontend/search/components/SearchModal.js:1147
-#: src/frontend/search/components/SearchModal.js:1210
+#: includes/Frontend/Frontend_Config.php:145
+#: src/frontend/search/components/SearchModal.js:1755
+#: src/frontend/search/components/SearchModal.js:1820
 msgid "Close search"
 msgstr "Fermer la recherche"
 
-#: includes/Frontend/Frontend_Config.php:134
-#: src/frontend/search/components/SearchModal.js:1198
+#: includes/Frontend/Frontend_Config.php:146
+#: src/frontend/search/components/SearchModal.js:1807
 msgid "Search by voice"
 msgstr "Rechercher par la voix"
 
-#: includes/Frontend/Frontend_Config.php:135
-#: src/frontend/search/components/SearchModal.js:1246
+#: includes/Frontend/Frontend_Config.php:147
+#: src/frontend/search/components/FilterBar.js:159
 msgid "All"
 msgstr "Tous"
 
 #. translators: %s: the name of the search service, "Searcio".
-#: includes/Frontend/Frontend_Config.php:137
+#: includes/Frontend/Frontend_Config.php:149
 #, php-format
 msgid "Search by %s (opens in a new tab)"
 msgstr "Recherche par %s (s’ouvre dans un nouvel onglet)"
@@ -1243,34 +1240,34 @@ msgstr "Searcio - environnement d’exécution"
 msgid "Connection, indexing, and sync state for support and debugging. Credentials are never included."
 msgstr "État de la connexion, de l’indexation et de la synchronisation, pour l’assistance et le débogage. Les identifiants ne sont jamais inclus."
 
-#: includes/Indexing/Index_Config.php:289
+#: includes/Indexing/Index_Config.php:397
 msgid "Post title"
 msgstr "Titre de la publication"
 
-#: includes/Indexing/Index_Config.php:293
+#: includes/Indexing/Index_Config.php:401
 msgid "Post content"
 msgstr "Contenu de la publication"
 
-#: includes/Indexing/Index_Config.php:297
-#: src/admin/settings/components/tabs/IndexingTab.js:34
+#: includes/Indexing/Index_Config.php:405
+#: src/admin/settings/components/tabs/IndexingTab.js:30
 msgid "Excerpt"
 msgstr "Extrait"
 
-#: includes/Indexing/Index_Config.php:301
+#: includes/Indexing/Index_Config.php:409
 msgid "Permalink (URL)"
 msgstr "Permalien (URL)"
 
-#: includes/Indexing/Index_Config.php:305
+#: includes/Indexing/Index_Config.php:413
 msgid "Featured image"
 msgstr "Image mise en avant"
 
-#: includes/Indexing/Index_Config.php:309
-#: src/admin/settings/components/tabs/IndexingTab.js:32
+#: includes/Indexing/Index_Config.php:417
+#: src/admin/settings/components/tabs/IndexingTab.js:28
 msgid "Published date"
 msgstr "Date de publication"
 
-#: includes/Indexing/Index_Config.php:313
-#: src/admin/settings/components/tabs/IndexingTab.js:31
+#: includes/Indexing/Index_Config.php:421
+#: src/admin/settings/components/tabs/IndexingTab.js:27
 msgid "Author"
 msgstr "Auteur"
 
@@ -1288,7 +1285,7 @@ msgstr "Impossible de se déconnecter de Searcio. Réessayez."
 
 #: includes/Routing/Connection_Endpoint.php:185
 #: includes/Routing/Connection_Endpoint.php:246
-#: includes/Routing/Search_Config_Endpoint.php:74
+#: includes/Routing/Search_Config_Endpoint.php:76
 msgid "Could not reach Searcio."
 msgstr "Impossible de joindre Searcio."
 
@@ -1326,7 +1323,7 @@ msgstr "Aucun site trouvé pour ces identifiants."
 msgid "Invalid indexing configuration payload."
 msgstr "Données de configuration d’indexation non valides."
 
-#: includes/Routing/Search_Config_Endpoint.php:55
+#: includes/Routing/Search_Config_Endpoint.php:57
 msgid "Invalid search configuration payload."
 msgstr "Données de configuration de recherche non valides."
 
@@ -1361,19 +1358,19 @@ msgstr "Aucune vérification n’est en cours."
 msgid "Not connected."
 msgstr "Non connecté."
 
-#: includes/Settings/Plugin_Settings.php:277
+#: includes/Settings/Plugin_Settings.php:295
 msgid "Keep history for (days)"
 msgstr "Conserver l’historique pendant (jours)"
 
-#: includes/Settings/Plugin_Settings.php:278
+#: includes/Settings/Plugin_Settings.php:296
 msgid "How long finished sync runs are kept. Use 0 to keep them forever."
 msgstr "Durée de conservation des synchronisations terminées. Utilisez 0 pour les conserver indéfiniment."
 
-#: includes/Settings/Plugin_Settings.php:281
+#: includes/Settings/Plugin_Settings.php:299
 msgid "Delete plugin data on uninstall"
 msgstr "Supprimer les données de l’extension à la désinstallation"
 
-#: includes/Settings/Plugin_Settings.php:282
+#: includes/Settings/Plugin_Settings.php:300
 msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio."
 msgstr "Lorsque cette option est activée, la suppression de l’extension retire aussi ses réglages, ses tables de synchronisation et les métadonnées de synchronisation de chaque contenu de ce site. Elle ne supprime jamais les documents déjà envoyés à Searcio."
 
@@ -1511,7 +1508,7 @@ msgid "Save Settings"
 msgstr "Enregistrer les réglages"
 
 #: src/admin/settings/components/SettingsPanel.js:167
-#: src/admin/settings/components/tabs/IndexingTab.js:558
+#: src/admin/settings/components/tabs/IndexingTab.js:561
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:86
 #: src/admin/settings/components/tabs/SearchConfigTab.js:712
 msgid "No unsaved changes."
@@ -1528,7 +1525,7 @@ msgid "The settings could not be loaded: %s"
 msgstr "Les réglages n’ont pas pu être chargés : %s"
 
 #: src/admin/settings/components/SettingsPanel.js:213
-#: src/admin/settings/components/tabs/IndexingTab.js:545
+#: src/admin/settings/components/tabs/IndexingTab.js:548
 #: src/admin/settings/components/tabs/SearchConfigTab.js:700
 #: src/frontend/search/components/AiAssistant.js:298
 msgid "Try again"
@@ -1744,288 +1741,288 @@ msgstr "Cela retire le site de Searcio et y supprime définitivement son index d
 msgid "Loading the indexing configuration"
 msgstr "Chargement de la configuration d’indexation"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:25
+#: src/admin/settings/components/tabs/IndexingTab.js:21
 msgid "Custom field"
 msgstr "Champ personnalisé"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:26
-#: src/admin/settings/components/tabs/IndexingTab.js:117
+#: src/admin/settings/components/tabs/IndexingTab.js:22
+#: src/admin/settings/components/tabs/IndexingTab.js:112
 msgid "Taxonomy"
 msgstr "Taxonomie"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:27
+#: src/admin/settings/components/tabs/IndexingTab.js:23
 msgid "Built-in field"
 msgstr "Champ intégré"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:33
+#: src/admin/settings/components/tabs/IndexingTab.js:29
 msgid "Modified date"
 msgstr "Date de modification"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:35
+#: src/admin/settings/components/tabs/IndexingTab.js:31
 msgid "Slug"
 msgstr "Identifiant"
 
 #. translators: %s: taxonomy label.
-#: src/admin/settings/components/tabs/IndexingTab.js:50
+#: src/admin/settings/components/tabs/IndexingTab.js:46
 #, js-format
 msgid "Taxonomy: %s"
 msgstr "Taxonomie : %s"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:57
+#: src/admin/settings/components/tabs/IndexingTab.js:53
 msgid "- Do not send -"
 msgstr "- Ne pas envoyer -"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:103
+#: src/admin/settings/components/tabs/IndexingTab.js:99
 msgid "Value"
 msgstr "Valeur"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:106
-#: src/admin/settings/components/tabs/IndexingTab.js:120
+#: src/admin/settings/components/tabs/IndexingTab.js:101
+#: src/admin/settings/components/tabs/IndexingTab.js:115
 msgid "- Select -"
 msgstr "- Sélectionner -"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:134
+#: src/admin/settings/components/tabs/IndexingTab.js:131
 msgid "Taxonomy slug"
 msgstr "Identifiant de la taxonomie"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:135
+#: src/admin/settings/components/tabs/IndexingTab.js:132
 msgid "Meta key"
 msgstr "Clé méta"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:146
+#: src/admin/settings/components/tabs/IndexingTab.js:143
 msgid "Send as"
 msgstr "Envoyer comme"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:152
+#: src/admin/settings/components/tabs/IndexingTab.js:149
 msgid "From"
 msgstr "Source"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:163
+#: src/admin/settings/components/tabs/IndexingTab.js:158
 #: src/admin/settings/components/tabs/SearchConfigTab.js:770
 msgid "Remove field"
 msgstr "Retirer le champ"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:175
+#: src/admin/settings/components/tabs/IndexingTab.js:170
 msgid "Activate WooCommerce to index product data."
 msgstr "Activez WooCommerce pour indexer les données des produits."
 
 #. translators: 1: current version, 2: minimum version.
-#: src/admin/settings/components/tabs/IndexingTab.js:187
+#: src/admin/settings/components/tabs/IndexingTab.js:182
 #, js-format
 msgid "WooCommerce %1$s is below the supported minimum %2$s. Product fields are disabled until WooCommerce is updated."
 msgstr "La version %1$s de WooCommerce est inférieure au minimum pris en charge (%2$s). Les champs produit sont désactivés jusqu’à la mise à jour de WooCommerce."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:203
+#: src/admin/settings/components/tabs/IndexingTab.js:198
 #: src/utils/facets.js:71
 msgid "Price"
 msgstr "Prix"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:204
+#: src/admin/settings/components/tabs/IndexingTab.js:199
 msgid "Regular & sale price"
 msgstr "Tarif régulier et tarif promo"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:205
+#: src/admin/settings/components/tabs/IndexingTab.js:200
 #: src/utils/facets.js:69
 msgid "SKU"
 msgstr "UGS"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:206
+#: src/admin/settings/components/tabs/IndexingTab.js:201
 msgid "Variation SKUs"
 msgstr "UGS des variations"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:208
+#: src/admin/settings/components/tabs/IndexingTab.js:203
 #: src/utils/facets.js:63
 msgid "Categories"
 msgstr "Catégories"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:209
+#: src/admin/settings/components/tabs/IndexingTab.js:204
 #: src/utils/facets.js:64
 msgid "Tags"
 msgstr "Étiquettes"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:211
+#: src/admin/settings/components/tabs/IndexingTab.js:206
 msgid "Average rating"
 msgstr "Note moyenne"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:212
+#: src/admin/settings/components/tabs/IndexingTab.js:207
 msgid "Review count"
 msgstr "Nombre d’avis"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:226
+#: src/admin/settings/components/tabs/IndexingTab.js:221
 msgid "Product details"
 msgstr "Détails du produit"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:227
+#: src/admin/settings/components/tabs/IndexingTab.js:222
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr "Choisissez les données WooCommerce à envoyer. Les produits variables sont indexés une seule fois (en tant que parent) avec une fourchette de prix."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:234
+#: src/admin/settings/components/tabs/IndexingTab.js:229
 msgid "Only index published, visible products"
 msgstr "Indexer uniquement les produits publiés et visibles"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:235
+#: src/admin/settings/components/tabs/IndexingTab.js:230
 msgid "Recommended. Hidden or draft products stay out of search."
 msgstr "Recommandé. Les produits masqués ou en brouillon restent hors de la recherche."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:254
+#: src/admin/settings/components/tabs/IndexingTab.js:249
 msgid "Product attributes"
 msgstr "Attributs du produit"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:255
+#: src/admin/settings/components/tabs/IndexingTab.js:250
 msgid "Each selected attribute is sent as its own field (attr_{name}) so it can be made searchable."
 msgstr "Chaque attribut sélectionné est envoyé dans son propre champ (attr_{name}) pour pouvoir être rendu recherchable."
 
 #. translators: %s: post type label.
-#: src/admin/settings/components/tabs/IndexingTab.js:304
+#: src/admin/settings/components/tabs/IndexingTab.js:299
 #, js-format
 msgid "Add %s to search"
 msgstr "Ajouter %s à la recherche"
 
 #. translators: %s: post type label.
-#: src/admin/settings/components/tabs/IndexingTab.js:309
+#: src/admin/settings/components/tabs/IndexingTab.js:304
 #, js-format
 msgid "When on, your %s are sent to Searcio and appear in search results."
 msgstr "Une fois activé, le contenu de type %s est envoyé à Searcio et apparaît dans les résultats de recherche."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:319
+#: src/admin/settings/components/tabs/IndexingTab.js:314
 msgid "What appears in results"
 msgstr "Ce qui apparaît dans les résultats"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:320
+#: src/admin/settings/components/tabs/IndexingTab.js:315
 msgid "Choose where each part of a search result comes from. The defaults work for most sites."
 msgstr "Choisissez d’où provient chaque partie d’un résultat de recherche. Les valeurs par défaut conviennent à la plupart des sites."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:327
-#: src/blocks/search/edit.js:368
+#: src/admin/settings/components/tabs/IndexingTab.js:322
+#: src/blocks/search/edit.js:398
 msgid "Title"
 msgstr "Titre"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:328
+#: src/admin/settings/components/tabs/IndexingTab.js:323
 msgid "The main heading of each result. Required."
 msgstr "Le titre principal de chaque résultat. Obligatoire."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:334
+#: src/admin/settings/components/tabs/IndexingTab.js:331
 msgid "Body text"
 msgstr "Corps du texte"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:335
+#: src/admin/settings/components/tabs/IndexingTab.js:332
 msgid "The text Searcio looks through for matches."
 msgstr "Le texte dans lequel Searcio cherche des correspondances."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:341
+#: src/admin/settings/components/tabs/IndexingTab.js:340
 msgid "Result link"
 msgstr "Lien du résultat"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:342
+#: src/admin/settings/components/tabs/IndexingTab.js:341
 msgid "Where clicking a result takes the visitor."
 msgstr "La page vers laquelle un clic sur le résultat mène le visiteur."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:348
+#: src/admin/settings/components/tabs/IndexingTab.js:349
 msgid "Thumbnail image"
 msgstr "Miniature"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:349
+#: src/admin/settings/components/tabs/IndexingTab.js:350
 msgid "Image shown next to each result."
 msgstr "Image affichée à côté de chaque résultat."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:357
+#: src/admin/settings/components/tabs/IndexingTab.js:360
 msgid "Options"
 msgstr "Options"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:361
+#: src/admin/settings/components/tabs/IndexingTab.js:364
 msgid "Include a short summary (excerpt)"
 msgstr "Inclure un court résumé (extrait)"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:367
+#: src/admin/settings/components/tabs/IndexingTab.js:370
 msgid "Also index private & password-protected items"
 msgstr "Indexer aussi les éléments privés et protégés par mot de passe"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:368
+#: src/admin/settings/components/tabs/IndexingTab.js:371
 msgid "Off by default."
 msgstr "Désactivé par défaut."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:386
+#: src/admin/settings/components/tabs/IndexingTab.js:389
 msgid "Hide advanced options"
 msgstr "Masquer les options avancées"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:387
+#: src/admin/settings/components/tabs/IndexingTab.js:390
 msgid "Show advanced options"
 msgstr "Afficher les options avancées"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:394
+#: src/admin/settings/components/tabs/IndexingTab.js:397
 msgid "Type label"
 msgstr "Libellé du type"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:395
+#: src/admin/settings/components/tabs/IndexingTab.js:398
 msgid "How this content is grouped and filtered in search. Most sites can leave this as the default."
 msgstr "La façon dont ce contenu est regroupé et filtré dans la recherche. La plupart des sites peuvent conserver la valeur par défaut."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:401
+#: src/admin/settings/components/tabs/IndexingTab.js:404
 msgid "Type"
 msgstr "Type"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:408
+#: src/admin/settings/components/tabs/IndexingTab.js:411
 msgid "Extra fields"
 msgstr "Champs supplémentaires"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:409
+#: src/admin/settings/components/tabs/IndexingTab.js:412
 msgid "Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose."
 msgstr "Envoyez des données supplémentaires (un champ personnalisé, une taxonomie ou un champ intégré) sous le nom de votre choix."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:429
+#: src/admin/settings/components/tabs/IndexingTab.js:432
 #: src/admin/settings/components/tabs/SearchConfigTab.js:777
 msgid "Add a field"
 msgstr "Ajouter un champ"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:483
-#: src/admin/settings/components/tabs/IndexingTab.js:523
-#: src/admin/settings/components/tabs/IndexingTab.js:540
+#: src/admin/settings/components/tabs/IndexingTab.js:486
+#: src/admin/settings/components/tabs/IndexingTab.js:526
+#: src/admin/settings/components/tabs/IndexingTab.js:543
 #: src/admin/settings/components/tabs/SearchConfigTab.js:499
 #: src/admin/settings/components/tabs/SearchConfigTab.js:695
 #: src/settings/store/provider.js:95
 msgid "the request to the REST API failed."
 msgstr "la requête vers l’API REST a échoué."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:520
+#: src/admin/settings/components/tabs/IndexingTab.js:523
 msgid "Indexing configuration saved."
 msgstr "Configuration d’indexation enregistrée."
 
 #. translators: %s: reason the request failed.
-#: src/admin/settings/components/tabs/IndexingTab.js:539
+#: src/admin/settings/components/tabs/IndexingTab.js:542
 #, js-format
 msgid "The indexing configuration could not be loaded: %s"
 msgstr "La configuration d’indexation n’a pas pu être chargée : %s"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:555
+#: src/admin/settings/components/tabs/IndexingTab.js:558
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:83
 #: src/admin/settings/components/tabs/SearchConfigTab.js:709
 msgid "Saving…"
 msgstr "Enregistrement…"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:556
+#: src/admin/settings/components/tabs/IndexingTab.js:559
 msgid "Save indexing configuration"
 msgstr "Enregistrer la configuration d’indexation"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:564
+#: src/admin/settings/components/tabs/IndexingTab.js:567
 msgid "What to index"
 msgstr "Contenu à indexer"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:565
+#: src/admin/settings/components/tabs/IndexingTab.js:568
 msgid "Turn on the content you want to be searchable and choose which information is sent for each. Changes take effect after the next sync."
 msgstr "Activez les contenus que vous voulez rendre recherchables et choisissez les informations envoyées pour chacun. Les modifications prennent effet après la prochaine synchronisation."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:573
+#: src/admin/settings/components/tabs/IndexingTab.js:576
 msgid "Sending a field here makes the data available. To let visitors search by it, also enable that field (with a weight) in the Search Config tab."
 msgstr "Envoyer un champ ici rend ses données disponibles. Pour que les visiteurs puissent rechercher dessus, activez aussi ce champ (avec un poids) dans l’onglet Configuration de la recherche."
 
 #. translators: %s: reason the save failed, as reported by the REST API.
-#: src/admin/settings/components/tabs/IndexingTab.js:598
+#: src/admin/settings/components/tabs/IndexingTab.js:601
 #, js-format
 msgid "The indexing configuration could not be saved: %s"
 msgstr "La configuration d’indexation n’a pas pu être enregistrée : %s"
 
 #. translators: %d: number of enabled content types.
-#: src/admin/settings/components/tabs/IndexingTab.js:623
+#: src/admin/settings/components/tabs/IndexingTab.js:626
 #, js-format
 msgid "%d content type will be indexed."
 msgid_plural "%d content types will be indexed."
@@ -2690,301 +2687,293 @@ msgstr "Terminée"
 msgid "Cancelled"
 msgstr "Annulée"
 
-#: src/blocks/products/edit.js:26
+#: src/blocks/products/edit.js:27
 msgid "the product being viewed"
 msgstr "le produit consulté"
 
-#: src/blocks/products/edit.js:27
+#: src/blocks/products/edit.js:28
 msgid "the category being browsed"
 msgstr "la catégorie parcourue"
 
-#: src/blocks/products/edit.js:42
+#: src/blocks/products/edit.js:46
 msgid "Products close in meaning to the one being viewed. Needs AI search on your plan; without it the row stays hidden."
 msgstr "Des produits proches par leur sens de celui qui est consulté. Nécessite la recherche IA dans votre forfait ; sans elle, la rangée reste masquée."
 
-#: src/blocks/products/edit.js:46
+#: src/blocks/products/edit.js:50
 msgid "A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out."
 msgstr "Une liste filtrée sur une catégorie, pour que vos règles de merchandising pour cette catégorie s’appliquent - produits épinglés en premier, produits masqués exclus."
 
-#: src/blocks/products/edit.js:63
+#: src/blocks/products/edit.js:66
 msgid "Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
 msgstr "Laissez vide pour utiliser le produit que le visiteur consulte - c’est ce qui permet d’utiliser ce bloc dans un modèle de produit."
 
-#: src/blocks/products/edit.js:92
+#: src/blocks/products/edit.js:95
 msgid "Shown only when a rule for this category actually carries one."
 msgstr "Affichée uniquement lorsqu’une règle pour cette catégorie en comporte réellement une."
 
-#: src/blocks/search/edit.js:80
+#: src/blocks/search/edit.js:81
 msgid "Search settings"
 msgstr "Réglages de recherche"
 
-#: src/blocks/search/edit.js:126
+#: src/blocks/search/edit.js:133
 msgid "Shows a microphone button in the modal (browser support required)."
 msgstr "Affiche un bouton micro dans la fenêtre modale (nécessite la prise en charge par le navigateur)."
 
-#: src/blocks/search/edit.js:132
+#: src/blocks/search/edit.js:139
 msgid "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button."
 msgstr "« Pendant la saisie » lance la recherche automatiquement après 3 caractères ; « À la validation » attend la touche Entrée ou le bouton Rechercher."
 
-#: src/blocks/search/edit.js:181
+#: src/blocks/search/edit.js:202
 msgid "Icon color (hover)"
 msgstr "Couleur de l’icône (survol)"
 
-#: src/blocks/search/edit.js:183
-#: src/blocks/search/edit.js:300
+#: src/blocks/search/edit.js:204
+#: src/blocks/search/edit.js:321
 msgid "Background (hover)"
 msgstr "Arrière-plan (survol)"
 
-#: src/blocks/search/edit.js:199
+#: src/blocks/search/edit.js:220
 msgid "Accent"
 msgstr "Accent"
 
-#: src/blocks/search/edit.js:216
+#: src/blocks/search/edit.js:237
 msgid "Placeholder"
 msgstr "Texte indicatif"
 
-#: src/blocks/search/edit.js:218
+#: src/blocks/search/edit.js:239
 msgid "Border (focus)"
 msgstr "Bordure (focus)"
 
-#: src/blocks/search/edit.js:228
+#: src/blocks/search/edit.js:249
 msgid "Search button bg"
 msgstr "Fond du bouton Rechercher"
 
-#: src/blocks/search/edit.js:229
+#: src/blocks/search/edit.js:250
 msgid "Search button bg (hover)"
 msgstr "Fond du bouton Rechercher (survol)"
 
-#: src/blocks/search/edit.js:230
+#: src/blocks/search/edit.js:251
 msgid "Search button text"
 msgstr "Texte du bouton Rechercher"
 
-#: src/blocks/search/edit.js:231
+#: src/blocks/search/edit.js:252
 msgid "Search button text (hover)"
 msgstr "Texte du bouton Rechercher (survol)"
 
-#: src/blocks/search/edit.js:232
+#: src/blocks/search/edit.js:253
 msgid "Icon buttons"
 msgstr "Boutons icônes"
 
-#: src/blocks/search/edit.js:233
+#: src/blocks/search/edit.js:254
 msgid "Icon buttons (hover)"
 msgstr "Boutons icônes (survol)"
 
-#: src/blocks/search/edit.js:234
+#: src/blocks/search/edit.js:255
 msgid "Icon button bg (hover)"
 msgstr "Fond des boutons icônes (survol)"
 
-#: src/blocks/search/edit.js:236
+#: src/blocks/search/edit.js:257
 msgid "Voice icon (hover)"
 msgstr "Icône vocale (survol)"
 
-#: src/blocks/search/edit.js:237
+#: src/blocks/search/edit.js:258
 msgid "Voice bg"
 msgstr "Fond du bouton vocal"
 
-#: src/blocks/search/edit.js:238
+#: src/blocks/search/edit.js:259
 msgid "Voice bg (hover)"
 msgstr "Fond du bouton vocal (survol)"
 
-#: src/blocks/search/edit.js:239
+#: src/blocks/search/edit.js:260
 msgid "Close icon"
 msgstr "Icône de fermeture"
 
-#: src/blocks/search/edit.js:240
+#: src/blocks/search/edit.js:261
 msgid "Close icon (hover)"
 msgstr "Icône de fermeture (survol)"
 
-#: src/blocks/search/edit.js:241
+#: src/blocks/search/edit.js:262
 msgid "Close bg"
 msgstr "Fond du bouton de fermeture"
 
-#: src/blocks/search/edit.js:242
+#: src/blocks/search/edit.js:263
 msgid "Close bg (hover)"
 msgstr "Fond du bouton de fermeture (survol)"
 
-#: src/blocks/search/edit.js:243
+#: src/blocks/search/edit.js:264
 msgid "Photo icon"
 msgstr "Icône photo"
 
-#: src/blocks/search/edit.js:244
+#: src/blocks/search/edit.js:265
 msgid "Photo icon (hover)"
 msgstr "Icône photo (survol)"
 
-#: src/blocks/search/edit.js:245
+#: src/blocks/search/edit.js:266
 msgid "Photo bg"
 msgstr "Fond du bouton photo"
 
-#: src/blocks/search/edit.js:246
+#: src/blocks/search/edit.js:267
 msgid "Photo bg (hover)"
 msgstr "Fond du bouton photo (survol)"
 
-#: src/blocks/search/edit.js:247
+#: src/blocks/search/edit.js:268
 msgid "Clear icon"
 msgstr "Icône d’effacement"
 
-#: src/blocks/search/edit.js:248
+#: src/blocks/search/edit.js:269
 msgid "Clear icon (hover)"
 msgstr "Icône d’effacement (survol)"
 
-#: src/blocks/search/edit.js:249
+#: src/blocks/search/edit.js:270
 msgid "Clear bg"
 msgstr "Fond du bouton d’effacement"
 
-#: src/blocks/search/edit.js:250
+#: src/blocks/search/edit.js:271
 msgid "Clear bg (hover)"
 msgstr "Fond du bouton d’effacement (survol)"
 
-#: src/blocks/search/edit.js:253
+#: src/blocks/search/edit.js:274
 msgid "Search button radius"
 msgstr "Arrondi du bouton Rechercher"
 
-#: src/blocks/search/edit.js:263
+#: src/blocks/search/edit.js:284
 msgid "Item text (hover)"
 msgstr "Texte des éléments (survol)"
 
-#: src/blocks/search/edit.js:264
+#: src/blocks/search/edit.js:285
 msgid "Item background (hover)"
 msgstr "Arrière-plan des éléments (survol)"
 
-#: src/blocks/search/edit.js:274
+#: src/blocks/search/edit.js:295
 msgid "Section title"
 msgstr "Titre de section"
 
-#: src/blocks/search/edit.js:275
+#: src/blocks/search/edit.js:296
 msgid "Chip background"
 msgstr "Fond des pastilles"
 
-#: src/blocks/search/edit.js:276
+#: src/blocks/search/edit.js:297
 msgid "Chip text"
 msgstr "Texte des pastilles"
 
-#: src/blocks/search/edit.js:277
+#: src/blocks/search/edit.js:298
 msgid "Chip border"
 msgstr "Bordure des pastilles"
 
-#: src/blocks/search/edit.js:278
+#: src/blocks/search/edit.js:299
 msgid "Chip background (hover)"
 msgstr "Fond des pastilles (survol)"
 
-#: src/blocks/search/edit.js:279
+#: src/blocks/search/edit.js:300
 msgid "Chip text (hover)"
 msgstr "Texte des pastilles (survol)"
 
-#: src/blocks/search/edit.js:280
+#: src/blocks/search/edit.js:301
 msgid "Chip border (hover)"
 msgstr "Bordure des pastilles (survol)"
 
-#: src/blocks/search/edit.js:281
-#: src/frontend/search/components/Browse.js:67
+#: src/blocks/search/edit.js:302
+#: src/frontend/search/components/Browse.js:76
 msgid "Clear all"
 msgstr "Tout effacer"
 
-#: src/blocks/search/edit.js:282
+#: src/blocks/search/edit.js:303
 msgid "Clear all (hover)"
 msgstr "Tout effacer (survol)"
 
-#: src/blocks/search/edit.js:283
+#: src/blocks/search/edit.js:304
 msgid "Clear all (active)"
 msgstr "Tout effacer (actif)"
 
-#: src/blocks/search/edit.js:284
+#: src/blocks/search/edit.js:305
 msgid "Popular text"
 msgstr "Texte des populaires"
 
-#: src/blocks/search/edit.js:285
+#: src/blocks/search/edit.js:306
 msgid "Popular text (hover)"
 msgstr "Texte des populaires (survol)"
 
-#: src/blocks/search/edit.js:286
+#: src/blocks/search/edit.js:307
 msgid "Popular bg (hover)"
 msgstr "Fond des populaires (survol)"
 
-#: src/blocks/search/edit.js:289
+#: src/blocks/search/edit.js:310
 msgid "Chip radius"
 msgstr "Arrondi des pastilles"
 
-#: src/blocks/search/edit.js:290
+#: src/blocks/search/edit.js:311
 msgid "Popular item spacing"
 msgstr "Espacement des populaires"
 
-#: src/blocks/search/edit.js:291
+#: src/blocks/search/edit.js:312
 msgid "Popular item radius"
 msgstr "Arrondi des populaires"
 
-#: src/blocks/search/edit.js:295
-msgid "Type filters"
-msgstr "Filtres de type"
-
-#: src/blocks/search/edit.js:301
+#: src/blocks/search/edit.js:322
 msgid "Text (hover)"
 msgstr "Texte (survol)"
 
-#: src/blocks/search/edit.js:302
+#: src/blocks/search/edit.js:323
 msgid "Background (active)"
 msgstr "Arrière-plan (actif)"
 
-#: src/blocks/search/edit.js:303
+#: src/blocks/search/edit.js:324
 msgid "Text (active)"
 msgstr "Texte (actif)"
 
-#: src/blocks/search/edit.js:304
+#: src/blocks/search/edit.js:325
 msgid "Count"
 msgstr "Nombre"
 
-#: src/blocks/search/edit.js:308
-msgid "Max height (px)"
-msgstr "Hauteur max. (px)"
-
-#: src/blocks/search/edit.js:312
+#: src/blocks/search/edit.js:342
 msgid "Modal tabs"
 msgstr "Onglets de la fenêtre modale"
 
-#: src/blocks/search/edit.js:316
+#: src/blocks/search/edit.js:346
 msgid "Tab text (active)"
 msgstr "Texte des onglets (actif)"
 
-#: src/blocks/search/edit.js:317
+#: src/blocks/search/edit.js:347
 msgid "Active indicator"
 msgstr "Indicateur actif"
 
-#: src/blocks/search/edit.js:350
+#: src/blocks/search/edit.js:380
 msgid "Answer background"
 msgstr "Fond des réponses"
 
-#: src/blocks/search/edit.js:351
+#: src/blocks/search/edit.js:381
 msgid "Answer text"
 msgstr "Texte des réponses"
 
-#: src/blocks/search/edit.js:352
+#: src/blocks/search/edit.js:382
 msgid "Answer border"
 msgstr "Bordure des réponses"
 
-#: src/blocks/search/edit.js:353
+#: src/blocks/search/edit.js:383
 msgid "Answer background (hover)"
 msgstr "Fond des réponses (survol)"
 
-#: src/blocks/search/edit.js:354
+#: src/blocks/search/edit.js:384
 msgid "Answer text (hover)"
 msgstr "Texte des réponses (survol)"
 
-#: src/blocks/search/edit.js:355
+#: src/blocks/search/edit.js:385
 msgid "Answer border (hover)"
 msgstr "Bordure des réponses (survol)"
 
-#: src/blocks/search/edit.js:367
+#: src/blocks/search/edit.js:397
 msgid "Border (hover)"
 msgstr "Bordure (survol)"
 
-#: src/blocks/search/edit.js:369
+#: src/blocks/search/edit.js:399
 msgid "Price / meta"
 msgstr "Prix / métadonnées"
 
-#: src/blocks/search/edit.js:411
+#: src/blocks/search/edit.js:441
 msgid "Searcio - search box"
 msgstr "Searcio - barre de recherche"
 
-#: src/blocks/search/edit.js:412
+#: src/blocks/search/edit.js:442
 msgid "Searcio - search icon"
 msgstr "Searcio - icône de recherche"
 
@@ -3051,7 +3040,7 @@ msgstr[1] "Comparaison de %d produits"
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:321
-#: src/frontend/search/components/SearchModal.js:1028
+#: src/frontend/search/components/SearchModal.js:1475
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -3066,7 +3055,7 @@ msgstr "Retour à la liste"
 msgid "Compare"
 msgstr "Comparer"
 
-#: src/frontend/search/components/Browse.js:85
+#: src/frontend/search/components/Browse.js:94
 msgid "Remove from recent searches"
 msgstr "Retirer des recherches récentes"
 
@@ -3088,17 +3077,17 @@ msgstr "Pages"
 msgid "Go to page %d"
 msgstr "Aller à la page %d"
 
-#: src/frontend/search/components/CompareTable.js:48
+#: src/frontend/search/components/CompareTable.js:58
 msgid "On backorder"
 msgstr "En réapprovisionnement"
 
-#: src/frontend/search/components/CompareTable.js:66
-#: src/frontend/search/components/CompareTable.js:81
+#: src/frontend/search/components/CompareTable.js:76
+#: src/frontend/search/components/CompareTable.js:91
 msgid "Yes"
 msgstr "Oui"
 
-#: src/frontend/search/components/CompareTable.js:67
-#: src/frontend/search/components/CompareTable.js:81
+#: src/frontend/search/components/CompareTable.js:77
+#: src/frontend/search/components/CompareTable.js:91
 msgid "No"
 msgstr "Non"
 
@@ -3164,7 +3153,7 @@ msgid "Your answers"
 msgstr "Vos réponses"
 
 #: src/frontend/search/components/QuizPane.js:403
-#: src/frontend/search/components/SearchModal.js:1057
+#: src/frontend/search/components/SearchModal.js:1504
 msgid "Loading…"
 msgstr "Chargement…"
 
@@ -3177,105 +3166,89 @@ msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr "Aucun produit ne correspond à toutes vos réponses. Revenez une étape en arrière et essayez une autre réponse."
 
 #. translators: %s: field name, e.g. "Price".
-#: src/frontend/search/components/RangeFilters.js:79
+#: src/frontend/search/components/PriceRange.js:131
 #, js-format
 msgid "Minimum %s"
 msgstr "%s minimum"
 
 #. translators: %s: field name, e.g. "Price".
-#: src/frontend/search/components/RangeFilters.js:95
+#: src/frontend/search/components/PriceRange.js:142
 #, js-format
 msgid "Maximum %s"
 msgstr "%s maximum"
 
-#. translators: %s: field name, e.g. "Price".
-#: src/frontend/search/components/RangeFilters.js:112
-#, js-format
-msgid "Apply %s filter"
-msgstr "Appliquer le filtre %s"
-
-#: src/frontend/search/components/RangeFilters.js:117
-msgid "Apply"
-msgstr "Appliquer"
-
-#. translators: %s: field name, e.g. "Price".
-#: src/frontend/search/components/RangeFilters.js:125
-#, js-format
-msgid "Clear %s filter"
-msgstr "Effacer le filtre %s"
-
-#: src/frontend/search/components/SearchModal.js:663
+#: src/frontend/search/components/SearchModal.js:832
 msgid "Photo search is not available on this store."
 msgstr "La recherche par photo n’est pas disponible sur cette boutique."
 
-#: src/frontend/search/components/SearchModal.js:665
+#: src/frontend/search/components/SearchModal.js:834
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr "Ce fichier n’est pas une image que nous pouvons lire. Essayez un JPEG ou un PNG de moins de 8 Mo."
 
-#: src/frontend/search/components/SearchModal.js:667
+#: src/frontend/search/components/SearchModal.js:836
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr "La recherche par photo a atteint sa limite pour le moment. Veuillez réessayer plus tard."
 
-#: src/frontend/search/components/SearchModal.js:669
+#: src/frontend/search/components/SearchModal.js:838
 msgid "That photo search failed. Try another photo."
 msgstr "Cette recherche par photo a échoué. Essayez une autre photo."
 
-#: src/frontend/search/components/SearchModal.js:963
+#: src/frontend/search/components/SearchModal.js:1409
 msgid "Your photo"
 msgstr "Votre photo"
 
-#: src/frontend/search/components/SearchModal.js:973
+#: src/frontend/search/components/SearchModal.js:1419
 msgid "From your photo"
 msgstr "D’après votre photo"
 
-#: src/frontend/search/components/SearchModal.js:989
-#: src/frontend/search/components/SearchModal.js:1004
+#: src/frontend/search/components/SearchModal.js:1436
+#: src/frontend/search/components/SearchModal.js:1451
 msgid "Current highlights"
 msgstr "Notre sélection du moment"
 
-#: src/frontend/search/components/SearchModal.js:1009
-#: src/frontend/search/components/SearchModal.js:1316
+#: src/frontend/search/components/SearchModal.js:1456
+#: src/frontend/search/components/SearchModal.js:1923
 msgid "Looking at your photo…"
 msgstr "Analyse de votre photo…"
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:1022
+#: src/frontend/search/components/SearchModal.js:1469
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr "%1$d résultats sur %2$d"
 
-#: src/frontend/search/components/SearchModal.js:1046
+#: src/frontend/search/components/SearchModal.js:1493
 msgid "Search results"
 msgstr "Résultats de recherche"
 
-#: src/frontend/search/components/SearchModal.js:1058
+#: src/frontend/search/components/SearchModal.js:1505
 msgid "Load more results"
 msgstr "Charger plus de résultats"
 
-#: src/frontend/search/components/SearchModal.js:1070
+#: src/frontend/search/components/SearchModal.js:1518
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr "Aucun résultat pour cette photo. Essayez une photo plus nette, ou un seul objet à la fois."
 
-#: src/frontend/search/components/SearchModal.js:1095
+#: src/frontend/search/components/SearchModal.js:1699
 msgid "Search modes"
 msgstr "Modes de recherche"
 
-#: src/frontend/search/components/SearchModal.js:1135
+#: src/frontend/search/components/SearchModal.js:1741
 msgid "Product finder"
 msgstr "Guide d’achat"
 
-#: src/frontend/search/components/SearchModal.js:1239
+#: src/frontend/search/components/FilterBar.js:157
 msgid "Filter by type"
 msgstr "Filtrer par type"
 
 #. translators: 1: number of results shown. 2: total number of results found.
-#: src/frontend/search/components/SearchModal.js:1323
+#: src/frontend/search/components/SearchModal.js:1930
 #, js-format
 msgid "Showing %1$d of %2$d results."
 msgstr "Affichage de %1$d résultats sur %2$d."
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:1329
+#: src/frontend/search/components/SearchModal.js:1936
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."
@@ -3333,3 +3306,246 @@ msgstr "Recherche Searcio"
 msgctxt "block description"
 msgid "A full-screen search box or icon powered by Searcio."
 msgstr "Une barre ou une icône de recherche plein écran, propulsée par Searcio."
+
+#: includes/Elementor/Widgets/Search_Widget.php:225
+#: src/blocks/search/edit.js:156
+msgid "Filter buttons in the bar"
+msgstr "Boutons de filtre dans la barre"
+
+#: includes/Elementor/Widgets/Search_Widget.php:231
+#: src/blocks/search/edit.js:157
+msgid "How many filters get a button of their own under the search field, as far as they fit. Every filter is under \"All filters\". 0 shows \"All filters\" alone."
+msgstr "Le nombre de filtres qui ont leur propre bouton sous le champ de recherche, dans la limite de la place. Tous les filtres sont dans « Tous les filtres ». 0 n’affiche que « Tous les filtres »."
+
+#: includes/Elementor/Widgets/Search_Widget.php:1017
+msgid "Style the filter buttons under the search field, the type switch, size tiles, colour pills and the filters shown beside the result count."
+msgstr "Met en forme les boutons de filtre sous le champ de recherche, le sélecteur de type, les tuiles de taille, les pastilles de couleur et les filtres affichés à côté du nombre de résultats."
+
+#: includes/Elementor/Widgets/Search_Widget.php:1038
+msgid "Button height"
+msgstr "Hauteur des boutons"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1038
+msgid "The height of the filter buttons under the search field."
+msgstr "La hauteur des boutons de filtre sous le champ de recherche."
+
+#: includes/Elementor/Widgets/Search_Widget.php:1039
+msgid "Max height of a value list in a filter panel; a longer list scrolls."
+msgstr "Hauteur maximale d’une liste de valeurs dans un panneau de filtre ; une liste plus longue défile."
+
+#: includes/Elementor/Widgets/Search_Widget.php:1043
+#: src/blocks/search/edit.js:326
+msgid "Count on \"All filters\""
+msgstr "Nombre sur « Tous les filtres »"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1050
+msgid "Filter panels"
+msgstr "Panneaux de filtre"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1052
+msgid "Popover width"
+msgstr "Largeur de la fenêtre contextuelle"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1053
+#: src/blocks/search/edit.js:335
+msgid "Popover radius"
+msgstr "Arrondi de la fenêtre contextuelle"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1054
+msgid "\"All filters\" width"
+msgstr "Largeur de « Tous les filtres »"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1054
+msgid "The side panel \"All filters\" opens on a tablet or a desktop."
+msgstr "Le panneau latéral qu’ouvre « Tous les filtres » sur tablette ou ordinateur."
+
+#: includes/Elementor/Widgets/Search_Widget.php:1055
+#: src/blocks/search/edit.js:337
+msgid "Phone sheet radius"
+msgstr "Arrondi du panneau sur mobile"
+
+#: includes/Elementor/Widgets/Search_Widget.php:1055
+msgid "The top corners of the panel filters open from the bottom on a phone."
+msgstr "Les coins supérieurs du panneau que les filtres ouvrent par le bas sur mobile."
+
+#: includes/Elementor/Widgets/Search_Widget.php:1088
+msgid "The title of a filter's panel and of each section of \"All filters\", such as \"Categories\" or \"Price\"."
+msgstr "Le titre du panneau d’un filtre et de chaque section de « Tous les filtres », comme « Catégories » ou « Prix »."
+
+#: src/blocks/search/edit.js:327
+msgid "Count on \"All filters\" (text)"
+msgstr "Nombre sur « Tous les filtres » (texte)"
+
+#: src/blocks/search/edit.js:332
+msgid "Button height (px)"
+msgstr "Hauteur des boutons (px)"
+
+#: src/blocks/search/edit.js:333
+msgid "Max height of a value list (px)"
+msgstr "Hauteur maximale d’une liste de valeurs (px)"
+
+#: src/blocks/search/edit.js:334
+msgid "Popover width (px)"
+msgstr "Largeur de la fenêtre contextuelle (px)"
+
+#: src/blocks/search/edit.js:336
+msgid "\"All filters\" width (px)"
+msgstr "Largeur de « Tous les filtres » (px)"
+
+#: src/frontend/search/components/ActiveFilters.js:47
+msgid "Active filters"
+msgstr "Filtres actifs"
+
+#. translators: %s: a filter and its value, e.g. "Colour: Olive".
+#: src/frontend/search/components/ActiveFilters.js:55
+#, js-format
+msgid "Remove %s"
+msgstr "Retirer %s"
+
+#. translators: 1: filter name, e.g. "Colour". 2: what is selected in it, e.g. "Olive".
+#: src/frontend/search/components/ActiveFilters.js:58
+#: src/utils/facets.js:691
+#, js-format
+msgid "%1$s: %2$s"
+msgstr "%1$s : %2$s"
+
+#: src/frontend/search/components/ActiveFilters.js:85
+msgid "Reset all"
+msgstr "Tout réinitialiser"
+
+#. translators: %s: the search term the results are for.
+#: src/frontend/search/components/Browse.js:142
+#, js-format
+msgid "for “%s”"
+msgstr "pour « %s »"
+
+#. translators: %s: filter name, e.g. "Colour"; the selected value follows.
+#: src/frontend/search/components/FilterBar.js:189
+#, js-format
+msgid "%s:"
+msgstr "%s :"
+
+#: src/frontend/search/components/FilterBar.js:212
+#: src/frontend/search/components/SearchModal.js:1977
+msgid "All filters"
+msgstr "Tous les filtres"
+
+#. translators: %d: number of filter values applied.
+#: src/frontend/search/components/FilterBar.js:218
+#, js-format
+msgid ", %d active"
+msgid_plural ", %d active"
+msgstr[0] ", %d actif"
+msgstr[1] ", %d actifs"
+
+#. translators: 1: number of values. 2: filter name, e.g. "Category".
+#: src/frontend/search/components/FilterPanel.js:67
+#, js-format
+msgid "Show all %1$d values for %2$s"
+msgstr "Afficher les %1$d valeurs de %2$s"
+
+#: src/frontend/search/components/FilterPanel.js:74
+msgid "Show fewer"
+msgstr "Afficher moins"
+
+#. translators: %d: number of values.
+#: src/frontend/search/components/FilterPanel.js:77
+#, js-format
+msgid "Show all %d"
+msgstr "Afficher les %d"
+
+#: src/frontend/search/components/FilterPanel.js:129
+msgid "No values match the other filters."
+msgstr "Aucune valeur ne correspond aux autres filtres."
+
+#. translators: %s: filter name, e.g. "Category".
+#: src/frontend/search/components/FilterPanel.js:200
+#: src/frontend/search/components/FilterPanel.js:205
+#, js-format
+msgid "Search %s"
+msgstr "Rechercher dans %s"
+
+#. translators: %s: what was typed into a filter's search field.
+#: src/frontend/search/components/FilterPanel.js:228
+#, js-format
+msgid "Nothing matches “%s”."
+msgstr "Rien ne correspond à « %s »."
+
+#: src/frontend/search/components/FilterSheet.js:60
+msgid "Close filters"
+msgstr "Fermer les filtres"
+
+#. translators: the short visible label over a filter's lower bound.
+#: src/frontend/search/components/PriceRange.js:135
+msgid "Min."
+msgstr "Min."
+
+#. translators: the short visible label over a filter's upper bound.
+#: src/frontend/search/components/PriceRange.js:146
+msgid "Max."
+msgstr "Max."
+
+#. translators: 1: lowest value among the loaded results, e.g. "99 €". 2: highest, e.g. "249 €".
+#: src/frontend/search/components/PriceRange.js:153
+#, js-format
+msgid "Range of the loaded results: %1$s to %2$s"
+msgstr "Étendue des résultats chargés : de %1$s à %2$s"
+
+#. translators: %d: number of filter values selected.
+#: src/frontend/search/components/SearchModal.js:1064
+#: src/frontend/search/components/SearchModal.js:1662
+#, js-format
+msgid "%d selected"
+msgid_plural "%d selected"
+msgstr[0] "%d sélectionné"
+msgstr[1] "%d sélectionnés"
+
+#: src/frontend/search/components/SearchModal.js:1524
+msgid "No result matches the filters you chose. Remove one, or reset them all."
+msgstr "Aucun résultat ne correspond aux filtres choisis. Retirez-en un ou réinitialisez-les tous."
+
+#: src/frontend/search/components/SearchModal.js:1525
+msgid "Check the spelling, or try a more general word."
+msgstr "Vérifiez l’orthographe ou essayez un terme plus général."
+
+#: src/frontend/search/components/SearchModal.js:1530
+msgid "Reset filters"
+msgstr "Réinitialiser les filtres"
+
+#: src/frontend/search/components/SearchModal.js:1595
+msgid "Done"
+msgstr "Terminé"
+
+#: src/frontend/search/components/SearchModal.js:1599
+msgid "No results"
+msgstr "Aucun résultat"
+
+#. translators: %d: number of results the filters leave.
+#: src/frontend/search/components/SearchModal.js:1602
+#, js-format
+msgid "Show %d result"
+msgid_plural "Show %d results"
+msgstr[0] "Afficher %d résultat"
+msgstr[1] "Afficher %d résultats"
+
+#: src/frontend/search/components/SearchModal.js:1624
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#. translators: 1: lower bound, e.g. "50 €". 2: upper bound, e.g. "200 €".
+#: src/utils/facets.js:650
+#, js-format
+msgid "%1$s - %2$s"
+msgstr "%1$s - %2$s"
+
+#. translators: %s: lower bound of a filter, e.g. "50 €".
+#: src/utils/facets.js:655
+#, js-format
+msgid "from %s"
+msgstr "à partir de %s"
+
+#. translators: %s: upper bound of a filter, e.g. "200 €".
+#: src/utils/facets.js:660
+#, js-format
+msgid "up to %s"
+msgstr "jusqu’à %s"

@@ -135,4 +135,17 @@ final class Trigger_Markup_Test extends TestCase {
 		$this->assertStringNotContainsString( '<script>', $html );
 		$this->assertStringContainsString( 'data-editor-query="&quot;&gt;&lt;script&gt;', $html );
 	}
+
+	public function test_the_filter_bar_shows_five_buttons_unless_the_placement_says_otherwise(): void {
+		$this->assertStringContainsString( 'data-facet-bar-limit="5"', Trigger_Markup::render( [] ) );
+		// An emptied Elementor number field.
+		$this->assertStringContainsString( 'data-facet-bar-limit="5"', Trigger_Markup::render( [ 'facetBarLimit' => '' ] ) );
+		$this->assertStringContainsString( 'data-facet-bar-limit="3"', Trigger_Markup::render( [ 'facetBarLimit' => '3' ] ) );
+	}
+
+	public function test_the_filter_bar_limit_is_kept_between_none_and_eight(): void {
+		$this->assertStringContainsString( 'data-facet-bar-limit="0"', Trigger_Markup::render( [ 'facetBarLimit' => 0 ] ) );
+		$this->assertStringContainsString( 'data-facet-bar-limit="0"', Trigger_Markup::render( [ 'facetBarLimit' => -2 ] ) );
+		$this->assertStringContainsString( 'data-facet-bar-limit="8"', Trigger_Markup::render( [ 'facetBarLimit' => 40 ] ) );
+	}
 }

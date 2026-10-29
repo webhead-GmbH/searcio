@@ -293,8 +293,11 @@ async function walk( page, url ) {
 	await widget.modal.locator( '.whsc-facet' ).nth( 1 ).hover();
 	await keep( 'results, pointer on a filter' );
 	await away();
-	await reach( widget.modal.locator( '.whsc-range__input' ).first() );
+	await widget.openGroup( 'Price' );
+	await reach( page.locator( '.whsc-price__input' ).first() );
 	await keep( 'results, focus in a price bound' );
+	await page.keyboard.press( 'Escape' );
+	await expect( page.locator( '.whsc-pop, .whsc-sheet' ) ).toHaveCount( 0 );
 	await reach( widget.loadMore );
 	await keep( 'results, focus on load more' );
 

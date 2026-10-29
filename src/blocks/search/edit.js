@@ -15,7 +15,7 @@ import { selectProps } from '../../utils/select';
 import InspectorStack from '../InspectorStack';
 
 const Edit = ( { attributes, setAttributes, clientId } ) => {
-	const { instanceId, mode, scopeType, cardSource, highlightsSource, placeholder, enableVoice, searchTrigger, showCount, animation } = attributes;
+	const { instanceId, mode, scopeType, cardSource, highlightsSource, placeholder, enableVoice, searchTrigger, showCount, facetBarLimit, animation } = attributes;
 	const { animationDuration } = attributes;
 	const [ postTypes, setPostTypes ] = useState( [] );
 	const blockProps = useBlockProps( { className: 'webhead-search-cloud-block-editor' } );
@@ -149,6 +149,18 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 							label={ __( 'Show result count on filters', 'searcio' ) }
 							checked={ Boolean( showCount ) }
 							onChange={ ( value ) => setAttributes( { showCount: value } ) }
+						/>
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Filter buttons in the bar', 'searcio' ) }
+							help={ __( 'How many filters get a button of their own under the search field, as far as they fit. Every filter is under "All filters". 0 shows "All filters" alone.', 'searcio' ) }
+							value={ facetBarLimit ?? 5 }
+							onChange={ ( value ) => setAttributes( { facetBarLimit: undefined === value ? 5 : value } ) }
+							min={ 0 }
+							max={ 8 }
+							allowReset
+							resetFallbackValue={ 5 }
 						/>
 						<SelectControl
 							label={ __( 'Open animation', 'searcio' ) }
@@ -301,7 +313,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				</PanelColorSettings>
 
 				<PanelColorSettings
-					title={ __( 'Type filters', 'searcio' ) }
+					title={ __( 'Filters', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
 						color( 'facetBg', __( 'Background', 'searcio' ) ),
@@ -311,10 +323,19 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'facetBgActive', __( 'Background (active)', 'searcio' ) ),
 						color( 'facetTextActive', __( 'Text (active)', 'searcio' ) ),
 						color( 'facetCount', __( 'Count', 'searcio' ) ),
+						color( 'filterBadgeBg', __( 'Count on "All filters"', 'searcio' ) ),
+						color( 'filterBadgeText', __( 'Count on "All filters" (text)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'facetRadius', __( 'Border radius', 'searcio' ), 999 ) }
-					{ sizeControl( 'facetsMaxHeight', __( 'Max height (px)', 'searcio' ), 400, 60 ) }
+					<InspectorStack>
+						{ sizeControl( 'facetRadius', __( 'Border radius', 'searcio' ), 999 ) }
+						{ sizeControl( 'filterHeight', __( 'Button height (px)', 'searcio' ), 64, 32 ) }
+						{ sizeControl( 'facetsMaxHeight', __( 'Max height of a value list (px)', 'searcio' ), 600, 60 ) }
+						{ sizeControl( 'popoverWidth', __( 'Popover width (px)', 'searcio' ), 560, 260 ) }
+						{ sizeControl( 'popoverRadius', __( 'Popover radius', 'searcio' ), 40 ) }
+						{ sizeControl( 'drawerWidth', __( '"All filters" width (px)', 'searcio' ), 640, 300 ) }
+						{ sizeControl( 'sheetRadius', __( 'Phone sheet radius', 'searcio' ), 40 ) }
+					</InspectorStack>
 				</PanelColorSettings>
 
 				<PanelColorSettings

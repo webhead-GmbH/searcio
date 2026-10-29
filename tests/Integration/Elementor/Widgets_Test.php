@@ -245,9 +245,52 @@ final class Widgets_Test extends Integration_Test_Case {
 
 		// Set per device. Depending on its breakpoint settings Elementor either
 		// duplicates a responsive control per device or flags the one control.
-		foreach ( [ 'carousel_card_width', 'modal_content_width', 'modal_width', 'modal_offset', 'trigger_box_width', 'trigger_align' ] as $id ) {
+		foreach ( [ 'carousel_card_width', 'modal_content_width', 'modal_width', 'modal_offset', 'trigger_box_width', 'trigger_align', 'filter_height' ] as $id ) {
 			$this->assertTrue( ! empty( $ids[ $id ]['is_responsive'] ) || isset( $ids[ $id . '_mobile' ] ), $id );
 		}
+	}
+
+	/**
+	 * The filter bar's own properties: the height of its buttons, the count on
+	 * "All filters", the popover, the drawer and the phone's sheet. They sit
+	 * with the other filter controls, and every one falls back in the
+	 * stylesheet to the look a site already set for the old filter chips.
+	 */
+	public function test_the_filter_bar_controls_write_their_custom_properties(): void {
+		$ids = $this->control_ids();
+
+		foreach ( [
+			'filter_height'     => '--whsc-filter-height: {{SIZE}}{{UNIT}};',
+			'filter_badge_bg'   => '--whsc-filter-badge-bg: {{VALUE}};',
+			'filter_badge_text' => '--whsc-filter-badge-text: {{VALUE}};',
+			'popover_width'     => '--whsc-popover-width: {{SIZE}}{{UNIT}};',
+			'popover_radius'    => '--whsc-popover-radius: {{SIZE}}{{UNIT}};',
+			'drawer_width'      => '--whsc-drawer-width: {{SIZE}}{{UNIT}};',
+			'sheet_radius'      => '--whsc-sheet-radius: {{SIZE}}{{UNIT}};',
+		] as $id => $declaration ) {
+			$this->assertSame( [ '.whsc-instance-{{ID}}' => $declaration ], $ids[ $id ]['selectors'], $id );
+			$this->assertSame( 'style_facets', $ids[ $id ]['section'], $id );
+		}
+	}
+
+	public function test_the_number_of_filter_buttons_reaches_the_trigger(): void {
+		$ids = $this->control_ids();
+
+		$this->assertSame( 5, $ids['facet_bar_limit']['default'] );
+		$this->assertSame( 0, $ids['facet_bar_limit']['min'] );
+		$this->assertSame( 8, $ids['facet_bar_limit']['max'] );
+
+		$widget = new Search_Widget(
+			[
+				'id'         => 'f1l7e2s',
+				'elType'     => 'widget',
+				'widgetType' => 'webhead-search-cloud-search',
+				'settings'   => [ 'facet_bar_limit' => 3 ],
+			],
+			[]
+		);
+
+		$this->assertStringContainsString( 'data-facet-bar-limit="3"', $this->render_widget( $widget ) );
 	}
 
 	/**

@@ -219,6 +219,19 @@ final class Search_Widget extends Widget {
 			]
 		);
 
+		$this->add_control(
+			'facet_bar_limit',
+			[
+				'label'       => __( 'Filter buttons in the bar', 'searcio' ),
+				'type'        => Controls_Manager::NUMBER,
+				'default'     => Trigger_Markup::FACET_BAR_LIMIT,
+				'min'         => 0,
+				'max'         => Trigger_Markup::FACET_BAR_LIMIT_MAX,
+				'step'        => 1,
+				'description' => __( 'How many filters get a button of their own under the search field, as far as they fit. Every filter is under "All filters". 0 shows "All filters" alone.', 'searcio' ),
+			]
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -984,8 +997,9 @@ final class Search_Widget extends Widget {
 	}
 
 	/* ---------------------------------------------------------------------
-	 * Style - Filters: the content-type chips and every facet group
-	 * (categories, brands, ...) share one look.
+	 * Style - Filters: the bar's buttons, the type switch, size tiles, colour
+	 * pills and the chips of the filters applied share one look; the popover,
+	 * the drawer and the phone's sheet they open have their own shape.
 	 * ------------------------------------------------------------------ */
 	private function register_facet_style_controls(): void {
 		$this->start_controls_section(
@@ -993,6 +1007,15 @@ final class Search_Widget extends Widget {
 			[
 				'label' => __( 'Filters', 'searcio' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_control(
+			'facet_note',
+			[
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => __( 'Style the filter buttons under the search field, the type switch, size tiles, colour pills and the filters shown beside the result count.', 'searcio' ),
+				'content_classes' => 'elementor-descriptor',
 			]
 		);
 
@@ -1012,7 +1035,24 @@ final class Search_Widget extends Widget {
 		$this->end_controls_tabs();
 
 		$this->var_slider( 'facet_radius', __( 'Border radius', 'searcio' ), '--whsc-facet-radius', 0, 999, false, [ 'separator' => 'before' ] );
-		$this->var_slider( 'facets_max_height', __( 'Max height', 'searcio' ), '--whsc-facets-max-height', 60, 400, false, [ 'description' => __( 'Caps a long filter list and lets it scroll instead of stretching the modal.', 'searcio' ) ] );
+		$this->var_slider( 'filter_height', __( 'Button height', 'searcio' ), '--whsc-filter-height', 32, 64, true, [ 'description' => __( 'The height of the filter buttons under the search field.', 'searcio' ) ] );
+		$this->var_slider( 'facets_max_height', __( 'Max height', 'searcio' ), '--whsc-facets-max-height', 60, 600, false, [ 'description' => __( 'Max height of a value list in a filter panel; a longer list scrolls.', 'searcio' ) ] );
+
+		$this->add_control(
+			'filter_badge_heading',
+			[ 'label' => __( 'Count on "All filters"', 'searcio' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->var_color( 'filter_badge_bg', __( 'Background', 'searcio' ), '--whsc-filter-badge-bg' );
+		$this->var_color( 'filter_badge_text', __( 'Text', 'searcio' ), '--whsc-filter-badge-text' );
+
+		$this->add_control(
+			'filter_panel_heading',
+			[ 'label' => __( 'Filter panels', 'searcio' ), 'type' => Controls_Manager::HEADING, 'separator' => 'before' ]
+		);
+		$this->var_slider( 'popover_width', __( 'Popover width', 'searcio' ), '--whsc-popover-width', 260, 560 );
+		$this->var_slider( 'popover_radius', __( 'Popover radius', 'searcio' ), '--whsc-popover-radius', 0, 40 );
+		$this->var_slider( 'drawer_width', __( '"All filters" width', 'searcio' ), '--whsc-drawer-width', 300, 640, false, [ 'description' => __( 'The side panel "All filters" opens on a tablet or a desktop.', 'searcio' ) ] );
+		$this->var_slider( 'sheet_radius', __( 'Phone sheet radius', 'searcio' ), '--whsc-sheet-radius', 0, 40, false, [ 'description' => __( 'The top corners of the panel filters open from the bottom on a phone.', 'searcio' ) ] );
 
 		$this->add_group_control(
 			Group_Control_Typography::get_type(),
@@ -1045,12 +1085,12 @@ final class Search_Widget extends Widget {
 			'facet_group_note',
 			[
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => __( 'The small title above each group of filters, such as "Categories" or "Price".', 'searcio' ),
+				'raw'             => __( 'The title of a filter\'s panel and of each section of "All filters", such as "Categories" or "Price".', 'searcio' ),
 				'content_classes' => 'elementor-descriptor',
 			]
 		);
-		// By default the label is the section title colour at 70% opacity; a
-		// colour picked for it is used as picked, so the opacity goes with it.
+		// By default the label is the section title colour; a colour picked for
+		// it is used as picked, at full opacity.
 		$this->var_color(
 			'facet_group_color',
 			__( 'Color', 'searcio' ),
@@ -1475,6 +1515,7 @@ final class Search_Widget extends Widget {
 				'voiceIconHtml' => $this->render_icon_html( $settings, 'voice_icon' ),
 				'animation'     => (string) ( $settings['modal_animation'] ?? 'fade' ),
 				'showCount'     => 'yes' === ( $settings['show_count'] ?? 'yes' ),
+				'facetBarLimit' => $settings['facet_bar_limit'] ?? null,
 				'editorPreview' => $this->is_editor_preview( $settings ),
 				'editorQuery'   => (string) ( $settings['editor_preview_query'] ?? '' ),
 			]

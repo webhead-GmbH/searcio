@@ -22,6 +22,7 @@ use WP_REST_Response;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Connection\Api_Response;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -34,7 +35,8 @@ defined( 'ABSPATH' ) || exit;
 final class Search_Config_Endpoint extends Rest_API {
 	public function __construct(
 		private Search_Cloud_Client $client,
-		private Language_Config $language_config
+		private Language_Config $language_config,
+		private Facet_Config $facet_config
 	) {}
 
 	protected function get_rest_namespace(): string {
@@ -76,10 +78,12 @@ final class Search_Config_Endpoint extends Rest_API {
 			);
 		}
 
-		// Mirror `languages` locally on every successful read/write so `Document_Builder` and the
-		// front-end language filter don't need a live API round trip on every sync or page load.
+		// Mirror `languages` and `facet_fields` locally on every successful read/write so
+		// `Document_Builder`, the front-end language filter and the search window's filter
+		// order don't need a live API round trip on every sync or page load.
 		if ( $response->ok() ) {
 			$this->language_config->set_enabled_languages( $response->body()['languages'] ?? [] );
+			$this->facet_config->set_fields( $response->body()['facet_fields'] ?? [] );
 		}
 
 		return new WP_REST_Response( $response->body(), $response->status );

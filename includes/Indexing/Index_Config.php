@@ -163,6 +163,20 @@ final class Index_Config {
 		return null === $woo ? $labels : array_merge( $labels, $this->woo->attribute_labels( $woo ) );
 	}
 
+	/**
+	 * Field => attribute taxonomy, for the WooCommerce attributes the product
+	 * mapping writes (`attr_color` => `pa_color`). Empty when products are not
+	 * indexed.
+	 *
+	 * @return array<string,string>
+	 */
+	public function attribute_taxonomies(): array {
+		$block = $this->block_for( Woo::POST_TYPE );
+		$woo   = is_array( $block['woo'] ?? null ) ? $block['woo'] : null;
+
+		return null === $woo ? [] : $this->woo->attribute_taxonomies( $woo );
+	}
+
 	public function config_version(): int {
 		return (int) $this->settings->get( Plugin_Settings::CONFIG_VERSION );
 	}

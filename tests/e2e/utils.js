@@ -382,6 +382,16 @@ export function setPlanTier( tier = 'clear' ) {
 }
 
 /**
+ * Set the facet fields the site keeps from Search Config, in their order, or
+ * forget them with no argument. See `seed-facet-fields.php`.
+ *
+ * @param {string[]} [fields]
+ */
+export function setFacetFields( fields = [] ) {
+	wpEvalFile( 'seed-facet-fields.php', fields.length > 0 ? fields.join( ',' ) : 'clear' );
+}
+
+/**
  * Page object over the search trigger and its portalled modal.
  */
 export class SearchWidget {
@@ -400,9 +410,44 @@ export class SearchWidget {
 		this.quizOptions = this.modal.locator( '.whsc-quiz__option' );
 		this.quizAnswers = this.modal.locator( '.whsc-quiz__answer' );
 		this.quizCards = this.modal.locator( '.whsc-quiz__grid .whsc-card' );
-		this.rangeGroups = this.modal.locator( '.whsc-range' );
 		this.loadMore = this.modal.locator( '.whsc-load-more__button' );
 		this.resultsHeading = this.modal.locator( '.whsc-browse__main .whsc-section-title' );
+		this.filterBar = this.modal.getByRole( 'group', { name: 'Filters', exact: true } );
+		this.typeSwitch = this.modal.getByRole( 'group', { name: 'Filter by type' } );
+		this.popover = this.modal.locator( '.whsc-pop' );
+		this.sheet = page.locator( '.whsc-sheet' );
+		this.activeChips = this.modal.locator( '.whsc-active-chip' );
+		this.status = this.modal.locator( 'p.whsc-visually-hidden[role="status"]' );
+	}
+
+	/**
+	 * A group's button in the filter bar, by the start of its name.
+	 *
+	 * @param {string} name E.g. "Colour", which also finds "Colour: Olive".
+	 */
+	groupButton( name ) {
+		return this.modal.locator( '.whsc-filter-btn[data-field]:not([hidden])' ).filter( { hasText: new RegExp( `^${ name }` ) } ).first();
+	}
+
+	/** "All filters", or "Filters" on a phone. */
+	get allFilters() {
+		return this.modal.locator( '.whsc-filter-btn--all' );
+	}
+
+	/**
+	 * Open a group's panel: its popover, or on a phone its sheet.
+	 *
+	 * @param {string} name
+	 * @return {Promise<import('@playwright/test').Locator>} The panel.
+	 */
+	async openGroup( name ) {
+		await this.groupButton( name ).click();
+
+		const panel = this.page.locator( '.whsc-pop, .whsc-sheet' ).first();
+
+		await panel.waitFor( { state: 'visible' } );
+
+		return panel;
 	}
 
 	async openModal() {

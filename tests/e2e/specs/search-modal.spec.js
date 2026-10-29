@@ -320,22 +320,22 @@ test.describe( 'Search modal', () => {
 		} );
 		await mockSearchCloud( page, {
 			facets: ( url ) => ( url.searchParams.get( 'q' )
-				? { types: [ { value: 'post', count: 2 } ] }
+				? { types: [ { value: 'post', count: 2 }, { value: 'page', count: 1 } ] }
 				: { types: [ { value: 'post', count: 152 }, { value: 'page', count: 16 } ] } ),
 			searchDelay: ( url ) => ( url.searchParams.get( 'q' ) ? 0 : 1500 ),
 		} );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
 
 		const widget = new SearchWidget( page );
-		const counts = widget.modal.locator( '.whsc-facets .whsc-facet__count' );
+		const counts = widget.typeSwitch.locator( '.whsc-facet__count' );
 
 		await widget.openModal();
 		await widget.search( 'guide' );
-		await expect( counts ).toHaveText( [ '2' ] );
+		await expect( counts ).toHaveText( [ '2', '1' ] );
 
 		await page.waitForFunction( () => window.whscHighlightsRead );
 
-		await expect( counts ).toHaveText( [ '2' ] );
+		await expect( counts ).toHaveText( [ '2', '1' ] );
 	} );
 
 	/**

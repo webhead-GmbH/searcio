@@ -27,7 +27,8 @@
 - **Full-screen search modal** - a fast, keyboard-friendly overlay with search-as-you-type, autocomplete suggestions,
   recent and popular searches, and an empty-state highlights carousel.
 - **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, tags,
-  and so on), with a minimum/maximum for numeric fields such as price or rating.
+  and so on), with a minimum/maximum for numeric fields such as price or rating. The filters sit in one bar under the
+  search field and apply as they are picked, in a popover, a side drawer or, on a phone, a sheet.
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, fully themeable (colors, radius, typography,

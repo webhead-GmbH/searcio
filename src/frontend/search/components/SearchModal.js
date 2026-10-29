@@ -1,17 +1,22 @@
-import {useCallback, useEffect, useId, useLayoutEffect, useRef, useState} from '@wordpress/element';
+import {useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from '@wordpress/element';
 import {Button, Icon, Modal} from '@wordpress/components';
-import {closeSmall, search as searchIcon} from '@wordpress/icons';
+import {chevronDown, closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 
 import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
-import {appendHits, buildFilterParams, buildRangeParams, buildTypeParam, extractFieldFacets, extractRangeFields, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
 import {redirectTarget} from '../../../utils/redirect';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
 import QuizPane from './QuizPane';
-import RangeFilters from './RangeFilters';
+import ActiveFilters from './ActiveFilters';
+import FilterBar from './FilterBar';
+import FilterPanel from './FilterPanel';
+import FilterPopover from './FilterPopover';
+import FilterSheet from './FilterSheet';
 import SearchInput from './SearchInput';
 import Suggestions, {optionId} from './Suggestions';
 import Browse from './Browse';
@@ -23,6 +28,15 @@ import SearcioCredit from './SearcioCredit';
 const SUGGEST_DEBOUNCE = 200;
 const LIVE_SEARCH_DEBOUNCE = 300;
 const LIVE_SEARCH_MIN_LENGTH = 3;
+// Picks made in quick succession share one request.
+const FILTER_DEBOUNCE = 250;
+// Under this width of the modal, the phone's layout: one scrolling row of
+// filters, and sheets from the bottom instead of popovers and a drawer. The
+// stylesheet's container queries use the same width.
+const NARROW_WIDTH = 640;
+// Under this width the input row has no room for three icon buttons.
+const TIGHT_WIDTH = 360;
+const DEFAULT_BAR_LIMIT = 5;
 // Keep the skeleton on screen for at least this long so a very fast API
 // response doesn't make the loading state flash by imperceptibly.
 const MIN_LOADING = 0;
@@ -30,25 +44,46 @@ const MIN_LOADING = 0;
 const delay = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
 
 /**
- * Compact a large result count so facet chips stay narrow: 1000+ becomes
- * "{n}k+" (e.g. 32494 → "32k+"), millions become "{n}M+". Smaller counts are
- * shown as-is.
+ * The width of the modal's scroll area, kept current as the window changes.
+ * The filters lay themselves out by the modal's width, not the viewport's, so
+ * a placement that narrows the modal gets the phone's layout too.
  *
- * @param {number} value
- * @return {string}
+ * @param {{current: ?HTMLElement}} ref An element inside the scroll area.
+ * @return {number} 0 until it has been measured.
  */
-const formatCount = (value) => {
-	const n = Number(value) || 0;
+const useModalWidth = (ref) => {
+	const [width, setWidth] = useState(0);
 
-	if (n >= 1000000) {
-		return `${Math.floor(n / 1000000)}M+`;
-	}
+	useLayoutEffect(() => {
+		const area = ref.current?.closest('.components-modal__content') || ref.current;
 
-	if (n >= 1000) {
-		return `${Math.floor(n / 1000)}K+`;
-	}
+		if (!area) {
+			return undefined;
+		}
 
-	return String(n);
+		let frame = 0;
+		const measure = () => setWidth(Math.round(area.clientWidth));
+
+		measure();
+
+		if (!window.ResizeObserver) {
+			return undefined;
+		}
+
+		const observer = new window.ResizeObserver(() => {
+			window.cancelAnimationFrame(frame);
+			frame = window.requestAnimationFrame(measure);
+		});
+
+		observer.observe(area);
+
+		return () => {
+			observer.disconnect();
+			window.cancelAnimationFrame(frame);
+		};
+	}, [ref]);
+
+	return width;
 };
 
 const supportsVoice = () => 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
@@ -113,6 +148,7 @@ const revealTab = (list, tab) => {
  *                                        (falls back to the plugin's own card per hit when no template matches).
  * @param {string}   [props.highlightsSource] 'featured' to source the empty-query highlights carousel from
  *                                            `filter[featured]=true` instead of a plain match-all (default 'newest').
+ * @param {number}   [props.facetBarLimit] How many filter buttons the bar shows at most; 0 shows "All filters" alone.
  * @param {boolean}  [props.editorPreview] Opened by the Elementor editor for styling rather than by a visitor:
  *                                        it takes no focus and runs its search term once.
  * @param {string}   props.initialQuery   Seed value when opened from a box trigger the user was already typing in.
@@ -130,6 +166,7 @@ const SearchModal = ({
 											 highlightsSource,
 											 showCount,
 											 animation,
+											 facetBarLimit = DEFAULT_BAR_LIMIT,
 											 editorPreview = false,
 											 initialQuery,
 											 onQueryChange,
@@ -155,6 +192,34 @@ const SearchModal = ({
 	// the visitor has applied to them (`range[field]=min:max`).
 	const [rangeFields, setRangeFields] = useState({});
 	const [activeRanges, setActiveRanges] = useState({});
+	// The filters as last picked, read by the request a pick schedules: the
+	// state above has not re-rendered yet when it is sent.
+	const filtersRef = useRef({types: [], facets: {}, ranges: {}});
+	const filterTimer = useRef(null);
+	// Which search the facet groups on screen came from, and what it loaded,
+	// counted up each time an answer brings new groups.
+	const groupsSource = useRef({key: null, hits: [], total: 0});
+	const [groupsVersion, setGroupsVersion] = useState(0);
+	// The bar's groups in order, and how each draws its values. Set once per
+	// search and type scope (see the effect below), never by a pick.
+	const [bar, setBar] = useState({key: null, order: [], displays: {}, types: []});
+	// The panel open: a group's popover, a group's sheet on a phone, or "All
+	// filters" (`all`). `anchor` is the button that opened it.
+	const [openFilter, setOpenFilter] = useState(null);
+	// The order each open panel's values had when it opened.
+	const [frozen, setFrozen] = useState({});
+	// Which sections of "All filters" are expanded.
+	const [expanded, setExpanded] = useState({});
+	// A press on the dimmed page that closed a popover, until it is let go.
+	const [pressClosedPopover, setPressClosedPopover] = useState(false);
+	const [fontsVersion, setFontsVersion] = useState(0);
+	const bodyRef = useRef(null);
+	const headerRef = useRef(null);
+	const resultsHeadingRef = useRef(null);
+	const popoverId = useId();
+	const modalWidth = useModalWidth(bodyRef);
+	const narrow = modalWidth > 0 && modalWidth < NARROW_WIDTH;
+	const tight = modalWidth > 0 && modalWidth < TIGHT_WIDTH;
 	const [suggestions, setSuggestions] = useState([]);
 	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
 	// The suggestion the arrow keys are on, or -1 while they are on none.
@@ -236,12 +301,28 @@ const SearchModal = ({
 	const highlightsSeq = useRef(0);
 
 	// Type filters only make sense when the placement isn't already locked to
-	// a single type.
-	const showFacets = '' === (scopeType || '') && facets.length > 0;
+	// a single type, and when the search had more than one type to choose
+	// between. A pressed type keeps the switch, so the way back to all types
+	// stays. The types are the ones the search started with, each with its
+	// count now: a type a pick leaves empty stays, at 0, so the bar never moves.
+	const barTypes = bar.types.length > 0 ? bar.types : facets.map((facet) => facet.value);
+	const typeFacets = barTypes.map((value) => ({value, count: facets.find((facet) => facet.value === value)?.count ?? 0}));
+	const showTypes = '' === (scopeType || '') && (typeFacets.length > 1 || activeTypes.length > 0);
+	// The filters Search Config lists, in its order, with how each is drawn.
 	// Dynamic field facet groups (brand, color, ...) are orthogonal to a
 	// type-scope lock - they render whenever the site has any configured,
 	// regardless of `scopeType`.
-	const facetGroupEntries = Object.entries(facetGroups);
+	const configFacets = Array.isArray(config.facets) ? config.facets : [];
+	const facetSettings = useMemo(() => Object.fromEntries(configFacets.map((facet) => [facet.field, facet])), [configFacets]);
+	const configuredOrder = useMemo(
+		() => [...configFacets].sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0)).map((facet) => facet.field),
+		[configFacets]
+	);
+	const locale = document.documentElement.lang || undefined;
+	const activeCount = activeFilterCount(activeFacets, activeRanges);
+
+	filtersRef.current = {types: activeTypes, facets: activeFacets, ranges: activeRanges};
+	const filtered = activeTypes.length > 0 || activeCount > 0;
 	const curatedPopularSearches = Array.isArray(config.popularSearches) ? config.popularSearches : [];
 	// Live queries from the API are the primary source - they reflect what
 	// visitors are actually searching for right now. The curated admin list
@@ -249,7 +330,13 @@ const SearchModal = ({
 	// yet, comes back empty, or errors out.
 	const popularSearches = livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches;
 	const trimmedQuery = query.trim();
-	const showEmptyState = '' === trimmedQuery && !visualActive;
+	const queryRef = useRef(query);
+
+	queryRef.current = query;
+
+	// An empty field with a filter picked browses the catalogue by that filter;
+	// only an empty field with nothing picked is the window at rest.
+	const showEmptyState = '' === trimmedQuery && !visualActive && !filtered;
 	// The tab bar exists only if there is a second mode to switch to; with none,
 	// the modal is the plain search box it has always been.
 	const hasTabs = assistantEnabled || quizEnabled;
@@ -432,6 +519,8 @@ const SearchModal = ({
 			}
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
 			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
+			groupsSource.current = {key: `|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
+			setGroupsVersion((version) => version + 1);
 		} catch (e) {
 			if (isLatest()) {
 				setHighlights([]);
@@ -484,11 +573,33 @@ const SearchModal = ({
 		return () => window.clearTimeout(suggestTimer.current);
 	}, [trimmedQuery]);
 
-	// `facetsOverride` mirrors `loadHighlights()`'s param - used only by a
-	// field-facet click, which needs its just-toggled selection applied before
-	// `activeFacets` state itself has re-rendered.
-	const runSearch = useCallback(async (q, type = buildTypeParam(scopeType, activeTypes), commit = true, facetsOverride, rangesOverride) => {
+	/**
+	 * Search for `q` with the filters given, or the ones on screen.
+	 *
+	 * A pick passes its filters in (`types`, `facets`, `ranges`): the state
+	 * they were just written to has not re-rendered yet when the request goes
+	 * out. A pick also keeps the results on screen while the new ones load
+	 * (`keep`), so they change behind an open popover instead of turning into
+	 * a skeleton under it.
+	 *
+	 * An empty query with a filter picked searches the whole catalogue by that
+	 * filter; an empty query with none puts the highlights back.
+	 *
+	 * @param {string} q
+	 * @param {Object} [options]
+	 * @param {string[]} [options.types]
+	 * @param {Object}   [options.facets]
+	 * @param {Object}   [options.ranges]
+	 * @param {boolean}  [options.commit] An explicit search, see below.
+	 * @param {boolean}  [options.keep]   Keep the results on screen while it loads.
+	 */
+	const runSearch = useCallback(async (q, {types, facets: facetsOverride, ranges: rangesOverride, commit = true, keep = false} = {}) => {
 		const trimmed = q.trim();
+		const appliedTypes = types ?? activeTypes;
+		const appliedFacets = facetsOverride ?? activeFacets;
+		const appliedRanges = rangesOverride ?? activeRanges;
+		const type = buildTypeParam(scopeType, appliedTypes);
+		const browseCatalogue = '' === trimmed && (appliedTypes.length > 0 || activeFilterCount(appliedFacets, appliedRanges) > 0);
 
 		setQuery(q);
 
@@ -508,7 +619,11 @@ const SearchModal = ({
 			window.clearTimeout(liveSearchTimer.current);
 		}
 
-		if ('' === trimmed) {
+		if ('' === trimmed && !browseCatalogue) {
+			// Nothing still loading may write its results over the highlights.
+			abortRef.current?.abort();
+			searchSeq.current += 1;
+			setIsSearching(false);
 			setResults(null);
 			// An empty search leaves the photo behind too. Kept, the column stayed
 			// in the photo state with nothing left to show in it.
@@ -521,9 +636,15 @@ const SearchModal = ({
 
 		// An unsupported visitor language degrades exactly like an
 		// unconfigured/unreachable API - native search, not a Searcio
-		// query scoped to the wrong (or no) content.
+		// query scoped to the wrong (or no) content. Browsing by a filter has
+		// no query to hand over, so it stays where it is.
 		if (!isConfigured() || !isLanguageSupported()) {
-			window.location.href = nativeSearchUrl(trimmed);
+			if (browseCatalogue) {
+				// A pick marked the results as loading before it got here.
+				setIsSearching(false);
+			} else {
+				window.location.href = nativeSearchUrl(trimmed);
+			}
 
 			return;
 		}
@@ -535,13 +656,11 @@ const SearchModal = ({
 		const seq = ++searchSeq.current;
 		const isLatest = () => seq === searchSeq.current;
 
-		setPendingKind('text');
+		setPendingKind(keep ? 'filter' : 'text');
 		setIsSearching(true);
 		setError('');
 		const started = Date.now();
 
-		const appliedFacets = facetsOverride ?? activeFacets;
-		const appliedRanges = rangesOverride ?? activeRanges;
 		const filters = buildFilterParams(appliedFacets, currentLangFilter());
 		const ranges = buildRangeParams(appliedRanges);
 
@@ -564,7 +683,7 @@ const SearchModal = ({
 			 * suggestion, chip or popular term - is an explicit "search for
 			 * exactly this", which is when the rule is meant to fire.
 			 */
-			const target = redirectTarget(response);
+			const target = '' === trimmed ? '' : redirectTarget(response);
 
 			if ('' !== target) {
 				if (commit) {
@@ -579,7 +698,7 @@ const SearchModal = ({
 				return;
 			}
 
-			setResults({...response, pageCount: (response.hits || []).length});
+			setResults({...response, pageCount: (response.hits || []).length, searchedQuery: trimmed});
 			// A typed search replaces whatever a photo put on screen.
 			setVisualTags([]);
 			setVisualActive(false);
@@ -593,8 +712,12 @@ const SearchModal = ({
 
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
 			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
+			groupsSource.current = {key: `${trimmed}|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
+			setGroupsVersion((version) => version + 1);
 
-			setRecent(addRecentSearch(trimmed));
+			if ('' !== trimmed) {
+				setRecent(addRecentSearch(trimmed));
+			}
 		} catch (e) {
 			// A superseded/cancelled request must not touch state or navigate.
 			if ('AbortError' === e.name || !isLatest()) {
@@ -608,7 +731,7 @@ const SearchModal = ({
 			// type" mode this fires on every character, so a single 429 or 5xx
 			// mid-word would navigate them away with half a word as their query.
 			// A live search that fails just shows the notice and waits.
-			if (commit) {
+			if (commit && !browseCatalogue) {
 				window.location.href = nativeSearchUrl(trimmed);
 			}
 		} finally {
@@ -677,6 +800,10 @@ const SearchModal = ({
 		// sit on screen describing a narrowing that is not being applied.
 		setActiveRanges({});
 		setRangeFields({});
+		// Nor may a pick still waiting to be sent search over the photo.
+		window.clearTimeout(filterTimer.current);
+		filtersRef.current = {types: [], facets: {}, ranges: {}};
+		setOpenFilter(null);
 
 		try {
 			const response = await visualSearch(file, {signal: controller.signal});
@@ -735,7 +862,7 @@ const SearchModal = ({
 		}
 
 		liveSearchTimer.current = window.setTimeout(() => {
-			void runSearch(query, buildTypeParam(scopeType, activeTypes), false);
+			void runSearch(query, {commit: false});
 		}, LIVE_SEARCH_DEBOUNCE);
 
 		return () => window.clearTimeout(liveSearchTimer.current);
@@ -753,64 +880,335 @@ const SearchModal = ({
 		if (editorPreview && '' !== trimmedQuery) {
 			setSuggestionsDismissed(true);
 			skipSuggestRef.current = trimmedQuery;
-			void runSearch(query, buildTypeParam(scopeType, activeTypes), false);
+			void runSearch(query, {commit: false});
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the preview opens.
 	}, []);
 
+	/**
+	 * Write a set of filters and search with them.
+	 *
+	 * Every pick applies - there is no "Apply" - so picks made in quick
+	 * succession wait for each other ({@see FILTER_DEBOUNCE}) and share one
+	 * request, and a newer request overtakes an older one as typing does. A
+	 * bound applies at once (`immediate`): its field waited for the typing to
+	 * stop already.
+	 *
+	 * An empty field with nothing picked any more goes back to the highlights,
+	 * and to the groups of the whole catalogue for the bar's panels.
+	 *
+	 * @param {{types: string[], facets: Object, ranges: Object}} next
+	 * @param {{immediate?: boolean}} [options]
+	 */
+	const applyFilters = (next, {immediate = false} = {}) => {
+		filtersRef.current = next;
+		setActiveTypes(next.types);
+		setActiveFacets(next.facets);
+		setActiveRanges(next.ranges);
+		window.clearTimeout(filterTimer.current);
+
+		const searches = '' !== queryRef.current.trim() || next.types.length > 0 || activeFilterCount(next.facets, next.ranges) > 0;
+
+		// Between the pick and its request the results are already on their
+		// way: no flash of the highlights, nor of results the pick has undone.
+		if (searches) {
+			setPendingKind('filter');
+			setIsSearching(true);
+		}
+
+		const send = () => {
+			const latest = filtersRef.current;
+			const q = queryRef.current;
+
+			if ('' === q.trim() && 0 === latest.types.length && 0 === activeFilterCount(latest.facets, latest.ranges)) {
+				void runSearch(q, {...latest, commit: false});
+				void loadHighlights(buildTypeParam(scopeType, []), {}, {});
+
+				return;
+			}
+
+			void runSearch(q, {...latest, commit: false, keep: true});
+		};
+
+		if (immediate) {
+			send();
+		} else {
+			filterTimer.current = window.setTimeout(send, FILTER_DEBOUNCE);
+		}
+	};
+
+	useEffect(() => () => window.clearTimeout(filterTimer.current), []);
+
 	// Clicking "All" (empty type) clears the selection; clicking a type
 	// toggles it in/out.
 	const onTypeFacetClick = (type) => {
-		const nextTypes = '' === type ? [] : toggleSelection(activeTypes, type);
+		const current = filtersRef.current;
 
-		setActiveTypes(nextTypes);
-		const typeParam = buildTypeParam(scopeType, nextTypes);
-
-		if ('' === trimmedQuery) {
-			void loadHighlights(typeParam);
-		} else {
-			void runSearch(query, typeParam);
-		}
+		applyFilters({...current, types: '' === type ? [] : toggleSelection(current.types, type)});
 	};
 
 	// Multi-select per field, OR'ed together for that field's
 	// `filter[field]=` value.
 	const onFieldFacetClick = (field, value) => {
-		const nextFacets = {...activeFacets, [field]: toggleSelection(activeFacets[field] || [], value)};
+		const current = filtersRef.current;
 
-		setActiveFacets(nextFacets);
-		const typeParam = buildTypeParam(scopeType, activeTypes);
-
-		if ('' === trimmedQuery) {
-			void loadHighlights(typeParam, nextFacets);
-		} else {
-			void runSearch(query, typeParam, true, nextFacets);
-		}
+		applyFilters({...current, facets: {...current.facets, [field]: toggleSelection(current.facets[field] || [], value)}});
 	};
 
-	// A bound is applied on submit rather than on every keystroke: a partly
-	// typed number ("1" on the way to "150") is a different, wrong filter, and
-	// searching for it would make the field fight the person typing in it.
+	// A bound arrives once its field has stopped changing (see `PriceRange`):
+	// a partly typed number ("1" on the way to "150") is a different, wrong
+	// filter, and searching for it would make the field fight the person
+	// typing in it.
 	const onRangeApply = (field, bound) => {
-		const min = String(bound?.min ?? '').trim();
-		const max = String(bound?.max ?? '').trim();
-		const nextRanges = {...activeRanges};
+		const current = filtersRef.current;
+		const ranges = {...current.ranges};
 
-		if ('' === min && '' === max) {
-			delete nextRanges[field];
+		if (hasBound(bound)) {
+			ranges[field] = {min: String(bound.min ?? '').trim(), max: String(bound.max ?? '').trim()};
 		} else {
-			nextRanges[field] = {min, max};
+			delete ranges[field];
 		}
 
-		setActiveRanges(nextRanges);
-		const typeParam = buildTypeParam(scopeType, activeTypes);
-
-		if ('' === trimmedQuery) {
-			void loadHighlights(typeParam, undefined, nextRanges);
-		} else {
-			void runSearch(query, typeParam, true, undefined, nextRanges);
-		}
+		applyFilters({...current, ranges}, {immediate: true});
 	};
+
+	const resetGroup = (field) => {
+		const current = filtersRef.current;
+		const facets = {...current.facets};
+		const ranges = {...current.ranges};
+
+		delete facets[field];
+		delete ranges[field];
+		applyFilters({...current, facets, ranges});
+	};
+
+	// The type stays: it is a scope, not one of the filters "Reset all" lists.
+	const resetAll = () => applyFilters({...filtersRef.current, facets: {}, ranges: {}});
+
+	// The bar's order for a search, set when the first answer for a new query
+	// or type scope arrives. A pick narrows the groups but never reorders them:
+	// a group the answer no longer has keeps its place, and one it newly has
+	// is added at the end.
+	useEffect(() => {
+		const {key, hits, total} = groupsSource.current;
+		const rangeOnly = Object.keys(rangeFields).filter((field) => !facetGroups[field]);
+		const fields = [...Object.keys(facetGroups), ...rangeOnly];
+		const active = [
+			...Object.keys(activeFacets).filter((field) => (activeFacets[field] || []).length > 0),
+			...Object.keys(activeRanges).filter((field) => hasBound(activeRanges[field])),
+		];
+		const display = (field) => (rangeOnly.includes(field)
+			? 'range'
+			: detectFacetDisplay(field, (facetGroups[field] || []).map((entry) => entry.value), facetSettings[field]));
+
+		setBar((current) => {
+			if (current.key !== key) {
+				const coverage = facetCoverage({...facetGroups, ...Object.fromEntries(rangeOnly.map((field) => [field, []]))}, hits, total);
+				const order = orderFacetGroups(fields, {configuredOrder, coverage, active});
+
+				// The types too: a pick that leaves one type must not take the
+				// switch out from under the bar.
+				return {key, order, displays: Object.fromEntries(order.map((field) => [field, display(field)])), types: facets.map((facet) => facet.value)};
+			}
+
+			const added = fields.filter((field) => !current.order.includes(field));
+
+			return 0 === added.length ? current : {
+				...current,
+				order: [...current.order, ...added],
+				displays: {...current.displays, ...Object.fromEntries(added.map((field) => [field, display(field)]))},
+			};
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- once per answer that brought groups.
+	}, [groupsVersion]);
+
+	// A web font that arrives late widens the buttons it was measured without.
+	useEffect(() => {
+		let cancelled = false;
+
+		document.fonts?.ready?.then(() => {
+			if (!cancelled) {
+				setFontsVersion((version) => version + 1);
+			}
+		});
+
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
+	const labelOf = (field) => humanizeFieldLabel(field, fieldLabels);
+	const displayOf = (field) => bar.displays[field]
+		|| (rangeFields[field] && !facetGroups[field] ? 'range' : detectFacetDisplay(field, (facetGroups[field] || []).map((entry) => entry.value), facetSettings[field]));
+	const isGroupActive = (field) => (activeFacets[field] || []).length > 0 || hasBound(activeRanges[field]);
+
+	// A bound of a price field is written as the shop writes prices, without
+	// decimals when it has none ("from 100 €"); any other is written as typed.
+	const formatBound = (field) => (value) => {
+		const number = Number(value);
+		const currency = config.currency || {};
+
+		if (!PRICE_FIELDS.has(field) || !Number.isFinite(number)) {
+			return String(value);
+		}
+
+		return formatPrice(number, {...currency, decimals: Number.isInteger(number) ? 0 : (currency.decimals ?? 2)});
+	};
+
+	const selectionOf = (field) => {
+		if (hasBound(activeRanges[field])) {
+			return rangeLabel(activeRanges[field], formatBound(field));
+		}
+
+		const count = (activeFacets[field] || []).length;
+
+		return count > 0 ? sprintf(
+			/* translators: %d: number of filter values selected. */
+			_n('%d selected', '%d selected', count, 'searcio'),
+			count
+		) : '';
+	};
+
+	// Fixes the order of a group's values for as long as its panel is open, so
+	// no row moves under the pointer as picks change the counts.
+	const freeze = (field) => {
+		const values = facetGroups[field] || [];
+		const counts = Object.fromEntries(values.map((entry) => [entry.value, entry.count]));
+
+		setFrozen((current) => ({
+			...current,
+			[field]: freezeValueOrder(values.map((entry) => entry.value), counts, activeFacets[field] || [], {natural: 'tiles' === displayOf(field), locale}),
+		}));
+	};
+
+	/**
+	 * @param {{kind: string, field?: string, anchor?: HTMLElement}} next
+	 */
+	const openPanel = (next) => {
+		setFrozen({});
+
+		if ('all' === next.kind) {
+			const active = bar.order.filter(isGroupActive);
+			const open = active.length > 0 ? active : bar.order.slice(0, 1);
+
+			setExpanded(Object.fromEntries(open.map((field) => [field, true])));
+			open.forEach(freeze);
+		} else {
+			freeze(next.field);
+		}
+
+		// Results that change behind a popover must not move the bar it hangs
+		// from: the body keeps the height it had when the popover opened.
+		if ('popover' === next.kind && bodyRef.current && '' === bodyRef.current.style.minHeight) {
+			bodyRef.current.style.minHeight = `${bodyRef.current.offsetHeight}px`;
+		}
+
+		setOpenFilter(next);
+	};
+
+	/**
+	 * Close the open panel. A popover hands focus back to its button
+	 * (`restore`), or on to the next control of the bar (`next`); a sheet's
+	 * `Modal` gives it back to what opened it by itself. Every pick has
+	 * applied already, so nothing is lost.
+	 *
+	 * @param {{restore?: boolean, next?: boolean, outside?: boolean}} [how]
+	 */
+	const closePanel = ({restore = true, next = false, outside = false} = {}) => {
+		const current = openFilter;
+
+		if (!current) {
+			return;
+		}
+
+		// The popover goes as the press starts; the search must not go too
+		// when it ends on the dimmed page. React draws the modal again in
+		// between, and without this hold it would be listening by then.
+		if (outside) {
+			setPressClosedPopover(true);
+
+			const release = () => {
+				window.removeEventListener('pointerup', release);
+				window.removeEventListener('pointercancel', release);
+				// After the modal has had the press's end, and ignored it.
+				window.setTimeout(() => setPressClosedPopover(false));
+			};
+
+			window.addEventListener('pointerup', release);
+			window.addEventListener('pointercancel', release);
+		}
+
+		if ('popover' === current.kind && current.anchor) {
+			const popover = document.getElementById(popoverId);
+			const hadFocus = popover?.contains(popover.ownerDocument.activeElement);
+
+			if (next) {
+				const controls = Array.from(headerRef.current?.querySelectorAll('.whsc-filterbar .whsc-facet:not([hidden])') || []);
+				const after = controls[controls.indexOf(current.anchor) + 1];
+
+				(after || current.anchor).focus();
+			} else if (restore || hadFocus) {
+				// A press elsewhere that lands on nothing focusable would leave
+				// focus on the page under the modal.
+				current.anchor.focus({preventScroll: !restore});
+			}
+		}
+
+		setOpenFilter(null);
+		setFrozen({});
+	};
+
+	const onGroup = (field, button) => {
+		if ('popover' === openFilter?.kind && field === openFilter.field) {
+			closePanel();
+
+			return;
+		}
+
+		openPanel({kind: narrow ? 'sheet' : 'popover', field, anchor: button});
+	};
+
+	const toggleSection = (field) => {
+		if (!expanded[field]) {
+			freeze(field);
+		}
+
+		setExpanded((current) => ({...current, [field]: !current[field]}));
+	};
+
+	// The body is held only while a popover is open.
+	useEffect(() => {
+		if ('popover' !== openFilter?.kind && bodyRef.current) {
+			bodyRef.current.style.minHeight = '';
+		}
+	}, [openFilter]);
+
+	// A popover belongs to the bar of one search at one width: a new search,
+	// or the modal crossing into the phone's layout, closes it.
+	useEffect(() => {
+		setOpenFilter((current) => ('popover' === current?.kind ? null : current));
+	}, [bar.key, narrow]);
+
+	// The header stays at the top of the scroll area and draws a line under
+	// itself once the results scroll beneath it.
+	useEffect(() => {
+		const header = headerRef.current;
+		const scroller = header?.closest('.components-modal__content');
+
+		if (!header || !scroller) {
+			return undefined;
+		}
+
+		const onScroll = () => {
+			const stuck = scroller.scrollTop > 0 && header.getBoundingClientRect().top - scroller.getBoundingClientRect().top < 1;
+
+			header.classList.toggle('is-stuck', stuck);
+		};
+
+		scroller.addEventListener('scroll', onScroll, {passive: true});
+
+		return () => scroller.removeEventListener('scroll', onScroll);
+	}, [activeTab]);
 
 	const onSelectSuggestion = (label) => {
 		setSuggestionsDismissed(true);
@@ -864,6 +1262,7 @@ const SearchModal = ({
 				pageCount: (response.hits || []).length,
 				// Clicks on every page attribute to the search that started it.
 				search_id: current?.search_id || response.search_id,
+				searchedQuery: current?.searchedQuery,
 				hits: appendHits(current?.hits, response.hits),
 			}));
 		} catch (e) {
@@ -988,10 +1387,17 @@ const SearchModal = ({
 	// are on screen.
 	const shownTotal = exactTotal ? totalResults : resultsHits.length;
 
+	// A pick keeps the results it narrows on screen while the new ones load,
+	// so they change behind an open popover instead of turning into a skeleton.
+	const updating = isSearching && 'filter' === pendingKind && null !== results;
+
 	// The main slot inside the browse layout swaps between highlights (idle),
-	// a skeleton (loading), and the results carousel / empty message.
+	// a skeleton (loading), and the results carousel / empty message. Recent
+	// and popular searches go with the highlights, and popular searches with
+	// a search that found nothing.
 	let mainTitle;
 	let mainContent;
+	let helpers = 'none';
 
 	// Which photo the results are for, and what the model read from it - so an
 	// unexpected result set reads as a misread photo rather than broken search.
@@ -1029,6 +1435,7 @@ const SearchModal = ({
 	// (submit mode, before Enter). That state used to show their title over a
 	// skeleton, which looked like a search loading that never finished.
 	if (showEmptyState || (!isSearching && !results)) {
+		helpers = 'all';
 		mainTitle = __('Current highlights', 'searcio');
 		mainContent = isLoadingHighlights ? (
 			<SearchResultsSkeleton/>
@@ -1047,7 +1454,7 @@ const SearchModal = ({
 				ariaLabel={__('Current highlights', 'searcio')}
 			/>
 		);
-	} else if (isSearching) {
+	} else if (isSearching && !updating) {
 		mainTitle = 'photo' === pendingKind
 			? __('Looking at your photo…', 'searcio')
 			: __('Results', 'searcio');
@@ -1073,7 +1480,7 @@ const SearchModal = ({
 				))
 			: __('Results', 'searcio');
 		mainContent = resultsHits.length > 0 ? (
-			<>
+			<div className={`whsc-results${updating ? ' is-updating' : ''}`} aria-busy={updating || undefined}>
 			{photoQuery}
 			<Carousel
 				items={resultsHits}
@@ -1102,20 +1509,166 @@ const SearchModal = ({
 					</button>
 				</div>
 			)}
-			</>
+			</div>
 		) : (
 			<>
 			{photoQuery}
-			<p className="whsc-no-results">
-				{visualActive
-					// A photo that matched nothing is a photo problem, not a
-					// catalogue problem - say what to do about it.
-					? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'searcio')
-					: (i18n.noResults || __('No results found.', 'searcio'))}
-			</p>
+			<div className="whsc-no-results">
+				<p className="whsc-no-results__title">
+					{visualActive
+						// A photo that matched nothing is a photo problem, not a
+						// catalogue problem - say what to do about it.
+						? __('No matches for that photo. Try a clearer shot, or one item on its own.', 'searcio')
+						: (i18n.noResults || __('No results found.', 'searcio'))}
+				</p>
+				{!visualActive && (
+					<p className="whsc-no-results__text">
+						{activeCount > 0
+							? __('No result matches the filters you chose. Remove one, or reset them all.', 'searcio')
+							: __('Check the spelling, or try a more general word.', 'searcio')}
+					</p>
+				)}
+				{!visualActive && activeCount > 0 && (
+					<button type="button" className="whsc-btn whsc-btn--secondary" onClick={resetAll}>
+						{__('Reset filters', 'searcio')}
+					</button>
+				)}
+			</div>
 			</>
 		);
+
+		if (0 === resultsHits.length) {
+			helpers = 'popular';
+		}
 	}
+
+	// The filters applied, as chips on the result line.
+	const chips = [];
+
+	[...new Set([...bar.order, ...Object.keys(activeFacets), ...Object.keys(activeRanges)])].forEach((field) => {
+		if (hasBound(activeRanges[field])) {
+			chips.push({key: `${field}:`, field, value: '', name: labelOf(field), label: rangeLabel(activeRanges[field], formatBound(field))});
+		}
+
+		(activeFacets[field] || []).forEach((value) => {
+			chips.push({key: `${field}:${value}`, field, value, name: labelOf(field), label: value});
+		});
+	});
+
+	const onRemoveChip = (chip) => {
+		if ('' === chip.value) {
+			onRangeApply(chip.field, {min: '', max: ''});
+		} else {
+			onFieldFacetClick(chip.field, chip.value);
+		}
+	};
+
+	const showingResults = null !== results && !showEmptyState && !visualActive;
+	const currency = config.currency || {};
+
+	const panel = (field) => (
+		<FilterPanel
+			key={field}
+			field={field}
+			label={labelOf(field)}
+			display={displayOf(field)}
+			values={facetGroups[field] || []}
+			selected={activeFacets[field] || []}
+			frozen={frozen[field] || []}
+			colors={facetSettings[field]?.colors || {}}
+			showCount={showCount}
+			locale={locale}
+			onToggle={onFieldFacetClick}
+			range={{
+				span: rangeFields[field],
+				active: activeRanges[field],
+				onApply: onRangeApply,
+				format: formatBound(field),
+				unit: PRICE_FIELDS.has(field) ? (currency.symbol || '') : '',
+				unitBefore: String(currency.position || '').startsWith('left'),
+				decimalSep: currency.decimalSep || '.',
+			}}
+		/>
+	);
+
+	// "Reset" takes this group's picks, or every pick, away; the other button
+	// only closes - its label says what is on screen now.
+	const panelFooter = (field) => {
+		const has = field ? isGroupActive(field) : activeCount > 0;
+		let done = __('Done', 'searcio');
+
+		if (showingResults) {
+			done = 0 === shownTotal
+				? __('No results', 'searcio')
+				: sprintf(
+					/* translators: %d: number of results the filters leave. */
+					_n('Show %d result', 'Show %d results', shownTotal, 'searcio'),
+					shownTotal
+				);
+		}
+
+		return (
+			<>
+				<button
+					type="button"
+					className="whsc-btn whsc-btn--secondary"
+					// Off, but still reachable: a disabled button would drop focus.
+					aria-disabled={!has}
+					onClick={() => {
+						if (has) {
+							if (field) {
+								resetGroup(field);
+							} else {
+								resetAll();
+							}
+						}
+					}}
+				>
+					{__('Reset', 'searcio')}
+				</button>
+				<button type="button" className="whsc-btn whsc-btn--primary" onClick={() => closePanel({restore: true})}>
+					{done}
+				</button>
+			</>
+		);
+	};
+
+	const sections = bar.order.map((field, index) => {
+		const open = Boolean(expanded[field]);
+		const summary = summarizeSelection(activeFacets[field], activeRanges[field], formatBound(field));
+		const sectionId = `${popoverId}-section-${index}`;
+
+		return (
+			<section className="whsc-acc" key={field}>
+				<h3 className="whsc-acc__heading">
+					<button
+						type="button"
+						className="whsc-acc__btn"
+						aria-expanded={open}
+						aria-controls={sectionId}
+						onClick={() => toggleSection(field)}
+					>
+						<span className="whsc-acc__title whsc-facet-group__label">{labelOf(field)}</span>
+						{'' !== summary && <span className="whsc-acc__sum"><bdi>{summary}</bdi></span>}
+						<Icon icon={chevronDown} className="whsc-chev" size={20}/>
+					</button>
+				</h3>
+				<div className="whsc-acc__panel" id={sectionId} hidden={!open}>
+					{open && panel(field)}
+				</div>
+			</section>
+		);
+	});
+
+	const allSelected = activeCount > 0 ? sprintf(
+		/* translators: %d: number of filter values selected. */
+		_n('%d selected', '%d selected', activeCount, 'searcio'),
+		activeCount
+	) : '';
+	const sheetOpen = null !== openFilter && 'popover' !== openFilter.kind;
+	// On a phone with the tabs on, the close button joins the tab row, which
+	// leaves the search field the room for its placeholder.
+	const closeInTabs = hasTabs && tight;
 
 	return (
 		<Modal
@@ -1128,8 +1681,19 @@ const SearchModal = ({
 			// so it would never see the frame's own copy (e.g. its colour).
 			overlayClassName={`whsc-modal-overlay${instanceClass ? ` ${instanceClass}` : ''}`}
 			contentLabel={i18n.placeholder || __('Search', 'searcio')}
+			// A press on the dimmed page while a popover is open closes only the
+			// popover (see `FilterPopover`), not the search.
+			shouldCloseOnClickOutside={'popover' !== openFilter?.kind && !pressClosedPopover}
+			onKeyDown={(event) => {
+				// Escape with a popover open but focus outside it, on its button
+				// say: the popover goes, the search stays.
+				if ('Escape' === event.key && !event.defaultPrevented && 'popover' === openFilter?.kind) {
+					event.preventDefault();
+					closePanel({restore: true});
+				}
+			}}
 		>
-			<div className="whsc-modal-body">
+			<div className="whsc-modal-body" ref={bodyRef}>
 				{hasTabs && (
 					<div className="whsc-modal-tabbar">
 					<div
@@ -1157,6 +1721,7 @@ const SearchModal = ({
 								aria-selected={'assistant' === activeTab}
 								className={`whsc-modal-tab${'assistant' === activeTab ? ' is-active' : ''}`}
 								onClick={() => {
+									setOpenFilter(null);
 									setAssistantOpened(true);
 									setActiveTab('assistant');
 								}}
@@ -1171,6 +1736,7 @@ const SearchModal = ({
 								aria-selected={'quiz' === activeTab}
 								className={`whsc-modal-tab${'quiz' === activeTab ? ' is-active' : ''}`}
 								onClick={() => {
+									setOpenFilter(null);
 									setQuizOpened(true);
 									setActiveTab('quiz');
 								}}
@@ -1181,9 +1747,11 @@ const SearchModal = ({
 					</div>
 					{/* Only the tabs without a search input need a close control
 					    here; the search tab keeps its own inside the input row, so
-					    turning these modes on never restyles the search tab. It sits
-					    beside the tablist rather than in it: a tablist holds tabs. */}
-					{'search' !== activeTab && (
+					    turning these modes on never restyles the search tab - except
+					    on a phone too narrow for the field and three icon buttons.
+					    It sits beside the tablist rather than in it: a tablist holds
+					    tabs. */}
+					{('search' !== activeTab || closeInTabs) && (
 						<Button
 							className="whsc-modal-close whsc-modal-close--tabbed"
 							icon={closeSmall}
@@ -1197,7 +1765,8 @@ const SearchModal = ({
 
 				{showSearchPane && (
 					<>
-				<div className="whsc-modal-header">
+				<div className="whsc-modal-header" ref={headerRef}>
+					<div className="whsc-modal-search">
 					<div className="whsc-input-row">
 						<SearchInput
 							ref={inputRef}
@@ -1247,13 +1816,15 @@ const SearchModal = ({
 						{visualEnabled && (
 							<VisualSearchButton busy={isSearching} onSelect={(file) => void runVisualSearch(file)}/>
 						)}
-						<Button
-							className="whsc-modal-close"
-							icon={closeSmall}
-							label={i18n.close || __('Close search', 'searcio')}
-							showTooltip={false}
-							onClick={onRequestClose}
-						/>
+						{!closeInTabs && (
+							<Button
+								className="whsc-modal-close"
+								icon={closeSmall}
+								label={i18n.close || __('Close search', 'searcio')}
+								showTooltip={false}
+								onClick={onRequestClose}
+							/>
+						)}
 					</div>
 
 					{suggestionsOpen && (
@@ -1265,6 +1836,47 @@ const SearchModal = ({
 							onDismiss={() => setSuggestionsDismissed(true)}
 						/>
 					)}
+					</div>
+
+					{/* A photo search takes no filters. */}
+					{!visualActive && (
+						<FilterBar
+							narrow={narrow}
+							types={typeFacets}
+							activeTypes={activeTypes}
+							showTypes={showTypes}
+							onType={onTypeFacetClick}
+							typeLabels={typeLabels}
+							allTypesLabel={i18n.allTypes}
+							showCount={showCount}
+							groups={bar.order}
+							buttonLabel={(field) => filterButtonLabel(labelOf(field), activeFacets[field], activeRanges[field], formatBound(field))}
+							isActive={isGroupActive}
+							openField={openFilter?.field || ''}
+							allOpen={'all' === openFilter?.kind}
+							popoverId={popoverId}
+							activeCount={activeCount}
+							limit={facetBarLimit}
+							fitKey={`${bar.key}|${modalWidth}|${fontsVersion}`}
+							onGroup={onGroup}
+							onAll={(button) => openPanel({kind: 'all', anchor: button})}
+						/>
+					)}
+
+					{'popover' === openFilter?.kind && (
+						<FilterPopover
+							id={popoverId}
+							title={labelOf(openFilter.field)}
+							selection={selectionOf(openFilter.field)}
+							kind={displayOf(openFilter.field)}
+							anchor={openFilter.anchor}
+							layoutKey={`${groupsVersion}|${modalWidth}`}
+							onClose={closePanel}
+							footer={panelFooter(openFilter.field)}
+						>
+							{panel(openFilter.field)}
+						</FilterPopover>
+					)}
 				</div>
 
 				{'string' === typeof results?.banner && '' !== results.banner && (
@@ -1273,64 +1885,6 @@ const SearchModal = ({
 					// these, so not rendering them made the field look broken.
 					// Merchant-authored text, rendered as text - never as markup.
 					<p className="whsc-banner" role="status">{results.banner}</p>
-				)}
-
-				{showFacets && (
-					// A group of independent toggle buttons, not an ARIA tablist -
-					// multi-select means more than one can be "selected" at once,
-					// which the tablist/tab/aria-selected pattern assumes never happens.
-					<div className="whsc-facets" role="group" aria-label={__('Filter by type', 'searcio')}>
-						<button
-							type="button"
-							aria-pressed={0 === activeTypes.length}
-							className={`whsc-facet${0 === activeTypes.length ? ' is-active' : ''}`}
-							onClick={() => onTypeFacetClick('')}
-						>
-							<span className="whsc-facet__label">{i18n.allTypes || __('All', 'searcio')}</span>
-						</button>
-						{facets.map((facet) => (
-							<button
-								key={facet.value}
-								type="button"
-								aria-pressed={activeTypes.includes(facet.value)}
-								className={`whsc-facet${activeTypes.includes(facet.value) ? ' is-active' : ''}`}
-								onClick={() => onTypeFacetClick(facet.value)}
-							>
-								<span className="whsc-facet__label">{typeLabels[facet.value] || facet.value}</span>
-								{showCount && <span className="whsc-facet__count">{formatCount(facet.count)}</span>}
-							</button>
-						))}
-					</div>
-				)}
-
-				{facetGroupEntries.length > 0 && facetGroupEntries.map(([field, values]) => (
-					<div className="whsc-facet-group" key={field}>
-						<span className="whsc-facet-group__label">{humanizeFieldLabel(field, fieldLabels)}</span>
-						<div className="whsc-facets" role="group" aria-label={humanizeFieldLabel(field, fieldLabels)}>
-							{values.map((entry) => (
-								<button
-									key={entry.value}
-									type="button"
-									aria-pressed={(activeFacets[field] || []).includes(entry.value)}
-									className={`whsc-facet${(activeFacets[field] || []).includes(entry.value) ? ' is-active' : ''}`}
-									onClick={() => onFieldFacetClick(field, entry.value)}
-								>
-									<span className="whsc-facet__label">{entry.value}</span>
-									{showCount && <span className="whsc-facet__count">{formatCount(entry.count)}</span>}
-								</button>
-							))}
-						</div>
-					</div>
-				))}
-
-				{!visualActive && (
-					<RangeFilters
-						fields={rangeFields}
-						active={activeRanges}
-						onApply={onRangeApply}
-						busy={isSearching}
-						labels={fieldLabels}
-					/>
 				)}
 
 				{error && (
@@ -1345,18 +1899,30 @@ const SearchModal = ({
 					recent={recent}
 					popularSearches={popularSearches}
 					mainTitle={mainTitle}
+					query={'all' === helpers || visualActive ? '' : String(results?.searchedQuery ?? '')}
+					meta={'all' !== helpers && !visualActive && (
+						<ActiveFilters
+							chips={chips}
+							// A search that found nothing has its own "Reset filters".
+							showReset={'popular' !== helpers}
+							onRemove={onRemoveChip}
+							onReset={resetAll}
+							fallbackRef={resultsHeadingRef}
+						/>
+					)}
 					main={mainContent}
-					busy={isSearching}
+					busy={isSearching && !updating}
 					// Clearing the field keeps the last results in state but puts the
-					// highlights back on screen, so an empty field is never "active".
-					searchActive={!showEmptyState && (isSearching || null !== results)}
+					// highlights back on screen, with the searches beside them.
+					helpers={helpers}
+					headingRef={resultsHeadingRef}
 					onSelect={(label) => void runSearch(label)}
 					onRemoveRecent={onRemoveRecent}
 					onClearRecent={onClearRecent}
 				/>
 
 				<p id={statusId} className="whsc-visually-hidden" role="status" aria-live="polite">
-					{isSearching && ('photo' === pendingKind
+					{isSearching && 'filter' !== pendingKind && ('photo' === pendingKind
 						? __('Looking at your photo…', 'searcio')
 						: (i18n.searching || __('Searching…', 'searcio')))}
 					{!isSearching && results && (
@@ -1406,6 +1972,21 @@ const SearchModal = ({
 
 				<SearcioCredit/>
 			</div>
+
+			{/* Rendered inside the search modal so that it nests in it: see `FilterSheet`. */}
+			{sheetOpen && (
+				<FilterSheet
+					variant={narrow ? 'sheet' : 'drawer'}
+					title={'all' === openFilter.kind ? (narrow ? __('Filters', 'searcio') : __('All filters', 'searcio')) : labelOf(openFilter.field)}
+					selection={'all' === openFilter.kind ? allSelected : selectionOf(openFilter.field)}
+					single={'all' !== openFilter.kind}
+					instanceClass={instanceClass}
+					onClose={() => closePanel({restore: false})}
+					footer={panelFooter('all' === openFilter.kind ? null : openFilter.field)}
+				>
+					{'all' === openFilter.kind ? sections : panel(openFilter.field)}
+				</FilterSheet>
+			)}
 		</Modal>
 	);
 };
