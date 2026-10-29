@@ -49,6 +49,7 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 = Fits your site =
 
 * **Gutenberg block and Elementor widgets** - put a search box or a search icon anywhere, for example in your header, and a row of products on any page.
+* **Any theme, any builder** - Searcio can take over your theme's own search, open from its search icon, sit in a floating button, or go anywhere as the `[searcio]` shortcode, a classic widget or a menu item.
 * **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. The search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
 * **Multilingual** - works with WPML and Polylang, so visitors only see results in their language.
@@ -107,7 +108,11 @@ Your visitors can still search: the search window falls back to WordPress's own 
 
 = Does it work with my theme and page builder? =
 
-Yes. Use the Searcio Search block in the block editor or the Site Editor, or the Searcio Search widget in Elementor. The search window keeps its own layout on any theme while following your site's font, text size and text color.
+Yes. Use the Searcio Search block in the block editor or the Site Editor, or the Searcio Search widget in Elementor; with any other theme or builder, use the Placement tab (see the next question). The search window keeps its own layout on any theme while following your site's font, text size and text color.
+
+= My theme has no block or Elementor support. Can I still use it? =
+
+Yes. Under Searcio > Placement, let Searcio take over your theme's search forms or open from your theme's own search icon (the tab suggests the selector for many popular themes), add a floating search button, or turn on the Ctrl+K shortcut. You can also place `[searcio]` in any page builder that runs shortcodes, use the classic widgets or add a search item to a menu. Every option is off until you turn it on.
 
 = Can I change how it looks? =
 

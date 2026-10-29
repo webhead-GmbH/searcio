@@ -2,8 +2,9 @@
 /**
  * Shared front-end trigger markup.
  *
- * One render helper used by both the Gutenberg block's `render.php` and the
- * Elementor widget so the two embed points never drift apart.
+ * One render helper used by the Gutenberg block's `render.php`, the Elementor
+ * widget, the shortcode, the classic widget and the site-wide placements, so
+ * the embed points never drift apart.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -25,6 +26,15 @@ final class Trigger_Markup {
 
 	private const HIGHLIGHTS_SOURCES = [ 'newest', 'featured' ];
 
+	/**
+	 * The two triggers the site prints once at the end of a page, which the
+	 * site-wide ways of opening the search open: one that draws nothing, and
+	 * the floating button.
+	 */
+	private const SITE_MODES = [ 'hidden', 'floating' ];
+
+	private const FLOATING_STYLES = [ 'icon', 'label' ];
+
 	/** How many filter buttons the search window's bar shows at most, unless a placement says otherwise. */
 	public const FACET_BAR_LIMIT = 5;
 
@@ -32,10 +42,13 @@ final class Trigger_Markup {
 	public const FACET_BAR_LIMIT_MAX = 8;
 
 	/**
-	 * @param  array{mode?:string,scopeType?:string,placeholder?:string,className?:string,enableVoice?:bool,searchTrigger?:string,instanceClass?:string,iconHtml?:string,voiceIconHtml?:string,animation?:string,showCount?:bool,cardSource?:string,highlightsSource?:string,facetBarLimit?:int|string|null,editorPreview?:bool,editorQuery?:string}  $attributes
+	 * @param  array{site?:string,floatingStyle?:string,mode?:string,scopeType?:string,placeholder?:string,className?:string,enableVoice?:bool,searchTrigger?:string,instanceClass?:string,iconHtml?:string,voiceIconHtml?:string,animation?:string,showCount?:bool,cardSource?:string,highlightsSource?:string,facetBarLimit?:int|string|null,editorPreview?:bool,editorQuery?:string}  $attributes
 	 */
 	public static function render( array $attributes ): string {
-		$mode           = in_array( $attributes['mode'] ?? '', [ 'box', 'icon' ], true ) ? $attributes['mode'] : 'icon';
+		$site           = in_array( $attributes['site'] ?? '', self::SITE_MODES, true ) ? (string) $attributes['site'] : '';
+		$mode           = '' !== $site
+			? $site
+			: ( in_array( $attributes['mode'] ?? '', [ 'box', 'icon' ], true ) ? $attributes['mode'] : 'icon' );
 		$scope_type     = is_string( $attributes['scopeType'] ?? null ) ? trim( (string) $attributes['scopeType'] ) : '';
 		$placeholder    = is_string( $attributes['placeholder'] ?? null ) ? trim( (string) $attributes['placeholder'] ) : '';
 		$class_name     = is_string( $attributes['className'] ?? null ) ? trim( (string) $attributes['className'] ) : '';
@@ -58,6 +71,20 @@ final class Trigger_Markup {
 		// Opens the modal on its own, which only the Elementor editor asks for
 		// (the widget checks it is rendering there), so it is omitted entirely
 		// otherwise rather than written as an "off" value.
+		// Only the site's own trigger carries these, so a block or a widget
+		// prints exactly what it printed before.
+		$site_data = '' !== $site
+			? sprintf(
+				' data-whsc-site="%1$s"%2$s',
+				esc_attr( $site ),
+				'floating' === $site
+					? sprintf(
+						' data-floating="%s"',
+						esc_attr( in_array( $attributes['floatingStyle'] ?? '', self::FLOATING_STYLES, true ) ? (string) $attributes['floatingStyle'] : 'icon' )
+					)
+					: ''
+			)
+			: '';
 		$editor_preview = ! empty( $attributes['editorPreview'] )
 			? sprintf(
 				' data-editor-preview="1" data-editor-query="%s"',
@@ -84,7 +111,7 @@ final class Trigger_Markup {
 		// portalled modal (rendered separately under `document.body`, see
 		// `index.js`) carries the same attribute on its own mount element.
 		return sprintf(
-			'<div class="%1$s" data-whsc-trigger data-webhead-frontend-root data-mode="%2$s" data-type="%3$s" data-placeholder="%4$s" data-voice="%5$s" data-search-trigger="%6$s" data-instance-class="%7$s" data-animation="%8$s" data-show-count="%9$s" data-icon="%10$s" data-voice-icon="%11$s" data-card-source="%12$s" data-highlights-source="%13$s" data-facet-bar-limit="%14$d"%15$s></div>',
+			'<div class="%1$s" data-whsc-trigger data-webhead-frontend-root data-mode="%2$s" data-type="%3$s" data-placeholder="%4$s" data-voice="%5$s" data-search-trigger="%6$s" data-instance-class="%7$s" data-animation="%8$s" data-show-count="%9$s" data-icon="%10$s" data-voice-icon="%11$s" data-card-source="%12$s" data-highlights-source="%13$s" data-facet-bar-limit="%14$d"%15$s%16$s></div>',
 			esc_attr( $classes ),
 			esc_attr( $mode ),
 			esc_attr( $scope_type ),
@@ -102,7 +129,8 @@ final class Trigger_Markup {
 			esc_attr( $card_source ),
 			esc_attr( $highlights_source ),
 			$facet_bar_limit,
-			$editor_preview
+			$editor_preview,
+			$site_data
 		);
 	}
 }

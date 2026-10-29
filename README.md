@@ -33,6 +33,9 @@
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, fully themeable (colors, radius, typography,
   spacing) from either editor, with no code required.
+- **Any theme, any builder** - the Placement tab takes over the theme's own search forms, opens Searcio from the
+  theme's search icon, adds a floating button and a Ctrl+K shortcut; `[searcio]` and `[searcio_products]`, two classic
+  widgets and a menu item place it anywhere else.
 - **Server-designed result cards** - optionally use card templates designed in the Searcio dashboard instead of the
   plugin's built-in card layout.
 - **Configurable indexing** - choose which post types and WooCommerce products to index, and map custom fields,
@@ -77,7 +80,7 @@ The AI Assistant, search by photo and the quiz appear when your Searcio plan and
 4. Open the **Indexing** tab and choose which content should be searchable.
 5. Open the **Sync** tab and start your first sync.
 6. Add the **Searcio Search** block to a page (or the **Searcio Search** widget in Elementor) to place the search trigger
-   anywhere on your site.
+   anywhere on your site. With another theme or builder, use the **Placement** tab.
 
 See [`docs/installation.md`](docs/installation.md) for a more detailed walkthrough.
 

@@ -30,6 +30,8 @@ use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Lifecycle\Uninstall
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Lifecycle\Upgrade_Runner;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Cache\Cache_Manager;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Assets\Asset_Registry;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Shortcode_Manager;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Site_Id_Option;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Sync_Options;
@@ -38,6 +40,7 @@ use Webhead\WP\SearchCloud\Jobs\Scheduled_Sync_Job;
 use Webhead\WP\SearchCloud\Jobs\Sync_Tick_Job;
 use Webhead\WP\SearchCloud\Jobs\Change_Drain_Job;
 use Webhead\WP\SearchCloud\Admin\Settings_Page;
+use Webhead\WP\SearchCloud\Admin\Menu_Item;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Database\Tables\Sync_Runs_Table;
 use Webhead\WP\SearchCloud\Database\Tables\Change_Queue_Table;
@@ -48,6 +51,7 @@ use Webhead\WP\SearchCloud\Routing\Sync_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Settings_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Cache_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Search_Config_Endpoint;
+use Webhead\WP\SearchCloud\Routing\Placement_Endpoint;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Indexing\Woo;
@@ -68,6 +72,13 @@ use Webhead\WP\SearchCloud\Sync\Incremental_Service;
 use Webhead\WP\SearchCloud\WP_CLI\Sync_Command;
 use Webhead\WP\SearchCloud\WP_CLI\Command_Registrar;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
+use Webhead\WP\SearchCloud\Frontend\Placement_Config;
+use Webhead\WP\SearchCloud\Frontend\Placement_Preview;
+use Webhead\WP\SearchCloud\Frontend\Search_Surface;
+use Webhead\WP\SearchCloud\Frontend\Site_Placement;
+use Webhead\WP\SearchCloud\Shortcodes\Products_Shortcode;
+use Webhead\WP\SearchCloud\Shortcodes\Search_Shortcode;
+use Webhead\WP\SearchCloud\Widgets\Widget_Registrar;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
 use Webhead\WP\SearchCloud\Health\Health_Tests;
@@ -380,6 +391,24 @@ final class Plugin extends Base_Plugin {
 				return new Command_Registrar( $container->get( 'sync_command' ) );
 			}
 		);
+		// Shared: the settings are read once a request, and two placements
+		// that look the same share one `<style>`.
+		$container->addShared(
+			'placement_config',
+			static function () use ( $container ): Placement_Config {
+				return new Placement_Config(
+					$container->get( Settings_Manager::class ),
+					$container->get( 'compatibility_manager' ),
+					$container->get( 'index_config' )
+				);
+			}
+		);
+		$container->addShared(
+			'search_surface',
+			static function () use ( $container ): Search_Surface {
+				return new Search_Surface( $container->get( Asset_Registry::class ) );
+			}
+		);
 		$container->add(
 			'frontend_config',
 			static function () use ( $container ): Frontend_Config {
@@ -388,10 +417,47 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'index_config' ),
 					$container->get( 'language' ),
 					$container->get( 'language_config' ),
-					$container->get( 'facet_config' )
+					$container->get( 'facet_config' ),
+					$container->get( 'placement_config' )
 				);
 			}
 		);
+		$container->add(
+			'placement_endpoint',
+			static function () use ( $container ): Placement_Endpoint {
+				return new Placement_Endpoint( $container->get( 'placement_config' ) );
+			}
+		);
+		$container->add(
+			'site_placement',
+			static function () use ( $container ): Site_Placement {
+				return new Site_Placement(
+					$container->get( 'placement_config' ),
+					$container->get( 'search_surface' ),
+					$container->get( Asset_Registry::class )
+				);
+			}
+		);
+		$container->add(
+			'placement_preview',
+			static function () use ( $container ): Placement_Preview {
+				return new Placement_Preview( $container->get( 'placement_config' ), $container->get( 'search_surface' ) );
+			}
+		);
+		$container->add(
+			'search_shortcode',
+			static function () use ( $container ): Search_Shortcode {
+				return new Search_Shortcode( $container->get( 'placement_config' ), $container->get( 'search_surface' ) );
+			}
+		);
+		$container->add(
+			'products_shortcode',
+			static function () use ( $container ): Products_Shortcode {
+				return new Products_Shortcode( $container->get( 'placement_config' ), $container->get( 'search_surface' ) );
+			}
+		);
+		$container->add( 'widget_registrar', Widget_Registrar::class );
+		$container->add( 'menu_item', Menu_Item::class );
 
 		// How the storefront entry is registered, said before anything asks for
 		// it. The configuration is a callback: it is built when a block or a
@@ -420,6 +486,22 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'search_config_endpoint' ) );
 		$hooks_manager->register( $container->get( 'command_registrar' ) );
 		$hooks_manager->register( $container->get( 'change_listener' ) );
+		$hooks_manager->register( $container->get( 'placement_endpoint' ) );
+		$hooks_manager->register( $container->get( 'site_placement' ) );
+		$hooks_manager->register( $container->get( 'placement_preview' ) );
+		$hooks_manager->register( $container->get( 'widget_registrar' ) );
+		$hooks_manager->register( $container->get( 'menu_item' ) );
+	}
+
+	/**
+	 * `[searcio]` and `[searcio_products]`, for a theme or a builder without a
+	 * block or an Elementor widget. Registered through the framework, which
+	 * also tells Elementor's element cache to run an element that holds one.
+	 */
+	protected function register_shortcodes( Shortcode_Manager $shortcode_manager, Container $container ): void {
+		$shortcode_manager
+			->register( $container->get( 'search_shortcode' ) )
+			->register( $container->get( 'products_shortcode' ) );
 	}
 
 	/**

@@ -113,6 +113,43 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'Oliv' => '#6f7a3a', 'Schwarz' => '#1F1F1F' ], $this->facets()[0]['colors'] );
 	}
 
+	/**
+	 * YITH's swatches keep a term's value under one key whatever the
+	 * attribute's type, so it is a colour only for an attribute of its colour
+	 * type. A term with two colours holds a list, an old release kept the
+	 * value under the taxonomy's name, and a label is not a colour.
+	 */
+	public function test_yith_swatches_colour_an_attribute_of_their_colour_type(): void {
+		$this->make_attribute( 'colorpicker' );
+		$this->map_attribute();
+		$this->facet_config()->set_fields( [ self::FIELD ] );
+
+		$olive = $this->term( 'Oliv' );
+		$duo   = $this->term( 'Schwarz-Weiss' );
+		$old   = $this->term( 'Sand' );
+		$label = $this->term( 'XL' );
+
+		update_term_meta( $olive, '_yith_wccl_value', '#6f7a3a' );
+		update_term_meta( $duo, '_yith_wccl_value', [ '#111111', '#ffffff' ] );
+		update_term_meta( $old, self::ATTRIBUTE . '_yith_wccl_value', '#c2b280' );
+		update_term_meta( $label, '_yith_wccl_value', 'Extra large' );
+
+		$this->assertSame(
+			[ 'Oliv' => '#6f7a3a', 'Sand' => '#c2b280', 'Schwarz-Weiss' => '#111111' ],
+			$this->facets()[0]['colors']
+		);
+	}
+
+	public function test_yith_values_of_a_label_attribute_are_not_colours(): void {
+		$this->make_attribute();
+		$this->map_attribute();
+		$this->facet_config()->set_fields( [ self::FIELD ] );
+
+		update_term_meta( $this->term( 'Oliv' ), '_yith_wccl_value', '#6f7a3a' );
+
+		$this->assertArrayNotHasKey( 'colors', $this->facets()[0] );
+	}
+
 	public function test_a_shop_can_give_or_correct_the_colours(): void {
 		$this->facet_config()->set_fields( [ 'colour' ] );
 
@@ -173,15 +210,23 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 	 * A global attribute in WooCommerce's own table, with its taxonomy
 	 * registered as WooCommerce registers it on `init`.
 	 */
-	private function make_attribute(): void {
+	/**
+	 * @param  string  $type  The attribute's type; a swatches plugin adds its own to WooCommerce's.
+	 */
+	private function make_attribute( string $type = 'select' ): void {
 		if ( ! class_exists( \WooCommerce::class ) || ! function_exists( 'wc_create_attribute' ) ) {
 			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+
+		if ( 'colorpicker' === $type ) {
+			add_filter( 'product_attributes_type_selector', static fn ( array $types ): array => $types + [ 'colorpicker' => 'Colorpicker' ] );
 		}
 
 		$id = wc_create_attribute(
 			[
 				'name' => 'Farbton',
 				'slug' => self::ATTRIBUTE_SLUG,
+				'type' => $type,
 			]
 		);
 

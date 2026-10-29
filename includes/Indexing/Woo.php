@@ -60,6 +60,16 @@ final class Woo {
 	/** Term meta a swatches plugin keeps an attribute term's colour in, see {@see self::attribute_colors()}. */
 	private const COLOR_META_KEYS = [ 'product_attribute_color', 'cfvsw_color' ];
 
+	/**
+	 * "YITH WooCommerce Color, Image & Label Variation Swatches" keeps a term's
+	 * value here whatever the attribute's type, so it is a colour only for an
+	 * attribute of the type it adds for colours. Releases before 2.0 kept it
+	 * under the taxonomy's name followed by this key. Read from version 2.32.0.
+	 */
+	private const YITH_VALUE_META_KEY = '_yith_wccl_value';
+
+	private const YITH_COLOR_TYPE = 'colorpicker';
+
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
 	}
@@ -342,7 +352,9 @@ final class Woo {
 	/**
 	 * Term name => hex colour, for the terms of an attribute a swatches plugin
 	 * has given a colour: "Variation Swatches for WooCommerce" by GetWooPlugins
-	 * (`product_attribute_color`) and the one by CartFlows (`cfvsw_color`).
+	 * (`product_attribute_color`), the one by CartFlows (`cfvsw_color`), and
+	 * YITH's for an attribute of its colour type (`_yith_wccl_value`, of which
+	 * a term with two colours has a list; the first is taken).
 	 * The names are the ones the index holds, in the language of the current
 	 * request, so the storefront can match them to the values a search answers
 	 * with. Empty when no term has a colour.
@@ -361,6 +373,7 @@ final class Woo {
 		}
 
 		$colors = [];
+		$yith   = $this->is_yith_color_attribute( $taxonomy );
 
 		foreach ( $terms as $term ) {
 			if ( ! $term instanceof \WP_Term ) {
@@ -372,12 +385,49 @@ final class Woo {
 
 				if ( is_string( $color ) && '' !== $color ) {
 					$colors[ Term_Names::decode( $term->name ) ] = $color;
-					break;
+					continue 2;
+				}
+			}
+
+			if ( $yith ) {
+				$color = $this->yith_color( $term->term_id, $taxonomy );
+
+				if ( '' !== $color ) {
+					$colors[ Term_Names::decode( $term->name ) ] = $color;
 				}
 			}
 		}
 
 		return $colors;
+	}
+
+	/** Whether YITH's swatches made this attribute a colour picker. */
+	private function is_yith_color_attribute( string $taxonomy ): bool {
+		if ( ! function_exists( 'wc_attribute_taxonomy_id_by_name' ) || ! function_exists( 'wc_get_attribute' ) ) {
+			return false;
+		}
+
+		$attribute = wc_get_attribute( wc_attribute_taxonomy_id_by_name( $taxonomy ) );
+
+		return is_object( $attribute ) && self::YITH_COLOR_TYPE === ( $attribute->type ?? '' );
+	}
+
+	private function yith_color( int $term_id, string $taxonomy ): string {
+		$value = get_term_meta( $term_id, self::YITH_VALUE_META_KEY, true );
+
+		if ( '' === $value || false === $value ) {
+			$value = get_term_meta( $term_id, $taxonomy . self::YITH_VALUE_META_KEY, true );
+		}
+
+		if ( is_array( $value ) ) {
+			$value = reset( $value );
+		} elseif ( is_string( $value ) && str_contains( $value, ',' ) ) {
+			$value = explode( ',', $value )[0];
+		}
+
+		$color = is_string( $value ) ? sanitize_hex_color( trim( $value ) ) : null;
+
+		return is_string( $color ) ? $color : '';
 	}
 
 	/**

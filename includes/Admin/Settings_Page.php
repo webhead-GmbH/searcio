@@ -107,6 +107,7 @@ final class Settings_Page extends Page {
 				'syncBase'            => '/webhead-search-cloud/v1/sync',
 				'cacheClearPath'      => '/webhead-search-cloud/v1/cache/clear',
 				'searchConfigPath'    => '/webhead-search-cloud/v1/search-config',
+				'placementPath'       => '/webhead-search-cloud/v1/placement',
 				'nonce'               => wp_create_nonce( 'wp_rest' ),
 			],
 			'caps' => [

@@ -226,6 +226,23 @@ final class Plugin_Settings {
 	public const POPULAR_SEARCHES = 'popular_searches';
 
 	/**
+	 * Where the search is placed without a block or a widget, and how a
+	 * shortcode, a classic widget and a site-wide placement look by default
+	 * (see {@see \Webhead\WP\SearchCloud\DTO\Placement_Options}). Read and
+	 * written through the Placement endpoint, which cleans it, so it is kept
+	 * out of the generic settings screen.
+	 */
+	#[Setting(
+		type: 'object',
+		default: [],
+		option_key: 'webhead_search_cloud_placement',
+		show_in_rest: false,
+		label: 'Placement',
+		description: 'Site-wide search placements and the defaults of the shortcodes and classic widgets.'
+	)]
+	public const PLACEMENT = 'placement';
+
+	/**
 	 * Opt-in uninstall policy, read by {@see \Webhead\WP\SearchCloud\Plugin::configure_uninstall()}.
 	 * Off by default: uninstalling the plugin keeps its settings, tables, and
 	 * per-post sync metadata untouched. Turning this on only affects data

@@ -1993,6 +1993,85 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 }
 
+/* -------------------------------------------------------------------------
+ * A placement without a block or a widget: the shortcode, the classic widget
+ * and a search form Searcio takes the place of. The wrapper is outside any
+ * root and aligns the trigger in what holds it. The trigger is the root, so
+ * these rules are written for the root itself and not inside the rules
+ * above, which are for what a root holds. A box fills the wrapper, or the
+ * width it was given, and never more than the space there is; only these
+ * placements give a trigger `whsc-trigger--box`.
+ * ---------------------------------------------------------------------- */
+.webhead-search-cloud-placement {
+	display: flex;
+	justify-content: flex-start;
+
+	&--center {
+		justify-content: center;
+	}
+
+	&--end {
+		justify-content: flex-end;
+	}
+}
+
+.webhead-search-cloud-trigger#{$lift}.whsc-trigger--box {
+	width: var(--whsc-trigger-box-width, 100%);
+	max-width: 100%;
+}
+
+/*
+ * The floating button, fixed to a bottom corner. Its distance from the
+ * bottom edge is the Placement tab's, so it can stand above a cart bar or a
+ * cookie notice, and a phone's home indicator is added to it.
+ */
+.webhead-search-cloud-trigger#{$lift}.whsc-trigger--floating {
+	position: fixed;
+	z-index: 99990;
+	inset-block-end: calc(var(--whsc-floating-offset, 24px) + env(safe-area-inset-bottom, 0px));
+	inset-inline-end: 16px;
+
+	&.whsc-floating--start {
+		inset-inline-start: 16px;
+		inset-inline-end: auto;
+	}
+
+	@media (min-width: 782px) {
+		&.whsc-floating--phones {
+			display: none;
+		}
+	}
+}
+
+/*
+ * Its own colours: the header magnifier's are made for the page behind it,
+ * and the button stands on its own fill. The accent is the fill, the icon and
+ * the word are white; a site sets `--whsc-floating-bg` and
+ * `--whsc-floating-color` for others.
+ */
+[data-webhead-frontend-root]#{$lift} .whsc-trigger-icon-button.whsc-trigger-floating-button.components-button {
+	--whsc-trigger-size: 56px;
+	color: var(--whsc-floating-color, #ffffff);
+	background: var(--whsc-floating-bg, var(--whsc-accent));
+	border-radius: 999px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled),
+	&:active:not(:disabled) {
+		color: var(--whsc-floating-color, #ffffff);
+		background: var(--whsc-floating-bg, var(--whsc-accent));
+		box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+	}
+
+	&.whsc-trigger-floating-button--label {
+		width: auto;
+		gap: 8px;
+		padding-inline: 18px 22px;
+		font-weight: 600;
+	}
+}
+
 /*
  * Stated on the price itself; inherited instead, it took the theme's body
  * leading. A placement's Elementor typography control still sets it: those

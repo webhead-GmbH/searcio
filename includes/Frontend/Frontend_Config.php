@@ -4,8 +4,9 @@
  *
  * The bundle itself is the webpack entry {@see self::ENTRY}, printed through
  * the plugin's asset registry by whatever draws a surface: a block's
- * `render.php` and the two Elementor widgets. The registry registers it the
- * first time one of them asks, and only then calls {@see self::to_array()} -
+ * `render.php`, the two Elementor widgets, the shortcodes, the classic widgets
+ * and the site-wide placements of the Placement tab. The registry registers it
+ * the first time one of them asks, and only then calls {@see self::to_array()} -
  * so a page with no surface on it reads no setting and translates no string.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
@@ -42,7 +43,8 @@ final class Frontend_Config {
 		private Index_Config $index_config,
 		private Language $language,
 		private Language_Config $language_config,
-		private Facet_Config $facet_config
+		private Facet_Config $facet_config,
+		private ?Placement_Config $placement_config = null
 	) {}
 
 	/**
@@ -131,6 +133,7 @@ final class Frontend_Config {
 			// ever match it - sending every visitor to native-search fallback.
 			'currentLang'     => $this->language->is_multilingual() ? $this->language->current_language() : '',
 			'enabledLanguages' => $this->language->is_multilingual() ? $this->language_config->enabled_languages() : [],
+			'placement'       => $this->placement(),
 			'i18n'            => [
 				'placeholder'     => __( 'Search…', 'searcio' ),
 				'noResults'       => __( 'No results found.', 'searcio' ),
@@ -147,7 +150,24 @@ final class Frontend_Config {
 				'allTypes'        => __( 'All', 'searcio' ),
 				/* translators: %s: the name of the search service, "Searcio". */
 				'credit'          => sprintf( __( 'Search by %s (opens in a new tab)', 'searcio' ), 'Searcio' ),
+				'search'          => __( 'Search', 'searcio' ),
 			],
+		];
+	}
+
+	/**
+	 * What opens the search besides its own triggers: the theme's elements
+	 * the Placement tab names, and whether the keyboard shortcut is on. A link
+	 * to `#searcio` and the class `searcio-open` always do, and need nothing.
+	 *
+	 * @return array{selectors:string[],shortcut:bool}
+	 */
+	private function placement(): array {
+		$options = $this->placement_config?->options();
+
+		return [
+			'selectors' => null !== $options && $options->openers ? $options->selectors : [],
+			'shortcut'  => null !== $options && $options->shortcut,
 		];
 	}
 }

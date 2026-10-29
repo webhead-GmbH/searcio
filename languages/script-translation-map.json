@@ -26,6 +26,9 @@
     "src/admin/settings/components/tabs/ManualConnectionEntry.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/tabs/PlacementTab.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/tabs/SearchConfigTab.js": [
         "public/bundle.settings.js"
     ],

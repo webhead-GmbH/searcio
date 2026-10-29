@@ -356,3 +356,116 @@
   border-radius: inherit;
   background: currentColor;
 }
+
+/* -------------------------------------------------------------------------
+ * Placement
+ * ---------------------------------------------------------------------- */
+
+// The preview is a page of the site, in the theme's own styles, framed as a
+// surface of its own. Its heights are the room each view needs: a trigger
+// with the space round it, the open window as a short screen, the floating
+// button in its corner.
+.whsc-placement-preview {
+  display: block;
+  width: 100%;
+  height: 180px;
+  border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+  border-radius: var(--wpds-border-radius-md);
+  background: var(--wpds-color-background-surface-neutral);
+}
+
+.whsc-placement-preview--modal {
+  height: 560px;
+}
+
+.whsc-placement-preview--floating {
+  height: 260px;
+}
+
+.whsc-placement-preview-note,
+.whsc-placement-check,
+.whsc-placement-suggestion__text,
+.whsc-placement-way p {
+  margin: 0;
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.whsc-placement-way h4 {
+  margin: 0;
+}
+
+// A selector or a snippet is code, and wraps anywhere rather than pushing its
+// card wider than the screen.
+.whsc-placement-suggestion__text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.whsc-placement-snippet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-sm);
+}
+
+.whsc-placement-snippet__code {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+  border-radius: var(--wpds-border-radius-sm);
+  background: var(--wpds-color-background-surface-neutral-weak);
+  color: var(--wpds-color-foreground-content-neutral);
+  font-family: var(--wpds-typography-font-family-mono);
+  font-size: var(--wpds-typography-font-size-sm);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+// The copy fallback for a page on plain HTTP selects a field that must exist
+// to be copied from, and must not be seen.
+.whsc-placement-copy-buffer {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.whsc-placement-colors {
+  min-width: 0;
+}
+
+// A colour is one row: its swatch, its name, and its value at the end.
+.whsc-placement-color,
+.whsc-placement-color__toggle {
+  width: 100%;
+}
+
+.whsc-placement-color__toggle {
+  gap: var(--wpds-dimension-gap-sm);
+  justify-content: flex-start;
+}
+
+.whsc-placement-color__name {
+  flex: 1 1 auto;
+  text-align: start;
+}
+
+.whsc-placement-color__value {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+  font-family: var(--wpds-typography-font-family-mono);
+  font-size: var(--wpds-typography-font-size-xs);
+}
+
+.whsc-placement-color__panel {
+  padding: var(--wpds-dimension-padding-md);
+}
+
+// The preview stays beside the settings it shows while they scroll, below
+// wp-admin's bar, on a screen wide enough for two columns.
+@media (min-width: 782px) {
+  .whsc-placement-preview-column {
+    position: sticky;
+    top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wpds-dimension-gap-lg));
+  }
+}
