@@ -3521,19 +3521,24 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	border-block-start: 1px solid var(--whsc-assistant-divider);
 }
 
-/* A popover is 360px wide: "Zurücksetzen" and "20 Ergebnisse anzeigen" are
- * to share one row there, which at the panel's own spacing they missed by a
- * few pixels. A longer label still wraps rather than being cut. */
-.whsc-pop__foot {
+/* A popover is 360px wide and a phone often 375px: "Zurücksetzen" and "20
+ * Ergebnisse anzeigen" are to share one row in both, which at the panel's own
+ * spacing they missed by a few pixels. A longer label still wraps rather than
+ * being cut. */
+.whsc-pop__foot,
+.whsc-sheet__foot {
 	gap: 8px;
+}
+
+.whsc-pop__foot {
 	padding-inline: 12px;
 }
 
-.whsc-modal .whsc-pop__foot .whsc-btn--secondary {
+:is(.whsc-modal, .whsc-sheet) :is(.whsc-pop__foot, .whsc-sheet__foot) .whsc-btn--secondary {
 	padding-inline: 14px;
 }
 
-.whsc-modal .whsc-pop__foot .whsc-btn--primary {
+:is(.whsc-modal, .whsc-sheet) :is(.whsc-pop__foot, .whsc-sheet__foot) .whsc-btn--primary {
 	padding-inline: 16px;
 }
 
