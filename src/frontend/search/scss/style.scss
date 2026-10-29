@@ -4324,7 +4324,25 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		padding-inline: 10px;
 	}
 
-	.whsc-modal .whsc-browse__aside--after .whsc-popular-item {
+	/* The recent and popular searches are targets of 44px too, the button that
+	 * takes a recent search away included. */
+	.whsc-modal .whsc-chip__label,
+	.whsc-modal .whsc-chip__label:hover,
+	.whsc-modal .whsc-chip__label:focus,
+	.whsc-modal .whsc-chip__label:active {
+		min-height: 44px;
+	}
+
+	.whsc-modal .whsc-chip__remove.components-button {
+		width: 44px;
+		height: 44px;
+		min-width: 44px;
+	}
+
+	.whsc-modal .whsc-popular-item,
+	.whsc-modal .whsc-popular-item:hover,
+	.whsc-modal .whsc-popular-item:focus,
+	.whsc-modal .whsc-popular-item:active {
 		min-height: 44px;
 	}
 }

@@ -639,7 +639,10 @@ const SearchModal = ({
 		// query scoped to the wrong (or no) content. Browsing by a filter has
 		// no query to hand over, so it stays where it is.
 		if (!isConfigured() || !isLanguageSupported()) {
-			if (!browseCatalogue) {
+			if (browseCatalogue) {
+				// A pick marked the results as loading before it got here.
+				setIsSearching(false);
+			} else {
 				window.location.href = nativeSearchUrl(trimmed);
 			}
 
