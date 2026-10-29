@@ -25,8 +25,14 @@ final class Trigger_Markup {
 
 	private const HIGHLIGHTS_SOURCES = [ 'newest', 'featured' ];
 
+	/** How many filter buttons the search window's bar shows at most, unless a placement says otherwise. */
+	public const FACET_BAR_LIMIT = 5;
+
+	/** The most a placement may ask for; more never fit beside "All filters" on a laptop. */
+	public const FACET_BAR_LIMIT_MAX = 8;
+
 	/**
-	 * @param  array{mode?:string,scopeType?:string,placeholder?:string,className?:string,enableVoice?:bool,searchTrigger?:string,instanceClass?:string,iconHtml?:string,voiceIconHtml?:string,animation?:string,showCount?:bool,cardSource?:string,highlightsSource?:string,editorPreview?:bool,editorQuery?:string}  $attributes
+	 * @param  array{mode?:string,scopeType?:string,placeholder?:string,className?:string,enableVoice?:bool,searchTrigger?:string,instanceClass?:string,iconHtml?:string,voiceIconHtml?:string,animation?:string,showCount?:bool,cardSource?:string,highlightsSource?:string,facetBarLimit?:int|string|null,editorPreview?:bool,editorQuery?:string}  $attributes
 	 */
 	public static function render( array $attributes ): string {
 		$mode           = in_array( $attributes['mode'] ?? '', [ 'box', 'icon' ], true ) ? $attributes['mode'] : 'icon';
@@ -45,6 +51,10 @@ final class Trigger_Markup {
 		// 'featured' sources the empty-query highlights carousel from
 		// `filter[featured]=true` instead of a plain match-all.
 		$highlights_source = in_array( $attributes['highlightsSource'] ?? '', self::HIGHLIGHTS_SOURCES, true ) ? $attributes['highlightsSource'] : 'newest';
+		// 0 shows "All filters" alone; an empty or unreadable value is the default.
+		$facet_bar_limit = is_numeric( $attributes['facetBarLimit'] ?? null )
+			? max( 0, min( self::FACET_BAR_LIMIT_MAX, (int) $attributes['facetBarLimit'] ) )
+			: self::FACET_BAR_LIMIT;
 		// Opens the modal on its own, which only the Elementor editor asks for
 		// (the widget checks it is rendering there), so it is omitted entirely
 		// otherwise rather than written as an "off" value.
@@ -74,7 +84,7 @@ final class Trigger_Markup {
 		// portalled modal (rendered separately under `document.body`, see
 		// `index.js`) carries the same attribute on its own mount element.
 		return sprintf(
-			'<div class="%1$s" data-whsc-trigger data-webhead-frontend-root data-mode="%2$s" data-type="%3$s" data-placeholder="%4$s" data-voice="%5$s" data-search-trigger="%6$s" data-instance-class="%7$s" data-animation="%8$s" data-show-count="%9$s" data-icon="%10$s" data-voice-icon="%11$s" data-card-source="%12$s" data-highlights-source="%13$s"%14$s></div>',
+			'<div class="%1$s" data-whsc-trigger data-webhead-frontend-root data-mode="%2$s" data-type="%3$s" data-placeholder="%4$s" data-voice="%5$s" data-search-trigger="%6$s" data-instance-class="%7$s" data-animation="%8$s" data-show-count="%9$s" data-icon="%10$s" data-voice-icon="%11$s" data-card-source="%12$s" data-highlights-source="%13$s" data-facet-bar-limit="%14$d"%15$s></div>',
 			esc_attr( $classes ),
 			esc_attr( $mode ),
 			esc_attr( $scope_type ),
@@ -91,6 +101,7 @@ final class Trigger_Markup {
 			esc_attr( $voice_icon_html ),
 			esc_attr( $card_source ),
 			esc_attr( $highlights_source ),
+			$facet_bar_limit,
 			$editor_preview
 		);
 	}

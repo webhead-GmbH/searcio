@@ -107,14 +107,16 @@
 	--whsc-popular-gap: 2px;
 	--whsc-popular-radius: 8px;
 
-	/* Type filters */
+	/* Filters: the bar's buttons, the type switch, tiles, colour pills and the
+	 * chips on the result line. `--whsc-filter-*`, `--whsc-popover-*`,
+	 * `--whsc-drawer-width` and `--whsc-sheet-radius` are not declared: each
+	 * rule that reads one names its fallback, which is one of these. */
 	--whsc-facet-bg: #f0f1f3;
 	--whsc-facet-text: #3a3f45;
 	--whsc-facet-bg-hover: #e4e6e9;
 	--whsc-facet-text-active: #ffffff;
 	--whsc-facet-count: currentColor;
 	--whsc-facet-radius: 999px;
-	--whsc-facets-max-height: 132px;
 
 	/* Result cards */
 	--whsc-card-bg: #ffffff;
@@ -237,7 +239,8 @@ $lift: ':is(*, #whsc#whsc#whsc)';
  * on, and the spacing a theme sets for all of its text. Its colours and its
  * background are its own, from the `--whsc-*` properties.
  */
-.whsc-modal-overlay#{$lift} {
+.whsc-modal-overlay#{$lift},
+.whsc-sheet-overlay#{$lift} {
 	color: inherit;
 	font: inherit;
 	letter-spacing: inherit;
@@ -472,6 +475,11 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		// The package's, which `font: inherit` at the top of this file replaced
 		// with the line height of the page.
 		line-height: 1;
+		// A placeholder longer than a header's box ends in an ellipsis, short of
+		// the box's edge, rather than cut in the middle of a word. A shop does
+		// not need CSS of its own for it.
+		text-overflow: ellipsis;
+		padding-inline-end: 12px;
 
 		// Under 16px a phone enlarges the page when a field takes focus, and
 		// leaves it enlarged. The package and the reset both say so for this
@@ -535,6 +543,9 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	overflow-y: auto;
 	overflow-x: hidden;
 	margin-top: 0;
+	/* The filters lay themselves out by the modal's width, not the viewport's,
+	 * so a placement that narrows the modal gets the phone's layout too. */
+	container: whsc-modal / inline-size;
 }
 
 .whsc-modal .components-modal__content::before {
@@ -576,7 +587,37 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+/*
+ * The search field and the filter bar stay at the top of the scroll area as
+ * the results scroll beneath them, with a hairline once they do (SearchModal
+ * sets `is-stuck`). The popover hangs from it, so it is its containing block.
+ */
 .whsc-modal-header {
+	position: sticky;
+	top: 0;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	/* The padding is air round the field and the bar once they are stuck; the
+	 * margin takes it back at rest, so nothing moves from where it was. */
+	margin-block: -12px;
+	margin-inline: calc(var(--whsc-padding) * -1);
+	padding: 12px var(--whsc-padding);
+	background: var(--whsc-bg);
+	transition: box-shadow 0.2s ease;
+
+	&.is-stuck {
+		box-shadow: 0 1px 0 var(--whsc-panel-border), 0 10px 18px -14px rgba(0, 0, 0, 0.35);
+	}
+
+	@media screen and (max-width: 600px) {
+		margin-inline: -16px;
+		padding-inline: 16px;
+	}
+}
+
+.whsc-modal-search {
 	position: relative;
 }
 
@@ -1001,157 +1042,91 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /* -------------------------------------------------------------------------
- * Type filters (facets)
+ * Filters (facets): the shape every filter control shares. The bar, the
+ * panels and the result line below each add their own size.
  * ---------------------------------------------------------------------- */
-.whsc-facets {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	/* A field with many values (dozens of brands, colours…) would otherwise
-	 * grow this chip row tall enough to push the results far down the modal.
-	 * Cap it and let it scroll; themeable per placement. */
-	max-height: calc(var(--whsc-facets-max-height, 132px) + 8px);
-	overflow-y: auto;
-	/* Room for the ring of a chip in keyboard focus, which is drawn 4px outside
-	 * the chip. A box that scrolls cuts what is drawn outside its padding, so
-	 * a chip in the first or the last row lost the top or the bottom of its
-	 * ring, and the first chip of a row the left. The margin puts the chips
-	 * back where they were, and the height above counts the padding in. */
-	padding: 4px;
-	margin: -4px;
-}
 
 /*
- * Box-model properties (radius, padding, border, margin, sizing) are declared
- * once and never re-declared per state, so a theme's `button:hover` reset
- * can't distort the pill shape on hover - only colors change between states.
- * These pills carry `role="tab"`, which the shared reset also resets
- * (background/border/box-shadow/color/cursor) at the same boosted
- * specificity this file now uses throughout, so every property the reset
- * touches is re-declared here too, not just the ones that visibly differ.
+ * Box-model properties (radius, border, margin, sizing) are declared once and
+ * never re-declared per state, so a theme's `button:hover` reset can't distort
+ * the pill shape on hover - only colours change between states. Each control
+ * of its own (`.whsc-facet.whsc-filter-btn` and the rest) sets its size after
+ * this, with a selector of the same weight.
  */
-.whsc-modal .whsc-facet,
-.whsc-modal .whsc-facet:hover,
-.whsc-modal .whsc-facet:focus,
-.whsc-modal .whsc-facet.is-active {
+:is(.whsc-modal, .whsc-sheet) .whsc-facet,
+:is(.whsc-modal, .whsc-sheet) .whsc-facet:hover,
+:is(.whsc-modal, .whsc-sheet) .whsc-facet:focus,
+:is(.whsc-modal, .whsc-sheet) .whsc-facet.is-active {
 	appearance: none;
+	position: relative;
 	display: inline-flex;
 	align-items: center;
-	gap: 5px;
+	gap: 6px;
 	border: none;
-	border-radius: var(--whsc-facet-radius);
+	border-radius: var(--whsc-filter-radius, var(--whsc-facet-radius));
 	padding: 8px 16px;
 	margin: 0;
 	box-shadow: none;
 	font: inherit;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	line-height: 1.2;
 	text-transform: none;
 	letter-spacing: normal;
+	white-space: nowrap;
 	cursor: pointer;
 }
 
-.whsc-modal .whsc-facet {
-	background: var(--whsc-facet-bg);
-	color: var(--whsc-facet-text);
-	transition: background-color 0.15s ease, color 0.15s ease;
+:is(.whsc-modal, .whsc-sheet) .whsc-facet {
+	background: var(--whsc-filter-bg, var(--whsc-facet-bg));
+	color: var(--whsc-filter-text, var(--whsc-facet-text));
+	transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 
-	&:hover:not(.is-active) {
-		background: var(--whsc-facet-bg-hover);
+	&:hover:not(.is-active):not(.is-empty) {
+		background: var(--whsc-filter-bg-hover, var(--whsc-facet-bg-hover));
 		color: var(--whsc-facet-text-hover, var(--whsc-text));
 	}
 
 	&.is-active {
-		background: var(--whsc-facet-bg-active, var(--whsc-accent-strong));
-		color: var(--whsc-facet-text-active);
+		background: var(--whsc-filter-bg-selected, var(--whsc-facet-bg-active, var(--whsc-accent-strong)));
+		color: var(--whsc-filter-text-selected, var(--whsc-facet-text-active));
 	}
 
 	/*
 	 * The shared reset rings a `[role="tab"]` in the admin theme colour; here it
-	 * takes the placement's accent, like every other control in the modal.
+	 * takes the placement's accent, like every other control in the modal. A
+	 * tile or a colour pill is a label round a hidden checkbox, and rings when
+	 * the checkbox has keyboard focus.
 	 */
-	&:focus-visible {
+	&:focus-visible,
+	&:has(input:focus-visible) {
 		outline: 2px solid var(--whsc-accent);
 		outline-offset: 2px;
 	}
 }
 
+/* 0.8 of the text colour is 5.4:1 on the chip background; 0.65 was 3.65:1,
+ * under the 4.5:1 small text needs. */
 .whsc-facet__count {
 	color: var(--whsc-facet-count);
-	opacity: 0.65;
+	opacity: 0.8;
+	font-variant-numeric: tabular-nums;
 }
 
 /*
- * Dynamic field facet groups (PLAN.md §3.1) - one per configured facet field
- * other than the built-in type filters above. Reuses the same `.whsc-facets`
- * / `.whsc-facet` chip styling; only the group label + stacking is new here.
+ * The title of a filter's popover, sheet or section of "All filters". The
+ * class is the one the old group headings had, so the Elementor widget's
+ * "Group names" colour and typography reach it.
  */
-.whsc-facet-group {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
-
 .whsc-facet-group__label {
-	font-size: 12px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.02em;
+	margin: 0;
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.35;
 	color: var(--whsc-facet-group-label, var(--whsc-title-color));
-	// Softens the section title colour it borrows; a colour chosen for the
-	// label itself is used as chosen (the widget sets this to 1 with it).
-	opacity: var(--whsc-facet-group-label-opacity, 0.7);
+	opacity: var(--whsc-facet-group-label-opacity, 1);
 }
 
-/*
- * Numeric facet fields (price, rating, review count) get two bounds instead of
- * chips - see `RangeFilters`. Reuses the search input's own custom properties
- * so a themed placement themes these too without another set of variables.
- */
-.whsc-modal .whsc-range__row {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	flex-wrap: wrap;
-}
-
-.whsc-modal .whsc-range__input {
-	width: 96px;
-	min-width: 0;
-	padding: 7px 12px;
-	border: 1px solid var(--whsc-input-border);
-	border-radius: var(--whsc-facet-radius);
-	background: var(--whsc-input-bg);
-	color: var(--whsc-input-text);
-	font-size: 13px;
-	line-height: 1.2;
-
-	&::placeholder {
-		color: var(--whsc-input-placeholder);
-	}
-
-	// See `.whsc-assistant__input`: smaller text makes iOS zoom in on focus.
-	@media (hover: none) {
-		font-size: 16px;
-	}
-
-	&:focus {
-		border-color: var(--whsc-input-border-focus, var(--whsc-accent));
-		outline: none;
-	}
-
-	&:focus-visible {
-		outline: 2px solid var(--whsc-accent);
-		outline-offset: 1px;
-	}
-}
-
-.whsc-modal .whsc-range__dash {
-	color: var(--whsc-input-placeholder);
-}
-
-.whsc-modal .whsc-range__apply,
 .whsc-modal .whsc-modal-body .whsc-load-more__button {
 	padding: 7px 16px;
 	border: 0;
@@ -1172,17 +1147,6 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		outline: 2px solid var(--whsc-accent);
 		outline-offset: 2px;
 	}
-}
-
-.whsc-modal .whsc-range__clear {
-	padding: var(--whsc-clear-padding);
-	border: 0;
-	background: transparent;
-	color: var(--whsc-clear-text);
-	font-size: 13px;
-	line-height: 1.2;
-	cursor: pointer;
-	text-decoration: underline;
 }
 
 /*
@@ -1951,10 +1915,30 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	overflow-wrap: anywhere;
 }
 
+/* What a search that found nothing says, and the way out of it. */
 .whsc-no-results {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 24px;
+	border: 1px dashed var(--whsc-input-border);
+	border-radius: var(--whsc-card-radius);
+	background: var(--whsc-assistant-row-bg);
+}
+
+.whsc-no-results__title {
+	font-size: 17px;
+	font-weight: 700;
+	line-height: 1.35;
+	color: var(--whsc-title-color);
+}
+
+.whsc-no-results__text {
+	max-width: 60ch;
+	font-size: 14px;
+	line-height: 1.5;
 	color: var(--whsc-price-color);
-	text-align: center;
-	padding: 24px 0;
 }
 
 /* Skeleton row mirrors the real carousel track: fixed-width cards clipped by
@@ -2035,6 +2019,16 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+// The overlay of "All filters" and of a phone's sheet, over the search modal.
+.whsc-sheet-overlay {
+	animation: whsc-overlay-in 0.2s ease both;
+	background-color: rgba(0, 0, 0, 0.42);
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
+}
+
 /*
  * `@keyframes` can't be nested inside a selector block, so these stay at the
  * top level - referencing them by name from inside the wrapper above works
@@ -2050,19 +2044,39 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	to { opacity: 1; }
 }
 
+/* Each ends on `transform: none`: with `animation-fill-mode: both`, a
+ * `translateY(0)` or `scale(1)` stays on the frame and makes it the containing
+ * block of everything fixed inside it. */
 @keyframes whsc-slide-down {
 	from { opacity: 0; transform: translateY(-24px); }
-	to { opacity: 1; transform: translateY(0); }
+	to { opacity: 1; transform: none; }
 }
 
 @keyframes whsc-slide-up {
 	from { opacity: 0; transform: translateY(24px); }
-	to { opacity: 1; transform: translateY(0); }
+	to { opacity: 1; transform: none; }
 }
 
 @keyframes whsc-zoom-in {
 	from { opacity: 0; transform: scale(0.96); }
-	to { opacity: 1; transform: scale(1); }
+	to { opacity: 1; transform: none; }
+}
+
+@keyframes whsc-pop-in {
+	from { opacity: 0; transform: translateY(-4px); }
+	to { opacity: 1; transform: none; }
+}
+
+@keyframes whsc-sheet-in {
+	from { transform: translateY(100%); }
+	to { transform: none; }
+}
+
+// The right-to-left stylesheet flips the direction, as it flips every other
+// physical value of this file.
+@keyframes whsc-drawer-in {
+	from { transform: translateX(100%); }
+	to { transform: none; }
 }
 
 /* Assistant "thinking" indicator. Starts off-screen right and sweeps left so
@@ -3298,6 +3312,1046 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 @media (prefers-reduced-motion: reduce) {
 	.whsc-modal .whsc-credit {
+		transition: none;
+	}
+}
+
+}
+
+/*
+ * The filters: the bar under the search field, a group's popover, the panels
+ * of the drawer and the phone's sheet, and the filters applied on the result
+ * line. They come after the rest, in a wrapper of their own like the tab bar's,
+ * so they weigh what the rest of this file weighs.
+ *
+ * The layout follows the modal's width (the `whsc-modal` container), not the
+ * viewport's: under 640px it is the phone's. The drawer and the sheet are
+ * dialogs of their own outside the modal (`.whsc-sheet`), so every rule a
+ * control of a panel needs names both.
+ */
+[data-webhead-frontend-root]#{$lift} {
+
+/* --------------------------------------------------------------------------
+ * The bar
+ * ------------------------------------------------------------------------ */
+.whsc-filterbar {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.whsc-filterbar__divider {
+	flex: none;
+	width: 1px;
+	height: 24px;
+	margin-inline: 4px;
+	background: var(--whsc-input-border);
+}
+
+/* A group that does not fit stays in the bar, hidden, for the next time the
+ * bar measures; `display` above would show it. */
+.whsc-modal .whsc-facet.whsc-filter-btn[hidden] {
+	display: none;
+}
+
+.whsc-modal .whsc-facet.whsc-filter-btn {
+	flex: none;
+	height: var(--whsc-filter-height, 40px);
+	max-width: 280px;
+	padding-block: 0;
+	padding-inline: 16px 12px;
+}
+
+/* The label is cut at its end when the button has to shorten. Its line is a
+ * little taller than the type's, or the descender of a "g" was cut too. */
+.whsc-filter-btn .whsc-facet__label {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 1.45;
+}
+
+:is(.whsc-modal, .whsc-sheet) .whsc-chev {
+	flex: none;
+	fill: currentColor;
+	transition: transform 0.2s ease;
+}
+
+:is(.whsc-filter-btn, .whsc-more, .whsc-acc__btn)[aria-expanded='true'] .whsc-chev {
+	transform: rotate(180deg);
+}
+
+/* The button whose popover is open. */
+.whsc-modal .whsc-facet.whsc-filter-btn[aria-expanded='true'] {
+	box-shadow: inset 0 0 0 1.5px var(--whsc-accent-strong);
+}
+
+.whsc-modal .whsc-facet.whsc-filter-btn.is-active[aria-expanded='true'] {
+	box-shadow: 0 0 0 2px var(--whsc-bg), 0 0 0 3.5px var(--whsc-accent-strong);
+}
+
+/* A pick can make a selected button wider. It shortens its own value text
+ * rather than pushing another button out of the bar. While the bar measures
+ * which buttons fit, every button has its full width; a phone's row scrolls
+ * instead. */
+.whsc-filterbar:not(.is-measuring, .is-narrow) .whsc-facet.whsc-filter-btn.is-active {
+	flex-shrink: 1;
+	min-width: 96px;
+}
+
+.whsc-filter-btn__more {
+	flex: none;
+	display: inline-grid;
+	place-items: center;
+	min-width: 24px;
+	height: 20px;
+	padding-inline: 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.22);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.whsc-modal .whsc-facet.whsc-filter-btn--all {
+	gap: 8px;
+	padding-inline: 14px 16px;
+}
+
+.whsc-filter-btn__icon {
+	flex: none;
+	fill: currentColor;
+}
+
+.whsc-badge {
+	display: inline-grid;
+	place-items: center;
+	min-width: 20px;
+	height: 20px;
+	padding-inline: 6px;
+	border-radius: 999px;
+	background: var(--whsc-filter-badge-bg, var(--whsc-accent-strong));
+	color: var(--whsc-filter-badge-text, #fff);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+}
+
+/* The type switch: one segmented control on a tablet or a desktop. */
+.whsc-types {
+	flex: none;
+	display: flex;
+	gap: 2px;
+	padding: 3px;
+	border-radius: var(--whsc-filter-radius, var(--whsc-facet-radius));
+	background: var(--whsc-filter-bg, var(--whsc-facet-bg));
+}
+
+.whsc-modal .whsc-facet.whsc-type {
+	height: calc(var(--whsc-filter-height, 40px) - 6px);
+	padding: 0 14px;
+}
+
+.whsc-modal .whsc-facet.whsc-type:not(.is-active) {
+	background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+ * The popover
+ * ------------------------------------------------------------------------ */
+.whsc-pop {
+	position: absolute;
+	z-index: 6;
+	inset-block-start: calc(100% + 8px);
+	inset-inline-start: 0;
+	display: flex;
+	flex-direction: column;
+	width: min(var(--whsc-popover-width, 360px), 100%);
+	background: var(--whsc-popover-bg, var(--whsc-panel-bg));
+	border: 1px solid var(--whsc-popover-border, var(--whsc-panel-border));
+	border-radius: var(--whsc-popover-radius, var(--whsc-panel-radius));
+	box-shadow: var(--whsc-popover-shadow, 0 18px 44px rgba(16, 24, 40, 0.16), 0 2px 6px rgba(16, 24, 40, 0.06));
+	color: var(--whsc-text);
+	overflow: hidden;
+	animation: whsc-pop-in 0.16s ease-out both;
+
+	&[data-kind='tiles'],
+	&[data-kind='color'] {
+		width: min(var(--whsc-popover-width, 380px), 100%);
+	}
+}
+
+.whsc-pop__head {
+	flex: none;
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 14px 16px 6px;
+}
+
+.whsc-pop__sel {
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.35;
+	white-space: nowrap;
+	color: var(--whsc-accent-strong);
+}
+
+.whsc-pop__body {
+	flex: 1 1 auto;
+	min-height: 0;
+	max-height: var(--whsc-facets-max-height, 360px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 4px 8px 8px;
+}
+
+:is(.whsc-pop__foot, .whsc-sheet__foot) {
+	flex: none;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 16px;
+	border-block-start: 1px solid var(--whsc-assistant-divider);
+}
+
+/* --------------------------------------------------------------------------
+ * A group's values
+ * ------------------------------------------------------------------------ */
+.whsc-opts {
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.whsc-opts__list,
+.whsc-swatches,
+.whsc-tiles,
+.whsc-active {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.whsc-opt {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 38px;
+	padding: 6px 8px;
+	border-radius: 8px;
+	font-size: 14px;
+	line-height: 1.35;
+	color: var(--whsc-text);
+	cursor: pointer;
+
+	&:hover:not(.is-empty) {
+		background: var(--whsc-suggestion-bg-hover);
+	}
+
+	.whsc-facet__label {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.whsc-facet__count {
+		font-size: 13px;
+		color: var(--whsc-price-color);
+		opacity: 1;
+	}
+
+	&.is-empty {
+		color: var(--whsc-input-placeholder);
+		cursor: default;
+	}
+}
+
+/* A checkbox of the surface's own: the browser's is a different size and
+ * colour on every system. */
+.whsc-box {
+	appearance: none;
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	border: 1.5px solid var(--whsc-price-color);
+	border-radius: 5px;
+	background: var(--whsc-bg);
+	cursor: pointer;
+
+	&:checked {
+		border-color: var(--whsc-accent-strong);
+		background: var(--whsc-accent-strong) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 13px no-repeat;
+	}
+
+	&:disabled {
+		border-color: var(--whsc-input-border);
+		cursor: default;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+/* The box of a tile or a colour pill: there to be a real checkbox, never seen. */
+.whsc-hidden-input {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: inherit;
+}
+
+.whsc-within {
+	position: sticky;
+	top: -4px;
+	z-index: 1;
+	padding: 4px 0 8px;
+	background: var(--whsc-popover-bg, var(--whsc-panel-bg));
+}
+
+.whsc-within__icon {
+	position: absolute;
+	inset-inline-start: 14px;
+	top: 14px;
+	fill: var(--whsc-input-icon);
+	pointer-events: none;
+}
+
+.whsc-within__input {
+	width: 100%;
+	height: 38px;
+	padding-block: 0;
+	padding-inline: 38px 14px;
+	border: 1px solid var(--whsc-input-border);
+	border-radius: var(--whsc-input-radius);
+	background: var(--whsc-input-bg);
+	color: var(--whsc-input-text);
+	font-size: 14px;
+
+	&::placeholder {
+		color: var(--whsc-input-placeholder);
+		opacity: 1;
+	}
+
+	&::-webkit-search-cancel-button {
+		appearance: none;
+	}
+
+	&:focus {
+		outline: none;
+	}
+
+	&:focus-visible {
+		border-color: var(--whsc-accent);
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 1px;
+	}
+
+	// See `.whsc-assistant__input`: smaller text makes iOS zoom in on focus.
+	@media (hover: none) {
+		font-size: 16px;
+	}
+}
+
+.whsc-opts__none {
+	margin: 8px;
+	font-size: 14px;
+	line-height: 1.4;
+	color: var(--whsc-price-color);
+}
+
+.whsc-more {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-height: 38px;
+	margin-block-start: 4px;
+	padding: 0 8px;
+	border: 0;
+	border-radius: 8px;
+	background: none;
+	color: var(--whsc-accent-strong);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.2;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--whsc-suggestion-bg-hover);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 1px;
+	}
+}
+
+/* Colour pills, for a field whose values have colours. */
+.whsc-swatches {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 4px;
+}
+
+:is(.whsc-modal, .whsc-sheet) .whsc-facet.whsc-swatch {
+	height: 36px;
+	padding-block: 0;
+	padding-inline: 10px 14px;
+	gap: 8px;
+}
+
+.whsc-swatch__dot {
+	flex: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: var(--whsc-dot);
+	box-shadow: inset 0 0 0 1px var(--whsc-swatch-border, rgba(0, 0, 0, 0.2));
+}
+
+.whsc-swatch.is-active .whsc-swatch__dot {
+	box-shadow: inset 0 0 0 1px var(--whsc-swatch-border, rgba(0, 0, 0, 0.2)), 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Sizes, shoe sizes and capacities: tiles in their natural order. A value the
+ * other filters leave empty stays in its place, greyed, so nothing moves. */
+.whsc-tiles {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+	gap: 8px;
+	padding: 4px;
+}
+
+:is(.whsc-modal, .whsc-sheet) .whsc-facet.whsc-tile {
+	flex-direction: column;
+	justify-content: center;
+	gap: 0;
+	width: 100%;
+	height: 52px;
+	padding: 4px;
+	border-radius: min(var(--whsc-filter-radius, var(--whsc-facet-radius)), 10px);
+
+	.whsc-facet__label {
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-weight: 600;
+	}
+
+	.whsc-facet__count {
+		font-size: 12px;
+	}
+}
+
+:is(.whsc-modal, .whsc-sheet) .whsc-facet.is-empty {
+	background: transparent;
+	box-shadow: inset 0 0 0 1px var(--whsc-input-border);
+	color: var(--whsc-input-placeholder);
+	cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+ * Two bounds, for a numeric field
+ * ------------------------------------------------------------------------ */
+.whsc-price {
+	padding: 4px 8px;
+}
+
+.whsc-price__row {
+	display: flex;
+	align-items: flex-end;
+	gap: 10px;
+}
+
+.whsc-price__field {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.whsc-price__label {
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: var(--whsc-price-color);
+}
+
+.whsc-price__box {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	height: 44px;
+	padding-inline: 14px;
+	border: 1px solid var(--whsc-input-border);
+	border-radius: var(--whsc-input-radius);
+	background: var(--whsc-input-bg);
+
+	&:focus-within {
+		border-color: var(--whsc-input-border-focus, var(--whsc-accent));
+		outline: 2px solid var(--whsc-input-border-focus, var(--whsc-accent));
+		outline-offset: 1px;
+		background: var(--whsc-bg);
+	}
+}
+
+/* 16px, or a phone enlarges the page when the field takes focus. */
+.whsc-price__input {
+	flex: 1;
+	min-width: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--whsc-input-text);
+	font-size: 16px;
+	font-variant-numeric: tabular-nums;
+
+	&::placeholder {
+		color: var(--whsc-input-placeholder);
+		opacity: 1;
+	}
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.whsc-price__unit,
+.whsc-price__dash {
+	color: var(--whsc-price-color);
+	font-size: 14px;
+}
+
+.whsc-price__dash {
+	padding-block-end: 12px;
+}
+
+.whsc-price__hint {
+	margin: 10px 0 0;
+	font-size: 13px;
+	line-height: 1.4;
+	color: var(--whsc-price-color);
+}
+
+/* --------------------------------------------------------------------------
+ * The buttons at the foot of a panel, and the one in a search that found
+ * nothing
+ * ------------------------------------------------------------------------ */
+:is(.whsc-modal, .whsc-sheet) .whsc-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 40px;
+	margin: 0;
+	padding: 0 18px;
+	border: 1px solid transparent;
+	border-radius: var(--whsc-btn-radius);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.2;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+}
+
+:is(.whsc-modal, .whsc-sheet) .whsc-btn--primary {
+	flex: 1 1 auto;
+	background: var(--whsc-btn-bg, var(--whsc-accent-strong));
+	color: var(--whsc-btn-text);
+
+	&:hover {
+		background: var(--whsc-btn-bg-hover, var(--whsc-btn-bg, var(--whsc-accent-strong)));
+		color: var(--whsc-btn-text-hover, var(--whsc-btn-text));
+	}
+}
+
+:is(.whsc-modal, .whsc-sheet) .whsc-btn--secondary {
+	border-color: var(--whsc-input-border);
+	background: var(--whsc-bg);
+	color: var(--whsc-text);
+
+	&:hover {
+		background: var(--whsc-suggestion-bg-hover);
+	}
+
+	/* Off, and plainly so, but still reachable: a dashed edge and muted text. */
+	&[aria-disabled='true'] {
+		border-style: dashed;
+		background: transparent;
+		color: var(--whsc-input-placeholder);
+		cursor: not-allowed;
+	}
+}
+
+/* --------------------------------------------------------------------------
+ * The result line: the count, the search, the filters applied, one reset
+ * ------------------------------------------------------------------------ */
+.whsc-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 12px;
+	min-height: 32px;
+	margin-block-end: 12px;
+}
+
+.whsc-meta__title {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 6px;
+	min-width: 0;
+}
+
+.whsc-modal .whsc-meta .whsc-section-title {
+	margin: 0;
+}
+
+.whsc-meta__query {
+	font-size: 13px;
+	line-height: 1.3;
+	color: var(--whsc-price-color);
+	overflow-wrap: anywhere;
+}
+
+.whsc-active {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.whsc-modal .whsc-facet.whsc-active-chip {
+	height: 32px;
+	padding-block: 0;
+	padding-inline: 12px 8px;
+	gap: 4px;
+	font-size: 13px;
+}
+
+.whsc-active-chip__name {
+	font-weight: 500;
+	opacity: 0.8;
+}
+
+.whsc-active-chip__icon {
+	flex: none;
+	fill: currentColor;
+}
+
+.whsc-link-btn {
+	min-height: 32px;
+	margin: 0;
+	padding: 0 6px;
+	border: 0;
+	border-radius: 6px;
+	background: none;
+	color: var(--whsc-accent-strong);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.2;
+	cursor: pointer;
+
+	&:hover {
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 1px;
+	}
+}
+
+/* Results a pick is narrowing, while the narrower ones load. */
+.whsc-results {
+	min-width: 0;
+	transition: opacity 0.15s ease;
+
+	&.is-updating {
+		opacity: 0.6;
+	}
+}
+
+/* After a search that found nothing, popular searches are chips under the
+ * message, at every width. */
+.whsc-browse__aside--after .whsc-popular-list {
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 8px;
+	max-height: none;
+	overflow: visible;
+
+	> li {
+		min-width: 0;
+		max-width: 100%;
+	}
+}
+
+.whsc-modal .whsc-browse__aside--after .whsc-popular-item,
+.whsc-modal .whsc-browse__aside--after .whsc-popular-item:hover,
+.whsc-modal .whsc-browse__aside--after .whsc-popular-item:focus,
+.whsc-modal .whsc-browse__aside--after .whsc-popular-item:active {
+	width: auto;
+	max-width: 100%;
+	padding: 7px 14px;
+	background: var(--whsc-chip-bg);
+	border: 1px solid var(--whsc-chip-border);
+	border-radius: 999px;
+}
+
+/* --------------------------------------------------------------------------
+ * "All filters" and the phone's sheets: a dialog of their own
+ * ------------------------------------------------------------------------ */
+.whsc-sheet.components-modal__frame {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	min-width: 0;
+	border: 0;
+	background: var(--whsc-bg);
+	color: var(--whsc-text);
+	font-family: var(--whsc-font-family, inherit);
+	box-shadow: 0 0 40px rgba(0, 0, 0, 0.22);
+}
+
+.whsc-sheet .components-modal__content {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+
+	&::before {
+		content: none;
+	}
+}
+
+.whsc-sheet .components-modal__children-container {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
+
+/* From the inline end, full height, from 640px of the search modal up. */
+.whsc-sheet--drawer.components-modal__frame {
+	align-self: stretch;
+	width: min(var(--whsc-drawer-width, 400px), 100%);
+	max-width: 100%;
+	height: 100%;
+	max-height: 100%;
+	margin-inline-start: auto;
+	border-radius: 0;
+	animation: whsc-drawer-in 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* From the bottom, on a phone. */
+.whsc-sheet--sheet.components-modal__frame {
+	align-self: flex-end;
+	width: 100%;
+	max-width: 100%;
+	max-height: 90%;
+	margin: 0;
+	border-radius: var(--whsc-sheet-radius, 20px) var(--whsc-sheet-radius, 20px) 0 0;
+	animation: whsc-sheet-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.whsc-sheet__grab {
+	flex: none;
+	width: 40px;
+	height: 4px;
+	margin: 8px auto 0;
+	border-radius: 2px;
+	background: var(--whsc-input-border);
+}
+
+.whsc-sheet__head {
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding-block: 8px;
+	padding-inline: 20px 8px;
+	border-block-end: 1px solid var(--whsc-assistant-divider);
+}
+
+.whsc-sheet .whsc-sheet__title {
+	flex: 1;
+	min-width: 0;
+	font-size: 18px;
+}
+
+.whsc-sheet .whsc-sheet__close.components-button {
+	flex: none;
+	min-width: 44px;
+	min-height: 44px;
+	padding: 0;
+	justify-content: center;
+	border-radius: 999px;
+	color: var(--whsc-icon-color);
+	background: transparent;
+	box-shadow: none;
+
+	&:hover:not(:disabled),
+	&:focus:not(:disabled) {
+		color: var(--whsc-icon-color-hover, var(--whsc-icon-color));
+		background: var(--whsc-icon-bg-hover);
+		box-shadow: none;
+	}
+}
+
+.whsc-sheet__body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 4px 20px 16px;
+}
+
+.whsc-sheet--single .whsc-sheet__body {
+	padding: 12px 12px 16px;
+}
+
+.whsc-sheet__foot {
+	padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+/* One section per group in "All filters". */
+.whsc-acc {
+	border-block-end: 1px solid var(--whsc-assistant-divider);
+}
+
+.whsc-acc__heading {
+	margin: 0;
+}
+
+.whsc-acc__btn {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	min-height: 56px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background: none;
+	color: var(--whsc-text);
+	text-align: start;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: -2px;
+	}
+
+	.whsc-chev {
+		margin-inline-start: auto;
+	}
+}
+
+.whsc-acc__title {
+	flex: none;
+}
+
+.whsc-acc__sum {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: end;
+	font-size: 13px;
+	color: var(--whsc-accent-strong);
+
+	& + .whsc-chev {
+		margin-inline-start: 0;
+	}
+}
+
+.whsc-acc__panel {
+	padding-block-end: 14px;
+
+	.whsc-opt {
+		padding-inline: 4px;
+	}
+}
+
+/* Every control of the phone's sheet is at least 44px tall. */
+.whsc-sheet--sheet {
+	.whsc-btn {
+		height: 48px;
+	}
+
+	.whsc-opt {
+		min-height: 48px;
+	}
+
+	.whsc-facet.whsc-swatch {
+		height: 44px;
+	}
+
+	.whsc-facet.whsc-tile {
+		height: 56px;
+	}
+
+	.whsc-more {
+		min-height: 44px;
+	}
+
+	.whsc-within__input {
+		height: 44px;
+	}
+
+	.whsc-within__icon {
+		top: 17px;
+	}
+}
+
+/* --------------------------------------------------------------------------
+ * The phone's layout, and a modal set as narrow
+ * ------------------------------------------------------------------------ */
+@container whsc-modal (max-width: 639px) {
+	.whsc-filterbar {
+		gap: 0;
+	}
+
+	.whsc-modal .whsc-facet.whsc-filter-btn {
+		height: var(--whsc-filter-height, 44px);
+	}
+
+	/* "Filters" stays put at the start; the row beside it scrolls. */
+	.whsc-modal .whsc-filterbar > .whsc-facet.whsc-filter-btn--all {
+		margin-inline-end: 8px;
+		padding-inline: 14px;
+	}
+
+	.whsc-filterbar__scroll {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-block: -4px;
+		/* Room for a focus ring, which a scroller would cut. */
+		padding-block: 4px;
+		padding-inline: 11px 4px;
+		overflow-x: auto;
+		scrollbar-width: none;
+		scroll-padding-inline: 11px;
+		border-inline-start: 1px solid var(--whsc-input-border);
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		/* More to the end: the row fades out there. The right-to-left
+		 * stylesheet does not turn a gradient round, so its end is said here. */
+		&.has-more {
+			-webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+			mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+		}
+
+		&.has-more:dir(rtl) {
+			-webkit-mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent);
+			mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent);
+		}
+	}
+
+	.whsc-filterbar__divider {
+		display: none;
+	}
+
+	/* Pills of their own, each a 44px target. */
+	.whsc-types {
+		gap: 8px;
+		padding: 0;
+		background: none;
+	}
+
+	.whsc-modal .whsc-facet.whsc-type,
+	.whsc-modal .whsc-facet.whsc-type:not(.is-active) {
+		height: 44px;
+		padding: 0 16px;
+	}
+
+	.whsc-modal .whsc-facet.whsc-type:not(.is-active) {
+		background: var(--whsc-filter-bg, var(--whsc-facet-bg));
+	}
+
+	/* The bar's labels and the count on "Filters" show the selection, so the
+	 * result line keeps only its reset. */
+	.whsc-active {
+		display: none;
+	}
+
+	.whsc-meta {
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		min-height: 0;
+	}
+
+	.whsc-link-btn {
+		min-height: 44px;
+		margin-inline-end: -10px;
+		padding-inline: 10px;
+	}
+
+	.whsc-modal .whsc-browse__aside--after .whsc-popular-item {
+		min-height: 44px;
+	}
+}
+
+/* At 320px the field kept 86px for its text beside the microphone, the camera
+ * and the close button, and the placeholder was cut in the middle of a word.
+ * The close button moves to the tab row where there is one (SearchModal), and
+ * the field's own magnifier, which says nothing a search field does not, goes. */
+@container whsc-modal (max-width: 359px) {
+	.whsc-search-input__icon {
+		display: none;
+	}
+
+	.whsc-modal .whsc-search-input__field {
+		padding-inline: 0 4px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.whsc-pop,
+	.whsc-sheet.components-modal__frame {
+		animation: none;
+	}
+
+	.whsc-chev,
+	.whsc-results,
+	.whsc-modal-header {
 		transition: none;
 	}
 }

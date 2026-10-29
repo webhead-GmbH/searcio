@@ -34,7 +34,14 @@ test.describe( 'numeric range filters', () => {
 		await configureSearchKey( requestUtils );
 	} );
 
-	test( 'offers bounds for a numeric facet and sends them as range[field]=min:max', async ( { page, requestUtils } ) => {
+	/**
+	 * Open the price filter of a search for "chair", recording every request.
+	 *
+	 * @param {import('@playwright/test').Page} page
+	 * @param {Object} requestUtils
+	 * @return {Promise<{widget: SearchWidget, panel: import('@playwright/test').Locator, requests: URL[]}>}
+	 */
+	const openPrice = async ( page, requestUtils ) => {
 		const requests = [];
 
 		await mockSearchCloud( page, {
@@ -52,73 +59,70 @@ test.describe( 'numeric range filters', () => {
 		await widget.search( 'chair' );
 		await expect( widget.cards.first() ).toBeVisible();
 
-		await expect( widget.rangeGroups ).toHaveCount( 1 );
-		await expect( widget.rangeGroups.first() ).toContainText( 'Price' );
+		return { widget, panel: await widget.openGroup( 'Price' ), requests };
+	};
 
-		await widget.modal.getByLabel( 'Minimum Price' ).fill( '20' );
-		await widget.modal.getByLabel( 'Maximum Price' ).fill( '45' );
-		await widget.modal.getByRole( 'button', { name: 'Apply Price filter' } ).click();
+	test( 'offers bounds for a numeric facet and sends them as range[field]=min:max', async ( { page, requestUtils } ) => {
+		const { panel, requests } = await openPrice( page, requestUtils );
+
+		// The span of the loaded results, said for what it is.
+		// A price is written as the shop writes prices, with its currency when
+		// WooCommerce is active.
+		await expect( panel.getByText( /^Range of the loaded results: \D*10\D* to \D*35\D*$/ ) ).toBeVisible();
+
+		await panel.getByLabel( 'Minimum Price' ).fill( '20' );
+		await panel.getByLabel( 'Maximum Price' ).fill( '45' );
+		await panel.getByLabel( 'Maximum Price' ).press( 'Enter' );
 
 		await expect
 			.poll( () => requests.some( ( url ) => '20:45' === url.searchParams.get( 'range[price]' ) ) )
 			.toBe( true );
 	} );
 
-	test( 'leaves one side open when only one bound is given', async ( { page, requestUtils } ) => {
-		const requests = [];
+	test( 'applies a bound once typing stops, and leaves the other side open', async ( { page, requestUtils } ) => {
+		const { panel, requests } = await openPrice( page, requestUtils );
 
-		await mockSearchCloud( page, {
-			hits: pricedHits( 6 ),
-			facets: { types: [], price: [] },
-			onSearch: ( url ) => requests.push( url ),
-		} );
-		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+		await panel.getByLabel( 'Minimum Price' ).pressSequentially( '100' );
 
-		const widget = new SearchWidget( page );
-		await widget.openModal();
-		await widget.search( 'chair' );
-		await expect( widget.cards.first() ).toBeVisible();
-
-		await widget.modal.getByLabel( 'Minimum Price' ).fill( '30' );
-		await widget.modal.getByRole( 'button', { name: 'Apply Price filter' } ).click();
-
+		// Not on every key: "1" on the way to "100" would be another filter.
+		expect( requests.some( ( url ) => '1:' === url.searchParams.get( 'range[price]' ) ) ).toBe( false );
 		await expect
-			.poll( () => requests.some( ( url ) => '30:' === url.searchParams.get( 'range[price]' ) ) )
+			.poll( () => requests.some( ( url ) => '100:' === url.searchParams.get( 'range[price]' ) ) )
 			.toBe( true );
 	} );
 
-	test( 'clears the bound again, and stops sending it', async ( { page, requestUtils } ) => {
-		const requests = [];
+	test( 'swaps a lower bound above the upper one', async ( { page, requestUtils } ) => {
+		const { panel, requests } = await openPrice( page, requestUtils );
 
-		await mockSearchCloud( page, {
-			hits: pricedHits( 6 ),
-			facets: { types: [], price: [] },
-			onSearch: ( url ) => requests.push( url ),
-		} );
-		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+		await panel.getByLabel( 'Minimum Price' ).fill( '200' );
+		await panel.getByLabel( 'Maximum Price' ).fill( '50' );
+		await panel.getByLabel( 'Maximum Price' ).press( 'Enter' );
 
-		const widget = new SearchWidget( page );
-		await widget.openModal();
-		await widget.search( 'chair' );
-		await expect( widget.cards.first() ).toBeVisible();
+		await expect
+			.poll( () => requests.some( ( url ) => '50:200' === url.searchParams.get( 'range[price]' ) ) )
+			.toBe( true );
+		await expect( panel.getByLabel( 'Minimum Price' ) ).toHaveValue( '50' );
+	} );
 
-		await widget.modal.getByLabel( 'Minimum Price' ).fill( '30' );
-		await widget.modal.getByRole( 'button', { name: 'Apply Price filter' } ).click();
+	test( 'takes the bound away again from its chip, and stops sending it', async ( { page, requestUtils }, testInfo ) => {
+		test.skip( 'mobile-chrome' === testInfo.project.name, 'A phone shows the filters applied on the bar, not as chips.' );
 
-		// Named for its field rather than just "Clear": the modal also has a
-		// "Clear" on the search box and a "Clear all" over recent searches.
-		const clearPrice = widget.modal.getByRole( 'button', { name: 'Clear Price filter' } );
+		const { widget, panel, requests } = await openPrice( page, requestUtils );
 
-		await expect( clearPrice ).toBeVisible();
+		await panel.getByLabel( 'Minimum Price' ).fill( '30' );
+		await panel.getByLabel( 'Minimum Price' ).press( 'Enter' );
+		await page.keyboard.press( 'Escape' );
+
+		const chip = widget.modal.getByRole( 'button', { name: /^Remove Price: from \D*30\D*$/ } );
+
+		await expect( chip ).toBeVisible();
+		await expect( widget.groupButton( 'Price' ) ).toHaveText( /Price: from \D*30/ );
 
 		requests.length = 0;
-		await clearPrice.click();
+		await chip.click();
 
-		// The control goes away with the bound it cleared.
-		await expect( clearPrice ).toBeHidden();
+		await expect( chip ).toBeHidden();
 
-		// Clearing on its own need not hit the network - the unfiltered search
-		// for this term already ran, so the in-page response cache answers it.
 		// Searching for something else is what proves the bound is really gone
 		// rather than just hidden, since that request has to go out.
 		await widget.search( 'stool' );
@@ -127,7 +131,7 @@ test.describe( 'numeric range filters', () => {
 		expect( requests.every( ( url ) => null === url.searchParams.get( 'range[price]' ) ) ).toBe( true );
 	} );
 
-	test( 'renders a text facet as chips, never as a number range', async ( { page, requestUtils } ) => {
+	test( 'draws a text facet as a list, never as a number range', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			hits: [ postHit( { brand: 'Acme' } ) ],
 			facets: { types: [], brand: [ { value: 'Acme', count: 1 } ] },
@@ -139,8 +143,10 @@ test.describe( 'numeric range filters', () => {
 		await widget.search( 'chair' );
 		await expect( widget.cards.first() ).toBeVisible();
 
-		await expect( widget.modal.locator( '.whsc-facet', { hasText: 'Acme' } ) ).toBeVisible();
-		await expect( widget.rangeGroups ).toHaveCount( 0 );
+		const panel = await widget.openGroup( 'Brand' );
+
+		await expect( panel.getByRole( 'checkbox', { name: /Acme/ } ) ).toBeVisible();
+		await expect( panel.locator( '.whsc-price' ) ).toHaveCount( 0 );
 	} );
 } );
 

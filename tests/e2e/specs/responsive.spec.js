@@ -149,9 +149,10 @@ test.describe( 'Responsive layout', () => {
 	/**
 	 * Stacked in one column, the recent and popular searches came first and the
 	 * results below them - at 320px entirely out of sight, so a submitted search
-	 * changed nothing on screen.
+	 * changed nothing on screen. With results on screen they are gone now, and
+	 * the results start under the filter bar.
 	 */
-	test( 'on a narrow screen the results come before the recent and popular searches', async ( { page, requestUtils } ) => {
+	test( 'on a narrow screen the results come first, without the recent and popular searches', async ( { page, requestUtils } ) => {
 		await page.setViewportSize( { width: 320, height: 568 } );
 		await mockSearchCloud( page, {
 			hits: MANY_HITS,
@@ -171,7 +172,7 @@ test.describe( 'Responsive layout', () => {
 		// First in the DOM, not only on screen: focus follows the DOM.
 		const titles = await widget.modal.locator( '.whsc-section-title' ).allTextContents();
 		expect( titles[ 0 ] ).toBe( '20 results' );
-		expect( titles.indexOf( 'Popular searches' ) ).toBeGreaterThan( 0 );
+		expect( titles ).not.toContain( 'Popular searches' );
 
 		// An empty field is browsing again, with the helpers back on top.
 		await widget.input.fill( '' );

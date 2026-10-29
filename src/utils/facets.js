@@ -3,7 +3,7 @@
  * effect free so they're unit-testable without a DOM or a mocked `fetch`.
  */
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /** Toggle `value` in `list`: drop it if present, otherwise append it. */
 export const toggleSelection = ( list, value ) =>
@@ -333,3 +333,390 @@ export const hasMorePages = ( results, loaded, exactTotal ) => {
 
 	return lastPage >= perPage;
 };
+
+/**
+ * Compact a large result count so a filter stays narrow: 1000+ becomes
+ * "{n}K+" (e.g. 32494 → "32K+"), millions become "{n}M+". Smaller counts are
+ * shown as they are.
+ *
+ * @param {number} value
+ * @return {string}
+ */
+export const formatCount = ( value ) => {
+	const n = Number( value ) || 0;
+
+	if ( n >= 1000000 ) {
+		return `${ Math.floor( n / 1000000 ) }M+`;
+	}
+
+	if ( n >= 1000 ) {
+		return `${ Math.floor( n / 1000 ) }K+`;
+	}
+
+	return String( n );
+};
+
+/**
+ * The share of the results that carry each field, from 0 to 1.
+ *
+ * Read from the loaded hits, which carry their fields; a field no loaded hit
+ * carries still covers at least as many results as its most common value,
+ * which the counts say for the whole match set.
+ *
+ * @param {Object<string,Array<{value: string, count: number}>>} groups Field facets.
+ * @param {Array<{source?: Object}>} hits
+ * @param {number} total
+ * @return {Object<string,number>}
+ */
+export const facetCoverage = ( groups, hits, total ) => {
+	const list = Array.isArray( hits ) ? hits : [];
+	const out = {};
+
+	Object.entries( groups || {} ).forEach( ( [ field, values ] ) => {
+		const carried = list.filter( ( hit ) => {
+			const value = hit?.source?.[ field ];
+
+			return undefined !== value && null !== value && '' !== value && ! ( Array.isArray( value ) && 0 === value.length );
+		} ).length;
+		const fromHits = list.length > 0 ? carried / list.length : 0;
+		const top = Math.max( 0, ...( Array.isArray( values ) ? values : [] ).map( ( entry ) => Number( entry?.count ) || 0 ) );
+		const fromCounts = Number( total ) > 0 ? Math.min( 1, top / Number( total ) ) : 0;
+
+		out[ field ] = Math.max( fromHits, fromCounts );
+	} );
+
+	return out;
+};
+
+/**
+ * The order of the filter bar for one search.
+ *
+ * The order Search Config lists the facet fields in comes first; a field it
+ * does not list follows, in the order given. A group that fewer than
+ * `minCoverage` of the results carry moves behind the rest, keeping its place
+ * among them. Without a configured order the groups are ordered by how many
+ * results carry them. An active group is always in the list, whatever it
+ * covers. The same input always gives the same order.
+ *
+ * @param {string[]} fields The groups the search has.
+ * @param {Object}   options
+ * @param {string[]} [options.configuredOrder]
+ * @param {Object<string,number>} [options.coverage]
+ * @param {string[]} [options.active]
+ * @param {number}   [options.minCoverage]
+ * @return {string[]}
+ */
+export const orderFacetGroups = ( fields, { configuredOrder = [], coverage = {}, active = [], minCoverage = 0.15 } = {} ) => {
+	const present = [ ...new Set( [ ...( fields || [] ), ...( active || [] ) ] ) ];
+	const covered = ( field ) => Number( coverage?.[ field ] ) || 0;
+	const configured = ( configuredOrder || [] ).filter( ( field ) => present.includes( field ) );
+	const rest = present.filter( ( field ) => ! configured.includes( field ) );
+	const ordered = configured.length > 0
+		? [ ...configured, ...rest ]
+		// A stable sort: equal coverage keeps the order the groups came in.
+		: present.map( ( field, index ) => [ field, index ] )
+			.sort( ( a, b ) => covered( b[ 0 ] ) - covered( a[ 0 ] ) || a[ 1 ] - b[ 1 ] )
+			.map( ( [ field ] ) => field );
+	const strong = ordered.filter( ( field ) => covered( field ) >= minCoverage || ( active || [] ).includes( field ) );
+
+	return [ ...strong, ...ordered.filter( ( field ) => ! strong.includes( field ) ) ];
+};
+
+/**
+ * Which group buttons the bar shows.
+ *
+ * Every pinned (active) group first, whatever room it takes; then the others
+ * in order until the room or the limit runs out. It stops at the first one
+ * that does not fit, so the bar never skips a group to fit a later, shorter
+ * one. The result keeps the bar's order. A limit of 0 is a bar with "All
+ * filters" alone, pinned groups included.
+ *
+ * @param {Object} options
+ * @param {Array<[string, number]>} options.widths    Each group with its button's width, in bar order.
+ * @param {number}                  options.available The room for group buttons.
+ * @param {string[]}                [options.pinned]
+ * @param {number}                  [options.limit]   How many buttons at most, pinned ones included.
+ * @param {number}                  [options.gap]     Space between two buttons.
+ * @return {string[]}
+ */
+export const fitFilterButtons = ( { widths, available, pinned = [], limit = 5, gap = 8 } ) => {
+	const list = Array.isArray( widths ) ? widths : [];
+	const chosen = new Set();
+	let room = Number( available ) || 0;
+
+	if ( limit <= 0 ) {
+		return [];
+	}
+
+	list.forEach( ( [ field, width ] ) => {
+		if ( pinned.includes( field ) ) {
+			chosen.add( field );
+			room -= width + gap;
+		}
+	} );
+
+	for ( const [ field, width ] of list ) {
+		if ( chosen.has( field ) ) {
+			continue;
+		}
+
+		if ( chosen.size >= limit || width + gap > room ) {
+			break;
+		}
+
+		chosen.add( field );
+		room -= width + gap;
+	}
+
+	return list.map( ( [ field ] ) => field ).filter( ( field ) => chosen.has( field ) );
+};
+
+/**
+ * The first `n` values, and any selected value further down, in order.
+ *
+ * @param {Array<{value: string}>} values Already in the panel's order.
+ * @param {string[]} selected
+ * @param {number}   n
+ * @return {Array<{value: string}>}
+ */
+export const topValues = ( values, selected, n ) => {
+	const list = Array.isArray( values ) ? values : [];
+	const chosen = selected || [];
+
+	return [ ...list.slice( 0, n ), ...list.slice( n ).filter( ( entry ) => chosen.includes( entry.value ) ) ];
+};
+
+const SIZE_RANK = { XXXS: 0, '3XS': 0, XXS: 1, '2XS': 1, XS: 2, S: 3, M: 4, L: 5, XL: 6, XXL: 7, '2XL': 7, XXXL: 8, '3XL': 8, '4XL': 9, '5XL': 10 };
+const UNITS = { KB: 1, MB: 1e3, GB: 1e6, TB: 1e9 };
+const NUMBER = /^\d+(?:[.,]\d+)?$/;
+const CAPACITY = /^(\d+(?:[.,]\d+)?)\s*(KB|MB|GB|TB)$/i;
+
+/**
+ * Where a value sorts in a natural order: clothing sizes, then numbers (shoe
+ * sizes, widths), then capacities by size, then words.
+ *
+ * @param {string} value
+ * @return {Array<number|string>}
+ */
+const naturalKey = ( value ) => {
+	const text = String( value ?? '' ).trim();
+	const upper = text.toUpperCase();
+
+	if ( undefined !== SIZE_RANK[ upper ] ) {
+		return [ 0, SIZE_RANK[ upper ] ];
+	}
+
+	if ( NUMBER.test( text ) ) {
+		return [ 1, parseFloat( text.replace( ',', '.' ) ) ];
+	}
+
+	const capacity = text.match( CAPACITY );
+
+	if ( capacity ) {
+		return [ 2, parseFloat( capacity[ 1 ].replace( ',', '.' ) ) * UNITS[ capacity[ 2 ].toUpperCase() ] ];
+	}
+
+	return [ 3, text ];
+};
+
+/**
+ * Natural order of two values: XXS..4XL, then numbers, then KB/MB/GB/TB by
+ * size, then the words as the page's language sorts them.
+ *
+ * @param {string} a
+ * @param {string} b
+ * @param {string} [locale] The page's language; the browser's when omitted.
+ * @return {number}
+ */
+export const compareFacetValues = ( a, b, locale ) => {
+	const x = naturalKey( a );
+	const y = naturalKey( b );
+
+	if ( x[ 0 ] !== y[ 0 ] ) {
+		return x[ 0 ] - y[ 0 ];
+	}
+
+	if ( 3 === x[ 0 ] ) {
+		return String( x[ 1 ] ).localeCompare( String( y[ 1 ] ), locale || undefined, { numeric: true, sensitivity: 'base' } );
+	}
+
+	return x[ 1 ] - y[ 1 ];
+};
+
+/**
+ * The order an opened panel keeps while it is open: by count, most first,
+ * then by name; or in natural order for tiles. A selected value that no
+ * longer has a count stays in the list.
+ *
+ * @param {string[]} values
+ * @param {Object<string,number>} counts
+ * @param {string[]} selected
+ * @param {{natural?: boolean, locale?: string}} [options]
+ * @return {string[]}
+ */
+export const freezeValueOrder = ( values, counts, selected, { natural = false, locale } = {} ) => {
+	const all = [ ...new Set( [ ...( values || [] ), ...( selected || [] ) ] ) ];
+	const count = ( value ) => Number( counts?.[ value ] ) || 0;
+
+	return natural
+		? all.sort( ( a, b ) => compareFacetValues( a, b, locale ) )
+		: all.sort( ( a, b ) => count( b ) - count( a ) || String( a ).localeCompare( String( b ), locale || undefined, { sensitivity: 'base' } ) );
+};
+
+/**
+ * How a group's values are drawn, when the site has not said: `color` when
+ * every value has a colour, `tiles` when every value is a size, a number or a
+ * capacity, `list` otherwise. A display the site set wins, except `color`
+ * without colours, which is a list.
+ *
+ * @param {string} field
+ * @param {string[]} values
+ * @param {{display?: string, colors?: Object<string,string>}} [config]
+ * @return {string} `list`, `tiles`, `color` or `range`.
+ */
+export const detectFacetDisplay = ( field, values, config = {} ) => {
+	const colors = config?.colors || {};
+	const list = ( values || [] ).filter( ( value ) => '' !== String( value ?? '' ).trim() );
+	const everyColored = list.length > 0 && list.every( ( value ) => 'string' === typeof colors[ value ] && '' !== colors[ value ] );
+	const set = String( config?.display || 'auto' );
+
+	if ( 'color' === set ) {
+		return everyColored ? 'color' : 'list';
+	}
+
+	if ( [ 'list', 'tiles', 'range' ].includes( set ) ) {
+		return set;
+	}
+
+	if ( everyColored ) {
+		return 'color';
+	}
+
+	if ( list.length > 0 && list.every( ( value ) => naturalKey( value )[ 0 ] < 3 ) ) {
+		return 'tiles';
+	}
+
+	return 'list';
+};
+
+/**
+ * A number typed the way the shop writes it: "1.299,50" in a shop whose
+ * decimal separator is a comma, "1,299.50" in one whose is a point. The other
+ * separator is a decimal point too when it is not followed by a group of
+ * three digits ("12,5" in an English shop), since that is what was meant.
+ *
+ * @param {string} text
+ * @param {string} [decimalSep]
+ * @return {string} The number with a point as decimal separator, or '' when there is none.
+ */
+export const parseAmount = ( text, decimalSep = '.' ) => {
+	const raw = String( text ?? '' ).replace( /[^\d.,]/g, '' );
+
+	if ( ! /\d/.test( raw ) ) {
+		return '';
+	}
+
+	const last = Math.max( raw.lastIndexOf( '.' ), raw.lastIndexOf( ',' ) );
+	const after = last >= 0 ? raw.slice( last + 1 ) : '';
+	const isDecimal = last >= 0 && ( raw[ last ] === decimalSep || ( '' !== after && 3 !== after.length ) );
+	const whole = ( isDecimal ? raw.slice( 0, last ) : raw ).replace( /[.,]/g, '' );
+	const value = Number( isDecimal && '' !== after ? `${ whole || '0' }.${ after }` : whole );
+
+	return Number.isFinite( value ) ? String( value ) : '';
+};
+
+/**
+ * Whether a bound has either side set.
+ *
+ * @param {{min?: string, max?: string}} [range]
+ * @return {boolean}
+ */
+export const hasBound = ( range ) =>
+	'' !== String( range?.min ?? '' ).trim() || '' !== String( range?.max ?? '' ).trim();
+
+/**
+ * The words of an applied bound: "from 50 €", "up to 200 €", "50 € - 200 €".
+ *
+ * @param {{min?: string, max?: string}} range
+ * @param {(value: string) => string} [format] Writes one bound, e.g. as a price.
+ * @return {string} Empty when neither side is set.
+ */
+export const rangeLabel = ( range, format = ( value ) => value ) => {
+	const min = String( range?.min ?? '' ).trim();
+	const max = String( range?.max ?? '' ).trim();
+
+	if ( '' !== min && '' !== max ) {
+		/* translators: 1: lower bound, e.g. "50 €". 2: upper bound, e.g. "200 €". */
+		return sprintf( __( '%1$s - %2$s', 'searcio' ), format( min ), format( max ) );
+	}
+
+	if ( '' !== min ) {
+		/* translators: %s: lower bound of a filter, e.g. "50 €". */
+		return sprintf( __( 'from %s', 'searcio' ), format( min ) );
+	}
+
+	if ( '' !== max ) {
+		/* translators: %s: upper bound of a filter, e.g. "200 €". */
+		return sprintf( __( 'up to %s', 'searcio' ), format( max ) );
+	}
+
+	return '';
+};
+
+/**
+ * What a group's button says. With nothing selected, its name. With values,
+ * the name and the first value, and how many more there are: the button
+ * reads "Colour: Olive +1", and is named "Colour: Olive, Black", which starts
+ * with what it shows. With a bound, the name and the bound.
+ *
+ * @param {string} label
+ * @param {string[]} [values]
+ * @param {{min?: string, max?: string}} [range]
+ * @param {(value: string) => string} [format]
+ * @return {{text: string, name: string, value: string, more: number, hidden: string}}
+ */
+export const filterButtonLabel = ( label, values = [], range, format ) => {
+	const bound = rangeLabel( range, format );
+	const list = ( values || [] ).filter( ( value ) => '' !== String( value ) );
+	const value = '' !== bound ? bound : ( list[ 0 ] ?? '' );
+
+	if ( '' === value ) {
+		return { text: label, name: label, value: '', more: 0, hidden: '' };
+	}
+
+	const rest = '' !== bound ? [] : list.slice( 1 );
+
+	return {
+		/* translators: 1: filter name, e.g. "Colour". 2: what is selected in it, e.g. "Olive". */
+		text: sprintf( __( '%1$s: %2$s', 'searcio' ), label, value ),
+		name: label,
+		value,
+		more: rest.length,
+		hidden: rest.length > 0 ? `, ${ rest.join( ', ' ) }` : '',
+	};
+};
+
+/**
+ * What is selected in a group, for the heading of its accordion.
+ *
+ * @param {string[]} values
+ * @param {{min?: string, max?: string}} [range]
+ * @param {(value: string) => string} [format]
+ * @return {string}
+ */
+export const summarizeSelection = ( values, range, format ) => {
+	const bound = rangeLabel( range, format );
+
+	return '' !== bound ? bound : ( values || [] ).join( ', ' );
+};
+
+/**
+ * The number on "All filters": each selected value, and each bound.
+ *
+ * @param {Object<string,string[]>} activeFacets
+ * @param {Object<string,{min?: string, max?: string}>} activeRanges
+ * @return {number}
+ */
+export const activeFilterCount = ( activeFacets, activeRanges ) =>
+	Object.values( activeFacets || {} ).reduce( ( sum, values ) => sum + ( Array.isArray( values ) ? values.length : 0 ), 0 )
+	+ Object.values( activeRanges || {} ).filter( hasBound ).length;

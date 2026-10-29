@@ -57,6 +57,9 @@ final class Woo {
 	 */
 	private const SEARCHABLE_VISIBILITIES = [ 'visible', 'search' ];
 
+	/** Term meta a swatches plugin keeps an attribute term's colour in, see {@see self::attribute_colors()}. */
+	private const COLOR_META_KEYS = [ 'product_attribute_color', 'cfvsw_color' ];
+
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
 	}
@@ -315,6 +318,66 @@ final class Woo {
 		}
 
 		return $labels;
+	}
+
+	/**
+	 * The attribute fields this mapping writes, each with the taxonomy it is
+	 * read from: `attr_color` => `pa_color`.
+	 *
+	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
+	 * @return array<string,string>
+	 */
+	public function attribute_taxonomies( array $woo ): array {
+		$taxonomies = [];
+
+		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
+			if ( taxonomy_exists( $taxonomy ) ) {
+				$taxonomies[ $this->attribute_field( $taxonomy ) ] = $taxonomy;
+			}
+		}
+
+		return $taxonomies;
+	}
+
+	/**
+	 * Term name => hex colour, for the terms of an attribute a swatches plugin
+	 * has given a colour: "Variation Swatches for WooCommerce" by GetWooPlugins
+	 * (`product_attribute_color`) and the one by CartFlows (`cfvsw_color`).
+	 * The names are the ones the index holds, in the language of the current
+	 * request, so the storefront can match them to the values a search answers
+	 * with. Empty when no term has a colour.
+	 *
+	 * @return array<string,string>
+	 */
+	public function attribute_colors( string $taxonomy ): array {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return [];
+		}
+
+		$terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => true ] );
+
+		if ( ! is_array( $terms ) ) {
+			return [];
+		}
+
+		$colors = [];
+
+		foreach ( $terms as $term ) {
+			if ( ! $term instanceof \WP_Term ) {
+				continue;
+			}
+
+			foreach ( self::COLOR_META_KEYS as $key ) {
+				$color = sanitize_hex_color( (string) get_term_meta( $term->term_id, $key, true ) );
+
+				if ( is_string( $color ) && '' !== $color ) {
+					$colors[ Term_Names::decode( $term->name ) ] = $color;
+					break;
+				}
+			}
+		}
+
+		return $colors;
 	}
 
 	/**

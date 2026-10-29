@@ -193,6 +193,24 @@ final class Plugin_Settings {
 	public const ENABLED_LANGUAGES = 'enabled_languages';
 
 	/**
+	 * Local mirror of Searcio's own `search-config.facet_fields`, refreshed
+	 * with the languages above. The search window lays its filters out in this
+	 * order; reading it from the service would cost every page that prints the
+	 * window a request. Empty until an admin opens Search Config: the window
+	 * then keeps the order the search answers with.
+	 */
+	#[Setting(
+		type: 'array',
+		default: [],
+		option_key: 'webhead_search_cloud_facet_fields',
+		show_in_rest: false,
+		label: 'Facet fields',
+		description: "Local mirror of Searcio's configured facet fields, in their order.",
+		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
+	)]
+	public const FACET_FIELDS = 'facet_fields';
+
+	/**
 	 * Curated fallback queries shown in the modal's empty-query state until the
 	 * Searcio API ships a popular/trending-searches endpoint.
 	 */

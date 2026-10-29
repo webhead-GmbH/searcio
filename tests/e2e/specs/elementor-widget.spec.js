@@ -87,10 +87,17 @@ test.describe( 'Elementor widget', () => {
 		await expect.poll( () => typographyOf( triggerInput ) ).toEqual( [ '20px', '700', '28px', 'uppercase' ] );
 
 		await widget.openModal();
+
+		// Popular searches are shown until a search has results.
+		const popular = widget.modal.locator( '.whsc-popular-item' ).first();
+
+		await expect( popular ).toBeVisible();
+		await expect.poll( () => typographyOf( popular ) ).toEqual( TYPOGRAPHY[ '.whsc-popular-item' ] );
+
 		await widget.search( 'hoodie' );
 		await expect( widget.cards.first() ).toBeVisible();
 
-		for ( const [ selector, expected ] of Object.entries( TYPOGRAPHY ) ) {
+		for ( const [ selector, expected ] of Object.entries( TYPOGRAPHY ).filter( ( [ name ] ) => '.whsc-popular-item' !== name ) ) {
 			const element = widget.modal.locator( selector ).first();
 
 			await expect( element, selector ).toBeVisible();
@@ -129,9 +136,11 @@ test.describe( 'Elementor widget', () => {
 			.poll( () => styleOf( widget.modal.locator( '.whsc-card__badge' ).first(), [ 'background-color', 'color', 'border-top-left-radius' ] ) )
 			.toEqual( [ 'rgb(124, 45, 18)', 'rgb(254, 243, 199)', '0px' ] );
 		await expect.poll( () => styleOf( widget.modal.locator( '.whsc-carousel-item' ).first(), [ 'width' ] ) ).toEqual( [ '260px' ] );
-		// A colour picked for the group name is used as picked, not dimmed.
+		// A colour picked for the group name is used as picked, on the title of
+		// the group's popover (or, on a phone, of its sheet).
+		await widget.openGroup( 'Categories' );
 		await expect
-			.poll( () => styleOf( widget.modal.locator( '.whsc-facet-group__label' ).first(), [ 'color', 'opacity' ] ) )
+			.poll( () => styleOf( page.locator( '.whsc-facet-group__label' ).first(), [ 'color', 'opacity' ] ) )
 			.toEqual( [ 'rgb(6, 95, 70)', '1' ] );
 	} );
 } );

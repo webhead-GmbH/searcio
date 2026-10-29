@@ -219,7 +219,7 @@ test.describe( 'search by photo', () => {
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
 
 		const widget = new SearchWidget( page );
-		const chips = widget.modal.locator( '.whsc-facets .whsc-facet' );
+		const chips = widget.typeSwitch.getByRole( 'button' );
 		await widget.openModal();
 		await expect( chips.first() ).toBeVisible();
 

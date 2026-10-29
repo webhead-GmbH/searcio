@@ -65,6 +65,9 @@
     "src/components/Modal.js": [
         "public/bundle.settings.js"
     ],
+    "src/frontend/search/components/ActiveFilters.js": [
+        "public/bundle.search.js"
+    ],
     "src/frontend/search/components/AiAssistant.js": [
         "public/bundle.search.js"
     ],
@@ -77,13 +80,22 @@
     "src/frontend/search/components/CompareTable.js": [
         "public/bundle.search.js"
     ],
+    "src/frontend/search/components/FilterBar.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/FilterPanel.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/FilterSheet.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/components/PriceRange.js": [
+        "public/bundle.search.js"
+    ],
     "src/frontend/search/components/ProductList.js": [
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/QuizPane.js": [
-        "public/bundle.search.js"
-    ],
-    "src/frontend/search/components/RangeFilters.js": [
         "public/bundle.search.js"
     ],
     "src/frontend/search/components/SearchInput.js": [

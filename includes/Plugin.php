@@ -54,6 +54,7 @@ use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Indexing\Field_Source_Resolver;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Document_Builder;
+use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Compatibility\Woo_Compatibility;
 use Webhead\WP\SearchCloud\Compatibility\Multilingual_Support;
@@ -236,6 +237,16 @@ final class Plugin extends Base_Plugin {
 			}
 		);
 		$container->add(
+			'facet_config',
+			static function () use ( $container ): Facet_Config {
+				return new Facet_Config(
+					$container->get( Settings_Manager::class ),
+					$container->get( 'index_config' ),
+					$container->get( 'woo' )
+				);
+			}
+		);
+		$container->add(
 			'document_builder',
 			static function () use ( $container ): Document_Builder {
 				return new Document_Builder(
@@ -352,7 +363,8 @@ final class Plugin extends Base_Plugin {
 			static function () use ( $container ): Search_Config_Endpoint {
 				return new Search_Config_Endpoint(
 					$container->get( 'search_cloud_client' ),
-					$container->get( 'language_config' )
+					$container->get( 'language_config' ),
+					$container->get( 'facet_config' )
 				);
 			}
 		);
@@ -375,7 +387,8 @@ final class Plugin extends Base_Plugin {
 					$container->get( Settings_Manager::class ),
 					$container->get( 'index_config' ),
 					$container->get( 'language' ),
-					$container->get( 'language_config' )
+					$container->get( 'language_config' ),
+					$container->get( 'facet_config' )
 				);
 			}
 		);

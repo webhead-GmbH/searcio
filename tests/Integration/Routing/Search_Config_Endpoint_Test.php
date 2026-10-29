@@ -182,6 +182,38 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'de', 'en' ], $this->service( 'language_config' )->enabled_languages() );
 	}
 
+	/**
+	 * The facet fields too, in their order: the search window lays its filter
+	 * bar out in it, and a page cannot ask the service.
+	 */
+	public function test_a_successful_read_or_write_mirrors_the_facet_fields_in_their_order(): void {
+		$this->as_admin();
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'categories', 'brand', 'attr_color' ] ] ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertSame( [ 'categories', 'brand', 'attr_color' ], $this->service( 'facet_config' )->fields() );
+
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'brand', 'categories' ] ] ) );
+
+		$request = new WP_REST_Request( 'PUT', self::ROUTE );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( [ 'facet_fields' => [ 'brand', 'categories' ] ] ) );
+		$this->server->dispatch( $request );
+
+		$this->assertSame( [ 'brand', 'categories' ], $this->service( 'facet_config' )->fields() );
+	}
+
+	public function test_a_failed_read_keeps_the_facet_fields_it_had(): void {
+		$this->as_admin();
+		$this->service( 'facet_config' )->set_fields( [ 'brand' ] );
+		$this->fake_http( static fn () => new \WP_Error( 'http_request_failed', 'timed out' ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertSame( [ 'brand' ], $this->service( 'facet_config' )->fields() );
+	}
+
 	public function test_an_unreachable_service_answers_502_rather_than_an_empty_configuration(): void {
 		$this->as_admin();
 		$this->fake_http( static fn () => new \WP_Error( 'http_request_failed', 'timed out' ) );
