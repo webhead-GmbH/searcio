@@ -18,6 +18,18 @@ const savePlacement = ( requestUtils, placement ) =>
 	requestUtils.rest( { path: PLACEMENT_PATH, method: 'POST', data: { placement } } );
 
 /**
+ * A section of the tab, by its entry in the list down the side. An entry is
+ * named by its label followed by its lines of state, so it is found by the
+ * label it starts with.
+ */
+const sectionTab = ( page, label ) => page.locator( SCREEN ).getByRole( 'tab', { name: new RegExp( `^${ label }` ) } );
+
+const openSection = async ( page, label ) => {
+	await sectionTab( page, label ).click( LOADED );
+	await expect( sectionTab( page, label ) ).toHaveAttribute( 'aria-selected', 'true' );
+};
+
+/**
  * A page holding the Enfold header's search item, as a live Enfold shop
  * prints it, with a theme script that opens its own dropdown on a click.
  */
@@ -44,19 +56,31 @@ test.describe( 'Placement tab', () => {
 
 		await expect( screen.getByRole( 'heading', { name: 'Placement', level: 2 } ) ).toBeVisible( LOADED );
 
-		for ( const name of [ 'Use Searcio for the site\'s search forms', 'Open Searcio from the theme\'s own search', 'Keyboard shortcut', 'Show a floating search button' ] ) {
+		for ( const [ section, name ] of [
+			[ 'Search forms', 'Use Searcio for the site\'s search forms' ],
+			[ 'The theme\'s search', 'Open Searcio from the theme\'s own search' ],
+			[ 'Keyboard shortcut', 'Use the keyboard shortcut' ],
+			[ 'Floating search button', 'Show a floating search button' ],
+		] ) {
+			await expect( sectionTab( page, section ) ).toContainText( 'Off' );
+			await openSection( page, section );
 			await expect( screen.getByRole( 'checkbox', { name } ) ).not.toBeChecked();
 		}
 
+		await openSection( page, 'The theme\'s search' );
 		await expect( screen.getByLabel( 'CSS selectors' ) ).toHaveCount( 0 );
 		await screen.getByRole( 'checkbox', { name: 'Open Searcio from the theme\'s own search' } ).check();
 		await expect( screen.getByLabel( 'CSS selectors' ) ).toBeVisible();
 
 		await screen.getByLabel( 'CSS selectors' ).fill( '#menu-item-search > a\na[href=' );
 		await expect( screen.getByText( 'A browser cannot read these, so they open nothing: a[href=' ) ).toBeVisible();
+		// The entry says what the section holds now, before it is saved.
+		await expect( sectionTab( page, 'The theme\'s search' ) ).toContainText( '2 selectors' );
 
+		await openSection( page, 'Floating search button' );
 		await screen.getByRole( 'checkbox', { name: 'Show a floating search button' } ).check();
 		await expect( screen.locator( 'iframe.whsc-placement-preview--floating' ) ).toBeVisible();
+		await expect( sectionTab( page, 'Floating search button' ) ).toContainText( 'On phones' );
 	} );
 
 	test( 'saves, says so, and has nothing left to save', async ( { page, requestUtils } ) => {
@@ -67,7 +91,8 @@ test.describe( 'Placement tab', () => {
 
 		await expect( save ).toBeDisabled( LOADED );
 
-		await screen.getByRole( 'checkbox', { name: 'Keyboard shortcut' } ).check();
+		await openSection( page, 'Keyboard shortcut' );
+		await screen.getByRole( 'checkbox', { name: 'Use the keyboard shortcut' } ).check();
 		await expect( save ).toBeEnabled();
 		await save.click();
 
@@ -94,7 +119,8 @@ test.describe( 'Placement tab', () => {
 
 		const screen = page.locator( SCREEN );
 
-		await screen.getByRole( 'checkbox', { name: 'Keyboard shortcut' } ).check( LOADED );
+		await openSection( page, 'Keyboard shortcut' );
+		await screen.getByRole( 'checkbox', { name: 'Use the keyboard shortcut' } ).check();
 		await screen.getByRole( 'button', { name: 'Save placement' } ).click();
 
 		await expect( screen.getByText( 'The placement could not be saved: The database is read-only.' ) ).toBeVisible();
@@ -104,6 +130,7 @@ test.describe( 'Placement tab', () => {
 	test( 'writes a shortcode with what differs from the look, and copies it', async ( { page, context } ) => {
 		await context.grantPermissions( [ 'clipboard-read', 'clipboard-write' ] );
 		await page.goto( TAB_URL );
+		await openSection( page, 'Shortcodes' );
 
 		const card = page.locator( SCREEN ).locator( '.whsc-settings-card' ).filter( { hasText: 'Shortcode for the search' } );
 		const code = card.locator( '.whsc-placement-snippet__code' );
@@ -123,18 +150,76 @@ test.describe( 'Placement tab', () => {
 		await page.goto( TAB_URL );
 		await expect( page.locator( SCREEN ).getByRole( 'button', { name: 'Save placement' } ) ).toBeVisible( LOADED );
 
+		await openSection( page, 'The theme\'s search' );
 		await page.locator( SCREEN ).getByRole( 'checkbox', { name: 'Open Searcio from the theme\'s own search' } ).check();
-		await page.locator( SCREEN ).getByRole( 'checkbox', { name: 'Show a floating search button' } ).check();
-
 		expect( await touchingInShell( page ) ).toEqual( [] );
+
+		for ( const section of [ 'Search forms', 'Keyboard shortcut', 'Floating search button', 'Look', 'Shortcodes', 'Product rows', 'Other ways to place it' ] ) {
+			await openSection( page, section );
+			expect( await touchingInShell( page ), section ).toEqual( [] );
+		}
 	} );
 
-	test( 'fits a phone without scrolling sideways', async ( { page } ) => {
+	/**
+	 * The tab used to be one column of eight cards. Each way is a section of
+	 * its own now, listed down the side with its state, and the one open is
+	 * kept in the address.
+	 */
+	test( 'lists its sections down the side, opens one at a time, and keeps it in the address', async ( { page, requestUtils } ) => {
+		await savePlacement( requestUtils, { shortcut: true, floating: { enabled: true, devices: 'all' }, search: { mode: 'box' } } );
+		await page.goto( TAB_URL );
+
+		const tabs = page.locator( SCREEN ).getByRole( 'tablist', { name: 'Placement settings' } ).getByRole( 'tab' );
+
+		await expect( tabs ).toHaveText( [
+			/^Search formsOff$/,
+			/^The theme's searchOff/,
+			/^Keyboard shortcutCtrl\+K and \/$/,
+			/^Floating search buttonOn every screen$/,
+			/^LookSearch fieldAll content$/,
+			/^Shortcodes\[searcio\]\[searcio_products\]$/,
+			/^Product rowsSimilarCarousel$/,
+			/^Other ways to place it/,
+		], LOADED );
+		await expect( sectionTab( page, 'Search forms' ) ).toHaveAttribute( 'aria-selected', 'true' );
+		await expect( page.locator( SCREEN ).getByText( 'Look of the shortcode and the widgets' ) ).toHaveCount( 0 );
+
+		await openSection( page, 'Look' );
+		await expect( page.locator( SCREEN ).getByText( 'Look of the shortcode and the widgets' ) ).toBeVisible();
+		await expect( page.locator( SCREEN ).getByRole( 'checkbox', { name: 'Use Searcio for the site\'s search forms' } ) ).toHaveCount( 0 );
+		expect( new URL( page.url() ).searchParams.get( 'section' ) ).toBe( 'look' );
+
+		await page.reload();
+		await expect( sectionTab( page, 'Look' ) ).toHaveAttribute( 'aria-selected', 'true', LOADED );
+
+		// Another tab of the screen has no sections; the address forgets it.
+		await page.locator( SCREEN ).getByRole( 'tab', { name: 'Search Config' } ).click();
+		await expect.poll( () => new URL( page.url() ).searchParams.get( 'section' ) ).toBeNull();
+	} );
+
+	test( 'fits a phone without scrolling sideways, with its sections in a strip of their own', async ( { page } ) => {
 		await page.setViewportSize( { width: 375, height: 812 } );
 		await page.goto( TAB_URL );
 		await expect( page.locator( SCREEN ).getByRole( 'button', { name: 'Save placement' } ) ).toBeVisible( LOADED );
 
-		expect( await page.evaluate( () => document.documentElement.scrollWidth - document.documentElement.clientWidth ) ).toBeLessThanOrEqual( 0 );
+		const overflow = () => page.evaluate( () => document.documentElement.scrollWidth - document.documentElement.clientWidth );
+
+		expect( await overflow() ).toBeLessThanOrEqual( 0 );
+
+		// The last entry is reached by scrolling the strip, not the page.
+		await openSection( page, 'Other ways to place it' );
+		expect( await overflow() ).toBeLessThanOrEqual( 0 );
+		await expect( page.locator( SCREEN ).getByText( 'PHP in a child theme' ) ).toBeVisible();
+
+		// Opened from the address, the open entry is in the strip's view.
+		await page.goto( `${ TAB_URL }&section=products` );
+		await expect( sectionTab( page, 'Product rows' ) ).toHaveAttribute( 'aria-selected', 'true', LOADED );
+		await expect.poll( () => page.evaluate( () => {
+			const strip = document.querySelector( '.webhead-search-cloud-sections__nav' ).getBoundingClientRect();
+			const entry = document.querySelector( '.webhead-search-cloud-sections__nav [aria-selected="true"]' ).getBoundingClientRect();
+
+			return entry.left >= strip.left - 1 && entry.right <= strip.right + 1;
+		} ) ).toBe( true );
 	} );
 } );
 

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-29T17:41:12+00:00\n"
+"POT-Creation-Date: 2026-10-30T06:21:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: searcio\n"
@@ -52,7 +52,7 @@ msgstr ""
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:161
 #: includes/Frontend/Frontend_Config.php:153
-#: src/admin/settings/components/tabs/PlacementTab.js:846
+#: src/admin/settings/components/tabs/PlacementTab.js:947
 #: src/frontend/search/components/SearchInput.js:32
 #: src/frontend/search/components/SearchModal.js:1683
 #: src/frontend/search/components/SearchModal.js:1715
@@ -92,8 +92,8 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Products_Widget.php:57
 #: includes/Widgets/Classic_Products_Widget.php:110
-#: src/admin/settings/components/tabs/PlacementTab.js:732
-#: src/admin/settings/components/tabs/PlacementTab.js:772
+#: src/admin/settings/components/tabs/PlacementTab.js:813
+#: src/admin/settings/components/tabs/PlacementTab.js:863
 #: src/blocks/products/edit.js:33
 #: src/frontend/search/components/ProductList.js:168
 msgid "Products"
@@ -120,8 +120,8 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Products_Widget.php:76
 #: includes/Widgets/Classic_Products_Widget.php:130
-#: src/admin/settings/components/tabs/PlacementTab.js:751
-#: src/admin/settings/components/tabs/PlacementTab.js:804
+#: src/admin/settings/components/tabs/PlacementTab.js:832
+#: src/admin/settings/components/tabs/PlacementTab.js:895
 #: src/blocks/products/edit.js:57
 msgid "Heading"
 msgstr ""
@@ -168,8 +168,8 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Products_Widget.php:126
 #: includes/Widgets/Classic_Products_Widget.php:118
-#: src/admin/settings/components/tabs/PlacementTab.js:743
-#: src/admin/settings/components/tabs/PlacementTab.js:783
+#: src/admin/settings/components/tabs/PlacementTab.js:824
+#: src/admin/settings/components/tabs/PlacementTab.js:874
 #: src/blocks/products/edit.js:103
 msgid "Layout"
 msgstr ""
@@ -177,8 +177,9 @@ msgstr ""
 #: includes/Elementor/Widgets/Products_Widget.php:130
 #: includes/Elementor/Widgets/Search_Widget.php:1348
 #: includes/Widgets/Classic_Products_Widget.php:121
-#: src/admin/settings/components/tabs/PlacementTab.js:747
-#: src/admin/settings/components/tabs/PlacementTab.js:787
+#: src/admin/settings/components/tabs/PlacementTab.js:828
+#: src/admin/settings/components/tabs/PlacementTab.js:848
+#: src/admin/settings/components/tabs/PlacementTab.js:878
 #: src/blocks/products/edit.js:106
 #: src/blocks/search/edit.js:409
 msgid "Carousel"
@@ -186,8 +187,9 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Products_Widget.php:131
 #: includes/Widgets/Classic_Products_Widget.php:122
-#: src/admin/settings/components/tabs/PlacementTab.js:748
-#: src/admin/settings/components/tabs/PlacementTab.js:788
+#: src/admin/settings/components/tabs/PlacementTab.js:829
+#: src/admin/settings/components/tabs/PlacementTab.js:848
+#: src/admin/settings/components/tabs/PlacementTab.js:879
 #: src/blocks/products/edit.js:107
 msgid "Grid"
 msgstr ""
@@ -282,6 +284,10 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:181
 #: includes/Elementor/Widgets/Search_Widget.php:314
+#: src/admin/settings/components/tabs/PlacementTab.js:365
+#: src/admin/settings/components/tabs/PlacementTab.js:398
+#: src/admin/settings/components/tabs/PlacementTab.js:494
+#: src/admin/settings/components/tabs/PlacementTab.js:521
 msgid "Off"
 msgstr ""
 
@@ -324,7 +330,7 @@ msgid "Hide"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:225
-#: src/admin/settings/components/tabs/PlacementTab.js:603
+#: src/admin/settings/components/tabs/PlacementTab.js:675
 #: src/blocks/search/edit.js:156
 msgid "Filter buttons in the bar"
 msgstr ""
@@ -380,31 +386,31 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:284
 #: includes/Elementor/Widgets/Search_Widget.php:1387
-#: src/admin/settings/components/tabs/PlacementTab.js:327
+#: src/admin/settings/components/tabs/PlacementTab.js:328
 #: src/blocks/search/edit.js:169
 msgid "None"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:285
-#: src/admin/settings/components/tabs/PlacementTab.js:323
+#: src/admin/settings/components/tabs/PlacementTab.js:324
 #: src/blocks/search/edit.js:170
 msgid "Fade"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:286
-#: src/admin/settings/components/tabs/PlacementTab.js:324
+#: src/admin/settings/components/tabs/PlacementTab.js:325
 #: src/blocks/search/edit.js:171
 msgid "Slide down"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:287
-#: src/admin/settings/components/tabs/PlacementTab.js:325
+#: src/admin/settings/components/tabs/PlacementTab.js:326
 #: src/blocks/search/edit.js:172
 msgid "Slide up"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:288
-#: src/admin/settings/components/tabs/PlacementTab.js:326
+#: src/admin/settings/components/tabs/PlacementTab.js:327
 #: src/blocks/search/edit.js:173
 msgid "Zoom"
 msgstr ""
@@ -440,13 +446,13 @@ msgid "All types"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:385
-#: src/admin/settings/components/tabs/PlacementTab.js:584
+#: src/admin/settings/components/tabs/PlacementTab.js:656
 msgid "Alignment"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:388
-#: src/admin/settings/components/tabs/PlacementTab.js:336
 #: src/admin/settings/components/tabs/PlacementTab.js:337
+#: src/admin/settings/components/tabs/PlacementTab.js:338
 msgid "Left"
 msgstr ""
 
@@ -455,8 +461,8 @@ msgid "Center"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:390
-#: src/admin/settings/components/tabs/PlacementTab.js:336
 #: src/admin/settings/components/tabs/PlacementTab.js:337
+#: src/admin/settings/components/tabs/PlacementTab.js:338
 msgid "Right"
 msgstr ""
 
@@ -693,8 +699,9 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:741
 #: includes/Widgets/Classic_Search_Widget.php:112
-#: src/admin/settings/components/tabs/PlacementTab.js:557
-#: src/admin/settings/components/tabs/PlacementTab.js:705
+#: src/admin/settings/components/tabs/PlacementTab.js:607
+#: src/admin/settings/components/tabs/PlacementTab.js:629
+#: src/admin/settings/components/tabs/PlacementTab.js:787
 #: src/blocks/search/edit.js:231
 msgid "Search field"
 msgstr ""
@@ -742,7 +749,7 @@ msgstr ""
 #: includes/Elementor/Widgets/Search_Widget.php:1185
 #: includes/Elementor/Widgets/Search_Widget.php:1190
 #: includes/Elementor/Widgets/Search_Widget.php:1269
-#: src/admin/settings/components/tabs/PlacementTab.js:636
+#: src/admin/settings/components/tabs/PlacementTab.js:708
 #: src/blocks/search/edit.js:219
 #: src/blocks/search/edit.js:235
 #: src/blocks/search/edit.js:320
@@ -1003,7 +1010,7 @@ msgid "Answer radius"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:1207
-#: src/admin/settings/components/tabs/PlacementTab.js:615
+#: src/admin/settings/components/tabs/PlacementTab.js:687
 #: src/blocks/search/edit.js:392
 msgid "Result cards"
 msgstr ""
@@ -1234,12 +1241,12 @@ msgstr ""
 msgid "Search by %s (opens in a new tab)"
 msgstr ""
 
-#: includes/Frontend/Placement_Preview.php:72
+#: includes/Frontend/Placement_Preview.php:83
 msgid "This preview opens from the Placement tab of the Searcio settings."
 msgstr ""
 
-#: includes/Frontend/Placement_Preview.php:73
-#: src/admin/settings/components/tabs/PlacementTab.js:667
+#: includes/Frontend/Placement_Preview.php:84
+#: src/admin/settings/components/tabs/PlacementTab.js:739
 msgid "Preview"
 msgstr ""
 
@@ -1615,7 +1622,7 @@ msgid "The category on the page"
 msgstr ""
 
 #: includes/Widgets/Classic_Products_Widget.php:126
-#: src/admin/settings/components/tabs/PlacementTab.js:794
+#: src/admin/settings/components/tabs/PlacementTab.js:885
 msgid "Number of products"
 msgstr ""
 
@@ -1624,22 +1631,23 @@ msgid "The Searcio search: a magnifier or a search field."
 msgstr ""
 
 #: includes/Widgets/Classic_Search_Widget.php:109
-#: src/admin/settings/components/tabs/PlacementTab.js:552
-#: src/admin/settings/components/tabs/PlacementTab.js:700
+#: src/admin/settings/components/tabs/PlacementTab.js:624
+#: src/admin/settings/components/tabs/PlacementTab.js:782
 msgid "Shown as"
 msgstr ""
 
 #: includes/Widgets/Classic_Search_Widget.php:113
-#: src/admin/settings/components/tabs/PlacementTab.js:513
-#: src/admin/settings/components/tabs/PlacementTab.js:556
-#: src/admin/settings/components/tabs/PlacementTab.js:637
-#: src/admin/settings/components/tabs/PlacementTab.js:704
+#: src/admin/settings/components/tabs/PlacementTab.js:574
+#: src/admin/settings/components/tabs/PlacementTab.js:607
+#: src/admin/settings/components/tabs/PlacementTab.js:628
+#: src/admin/settings/components/tabs/PlacementTab.js:709
+#: src/admin/settings/components/tabs/PlacementTab.js:786
 msgid "Magnifier"
 msgstr ""
 
 #: includes/Widgets/Classic_Search_Widget.php:117
-#: src/admin/settings/components/tabs/PlacementTab.js:560
-#: src/admin/settings/components/tabs/PlacementTab.js:708
+#: src/admin/settings/components/tabs/PlacementTab.js:632
+#: src/admin/settings/components/tabs/PlacementTab.js:790
 #: src/blocks/search/edit.js:237
 msgid "Placeholder"
 msgstr ""
@@ -1692,7 +1700,7 @@ msgid "Search Config"
 msgstr ""
 
 #: src/admin/settings/components/SettingsPanel.js:111
-#: src/admin/settings/components/tabs/PlacementTab.js:349
+#: src/admin/settings/components/tabs/PlacementTab.js:965
 msgid "Placement"
 msgstr ""
 
@@ -1715,7 +1723,7 @@ msgstr ""
 #: src/admin/settings/components/SettingsPanel.js:173
 #: src/admin/settings/components/tabs/IndexingTab.js:561
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:86
-#: src/admin/settings/components/tabs/PlacementTab.js:344
+#: src/admin/settings/components/tabs/PlacementTab.js:345
 #: src/admin/settings/components/tabs/SearchConfigTab.js:712
 msgid "No unsaved changes."
 msgstr ""
@@ -1732,7 +1740,7 @@ msgstr ""
 
 #: src/admin/settings/components/SettingsPanel.js:219
 #: src/admin/settings/components/tabs/IndexingTab.js:548
-#: src/admin/settings/components/tabs/PlacementTab.js:288
+#: src/admin/settings/components/tabs/PlacementTab.js:289
 #: src/admin/settings/components/tabs/SearchConfigTab.js:700
 #: src/frontend/search/components/AiAssistant.js:298
 msgid "Try again"
@@ -2179,8 +2187,8 @@ msgstr ""
 #: src/admin/settings/components/tabs/IndexingTab.js:486
 #: src/admin/settings/components/tabs/IndexingTab.js:526
 #: src/admin/settings/components/tabs/IndexingTab.js:543
-#: src/admin/settings/components/tabs/PlacementTab.js:45
-#: src/admin/settings/components/tabs/PlacementTab.js:283
+#: src/admin/settings/components/tabs/PlacementTab.js:46
+#: src/admin/settings/components/tabs/PlacementTab.js:284
 #: src/admin/settings/components/tabs/SearchConfigTab.js:499
 #: src/admin/settings/components/tabs/SearchConfigTab.js:695
 #: src/settings/store/provider.js:95
@@ -2199,7 +2207,7 @@ msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:558
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:83
-#: src/admin/settings/components/tabs/PlacementTab.js:343
+#: src/admin/settings/components/tabs/PlacementTab.js:344
 #: src/admin/settings/components/tabs/SearchConfigTab.js:709
 msgid "Saving…"
 msgstr ""
@@ -2290,422 +2298,492 @@ msgstr ""
 msgid "Test uses your saved credentials - save first."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:104
+#: src/admin/settings/components/tabs/PlacementTab.js:105
 msgid "Copied."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:106
+#: src/admin/settings/components/tabs/PlacementTab.js:107
 msgid "The browser did not allow copying. Select the text and copy it yourself."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:110
+#: src/admin/settings/components/tabs/PlacementTab.js:111
 msgid "Copy"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:133
+#: src/admin/settings/components/tabs/PlacementTab.js:134
 msgid "Default"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:147
+#: src/admin/settings/components/tabs/PlacementTab.js:148
 msgid "Use the default"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:256
+#: src/admin/settings/components/tabs/PlacementTab.js:257
 msgid "Placement saved."
 msgstr ""
 
 #. translators: %s: reason the save failed, as reported by the REST API.
-#: src/admin/settings/components/tabs/PlacementTab.js:261
+#: src/admin/settings/components/tabs/PlacementTab.js:262
 #, js-format
 msgid "The placement could not be saved: %s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:273
+#: src/admin/settings/components/tabs/PlacementTab.js:274
 msgid "Loading the placement settings"
 msgstr ""
 
 #. translators: %s: reason the request failed.
-#: src/admin/settings/components/tabs/PlacementTab.js:282
+#: src/admin/settings/components/tabs/PlacementTab.js:283
 #, js-format
 msgid "The placement settings could not be loaded: %s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:305
+#: src/admin/settings/components/tabs/PlacementTab.js:306
 msgid "Translate it under Languages > Translations, in the Searcio group."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:307
+#: src/admin/settings/components/tabs/PlacementTab.js:308
 msgid "Translate it under WPML > String Translation, in the Searcio domain."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:311
+#: src/admin/settings/components/tabs/PlacementTab.js:312
+#: src/admin/settings/components/tabs/PlacementTab.js:608
 msgid "All content"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:315
+#: src/admin/settings/components/tabs/PlacementTab.js:316
 msgid "When Enter is pressed"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:316
+#: src/admin/settings/components/tabs/PlacementTab.js:317
 msgid "As the visitor types"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:319
+#: src/admin/settings/components/tabs/PlacementTab.js:320
 msgid "The newest products"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:320
+#: src/admin/settings/components/tabs/PlacementTab.js:321
 msgid "Featured products"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:330
+#: src/admin/settings/components/tabs/PlacementTab.js:331
 msgid "Drawn by the plugin"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:331
+#: src/admin/settings/components/tabs/PlacementTab.js:332
 msgid "Templates from Searcio"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:343
+#: src/admin/settings/components/tabs/PlacementTab.js:344
 msgid "Save placement"
 msgstr ""
 
 #: src/admin/settings/components/tabs/PlacementTab.js:350
-msgid "Puts the search where a block or an Elementor widget cannot go: into the theme's own search, a floating button, shortcodes and classic widgets. Every way here is off until you turn it on."
+msgid "To check a change, save it, open your site in a new tab and click its search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:358
-msgid "On the whole site"
+#: src/admin/settings/components/tabs/PlacementTab.js:353
+msgid "Open your site"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:359
-msgid "For a theme that draws its own search. Searcio takes its place on every page, with nothing to edit in the theme."
+#: src/admin/settings/components/tabs/PlacementTab.js:363
+#: src/admin/settings/components/tabs/PlacementTab.js:371
+msgid "Search forms"
 msgstr ""
 
 #: src/admin/settings/components/tabs/PlacementTab.js:365
+msgid "Drawn as Searcio"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:372
+msgid "For a theme that draws its own search. Searcio takes its place on every page, with nothing to edit in the theme."
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:377
 msgid "Use Searcio for the site's search forms"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:366
+#: src/admin/settings/components/tabs/PlacementTab.js:378
 msgid "The theme's search form, WooCommerce's product search and the Search blocks become a Searcio search field. Without JavaScript they still search WordPress."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:374
+#: src/admin/settings/components/tabs/PlacementTab.js:390
+#: src/admin/settings/components/tabs/PlacementTab.js:406
+msgid "The theme's search"
+msgstr ""
+
+#. translators: %d: number of CSS selectors.
+#: src/admin/settings/components/tabs/PlacementTab.js:395
+#, js-format
+msgid "%d selector"
+msgid_plural "%d selectors"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: the theme's name.
+#: src/admin/settings/components/tabs/PlacementTab.js:400
+#, js-format
+msgid "Theme: %s"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:407
+msgid "For a theme whose header has a search icon or field of its own."
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:413
 msgid "Open Searcio from the theme's own search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:375
+#: src/admin/settings/components/tabs/PlacementTab.js:414
 msgid "A click on an element these selectors find opens Searcio, and the theme's own search stays closed. A search field opens it with what was typed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:383
+#: src/admin/settings/components/tabs/PlacementTab.js:422
 msgid "CSS selectors"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:384
+#: src/admin/settings/components/tabs/PlacementTab.js:423
 msgid "One per line, e.g. #menu-item-search > a. To find one, right-click the theme's search icon, choose Inspect, and copy a class or id it has."
 msgstr ""
 
 #. translators: %s: the selectors, one after another.
-#: src/admin/settings/components/tabs/PlacementTab.js:395
+#: src/admin/settings/components/tabs/PlacementTab.js:434
 #, js-format
 msgid "A browser cannot read these, so they open nothing: %s"
 msgstr ""
 
 #. translators: 1: a theme's or a builder's name, 2: its CSS selectors.
-#: src/admin/settings/components/tabs/PlacementTab.js:410
+#: src/admin/settings/components/tabs/PlacementTab.js:449
 #, js-format
 msgid "For %1$s: %2$s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:427
+#: src/admin/settings/components/tabs/PlacementTab.js:466
 msgid "In the list"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:427
+#: src/admin/settings/components/tabs/PlacementTab.js:466
 msgid "Use the suggestion"
 msgstr ""
 
 #. translators: %s: the theme's name.
-#: src/admin/settings/components/tabs/PlacementTab.js:437
+#: src/admin/settings/components/tabs/PlacementTab.js:476
 #, js-format
 msgid "Searcio has no suggestion for %s yet."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:448
+#: src/admin/settings/components/tabs/PlacementTab.js:492
+#: src/admin/settings/components/tabs/PlacementTab.js:500
 msgid "Keyboard shortcut"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:449
+#: src/admin/settings/components/tabs/PlacementTab.js:494
+msgid "Ctrl+K and /"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:501
 msgid "Ctrl+K, Cmd+K on a Mac, and \"/\" outside a field open the search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:455
-msgid "To check a change, save it, open your site in a new tab and click its search."
+#: src/admin/settings/components/tabs/PlacementTab.js:506
+msgid "Use the keyboard shortcut"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:458
-msgid "Open your site"
-msgstr ""
-
-#: src/admin/settings/components/tabs/PlacementTab.js:467
+#: src/admin/settings/components/tabs/PlacementTab.js:518
+#: src/admin/settings/components/tabs/PlacementTab.js:528
 msgid "Floating search button"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:468
+#: src/admin/settings/components/tabs/PlacementTab.js:522
+msgid "On every screen"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:522
+msgid "On phones"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:529
 msgid "A button fixed to a bottom corner of every page, for a theme that has no search on a phone."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:474
+#: src/admin/settings/components/tabs/PlacementTab.js:535
 msgid "Show a floating search button"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:486
+#: src/admin/settings/components/tabs/PlacementTab.js:547
 msgid "Corner"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:497
+#: src/admin/settings/components/tabs/PlacementTab.js:558
 msgid "Shown on"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:498
+#: src/admin/settings/components/tabs/PlacementTab.js:559
 msgid "Phones are screens narrower than 782px."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:502
+#: src/admin/settings/components/tabs/PlacementTab.js:563
 msgid "Phones"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:503
+#: src/admin/settings/components/tabs/PlacementTab.js:564
 msgid "Every screen"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:509
+#: src/admin/settings/components/tabs/PlacementTab.js:570
 msgid "Button"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:514
+#: src/admin/settings/components/tabs/PlacementTab.js:575
 msgid "With \"Search\""
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:519
+#: src/admin/settings/components/tabs/PlacementTab.js:580
 msgid "Distance from the bottom (px)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:520
+#: src/admin/settings/components/tabs/PlacementTab.js:581
 msgid "Lift it above a cookie notice or a cart bar."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:532
+#: src/admin/settings/components/tabs/PlacementTab.js:593
 msgid "Preview of the floating search button"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:542
+#: src/admin/settings/components/tabs/PlacementTab.js:605
+msgid "Look"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:614
 msgid "Look of the shortcode and the widgets"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:543
+#: src/admin/settings/components/tabs/PlacementTab.js:615
 msgid "How [searcio], the Searcio Search widget, a form Searcio takes over and the floating button look and behave, unless one of them says otherwise. The block and the Elementor widget keep their own settings."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:566
-#: src/admin/settings/components/tabs/PlacementTab.js:713
+#: src/admin/settings/components/tabs/PlacementTab.js:638
+#: src/admin/settings/components/tabs/PlacementTab.js:795
 msgid "Content to search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:574
+#: src/admin/settings/components/tabs/PlacementTab.js:646
 msgid "Width of the field (px)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:575
+#: src/admin/settings/components/tabs/PlacementTab.js:647
 msgid "0 fills the space it is placed in."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:588
+#: src/admin/settings/components/tabs/PlacementTab.js:660
 msgid "Start"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:589
+#: src/admin/settings/components/tabs/PlacementTab.js:661
 msgid "Centre"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:590
+#: src/admin/settings/components/tabs/PlacementTab.js:662
 msgid "End"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:593
+#: src/admin/settings/components/tabs/PlacementTab.js:665
 msgid "Search starts"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:597
+#: src/admin/settings/components/tabs/PlacementTab.js:669
 msgid "Before a search, the window shows"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:604
+#: src/admin/settings/components/tabs/PlacementTab.js:676
 msgid "0 shows \"All filters\" alone."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:611
+#: src/admin/settings/components/tabs/PlacementTab.js:683
 msgid "Opening animation"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:620
+#: src/admin/settings/components/tabs/PlacementTab.js:692
 msgid "Voice search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:626
+#: src/admin/settings/components/tabs/PlacementTab.js:698
 msgid "Show how many results each filter leaves"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:631
+#: src/admin/settings/components/tabs/PlacementTab.js:703
 msgid "Colours"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:634
+#: src/admin/settings/components/tabs/PlacementTab.js:706
 #: src/blocks/search/edit.js:220
 msgid "Accent"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:635
+#: src/admin/settings/components/tabs/PlacementTab.js:707
 msgid "Window background"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:651
+#: src/admin/settings/components/tabs/PlacementTab.js:723
 msgid "Corner radius of the window (px)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:671
+#: src/admin/settings/components/tabs/PlacementTab.js:743
 msgid "On the page"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:672
+#: src/admin/settings/components/tabs/PlacementTab.js:744
 msgid "Window open"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:678
+#: src/admin/settings/components/tabs/PlacementTab.js:750
 msgid "Preview of the search on a page of the site"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:681
+#: src/admin/settings/components/tabs/PlacementTab.js:753
 msgid "Drawn in your theme's styles, from the settings on screen. Save to put them on the site."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:691
+#: src/admin/settings/components/tabs/PlacementTab.js:764
+msgid "Shortcodes"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:773
 msgid "Shortcode for the search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:692
-msgid "Change what one place needs; what the look above already says is left out of the shortcode."
+#: src/admin/settings/components/tabs/PlacementTab.js:774
+msgid "Change what one place needs; what the Look section already sets is left out of the shortcode."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:716
+#: src/admin/settings/components/tabs/PlacementTab.js:798
 msgid "The search shortcode"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:723
+#: src/admin/settings/components/tabs/PlacementTab.js:804
 msgid "Shortcode for a product row"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:724
+#: src/admin/settings/components/tabs/PlacementTab.js:805
 msgid "Similar products on a product page, or a category listing on a category page. On a page without either, it shows nothing."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:736
-#: src/admin/settings/components/tabs/PlacementTab.js:776
+#: src/admin/settings/components/tabs/PlacementTab.js:817
+#: src/admin/settings/components/tabs/PlacementTab.js:847
+#: src/admin/settings/components/tabs/PlacementTab.js:867
 msgid "Similar"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:737
-#: src/admin/settings/components/tabs/PlacementTab.js:777
+#: src/admin/settings/components/tabs/PlacementTab.js:818
+#: src/admin/settings/components/tabs/PlacementTab.js:847
+#: src/admin/settings/components/tabs/PlacementTab.js:868
 msgid "Category"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:755
+#: src/admin/settings/components/tabs/PlacementTab.js:836
 msgid "The product row shortcode"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:763
+#: src/admin/settings/components/tabs/PlacementTab.js:845
+msgid "Product rows"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:854
 msgid "Defaults of a product row"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:764
+#: src/admin/settings/components/tabs/PlacementTab.js:855
 msgid "What [searcio_products] and the Searcio Products widget show unless they say otherwise."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:795
+#: src/admin/settings/components/tabs/PlacementTab.js:886
 msgid "Empty or 0 is 6 similar products, or 12 in a category."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:811
+#: src/admin/settings/components/tabs/PlacementTab.js:902
 msgid "Show a category's banner"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:812
+#: src/admin/settings/components/tabs/PlacementTab.js:903
 msgid "A merchandising rule's banner, above a category listing."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:822
+#: src/admin/settings/components/tabs/PlacementTab.js:915
+#: src/admin/settings/components/tabs/PlacementTab.js:923
 msgid "Other ways to place it"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:823
-msgid "Each of these uses the look set above, unless it has settings of its own."
+#: src/admin/settings/components/tabs/PlacementTab.js:917
+msgid "Blocks, widgets, menus and links"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:828
+#: src/admin/settings/components/tabs/PlacementTab.js:924
+msgid "Each of these uses the settings of the Look section, unless it has settings of its own."
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:929
 msgid "Block editor"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:829
+#: src/admin/settings/components/tabs/PlacementTab.js:930
 msgid "The Searcio Search and Searcio Products blocks, in a page, a template or a block widget area. They have settings and styles of their own."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:832
+#: src/admin/settings/components/tabs/PlacementTab.js:933
 msgid "Elementor"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:833
+#: src/admin/settings/components/tabs/PlacementTab.js:934
 msgid "The Searcio Search and Searcio Products widgets, under Searcio in the panel, with settings and styles of their own."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:836
+#: src/admin/settings/components/tabs/PlacementTab.js:937
 msgid "Classic widgets"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:837
+#: src/admin/settings/components/tabs/PlacementTab.js:938
 msgid "Searcio Search and Searcio Products under Appearance > Widgets, for a theme with classic widget areas."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:840
+#: src/admin/settings/components/tabs/PlacementTab.js:941
 msgid "Menu item"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:841
+#: src/admin/settings/components/tabs/PlacementTab.js:942
 msgid "Under Appearance > Menus, the Searcio box adds a search item to a menu. In a Navigation block, add a custom link to #searcio."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:844
+#: src/admin/settings/components/tabs/PlacementTab.js:945
 msgid "A link or a button"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:845
+#: src/admin/settings/components/tabs/PlacementTab.js:946
 msgid "A link to #searcio, or any element with the class searcio-open, opens the search: a page builder's button, a theme option's link, an icon."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:846
+#: src/admin/settings/components/tabs/PlacementTab.js:947
 msgid "A link that opens the search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:849
+#: src/admin/settings/components/tabs/PlacementTab.js:950
 msgid "PHP in a child theme"
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:850
+#: src/admin/settings/components/tabs/PlacementTab.js:951
 msgid "Where a template of the theme should draw the search itself, for example in header.php."
 msgstr ""
 
-#: src/admin/settings/components/tabs/PlacementTab.js:851
+#: src/admin/settings/components/tabs/PlacementTab.js:952
 msgid "PHP that draws the search"
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:966
+msgid "Puts the search where a block or an Elementor widget cannot go: into the theme's own search, a floating button, shortcodes and classic widgets. Every way here is off until you turn it on."
+msgstr ""
+
+#: src/admin/settings/components/tabs/PlacementTab.js:972
+msgid "Placement settings"
 msgstr ""
 
 #. translators: %s: one or more quoted field names, e.g. "category".

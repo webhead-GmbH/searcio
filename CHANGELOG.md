@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- **Searcio can be placed on any theme and with any builder**, where it needed the block or the Elementor widget. A new **Placement** tab (*Einbindung*) holds every other way, each off until it is turned on, so a site that updates looks and loads as it did:
+- **Searcio can be placed on any theme and with any builder**, where it needed the block or the Elementor widget. A new **Placement** tab (*Einbindung*) holds every other way, each off until it is turned on, so a site that updates looks and loads as it did. Its sections are listed down the side, each with a line of its state ("Off", "2 selectors", "On phones"), and one is open beside the list at a time, kept in the address; on a narrow screen the list is a strip that scrolls sideways (`SectionList`, as webhead's other plugins draw a long tab):
   - *Use Searcio for the site's search forms* draws the theme's `get_search_form()`, WooCommerce's product search and the Search and Product Search blocks as a Searcio search field. The form it replaces stays in the page beside it until the search is drawn, so `?s=` still searches WordPress without JavaScript.
   - *Open Searcio from the theme's own search* opens it from the elements CSS selectors name, and the theme's own dropdown or overlay stays closed: the click is taken on its way down, before any handler of the theme. A search field opens it with what was typed. The tab names the theme and suggests its selectors for Enfold, Flatsome, Astra, Kadence, Blocksy, GeneratePress, OceanWP, Storefront, Divi, Woodmart, Avada, The7 and Salient, and for Elementor Pro's search form, each read from the theme's own markup; a suggestion is applied by the admin, never by itself.
   - A keyboard shortcut, Ctrl+K or Cmd+K and "/" outside a field.

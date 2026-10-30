@@ -1,0 +1,80 @@
+// `SectionList`: a tab's sections listed down the side, one of them beside the
+// list at a time. The selected entry's background and the focus ring are the
+// vertical `Tabs` of `@wordpress/ui`; these rules only lay the list out and
+// give each entry room for its lines of state.
+.webhead-search-cloud-sections {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--wpds-dimension-gap-xl);
+  align-items: start;
+
+  // A column here, and in view while the section beside it scrolls.
+  .webhead-search-cloud-sections__nav[role="tablist"] {
+    position: sticky;
+    top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wpds-dimension-gap-lg));
+    flex-direction: column;
+    gap: var(--wpds-dimension-gap-xs);
+    overflow: visible;
+  }
+
+  .webhead-search-cloud-sections__tab[role="tab"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wpds-dimension-gap-xs);
+    width: 100%;
+    height: auto;
+    padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+    white-space: normal;
+    text-align: start;
+    border-radius: var(--wpds-border-radius-sm);
+  }
+
+  .webhead-search-cloud-sections__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wpds-dimension-gap-xs);
+  }
+
+  .webhead-search-cloud-sections__label {
+    font-size: var(--wpds-typography-font-size-md);
+    line-height: var(--wpds-typography-line-height-md);
+    font-weight: var(--wpds-typography-font-weight-emphasis);
+  }
+
+  .webhead-search-cloud-sections__summary {
+    font-size: var(--wpds-typography-font-size-sm);
+    line-height: var(--wpds-typography-line-height-sm);
+    font-weight: var(--wpds-typography-font-weight-default);
+    color: var(--wpds-color-foreground-content-neutral-weak);
+  }
+
+  // Beside the list, not under it: the shell puts every panel below a strip.
+  .webhead-search-cloud-sections__panel[role="tabpanel"] {
+    min-width: 0;
+    margin-top: 0;
+  }
+
+  // Too narrow for a column beside the cards: the list becomes a strip that
+  // scrolls on its own.
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .webhead-search-cloud-sections__nav[role="tablist"] {
+      position: static;
+      flex-direction: row;
+      // Entries carry one or two lines of state, so they line up by their
+      // names, not their middles.
+      align-items: flex-start;
+      overflow-x: auto;
+      padding: 0 0 var(--wpds-dimension-gap-sm);
+      border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+    }
+
+    .webhead-search-cloud-sections__tab[role="tab"] {
+      flex: 0 0 auto;
+      width: auto;
+    }
+  }
+}
