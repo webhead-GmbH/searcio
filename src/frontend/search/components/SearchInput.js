@@ -1,7 +1,8 @@
 import { forwardRef } from '@wordpress/element';
-import { Button, Icon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { search, closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import Button from './Button';
 
 /**
  * A fully custom-built search input (icon + plain `<input>` + clear button)

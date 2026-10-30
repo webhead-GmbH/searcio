@@ -355,6 +355,17 @@ final class Widgets_Test extends Integration_Test_Case {
 		}
 	}
 
+	public function test_the_border_of_the_box_field_is_written_on_the_line_that_is_drawn(): void {
+		$stack    = ( new Search_Widget() )->get_stack( false );
+		$controls = array_merge( $stack['controls'] ?? [], $stack['style_controls'] ?? [] );
+
+		$this->assertArrayHasKey( 'trigger_box_border_border', $controls );
+		$this->assertStringContainsString(
+			'.components-input-control__backdrop',
+			(string) wp_json_encode( $controls['trigger_box_border_border']['selectors'] ?? [] )
+		);
+	}
+
 	/**
 	 * Every control, style ones included: outside the editor Elementor files
 	 * style controls separately and `get_controls()` leaves them out.

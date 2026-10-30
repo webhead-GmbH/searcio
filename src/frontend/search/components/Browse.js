@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef } from '@wordpress/element';
-import { Button } from '@wordpress/components';
-import { closeSmall } from '@wordpress/icons';
+import { Icon } from '@wordpress/components';
+import { closeSmall, trendingUp } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import Button from './Button';
 
 /**
  * The area under the search field.
@@ -115,7 +116,8 @@ const Browse = ( {
 							onClick={ () => onSelect( label, 'popular' ) }
 							disabled={ busy }
 						>
-							{ label }
+							<Icon icon={ trendingUp } className="whsc-popular-item__icon" size={ 18 } />
+							<span className="whsc-popular-item__label">{ label }</span>
 						</button>
 					</li>
 				) ) }

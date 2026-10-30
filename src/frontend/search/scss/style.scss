@@ -202,8 +202,8 @@
  * written `block__element`, then draws the package's own design over them
  * with the same weight. That is the right base for a surface made of
  * WordPress's controls as they come. This surface has a design of its own
- * - its buttons are `.components-button`, its pills carry `role="tab"`, its
- * classes are `whsc-block__element` - and every one of those rules matches it.
+ * - its pills carry `role="tab"`, its classes are `whsc-block__element` - and
+ * those rules match it.
  *
  * So this file weighs one id more. `$lift` matches every element and adds
  * three ids, which puts each rule below above the reset's and leaves what the
@@ -342,6 +342,35 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	outline-offset: 2px;
 }
 
+/*
+ * The buttons of this surface (`Button.js`). The rule above this nest has taken
+ * everything off them, a site's `button {}` with the rest, so what any button
+ * needs is said here and each control adds what is its own.
+ */
+.whsc-control {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	text-align: center;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid var(--whsc-accent);
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		cursor: default;
+	}
+}
+
 /* Screen-reader-only status text (search progress / result-count announcements). */
 .whsc-visually-hidden {
 	position: absolute;
@@ -369,7 +398,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
-.whsc-trigger-icon-button.components-button {
+.whsc-trigger-icon-button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -450,7 +479,6 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	 */
 	.components-input-control__container {
 		background: var(--whsc-trigger-box-bg, var(--whsc-input-bg));
-		border-color: var(--whsc-trigger-box-border, var(--whsc-input-border));
 		border-radius: var(--whsc-trigger-box-radius, var(--whsc-input-radius));
 	}
 
@@ -458,9 +486,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	 * The line round the box is drawn by the control's backdrop, an element
 	 * laid over the container, which the package has follow the container's
 	 * radius. The reset states a radius of its own there, and the box lost
-	 * its shape: square corners on a pill, and a square ring in focus.
+	 * its shape: square corners on a pill, and a square ring in focus. The
+	 * reset states the line's colour there too, so a colour set on the
+	 * container was never seen.
 	 */
 	.components-input-control__backdrop {
+		border-color: var(--whsc-trigger-box-border, var(--whsc-input-border));
 		border-radius: inherit;
 	}
 
@@ -717,7 +748,11 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	color: var(--whsc-input-text) !important;
 	-webkit-text-fill-color: var(--whsc-input-text);
 	font-size: 16px;
+	/* A whole number of pixels. At 1.4 the field was 48.39px high, so everything
+	 * under it stood between two pixels and its edges and its words were rounded
+	 * apart. */
 	line-height: 1.4;
+	line-height: round(1.4em, 1px);
 	padding-block: 13px;
 	padding-inline: 12px;
 	min-width: 0;
@@ -744,7 +779,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
-.whsc-modal .whsc-search-input__clear.components-button {
+.whsc-modal .whsc-search-input__clear {
 	flex-shrink: 0;
 	min-width: 30px;
 	min-height: 30px;
@@ -766,7 +801,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /* -------------------------------------------------------------------------
  * Submit + icon buttons in the header row
  * ---------------------------------------------------------------------- */
-.whsc-modal .whsc-submit-btn.components-button {
+.whsc-modal .whsc-submit-btn {
 	flex-shrink: 0;
 	height: 48px;
 	padding-inline: 22px;
@@ -809,8 +844,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	fill: currentColor;
 }
 
-.whsc-modal .whsc-voice-btn.components-button,
-.whsc-modal .whsc-modal-close.components-button {
+.whsc-modal .whsc-voice-btn,
+.whsc-modal .whsc-modal-close {
 	flex-shrink: 0;
 	min-width: 44px;
 	min-height: 44px;
@@ -818,7 +853,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.whsc-modal .whsc-voice-btn.components-button {
+.whsc-modal .whsc-voice-btn {
 	padding: var(--whsc-voice-padding);
 	color: var(--whsc-voice-color, var(--whsc-icon-color));
 	background: var(--whsc-voice-bg);
@@ -832,7 +867,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
-.whsc-modal .whsc-modal-close.components-button {
+.whsc-modal .whsc-modal-close {
 	padding: var(--whsc-close-padding);
 	color: var(--whsc-close-color, var(--whsc-icon-color));
 	background: var(--whsc-close-bg);
@@ -852,7 +887,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 /* The photo-search control: same footprint and behaviour as the mic, so the
  * input row reads as one set of controls rather than two designs. */
-.whsc-modal .whsc-visual-btn.components-button {
+.whsc-modal .whsc-visual-btn {
 	flex-shrink: 0;
 	min-width: 44px;
 	min-height: 44px;
@@ -876,17 +911,17 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
-/* Same reasoning as the mic glyph above: the camera is a stroke-only outline,
- * and core's `.components-button svg { fill: currentColor }` would fill it
- * into a solid blob unless the `svg` itself is targeted. */
+/* The camera is a stroke-only outline, and a site's `svg { fill: ... }` would
+ * fill it into a solid blob unless the `svg` itself is targeted. */
 .whsc-visual-btn .whsc-visual-icon svg {
 	fill: none;
 	stroke: currentColor;
 }
 
-/* The camera comes wrapped in a span, and an svg in a line of text sits on its
- * baseline: the camera stood 4px above the clear and close icons beside it. */
-.whsc-visual-btn .whsc-visual-icon {
+/* The camera and the mic come wrapped in a span, and an svg in a line of text
+ * sits on its baseline: each stood 3px to 4px above the middle of its button. */
+.whsc-visual-btn .whsc-visual-icon,
+.whsc-voice-btn .whsc-default-voice-icon {
 	display: flex;
 }
 
@@ -908,8 +943,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /*
  * The mic glyph (`icons.js`) is a stroke-only outline (`fill="none"`,
  * `stroke="currentColor"`). `fill="none"` is only a presentation attribute,
- * which core's `.components-button svg { fill: currentColor }` overrides and
- * fills into a solid blob - force it back. Scoped to the built-in mic glyph
+ * which a site's `svg { fill: ... }` overrides and fills into a solid blob -
+ * force it back. Scoped to the built-in mic glyph
  * specifically (`.whsc-default-voice-icon`, set only when no custom icon is
  * chosen) so a custom SVG selected via the Elementor icon picker - which may
  * legitimately need its own fill - is never forced to `fill: none`.
@@ -917,9 +952,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * Targets the `svg` itself, not just the wrapping span: `fill`/`stroke` are
  * inherited properties, and an inherited value always loses to any rule that
  * matches the element directly (regardless of specificity) - so setting
- * `fill: none` on `.whsc-default-voice-icon` alone never wins against the
- * reset's `.components-button svg { fill: currentColor }`, which targets the
- * `svg` node explicitly.
+ * `fill: none` on `.whsc-default-voice-icon` alone never wins against a rule
+ * that targets the `svg` node explicitly.
  */
 .whsc-voice-btn .whsc-default-voice-icon svg {
 	fill: none;
@@ -974,10 +1008,14 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	overflow-y: auto;
 }
 
-.whsc-suggestions__close.components-button {
+.whsc-suggestions__close {
 	position: absolute;
 	top: 6px;
 	right: 6px;
+	min-width: 36px;
+	width: 36px;
+	height: 36px;
+	padding: 6px;
 	color: var(--whsc-icon-color);
 	background: transparent;
 	border-radius: 999px;
@@ -1326,7 +1364,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	opacity: 0.55;
 }
 
-.whsc-modal .whsc-chip__remove.components-button {
+.whsc-modal .whsc-chip__remove {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -1383,18 +1421,29 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 .whsc-modal .whsc-popular-item:hover,
 .whsc-modal .whsc-popular-item:focus,
 .whsc-modal .whsc-popular-item:active {
-	display: block;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	width: 100%;
 	border: none;
 	margin: 0;
-	text-align: left;
+	text-align: start;
 	padding: var(--whsc-popular-padding, 9px 12px);
 	border-radius: var(--whsc-popular-radius, 8px);
 	box-shadow: none;
-	overflow: hidden;
-	text-overflow: ellipsis;
 	white-space: nowrap;
 	cursor: pointer;
+}
+
+.whsc-popular-item__label {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.whsc-popular-item__icon {
+	flex: none;
+	color: var(--whsc-icon-color);
 }
 
 .whsc-modal .whsc-popular-item {
@@ -1423,7 +1472,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 .whsc-modal .whsc-popular-item:disabled,
-.whsc-modal .whsc-chip__remove.components-button:disabled,
+.whsc-modal .whsc-chip__remove:disabled,
 .whsc-modal .whsc-clear-all:disabled {
 	cursor: default;
 	opacity: 0.55;
@@ -1516,7 +1565,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	-webkit-user-drag: none;
 }
 
-.whsc-carousel-arrow.components-button {
+.whsc-carousel-arrow {
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
@@ -2049,7 +2098,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * the word are white; a site sets `--whsc-floating-bg` and
  * `--whsc-floating-color` for others.
  */
-[data-webhead-frontend-root]#{$lift} .whsc-trigger-icon-button.whsc-trigger-floating-button.components-button {
+[data-webhead-frontend-root]#{$lift} .whsc-trigger-icon-button.whsc-trigger-floating-button {
 	--whsc-trigger-size: 56px;
 	color: var(--whsc-floating-color, #ffffff);
 	background: var(--whsc-floating-bg, var(--whsc-accent));
@@ -2270,7 +2319,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
-.whsc-modal .whsc-modal-close--tabbed.components-button {
+.whsc-modal .whsc-modal-close--tabbed {
 	margin-left: auto;
 }
 
@@ -2624,7 +2673,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /* Filled circle: a bare glyph read as decoration rather than the send control. */
-.whsc-modal .whsc-assistant__send.components-button {
+.whsc-modal .whsc-assistant__send {
 	/* `display: flex` + centring explicitly: the button's own padding would
 	 * otherwise leave the glyph off-centre inside the circle. */
 	display: flex;
@@ -3464,6 +3513,16 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	line-height: 1.45;
 }
 
+/* A line of text is centred by its line box, and a font keeps more room above
+ * its capitals than under its baseline: the words of a button stood 1px below
+ * its middle, measured 16px above and 14px under them on a 40px button. Trimmed
+ * to the capitals they are centred in any font. The padding gives
+ * `overflow: hidden` back the room a descender needs. */
+.whsc-filterbar :is(.whsc-facet__label, .whsc-facet__count) {
+	padding-block: 0.3em;
+	text-box: trim-both cap alphabetic;
+}
+
 :is(.whsc-modal, .whsc-sheet) .whsc-chev {
 	flex: none;
 	fill: currentColor;
@@ -3788,6 +3847,11 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+/* A subcategory stands under its parent. */
+.whsc-opts__item {
+	padding-inline-start: calc(var(--whsc-level, 0) * 20px);
+}
+
 .whsc-opts__none {
 	margin: 8px;
 	font-size: 14px;
@@ -3845,6 +3909,15 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	box-shadow: inset 0 0 0 1px var(--whsc-swatch-border, rgba(0, 0, 0, 0.2));
 }
 
+.whsc-swatch__image {
+	flex: none;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	object-fit: cover;
+	box-shadow: 0 0 0 1px var(--whsc-swatch-border, rgba(0, 0, 0, 0.2));
+}
+
 .whsc-swatch.is-active .whsc-swatch__dot {
 	box-shadow: inset 0 0 0 1px var(--whsc-swatch-border, rgba(0, 0, 0, 0.2)), 0 0 0 2px rgba(255, 255, 255, 0.9);
 }
@@ -3852,19 +3925,25 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /* Sizes, shoe sizes and capacities: tiles in their natural order. A value the
  * other filters leave empty stays in its place, greyed, so nothing moves. */
 .whsc-tiles {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
 	padding: 4px;
 }
 
+.whsc-tiles__item {
+	max-width: 100%;
+}
+
+/* A tile is as wide as its value, so "256 GB" is not cut to "256 ...". */
 :is(.whsc-modal, .whsc-sheet) .whsc-facet.whsc-tile {
 	flex-direction: column;
 	justify-content: center;
-	gap: 0;
-	width: 100%;
+	gap: 2px;
+	min-width: 52px;
+	max-width: 100%;
 	height: 52px;
-	padding: 4px;
+	padding: 4px 8px;
 	border-radius: min(var(--whsc-filter-radius, var(--whsc-facet-radius)), 10px);
 
 	.whsc-facet__label {
@@ -3872,10 +3951,22 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		overflow: hidden;
 		text-overflow: ellipsis;
 		font-weight: 600;
+		line-height: 1.25;
 	}
 
+	/* Under a size that is a number, a number of the same weight reads as a
+	 * second size. In brackets and smaller, it reads as how many there are. */
 	.whsc-facet__count {
-		font-size: 12px;
+		font-size: 11px;
+		line-height: 1.2;
+
+		&::before {
+			content: '(';
+		}
+
+		&::after {
+			content: ')';
+		}
 	}
 }
 
@@ -4226,7 +4317,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	font-size: 18px;
 }
 
-.whsc-sheet .whsc-sheet__close.components-button {
+.whsc-sheet .whsc-sheet__close {
 	flex: none;
 	min-width: 44px;
 	min-height: 44px;
@@ -4457,7 +4548,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		min-height: 44px;
 	}
 
-	.whsc-modal .whsc-chip__remove.components-button {
+	.whsc-modal .whsc-chip__remove {
 		width: 44px;
 		height: 44px;
 		min-width: 44px;

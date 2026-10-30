@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from '@wordpress/element';
-import {Button, Icon, Modal} from '@wordpress/components';
+import {Icon, Modal} from '@wordpress/components';
 import {chevronDown, closeSmall, search as searchIcon} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
+import Button from './Button';
 
 import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
@@ -1595,6 +1596,10 @@ const SearchModal = ({
 			selected={activeFacets[field] || []}
 			frozen={frozen[field] || []}
 			colors={facetSettings[field]?.colors || {}}
+			secondColors={facetSettings[field]?.secondColors || {}}
+			images={facetSettings[field]?.images || {}}
+			labels={facetSettings[field]?.labels || {}}
+			tree={facetSettings[field]?.tree}
 			showCount={showCount}
 			locale={locale}
 			onToggle={onFieldFacetClick}
@@ -1799,7 +1804,6 @@ const SearchModal = ({
 						/>
 						{'submit' === searchTrigger && (
 							<Button
-								variant="primary"
 								className="whsc-submit-btn"
 								onClick={() => void runSearch(query, {origin: 'typed'})}
 							>

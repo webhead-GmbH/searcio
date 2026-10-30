@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Button, FormTokenField, RangeControl } from '@wordpress/components';
-import { Card, CheckboxControl, InputControl, Notice, Stack, Text, TextareaControl } from '@wordpress/ui';
+import { Card, CheckboxControl, InputControl, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -14,6 +14,7 @@ import {
 	toPayload,
 } from '../../searchConfig';
 import { indexedFields, unindexedFields } from '../../indexedFields';
+import { selectProps } from '../../../../utils/select';
 import { Grid } from '../../../../components/Layout';
 import { showToast } from '../../../../toast';
 import TabIntro from '../TabIntro';
@@ -149,6 +150,49 @@ const CardHeading = ( { title, description } ) => (
 		</div>
 	</Card.Header>
 );
+
+/**
+ * How the search window's category filter lists the categories. Persists
+ * through the settings store, as the Popular Searches card below does, and
+ * shares this tab's save button.
+ */
+const CategoryFilterCard = () => {
+	const { settings, updateSetting } = useContext( SettingsContext );
+	const mode = settings.category_filter || 'all';
+	const items = [
+		{ value: 'all', label: __( 'All categories, in one list', 'searcio' ) },
+		{ value: 'main', label: __( 'Main categories only', 'searcio' ) },
+		{ value: 'nested', label: __( 'Main categories with their subcategories under them', 'searcio' ) },
+	];
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
+			<CardHeading
+				title={ __( 'Category filter', 'searcio' ) }
+				description={ __( 'How the search window lists your categories in its filter. Picking a main category finds what is in its subcategories too.', 'searcio' ) }
+			/>
+			<Card.Content className="whsc-settings-card-content">
+				<Stack direction="column" gap="md">
+					<SelectControl
+						label={ __( 'Categories to show', 'searcio' ) }
+						{ ...selectProps( items, mode, ( value ) => updateSetting( 'category_filter', value || 'all' ) ) }
+					/>
+					{ 'nested' === mode && (
+						<InputControl
+							type="number"
+							min={ 2 }
+							max={ 10 }
+							label={ __( 'Levels to show', 'searcio' ) }
+							description={ __( 'Counts the main categories as the first level, so 2 shows them and their direct subcategories.', 'searcio' ) }
+							value={ String( settings.category_filter_depth ?? 2 ) }
+							onValueChange={ ( value ) => updateSetting( 'category_filter_depth', Number( value ) || 2 ) }
+						/>
+					) }
+				</Stack>
+			</Card.Content>
+		</Card.Root>
+	);
+};
 
 /**
  * Moved here from its own tab per admin feedback - it's a curated fallback
@@ -661,7 +705,7 @@ const SearchConfigTab = () => {
 			if ( await savePopularSearches() ) {
 				savedSomething = true;
 			} else {
-				failures.push( __( 'The popular searches could not be saved.', 'searcio' ) );
+				failures.push( __( 'The popular searches and the category filter could not be saved.', 'searcio' ) );
 			}
 		}
 
@@ -860,6 +904,8 @@ const SearchConfigTab = () => {
 						</Stack>
 					</Card.Content>
 				</Card.Root>
+
+				<CategoryFilterCard />
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading

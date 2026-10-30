@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { currentLangFilter, fetchQuizzes, getConfig, search, trackClick } from '../../../utils/api';

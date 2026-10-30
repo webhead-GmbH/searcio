@@ -27,19 +27,27 @@ final class Storefront_Facet {
 	 * @param  int                   $order    Its place in the order Search Config lists the facet fields in.
 	 * @param  Facet_Display         $display  How its values are drawn.
 	 * @param  array<string,string>  $colors   Value => hex colour, for the values that have one.
+	 * @param  array<string,string>  $second_colors  Value => second hex colour, for a value of two colours.
+	 * @param  array<string,string>  $images   Value => image URL.
+	 * @param  array<string,string>  $labels   Value => the short text a shop shows for it.
+	 * @param  array{depth:int,parents:array<string,string>}|null  $tree  The levels to show and each value's parent, for a filter drawn as a tree.
 	 */
 	public function __construct(
 		public readonly string $field,
 		public readonly int $order,
 		public readonly Facet_Display $display = Facet_Display::Auto,
-		public readonly array $colors = []
+		public readonly array $colors = [],
+		public readonly array $second_colors = [],
+		public readonly array $images = [],
+		public readonly array $labels = [],
+		public readonly ?array $tree = null
 	) {}
 
 	/**
-	 * What the storefront reads. `colors` is left out when there are none, and
-	 * is an object, never a list, when there are.
+	 * What the storefront reads. A map is left out when it has nothing in it,
+	 * and is an object, never a list, when it has.
 	 *
-	 * @return array{field:string,order:int,display:string,colors?:array<string,string>}
+	 * @return array{field:string,order:int,display:string,colors?:array<string,string>,secondColors?:array<string,string>,images?:array<string,string>,labels?:array<string,string>,tree?:array{depth:int,parents:array<string,string>}}
 	 */
 	public function to_array(): array {
 		$out = [
@@ -48,8 +56,21 @@ final class Storefront_Facet {
 			'display' => $this->display->value,
 		];
 
-		if ( [] !== $this->colors ) {
-			$out['colors'] = $this->colors;
+		$maps = [
+			'colors'       => $this->colors,
+			'secondColors' => $this->second_colors,
+			'images'       => $this->images,
+			'labels'       => $this->labels,
+		];
+
+		foreach ( $maps as $key => $map ) {
+			if ( [] !== $map ) {
+				$out[ $key ] = $map;
+			}
+		}
+
+		if ( null !== $this->tree ) {
+			$out['tree'] = $this->tree;
 		}
 
 		return $out;

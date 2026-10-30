@@ -1,6 +1,7 @@
 import {
 	activeFilterCount,
 	appendHits,
+	arrangeTree,
 	buildFilterParams,
 	buildRangeParams,
 	buildTypeParam,
@@ -590,5 +591,88 @@ describe( 'activeFilterCount', () => {
 	it( 'counts every selected value and every bound', () => {
 		expect( activeFilterCount( { attr_color: [ 'Oliv', 'Schwarz' ], brand: [] }, { price: { min: '50', max: '' }, rating: { min: '', max: '' } } ) ).toBe( 3 );
 		expect( activeFilterCount( {}, {} ) ).toBe( 0 );
+	} );
+} );
+
+describe( 'detectFacetDisplay with images', () => {
+	const images = { Leinen: 'https://shop.test/leinen.jpg', Wolle: 'https://shop.test/wolle.jpg' };
+
+	it( 'draws images when every value has one', () => {
+		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Wolle' ], { images } ) ).toBe( 'image' );
+	} );
+
+	it( 'draws a list when a value has none', () => {
+		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Seide' ], { images } ) ).toBe( 'list' );
+		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Seide' ], { display: 'image', images } ) ).toBe( 'list' );
+	} );
+
+	it( 'prefers colours where a value has both', () => {
+		expect( detectFacetDisplay( 'attr_material', [ 'Leinen' ], { images, colors: { Leinen: '#eee' } } ) ).toBe( 'color' );
+	} );
+
+	it( 'leaves an image to the site that sets another display', () => {
+		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Wolle' ], { display: 'list', images } ) ).toBe( 'list' );
+	} );
+} );
+
+describe( 'arrangeTree', () => {
+	const entry = ( value, selected = false ) => ( { value, count: 1, selected, disabled: false } );
+	const parents = { Jacken: 'Kleidung', Regenjacken: 'Jacken', Hosen: 'Kleidung' };
+	const rows = ( list ) => list.map( ( { value, level } ) => [ value, level ] );
+
+	it( 'leaves a list alone without a tree', () => {
+		const entries = [ entry( 'Jacken' ), entry( 'Kleidung' ) ];
+
+		expect( arrangeTree( entries ) ).toBe( entries );
+		expect( arrangeTree( entries, { depth: 0, parents } ) ).toBe( entries );
+	} );
+
+	it( 'puts each value under its parent, siblings in the order they came', () => {
+		const entries = [ 'Hosen', 'Schuhe', 'Jacken', 'Kleidung' ].map( ( value ) => entry( value ) );
+
+		expect( rows( arrangeTree( entries, { depth: 2, parents } ) ) ).toEqual( [
+			[ 'Schuhe', 0 ],
+			[ 'Kleidung', 0 ],
+			[ 'Hosen', 1 ],
+			[ 'Jacken', 1 ],
+		] );
+	} );
+
+	it( 'leaves out the levels past the depth', () => {
+		const entries = [ 'Kleidung', 'Jacken', 'Regenjacken' ].map( ( value ) => entry( value ) );
+
+		expect( rows( arrangeTree( entries, { depth: 2, parents } ) ) ).toEqual( [ [ 'Kleidung', 0 ], [ 'Jacken', 1 ] ] );
+		expect( rows( arrangeTree( entries, { depth: 1, parents } ) ) ).toEqual( [ [ 'Kleidung', 0 ] ] );
+		expect( rows( arrangeTree( entries, { depth: 3, parents } ) ) ).toEqual( [ [ 'Kleidung', 0 ], [ 'Jacken', 1 ], [ 'Regenjacken', 2 ] ] );
+	} );
+
+	it( 'keeps a selected value past the depth, so its filter can be turned off', () => {
+		const entries = [ entry( 'Kleidung' ), entry( 'Jacken', true ) ];
+
+		expect( rows( arrangeTree( entries, { depth: 1, parents } ) ) ).toEqual( [ [ 'Kleidung', 0 ], [ 'Jacken', 1 ] ] );
+	} );
+
+	it( 'hangs a value whose parent the search did not answer with on its nearest ancestor', () => {
+		const entries = [ entry( 'Kleidung' ), entry( 'Regenjacken' ) ];
+
+		expect( rows( arrangeTree( entries, { depth: 3, parents } ) ) ).toEqual( [ [ 'Kleidung', 0 ], [ 'Regenjacken', 1 ] ] );
+	} );
+
+	it( 'starts the list with a value that has no ancestor among the entries', () => {
+		expect( rows( arrangeTree( [ entry( 'Jacken' ) ], { depth: 3, parents } ) ) ).toEqual( [ [ 'Jacken', 0 ] ] );
+	} );
+
+	it( 'treats a value the shop has no parent for as a main one', () => {
+		expect( rows( arrangeTree( [ entry( 'Sale' ) ], { depth: 1, parents } ) ) ).toEqual( [ [ 'Sale', 0 ] ] );
+	} );
+
+	it( 'is not caught by a loop in the shop\'s tree', () => {
+		const loop = { A: 'B', B: 'A' };
+
+		expect( rows( arrangeTree( [ entry( 'A' ) ], { depth: 5, parents: loop } ) ) ).toEqual( [ [ 'A', 0 ] ] );
+	} );
+
+	it( 'does not take a name from an object\'s prototype for a parent', () => {
+		expect( rows( arrangeTree( [ entry( 'constructor' ) ], { depth: 1, parents } ) ) ).toEqual( [ [ 'constructor', 0 ] ] );
 	} );
 } );

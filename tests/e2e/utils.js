@@ -397,6 +397,17 @@ export function setFacetFields( fields = [] ) {
 }
 
 /**
+ * Set how the search window's category filter lists the categories, with a
+ * small tree of categories, or take both away (`clear`).
+ *
+ * @param {string} mode    `main`, `nested` or `clear`.
+ * @param {number} [depth] The levels to show.
+ */
+export function setCategoryFilter( mode, depth = 2 ) {
+	wpEvalFile( 'seed-category-filter.php', mode, depth );
+}
+
+/**
  * Page object over the search trigger and its portalled modal.
  */
 export class SearchWidget {

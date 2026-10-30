@@ -28,6 +28,9 @@ enum Facet_Display: string {
 	/** Pills with a colour dot, for a field whose values have colours. */
 	case Color = 'color';
 
+	/** Pills with a small picture, for a field whose values have images. */
+	case Image = 'image';
+
 	/** Two bounds, for a numeric field. */
 	case Range = 'range';
 

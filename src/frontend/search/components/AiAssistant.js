@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import Button from './Button';
 
 import { askAssistant, trackClick } from '../../../utils/api';
 import { positionInSearch } from '../../../utils/clicks';

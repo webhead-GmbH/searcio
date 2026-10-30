@@ -226,6 +226,36 @@ final class Plugin_Settings {
 	public const POPULAR_SEARCHES = 'popular_searches';
 
 	/**
+	 * How the search window's category filter lists the categories, one of
+	 * {@see \Webhead\WP\SearchCloud\Enums\Category_Filter}. Drawn on the Search
+	 * Config tab beside the facet fields, so not by the schema-driven grid.
+	 */
+	#[Setting(
+		type: 'string',
+		default: 'all',
+		option_key: 'webhead_search_cloud_category_filter',
+		show_in_rest: true,
+		label: 'Categories in the filter',
+		description: 'All categories in one list, the main categories alone, or the main categories with their subcategories under them.',
+		schema: [ 'enum' => [ 'all', 'main', 'nested' ] ]
+	)]
+	public const CATEGORY_FILTER = 'category_filter';
+
+	/**
+	 * How many levels of categories the filter shows when it nests them, the
+	 * main categories being the first.
+	 */
+	#[Setting(
+		type: 'integer',
+		default: 2,
+		option_key: 'webhead_search_cloud_category_filter_depth',
+		show_in_rest: true,
+		label: 'Category levels',
+		description: 'How many levels of categories the filter shows.'
+	)]
+	public const CATEGORY_FILTER_DEPTH = 'category_filter_depth';
+
+	/**
 	 * Where the search is placed without a block or a widget, and how a
 	 * shortcode, a classic widget and a site-wide placement look by default
 	 * (see {@see \Webhead\WP\SearchCloud\DTO\Placement_Options}). Read and
