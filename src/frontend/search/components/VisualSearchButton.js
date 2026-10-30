@@ -1,6 +1,6 @@
 import { useRef } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import Button from './Button';
 
 import { cameraIcon } from './icons';
 

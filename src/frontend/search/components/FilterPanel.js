@@ -3,12 +3,12 @@ import { Icon } from '@wordpress/components';
 import { chevronDown, search as searchIcon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { formatCount, freezeValueOrder, topValues } from '../../../utils/facets';
+import { arrangeTree, formatCount, freezeValueOrder, topValues } from '../../../utils/facets';
 import PriceRange from './PriceRange';
 
 /** Values a list shows before "Show all". */
 export const TOP_N = 8;
-/** Colour pills shown before "Show all". */
+/** Colour and image pills shown before "Show all". */
 const COLOR_TOP_N = 12;
 /** A list longer than this gets a field to search it. */
 const SEARCH_WITHIN = 12;
@@ -93,8 +93,8 @@ const Checkbox = ( { field, entry, onToggle, className } ) => (
 );
 
 /**
- * One group's values: a checkbox list, colour pills, size tiles or two
- * bounds. The popover, the phone's sheet and each section of "All filters"
+ * One group's values: a checkbox list, colour or image pills, size tiles or
+ * two bounds. The popover, the phone's sheet and each section of "All filters"
  * draw a group with this.
  *
  * Every value is a real checkbox in a fieldset named by the group, tiles and
@@ -103,17 +103,21 @@ const Checkbox = ( { field, entry, onToggle, className } ) => (
  * @param {Object}   props
  * @param {string}   props.field
  * @param {string}   props.label
- * @param {string}   props.display     `list`, `color`, `tiles` or `range`.
+ * @param {string}   props.display     `list`, `color`, `image`, `tiles` or `range`.
  * @param {Array<{value: string, count: number}>} [props.values]
  * @param {string[]} [props.selected]
  * @param {string[]} [props.frozen]    The order the panel opened with.
  * @param {Object<string,string>} [props.colors]
+ * @param {Object<string,string>} [props.secondColors] For a value of two colours.
+ * @param {Object<string,string>} [props.images]
+ * @param {Object<string,string>} [props.labels]       The short text a shop shows for a value on a tile.
+ * @param {{depth: number, parents: Object<string,string>}} [props.tree] For a list drawn as the shop's tree.
  * @param {boolean}  [props.showCount]
  * @param {string}   [props.locale]
  * @param {(field: string, value: string) => void} props.onToggle
  * @param {Object}   [props.range]     For `range`: `span`, `active`, `onApply` and the formatting of {@see PriceRange}.
  */
-const FilterPanel = ( { field, label, display, values = [], selected = [], frozen = [], colors = {}, showCount = true, locale, onToggle, range = {} } ) => {
+const FilterPanel = ( { field, label, display, values = [], selected = [], frozen = [], colors = {}, secondColors = {}, images = {}, labels = {}, tree, showCount = true, locale, onToggle, range = {} } ) => {
 	const [ showAll, setShowAll ] = useState( false );
 	const [ term, setTerm ] = useState( '' );
 
@@ -121,7 +125,8 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 		return <PriceRange field={ field } label={ label } { ...range } />;
 	}
 
-	const entries = panelEntries( { values, selected, frozen, natural: 'tiles' === display, keepEmpty: 'tiles' === display, locale } );
+	const opened = panelEntries( { values, selected, frozen, natural: 'tiles' === display, keepEmpty: 'tiles' === display, locale } );
+	const entries = 'list' === display ? arrangeTree( opened, tree ) : opened;
 	const count = ( entry ) => showCount && <span className="whsc-facet__count">{ formatCount( entry.count ) }</span>;
 	const legend = <legend className="whsc-visually-hidden">{ label }</legend>;
 
@@ -138,7 +143,7 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 						<li className="whsc-tiles__item" key={ entry.value }>
 							<label className={ `whsc-facet whsc-tile${ entry.selected ? ' is-active' : '' }${ entry.disabled ? ' is-empty' : '' }` }>
 								<Checkbox field={ field } entry={ entry } onToggle={ onToggle } className="whsc-hidden-input" />
-								<span className="whsc-facet__label"><bdi>{ entry.value }</bdi></span>
+								<span className="whsc-facet__label"><bdi>{ labels[ entry.value ] || entry.value }</bdi></span>
 								{ count( entry ) }
 							</label>
 						</li>
@@ -148,7 +153,7 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 		);
 	}
 
-	const limit = 'color' === display ? COLOR_TOP_N : TOP_N;
+	const limit = 'list' === display ? TOP_N : COLOR_TOP_N;
 	const long = entries.length > limit + SLACK;
 	const searchable = 'list' === display && entries.length > SEARCH_WITHIN;
 	const wanted = fold( term.trim() );
@@ -164,7 +169,11 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 		<ShowAll expanded={ showAll } total={ entries.length } label={ label } onToggle={ () => setShowAll( ! showAll ) } />
 	);
 
-	if ( 'color' === display ) {
+	if ( 'color' === display || 'image' === display ) {
+		const dot = ( value ) => ( secondColors[ value ]
+			? `linear-gradient(135deg, ${ colors[ value ] } 50%, ${ secondColors[ value ] } 50%)`
+			: colors[ value ] );
+
 		return (
 			<fieldset className="whsc-opts">
 				{ legend }
@@ -173,7 +182,9 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 						<li className="whsc-swatches__item" key={ entry.value }>
 							<label className={ `whsc-facet whsc-swatch${ entry.selected ? ' is-active' : '' }${ entry.disabled ? ' is-empty' : '' }` }>
 								<Checkbox field={ field } entry={ entry } onToggle={ onToggle } className="whsc-hidden-input" />
-								<span className="whsc-swatch__dot" style={ { '--whsc-dot': colors[ entry.value ] } } />
+								{ 'image' === display
+									? <img className="whsc-swatch__image" src={ images[ entry.value ] } alt="" loading="lazy" />
+									: <span className="whsc-swatch__dot" style={ { '--whsc-dot': dot( entry.value ) } } /> }
 								<span className="whsc-facet__label"><bdi>{ entry.value }</bdi></span>
 								{ count( entry ) }
 							</label>
@@ -212,7 +223,12 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 			) }
 			<ul className="whsc-opts__list">
 				{ shown.map( ( entry ) => (
-					<li className="whsc-opts__item" key={ entry.value }>
+					// A search within the list reads as one list.
+					<li
+						className="whsc-opts__item"
+						key={ entry.value }
+						style={ entry.level && '' === wanted ? { '--whsc-level': entry.level } : undefined }
+					>
 						<label className={ `whsc-opt${ entry.disabled ? ' is-empty' : '' }` }>
 							<Checkbox field={ field } entry={ entry } onToggle={ onToggle } className="whsc-box" />
 							<span className="whsc-facet__label"><bdi>{ entry.value }</bdi></span>

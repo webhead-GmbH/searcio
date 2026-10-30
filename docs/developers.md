@@ -147,7 +147,7 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
   }, 10, 2 );
   ```
 
-- **`webhead_search_cloud/storefront/facet_display`** - `(string $display, string $field)`. How the search window draws a field's values in its filter panels: `auto` (the default: tiles for sizes, shoe sizes and capacities, colour pills when every value has a colour, a checkbox list otherwise), `list`, `tiles`, `color` or `range`. Anything else is `auto`, and `color` without colours is a list:
+- **`webhead_search_cloud/storefront/facet_display`** - `(string $display, string $field)`. How the search window draws a field's values in its filter panels: `auto` (the default: colour pills when every value has a colour, image pills when every value has an image, tiles for sizes, shoe sizes and capacities, a checkbox list otherwise), `list`, `tiles`, `color`, `image` or `range`. Anything else is `auto`, and `color` without colours and `image` without images are a list. The filter is given `tiles` for an attribute a swatches plugin shows as labels or buttons:
 
   ```php
   add_filter( 'webhead_search_cloud/storefront/facet_display', function ( $display, $field ) {
@@ -155,7 +155,24 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
   }, 10, 2 );
   ```
 
-- **`webhead_search_cloud/storefront/facet_colors`** - `(array $colors, string $field, string $taxonomy)`. Value => hex colour for a field's values, in the language of the page. The plugin fills it for a WooCommerce attribute whose terms a swatches plugin has coloured (`product_attribute_color` of "Variation Swatches for WooCommerce" by GetWooPlugins, `cfvsw_color` of the one by CartFlows, and `_yith_wccl_value` of "YITH WooCommerce Color, Image & Label Variation Swatches" for an attribute of its colour type); `$taxonomy` is empty for a field that is not an attribute. A value without a valid hex colour is dropped.
+- **`webhead_search_cloud/storefront/facet_colors`** - `(array $colors, string $field, string $taxonomy)`. Value => hex colour for a field's values, in the language of the page. The plugin fills it for a WooCommerce attribute a swatches plugin has dressed (see below); `$taxonomy` is empty for a field that is not an attribute. A value without a valid hex colour is dropped.
+
+- **`webhead_search_cloud/storefront/facet_images`** - `(array $images, string $field, string $taxonomy)`. Value => image address, in the same way. An address that is not `http` or `https` is dropped. Use it, with `facet_colors`, for a theme or a plugin the list below does not name; Flatsome and Woodmart, whose source is not public, are not read.
+
+**Swatches.** What a swatches plugin set for an attribute's terms reaches the filters by itself, in `Woo::attribute_swatches()`, with the keys read from each plugin's own source. The attribute's type (`wc_get_attribute()`) says which counts, since a plugin keeps what was set before the type changed:
+
+| Plugin | Colour | Image | Label |
+|---|---|---|---|
+| Variation Swatches for WooCommerce, by GetWooPlugins | `product_attribute_color`, with `is_dual_color` and `secondary_color` | `product_attribute_image` | |
+| Variation Swatches for WooCommerce, by CartFlows | `cfvsw_color` | `cfvsw_image` | |
+| Variation Swatches for WooCommerce, by ThemeAlien | `color` | `image` | `label` |
+| WCBoost - Variation Swatches | `color` | `image` | `label` |
+| Variation Swatches for WooCommerce, by RadiusTheme | as GetWooPlugins | | |
+| YITH WooCommerce Color, Image & Label Variation Swatches | `_yith_wccl_value` | `_yith_wccl_value` | `_yith_wccl_value` |
+
+An image may be an attachment's id or an address. `color`, `image` and `label` are names anything could use, so they count only on an attribute of a swatch type (`color`, `colorpicker`, `image`, `label`, `button`). A term the plugin has translated without its swatch has none on that language's page.
+
+**The category filter** is set on the Search Config tab (`category_filter`: `all`, `main` or `nested`; `category_filter_depth`). `Facet_Config` then hands the `categories` filter a `tree`, the levels to show and each category's parent by name, read from `product_cat` and `category`, and `arrangeTree()` in `src/utils/facets.js` draws it. A search answers with names, so two categories of one name are one value, a main one if either is. The indexer writes every ancestor of a post's categories, so picking a main category finds what is in its subcategories.
 
 - **`webhead_search_cloud/storefront/is_preview`** - `(bool $is_preview)`. Whether the page is a page builder's editor, whose searches Searcio meters but keeps out of the site's statistics. The plugin knows Elementor, Divi, Beaver Builder, Oxygen, WPBakery's frontend editor and Bricks by their editor's address, and the Customizer; return `true` for another editor:
 

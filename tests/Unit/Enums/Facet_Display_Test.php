@@ -16,6 +16,7 @@ final class Facet_Display_Test extends TestCase {
 		$this->assertSame( Facet_Display::List, Facet_Display::from_storage( 'list' ) );
 		$this->assertSame( Facet_Display::Tiles, Facet_Display::from_storage( 'tiles' ) );
 		$this->assertSame( Facet_Display::Color, Facet_Display::from_storage( ' Color ' ) );
+		$this->assertSame( Facet_Display::Image, Facet_Display::from_storage( 'image' ) );
 		$this->assertSame( Facet_Display::Range, Facet_Display::from_storage( 'range' ) );
 		$this->assertSame( Facet_Display::Auto, Facet_Display::from_storage( 'auto' ) );
 	}

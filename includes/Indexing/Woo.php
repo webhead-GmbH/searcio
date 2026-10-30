@@ -18,6 +18,8 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Indexing;
 
 use WP_Post;
+use Webhead\WP\SearchCloud\DTO\Attribute_Swatches;
+use Webhead\WP\SearchCloud\Enums\Facet_Display;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -57,14 +59,49 @@ final class Woo {
 	 */
 	private const SEARCHABLE_VISIBILITIES = [ 'visible', 'search' ];
 
-	/** Term meta a swatches plugin keeps an attribute term's colour in, see {@see self::attribute_colors()}. */
+	/**
+	 * Term meta a swatches plugin keeps a term's swatch in, read from each
+	 * plugin's own source:
+	 *
+	 * - "Variation Swatches for WooCommerce" by GetWooPlugins, and the one by
+	 *   RadiusTheme, which took its keys (`product_attribute_*`, of which an
+	 *   image is an attachment id). A term of two colours adds `is_dual_color`
+	 *   and `secondary_color`.
+	 * - "Variation Swatches for WooCommerce" by CartFlows (`cfvsw_*`).
+	 */
 	private const COLOR_META_KEYS = [ 'product_attribute_color', 'cfvsw_color' ];
+
+	private const IMAGE_META_KEYS = [ 'product_attribute_image', 'cfvsw_image' ];
+
+	/**
+	 * "Variation Swatches for WooCommerce" by ThemeAlien and "WCBoost -
+	 * Variation Swatches" use names this plain, which could be anybody's, so
+	 * they are read only on an attribute of a swatch type.
+	 */
+	private const PLAIN_COLOR_META_KEY = 'color';
+
+	private const PLAIN_IMAGE_META_KEY = 'image';
+
+	private const PLAIN_LABEL_META_KEY = 'label';
+
+	/**
+	 * The attribute types these plugins add, and how such an attribute is
+	 * drawn. A colour is left to `auto`: the storefront draws colours when
+	 * every value of a search has one.
+	 */
+	private const SWATCH_TYPES = [
+		'color'       => Facet_Display::Auto,
+		'colorpicker' => Facet_Display::Auto,
+		'image'       => Facet_Display::Auto,
+		'label'       => Facet_Display::Tiles,
+		'button'      => Facet_Display::Tiles,
+	];
 
 	/**
 	 * "YITH WooCommerce Color, Image & Label Variation Swatches" keeps a term's
-	 * value here whatever the attribute's type, so it is a colour only for an
-	 * attribute of the type it adds for colours. Releases before 2.0 kept it
-	 * under the taxonomy's name followed by this key. Read from version 2.32.0.
+	 * value here whatever the attribute's type, so what it is depends on the
+	 * type. Releases before 2.0 kept it under the taxonomy's name followed by
+	 * this key. Read from version 2.32.0.
 	 */
 	private const YITH_VALUE_META_KEY = '_yith_wccl_value';
 
@@ -350,84 +387,164 @@ final class Woo {
 	}
 
 	/**
-	 * Term name => hex colour, for the terms of an attribute a swatches plugin
-	 * has given a colour: "Variation Swatches for WooCommerce" by GetWooPlugins
-	 * (`product_attribute_color`), the one by CartFlows (`cfvsw_color`), and
-	 * YITH's for an attribute of its colour type (`_yith_wccl_value`, of which
-	 * a term with two colours has a list; the first is taken).
-	 * The names are the ones the index holds, in the language of the current
-	 * request, so the storefront can match them to the values a search answers
-	 * with. Empty when no term has a colour.
+	 * What a swatches plugin made of an attribute: how it is drawn, and the
+	 * colour, image or short label of each term. The names are the ones the
+	 * index holds, in the language of the current request, so the storefront
+	 * can match them to the values a search answers with.
 	 *
-	 * @return array<string,string>
+	 * The type of the attribute says which of a term's values counts: a plugin
+	 * keeps what was set before the type changed. An attribute of no swatch
+	 * type shows colours when it has any, as a site that switched plugins may
+	 * have them, and images otherwise.
 	 */
-	public function attribute_colors( string $taxonomy ): array {
+	public function attribute_swatches( string $taxonomy ): Attribute_Swatches {
 		if ( ! taxonomy_exists( $taxonomy ) ) {
-			return [];
+			return new Attribute_Swatches();
 		}
 
 		$terms = get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => true ] );
 
 		if ( ! is_array( $terms ) ) {
-			return [];
+			return new Attribute_Swatches();
 		}
 
-		$colors = [];
-		$yith   = $this->is_yith_color_attribute( $taxonomy );
+		$type   = $this->attribute_type( $taxonomy );
+		$values = [
+			'color'  => [],
+			'second' => [],
+			'image'  => [],
+			'label'  => [],
+		];
 
 		foreach ( $terms as $term ) {
 			if ( ! $term instanceof \WP_Term ) {
 				continue;
 			}
 
-			foreach ( self::COLOR_META_KEYS as $key ) {
-				$color = sanitize_hex_color( (string) get_term_meta( $term->term_id, $key, true ) );
+			$name = Term_Names::decode( $term->name );
 
-				if ( is_string( $color ) && '' !== $color ) {
-					$colors[ Term_Names::decode( $term->name ) ] = $color;
-					continue 2;
-				}
-			}
-
-			if ( $yith ) {
-				$color = $this->yith_color( $term->term_id, $taxonomy );
-
-				if ( '' !== $color ) {
-					$colors[ Term_Names::decode( $term->name ) ] = $color;
+			foreach ( $this->term_swatch( $term->term_id, $taxonomy, $type ) as $key => $value ) {
+				if ( '' !== $value ) {
+					$values[ $key ][ $name ] = $value;
 				}
 			}
 		}
 
-		return $colors;
+		$images = in_array( $type, [ 'color', self::YITH_COLOR_TYPE ], true ) ? [] : $values['image'];
+		$colors = 'image' === $type ? [] : $values['color'];
+
+		if ( [] !== $colors ) {
+			$images = [];
+		}
+
+		return new Attribute_Swatches(
+			self::SWATCH_TYPES[ $type ] ?? Facet_Display::Auto,
+			$colors,
+			[] === $colors ? [] : $values['second'],
+			$images,
+			$values['label']
+		);
 	}
 
-	/** Whether YITH's swatches made this attribute a colour picker. */
-	private function is_yith_color_attribute( string $taxonomy ): bool {
+	/**
+	 * @return array{color:string,second:string,image:string,label:string}
+	 */
+	private function term_swatch( int $term_id, string $taxonomy, string $type ): array {
+		$color_keys = self::COLOR_META_KEYS;
+		$image_keys = self::IMAGE_META_KEYS;
+		$label_keys = [];
+
+		if ( isset( self::SWATCH_TYPES[ $type ] ) ) {
+			$color_keys[] = self::PLAIN_COLOR_META_KEY;
+			$image_keys[] = self::PLAIN_IMAGE_META_KEY;
+			$label_keys[] = self::PLAIN_LABEL_META_KEY;
+		}
+
+		$color  = '';
+		$second = '';
+		$image  = '';
+		$label  = '';
+
+		foreach ( $color_keys as $key ) {
+			$color = $this->hex( get_term_meta( $term_id, $key, true ) );
+
+			if ( '' !== $color ) {
+				break;
+			}
+		}
+
+		foreach ( $image_keys as $key ) {
+			$image = $this->image_url( get_term_meta( $term_id, $key, true ) );
+
+			if ( '' !== $image ) {
+				break;
+			}
+		}
+
+		foreach ( $label_keys as $key ) {
+			$label = trim( wp_strip_all_tags( (string) get_term_meta( $term_id, $key, true ) ) );
+
+			if ( '' !== $label ) {
+				break;
+			}
+		}
+
+		if ( '' !== $color && 'yes' === get_term_meta( $term_id, 'is_dual_color', true ) ) {
+			$second = $this->hex( get_term_meta( $term_id, 'secondary_color', true ) );
+		}
+
+		$yith = $this->yith_value( $term_id, $taxonomy );
+
+		if ( self::YITH_COLOR_TYPE === $type && '' === $color ) {
+			$colors = is_array( $yith ) ? array_values( $yith ) : explode( ',', (string) $yith );
+			$color  = $this->hex( $colors[0] ?? '' );
+			$second = $this->hex( $colors[1] ?? '' );
+		} elseif ( 'image' === $type && '' === $image ) {
+			$image = $this->image_url( $yith );
+		} elseif ( 'label' === $type && '' === $label && is_string( $yith ) ) {
+			$label = trim( wp_strip_all_tags( $yith ) );
+		}
+
+		return [
+			'color'  => $color,
+			'second' => $second,
+			'image'  => $image,
+			'label'  => $label,
+		];
+	}
+
+	/** The type WooCommerce keeps for an attribute: `select`, or one a swatches plugin added. */
+	private function attribute_type( string $taxonomy ): string {
 		if ( ! function_exists( 'wc_attribute_taxonomy_id_by_name' ) || ! function_exists( 'wc_get_attribute' ) ) {
-			return false;
+			return '';
 		}
 
 		$attribute = wc_get_attribute( wc_attribute_taxonomy_id_by_name( $taxonomy ) );
 
-		return is_object( $attribute ) && self::YITH_COLOR_TYPE === ( $attribute->type ?? '' );
+		return is_object( $attribute ) ? (string) ( $attribute->type ?? '' ) : '';
 	}
 
-	private function yith_color( int $term_id, string $taxonomy ): string {
+	private function yith_value( int $term_id, string $taxonomy ): mixed {
 		$value = get_term_meta( $term_id, self::YITH_VALUE_META_KEY, true );
 
-		if ( '' === $value || false === $value ) {
-			$value = get_term_meta( $term_id, $taxonomy . self::YITH_VALUE_META_KEY, true );
-		}
+		return '' === $value || false === $value ? get_term_meta( $term_id, $taxonomy . self::YITH_VALUE_META_KEY, true ) : $value;
+	}
 
-		if ( is_array( $value ) ) {
-			$value = reset( $value );
-		} elseif ( is_string( $value ) && str_contains( $value, ',' ) ) {
-			$value = explode( ',', $value )[0];
-		}
-
+	private function hex( mixed $value ): string {
 		$color = is_string( $value ) ? sanitize_hex_color( trim( $value ) ) : null;
 
 		return is_string( $color ) ? $color : '';
+	}
+
+	/** A plugin keeps an image as an attachment's id or as its address. */
+	private function image_url( mixed $value ): string {
+		if ( is_numeric( $value ) ) {
+			$url = wp_get_attachment_image_url( (int) $value, 'thumbnail' );
+
+			return is_string( $url ) ? $url : '';
+		}
+
+		return is_string( $value ) && 1 === preg_match( '#^https?://#i', trim( $value ) ) ? esc_url_raw( trim( $value ) ) : '';
 	}
 
 	/**

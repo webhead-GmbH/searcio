@@ -565,23 +565,29 @@ export const freezeValueOrder = ( values, counts, selected, { natural = false, l
 
 /**
  * How a group's values are drawn, when the site has not said: `color` when
- * every value has a colour, `tiles` when every value is a size, a number or a
- * capacity, `list` otherwise. A display the site set wins, except `color`
- * without colours, which is a list.
+ * every value has a colour, `image` when every value has an image, `tiles`
+ * when every value is a size, a number or a capacity, `list` otherwise. A
+ * display the site set wins, except `color` without colours and `image`
+ * without images, which are a list.
  *
  * @param {string} field
  * @param {string[]} values
- * @param {{display?: string, colors?: Object<string,string>}} [config]
- * @return {string} `list`, `tiles`, `color` or `range`.
+ * @param {{display?: string, colors?: Object<string,string>, images?: Object<string,string>}} [config]
+ * @return {string} `list`, `tiles`, `color`, `image` or `range`.
  */
 export const detectFacetDisplay = ( field, values, config = {} ) => {
-	const colors = config?.colors || {};
 	const list = ( values || [] ).filter( ( value ) => '' !== String( value ?? '' ).trim() );
-	const everyColored = list.length > 0 && list.every( ( value ) => 'string' === typeof colors[ value ] && '' !== colors[ value ] );
+	const hasEvery = ( map ) => list.length > 0 && list.every( ( value ) => 'string' === typeof map?.[ value ] && '' !== map[ value ] );
+	const everyColored = hasEvery( config?.colors );
+	const everyImaged = hasEvery( config?.images );
 	const set = String( config?.display || 'auto' );
 
 	if ( 'color' === set ) {
 		return everyColored ? 'color' : 'list';
+	}
+
+	if ( 'image' === set ) {
+		return everyImaged ? 'image' : 'list';
 	}
 
 	if ( [ 'list', 'tiles', 'range' ].includes( set ) ) {
@@ -592,11 +598,73 @@ export const detectFacetDisplay = ( field, values, config = {} ) => {
 		return 'color';
 	}
 
+	if ( everyImaged ) {
+		return 'image';
+	}
+
 	if ( list.length > 0 && list.every( ( value ) => naturalKey( value )[ 0 ] < 3 ) ) {
 		return 'tiles';
 	}
 
 	return 'list';
+};
+
+/**
+ * The entries of a filter as the shop's tree: each under its parent, the
+ * levels past `depth` left out. An entry that is selected stays whatever its
+ * level, so a filter that is on can always be turned off. An entry whose parent
+ * is not among the entries goes under its nearest ancestor that is, or starts
+ * the list: a search answers with the values it has, not with the shop's tree.
+ *
+ * @param {Array<{value: string, selected?: boolean}>} entries In the order siblings are to keep.
+ * @param {{depth: number, parents: Object<string,string>}} [tree]
+ * @return {Array<Object>} The entries, each with its `level`, 0 for a main one.
+ */
+export const arrangeTree = ( entries, tree ) => {
+	const depth = Number( tree?.depth ) || 0;
+
+	if ( depth < 1 ) {
+		return entries;
+	}
+
+	const parents = tree.parents || {};
+	const parentOf = ( value ) => ( Object.prototype.hasOwnProperty.call( parents, value ) ? parents[ value ] : undefined );
+
+	// Every ancestor of a value, nearest first. A loop ends the walk.
+	const ancestors = ( value ) => {
+		const seen = [ value ];
+
+		for ( let parent = parentOf( value ); undefined !== parent && ! seen.includes( parent ); parent = parentOf( parent ) ) {
+			seen.push( parent );
+		}
+
+		return seen.slice( 1 );
+	};
+
+	const kept = entries.filter( ( entry ) => entry.selected || ancestors( entry.value ).length < depth );
+	const present = new Set( kept.map( ( entry ) => entry.value ) );
+	const children = new Map();
+	const roots = [];
+
+	kept.forEach( ( entry ) => {
+		const parent = ancestors( entry.value ).find( ( value ) => present.has( value ) );
+
+		if ( undefined === parent ) {
+			roots.push( entry );
+		} else {
+			children.set( parent, [ ...( children.get( parent ) || [] ), entry ] );
+		}
+	} );
+
+	const out = [];
+	const add = ( entry, level ) => {
+		out.push( { ...entry, level } );
+		( children.get( entry.value ) || [] ).forEach( ( child ) => add( child, level + 1 ) );
+	};
+
+	roots.forEach( ( entry ) => add( entry, 0 ) );
+
+	return out;
 };
 
 /**

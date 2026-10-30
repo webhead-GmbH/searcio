@@ -138,6 +138,80 @@ describe( 'FilterPanel', () => {
 		expect( container.querySelector( '.whsc-swatch__dot' ).style.getPropertyValue( '--whsc-dot' ) ).toBe( '#6f7a3a' );
 		expect( container.querySelector( '.whsc-swatch input[type="checkbox"]' ) ).not.toBeNull();
 	} );
+
+	it( 'splits the dot of a value of two colours', () => {
+		render( {
+			field: 'attr_color',
+			label: 'Farbe',
+			display: 'color',
+			values: [ { value: 'Schwarz/Weiss', count: 1 } ],
+			colors: { 'Schwarz/Weiss': '#000000' },
+			secondColors: { 'Schwarz/Weiss': '#ffffff' },
+		} );
+
+		expect( container.querySelector( '.whsc-swatch__dot' ).style.getPropertyValue( '--whsc-dot' ) )
+			.toBe( 'linear-gradient(135deg, #000000 50%, #ffffff 50%)' );
+	} );
+
+	it( 'draws image pills, with the name of the value as their text', () => {
+		render( {
+			field: 'attr_material',
+			label: 'Material',
+			display: 'image',
+			values: [ { value: 'Leinen', count: 3 } ],
+			images: { Leinen: 'https://shop.test/leinen.jpg' },
+		} );
+
+		const image = container.querySelector( '.whsc-swatch img' );
+
+		expect( image.getAttribute( 'src' ) ).toBe( 'https://shop.test/leinen.jpg' );
+		expect( image.getAttribute( 'alt' ) ).toBe( '' );
+		expect( labels() ).toEqual( [ 'Leinen' ] );
+		expect( container.querySelector( '.whsc-swatch__dot' ) ).toBeNull();
+	} );
+
+	it( 'shows a shop\'s short label on a tile, and filters by the value', () => {
+		const onToggle = jest.fn();
+
+		render( {
+			field: 'attr_size',
+			label: 'Grösse',
+			display: 'tiles',
+			values: [ { value: 'Extra Large', count: 3 } ],
+			labels: { 'Extra Large': 'XL' },
+			onToggle,
+		} );
+
+		expect( labels() ).toEqual( [ 'XL' ] );
+
+		act( () => container.querySelector( 'input' ).click() );
+
+		expect( onToggle ).toHaveBeenCalledWith( 'attr_size', 'Extra Large' );
+	} );
+
+	it( 'draws a list as the shop\'s tree', () => {
+		render( {
+			display: 'list',
+			values: [ { value: 'Kleidung', count: 5 }, { value: 'Jacken', count: 3 }, { value: 'Regenjacken', count: 1 } ],
+			tree: { depth: 2, parents: { Jacken: 'Kleidung', Regenjacken: 'Jacken' } },
+		} );
+
+		const items = [ ...container.querySelectorAll( '.whsc-opts__item' ) ];
+
+		expect( labels() ).toEqual( [ 'Kleidung', 'Jacken' ] );
+		expect( items[ 0 ].style.getPropertyValue( '--whsc-level' ) ).toBe( '' );
+		expect( items[ 1 ].style.getPropertyValue( '--whsc-level' ) ).toBe( '1' );
+	} );
+
+	it( 'does not take the tree of a list for anything else', () => {
+		render( {
+			display: 'tiles',
+			values: [ { value: '38', count: 1 } ],
+			tree: { depth: 1, parents: { 38: 'Schuhe' } },
+		} );
+
+		expect( labels() ).toEqual( [ '38' ] );
+	} );
 } );
 
 describe( 'panelEntries', () => {

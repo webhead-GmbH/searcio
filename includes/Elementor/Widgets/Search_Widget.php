@@ -545,10 +545,10 @@ final class Search_Widget extends Widget {
 				// properties (it has no custom-property output mode), so it
 				// can't sidestep the specificity fight the same way the
 				// controls above do, and is boosted instead. Targets the
-				// container, not the `<input>` itself -
-				// `@wordpress/components`' `SearchControl` draws the visible
-				// border/box around that shared container, not the input.
-				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__container' ),
+				// backdrop, not the `<input>` or the container round it:
+				// `@wordpress/components`' `SearchControl` draws the line
+				// there, on an element laid over both.
+				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__backdrop' ),
 			]
 		);
 		$this->add_responsive_control(
