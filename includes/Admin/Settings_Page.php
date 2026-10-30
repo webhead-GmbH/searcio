@@ -12,7 +12,6 @@ use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Page;
-use Webhead\WP\SearchCloud\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,15 +25,6 @@ final class Settings_Page extends Page {
 	) {}
 	protected function get_menu_slug(): string {
 		return 'webhead-search-cloud';
-	}
-
-	/**
-	 * The framework translates a page's script under its menu slug, which is
-	 * the plugin's first slug and stays in the page's address. Its strings are
-	 * translated under the plugin's text domain.
-	 */
-	protected function get_text_domain(): string {
-		return Plugin::TEXT_DOMAIN;
 	}
 
 	protected function get_menu_parent(): ?string {
