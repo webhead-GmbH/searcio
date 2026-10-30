@@ -74,6 +74,8 @@ test.describe( 'Placement tab', () => {
 
 		await screen.getByLabel( 'CSS selectors' ).fill( '#menu-item-search > a\na[href=' );
 		await expect( screen.getByText( 'A browser cannot read these, so they open nothing: a[href=' ) ).toBeVisible();
+		// A notice no longer says itself. This one is said when the typing stops.
+		await expect( page.locator( '#a11y-speak-polite' ) ).toContainText( 'A browser cannot read these, so they open nothing: a[href=' );
 		// The entry says what the section holds now, before it is saved.
 		await expect( sectionTab( page, 'The theme\'s search' ) ).toContainText( '2 selectors' );
 

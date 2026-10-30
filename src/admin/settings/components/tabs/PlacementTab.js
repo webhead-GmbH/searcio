@@ -26,10 +26,13 @@ import { selectProps } from '../../../../utils/select';
 import { Grid } from '../../../../components/Layout';
 import SectionList from '../../../../components/SectionList';
 import { showToast } from '../../../../toast';
+import { useAnnounce } from '../../../../utils/announce';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 
 const pluginData = window.webhead_search_cloudData || {};
+// How long a pause in typing has to be before a selector counts as written.
+const TYPING_PAUSE = 1000;
 const PLACEMENT_PATH = pluginData?.api?.placementPath || '/webhead-search-cloud/v1/placement';
 
 /** The shortcodes' tags (`Search_Shortcode::TAG`, `Products_Shortcode::TAG`). */
@@ -220,6 +223,7 @@ const PlacementTab = () => {
 	const [ loadAttempt, setLoadAttempt ] = useState( 0 );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ saveError, setSaveError ] = useState( null );
+	const [ settledSelectorsNote, setSettledSelectorsNote ] = useState( '' );
 	const [ previewView, setPreviewView ] = useState( 'trigger' );
 	const [ searchShortcode, setSearchShortcode ] = useState( {} );
 	const [ productsShortcode, setProductsShortcode ] = useState( {} );
@@ -291,19 +295,40 @@ const PlacementTab = () => {
 		}
 	};
 
+	const loadFailure = ! isLoading && ( loadError || ! placement ) ? sprintf(
+		/* translators: %s: reason the request failed. */
+		__( 'The placement settings could not be loaded: %s', 'searcio' ),
+		loadError || __( 'the request to the REST API failed.', 'searcio' )
+	) : '';
+	const badSelectors = placement ? invalidSelectors( placement.selectors ) : [];
+	const selectorsNote = badSelectors.length > 0 ? sprintf(
+		/* translators: %s: the selectors, one after another. */
+		__( 'A browser cannot read these, so they open nothing: %s', 'searcio' ),
+		badSelectors.join( ', ' )
+	) : '';
+
+	useEffect( () => {
+		const pause = setTimeout( () => setSettledSelectorsNote( selectorsNote ), TYPING_PAUSE );
+
+		return () => clearTimeout( pause );
+	}, [ selectorsNote ] );
+
+	// A failed load and a failed save are read out as they appear. A selector
+	// is wrong for as long as it is half typed, and the note changes with every
+	// key, so that one is read out when the typing stops.
+	useAnnounce( loadFailure, 'assertive' );
+	useAnnounce( saveError || '', 'assertive' );
+	useAnnounce( settledSelectorsNote );
+
 	if ( isLoading ) {
 		return <IndexingSkeleton label={ __( 'Loading the placement settings', 'searcio' ) } />;
 	}
 
-	if ( loadError || ! placement ) {
+	if ( loadFailure ) {
 		return (
 			<Notice.Root intent="error">
 				<Notice.Description>
-					{ sprintf(
-						/* translators: %s: reason the request failed. */
-						__( 'The placement settings could not be loaded: %s', 'searcio' ),
-						loadError || __( 'the request to the REST API failed.', 'searcio' )
-					) }
+					{ loadFailure }
 				</Notice.Description>
 				<Notice.Actions>
 					<Notice.ActionButton onClick={ () => setLoadAttempt( ( attempt ) => attempt + 1 ) }>
@@ -319,7 +344,6 @@ const PlacementTab = () => {
 	const suggestion = theme.suggestion || null;
 	const builders = Array.isArray( theme.builders ) ? theme.builders : [];
 	const typeLabels = catalog?.types || {};
-	const badSelectors = invalidSelectors( placement.selectors );
 	const home = catalog?.home || '/';
 	const multilingual = catalog?.multilingual || null;
 
@@ -442,14 +466,10 @@ const PlacementTab = () => {
 										rows={ 3 }
 									/>
 
-									{ badSelectors.length > 0 && (
+									{ selectorsNote && (
 										<Notice.Root intent="warning">
 											<Notice.Description>
-												{ sprintf(
-													/* translators: %s: the selectors, one after another. */
-													__( 'A browser cannot read these, so they open nothing: %s', 'searcio' ),
-													badSelectors.join( ', ' )
-												) }
+												{ selectorsNote }
 											</Notice.Description>
 										</Notice.Root>
 									) }
@@ -977,7 +997,7 @@ const PlacementTab = () => {
 			{ saveError && (
 				<Notice.Root intent="error">
 					<Notice.Description>{ saveError }</Notice.Description>
-					<Notice.CloseIcon onClick={ () => setSaveError( null ) } />
+					<Notice.CloseIconButton onClick={ () => setSaveError( null ) } />
 				</Notice.Root>
 			) }
 
