@@ -63,11 +63,11 @@ must be resolved first → **modal**. Anything requiring a decision must not aut
 
 **One announcement per update.** A notice that is on the page when it renders announces nothing.
 One that appears is announced — assertively for an error that needs attention now, politely
-otherwise — with its title and description and nothing else. At `@wordpress/ui` 0.23 the notice
-does that itself, so adding `role="alert"`, an `aria-live` region or a `speak()` beside it makes
-two. A later release takes it out of the component: if `Notice.Root` no longer has `spokenMessage`
-and `politeness` in `node_modules/@wordpress/ui/build-types/notice/types.d.ts`, the handler that
-shows a notice calls `speak( message, 'assertive' )` from `@wordpress/a11y`.
+otherwise — with its title and description and nothing else. The notice does not do it: since
+`@wordpress/ui` 0.24 the code that shows it calls `speak( message, 'assertive' )` from
+`@wordpress/a11y`, in an effect that runs when the message appears, with the same string the
+notice prints. The settings screen does it for a failed load and a failed save. Do not add
+`role="alert"` or an `aria-live` region as well: that makes two.
 
 ## Forms
 

@@ -1,6 +1,6 @@
 ---
 name: webhead-e2e-testing
-description: "Use this skill when writing or debugging webhead Search Cloud's Playwright end-to-end specs: tests/e2e, playwright.config.js, admin authentication, seeding data for the browser, flaky specs, or a spec that cannot find its element."
+description: "Use this skill when writing or debugging Searcio - Fast AI Product Search for WooCommerce's Playwright end-to-end specs: tests/e2e, playwright.config.js, admin authentication, seeding data for the browser, flaky specs, or a spec that cannot find its element."
 license: MIT
 metadata:
   author: webhead

@@ -1,6 +1,6 @@
 ---
 name: webhead-design-system
-description: "Use this skill before writing or changing any admin UI in webhead Search Cloud: which WordPress component to reach for, design tokens, cards, tabs, typography, elevation, radius, layout, loading and saving states, destructive confirmations, error messages, badges and tooltips."
+description: "Use this skill before writing or changing any admin UI in Searcio - Fast AI Product Search for WooCommerce: which WordPress component to reach for, design tokens, cards, tabs, typography, elevation, radius, layout, loading and saving states, destructive confirmations, error messages, badges and tooltips."
 license: MIT
 metadata:
   author: webhead
@@ -56,8 +56,8 @@ prop from `node_modules`. When a `@wordpress/*` version moves, read the breaking
 The design system recommends its "WordPress Design System MCP Server" to AI agents. When it is
 connected, ask it for a component's status before opening a browser.
 
-These files were written on 2026-10-03 against `@wordpress/components` 41, `@wordpress/ui` 0.23,
-`@wordpress/theme` 2.2, `@wordpress/icons` 17 and `@wordpress/dataviews` 19.1.
+These files were written on 2026-10-29 against `@wordpress/components` 43, `@wordpress/ui` 0.25,
+`@wordpress/theme` 3.0, `@wordpress/icons` 19 and `@wordpress/dataviews` 21.0.
 
 ## When the design system falls short, stop and ask
 
@@ -77,22 +77,22 @@ chose gets a comment naming the gap.
 ## Which component to reach for
 
 This is **not** "prefer `@wordpress/ui`". Upstream is mid-migration and the two packages disagree
-in both directions: 34 `@wordpress/components` exports are not-recommended or deprecated, and
-about twenty `@wordpress/ui` components are use-with-caution — nearly all of them because they are
+in both directions: 39 `@wordpress/components` exports are not-recommended or deprecated, and
+seventeen `@wordpress/ui` components are use-with-caution — nearly all of them because they are
 *"not yet recommended for use alongside components from `@wordpress/components`"*.
 
 So choose **per component, by its status**: take the one that is recommended, and where the
 `@wordpress/ui` one is cautionary stay on `@wordpress/components`. That is why the settings screen
-imports `Button` and `ToggleControl` from `@wordpress/components` and `Notice`, `Card`, `Tabs`,
-`InputControl`, `Stack` and `Skeleton` from `@wordpress/ui`.
+imports `Button` from `@wordpress/components` and `Notice`, `Card`, `Tabs`, `InputControl`,
+`SwitchControl`, `Stack` and `Skeleton` from `@wordpress/ui`.
 
 The full lists and the `@wordpress/ui` export shapes are in `references/component-status.md`. Two
 rules that never need looking up:
 
 - **A `not-recommended` component is not an option**, whatever a neighbouring file still does.
 - **No `@wordpress/ui` form control takes `onChange`.** Text, select and radio controls take
-  `onValueChange`; `CheckboxControl` takes `checked` and `onCheckedChange`. The wrong one is not
-  an error; it is a control that silently never updates.
+  `onValueChange`; `CheckboxControl` and `SwitchControl` take `checked` and `onCheckedChange`. The
+  wrong one is not an error; it is a control that silently never updates.
 
 ## Design tokens, in four rules
 

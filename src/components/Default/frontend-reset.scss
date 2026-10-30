@@ -153,21 +153,36 @@ body:has([data-webhead-frontend-root]) {
 // is not of a package whose styles are outside a layer. And a button or a
 // field of `@wordpress/components` whose styles are all in that package's
 // stylesheet, which is written again below this rule with more weight than it.
+// Those are named in `$whole`, and no other control of the package is reached.
 //
 // It leaves three kinds alone, because it would take their own styles off as
-// well. An element whose styles `@wordpress/components` writes when it runs
-// (`css-`): the rules further down restate those by name. Everything of
-// DataViews, which is styled by element. And an element with a class of the
-// plugin's own, which is the plugin's to style: do not give one to a control
-// of `@wordpress/ui`, for the rule then leaves that control to the theme.
+// well. Every other element of `@wordpress/components`, whose styles the
+// package writes when the page runs, outside a layer: the rules further down
+// restate those by name. Everything of DataViews, which is styled by element.
+// And an element with a class of the plugin's own, which is the plugin's to
+// style: do not give one to a control of `@wordpress/ui`, for the rule then
+// leaves that control to the theme.
+//
+// What the package writes when it runs cannot be told from its stylesheet by
+// a class. The copy WordPress 7.1 ships writes most of it with Emotion, on a
+// class that begins with `css-`, and some of it with CSS modules already. The
+// copy the Gutenberg plugin ships, `@wordpress/components` 43, has no Emotion:
+// it writes all of it with CSS modules, on classes shaped as those of
+// `@wordpress/ui` are, beside the `components-` ones. This rule once knew the
+// package's controls by `css-`, and under that copy it took the layout off an
+// option of ToggleGroupControl, showed the native slider of a RangeControl
+// over its track and left its number field 19px tall. A control the list
+// does not name is drawn as the package draws it; one that the package moves
+// out of its stylesheet has to leave the list.
 //
 // The rule weighs two ids and no more. Every other rule of this file is above
 // it, and a rule a plugin writes for an element with no class is below it:
 // give the element a class of the plugin's.
 $tags: "a, address, blockquote, button, caption, code, dd, dl, dt, fieldset, figcaption, figure, h1, h2, h3, h4, h5, h6, hr, img, input, kbd, label, legend, li, mark, ol, optgroup, p, pre, samp, select, table, tbody, td, textarea, tfoot, th, thead, tr, ul";
+$whole: ".components-button, .components-checkbox-control__input, .components-color-palette__custom-color-button, .components-form-toggle__input, .components-form-token-field__input, .components-radio-control__input, .components-text-control__input";
 $written-late: "[class*='css-'], [class*='dataviews-'], [class*='dataforms-']";
 $unlayered: "[class*='components-'], #{$written-late}, [class*='webhead-search-cloud-']";
-$taken-off: ":where(:not([class]):not(:is([class*='dataviews-'], [class*='dataforms-']) *), [class*='__']:not(#{$unlayered}), :is(button, input, optgroup, select, textarea)[class*='components-']:not(#{$written-late}))";
+$taken-off: ":where(:not([class]):not(:is([class*='dataviews-'], [class*='dataforms-']) *), [class*='__']:not(#{$unlayered}), :is(button, input):is(#{$whole}):not(#{$written-late}))";
 
 #{$scope} :where(#{$tags})#{$taken-off},
 #{$scope} :where(#{$tags})#{$taken-off}::before,
@@ -198,10 +213,13 @@ $taken-off: ":where(:not([class]):not(:is([class*='dataviews-'], [class*='datafo
 }
 
 // And the colour, the font and the size, which the package does write for some
-// of them. Not for an element whose styles it writes when it runs (`css-`):
-// this rule would outrank those, and the rules further down say them again by
-// name.
-$static: "[class*='components-']:not([class*='css-'])";
+// of them. Only for the ones its stylesheet styles, named: this rule would
+// outrank what the package writes when the page runs, and the rules further
+// down say that again by name. Under the copy of the package the Gutenberg
+// plugin ships, the label of an InputControl carries no `css-` any more, and a
+// rule that left out only `css-` set its size, weight and height back to the
+// surface's.
+$static: ".components-checkbox-control__label, .components-modal__header-heading, .components-panel__body-title, .components-radio-control__label, .components-toggle-control__label, .components-visually-hidden";
 
 #{$scope} :where(h1, h2, h3, h4, h5, h6, label, legend):where(#{$static}) {
 	color: inherit;

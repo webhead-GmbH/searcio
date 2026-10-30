@@ -1,6 +1,6 @@
 ---
 name: webhead-plugin-architecture
-description: "Use this skill when editing PHP architecture in webhead Search Cloud: bootstrap, services, hooks, settings, capabilities, database tables, jobs, lifecycle, REST endpoints, Site Health, diagnostics, updates, multisite, or compatibility integrations."
+description: "Use this skill when editing PHP architecture in Searcio - Fast AI Product Search for WooCommerce: bootstrap, services, hooks, settings, capabilities, database tables, jobs, lifecycle, REST endpoints, Site Health, diagnostics, updates, multisite, or compatibility integrations."
 license: MIT
 metadata:
   author: webhead
@@ -12,12 +12,12 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 
 ## Project Snapshot
 
-- Plugin name: `webhead Search Cloud`
+- Plugin name: `Searcio - Fast AI Product Search for WooCommerce`
 - Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
-- Description: `Connect WordPress and WooCommerce to webhead Search Cloud.`
+- Description: `Connect WordPress and WooCommerce to Searcio.`
 - Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`

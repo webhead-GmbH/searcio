@@ -4,12 +4,12 @@ This repository is a framework-scaffolded WordPress plugin. Keep changes aligned
 
 ## Project Snapshot
 
-- Plugin name: `webhead Search Cloud`
+- Plugin name: `Searcio - Fast AI Product Search for WooCommerce`
 - Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
-- Description: `Connect WordPress and WooCommerce to webhead Search Cloud.`
+- Description: `Connect WordPress and WooCommerce to Searcio.`
 - Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
@@ -132,7 +132,7 @@ This repository is a framework-scaffolded WordPress plugin. Keep changes aligned
 - Create PHP enums for finite states, modes, policies, or option values instead of spreading string literals through the codebase.
 - Draw every admin screen with `src/components/AdminPage.js`, as the settings screen is. The shell owns the header, the page padding and the width, so two screens drawn by it start at the same place and are equally wide; pass `tabbed` when the content opens with a tab strip.
 - Use `@wordpress/dataviews` for admin tables, imported from `src/components/DataViews.js` so that its stylesheet comes with it, and keep search, filtering, sorting, and pagination server-driven.
-- Use recommended `@wordpress/ui` primitives for generated admin UI: `Card.Root`, `Card.Header`, `Card.Title`, `Card.Content`, `Tabs.Root`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`, `Text`, `Stack`, `Skeleton`, `InputControl`, and the compound `Notice` (`Notice.Root` with `intent`). Choose per component by its Storybook status, not per package: `Button` and `ToggleControl` stay on `@wordpress/components`.
+- Use recommended `@wordpress/ui` primitives for generated admin UI: `Card.Root`, `Card.Header`, `Card.Title`, `Card.Content`, `Tabs.Root`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`, `Text`, `Stack`, `Skeleton`, `InputControl`, `SwitchControl`, and the compound `Notice` (`Notice.Root` with `intent`). Choose per component by its Storybook status, not per package: `Button` stays on `@wordpress/components`.
 - Hold more than one element inside a `Card.Content`, a tab panel, or a fragment in a `Stack` with a `gap` token. `Card.Content` pads itself and does not space its children, so two elements written one after the other touch. Put buttons in a row `Stack` of their own, and never `align="start"` on the column.
 - Put titles inside `Card.Header` with `Card.Title`; use the `render` prop for semantic heading levels.
 - Use `Text` variants such as `heading-xl`, `heading-lg`, `heading-md`, `body-md`, and `body-sm` instead of hard-coded admin font sizes.

@@ -1,6 +1,6 @@
 ---
 name: webhead-scaffold-maintenance
-description: "Use this skill when updating framework-owned generated files, composer/package manifests, AI guide files, scaffold:update behavior, or framework upgrade workflows for webhead Search Cloud."
+description: "Use this skill when updating framework-owned generated files, composer/package manifests, AI guide files, scaffold:update behavior, or framework upgrade workflows for Searcio - Fast AI Product Search for WooCommerce."
 license: MIT
 metadata:
   author: webhead

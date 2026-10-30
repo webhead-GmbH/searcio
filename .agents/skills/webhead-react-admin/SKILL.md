@@ -1,6 +1,6 @@
 ---
 name: webhead-react-admin
-description: "Use this skill when changing React admin screens, WordPress DataViews tables, asset loading, block-editor sources, REST/UI contracts, JavaScript package manifests, or translations in webhead Search Cloud."
+description: "Use this skill when changing React admin screens, WordPress DataViews tables, asset loading, block-editor sources, REST/UI contracts, JavaScript package manifests, or translations in Searcio - Fast AI Product Search for WooCommerce."
 license: MIT
 metadata:
   author: webhead

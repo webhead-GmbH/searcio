@@ -1,6 +1,6 @@
 ---
 name: webhead-plugin-quality
-description: "Use this skill when checking WordPress plugin quality in webhead Search Cloud: security, escaping, capabilities, translations, Site Health, diagnostics, release packaging, plugin-check, and operational safety."
+description: "Use this skill when checking WordPress plugin quality in Searcio - Fast AI Product Search for WooCommerce: security, escaping, capabilities, translations, Site Health, diagnostics, release packaging, plugin-check, and operational safety."
 license: MIT
 metadata:
   author: webhead

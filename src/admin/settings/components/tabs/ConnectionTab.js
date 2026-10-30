@@ -14,6 +14,7 @@ import ConnectionResultNotice from './ConnectionResultNotice';
 import LegalLinks from './LegalLinks';
 import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
+import {useAnnounce} from '../../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
 const CONNECT_PATH = pluginData?.api?.connectPath || '/webhead-search-cloud/v1/connection/connect';
@@ -89,6 +90,18 @@ const ConnectionTab = () => {
 			cancelled = true;
 		};
 	}, [isLoading, isConnected, connectedResult]);
+
+	// A connect that failed, and one that found an account for the email,
+	// are read out as their notices appear.
+	useAnnounce(connectError ? String(connectError) : '', 'assertive');
+	useAnnounce(pendingClaim ? sprintf(
+		/* translators: %s: the email address a confirmation link was sent to. */
+		__(
+			'An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Searcio dashboard, then paste the resulting keys below.',
+			'searcio'
+		),
+		pendingClaimEmail
+	) : '');
 
 	// A pending claim always needs the pasted-keys path to finish.
 	useEffect(() => {

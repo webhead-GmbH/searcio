@@ -139,8 +139,8 @@ and the old way of colouring an icon does nothing to them:
   only for the icons that are still filled, and expect it to do nothing for the rest.
 - **The inline `fill: none` beats any stylesheet rule**, so a `fill` you add cannot turn a stroke
   icon into a blob — and cannot recolour it either.
-- **Strokes do not scale with the box.** An icon rendered larger keeps its line weight, so a 48px
-  icon looks lighter than a 24px one. Size icons through the component's `size`.
+- **Strokes scale with the box since `@wordpress/icons` 18:** 1px at 16px, 1.5px at 24px, 3px at
+  48px. Size icons through the component's `size`.
 
 ## An accent is two colours
 

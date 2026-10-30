@@ -1,6 +1,6 @@
 ---
 name: webhead-elementor-widgets
-description: "Use this skill when changing Elementor widget registration, widget controls, live preview templates, widget style controls, responsive controls, or Elementor-specific asset loading in webhead Search Cloud."
+description: "Use this skill when changing Elementor widget registration, widget controls, live preview templates, widget style controls, responsive controls, or Elementor-specific asset loading in Searcio - Fast AI Product Search for WooCommerce."
 license: MIT
 metadata:
   author: webhead
