@@ -12,6 +12,13 @@ jobs:
   unit-tests:
     name: Execute Unit Tests (PHP ${{ matrix.php }}, WP ${{ matrix.wp }})
     runs-on: ubuntu-latest
+    # The repository is named searcio, and wp-env mounts a plugin under the
+    # name of the folder it is checked out in. The plugin's scripts, tests and
+    # seeds name it by its slug, webhead-search-cloud, so it is checked out
+    # into a folder of that name and every step runs there.
+    defaults:
+      run:
+        working-directory: webhead-search-cloud
 
     strategy:
       matrix:
@@ -22,6 +29,8 @@ jobs:
     steps:
       -   name: Checkout repository
           uses: actions/checkout@v4
+          with:
+            path: webhead-search-cloud
 
       # package.json asks for Node 22: the webpack configuration loads the
       # design system's token plugin, an ES module, with require().
@@ -141,10 +150,19 @@ jobs:
   e2e-tests:
     name: Playwright E2E (WP latest)
     runs-on: ubuntu-latest
+    # The repository is named searcio, and wp-env mounts a plugin under the
+    # name of the folder it is checked out in. The plugin's scripts, tests and
+    # seeds name it by its slug, webhead-search-cloud, so it is checked out
+    # into a folder of that name and every step runs there.
+    defaults:
+      run:
+        working-directory: webhead-search-cloud
 
     steps:
       -   name: Checkout repository
           uses: actions/checkout@v4
+          with:
+            path: webhead-search-cloud
 
       -   name: Setup Node.js
           uses: actions/setup-node@v4
@@ -226,7 +244,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: playwright-artifacts
-            path: artifacts/
+            path: webhead-search-cloud/artifacts/
             retention-days: 7
 
       -   name: Stop wp-env
