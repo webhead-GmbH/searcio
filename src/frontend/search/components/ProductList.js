@@ -51,8 +51,9 @@ const ProductList = ( {
 } ) => {
 	const [ products, setProducts ] = useState( null );
 	const [ banner, setBanner ] = useState( '' );
-	// Only a category row has one: it is a `/search`, and `/search/similar`
-	// returns no `search_id` because it is not a candidate for attribution.
+	// The `search_id` the row's clicks are attributed to: the category row's
+	// `/search`, or the `/search/similar` list (a service that does not record
+	// those answers with none, and a click then sends nothing).
 	const [ searchId, setSearchId ] = useState( '' );
 	const abortRef = useRef( null );
 
@@ -83,6 +84,7 @@ const ProductList = ( {
 					} );
 
 					setProducts( Array.isArray( response?.similar ) ? response.similar : [] );
+					setSearchId( 'string' === typeof response?.search_id ? response.search_id : '' );
 
 					return;
 				}
@@ -96,6 +98,7 @@ const ProductList = ( {
 				const response = await search( '', {
 					filters: buildFilterParams( {}, { [ filterField ]: filterValue, ...currentLangFilter() } ),
 					perPage: limit || 12,
+					surface: 'category',
 					signal: controller.signal,
 				} );
 

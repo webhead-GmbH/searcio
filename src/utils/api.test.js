@@ -389,3 +389,128 @@ describe( 'fetchSimilar', () => {
 		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
+
+describe( 'search analytics hints', () => {
+	const params = ( call = 0 ) => new URL( global.fetch.mock.calls[ call ][ 0 ] ).searchParams;
+
+	afterEach( () => {
+		delete window.elementorFrontend;
+	} );
+
+	it( 'marks a search as you type live, and gives it no origin', async () => {
+		const api = loadApi();
+
+		await api.search( 'jack', { live: true, origin: 'typed', surface: 'overlay' } );
+
+		expect( params().get( 'live' ) ).toBe( '1' );
+		expect( params().has( 'origin' ) ).toBe( false );
+		expect( params().get( 'surface' ) ).toBe( 'overlay' );
+	} );
+
+	it( 'says how a settled search was started, and nothing it does not know', async () => {
+		const api = loadApi();
+
+		await api.search( 'jacket', { origin: 'suggestion' } );
+		await api.search( 'boots', { origin: 'carousel', surface: 'sidebar' } );
+
+		expect( params( 0 ).get( 'origin' ) ).toBe( 'suggestion' );
+		expect( params( 0 ).has( 'live' ) ).toBe( false );
+		expect( params( 1 ).has( 'origin' ) ).toBe( false );
+		expect( params( 1 ).has( 'surface' ) ).toBe( false );
+	} );
+
+	it.each( [ 'typed', 'suggestion', 'popular', 'recent', 'voice', 'filter' ] )( 'sends the origin %s', async ( origin ) => {
+		const api = loadApi();
+
+		await api.search( 'jacket', { origin } );
+
+		expect( params().get( 'origin' ) ).toBe( origin );
+	} );
+
+	/**
+	 * Only page one of a search with words in it is counted: a listing without
+	 * them and "load more" carry neither hint, and say only where they are shown.
+	 */
+	it( 'leaves live and origin off a listing without words and off later pages', async () => {
+		const api = loadApi();
+
+		await api.search( '', { live: true, origin: 'filter', surface: 'highlights' } );
+		await api.search( 'jacket', { live: true, origin: 'typed', surface: 'overlay', page: 2 } );
+
+		expect( params( 0 ).has( 'live' ) ).toBe( false );
+		expect( params( 0 ).has( 'origin' ) ).toBe( false );
+		expect( params( 0 ).get( 'surface' ) ).toBe( 'highlights' );
+		expect( params( 1 ).has( 'live' ) ).toBe( false );
+		expect( params( 1 ).has( 'origin' ) ).toBe( false );
+		expect( params( 1 ).get( 'surface' ) ).toBe( 'overlay' );
+	} );
+
+	it.each( [ 'overlay', 'highlights', 'category', 'quiz' ] )( 'sends the surface %s', async ( surface ) => {
+		const api = loadApi();
+
+		await api.search( '', { surface } );
+
+		expect( params().get( 'surface' ) ).toBe( surface );
+	} );
+
+	/**
+	 * Before, the settled search answered from the cache the live request for
+	 * the same words had left, and never reached the service to be counted.
+	 */
+	it( 'sends a settled search after a live one for the same words', async () => {
+		const api = loadApi();
+
+		await api.search( 'jacket', { live: true, surface: 'overlay' } );
+		await api.search( 'jacket', { origin: 'typed', surface: 'overlay' } );
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 2 );
+		expect( params( 1 ).get( 'origin' ) ).toBe( 'typed' );
+	} );
+
+	it( 'sends none of the hints when it is told none', async () => {
+		const api = loadApi();
+
+		await api.search( 'jacket' );
+
+		[ 'live', 'origin', 'surface', 'preview' ].forEach( ( hint ) => expect( params().has( hint ) ).toBe( false ) );
+	} );
+
+	it( 'marks every search and similar list of a page builder\'s editor as a preview', async () => {
+		setConfig( { preview: true } );
+		global.fetch.mockResolvedValue( jsonResponse( { hits: [], similar: [] } ) );
+		const api = loadApi();
+
+		await api.search( '', { surface: 'highlights' } );
+		await api.search( 'jacket', { origin: 'typed' } );
+		await api.fetchSimilar( 'product-1' );
+
+		expect( params( 0 ).get( 'preview' ) ).toBe( '1' );
+		expect( params( 1 ).get( 'preview' ) ).toBe( '1' );
+		expect( params( 2 ).get( 'preview' ) ).toBe( '1' );
+	} );
+
+	it( 'takes Elementor\'s own word for its editor', async () => {
+		window.elementorFrontend = { isEditMode: () => true };
+		const api = loadApi();
+
+		await api.search( 'jacket' );
+
+		expect( params().get( 'preview' ) ).toBe( '1' );
+	} );
+
+	it( 'puts none of the hints on the requests that are not searches', async () => {
+		setConfig( { preview: true } );
+		global.fetch.mockResolvedValue( jsonResponse( {} ) );
+		const api = loadApi();
+
+		await api.suggest( 'jac' );
+		await api.fetchPopularSearches();
+		await api.fetchCardTemplates();
+		await api.fetchStorefrontConfig();
+		await api.fetchQuizzes();
+
+		global.fetch.mock.calls.forEach( ( [ url ] ) => {
+			[ 'live', 'origin', 'surface', 'preview' ].forEach( ( hint ) => expect( new URL( url ).searchParams.has( hint ) ).toBe( false ) );
+		} );
+	} );
+} );

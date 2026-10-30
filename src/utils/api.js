@@ -118,12 +118,73 @@ const request = async ( path, params, ttl, signal ) => {
 	return data;
 };
 
+/** How a settled search was started, as the service records it (`origin` on `/search`). */
+export const ORIGINS = [ 'typed', 'suggestion', 'popular', 'recent', 'voice', 'filter' ];
+
+/** Where the results of a `/search` are shown (`surface`). */
+export const SURFACES = [ 'overlay', 'highlights', 'category', 'quiz' ];
+
+/**
+ * Whether this page is a page builder's editor. Its searches are the editor's,
+ * not a visitor's: the service meters them but does not record them
+ * (`preview`). The plugin tells the editors it knows from the page's address
+ * (`Frontend_Config`), and Elementor's frontend says so itself.
+ *
+ * @return {boolean} Whether the requests of this page are an editor's.
+ */
+export const isPreview = () => {
+	if ( config.preview ) {
+		return true;
+	}
+
+	try {
+		return Boolean( window.elementorFrontend?.isEditMode?.() );
+	} catch ( e ) {
+		return false;
+	}
+};
+
+/**
+ * The analytics hints of a `/search` (`docs/api/search.md`). They feed the
+ * site's search statistics and never change the results.
+ *
+ * - `live`: a search as you type that the visitor has not settled on. The
+ *   service leaves it out of the counts unless one of its results is clicked.
+ * - `origin`: how a settled search was started.
+ * - `surface`: where its results are shown.
+ * - `preview`: made in a page builder's editor.
+ *
+ * Only the first page of a search with a query is counted, so `live` and
+ * `origin` are left off a listing without one and off "load more"; `origin`
+ * is left off a live search as well.
+ *
+ * @param {string} q
+ * @param {number} page
+ * @param {{live?: boolean, origin?: string, surface?: string}} options
+ * @return {Object<string, (number|string|undefined)>} The parameters to add.
+ */
+export const searchHints = ( q, page, options ) => {
+	const counted = '' !== String( q ?? '' ).trim() && 1 === page;
+	const live = counted && Boolean( options.live );
+
+	return {
+		live: live ? 1 : undefined,
+		origin: counted && ! live && ORIGINS.includes( options.origin ) ? options.origin : undefined,
+		surface: SURFACES.includes( options.surface ) ? options.surface : undefined,
+		preview: isPreview() ? 1 : undefined,
+	};
+};
+
 /**
  * @param {string} q
- * @param {{type?: string, filters?: Object<string,string>, ranges?: Object<string,string>, page?: number, perPage?: number, signal?: AbortSignal}} [options]
+ * @param {{type?: string, filters?: Object<string,string>, ranges?: Object<string,string>, page?: number, perPage?: number, live?: boolean, origin?: string, surface?: string, signal?: AbortSignal}} [options]
  */
 export const search = ( q, options = {} ) => {
-	const params = { q, type: options.type, page: options.page || 1, per_page: options.perPage || 20 };
+	const page = options.page || 1;
+	// The hints are part of the address, so a settled search never answers
+	// from the cache a live request for the same words left behind: it goes
+	// out, and the service counts it.
+	const params = { q, type: options.type, page, per_page: options.perPage || 20, ...searchHints( q, page, options ) };
 
 	// Filterable fields must already be configured as facet fields server-side
 	// (search.md) - an unfiltered chip list never sends a field the API would
@@ -208,23 +269,31 @@ export const fetchQuizzes = ( options = {} ) =>
  * an empty list rather than an error and the row simply does not render.
  *
  * Not metered as a search, and it changes only when the catalogue does, so it
- * is cached for the page view like the card templates.
+ * is cached for the page view like the card templates. The response carries a
+ * `search_id` for its clicks (a service without it answers with none, and a
+ * click then sends nothing).
  *
  * @param {string}                            id        The source product's document id.
  * @param {{limit?: number, signal?: AbortSignal}} [options]
  * @return {Promise<{similar: Array<Object>}>}
  */
 export const fetchSimilar = ( id, options = {} ) =>
-	request( '/search/similar', { id, limit: options.limit || 6 }, SIMILAR_TTL, options.signal );
+	request(
+		'/search/similar',
+		{ id, limit: options.limit || 6, preview: isPreview() ? 1 : undefined },
+		SIMILAR_TTL,
+		options.signal
+	);
 
 /**
  * Search by photo (see `docs/api/visual-search.md`). A vision model describes
  * the image as tags and those tags run as an ordinary search, so the response
  * carries the same `hits`/`facets` shape as `/search` plus the `tags` it saw.
  *
- * Two things it deliberately does not carry: no `search_id` (a photo search is
- * not a candidate for click attribution) and no `redirect` short-circuit (a
- * synthetic query never triggers a merchant's typed-term redirect).
+ * It carries a `search_id` whenever the vision model found tags, which the
+ * clicks on its results are attributed to like those of a typed search, and
+ * never a `redirect` (a synthetic query never triggers a merchant's
+ * typed-term redirect).
  *
  * Not cached - the same photo picked twice is a new upload either way, and the
  * cache is keyed by URL, which a multipart body never varies.
