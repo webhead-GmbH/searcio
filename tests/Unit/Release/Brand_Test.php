@@ -5,8 +5,9 @@
  * It was webhead Search Cloud, Search Cloud on screen, and its slug and text
  * domain are written searcio. A name a person reads starts with a capital:
  * the menu, the blocks, the widgets, the messages, the translations and the
- * readmes. The slug, the text domain, the folder, the file names and
- * searcio.com stay as they are, and so does anything that names them. These
+ * readmes. The slug, the text domain, the folder, the file names, the
+ * shortcode `[searcio]` and searcio.com stay as they are, and so does anything
+ * that names them. These
  * tests read the template every translation starts from, each translation
  * and the script translations made from it, the blocks, the plugin header,
  * the readmes and the code itself, so a string written another way fails
@@ -34,6 +35,9 @@ final class Brand_Test extends TestCase {
 	private const LOWER_CASE = '/(?<![\w.\/@#$`=\\\\-])searcio(?![\w\/\\\\]|-(?![A-ZÄÖÜ])|\.[A-Za-z0-9_])/u';
 
 	private const OLD_NAME = '/search cloud/i';
+
+	/** The shortcode as it is written, `[searcio]` or `[searcio mode="box"]`: a tag, not the name. */
+	private const SHORTCODE = '/\[searcio(?=[\s\]])/';
 
 	public function test_the_plugin_carries_its_name(): void {
 		$this->assertSame( self::NAME, $this->find( '/^ \* Plugin Name:\s*(.+?)\s*$/m', 'searcio.php' ) );
@@ -126,7 +130,7 @@ final class Brand_Test extends TestCase {
 
 		foreach ( $files as $file ) {
 			$code = (string) preg_replace(
-				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', '/^ \* Text Domain: searcio\s*$/m' ],
+				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TAG = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
 				'',
 				(string) file_get_contents( $file )
 			);
@@ -152,6 +156,8 @@ final class Brand_Test extends TestCase {
 	}
 
 	private function assertNoOtherName( string $text, string $where ): void {
+		$text = (string) preg_replace( self::SHORTCODE, '', $text );
+
 		$this->assertDoesNotMatchRegularExpression( self::OLD_NAME, $text, sprintf( '%s still uses the old name: %s', $where, $this->excerpt( self::OLD_NAME, $text ) ) );
 		$this->assertDoesNotMatchRegularExpression( self::LOWER_CASE, $text, sprintf( '%s writes the name in lower case: %s', $where, $this->excerpt( self::LOWER_CASE, $text ) ) );
 	}

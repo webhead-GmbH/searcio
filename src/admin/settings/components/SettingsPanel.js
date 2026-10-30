@@ -19,6 +19,7 @@ import ConnectionTab from './tabs/ConnectionTab';
 import IndexingTab from './tabs/IndexingTab';
 import SyncTab from './tabs/SyncTab';
 import SearchConfigTab from './tabs/SearchConfigTab';
+import PlacementTab from './tabs/PlacementTab';
 import {useAnnounce} from '../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
@@ -26,8 +27,9 @@ const pluginData = window.webhead_search_cloudData || {};
 const SYNC_TAB = 'sync';
 const INDEXING_TAB = 'indexing';
 const SEARCH_CONFIG_TAB = 'search-config';
+const PLACEMENT_TAB = 'placement';
 const CONNECTION_TAB = 'connection';
-const SELF_MANAGED_TABS = [SYNC_TAB, INDEXING_TAB, SEARCH_CONFIG_TAB, CONNECTION_TAB];
+const SELF_MANAGED_TABS = [SYNC_TAB, INDEXING_TAB, SEARCH_CONFIG_TAB, PLACEMENT_TAB, CONNECTION_TAB];
 const CONNECTION_KEYS = pluginData.connectionKeys || [
 	'search_key',
 	'write_key',
@@ -104,6 +106,10 @@ const SettingsPanel = () => {
 			{
 				name: SEARCH_CONFIG_TAB,
 				title: renderAnimatedTabTitle(__('Search Config', 'searcio'), '', 0.16),
+			},
+			{
+				name: PLACEMENT_TAB,
+				title: renderAnimatedTabTitle(__('Placement', 'searcio'), '', 0.18),
 			},
 			{
 				name: CONNECTION_TAB,
@@ -267,6 +273,14 @@ const SettingsPanel = () => {
 						<Tabs.Panel value={SEARCH_CONFIG_TAB} className="tab-content">
 							<motion.div {...panelMotion}>
 								<SearchConfigTab/>
+							</motion.div>
+						</Tabs.Panel>
+					)}
+
+					{canManageSettings && (
+						<Tabs.Panel value={PLACEMENT_TAB} className="tab-content">
+							<motion.div {...panelMotion}>
+								<PlacementTab/>
 							</motion.div>
 						</Tabs.Panel>
 					)}

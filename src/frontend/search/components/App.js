@@ -1,5 +1,6 @@
 import { createPortal, useEffect, useState } from '@wordpress/element';
 
+import { OPEN_EVENT } from '../openers';
 import Trigger from './Trigger';
 import ProductList from './ProductList';
 import SearchModal from './SearchModal';
@@ -27,6 +28,28 @@ const App = ( { triggerElements, listElements = [] } ) => {
 		setQuery( value );
 		setActiveIndex( index );
 	};
+
+	// A theme's element, a `#searcio` link or the keyboard shortcut asks for
+	// the search (see `openers.js`): it opens as the site's own trigger
+	// configures it, or as the first trigger on the page where the site
+	// printed none.
+	useEffect( () => {
+		const onOpenRequest = ( event ) => {
+			const site = triggerElements.findIndex( ( el ) => undefined !== el.dataset.whscSite );
+			const index = site >= 0 ? site : 0;
+
+			if ( ! triggerElements[ index ] ) {
+				return;
+			}
+
+			setQuery( event.detail?.query || '' );
+			setActiveIndex( index );
+		};
+
+		window.addEventListener( OPEN_EVENT, onOpenRequest );
+
+		return () => window.removeEventListener( OPEN_EVENT, onOpenRequest );
+	}, [ triggerElements ] );
 
 	const closeModal = () => {
 		const el = null !== activeIndex ? triggerElements[ activeIndex ] : null;
@@ -68,6 +91,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 					mode={ el.dataset.mode || 'icon' }
 					placeholder={ el.dataset.placeholder || '' }
 					iconHtml={ el.dataset.icon || '' }
+					floatingStyle={ el.dataset.floating || 'icon' }
 					value={ activeIndex === index ? query : '' }
 					onOpen={ () => openFresh( index ) }
 					onBoxChange={ ( value ) => openWithValue( index, value ) }

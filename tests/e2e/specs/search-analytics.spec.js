@@ -42,8 +42,20 @@ const beacons = ( page ) => {
 	return sent;
 };
 
-/** A link a card opens goes nowhere, so a click does not leave the page under test. */
-const stayOnPage = ( page ) => page.route( 'https://example.test/**', ( route ) => route.fulfill( { status: 204, body: '' } ) );
+/**
+ * A link a card opens goes nowhere, so a click does not leave the page under
+ * test. The address answers a link opened in a new tab. A click in the page is
+ * cancelled once the page has heard it: `click()` waits for the navigation it
+ * starts, and a 204 never finishes one.
+ */
+const stayOnPage = async ( context ) => {
+	await context.route( 'https://example.test/**', ( route ) => route.fulfill( { status: 204, body: '' } ) );
+	await context.addInitScript( () => window.addEventListener( 'click', ( event ) => {
+		if ( event.target.closest?.( 'a[href^="https://example.test/"]' ) ) {
+			event.preventDefault();
+		}
+	} ) );
+};
 
 async function createPage( requestUtils, content ) {
 	const post = await requestUtils.createPost( { title: 'Analytics page', content, status: 'publish' } );

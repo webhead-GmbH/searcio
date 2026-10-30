@@ -3,6 +3,7 @@ import domReady from '@wordpress/dom-ready';
 
 import './scss/style.scss';
 import App from './components/App';
+import { attachOpeners } from './openers';
 
 const hydrated = new WeakSet();
 
@@ -51,7 +52,12 @@ const collect = ( selector, mounted ) => {
 		return null;
 	}
 
-	newEls.forEach( ( el ) => hydrated.add( el ) );
+	newEls.forEach( ( el ) => {
+		hydrated.add( el );
+		// A site's own search form that Searcio took the place of stays beside
+		// the trigger until now, for a visitor without JavaScript.
+		el.parentElement?.querySelector( ':scope > .webhead-search-cloud-fallback' )?.remove();
+	} );
 
 	return [ ...stillConnected, ...newEls ];
 };
@@ -74,6 +80,8 @@ const sync = () => {
 };
 
 const boot = () => {
+	attachOpeners( window.webheadSearchCloudFrontend?.placement || {} );
+
 	sync();
 
 	new MutationObserver( sync ).observe( document.body, {

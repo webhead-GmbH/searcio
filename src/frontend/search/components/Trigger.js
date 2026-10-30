@@ -14,12 +14,36 @@ import { __ } from '@wordpress/i18n';
  * programmatically (`el.focus()`), which fires a native focus event but not
  * a click; using `onFocus` here would immediately reopen the modal the
  * instant it finished closing.
+ *
+ * The site's own trigger, printed at the end of a page for the site-wide ways
+ * of opening the search, is `hidden` (nothing to draw) or `floating`: a button
+ * fixed to a corner, with the magnifier alone or with the word "Search".
  */
-const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange } ) => {
+const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange, floatingStyle = 'icon' } ) => {
 	// An icon button has no text of its own, so its label is its only name. The
 	// placeholder is optional in the block and the widget, and left empty it
 	// rendered `aria-label=""`: a screen reader announced just "button".
 	const name = placeholder || __( 'Search', 'searcio' );
+
+	if ( 'hidden' === mode ) {
+		return null;
+	}
+
+	if ( 'floating' === mode ) {
+		const label = 'label' === floatingStyle;
+
+		return (
+			<Button
+				className={ `whsc-trigger-icon-button whsc-trigger-floating-button${ label ? ' whsc-trigger-floating-button--label' : '' }` }
+				icon={ search }
+				label={ label ? undefined : name }
+				showTooltip={ ! label }
+				onClick={ onOpen }
+			>
+				{ label ? __( 'Search', 'searcio' ) : null }
+			</Button>
+		);
+	}
 
 	if ( 'box' === mode ) {
 		return (

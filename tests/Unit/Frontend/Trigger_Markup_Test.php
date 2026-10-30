@@ -148,4 +148,37 @@ final class Trigger_Markup_Test extends TestCase {
 		$this->assertStringContainsString( 'data-facet-bar-limit="0"', Trigger_Markup::render( [ 'facetBarLimit' => -2 ] ) );
 		$this->assertStringContainsString( 'data-facet-bar-limit="8"', Trigger_Markup::render( [ 'facetBarLimit' => 40 ] ) );
 	}
+
+	public function test_a_block_or_widget_trigger_carries_no_site_data(): void {
+		$html = Trigger_Markup::render( [ 'mode' => 'box' ] );
+
+		$this->assertStringNotContainsString( 'data-whsc-site', $html );
+		$this->assertStringNotContainsString( 'data-floating', $html );
+	}
+
+	public function test_the_hidden_site_trigger_takes_its_own_mode(): void {
+		$html = Trigger_Markup::render( [ 'site' => 'hidden', 'mode' => 'box' ] );
+
+		$this->assertStringContainsString( 'data-mode="hidden"', $html );
+		$this->assertStringContainsString( 'data-whsc-site="hidden"', $html );
+		$this->assertStringNotContainsString( 'data-floating', $html );
+	}
+
+	public function test_the_floating_site_trigger_says_how_it_is_drawn(): void {
+		$this->assertStringContainsString(
+			'data-whsc-site="floating" data-floating="label"',
+			Trigger_Markup::render( [ 'site' => 'floating', 'floatingStyle' => 'label' ] )
+		);
+		$this->assertStringContainsString(
+			'data-floating="icon"',
+			Trigger_Markup::render( [ 'site' => 'floating', 'floatingStyle' => 'sparkles' ] )
+		);
+	}
+
+	public function test_an_unknown_site_mode_is_an_ordinary_trigger(): void {
+		$html = Trigger_Markup::render( [ 'site' => 'everywhere' ] );
+
+		$this->assertStringContainsString( 'data-mode="icon"', $html );
+		$this->assertStringNotContainsString( 'data-whsc-site', $html );
+	}
 }
