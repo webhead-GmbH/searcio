@@ -39,6 +39,7 @@ Generated files are a framework-owned contract, but product plugins may customiz
 - Preserve custom `.agents/skills/*` files while updating framework-owned AI guide files.
 - Preserve unmanaged `.editorconfig`, `phpcs.xml`, `phpstan.neon`, and `webpack.config.js` files unless they carry the `Webhead scaffold managed file` marker.
 - Do not delete `composer.json` or `package.json` and recreate them from stubs.
+- Rename the plugin with `wh-plugin rename`, never by hand. The display name is the `Plugin Name` header. The text domain is the `Text Domain` header and the `TEXT_DOMAIN` constant, and names translations only. The slug is the `PLUGIN_SLUG` constant in the main plugin file, and names everything a site stores: options, tables, capabilities, hooks, REST routes, WP-CLI commands, asset handles, CSS classes and the package in Central. `--slug` moves the text domain and keeps the slug. `--unreleased` moves the slug, the namespace and the main file as well, and is for a plugin that is on no site yet. `scaffold:update` reads the slug from `PLUGIN_SLUG`, so keep it written out in the main file.
 - After dependency changes, run `composer update -W` and `npm install` as appropriate.
 
 ## Verification

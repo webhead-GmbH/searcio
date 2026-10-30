@@ -77,10 +77,10 @@ button are one colour. If you see a control that is not, do not set another `--w
 
 ```jsx
 <Notice.Root intent="error">
-    <Notice.Title>{ __( 'Settings were not saved', 'webhead-search-cloud' ) }</Notice.Title>
+    <Notice.Title>{ __( 'Settings were not saved', 'searcio' ) }</Notice.Title>
     <Notice.Description>{ reason }</Notice.Description>
     <Notice.Actions>
-        <Notice.ActionButton onClick={ retry }>{ __( 'Try again', 'webhead-search-cloud' ) }</Notice.ActionButton>
+        <Notice.ActionButton onClick={ retry }>{ __( 'Try again', 'searcio' ) }</Notice.ActionButton>
     </Notice.Actions>
     <Notice.CloseIconButton onClick={ dismiss } />
 </Notice.Root>

@@ -24,7 +24,7 @@ const container = document.getElementById( 'webhead-search-cloud-reports-root' )
 if ( container ) {
     createRoot( container ).render(
         <ThemeProvider isRoot color={ { primary: '#101010' } }>
-            <AdminPage title={ __( 'Reports', 'webhead-search-cloud' ) } icon={ ChartIcon }>
+            <AdminPage title={ __( 'Reports', 'searcio' ) } icon={ ChartIcon }>
                 …cards…
             </AdminPage>
             <ToastContainer />
@@ -48,13 +48,13 @@ other inside a card touch, and nothing in the source shows it:
 ```jsx
 <Card.Content className="webhead-search-cloud-card__content">
     <Stack direction="column" gap="md">
-        <Text>{ __( 'What this does.', 'webhead-search-cloud' ) }</Text>
+        <Text>{ __( 'What this does.', 'searcio' ) }</Text>
         <Stack direction="row" gap="sm">
-            <Button variant="primary" onClick={ run }>{ __( 'Run now', 'webhead-search-cloud' ) }</Button>
+            <Button variant="primary" onClick={ run }>{ __( 'Run now', 'searcio' ) }</Button>
         </Stack>
         { done && (
             <Notice.Root intent="success">
-                <Notice.Description>{ __( 'Done.', 'webhead-search-cloud' ) }</Notice.Description>
+                <Notice.Description>{ __( 'Done.', 'searcio' ) }</Notice.Description>
             </Notice.Root>
         ) }
     </Stack>
@@ -110,7 +110,7 @@ menu, a switch — holds both in one row:
 ```jsx
 <Card.Header className="webhead-search-cloud-card__header">
     <Stack direction="row" gap="md" justify="space-between" align="center" wrap="wrap">
-        <Card.Title render={ <h2 /> }>{ __( 'Shortcode', 'webhead-search-cloud' ) }</Card.Title>
+        <Card.Title render={ <h2 /> }>{ __( 'Shortcode', 'searcio' ) }</Card.Title>
         <Stack direction="row" gap="sm" align="center">…</Stack>
     </Stack>
 </Card.Header>
@@ -125,10 +125,10 @@ parent puts it, which in a page is the left edge:
 <Stack direction="column" align="center">
     <EmptyState.Root>
         <EmptyState.Icon icon={ InboxIcon } />
-        <EmptyState.Title>{ __( 'No exports yet', 'webhead-search-cloud' ) }</EmptyState.Title>
-        <EmptyState.Description>{ __( 'The first one appears here when it is ready.', 'webhead-search-cloud' ) }</EmptyState.Description>
+        <EmptyState.Title>{ __( 'No exports yet', 'searcio' ) }</EmptyState.Title>
+        <EmptyState.Description>{ __( 'The first one appears here when it is ready.', 'searcio' ) }</EmptyState.Description>
         <EmptyState.Actions>
-            <Button variant="primary" onClick={ create }>{ __( 'Create an export', 'webhead-search-cloud' ) }</Button>
+            <Button variant="primary" onClick={ create }>{ __( 'Create an export', 'searcio' ) }</Button>
         </EmptyState.Actions>
     </EmptyState.Root>
 </Stack>

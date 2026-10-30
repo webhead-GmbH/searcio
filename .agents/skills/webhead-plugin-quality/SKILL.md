@@ -25,7 +25,7 @@ Use this before finalizing changes that affect WordPress runtime behavior, relea
 
 ## Translations
 
-- Keep the text domain `webhead-search-cloud` consistent.
+- Keep the text domain `searcio` consistent. To change it, run `wh-plugin rename --slug=<new>`: it moves every translation call and the language files, and leaves what sites have stored where it is.
 - Update `languages/script-translation-map.json` when JavaScript source paths move.
 - Exclude AI skill folders, tests, docs, dependencies, and generated assets from POT generation.
 

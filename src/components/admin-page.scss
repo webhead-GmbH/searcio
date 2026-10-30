@@ -42,7 +42,11 @@
 	// showed as a lighter rectangle on a surface that was almost the same white.
 	background: var(--wpds-color-background-surface-neutral-strong);
 	box-shadow: wp-base.$elevation-x-small;
-	overflow: hidden;
+	// `clip`, not `hidden`: both cut the content at the rounded corners, and
+	// `hidden` also makes the surface a scroll container, which turns
+	// `position: sticky` off for everything inside it. The list of a
+	// `SectionList` sticks below the admin bar through this.
+	overflow: clip;
 }
 
 .webhead-search-cloud-admin-page__header {
@@ -446,10 +450,11 @@
 // Keyed to the role, so any tabbed screen gets it, and to the strip that opens
 // the content: the list itself or the first thing `Tabs.Root` holds. A tab list
 // further in, inside a card or a table, is not the page's strip and keeps the
-// component's own shape. The last selector is for a placeholder strip, which
-// has no role while its tabs are still loading.
-.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"],
-.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"],
+// component's own shape, and so does a vertical list, which is a column beside
+// what it opens and not a strip above it. The last selector is for a
+// placeholder strip, which has no role while its tabs are still loading.
+.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"]:not([aria-orientation="vertical"]),
+.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"]:not([aria-orientation="vertical"]),
 .webhead-search-cloud-admin-page__content--tabbed .webhead-search-cloud-admin-page__tab-strip {
 	box-sizing: border-box;
 	display: flex;
@@ -464,8 +469,8 @@
 // wide as its tabs and lets each one grow to fill it (`flex: 1 0 auto`), which
 // changes nothing while the list fits its tabs. Made as wide as the surface it
 // stretched two tabs to half the strip each, 761px for the word "Overview".
-.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"] > [role="tab"],
-.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"] > [role="tab"] {
+.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"]:not([aria-orientation="vertical"]) > [role="tab"],
+.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"]:not([aria-orientation="vertical"]) > [role="tab"] {
 	flex: 0 0 auto;
 }
 

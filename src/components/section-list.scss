@@ -1,0 +1,81 @@
+// Webhead scaffold managed file.
+//
+// `SectionList`: a tab's sections listed down the side, one of them beside the
+// list at a time. Everything here is a design token, except the width of the
+// list's column. The sizes and weights of the text come from `Text`.
+//
+// Nothing here marks the selected entry. `Tabs` from @wordpress/ui draws its
+// own line beside it, and a background of ours would be a second mark.
+
+.webhead-search-cloud-sections {
+	display: grid;
+	grid-template-columns: 240px minmax(0, 1fr);
+	gap: var(--wpds-dimension-gap-xl);
+	align-items: start;
+}
+
+// A column, and in view while the section beside it scrolls. It sticks below
+// the admin bar only while no ancestor is a scroll container: the page shell
+// clips its corners with `overflow: clip` for this reason, where `hidden`
+// would turn `position: sticky` off for everything inside it.
+.webhead-search-cloud-sections[data-orientation="vertical"] > .webhead-search-cloud-sections__nav {
+	position: sticky;
+	top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wpds-dimension-gap-lg));
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+// A tab holds a name and one or two lines of state, and the column is narrower
+// than some of them: they wrap, from the start of the line, and the tab is as
+// high as they are. @wordpress/ui gives a horizontal tab 48px through any
+// ancestor marked horizontal, and the tabs that hold a section list are one:
+// at 48px each entry ran into the next.
+.webhead-search-cloud-sections[data-orientation="vertical"] .webhead-search-cloud-sections__tab {
+	height: auto;
+	white-space: normal;
+	text-align: start;
+}
+
+.webhead-search-cloud-sections__text {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+.webhead-search-cloud-sections__summary {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// Beside the list, and allowed to be narrower than what it holds: a table in
+// a section scrolls inside the section rather than widening the page.
+.webhead-search-cloud-sections__panel {
+	min-width: 0;
+}
+
+// The page shell puts every tab panel a gap below its strip. Beside a column
+// there is no strip above it, and the section starts level with the list.
+.webhead-search-cloud-sections[data-orientation="vertical"] > .webhead-search-cloud-sections__panel {
+	margin-top: 0;
+}
+
+// Too narrow for a column beside the section: the list is a strip across the
+// top that scrolls on its own, as wide as the section under it, with the line
+// every strip of the design system has under it.
+.webhead-search-cloud-sections[data-orientation="horizontal"] {
+	grid-template-columns: minmax(0, 1fr);
+
+	> .webhead-search-cloud-sections__nav {
+		width: 100%;
+		border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	}
+
+	// A horizontal tab is 48px high and centred, and grows to share the
+	// strip: these hold a name and lines of state, so they take the height
+	// they need, line up by their names, and stay as wide as their text.
+	.webhead-search-cloud-sections__tab {
+		flex: 0 0 auto;
+		align-items: flex-start;
+		height: auto;
+		padding-block: var(--wpds-dimension-padding-md);
+	}
+}

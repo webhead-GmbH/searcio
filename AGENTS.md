@@ -13,7 +13,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
-- Text domain: `webhead-search-cloud`
+- Text domain: `searcio`
 - Hook prefix: `webhead_search_cloud`
 - Cache group: `webhead_search_cloud`
 - REST namespace: `webhead-search-cloud/v1`
@@ -144,11 +144,12 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Choose `Badge` intent by attention priority: prefer `none` or plain text for normal states, then `stable`, `draft`, `informational`, `low`, `medium`, or `high` only when the view needs that emphasis.
 - Use higher-level controls or `DataForm` before low-level form primitives, keep tab panels as `Tabs` instead of link lists, and use tooltips only as visual labels with accessible trigger names.
 - Keep large tab sets responsive with a horizontally scrollable `Tabs.List`, token spacing, visible focus, and browser checks at desktop and mobile widths. The shell draws the strip of a `tabbed` page full-bleed with a light bottom border; do not style it per screen.
+- List the sections of a tab that has more than about five down the side with `src/components/SectionList.js`, each entry carrying its name and its state, rather than stacking them down the page or folding them into collapsible cards. Do not build a vertical tab list of your own.
 - When the WordPress Design System does not cover something, stop and ask before working around it: name the component, token, or page and what is missing, and let the person decide.
 
 ## Don't
 
-- Do not rename the plugin slug, namespace, text domain, hook prefix, cache group, or REST namespace in only one place.
+- Do not rename the plugin by hand: run `wh-plugin rename`. The slug in `PLUGIN_SLUG` names everything a site stores, and changing it, the namespace, the hook prefix, the cache group or the REST namespace on a released plugin leaves that data behind.
 - Do not scatter raw `add_action()` or `add_filter()` calls through unrelated files when a centralized hookable class is more appropriate.
 - Do not bypass framework managers for schema registration, settings writes, scheduled jobs, cache invalidation, or lifecycle cleanup.
 - Do not assume WPML, Polylang, or Wordfence are active.
