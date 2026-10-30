@@ -30,9 +30,8 @@ final class Text_Domain_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The framework names these after the text domain. Named after searcio,
-	 * they would make a site that ran an earlier release look like a new
-	 * install.
+	 * Named after searcio, these would make a site that ran an earlier release
+	 * look like a new install.
 	 */
 	public function test_the_installed_version_is_kept_where_it_was(): void {
 		$this->assertSame( 'webhead_search_cloud_lifecycle_state', $this->call( 'get_lifecycle_state_key' ) );
@@ -41,8 +40,8 @@ final class Text_Domain_Test extends Integration_Test_Case {
 
 	/**
 	 * The German the plugin ships is read from the folder the plugin is in,
-	 * under searcio. wordpress.org installs it in a `searcio/` folder, and the
-	 * framework would look in one named after the plugin slug.
+	 * under searcio. wordpress.org installs it in a `searcio/` folder, which
+	 * is not named after the plugin slug.
 	 */
 	public function test_the_translations_it_ships_load_under_searcio(): void {
 		$german = static fn (): string => 'de_DE';
@@ -65,8 +64,8 @@ final class Text_Domain_Test extends Integration_Test_Case {
 
 	/**
 	 * The settings screen keeps its address, `page=webhead-search-cloud`, and
-	 * the framework translates a page's script under its menu slug. Under that
-	 * name the screen was English for every language.
+	 * its script is translated under the text domain. Under the name in the
+	 * address the screen would be English for every language.
 	 */
 	public function test_the_settings_screen_is_translated_under_searcio(): void {
 		if ( ! function_exists( 'add_menu_page' ) ) {
@@ -76,7 +75,7 @@ final class Text_Domain_Test extends Integration_Test_Case {
 		$GLOBALS['wp_scripts'] = null;
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$page = $this->service( 'settings_page' );
+		$page = $this->plugin()->get_page_registry()->get( 'webhead-search-cloud' );
 		$page->add_page();
 		$page->enqueue_scripts( (string) $page->registered_hook_suffix() );
 

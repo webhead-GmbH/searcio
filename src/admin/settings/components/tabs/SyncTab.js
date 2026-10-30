@@ -11,6 +11,7 @@ import {formatNumber} from '../../../../utils/number';
 import TabIntro from '../TabIntro';
 import SyncSkeleton from './SyncSkeleton';
 import SyncHistory from './SyncHistory';
+import {useAnnounce} from '../../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
 const SYNC_BASE = pluginData?.api?.syncBase || '/webhead-search-cloud/v1/sync';
@@ -152,6 +153,13 @@ const SyncTab = () => {
 				: __('Sync started.', 'searcio')
 		);
 	};
+
+	// What a run says about itself is read out as it says it: a wait before
+	// a retry politely, a failure at once.
+	useAnnounce(
+		status?.active?.last_error ? String(status.active.last_error) : '',
+		'running' === status?.active?.status && status?.active?.cursor?.retries > 0 ? 'polite' : 'assertive'
+	);
 
 	if (loading || !status) {
 		return <SyncSkeleton/>;

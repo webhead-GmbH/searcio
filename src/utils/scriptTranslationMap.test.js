@@ -19,6 +19,12 @@ const MAP_PATH = path.join( ROOT, 'languages/script-translation-map.json' );
 // Matches the i18n calls `make-pot` itself extracts.
 const I18N_CALL = /\b(?:__|_n|_x|_nx)\s*\(/;
 
+// `make-pot` does not read comments, and a managed component shows its use in
+// one: a call in an example is not a string of that file.
+const withoutComments = ( source ) => source
+	.replace( /\/\*[\s\S]*?\*\//g, '' )
+	.replace( /^\s*\/\/.*$/gm, '' );
+
 const sourceFiles = ( dir ) => {
 	const out = [];
 
@@ -36,7 +42,7 @@ const sourceFiles = ( dir ) => {
 };
 
 const translatableFiles = () => sourceFiles( path.join( ROOT, 'src' ) )
-	.filter( ( file ) => I18N_CALL.test( fs.readFileSync( file, 'utf8' ) ) )
+	.filter( ( file ) => I18N_CALL.test( withoutComments( fs.readFileSync( file, 'utf8' ) ) ) )
 	.map( ( file ) => path.relative( ROOT, file ).split( path.sep ).join( '/' ) );
 
 describe( 'script translation map', () => {

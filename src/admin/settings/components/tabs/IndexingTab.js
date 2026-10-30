@@ -10,6 +10,7 @@ import {showToast} from '../../../../toast';
 import {selectProps} from '../../../../utils/select';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
+import {useAnnounce} from '../../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
 const CONFIG_PATH =
@@ -529,6 +530,18 @@ const IndexingTab = () => {
 		}
 	};
 
+	// A failed load and a failed save are read out as they appear.
+	useAnnounce(loadError ? sprintf(
+		/* translators: %s: reason the request failed. */
+		__('The indexing configuration could not be loaded: %s', 'searcio'),
+		loadError
+	) : '', 'assertive');
+	useAnnounce(saveError ? sprintf(
+		/* translators: %s: reason the save failed, as reported by the REST API. */
+		__('The indexing configuration could not be saved: %s', 'searcio'),
+		saveError
+	) : '', 'assertive');
+
 	if (isLoading) {
 		return <IndexingSkeleton/>;
 	}
@@ -602,7 +615,7 @@ const IndexingTab = () => {
 							saveError
 						)}
 					</Notice.Description>
-					<Notice.CloseIcon onClick={() => setSaveError(null)}/>
+					<Notice.CloseIconButton onClick={() => setSaveError(null)}/>
 				</Notice.Root>
 			)}
 

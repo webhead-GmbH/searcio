@@ -1,77 +1,120 @@
-import { useEffect, useRef, useState } from '@wordpress/element';
-import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { Stack, Tabs } from '@wordpress/ui';
-import { motion } from 'motion/react';
-
-import { useFadeInUpProps } from '../utils/animation';
-import './section-list.scss';
-
 /**
- * A tab with many sections: all of them listed down the side, one of them
- * beside the list at a time, as webhead's other plugins draw a long tab.
+ * Webhead scaffold managed file.
+ *
+ * A tab with many sections: every section listed down the side, one of them
+ * beside the list at a time. Reach for it once a tab holds more than about
+ * five sections, rather than stacking them down a page nobody reaches the end
+ * of, or folding them into collapsible cards.
+ *
+ *     <SectionList
+ *         label={ __( 'Firewall', 'text-domain' ) }
+ *         sections={ [
+ *             {
+ *                 id: 'events',
+ *                 label: __( 'Refused requests', 'text-domain' ),
+ *                 summary: [ __( 'Nothing refused this week', 'text-domain' ) ],
+ *                 content: <RefusedRequests />,
+ *             },
+ *             …
+ *         ] }
+ *     />
  *
  * Each entry carries its name and its state, one short line per fact, so the
  * list reads as a summary of the whole tab before anything is opened. The
- * section is kept in the address, so a reload or a copied link lands on it,
- * and taken out again when the tab is left, since it names a section of this
- * tab only. On a narrow screen the list is a strip above the section that
- * scrolls sideways on its own.
+ * section is kept in the address (`section=`), so a reload or a copied link
+ * lands on it, and taken out again when the list goes, since it names a
+ * section of this list only. `aliases` maps the name of a section that was
+ * merged into another to the one it went into, so an old link still lands.
  *
- * @param {Object}                                                                        props
- * @param {Array<{id: string, label: string, summary?: Array<string>, content: Object}>} props.sections
- * @param {string}                                                                        props.label     The list's name, for a screen reader.
- * @param {string}                                                                        [props.className]
+ * The selected entry is marked by `Tabs` itself: `@wordpress/ui` draws a line
+ * beside it as high as its content. Give it no background of your own.
+ *
+ * Narrower than 960px, where WordPress folds its admin menu, the list is a
+ * strip across the top that scrolls on its own, and the tabs turn horizontal
+ * with it: the arrow keys and `aria-orientation` then say what the screen
+ * shows, and the line that marks the selected entry moves under it. A
+ * vertical tab list laid out as a row by CSS alone keeps that line at the
+ * left edge of the strip.
  */
-const SectionList = ( { sections, label, className = '' } ) => {
-	const [ section, setSection ] = useState( () => new URLSearchParams( window.location.search ).get( 'section' ) );
+import { useEffect, useState } from '@wordpress/element';
+import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { Stack, Tabs, Text } from '@wordpress/ui';
+
+// The component owns its stylesheet, so a screen that uses it needs no wiring
+// step: a list that renders unstyled reports nothing.
+import './section-list.scss';
+
+const SECTION_PARAMETER = 'section';
+const NARROW = '(max-width: 960px)';
+
+function useNarrow() {
+	const [ narrow, setNarrow ] = useState( () => window.matchMedia( NARROW ).matches );
+
+	useEffect( () => {
+		const query = window.matchMedia( NARROW );
+		const update = () => setNarrow( query.matches );
+
+		update();
+		query.addEventListener( 'change', update );
+
+		return () => query.removeEventListener( 'change', update );
+	}, [] );
+
+	return narrow;
+}
+
+/**
+ * @param {Object}                 props
+ * @param {Array<Object>}          props.sections            `{ id, label, summary, content }` for each section, in order.
+ * @param {string}                 props.sections[].id       Kept in the address; never shown.
+ * @param {import('react').ReactNode} props.sections[].label The section's name.
+ * @param {string[]}               [props.sections[].summary] Its state, one short line per fact. Empty lines are left out.
+ * @param {import('react').ReactNode} props.sections[].content What the section holds.
+ * @param {Object<string, string>} [props.aliases]           Old section names, each mapped to the section it went into.
+ * @param {string}                 [props.label]             Names the list for assistive technology.
+ * @param {string}                 [props.className]         Extra class on the root.
+ */
+export default function SectionList( { sections, aliases = {}, label, className = '' } ) {
+	const [ section, setSection ] = useState( () => {
+		const asked = new URLSearchParams( window.location.search ).get( SECTION_PARAMETER );
+
+		return aliases[ asked ] || asked;
+	} );
+	const narrow = useNarrow();
 	const current = sections.some( ( item ) => item.id === section ) ? section : sections[ 0 ]?.id;
-	// A section arrives as a tab of the screen does.
-	const panelMotion = useFadeInUpProps( 0.02 );
-	const rootRef = useRef( null );
 
 	useEffect( () => {
 		if ( current ) {
-			window.history.replaceState( {}, '', addQueryArgs( window.location.href, { section: current } ) );
+			window.history.replaceState( {}, '', addQueryArgs( window.location.href, { [ SECTION_PARAMETER ]: current } ) );
 		}
 	}, [ current ] );
 
 	useEffect( () => () => {
-		window.history.replaceState( {}, '', removeQueryArgs( window.location.href, 'section' ) );
+		window.history.replaceState( {}, '', removeQueryArgs( window.location.href, SECTION_PARAMETER ) );
 	}, [] );
 
-	// Where the list is a strip that scrolls sideways, the open entry is
-	// brought into its middle, or a section opened from the address would be
-	// open with nothing in the strip saying which. Measured on the screen, so
-	// a right-to-left strip scrolls the same way.
-	useEffect( () => {
-		const nav = rootRef.current?.querySelector( '.webhead-search-cloud-sections__nav' );
-		const tab = nav?.querySelector( '[aria-selected="true"]' );
-
-		if ( ! nav || ! tab || nav.scrollWidth <= nav.clientWidth ) {
-			return;
-		}
-
-		const strip = nav.getBoundingClientRect();
-		const entry = tab.getBoundingClientRect();
-
-		nav.scrollBy( { left: ( entry.left + ( entry.width / 2 ) ) - ( strip.left + ( strip.width / 2 ) ) } );
-	}, [ current ] );
+	if ( ! current ) {
+		return null;
+	}
 
 	return (
 		<Tabs.Root
-			ref={ rootRef }
-			orientation="vertical"
+			orientation={ narrow ? 'horizontal' : 'vertical' }
 			value={ current }
-			onValueChange={ setSection }
+			onValueChange={ ( value ) => setSection( value ) }
 			className={ `webhead-search-cloud-sections ${ className }`.trim() }
 		>
-			<Tabs.List className="webhead-search-cloud-sections__nav" aria-label={ label }>
+			<Tabs.List aria-label={ label } className="webhead-search-cloud-sections__nav">
 				{ sections.map( ( item ) => (
 					<Tabs.Tab key={ item.id } value={ item.id } className="webhead-search-cloud-sections__tab">
 						<span className="webhead-search-cloud-sections__text">
-							<span className="webhead-search-cloud-sections__label">{ item.label }</span>
-							{ ( item.summary || [] ).filter( Boolean ).map( ( line ) => (
-								<span key={ line } className="webhead-search-cloud-sections__summary">{ line }</span>
+							<Text variant="heading-md" className="webhead-search-cloud-sections__label">
+								{ item.label }
+							</Text>
+							{ ( item.summary || [] ).filter( Boolean ).map( ( line, index ) => (
+								<Text key={ index } variant="body-sm" className="webhead-search-cloud-sections__summary">
+									{ line }
+								</Text>
 							) ) }
 						</span>
 					</Tabs.Tab>
@@ -80,15 +123,11 @@ const SectionList = ( { sections, label, className = '' } ) => {
 
 			{ sections.map( ( item ) => (
 				<Tabs.Panel key={ item.id } value={ item.id } className="webhead-search-cloud-sections__panel">
-					<motion.div { ...panelMotion }>
-						<Stack direction="column" gap="lg">
-							{ item.content }
-						</Stack>
-					</motion.div>
+					<Stack direction="column" gap="lg">
+						{ item.content }
+					</Stack>
 				</Tabs.Panel>
 			) ) }
 		</Tabs.Root>
 	);
-};
-
-export default SectionList;
+}

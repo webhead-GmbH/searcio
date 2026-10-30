@@ -1,6 +1,6 @@
 ---
 name: webhead-plugin-testing
-description: "Use this skill whenever adding, changing, or fixing behavior in webhead Search Cloud. Routes a change to the right test tier, states required coverage, and lists the commands. For wp-env internals use webhead-wp-env-testing; for Playwright use webhead-e2e-testing."
+description: "Use this skill whenever adding, changing, or fixing behavior in Searcio - Fast AI Product Search for WooCommerce. Routes a change to the right test tier, states required coverage, and lists the commands. For wp-env internals use webhead-wp-env-testing; for Playwright use webhead-e2e-testing."
 license: MIT
 metadata:
   author: webhead

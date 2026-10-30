@@ -130,7 +130,7 @@ final class Brand_Test extends TestCase {
 
 		foreach ( $files as $file ) {
 			$code = (string) preg_replace(
-				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TEXT_DOMAIN = 'searcio'/", "/TAG = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
+				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TAG = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
 				'',
 				(string) file_get_contents( $file )
 			);

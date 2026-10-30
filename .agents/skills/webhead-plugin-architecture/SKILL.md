@@ -1,6 +1,6 @@
 ---
 name: webhead-plugin-architecture
-description: "Use this skill when editing PHP architecture in webhead Search Cloud: bootstrap, services, hooks, settings, capabilities, database tables, jobs, lifecycle, REST endpoints, Site Health, diagnostics, updates, multisite, or compatibility integrations."
+description: "Use this skill when editing PHP architecture in Searcio - Fast AI Product Search for WooCommerce: bootstrap, services, hooks, settings, capabilities, database tables, jobs, lifecycle, REST endpoints, Site Health, diagnostics, updates, multisite, or compatibility integrations."
 license: MIT
 metadata:
   author: webhead
@@ -12,16 +12,16 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 
 ## Project Snapshot
 
-- Plugin name: `webhead Search Cloud`
+- Plugin name: `Searcio - Fast AI Product Search for WooCommerce`
 - Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
-- Description: `Connect WordPress and WooCommerce to webhead Search Cloud.`
+- Description: `Connect WordPress and WooCommerce to Searcio.`
 - Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
-- Text domain: `webhead-search-cloud`
+- Text domain: `searcio`
 - Hook prefix: `webhead_search_cloud`
 - Cache group: `webhead_search_cloud`
 - REST namespace: `webhead-search-cloud/v1`
@@ -104,7 +104,7 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 - Every write to a table invalidates this plugin's whole cache group. Give a table that is written often its own group with `set_cache_group()`.
 - Take the id of a row you inserted from `$table->insert_get_id( $data )`, never from `$wpdb->insert_id` after `insert()`: the write invalidates the cache group, which can insert a row of its own, and `insert_id` is then that row's.
 - Store an amount of money in a `$table->decimal( 'total' )` column with the `decimal` cast, never in a float. Declare a uniqueness rule with `$table->unique_index( 'name', [ 'column_a', 'column_b' ] )`.
-- A label handed over in a `register_*()` method is handed over while the plugin boots, before translations are loaded. Where the API takes a closure, as `Elementor_Manager::set_category()` does, give it one: `static fn (): string => __( 'Label', 'webhead-search-cloud' )`.
+- A label handed over in a `register_*()` method is handed over while the plugin boots, before translations are loaded. Where the API takes a closure, as `Elementor_Manager::set_category()` does, give it one: `static fn (): string => __( 'Label', 'searcio' )`.
 - `Plugin::instance()` is the plugin that is running, for code WordPress builds or includes itself, such as a block's `render.php`. Everything this plugin builds gets what it needs through the container instead.
 - A plugin that extends WooCommerce names the WooCommerce features it was tested with in `get_woocommerce_feature_compatibility()`, for example `[ 'custom_order_tables' ]`, and reads orders only through WooCommerce's own API so it works under either order storage.
 - On multisite, a setting stored as a network option is only shown to, and saved by, a user with `manage_network_options` through REST. A site administrator sees the site's own settings.

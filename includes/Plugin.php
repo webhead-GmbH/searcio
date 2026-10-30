@@ -88,46 +88,6 @@ use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
  * @since 1.0.0
  */
 final class Plugin extends Base_Plugin {
-	/**
-	 * The plugin's slug on wordpress.org, which installs it as `searcio/` and
-	 * files its translations under that name. Only the translations follow it:
-	 * the hook prefix, the cache group, the options, the asset handles, the
-	 * admin page and the REST namespace keep the plugin's first slug, which
-	 * {@see PLUGIN_SLUG} names whatever folder the plugin is installed in.
-	 */
-	public const TEXT_DOMAIN = 'searcio';
-
-	protected function get_text_domain(): string {
-		return self::TEXT_DOMAIN;
-	}
-
-	/**
-	 * Where the installed version is kept. The framework names it after the
-	 * text domain, so a site that ran a release before the text domain changed
-	 * would look like a new install to the release after it.
-	 */
-	protected function get_lifecycle_state_key(): string {
-		return 'webhead_search_cloud_lifecycle_state';
-	}
-
-	/**
-	 * Where a network activation is remembered, named as before for the same
-	 * reason as {@see self::get_lifecycle_state_key()}.
-	 */
-	protected function get_network_activation_state_key(): string {
-		return 'webhead_search_cloud_network_activated';
-	}
-
-	/**
-	 * The translations the plugin ships, from the folder it is installed in.
-	 * The framework would look in a folder named after the plugin slug, and
-	 * wordpress.org installs the plugin in one named after the text domain.
-	 */
-	public function load_textdomain(): void {
-		// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- The plugin ships languages/ for sites that install it from a release; wordpress.org language packs need nothing.
-		load_plugin_textdomain( self::TEXT_DOMAIN, false, dirname( PLUGIN_BASE ) . '/languages' );
-	}
-
 	protected function register_capabilities( Capability_Manager $capability_manager, Container $container ): void {
 		$capability_manager->register_provider( Plugin_Capabilities::class );
 	}

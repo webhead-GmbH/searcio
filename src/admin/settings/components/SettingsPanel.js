@@ -20,6 +20,7 @@ import IndexingTab from './tabs/IndexingTab';
 import SyncTab from './tabs/SyncTab';
 import SearchConfigTab from './tabs/SearchConfigTab';
 import PlacementTab from './tabs/PlacementTab';
+import {useAnnounce} from '../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
 
@@ -152,6 +153,19 @@ const SettingsPanel = () => {
 	useEffect(() => {
 		clearSaveError();
 	}, [activeTab, clearSaveError]);
+
+	// A failed load and a failed save are read out as they appear, in the
+	// words their notices print.
+	useAnnounce(loadError ? sprintf(
+		/* translators: %s: reason the settings request failed. */
+		__('The settings could not be loaded: %s', 'searcio'),
+		loadError
+	) : '', 'assertive');
+	useAnnounce(saveError ? sprintf(
+		/* translators: %s: reason the settings could not be saved, as reported by the REST API. */
+		__('The settings could not be saved: %s', 'searcio'),
+		saveError
+	) : '', 'assertive');
 
 	const handleSave = async () => {
 		const success = await saveSettings();
@@ -316,7 +330,7 @@ const SettingsPanel = () => {
 									saveError
 								)}
 							</Notice.Description>
-							<Notice.CloseIcon onClick={clearSaveError}/>
+							<Notice.CloseIconButton onClick={clearSaveError}/>
 						</Notice.Root>
 					)}
 					{/* A row of its own, so the column does not stretch the button. */}

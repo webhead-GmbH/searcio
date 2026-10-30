@@ -18,6 +18,7 @@ import { Grid } from '../../../../components/Layout';
 import { showToast } from '../../../../toast';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
+import { useAnnounce } from '../../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
 const SEARCH_CONFIG_PATH =
@@ -681,6 +682,14 @@ const SearchConfigTab = () => {
 		);
 	};
 
+	// A failed load and a failed save are read out as they appear.
+	useAnnounce( loadError ? sprintf(
+		/* translators: %s: reason the request failed. */
+		__( 'The search configuration could not be loaded: %s', 'searcio' ),
+		loadError
+	) : '', 'assertive' );
+	useAnnounce( saveError || '', 'assertive' );
+
 	if ( isLoading ) {
 		return <IndexingSkeleton label={ __( 'Loading the search configuration', 'searcio' ) } />;
 	}
@@ -973,7 +982,7 @@ const SearchConfigTab = () => {
 			{ saveError && (
 				<Notice.Root intent="error">
 					<Notice.Description>{ saveError }</Notice.Description>
-					<Notice.CloseIcon onClick={ () => setSaveError( null ) } />
+					<Notice.CloseIconButton onClick={ () => setSaveError( null ) } />
 				</Notice.Root>
 			) }
 

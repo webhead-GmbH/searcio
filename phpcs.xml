@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- Webhead scaffold managed file. scaffold:update may refresh this file. -->
-<ruleset name="webhead Search Cloud">
-    <description>PHPCS rules for webhead Search Cloud</description>
+<ruleset name="Searcio - Fast AI Product Search for WooCommerce">
+    <description>PHPCS rules for Searcio - Fast AI Product Search for WooCommerce</description>
 
     <!-- The PHP this plugin ships and owns. -->
     <file>searcio.php</file>

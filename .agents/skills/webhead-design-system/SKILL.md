@@ -1,6 +1,6 @@
 ---
 name: webhead-design-system
-description: "Use this skill before writing or changing any admin UI in webhead Search Cloud: which WordPress component to reach for, design tokens, cards, tabs, typography, elevation, radius, layout, loading and saving states, destructive confirmations, error messages, badges and tooltips."
+description: "Use this skill before writing or changing any admin UI in Searcio - Fast AI Product Search for WooCommerce: which WordPress component to reach for, design tokens, cards, tabs, typography, elevation, radius, layout, loading and saving states, destructive confirmations, error messages, badges and tooltips."
 license: MIT
 metadata:
   author: webhead
@@ -56,8 +56,8 @@ prop from `node_modules`. When a `@wordpress/*` version moves, read the breaking
 The design system recommends its "WordPress Design System MCP Server" to AI agents. When it is
 connected, ask it for a component's status before opening a browser.
 
-These files were written on 2026-10-03 against `@wordpress/components` 41, `@wordpress/ui` 0.23,
-`@wordpress/theme` 2.2, `@wordpress/icons` 17 and `@wordpress/dataviews` 19.1.
+These files were written on 2026-10-29 against `@wordpress/components` 43, `@wordpress/ui` 0.25,
+`@wordpress/theme` 3.0, `@wordpress/icons` 19 and `@wordpress/dataviews` 21.0.
 
 ## When the design system falls short, stop and ask
 
@@ -77,22 +77,22 @@ chose gets a comment naming the gap.
 ## Which component to reach for
 
 This is **not** "prefer `@wordpress/ui`". Upstream is mid-migration and the two packages disagree
-in both directions: 34 `@wordpress/components` exports are not-recommended or deprecated, and
-about twenty `@wordpress/ui` components are use-with-caution — nearly all of them because they are
+in both directions: 39 `@wordpress/components` exports are not-recommended or deprecated, and
+seventeen `@wordpress/ui` components are use-with-caution — nearly all of them because they are
 *"not yet recommended for use alongside components from `@wordpress/components`"*.
 
 So choose **per component, by its status**: take the one that is recommended, and where the
 `@wordpress/ui` one is cautionary stay on `@wordpress/components`. That is why the settings screen
-imports `Button` and `ToggleControl` from `@wordpress/components` and `Notice`, `Card`, `Tabs`,
-`InputControl`, `Stack` and `Skeleton` from `@wordpress/ui`.
+imports `Button` from `@wordpress/components` and `Notice`, `Card`, `Tabs`, `InputControl`,
+`SwitchControl`, `Stack` and `Skeleton` from `@wordpress/ui`.
 
 The full lists and the `@wordpress/ui` export shapes are in `references/component-status.md`. Two
 rules that never need looking up:
 
 - **A `not-recommended` component is not an option**, whatever a neighbouring file still does.
 - **No `@wordpress/ui` form control takes `onChange`.** Text, select and radio controls take
-  `onValueChange`; `CheckboxControl` takes `checked` and `onCheckedChange`. The wrong one is not
-  an error; it is a control that silently never updates.
+  `onValueChange`; `CheckboxControl` and `SwitchControl` take `checked` and `onCheckedChange`. The
+  wrong one is not an error; it is a control that silently never updates.
 
 ## Design tokens, in four rules
 
@@ -122,13 +122,13 @@ second screen cannot look like a different plugin:
 
 ```jsx
 <AdminPage
-    title={ __( 'Reports', 'webhead-search-cloud' ) }
-    description={ __( 'What this screen is for.', 'webhead-search-cloud' ) }
+    title={ __( 'Reports', 'searcio' ) }
+    description={ __( 'What this screen is for.', 'searcio' ) }
     icon={ ChartIcon }
     actions={ [
-        { label: __( 'Refresh', 'webhead-search-cloud' ), icon: UpdateIcon, onClick: refresh },
-        { label: __( 'Add new', 'webhead-search-cloud' ), onClick: create },
-        { label: __( 'Export', 'webhead-search-cloud' ), onClick: exportAll },
+        { label: __( 'Refresh', 'searcio' ), icon: UpdateIcon, onClick: refresh },
+        { label: __( 'Add new', 'searcio' ), onClick: create },
+        { label: __( 'Export', 'searcio' ), onClick: exportAll },
     ] }
 >
     …cards…
@@ -231,10 +231,13 @@ tab strip and its panel and between related cards, `gap-xl` between major sectio
 `references/screens.md` has each with its sample and what it looked like the other way. Read it
 before putting a second element into anything.
 
-**A card separates one section from another. One section needs no card.** If a screen or a tab
-holds a single region, put it straight into the page shell — wrapping it draws a box around the
-whole thing and promises a second section that never arrives. Reach for cards when there are
-several regions and the reader needs to tell them apart.
+**A card separates one section from another. One section needs no card.** A screen, a tab, or a
+section beside a `SectionList` that holds a single region puts it straight on the panel: a lone
+table with no wrapper, a lone form with no card. A box around the only thing there says a second
+section is coming that never does. Reach for cards when there are several regions and the reader
+needs to tell them apart, and count the regions when the tab can change: a History tab whose
+second card shows only once there are repairs is a one-region tab until then. The generated
+settings screen does this for a tab that holds one setting.
 
 **Let the Card be a Card.** `Card.Root` already draws its border, radius and surface;
 `Card.Header` and `Card.Content` already pad themselves, and there is no separator line under a
@@ -245,7 +248,7 @@ rule beats a layered one however specific either is. `references/css-traps.md` h
 ```jsx
 <Card.Root className="webhead-search-cloud-card webhead-search-cloud-card--dotted">
     <Card.Header className="webhead-search-cloud-card__header">
-        <Card.Title render={ <h2 /> }>{ __( 'Title', 'webhead-search-cloud' ) }</Card.Title>
+        <Card.Title render={ <h2 /> }>{ __( 'Title', 'searcio' ) }</Card.Title>
     </Card.Header>
     <Card.Content className="webhead-search-cloud-card__content">…</Card.Content>
 </Card.Root>
@@ -268,9 +271,15 @@ rule beats a layered one however specific either is. `references/css-traps.md` h
   accessible label only. A switch is the answer to the question its title asks, so it belongs on
   the title row rather than stranded below a description.
 
-`CollapsibleCard` is the answer to a crowded tab, opened by rule rather than habit:
+`CollapsibleCard` is the answer to a crowded card, opened by rule rather than habit:
 `defaultOpen={ items.length > 0 }`. One card left open among closed ones reads as the important
 one.
+
+**A tab with more than about five sections lists them down the side** and shows one at a time:
+`SectionList` from `src/components/SectionList.js`. Each entry carries its name and its state, a
+line per fact; the section is in the address; the design system marks the selected entry. Do not
+stack the sections down the page, fold them into collapsible cards, or build a vertical tab list
+of your own. The rules are under Tabs in `references/patterns.md`.
 
 ## Verify by measuring, not by looking
 

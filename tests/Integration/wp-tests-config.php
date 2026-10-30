@@ -44,7 +44,7 @@ $table_prefix = $webhead_search_cloud_env( 'WP_TESTS_TABLE_PREFIX', 'wptests_' )
 
 define( 'WP_TESTS_DOMAIN', $webhead_search_cloud_env( 'WP_TESTS_DOMAIN', 'example.org' ) );
 define( 'WP_TESTS_EMAIL', 'admin@example.org' );
-define( 'WP_TESTS_TITLE', 'webhead Search Cloud Tests' );
+define( 'WP_TESTS_TITLE', 'Searcio - Fast AI Product Search for WooCommerce Tests' );
 
 define( 'WP_PHP_BINARY', 'php' );
 
