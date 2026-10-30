@@ -361,6 +361,25 @@
  * Placement
  * ---------------------------------------------------------------------- */
 
+// A section with nothing beside it is no card: its title, its sentence and
+// its controls straight on the panel, on the rhythm a card would give them.
+// wp-admin gives a bare `h3` and `p` margins of their own inside `.wrap`.
+.whsc-placement-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-lg);
+  min-width: 0;
+
+  .whsc-placement-section__title,
+  .whsc-placement-section__description {
+    margin: 0;
+  }
+
+  .whsc-placement-section__description {
+    color: var(--wpds-color-foreground-content-neutral-weak);
+  }
+}
+
 // The preview is a page of the site, in the theme's own styles, framed as a
 // surface of its own. Its heights are the room each view needs: a trigger
 // with the space round it, the open window as a short screen, the floating

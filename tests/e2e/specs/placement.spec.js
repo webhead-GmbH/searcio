@@ -186,6 +186,15 @@ test.describe( 'Placement tab', () => {
 
 		await openSection( page, 'Look' );
 		await expect( page.locator( SCREEN ).getByText( 'Look of the shortcode and the widgets' ) ).toBeVisible();
+
+		// A card separates one region from another: a section with one region
+		// has none, and Shortcodes, with two, has two.
+		const panel = page.locator( SCREEN ).getByRole( 'tabpanel', { name: /^Look/ } );
+
+		await expect( panel.locator( '.whsc-card' ) ).toHaveCount( 0 );
+		await openSection( page, 'Shortcodes' );
+		await expect( page.locator( SCREEN ).getByRole( 'tabpanel', { name: /^Shortcodes/ } ).locator( '.whsc-card' ) ).toHaveCount( 2 );
+		await openSection( page, 'Look' );
 		await expect( page.locator( SCREEN ).getByRole( 'checkbox', { name: 'Use Searcio for the site\'s search forms' } ) ).toHaveCount( 0 );
 		expect( new URL( page.url() ).searchParams.get( 'section' ) ).toBe( 'look' );
 
