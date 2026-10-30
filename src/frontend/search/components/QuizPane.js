@@ -122,6 +122,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		try {
 			const response = await search( '', {
 				filters: buildFilterParams( {}, { ...finalTags, ...currentLangFilter() } ),
+				surface: 'quiz',
 				signal: controller.signal,
 			} );
 
@@ -148,6 +149,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			const response = await search( '', {
 				filters: buildFilterParams( {}, { ...appliedTagsRef.current, ...currentLangFilter() } ),
 				page: nextPage,
+				surface: 'quiz',
 			} );
 
 			setResults( ( current ) => ( {

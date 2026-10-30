@@ -13,6 +13,7 @@ import { useLayoutEffect } from '@wordpress/element';
 
 import { formatPrice, PRICE_FIELDS } from '../../../utils/currency';
 import { PLACEHOLDER_IMAGE_DATA_URI } from '../../../utils/placeholderImage';
+import { openHandlers } from '../../../utils/clicks';
 
 const PLACEHOLDER_RE = /\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g;
 
@@ -494,7 +495,9 @@ export const ServerCard = ( { hit, template, onClick } ) => {
 	return (
 		<div
 			className={ `whsc-card whsc-card--server sct-${ template.id }` }
-			onClick={ onClick }
+			// A link inside the template is opened by a click or a middle
+			// click; both reach this box on their way up.
+			{ ...openHandlers( onClick ) }
 			// eslint-disable-next-line react/no-danger -- server-designed, trusted HTML; field values are escaped in buildServerCardHtml().
 			dangerouslySetInnerHTML={ { __html: buildServerCardHtml( template, hit ) } }
 		/>

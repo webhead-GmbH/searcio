@@ -67,6 +67,8 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {Array}          [options.visualHits]  `/search/visual` hits.
  * @param {number}         [options.visualStatus] Force a non-200 `/search/visual` status.
  * @param {number}         [options.visualDelay]  Hold the `/search/visual` answer this many ms.
+ * @param {string}         [options.similarSearchId] A `search_id` on `/search/similar`, as a service that records them sends.
+ * @param {string}         [options.visualSearchId]  A `search_id` on `/search/visual`, likewise.
  */
 export async function mockSearchCloud( page, options = {} ) {
 	const {
@@ -98,6 +100,8 @@ export async function mockSearchCloud( page, options = {} ) {
 		visualHits = [ postHit( { title: 'Red Silk Dress', type: 'product' }, 'visual-1' ) ],
 		visualStatus = 200,
 		visualDelay = 0,
+		similarSearchId = '',
+		visualSearchId = '',
 	} = options;
 
 	await page.route( '**/api/v1/**', async ( route ) => {
@@ -122,7 +126,7 @@ export async function mockSearchCloud( page, options = {} ) {
 				return json( {}, similarStatus );
 			}
 
-			return json( { similar } );
+			return json( similarSearchId ? { search_id: similarSearchId, similar } : { similar } );
 		}
 		if ( '/quizzes' === path ) {
 			return json( { quizzes } );
@@ -136,6 +140,7 @@ export async function mockSearchCloud( page, options = {} ) {
 			}
 
 			return json( {
+				...( visualSearchId ? { search_id: visualSearchId } : {} ),
 				query: visualTags.join( ' ' ) || null,
 				tags: visualTags,
 				total: visualHits.length,

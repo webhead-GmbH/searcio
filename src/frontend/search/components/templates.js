@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { getConfig } from '../../../utils/api';
 import { formatPrice } from '../../../utils/currency';
 import { matchTemplate, ServerCard } from './serverCards';
+import { openHandlers } from '../../../utils/clicks';
 
 /**
  * The price line for a product card: strikethrough regular + sale price when
@@ -108,7 +109,7 @@ const ProductCard = ( { hit, onClick } ) => {
 	const i18n = getConfig().i18n || {};
 
 	return (
-		<a className="whsc-card whsc-card--product" href={ source.url || '#' } onClick={ onClick }>
+		<a className="whsc-card whsc-card--product" href={ source.url || '#' } { ...openHandlers( onClick ) }>
 			<span className="whsc-card__media">
 				<CardImage src={ source.image } />
 				{ Boolean( source.on_sale ) && (
@@ -194,7 +195,7 @@ const PostCard = ( { hit, onClick } ) => {
 	const excerpt = trimExcerpt( source.content );
 
 	return (
-		<a className="whsc-card whsc-card--post" href={ source.url || '#' } onClick={ onClick }>
+		<a className="whsc-card whsc-card--post" href={ source.url || '#' } { ...openHandlers( onClick ) }>
 			<CardImage src={ source.image } />
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
@@ -209,7 +210,7 @@ const GenericCard = ( { hit, onClick } ) => {
 	const source = hit.source || {};
 
 	return (
-		<a className="whsc-card whsc-card--generic" href={ source.url || '#' } onClick={ onClick }>
+		<a className="whsc-card whsc-card--generic" href={ source.url || '#' } { ...openHandlers( onClick ) }>
 			<CardImage src={ source.image } />
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
@@ -237,6 +238,7 @@ export const registerTemplate = ( type, Component ) => {
  * @param {Array<Object>}  [props.serverTemplates]  Fetched once per modal
  *                                                   session by the caller.
  * @param {Function}       [props.onClick]          Fired when the card is opened,
+ *                                                   by a click or a middle click,
  *                                                   for click-through tracking.
  */
 export const ResultCard = ( { hit, cardSource, serverTemplates, onClick } ) => {
