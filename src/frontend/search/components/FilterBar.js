@@ -4,6 +4,7 @@ import { chevronDown, funnel } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { fitFilterButtons, formatCount } from '../../../utils/facets';
+import { trackScrollEnd } from '../../../utils/scrollEnd';
 
 /** Space between two buttons of the bar, as the stylesheet sets it. */
 const GAP = 8;
@@ -34,7 +35,7 @@ const BADGE_ROOM = 28;
  * @param {(type: string) => void} props.onType '' for all types.
  * @param {Object<string,string>} props.typeLabels
  * @param {string}   [props.allTypesLabel]
- * @param {boolean}  props.showCount
+ * @param {boolean}  props.showCount   Counts on the type buttons: off where the total is not exact.
  * @param {string[]} props.groups      In bar order.
  * @param {(field: string) => {text: string, name: string, value: string, more: number, hidden: string}} props.buttonLabel
  * @param {(field: string) => boolean} props.isActive
@@ -116,33 +117,24 @@ const FilterBar = ( {
 	}, [ fitKey, groupKey, narrow, limit, showTypes ] );
 
 	// The phone's row fades out at its end while there is more to scroll to.
-	// `scrollLeft` counts down from 0 in a right-to-left page.
-	useEffect( () => {
-		const row = scrollRef.current;
-
-		if ( ! row ) {
-			return undefined;
-		}
-
-		const update = () => row.classList.toggle( 'has-more', row.scrollWidth - row.clientWidth - Math.abs( row.scrollLeft ) > 4 );
-
-		update();
-		row.addEventListener( 'scroll', update, { passive: true } );
-
-		return () => row.removeEventListener( 'scroll', update );
-	} );
+	useEffect( () => trackScrollEnd( scrollRef.current ) );
 
 	const shown = ( field ) => null === visible || visible.includes( field );
 
 	const typeButton = ( value, label, count ) => {
 		const pressed = '' === value ? 0 === activeTypes.length : activeTypes.includes( value );
+		// A type the filters leave empty keeps its place, so the bar does not
+		// move under a pick, but is off like an empty size tile: pressing it
+		// could only show nothing.
+		const empty = '' !== value && 0 === count && ! pressed;
 
 		return (
 			<button
 				key={ value || 'all' }
 				type="button"
 				aria-pressed={ pressed }
-				className={ `whsc-facet whsc-type${ pressed ? ' is-active' : '' }` }
+				disabled={ empty }
+				className={ `whsc-facet whsc-type${ pressed ? ' is-active' : '' }${ empty ? ' is-empty' : '' }` }
 				onClick={ () => onType( value ) }
 			>
 				<span className="whsc-facet__label">{ label }</span>

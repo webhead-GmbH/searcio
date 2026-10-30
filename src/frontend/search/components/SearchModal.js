@@ -8,6 +8,7 @@ import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSea
 import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
 import {redirectTarget} from '../../../utils/redirect';
+import {trackScrollEnd} from '../../../utils/scrollEnd';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
@@ -251,6 +252,9 @@ const SearchModal = ({
 	useLayoutEffect(() => {
 		revealTab(tabListRef.current, tabListRef.current?.querySelector('.whsc-modal-tab.is-active'));
 	}, [activeTab]);
+	// A tab the row's end cuts off fades out, so "Produktfinder" cut to
+	// "Produl" at 320px reads as more to scroll to, not as a typo.
+	useEffect(() => trackScrollEnd(tabListRef.current));
 	// What the vision model saw in the uploaded photo, shown above the results
 	// so a surprising result set is explained rather than just odd.
 	const [visualTags, setVisualTags] = useState([]);
@@ -1848,7 +1852,10 @@ const SearchModal = ({
 							onType={onTypeFacetClick}
 							typeLabels={typeLabels}
 							allTypesLabel={i18n.allTypes}
-							showCount={showCount}
+							// The type counts come from the same window as `total`: when the
+							// heading cannot give an exact number, neither can they, and two
+							// numbers that disagree ("20 results", "Products 21") help no one.
+							showCount={showCount && exactTotal}
 							groups={bar.order}
 							buttonLabel={(field) => filterButtonLabel(labelOf(field), activeFacets[field], activeRanges[field], formatBound(field))}
 							isActive={isGroupActive}
