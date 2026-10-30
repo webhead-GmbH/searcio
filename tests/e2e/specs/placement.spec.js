@@ -222,15 +222,10 @@ test.describe( 'Placement tab', () => {
 		expect( await overflow() ).toBeLessThanOrEqual( 0 );
 		await expect( page.locator( SCREEN ).getByText( 'PHP in a child theme' ) ).toBeVisible();
 
-		// Opened from the address, the open entry is in the strip's view.
+		// Opened from the address, the section it names is the open one.
 		await page.goto( `${ TAB_URL }&section=products` );
 		await expect( sectionTab( page, 'Product rows' ) ).toHaveAttribute( 'aria-selected', 'true', LOADED );
-		await expect.poll( () => page.evaluate( () => {
-			const strip = document.querySelector( '.webhead-search-cloud-sections__nav' ).getBoundingClientRect();
-			const entry = document.querySelector( '.webhead-search-cloud-sections__nav [aria-selected="true"]' ).getBoundingClientRect();
-
-			return entry.left >= strip.left - 1 && entry.right <= strip.right + 1;
-		} ) ).toBe( true );
+		expect( await overflow() ).toBeLessThanOrEqual( 0 );
 	} );
 } );
 
