@@ -139,8 +139,8 @@ and the old way of colouring an icon does nothing to them:
   only for the icons that are still filled, and expect it to do nothing for the rest.
 - **The inline `fill: none` beats any stylesheet rule**, so a `fill` you add cannot turn a stroke
   icon into a blob — and cannot recolour it either.
-- **Strokes do not scale with the box.** An icon rendered larger keeps its line weight, so a 48px
-  icon looks lighter than a 24px one. Size icons through the component's `size`.
+- **Strokes scale with the box since `@wordpress/icons` 18:** 1px at 16px, 1.5px at 24px, 3px at
+  48px. Size icons through the component's `size`.
 
 ## An accent is two colours
 
@@ -237,3 +237,14 @@ the component's own shape. Three things that go wrong when a screen styles its o
   reports a rule that matches no element.
 - A margin between the strip and its panel that is written for the loaded state also moves the
   loading one. Scope it to the state it belongs to.
+
+The rule leaves a vertical list alone: a `SectionList` is a column beside what it opens, not a
+strip above it.
+
+## Sticky inside a clipped container
+
+`overflow: hidden` on an ancestor makes it a scroll container, and `position: sticky` then sticks
+to that ancestor, which does not scroll, so nothing sticks. The page shell's surface clips its
+rounded corners with `overflow: clip` for that reason: the corners are cut the same, and the list
+of a `SectionList` stays in view while its section scrolls. Do not put `overflow: hidden` on
+anything between a sticky element and the page; clip with `overflow: clip`.

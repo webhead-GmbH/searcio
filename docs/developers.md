@@ -205,7 +205,19 @@ wp plugin check searcio --error-severity=7 --warning-severity=6 --include-low-se
 
 `includes/Dependencies` must hold `Webhead`, `League`, `Psr` and the prefixed `composer` autoloader, and nothing else.
 
-Do not run `scaffold:update` (`composer framework:update`) until the framework resolves a plugin's slug from somewhere other than its `Text Domain` header. It reads the slug from that header first and derives the hook prefix, the cache group, the REST namespace and the admin page's class names from it, so today it would rewrite the managed files for a plugin named `searcio`. The text domain of the two strings in `src/components/AdminPage.js` and `src/components/Modal.js` is already the one it writes, and so is the name of the main file, `searcio.php`, that `tests/Integration/bootstrap.php` loads, `phpcs.xml` lints and the guides in `CLAUDE.md`, `AGENTS.md` and the skills name.
+The plugin has three names, each written in one place, and `scaffold:update` (`composer framework:update`) reads them from there, so a framework update leaves them as they are:
+
+- **The display name** is the `Plugin Name` header of `searcio.php`.
+- **The text domain**, `searcio`, is the `Text Domain` header and the `TEXT_DOMAIN` constant of `searcio.php`. It names the translations and nothing else.
+- **The slug**, `webhead-search-cloud`, is the `PLUGIN_SLUG` constant of `searcio.php`. Options, tables, capabilities, hooks, the REST namespace and the admin page are named after it, and it never changes, since sites hold their data under it.
+
+A new name goes through `vendor/bin/webhead scaffold:rename` (`wh-plugin rename`), never by hand: `--name` for the display name, `--slug` for the text domain. It does not take `--unreleased`, which would move the slug. The folder of the release zip stays `searcio`.
+
+To update the framework:
+
+1. `composer update webhead/wp-plugin-framework -W`. Mozart rebuilds `includes/Dependencies` and `bundle:prune` runs after it.
+2. `composer framework:update`, and read the diff of every managed file.
+3. Do what the update says: when the `@wordpress/*` majors move, delete `package-lock.json` and `node_modules` and run `npm install`, then rename what it names and build.
 
 `.wordpress-org` holds the plugin's page on wordpress.org: `icon.svg`, `icon-128x128.png` and `icon-256x256.png`, `banner-772x250.png` and `banner-1544x500.png`, and `screenshot-N.png`, numbered as the **Screenshots** section of `readme.txt` captions them. They go in the `assets/` folder of the wordpress.org SVN repository, never in the plugin: `.distignore` leaves every hidden folder out of the package. A screenshot that is added, removed or reordered changes its caption in `readme.txt` in the same change.
 

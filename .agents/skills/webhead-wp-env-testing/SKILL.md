@@ -1,6 +1,6 @@
 ---
 name: webhead-wp-env-testing
-description: "Use this skill when writing or debugging webhead Search Cloud's wp-env integration tests: the tests/Integration suite, the wp-phpunit bootstrap, database transactions, activation state, multisite runs, .wp-env.json, or a suite that will not boot."
+description: "Use this skill when writing or debugging Searcio - Fast AI Product Search for WooCommerce's wp-env integration tests: the tests/Integration suite, the wp-phpunit bootstrap, database transactions, activation state, multisite runs, .wp-env.json, or a suite that will not boot."
 license: MIT
 metadata:
   author: webhead

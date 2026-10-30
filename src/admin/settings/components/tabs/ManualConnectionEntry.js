@@ -7,6 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 import SettingsContext from '../../../../settings/store/context';
 import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
+import {useAnnounce} from '../../../../utils/announce';
 
 const pluginData = window.webhead_search_cloudData || {};
 const SECRET_PLACEHOLDER = '••••••••••••';
@@ -86,6 +87,13 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 		? __('No unsaved changes.', 'searcio')
 		: undefined;
 
+	// A failed save is read out as its notice appears.
+	useAnnounce(saveError ? sprintf(
+		/* translators: %s: reason the settings could not be saved, as reported by the REST API. */
+		__('The settings could not be saved: %s', 'searcio'),
+		saveError
+	) : '', 'assertive');
+
 	return (
 		<Stack direction="column" gap="lg" className="webhead-search-cloud-manual-entry">
 			<Text render={<p/>} variant="body-sm">
@@ -144,7 +152,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 							saveError
 						)}
 					</Notice.Description>
-					<Notice.CloseIcon onClick={clearSaveError}/>
+					<Notice.CloseIconButton onClick={clearSaveError}/>
 				</Notice.Root>
 			)}
 

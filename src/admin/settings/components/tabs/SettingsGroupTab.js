@@ -10,6 +10,7 @@ import { Card, InputControl, Notice, Stack, Text, TextareaControl } from '@wordp
 import { __ } from '@wordpress/i18n';
 
 import { Grid } from '../../../../components/Layout';
+import { useAnnounce } from '../../../../utils/announce';
 
 const serializeJsonValue = ( value, definition ) =>
 	JSON.stringify(
@@ -48,6 +49,11 @@ const JsonFieldControl = ( { settingKey, definition, value, updateSetting } ) =>
 		setDraft( serialized );
 		setIsInvalid( false );
 	}, [ serialized ] );
+
+	// Read out as the value stops parsing, not on every key after that.
+	useAnnounce(
+		isInvalid ? __( 'This is not valid JSON yet, so the change has not been applied. Finish the value to save it.', 'searcio' ) : ''
+	);
 
 	return (
 		// A Stack and not a fragment. Card.Content does not space what is put

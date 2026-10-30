@@ -1,6 +1,6 @@
 ---
 name: webhead-verify-before-you-write
-description: "Read this before writing code against any package, and before reporting that anything works. It is a list of mistakes that were actually made in webhead Search Cloud's codebase and how each one was caught — every entry cost real debugging time, and every one was avoidable by reading instead of recalling."
+description: "Read this before writing code against any package, and before reporting that anything works. It is a list of mistakes that were actually made in Searcio - Fast AI Product Search for WooCommerce's codebase and how each one was caught — every entry cost real debugging time, and every one was avoidable by reading instead of recalling."
 license: MIT
 metadata:
   author: webhead
@@ -35,13 +35,14 @@ These produce no error at all. Nothing goes red; the thing just does not work.
 | `<Stack wrap>` | `wrap` is a `flex-wrap` **string**. A bare attribute passes `true`, which is not valid CSS, so content overflows its card. |
 | `<Badge intent="success">` | Intents are `none \| stable \| draft \| informational \| low \| medium \| high`. Anything else renders unstyled. |
 | `<InputControl onChange={…}>` | The `@wordpress/ui` controls take **`onValueChange`**. The field renders perfectly and never updates. |
-| `<ToggleControl hideLabelFromVision>` | `ToggleControl` renders its own label and ignores the prop entirely. |
 | `box-shadow: var( --wpds-elevation-xs )` | `@wordpress/theme` removed the elevation properties. The declaration was dropped; no shadow, no warning. The build stops on it now (`Unknown design token`), in a stylesheet. |
 | A `--wpds-*` name that does not exist, in a `style` prop or a JavaScript string | Same silence, and the build does not reach it. CSS drops the declaration and nothing reports it. |
 | Two elements, one after the other, in a `Card.Content` | `Card.Content` pads itself and does not space its children; a fragment does not either. They touch — 0px, measured — and the source looks fine. A `Stack direction="column"` with a `gap` holds them. |
 | `.thing svg { fill: white; }` | `@wordpress/icons` 17 draws most icons as strokes carrying `fill: none` inline. The rule does nothing; `color` recolours them. |
-| `<Notice.Root status="error" isDismissible>` | That is the `@wordpress/components` API. The `@wordpress/ui` notice takes `intent`, and is dismissible when it holds a `Notice.CloseIcon`. |
-| `import { ButtonLink, Progress } from '@wordpress/ui'` | Names from the Storybook, which documents Gutenberg's trunk. 0.23 exports `LinkButton` and no `Progress`: `undefined`, and #130 again. |
+| `<Notice.Root status="error" isDismissible>` | That is the `@wordpress/components` API. The `@wordpress/ui` notice takes `intent`, and is dismissible when it holds a `Notice.CloseIconButton`. |
+| A `Notice` that appears, and nothing that reads it out | `@wordpress/ui` 0.23 announced a notice itself, and 0.24 stopped. It renders the same, and a screen reader hears nothing. Call `speak()` from `@wordpress/a11y` when it appears. |
+| `page.getByLabel( 'Enable Feature' )` on a switch or a radio of `@wordpress/ui` | The control is a `role="switch"` or `role="radio"` element with a hidden input beside it, and the label names both: strict mode stops on two elements. `getByRole( 'switch', { name } )` finds the one a person uses. |
+| `import { LinkButton } from '@wordpress/ui'`, or `<Notice.CloseIcon>` | Names 0.24 took away, for `ButtonLink` and `Notice.CloseIconButton`: `undefined`, and #130 again. |
 | `<Stack direction="column" align="start">` around a button and a notice | `align` applies to every child. The button stays as wide as its label, which was the point, and the notice collapses to 26px with its text one word to a line. It only shows after the button is clicked. Buttons go in `<Stack direction="row">`. |
 | A custom property set on a screen's root, or on `body`, to recolour it | A theme provider writes its values inline on `<html>` and on its own element, and WordPress sets `--wp-admin-theme-color` on `body.admin-color-*`. A value set above either never arrives. Read it back with `getComputedStyle` on the control. |
 | An element rule (`button { color: inherit; }`) outside a cascade layer | `@wordpress/ui` styles are in a layer, and a rule outside one outranks them whatever its specificity: a filled button had its label dark on a dark fill. |

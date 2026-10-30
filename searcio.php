@@ -51,11 +51,20 @@ defined( 'Webhead\WP\SearchCloud\PLUGIN_URL' ) || define(
  * The name the framework gives everything after: the hook prefix, the cache
  * group, the asset handles, the admin page. It is the plugin's first slug and
  * stays, whatever folder the plugin is installed in: wordpress.org installs it
- * as `searcio/`, the text domain (see Plugin::TEXT_DOMAIN).
+ * as `searcio/`, the text domain.
  */
 defined( 'Webhead\WP\SearchCloud\PLUGIN_SLUG' ) || define(
 	'Webhead\WP\SearchCloud\PLUGIN_SLUG',
 	'webhead-search-cloud'
+);
+/**
+ * The plugin's slug on wordpress.org, which files its translations under that
+ * name. Only the translations follow it: what a site stores, and what the
+ * service calls, keep the names of the slug above.
+ */
+defined( 'Webhead\WP\SearchCloud\TEXT_DOMAIN' ) || define(
+	'Webhead\WP\SearchCloud\TEXT_DOMAIN',
+	'searcio'
 );
 defined( 'Webhead\WP\SearchCloud\CACHE_GROUP' )
 || define( 'Webhead\WP\SearchCloud\CACHE_GROUP', 'webhead_search_cloud' );

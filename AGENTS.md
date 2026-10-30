@@ -4,16 +4,16 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 
 ## Project Snapshot
 
-- Plugin name: `webhead Search Cloud`
+- Plugin name: `Searcio - Fast AI Product Search for WooCommerce`
 - Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
 - Plugin slug: `webhead-search-cloud`
 - Namespace root: `Webhead\WP\SearchCloud`
-- Description: `Connect WordPress and WooCommerce to webhead Search Cloud.`
+- Description: `Connect WordPress and WooCommerce to Searcio.`
 - Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
-- Text domain: `webhead-search-cloud`
+- Text domain: `searcio`
 - Hook prefix: `webhead_search_cloud`
 - Cache group: `webhead_search_cloud`
 - REST namespace: `webhead-search-cloud/v1`
@@ -132,7 +132,7 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Create PHP enums for finite states, modes, policies, or option values instead of spreading string literals through the codebase.
 - Draw every admin screen with `src/components/AdminPage.js`, as the settings screen is. The shell owns the header, the page padding and the width, so two screens drawn by it start at the same place and are equally wide; pass `tabbed` when the content opens with a tab strip.
 - Use `@wordpress/dataviews` for admin tables, imported from `src/components/DataViews.js` so that its stylesheet comes with it, and keep search, filtering, sorting, and pagination server-driven.
-- Use recommended `@wordpress/ui` primitives for generated admin UI: `Card.Root`, `Card.Header`, `Card.Title`, `Card.Content`, `Tabs.Root`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`, `Text`, `Stack`, `Skeleton`, `InputControl`, and the compound `Notice` (`Notice.Root` with `intent`). Choose per component by its Storybook status, not per package: `Button` and `ToggleControl` stay on `@wordpress/components`.
+- Use recommended `@wordpress/ui` primitives for generated admin UI: `Card.Root`, `Card.Header`, `Card.Title`, `Card.Content`, `Tabs.Root`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`, `Text`, `Stack`, `Skeleton`, `InputControl`, `SwitchControl`, and the compound `Notice` (`Notice.Root` with `intent`). Choose per component by its Storybook status, not per package: `Button` stays on `@wordpress/components`.
 - Hold more than one element inside a `Card.Content`, a tab panel, or a fragment in a `Stack` with a `gap` token. `Card.Content` pads itself and does not space its children, so two elements written one after the other touch. Put buttons in a row `Stack` of their own, and never `align="start"` on the column.
 - Put titles inside `Card.Header` with `Card.Title`; use the `render` prop for semantic heading levels.
 - Use `Text` variants such as `heading-xl`, `heading-lg`, `heading-md`, `body-md`, and `body-sm` instead of hard-coded admin font sizes.
@@ -144,11 +144,12 @@ Use this file as the top-level operating manual for AI-assisted work in this rep
 - Choose `Badge` intent by attention priority: prefer `none` or plain text for normal states, then `stable`, `draft`, `informational`, `low`, `medium`, or `high` only when the view needs that emphasis.
 - Use higher-level controls or `DataForm` before low-level form primitives, keep tab panels as `Tabs` instead of link lists, and use tooltips only as visual labels with accessible trigger names.
 - Keep large tab sets responsive with a horizontally scrollable `Tabs.List`, token spacing, visible focus, and browser checks at desktop and mobile widths. The shell draws the strip of a `tabbed` page full-bleed with a light bottom border; do not style it per screen.
+- List the sections of a tab that has more than about five down the side with `src/components/SectionList.js`, each entry carrying its name and its state, rather than stacking them down the page or folding them into collapsible cards. Do not build a vertical tab list of your own.
 - When the WordPress Design System does not cover something, stop and ask before working around it: name the component, token, or page and what is missing, and let the person decide.
 
 ## Don't
 
-- Do not rename the plugin slug, namespace, text domain, hook prefix, cache group, or REST namespace in only one place.
+- Do not rename the plugin by hand: run `wh-plugin rename`. The slug in `PLUGIN_SLUG` names everything a site stores, and changing it, the namespace, the hook prefix, the cache group or the REST namespace on a released plugin leaves that data behind.
 - Do not scatter raw `add_action()` or `add_filter()` calls through unrelated files when a centralized hookable class is more appropriate.
 - Do not bypass framework managers for schema registration, settings writes, scheduled jobs, cache invalidation, or lifecycle cleanup.
 - Do not assume WPML, Polylang, or Wordfence are active.

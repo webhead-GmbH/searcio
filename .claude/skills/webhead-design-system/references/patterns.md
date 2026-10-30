@@ -22,6 +22,53 @@ Loaded from `webhead-design-system` when building one of these surfaces.
 - **Do not render a placeholder tab while data loads** and then swap it for the real set — that
   reads as the tabs arriving after the page has settled. Render skeleton shapes until the real
   sections are known.
+- **The chosen tab is in the address** (`tab=`), as on the settings screen, so a reload or a
+  copied link lands on it.
+
+### A tab with many sections lists them down the side
+
+Past about five sections, a tab shows **one section at a time beside a list of all of them**:
+`SectionList` from `src/components/SectionList.js`, which draws vertical `Tabs` from
+`@wordpress/ui`. A plugin generated before it existed gets it from `composer framework:update`, or
+from `wh-plugin components:add sections`.
+
+```jsx
+import SectionList from '../../../components/SectionList';
+
+<SectionList
+    label={ __( 'Firewall', 'searcio' ) }
+    aliases={ { addresses: 'blocks' } }
+    sections={ [
+        {
+            id: 'blocks',
+            label: __( 'Blocked addresses', 'searcio' ),
+            summary: [ __( '0 of 200 blocked', 'searcio' ), lockoutLine ],
+            content: <Grid auto={ … }>{ /* two cards */ }</Grid>,
+        },
+        …
+    ] }
+/>
+```
+
+- **Each entry carries its name and its state**, one short line per fact ("5 attempts, then 60
+  minutes"), so the list reads as a summary of the whole tab. Work the lines out from the state
+  the section edits, so they change with it. A line must make sense without its section's name
+  beside it. A fact that does not hold is `''`, which the list leaves out.
+- **Each section fills its panel.** Merge a section of one short card with a related one. Inside
+  a section the card rules hold: **one region goes straight on the panel, in no card**, and
+  several are cards. Count them when the section can change.
+- **A section with nothing to show is not listed.**
+- **The section is in the address** (`section=`) and leaves it with the list. When sections
+  merge, map each old name to the one it went into with `aliases`, so an old link still lands.
+- **Let the design system mark the selected entry**: `@wordpress/ui` draws a line beside it. Give
+  it no background of your own.
+- **The list sticks below the admin bar** while a long section scrolls, which needs every
+  ancestor to be something other than a scroll container — see `css-traps.md`.
+- **Below 960px** the list is a strip across the top that scrolls on its own, and its tabs turn
+  horizontal with it.
+- **Name the list** with `label`, usually the tab's own name.
+- **Never build a vertical tab list of your own**, and never stack many sections down a page or
+  fold them into collapsible cards instead.
 
 ## Save & submit: one model per surface
 
@@ -63,11 +110,11 @@ must be resolved first → **modal**. Anything requiring a decision must not aut
 
 **One announcement per update.** A notice that is on the page when it renders announces nothing.
 One that appears is announced — assertively for an error that needs attention now, politely
-otherwise — with its title and description and nothing else. At `@wordpress/ui` 0.23 the notice
-does that itself, so adding `role="alert"`, an `aria-live` region or a `speak()` beside it makes
-two. A later release takes it out of the component: if `Notice.Root` no longer has `spokenMessage`
-and `politeness` in `node_modules/@wordpress/ui/build-types/notice/types.d.ts`, the handler that
-shows a notice calls `speak( message, 'assertive' )` from `@wordpress/a11y`.
+otherwise — with its title and description and nothing else. The notice does not do it: since
+`@wordpress/ui` 0.24 the code that shows it calls `speak( message, 'assertive' )` from
+`@wordpress/a11y`, in an effect that runs when the message appears, with the same string the
+notice prints. The settings screen does it for a failed load and a failed save. Do not add
+`role="alert"` or an `aria-live` region as well: that makes two.
 
 ## Forms
 
@@ -128,4 +175,5 @@ If the plugin predates it, install it with `wh-plugin components:add modal`.
   the same thing. Never hide a description or status in one: a description is inline text, an
   infotip is a `Popover`, and feedback after an action is a notice or a snackbar.
 - **A busy tab is a design problem**, not a density preference. More than about five controls in
-  one region wants grouping into cards or progressive disclosure.
+  one region wants grouping into cards or progressive disclosure. More than about five sections
+  in one tab want a `SectionList` (see Tabs, above).
