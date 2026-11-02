@@ -197,7 +197,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->assertArrayNotHasKey( 'colors', $facet, 'A plugin keeps what was set before the type changed.' );
 	}
 
-	/** "Variation Swatches for WooCommerce" by ThemeAlien and "WCBoost - Variation Swatches". */
+	/** "Variation Swatches for WooCommerce" by Woosuite and "WCBoost - Variation Swatches". */
 	public function test_plain_meta_keys_count_on_an_attribute_of_a_swatch_type(): void {
 		$this->make_attribute( 'color' );
 		$this->map_attribute();

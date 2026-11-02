@@ -178,7 +178,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 = Unreleased =
 - A theme that styles WooCommerce's block buttons no longer turns the search window's icons white: the colours set in the widget or the block now reach them, with no custom CSS.
 - New on the Search Config tab: the category filter can show all categories, the main categories only, or the main categories with their subcategories under them, to the number of levels you choose.
-- The filters show what your swatches plugin set up: images, two-colour pills and short labels as well as colours, from Variation Swatches by GetWooPlugins, CartFlows, ThemeAlien and RadiusTheme, WCBoost, and YITH.
+- The filters show what your swatches plugin set up: images, two-colour pills and short labels as well as colours, from Variation Swatches by GetWooPlugins, CartFlows, Woosuite and RadiusTheme, WCBoost, and YITH.
 - Filters whose values are numbers are easier to read: the count is smaller and in brackets, and a value like "256 GB" is no longer cut.
 - Popular searches have a trending arrow.
 - The microphone, the assistant's icon and the words of the filter buttons stand in the middle of their buttons.

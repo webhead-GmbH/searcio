@@ -74,7 +74,7 @@ final class Woo {
 	private const IMAGE_META_KEYS = [ 'product_attribute_image', 'cfvsw_image' ];
 
 	/**
-	 * "Variation Swatches for WooCommerce" by ThemeAlien and "WCBoost -
+	 * "Variation Swatches for WooCommerce" by Woosuite and "WCBoost -
 	 * Variation Swatches" use names this plain, which could be anybody's, so
 	 * they are read only on an attribute of a swatch type.
 	 */

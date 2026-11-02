@@ -165,7 +165,7 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
 |---|---|---|---|
 | Variation Swatches for WooCommerce, by GetWooPlugins | `product_attribute_color`, with `is_dual_color` and `secondary_color` | `product_attribute_image` | |
 | Variation Swatches for WooCommerce, by CartFlows | `cfvsw_color` | `cfvsw_image` | |
-| Variation Swatches for WooCommerce, by ThemeAlien | `color` | `image` | `label` |
+| Variation Swatches for WooCommerce, by Woosuite | `color` | `image` | `label` |
 | WCBoost - Variation Swatches | `color` | `image` | `label` |
 | Variation Swatches for WooCommerce, by RadiusTheme | as GetWooPlugins | | |
 | YITH WooCommerce Color, Image & Label Variation Swatches | `_yith_wccl_value` | `_yith_wccl_value` | `_yith_wccl_value` |
