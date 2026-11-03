@@ -20,6 +20,10 @@ namespace Webhead\WP\SearchCloud\Routing;
 use WP_REST_Request;
 use WP_REST_Response;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
+use Webhead\WP\SearchCloud\DTO\Look;
+use Webhead\WP\SearchCloud\Frontend\Google_Fonts;
+use Webhead\WP\SearchCloud\Frontend\Look_Styles;
+use Webhead\WP\SearchCloud\Frontend\Placement_Preview;
 use Webhead\WP\SearchCloud\Frontend\Placement_Config;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -60,6 +64,23 @@ final class Placement_Endpoint extends Rest_API {
 		$payload['saved'] = true;
 
 		return new WP_REST_Response( $payload );
+	}
+
+	/**
+	 * The CSS of a Look the editor has on screen, for the preview's instance,
+	 * and the Google Fonts stylesheet it needs. The editor sends it into the
+	 * preview as it changes, so the preview shows what the storefront will.
+	 */
+	#[Route( '/placement/look-css', methods: 'POST', permission_callback: 'can_manage_settings', args: [ 'look' => [ 'type' => 'object' ] ] )]
+	public function look_css( WP_REST_Request $request ): WP_REST_Response {
+		$look = Look::from_array( $request->get_param( 'look' ) );
+
+		return new WP_REST_Response(
+			[
+				'css'   => Look_Styles::css( $look, Placement_Preview::INSTANCE ),
+				'fonts' => Google_Fonts::url( Look_Styles::google_families( $look, Google_Fonts::site_families() ) ),
+			]
+		);
 	}
 
 	public function can_view(): bool {

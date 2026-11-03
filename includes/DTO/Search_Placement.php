@@ -69,6 +69,7 @@ final class Search_Placement {
 	 * @param  string  $align        Where the trigger sits in what holds it.
 	 * @param  array<string,string>  $colors  Shortcode attribute => colour, for the colours that are set.
 	 * @param  ?int    $radius       The window's corner radius in px; null is the storefront's own.
+	 * @param  ?Look   $look         The style settings of the Placement tab's Look editor.
 	 */
 	public function __construct(
 		public readonly string $mode = 'icon',
@@ -84,8 +85,14 @@ final class Search_Placement {
 		public readonly int $width = 0,
 		public readonly string $align = 'start',
 		public readonly array $colors = [],
-		public readonly ?int $radius = null
-	) {}
+		public readonly ?int $radius = null,
+		?Look $look = null
+	) {
+		$this->look = $look ?? Look::empty();
+	}
+
+	/** The Look editor's settings; a shortcode cannot set them, and takes the tab's. */
+	public readonly Look $look;
 
 	/**
 	 * Reads stored settings or shortcode attributes. A key that is missing or
@@ -129,7 +136,8 @@ final class Search_Placement {
 			colors: $colors,
 			radius: array_key_exists( 'radius', $data )
 				? Value::number( $data['radius'], 0, self::RADIUS_MAX )
-				: $fallback->radius
+				: $fallback->radius,
+			look: array_key_exists( 'look', $data ) ? Look::from_array( $data['look'] ) : $fallback->look
 		);
 	}
 
@@ -160,6 +168,7 @@ final class Search_Placement {
 		}
 
 		$out['radius'] = $this->radius;
+		$out['look']   = $this->look->to_array();
 
 		return $out;
 	}
@@ -207,6 +216,6 @@ final class Search_Placement {
 	 * @return array<string,string>
 	 */
 	public function to_shortcode_defaults(): array {
-		return Value::to_strings( $this->to_array() );
+		return Value::to_strings( array_diff_key( $this->to_array(), [ 'look' => true ] ) );
 	}
 }

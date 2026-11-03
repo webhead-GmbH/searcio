@@ -47,7 +47,7 @@ msgstr "Searcio"
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:161
 #: includes/Frontend/Frontend_Config.php:183
-#: src/admin/settings/components/tabs/PlacementTab.js:971
+#: src/admin/settings/components/tabs/PlacementTab.js:910
 #: src/frontend/search/components/SearchInput.js:33
 #: src/frontend/search/components/SearchModal.js:1732
 #: src/frontend/search/components/SearchModal.js:1764
@@ -86,8 +86,8 @@ msgstr "Produits Searcio"
 
 #: includes/Elementor/Widgets/Products_Widget.php:57
 #: includes/Widgets/Classic_Products_Widget.php:110
-#: src/admin/settings/components/tabs/PlacementTab.js:841
-#: src/admin/settings/components/tabs/PlacementTab.js:890
+#: src/admin/settings/components/tabs/PlacementTab.js:780
+#: src/admin/settings/components/tabs/PlacementTab.js:829
 #: src/blocks/products/edit.js:33
 #: src/frontend/search/components/ProductList.js:171
 msgid "Products"
@@ -96,6 +96,7 @@ msgstr "Produits"
 #: includes/Elementor/Widgets/Products_Widget.php:63
 #: includes/Elementor/Widgets/Search_Widget.php:216
 #: includes/Elementor/Widgets/Search_Widget.php:1324
+#: includes/Frontend/Look_Schema.php:352
 #: src/blocks/products/edit.js:36
 msgid "Show"
 msgstr "Afficher"
@@ -114,8 +115,8 @@ msgstr "Liste d’une catégorie"
 
 #: includes/Elementor/Widgets/Products_Widget.php:76
 #: includes/Widgets/Classic_Products_Widget.php:130
-#: src/admin/settings/components/tabs/PlacementTab.js:860
-#: src/admin/settings/components/tabs/PlacementTab.js:922
+#: src/admin/settings/components/tabs/PlacementTab.js:799
+#: src/admin/settings/components/tabs/PlacementTab.js:861
 #: src/blocks/products/edit.js:57
 msgid "Heading"
 msgstr "Titre"
@@ -162,18 +163,19 @@ msgstr "Afficher la bannière de merchandising"
 
 #: includes/Elementor/Widgets/Products_Widget.php:126
 #: includes/Widgets/Classic_Products_Widget.php:118
-#: src/admin/settings/components/tabs/PlacementTab.js:852
-#: src/admin/settings/components/tabs/PlacementTab.js:901
+#: src/admin/settings/components/tabs/PlacementTab.js:791
+#: src/admin/settings/components/tabs/PlacementTab.js:840
 #: src/blocks/products/edit.js:103
 msgid "Layout"
 msgstr "Mise en page"
 
 #: includes/Elementor/Widgets/Products_Widget.php:130
 #: includes/Elementor/Widgets/Search_Widget.php:1347
+#: includes/Frontend/Look_Schema.php:367
 #: includes/Widgets/Classic_Products_Widget.php:121
-#: src/admin/settings/components/tabs/PlacementTab.js:856
-#: src/admin/settings/components/tabs/PlacementTab.js:877
-#: src/admin/settings/components/tabs/PlacementTab.js:905
+#: src/admin/settings/components/tabs/PlacementTab.js:795
+#: src/admin/settings/components/tabs/PlacementTab.js:816
+#: src/admin/settings/components/tabs/PlacementTab.js:844
 #: src/blocks/products/edit.js:106
 #: src/blocks/search/edit.js:409
 msgid "Carousel"
@@ -181,9 +183,9 @@ msgstr "Carrousel"
 
 #: includes/Elementor/Widgets/Products_Widget.php:131
 #: includes/Widgets/Classic_Products_Widget.php:122
-#: src/admin/settings/components/tabs/PlacementTab.js:857
-#: src/admin/settings/components/tabs/PlacementTab.js:877
-#: src/admin/settings/components/tabs/PlacementTab.js:906
+#: src/admin/settings/components/tabs/PlacementTab.js:796
+#: src/admin/settings/components/tabs/PlacementTab.js:816
+#: src/admin/settings/components/tabs/PlacementTab.js:845
 #: src/blocks/products/edit.js:107
 msgid "Grid"
 msgstr "Grille"
@@ -221,6 +223,7 @@ msgstr "Recherche Searcio"
 
 #: includes/Elementor/Widgets/Search_Widget.php:121
 #: includes/Elementor/Widgets/Search_Widget.php:375
+#: includes/Frontend/Look_Schema.php:103
 #: src/admin/settings/components/tabs/SyncHistory.js:219
 #: src/blocks/search/edit.js:198
 msgid "Trigger"
@@ -278,10 +281,10 @@ msgstr "Activé"
 
 #: includes/Elementor/Widgets/Search_Widget.php:181
 #: includes/Elementor/Widgets/Search_Widget.php:314
-#: src/admin/settings/components/tabs/PlacementTab.js:410
-#: src/admin/settings/components/tabs/PlacementTab.js:440
-#: src/admin/settings/components/tabs/PlacementTab.js:529
-#: src/admin/settings/components/tabs/PlacementTab.js:553
+#: src/admin/settings/components/tabs/PlacementTab.js:444
+#: src/admin/settings/components/tabs/PlacementTab.js:474
+#: src/admin/settings/components/tabs/PlacementTab.js:563
+#: src/admin/settings/components/tabs/PlacementTab.js:587
 msgid "Off"
 msgstr "Désactivé"
 
@@ -316,11 +319,12 @@ msgstr "Afficher le nombre de résultats sur les filtres"
 
 #: includes/Elementor/Widgets/Search_Widget.php:217
 #: includes/Elementor/Widgets/Search_Widget.php:1329
+#: includes/Frontend/Look_Schema.php:356
 msgid "Hide"
 msgstr "Masquer"
 
 #: includes/Elementor/Widgets/Search_Widget.php:225
-#: src/admin/settings/components/tabs/PlacementTab.js:702
+#: src/admin/settings/components/tabs/PlacementTab.js:396
 #: src/blocks/search/edit.js:156
 msgid "Filter buttons in the bar"
 msgstr "Boutons de filtre dans la barre"
@@ -365,6 +369,7 @@ msgstr "Ce que montre le carrousel « sélection » quand la recherche est vid
 
 #: includes/Elementor/Widgets/Search_Widget.php:274
 #: includes/Elementor/Widgets/Search_Widget.php:583
+#: includes/Frontend/Look_Schema.php:122
 #: src/blocks/search/edit.js:215
 msgid "Modal"
 msgstr "Fenêtre modale"
@@ -376,31 +381,33 @@ msgstr "Animation d’ouverture"
 
 #: includes/Elementor/Widgets/Search_Widget.php:284
 #: includes/Elementor/Widgets/Search_Widget.php:1386
-#: src/admin/settings/components/tabs/PlacementTab.js:373
+#: includes/Frontend/Look_Schema.php:386
+#: src/admin/settings/components/look/LookControl.js:245
+#: src/admin/settings/components/tabs/PlacementTab.js:316
 #: src/blocks/search/edit.js:169
 msgid "None"
 msgstr "Aucune"
 
 #: includes/Elementor/Widgets/Search_Widget.php:285
-#: src/admin/settings/components/tabs/PlacementTab.js:369
+#: src/admin/settings/components/tabs/PlacementTab.js:312
 #: src/blocks/search/edit.js:170
 msgid "Fade"
 msgstr "Fondu"
 
 #: includes/Elementor/Widgets/Search_Widget.php:286
-#: src/admin/settings/components/tabs/PlacementTab.js:370
+#: src/admin/settings/components/tabs/PlacementTab.js:313
 #: src/blocks/search/edit.js:171
 msgid "Slide down"
 msgstr "Glissement vers le bas"
 
 #: includes/Elementor/Widgets/Search_Widget.php:287
-#: src/admin/settings/components/tabs/PlacementTab.js:371
+#: src/admin/settings/components/tabs/PlacementTab.js:314
 #: src/blocks/search/edit.js:172
 msgid "Slide up"
 msgstr "Glissement vers le haut"
 
 #: includes/Elementor/Widgets/Search_Widget.php:288
-#: src/admin/settings/components/tabs/PlacementTab.js:372
+#: src/admin/settings/components/tabs/PlacementTab.js:315
 #: src/blocks/search/edit.js:173
 msgid "Zoom"
 msgstr "Zoom"
@@ -436,13 +443,14 @@ msgid "All types"
 msgstr "Tous les types"
 
 #: includes/Elementor/Widgets/Search_Widget.php:385
-#: src/admin/settings/components/tabs/PlacementTab.js:683
+#: src/admin/settings/components/tabs/PlacementTab.js:377
 msgid "Alignment"
 msgstr "Alignement"
 
 #: includes/Elementor/Widgets/Search_Widget.php:388
-#: src/admin/settings/components/tabs/PlacementTab.js:382
-#: src/admin/settings/components/tabs/PlacementTab.js:383
+#: src/admin/settings/components/look/LookControl.js:88
+#: src/admin/settings/components/tabs/PlacementTab.js:325
+#: src/admin/settings/components/tabs/PlacementTab.js:326
 msgid "Left"
 msgstr "Gauche"
 
@@ -451,17 +459,20 @@ msgid "Center"
 msgstr "Centre"
 
 #: includes/Elementor/Widgets/Search_Widget.php:390
-#: src/admin/settings/components/tabs/PlacementTab.js:382
-#: src/admin/settings/components/tabs/PlacementTab.js:383
+#: src/admin/settings/components/look/LookControl.js:88
+#: src/admin/settings/components/tabs/PlacementTab.js:325
+#: src/admin/settings/components/tabs/PlacementTab.js:326
 msgid "Right"
 msgstr "Droite"
 
 #: includes/Elementor/Widgets/Search_Widget.php:412
+#: includes/Frontend/Look_Schema.php:105
 #: src/blocks/search/edit.js:208
 msgid "Icon size"
 msgstr "Taille de l’icône"
 
 #: includes/Elementor/Widgets/Search_Widget.php:425
+#: includes/Frontend/Look_Schema.php:106
 #: src/blocks/search/edit.js:209
 msgid "Button size"
 msgstr "Taille du bouton"
@@ -475,6 +486,15 @@ msgstr "Taille du bouton"
 #: includes/Elementor/Widgets/Search_Widget.php:1222
 #: includes/Elementor/Widgets/Search_Widget.php:1261
 #: includes/Elementor/Widgets/Search_Widget.php:1269
+#: includes/Frontend/Look_Schema.php:107
+#: includes/Frontend/Look_Schema.php:116
+#: includes/Frontend/Look_Schema.php:166
+#: includes/Frontend/Look_Schema.php:181
+#: includes/Frontend/Look_Schema.php:254
+#: includes/Frontend/Look_Schema.php:297
+#: includes/Frontend/Look_Schema.php:325
+#: includes/Frontend/Look_Schema.php:333
+#: includes/Frontend/Look_Schema.php:451
 #: src/blocks/search/edit.js:210
 #: src/blocks/search/edit.js:242
 #: src/blocks/search/edit.js:331
@@ -495,6 +515,8 @@ msgstr "Arrondi des bordures"
 #: includes/Elementor/Widgets/Search_Widget.php:1182
 #: includes/Elementor/Widgets/Search_Widget.php:1214
 #: includes/Elementor/Widgets/Search_Widget.php:1367
+#: src/admin/settings/components/look/LookControl.js:232
+#: src/admin/settings/components/look/LookEditor.js:22
 msgid "Normal"
 msgstr "Normal"
 
@@ -504,6 +526,12 @@ msgstr "Normal"
 #: includes/Elementor/Widgets/Search_Widget.php:749
 #: includes/Elementor/Widgets/Search_Widget.php:844
 #: includes/Elementor/Widgets/Search_Widget.php:848
+#: includes/Frontend/Look_Schema.php:108
+#: includes/Frontend/Look_Schema.php:110
+#: includes/Frontend/Look_Schema.php:113
+#: includes/Frontend/Look_Schema.php:163
+#: includes/Frontend/Look_Schema.php:447
+#: includes/Frontend/Look_Schema.php:449
 #: src/blocks/search/edit.js:201
 msgid "Icon color"
 msgstr "Couleur de l’icône"
@@ -530,6 +558,28 @@ msgstr "Couleur de l’icône"
 #: includes/Elementor/Widgets/Search_Widget.php:1211
 #: includes/Elementor/Widgets/Search_Widget.php:1260
 #: includes/Elementor/Widgets/Search_Widget.php:1267
+#: includes/Frontend/Look_Schema.php:109
+#: includes/Frontend/Look_Schema.php:111
+#: includes/Frontend/Look_Schema.php:124
+#: includes/Frontend/Look_Schema.php:160
+#: includes/Frontend/Look_Schema.php:177
+#: includes/Frontend/Look_Schema.php:179
+#: includes/Frontend/Look_Schema.php:211
+#: includes/Frontend/Look_Schema.php:214
+#: includes/Frontend/Look_Schema.php:225
+#: includes/Frontend/Look_Schema.php:235
+#: includes/Frontend/Look_Schema.php:248
+#: includes/Frontend/Look_Schema.php:250
+#: includes/Frontend/Look_Schema.php:252
+#: includes/Frontend/Look_Schema.php:261
+#: includes/Frontend/Look_Schema.php:294
+#: includes/Frontend/Look_Schema.php:324
+#: includes/Frontend/Look_Schema.php:331
+#: includes/Frontend/Look_Schema.php:411
+#: includes/Frontend/Look_Schema.php:423
+#: includes/Frontend/Look_Schema.php:426
+#: includes/Frontend/Look_Schema.php:448
+#: includes/Frontend/Look_Schema.php:450
 #: src/blocks/search/edit.js:203
 #: src/blocks/search/edit.js:218
 #: src/blocks/search/edit.js:234
@@ -550,6 +600,7 @@ msgstr "Arrière-plan"
 #: includes/Elementor/Widgets/Search_Widget.php:1187
 #: includes/Elementor/Widgets/Search_Widget.php:1217
 #: includes/Elementor/Widgets/Search_Widget.php:1371
+#: src/admin/settings/components/look/LookEditor.js:23
 msgid "Hover"
 msgstr "Survol"
 
@@ -560,14 +611,19 @@ msgstr "Largeur"
 #: includes/Elementor/Widgets/Search_Widget.php:514
 #: includes/Elementor/Widgets/Search_Widget.php:589
 #: includes/Elementor/Widgets/Search_Widget.php:747
+#: includes/Frontend/Look_Schema.php:112
+#: includes/Frontend/Look_Schema.php:125
+#: includes/Frontend/Look_Schema.php:161
 msgid "Text color"
 msgstr "Couleur du texte"
 
 #: includes/Elementor/Widgets/Search_Widget.php:533
+#: includes/Frontend/Look_Schema.php:114
 msgid "Background color"
 msgstr "Couleur d’arrière-plan"
 
 #: includes/Elementor/Widgets/Search_Widget.php:592
+#: includes/Frontend/Look_Schema.php:126
 msgid "Accent color"
 msgstr "Couleur d’accentuation"
 
@@ -576,6 +632,7 @@ msgid "Selected states, focus rings, links and the default button colour. Anythi
 msgstr "États sélectionnés, contours de focus, liens et couleur par défaut des boutons. Tout réglage plus précis dans une autre section l’emporte."
 
 #: includes/Elementor/Widgets/Search_Widget.php:598
+#: includes/Frontend/Look_Schema.php:127
 msgid "Overlay"
 msgstr "Superposition"
 
@@ -584,6 +641,8 @@ msgid "Covers the page behind the open modal. A colour with transparency keeps t
 msgstr "Couvre la page derrière la fenêtre modale ouverte. Une couleur avec de la transparence laisse voir la page."
 
 #: includes/Elementor/Widgets/Search_Widget.php:608
+#: includes/Frontend/Look_Schema.php:128
+#: src/admin/settings/components/look/LookControl.js:274
 msgid "Font family"
 msgstr "Famille de police"
 
@@ -592,11 +651,13 @@ msgid "Used by all text in the modal and in the search box trigger. Leave empty 
 msgstr "Utilisée par tout le texte de la fenêtre modale et de la barre de recherche qui l’ouvre. Laissez vide pour utiliser la police de la page."
 
 #: includes/Elementor/Widgets/Search_Widget.php:617
+#: includes/Frontend/Look_Schema.php:129
 #: src/blocks/search/edit.js:224
 msgid "Corner radius"
 msgstr "Arrondi des angles"
 
 #: includes/Elementor/Widgets/Search_Widget.php:623
+#: includes/Frontend/Look_Schema.php:130
 msgid "Round the top corners too"
 msgstr "Arrondir aussi les angles supérieurs"
 
@@ -608,17 +669,23 @@ msgstr "Pour une fenêtre modale placée à distance du haut de l’écran."
 #: includes/Elementor/Widgets/Search_Widget.php:858
 #: includes/Elementor/Widgets/Search_Widget.php:955
 #: includes/Elementor/Widgets/Search_Widget.php:1223
+#: includes/Frontend/Look_Schema.php:131
+#: includes/Frontend/Look_Schema.php:227
+#: includes/Frontend/Look_Schema.php:298
+#: includes/Frontend/Look_Schema.php:452
 #: src/blocks/search/edit.js:225
 #: src/blocks/search/edit.js:405
 msgid "Padding"
 msgstr "Marge interne"
 
 #: includes/Elementor/Widgets/Search_Widget.php:632
+#: includes/Frontend/Look_Schema.php:132
 #: src/blocks/search/edit.js:226
 msgid "Section spacing"
 msgstr "Espacement des sections"
 
 #: includes/Elementor/Widgets/Search_Widget.php:637
+#: includes/Frontend/Look_Schema.php:133
 msgid "Modal width"
 msgstr "Largeur de la fenêtre modale"
 
@@ -627,10 +694,12 @@ msgid "Leave empty for a full-width modal docked to the top of the screen. A nar
 msgstr "Laissez vide pour une fenêtre modale pleine largeur ancrée en haut de l’écran. Une fenêtre plus étroite est centrée."
 
 #: includes/Elementor/Widgets/Search_Widget.php:646
+#: includes/Frontend/Look_Schema.php:134
 msgid "Distance from top"
 msgstr "Distance depuis le haut"
 
 #: includes/Elementor/Widgets/Search_Widget.php:653
+#: includes/Frontend/Look_Schema.php:135
 msgid "Content width"
 msgstr "Largeur du contenu"
 
@@ -639,6 +708,7 @@ msgid "The widest the content grows inside the full-width modal. Use your theme'
 msgstr "La largeur maximale du contenu dans la fenêtre modale pleine largeur. Utilisez la largeur de conteneur de votre thème pour l’aligner sur la page."
 
 #: includes/Elementor/Widgets/Search_Widget.php:664
+#: includes/Frontend/Look_Schema.php:137
 msgid "Section titles"
 msgstr "Titres de section"
 
@@ -648,6 +718,8 @@ msgstr "Les titres comme « Recherches récentes », « Recherches populaires
 
 #: includes/Elementor/Widgets/Search_Widget.php:674
 #: includes/Elementor/Widgets/Search_Widget.php:1095
+#: includes/Frontend/Look_Schema.php:139
+#: includes/Frontend/Look_Schema.php:284
 msgid "Color"
 msgstr "Couleur"
 
@@ -655,10 +727,17 @@ msgstr "Couleur"
 #: includes/Elementor/Widgets/Search_Widget.php:726
 #: includes/Elementor/Widgets/Search_Widget.php:815
 #: includes/Elementor/Widgets/Search_Widget.php:1103
+#: includes/Frontend/Look_Schema.php:117
+#: includes/Frontend/Look_Schema.php:140
+#: includes/Frontend/Look_Schema.php:153
+#: includes/Frontend/Look_Schema.php:167
+#: includes/Frontend/Look_Schema.php:182
+#: includes/Frontend/Look_Schema.php:285
 msgid "Typography"
 msgstr "Typographie"
 
 #: includes/Elementor/Widgets/Search_Widget.php:696
+#: includes/Frontend/Look_Schema.php:147
 msgid "Mode tabs"
 msgstr "Onglets de mode"
 
@@ -668,6 +747,8 @@ msgstr "La rangée d’onglets au-dessus du champ de recherche. Elle n’appara�
 
 #: includes/Elementor/Widgets/Search_Widget.php:712
 #: includes/Elementor/Widgets/Search_Widget.php:715
+#: includes/Frontend/Look_Schema.php:149
+#: includes/Frontend/Look_Schema.php:150
 #: src/blocks/search/edit.js:345
 msgid "Tab text"
 msgstr "Texte des onglets"
@@ -675,46 +756,57 @@ msgstr "Texte des onglets"
 #: includes/Elementor/Widgets/Search_Widget.php:714
 #: includes/Elementor/Widgets/Search_Widget.php:948
 #: includes/Elementor/Widgets/Search_Widget.php:1030
+#: src/admin/settings/components/look/LookEditor.js:24
 msgid "Active"
 msgstr "Actif"
 
 #: includes/Elementor/Widgets/Search_Widget.php:716
+#: includes/Frontend/Look_Schema.php:151
+#: src/admin/settings/components/look/LookControl.js:246
 msgid "Underline"
 msgstr "Soulignement"
 
 #: includes/Elementor/Widgets/Search_Widget.php:720
+#: includes/Frontend/Look_Schema.php:152
 #: src/blocks/search/edit.js:348
 msgid "Divider"
 msgstr "Séparateur"
 
 #: includes/Elementor/Widgets/Search_Widget.php:741
+#: includes/Frontend/Look_Schema.php:158
 #: includes/Widgets/Classic_Search_Widget.php:112
-#: src/admin/settings/components/tabs/PlacementTab.js:636
-#: src/admin/settings/components/tabs/PlacementTab.js:656
-#: src/admin/settings/components/tabs/PlacementTab.js:815
+#: src/admin/settings/components/tabs/PlacementTab.js:350
+#: src/admin/settings/components/tabs/PlacementTab.js:670
+#: src/admin/settings/components/tabs/PlacementTab.js:754
 #: src/blocks/search/edit.js:231
 msgid "Search field"
 msgstr "Champ de recherche"
 
 #: includes/Elementor/Widgets/Search_Widget.php:748
+#: includes/Frontend/Look_Schema.php:162
 msgid "Placeholder color"
 msgstr "Couleur du texte indicatif"
 
 #: includes/Elementor/Widgets/Search_Widget.php:753
 #: includes/Elementor/Widgets/Search_Widget.php:756
+#: includes/Frontend/Look_Schema.php:164
+#: includes/Frontend/Look_Schema.php:165
 msgid "Border color"
 msgstr "Couleur de la bordure"
 
 #: includes/Elementor/Widgets/Search_Widget.php:755
+#: src/admin/settings/components/look/LookEditor.js:25
 msgid "Focus"
 msgstr "Focus"
 
 #: includes/Elementor/Widgets/Search_Widget.php:781
+#: includes/Frontend/Look_Schema.php:172
 #: src/blocks/search/edit.js:246
 msgid "Buttons"
 msgstr "Boutons"
 
 #: includes/Elementor/Widgets/Search_Widget.php:788
+#: includes/Frontend/Look_Schema.php:175
 msgid "Primary buttons"
 msgstr "Boutons principaux"
 
@@ -739,7 +831,23 @@ msgstr "« Charger plus » sous les résultats et le bouton Appliquer du filtre 
 #: includes/Elementor/Widgets/Search_Widget.php:1184
 #: includes/Elementor/Widgets/Search_Widget.php:1189
 #: includes/Elementor/Widgets/Search_Widget.php:1268
-#: src/admin/settings/components/tabs/PlacementTab.js:735
+#: includes/Frontend/Look_Schema.php:178
+#: includes/Frontend/Look_Schema.php:180
+#: includes/Frontend/Look_Schema.php:212
+#: includes/Frontend/Look_Schema.php:215
+#: includes/Frontend/Look_Schema.php:223
+#: includes/Frontend/Look_Schema.php:224
+#: includes/Frontend/Look_Schema.php:226
+#: includes/Frontend/Look_Schema.php:233
+#: includes/Frontend/Look_Schema.php:234
+#: includes/Frontend/Look_Schema.php:249
+#: includes/Frontend/Look_Schema.php:251
+#: includes/Frontend/Look_Schema.php:253
+#: includes/Frontend/Look_Schema.php:262
+#: includes/Frontend/Look_Schema.php:332
+#: includes/Frontend/Look_Schema.php:412
+#: includes/Frontend/Look_Schema.php:424
+#: includes/Frontend/Look_Schema.php:427
 #: src/blocks/search/edit.js:219
 #: src/blocks/search/edit.js:235
 #: src/blocks/search/edit.js:320
@@ -748,61 +856,75 @@ msgid "Text"
 msgstr "Texte"
 
 #: includes/Elementor/Widgets/Search_Widget.php:823
+#: includes/Frontend/Look_Schema.php:185
 msgid "Voice button"
 msgstr "Bouton vocal"
 
 #: includes/Elementor/Widgets/Search_Widget.php:824
+#: includes/Frontend/Look_Schema.php:186
 msgid "Photo search button"
 msgstr "Bouton de recherche par photo"
 
 #: includes/Elementor/Widgets/Search_Widget.php:825
+#: includes/Frontend/Look_Schema.php:187
 msgid "Close button"
 msgstr "Bouton de fermeture"
 
 #: includes/Elementor/Widgets/Search_Widget.php:826
+#: includes/Frontend/Look_Schema.php:188
 msgid "Clear button"
 msgstr "Bouton d’effacement"
 
 #: includes/Elementor/Widgets/Search_Widget.php:875
+#: includes/Frontend/Look_Schema.php:193
 #: src/blocks/search/edit.js:278
 msgid "Suggestions"
 msgstr "Suggestions"
 
 #: includes/Elementor/Widgets/Search_Widget.php:880
+#: includes/Frontend/Look_Schema.php:195
 #: src/blocks/search/edit.js:281
 msgid "Panel background"
 msgstr "Arrière-plan du panneau"
 
 #: includes/Elementor/Widgets/Search_Widget.php:881
+#: includes/Frontend/Look_Schema.php:196
 #: src/blocks/search/edit.js:282
 msgid "Panel border"
 msgstr "Bordure du panneau"
 
 #: includes/Elementor/Widgets/Search_Widget.php:882
+#: includes/Frontend/Look_Schema.php:197
 #: src/blocks/search/edit.js:288
 msgid "Panel radius"
 msgstr "Arrondi du panneau"
 
 #: includes/Elementor/Widgets/Search_Widget.php:886
 #: includes/Elementor/Widgets/Search_Widget.php:889
+#: includes/Frontend/Look_Schema.php:198
+#: includes/Frontend/Look_Schema.php:199
 #: src/blocks/search/edit.js:283
 msgid "Item text"
 msgstr "Texte des éléments"
 
 #: includes/Elementor/Widgets/Search_Widget.php:890
+#: includes/Frontend/Look_Schema.php:200
 msgid "Item background"
 msgstr "Arrière-plan des éléments"
 
 #: includes/Elementor/Widgets/Search_Widget.php:898
+#: includes/Frontend/Look_Schema.php:201
 msgid "Item typography"
 msgstr "Typographie des éléments"
 
 #: includes/Elementor/Widgets/Search_Widget.php:913
+#: includes/Frontend/Look_Schema.php:206
 #: src/blocks/search/edit.js:292
 msgid "Recent & popular"
 msgstr "Récentes et populaires"
 
 #: includes/Elementor/Widgets/Search_Widget.php:920
+#: includes/Frontend/Look_Schema.php:209
 msgid "Recent chips"
 msgstr "Pastilles récentes"
 
@@ -812,42 +934,58 @@ msgstr "Pastilles récentes"
 #: includes/Elementor/Widgets/Search_Widget.php:1190
 #: includes/Elementor/Widgets/Search_Widget.php:1215
 #: includes/Elementor/Widgets/Search_Widget.php:1218
+#: includes/Frontend/Look_Schema.php:115
+#: includes/Frontend/Look_Schema.php:213
+#: includes/Frontend/Look_Schema.php:216
+#: includes/Frontend/Look_Schema.php:295
+#: includes/Frontend/Look_Schema.php:296
+#: includes/Frontend/Look_Schema.php:425
+#: includes/Frontend/Look_Schema.php:428
 #: src/blocks/search/edit.js:238
 #: src/blocks/search/edit.js:396
 msgid "Border"
 msgstr "Bordure"
 
 #: includes/Elementor/Widgets/Search_Widget.php:934
+#: includes/Frontend/Look_Schema.php:217
 msgid "Radius"
 msgstr "Arrondi"
 
 #: includes/Elementor/Widgets/Search_Widget.php:938
+#: includes/Frontend/Look_Schema.php:221
 msgid "\"Clear all\" link"
 msgstr "Lien « Tout effacer »"
 
 #: includes/Elementor/Widgets/Search_Widget.php:964
+#: includes/Frontend/Look_Schema.php:231
 msgid "Popular items"
 msgstr "Éléments populaires"
 
 #: includes/Elementor/Widgets/Search_Widget.php:975
 #: includes/Elementor/Widgets/Search_Widget.php:1361
+#: includes/Frontend/Look_Schema.php:236
+#: includes/Frontend/Look_Schema.php:370
 #: src/blocks/search/edit.js:418
 msgid "Spacing between items"
 msgstr "Espacement entre les éléments"
 
 #: includes/Elementor/Widgets/Search_Widget.php:976
+#: includes/Frontend/Look_Schema.php:237
 msgid "Item radius"
 msgstr "Arrondi des éléments"
 
 #: includes/Elementor/Widgets/Search_Widget.php:980
+#: includes/Frontend/Look_Schema.php:238
 msgid "Item padding"
 msgstr "Marge interne des éléments"
 
 #: includes/Elementor/Widgets/Search_Widget.php:990
+#: includes/Frontend/Look_Schema.php:239
 msgid "Popular typography"
 msgstr "Typographie des populaires"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1007
+#: includes/Frontend/Look_Schema.php:246
 #: src/blocks/search/edit.js:316
 #: src/frontend/search/components/FilterBar.js:204
 #: src/frontend/search/components/FilterBar.js:228
@@ -860,6 +998,7 @@ msgid "Style the filter buttons under the search field, the type switch, size ti
 msgstr "Met en forme les boutons de filtre sous le champ de recherche, le sélecteur de type, les tuiles de taille, les pastilles de couleur et les filtres affichés à côté du nombre de résultats."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1037
+#: includes/Frontend/Look_Schema.php:255
 msgid "Button height"
 msgstr "Hauteur des boutons"
 
@@ -868,6 +1007,7 @@ msgid "The height of the filter buttons under the search field."
 msgstr "La hauteur des boutons de filtre sous le champ de recherche."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1038
+#: includes/Frontend/Look_Schema.php:256
 msgid "Max height"
 msgstr "Hauteur max."
 
@@ -876,24 +1016,29 @@ msgid "Max height of a value list in a filter panel; a longer list scrolls."
 msgstr "Hauteur maximale d’une liste de valeurs dans un panneau de filtre ; une liste plus longue défile."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1042
+#: includes/Frontend/Look_Schema.php:259
 #: src/blocks/search/edit.js:326
 msgid "Count on \"All filters\""
 msgstr "Nombre sur « Tous les filtres »"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1049
+#: includes/Frontend/Look_Schema.php:266
 msgid "Filter panels"
 msgstr "Panneaux de filtre"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1051
+#: includes/Frontend/Look_Schema.php:268
 msgid "Popover width"
 msgstr "Largeur de la fenêtre contextuelle"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1052
+#: includes/Frontend/Look_Schema.php:269
 #: src/blocks/search/edit.js:335
 msgid "Popover radius"
 msgstr "Arrondi de la fenêtre contextuelle"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1053
+#: includes/Frontend/Look_Schema.php:270
 msgid "\"All filters\" width"
 msgstr "Largeur de « Tous les filtres »"
 
@@ -902,6 +1047,7 @@ msgid "The side panel \"All filters\" opens on a tablet or a desktop."
 msgstr "Le panneau latéral qu’ouvre « Tous les filtres » sur tablette ou ordinateur."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1054
+#: includes/Frontend/Look_Schema.php:271
 #: src/blocks/search/edit.js:337
 msgid "Phone sheet radius"
 msgstr "Arrondi du panneau sur mobile"
@@ -911,22 +1057,27 @@ msgid "The top corners of the panel filters open from the bottom on a phone."
 msgstr "Les coins supérieurs du panneau que les filtres ouvrent par le bas sur mobile."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1060
+#: includes/Frontend/Look_Schema.php:257
 msgid "Label typography"
 msgstr "Typographie des libellés"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1067
+#: includes/Frontend/Look_Schema.php:275
 msgid "Result count"
 msgstr "Nombre de résultats"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1069
+#: includes/Frontend/Look_Schema.php:277
 msgid "Count color"
 msgstr "Couleur du nombre"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1074
+#: includes/Frontend/Look_Schema.php:278
 msgid "Count typography"
 msgstr "Typographie du nombre"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1081
+#: includes/Frontend/Look_Schema.php:282
 msgid "Group names"
 msgstr "Noms des groupes"
 
@@ -935,42 +1086,50 @@ msgid "The title of a filter's panel and of each section of \"All filters\", suc
 msgstr "Le titre du panneau d’un filtre et de chaque section de « Tous les filtres », comme « Catégories » ou « Prix »."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1120
+#: includes/Frontend/Look_Schema.php:397
 #: src/blocks/search/edit.js:353
 #: src/frontend/search/components/SearchModal.js:1778
 msgid "AI Assistant"
 msgstr "Assistant IA"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1125
+#: includes/Frontend/Look_Schema.php:399
 #: src/blocks/search/edit.js:356
 msgid "Accent (avatar, dots)"
 msgstr "Accent (avatar, points)"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1126
+#: includes/Frontend/Look_Schema.php:400
 #: src/blocks/search/edit.js:357
 msgid "Reply text"
 msgstr "Texte des réponses"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1127
+#: includes/Frontend/Look_Schema.php:401
 #: src/blocks/search/edit.js:358
 msgid "Your message background"
 msgstr "Arrière-plan de vos messages"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1128
+#: includes/Frontend/Look_Schema.php:402
 #: src/blocks/search/edit.js:359
 msgid "Your message text"
 msgstr "Texte de vos messages"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1129
+#: includes/Frontend/Look_Schema.php:403
 #: src/blocks/search/edit.js:360
 msgid "Compare row shading"
 msgstr "Ombrage des lignes de comparaison"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1130
+#: includes/Frontend/Look_Schema.php:404
 #: src/blocks/search/edit.js:363
 msgid "Message field radius"
 msgstr "Arrondi du champ de message"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1145
+#: includes/Frontend/Look_Schema.php:409
 #: src/admin/settings/components/tabs/SearchConfigTab.js:456
 #: src/blocks/search/edit.js:367
 msgid "Promotional banner"
@@ -981,71 +1140,87 @@ msgid "Shown above the results when a merchandising rule attaches a banner to th
 msgstr "Affichée au-dessus des résultats lorsqu’une règle de merchandising associe une bannière à la recherche."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1169
+#: includes/Frontend/Look_Schema.php:417
 #: src/blocks/search/edit.js:376
 msgid "Guided quiz"
 msgstr "Quiz guidé"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1174
+#: includes/Frontend/Look_Schema.php:419
 #: src/blocks/search/edit.js:379
 msgid "Question text"
 msgstr "Texte des questions"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1178
+#: includes/Frontend/Look_Schema.php:421
 msgid "Answers"
 msgstr "Réponses"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1194
+#: includes/Frontend/Look_Schema.php:429
 #: src/blocks/search/edit.js:388
 msgid "Answer radius"
 msgstr "Arrondi des réponses"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1206
-#: src/admin/settings/components/tabs/PlacementTab.js:714
+#: includes/Frontend/Look_Schema.php:292
+#: src/admin/settings/components/tabs/PlacementTab.js:408
 #: src/blocks/search/edit.js:392
 msgid "Result cards"
 msgstr "Cartes de résultats"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1227
+#: includes/Frontend/Look_Schema.php:300
 msgid "Image"
 msgstr "Image"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1232
+#: includes/Frontend/Look_Schema.php:304
 msgid "Aspect ratio"
 msgstr "Proportions"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1236
+#: includes/Frontend/Look_Schema.php:307
 msgid "Square (default)"
 msgstr "Carré (par défaut)"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1237
+#: includes/Frontend/Look_Schema.php:308
 msgid "Portrait 4:5"
 msgstr "Portrait 4:5"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1238
+#: includes/Frontend/Look_Schema.php:309
 msgid "Portrait 3:4"
 msgstr "Portrait 3:4"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1239
+#: includes/Frontend/Look_Schema.php:310
 msgid "Tall 2:3"
 msgstr "Haut 2:3"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1240
+#: includes/Frontend/Look_Schema.php:311
 msgid "Landscape 4:3"
 msgstr "Paysage 4:3"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1241
+#: includes/Frontend/Look_Schema.php:312
 msgid "Wide 16:9"
 msgstr "Large 16:9"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1249
+#: includes/Frontend/Look_Schema.php:317
 msgid "Fit"
 msgstr "Ajustement"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1253
+#: includes/Frontend/Look_Schema.php:320
 msgid "Fill and crop (default)"
 msgstr "Remplir et recadrer (par défaut)"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1254
+#: includes/Frontend/Look_Schema.php:321
 msgid "Show the whole image"
 msgstr "Afficher l’image entière"
 
@@ -1054,22 +1229,27 @@ msgid "\"Show the whole image\" keeps packshots on a plain background uncropped;
 msgstr "« Afficher l’image entière » garde sans recadrage les photos de produits sur fond uni ; l’arrière-plan ci-dessous remplit l’espace autour d’elles."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1265
+#: includes/Frontend/Look_Schema.php:329
 msgid "Sale badge"
 msgstr "Badge Promo"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1273
+#: includes/Frontend/Look_Schema.php:337
 msgid "Title and price"
 msgstr "Titre et prix"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1275
+#: includes/Frontend/Look_Schema.php:339
 msgid "Title color"
 msgstr "Couleur du titre"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1280
+#: includes/Frontend/Look_Schema.php:340
 msgid "Title typography"
 msgstr "Typographie du titre"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1287
+#: includes/Frontend/Look_Schema.php:341
 msgid "Title lines"
 msgstr "Lignes du titre"
 
@@ -1078,28 +1258,34 @@ msgid "A longer title is cut off with an ellipsis after this many lines, so card
 msgstr "Au-delà de ce nombre de lignes, un titre plus long est coupé par des points de suspension, pour que les cartes restent alignées."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1297
+#: includes/Frontend/Look_Schema.php:342
 msgid "Price / meta color"
 msgstr "Couleur du prix / des métadonnées"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1304
+#: includes/Frontend/Look_Schema.php:343
 msgid "Price typography"
 msgstr "Typographie du prix"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1312
+#: includes/Frontend/Look_Schema.php:344
 msgid "Price suffix / \"from\" typography"
 msgstr "Typographie du suffixe de prix / « à partir de »"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1319
+#: includes/Frontend/Look_Schema.php:348
 #: src/admin/settings/components/tabs/IndexingTab.js:203
 #: src/utils/facets.js:65
 msgid "Stock status"
 msgstr "État du stock"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1328
+#: includes/Frontend/Look_Schema.php:355
 msgid "Show (default)"
 msgstr "Afficher (par défaut)"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1334
+#: includes/Frontend/Look_Schema.php:359
 #: src/blocks/search/edit.js:400
 #: src/frontend/search/components/CompareTable.js:57
 #: src/frontend/search/components/templates.js:102
@@ -1108,6 +1294,7 @@ msgid "In stock"
 msgstr "En stock"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1335
+#: includes/Frontend/Look_Schema.php:360
 #: src/blocks/search/edit.js:401
 #: src/frontend/search/components/CompareTable.js:58
 #: src/frontend/search/components/templates.js:102
@@ -1115,6 +1302,7 @@ msgid "Out of stock"
 msgstr "En rupture de stock"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1354
+#: includes/Frontend/Look_Schema.php:369
 msgid "Card width"
 msgstr "Largeur des cartes"
 
@@ -1123,43 +1311,54 @@ msgid "How wide each result card is, and so how many fit side by side. Set it pe
 msgstr "La largeur de chaque carte de résultat, et donc le nombre de cartes côte à côte. Réglez-la par appareil avec le sélecteur responsive."
 
 #: includes/Elementor/Widgets/Search_Widget.php:1364
+#: includes/Frontend/Look_Schema.php:372
 msgid "Arrows"
 msgstr "Flèches"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1368
 #: includes/Elementor/Widgets/Search_Widget.php:1372
+#: includes/Frontend/Look_Schema.php:374
+#: includes/Frontend/Look_Schema.php:376
 #: src/blocks/search/edit.js:412
 msgid "Arrow color"
 msgstr "Couleur des flèches"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1369
 #: includes/Elementor/Widgets/Search_Widget.php:1373
+#: includes/Frontend/Look_Schema.php:375
+#: includes/Frontend/Look_Schema.php:377
 #: src/blocks/search/edit.js:413
 msgid "Arrow background"
 msgstr "Arrière-plan des flèches"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1376
+#: includes/Frontend/Look_Schema.php:378
 msgid "Arrow size"
 msgstr "Taille des flèches"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1377
+#: includes/Frontend/Look_Schema.php:379
 msgid "Arrow radius"
 msgstr "Arrondi des flèches"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1381
+#: includes/Frontend/Look_Schema.php:382
 msgid "Arrow shadow"
 msgstr "Ombre des flèches"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1385
+#: includes/Frontend/Look_Schema.php:385
 msgid "Soft (default)"
 msgstr "Douce (par défaut)"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1391
+#: includes/Frontend/Look_Schema.php:391
 #: src/blocks/search/edit.js:414
 msgid "Dot color"
 msgstr "Couleur des points"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1392
+#: includes/Frontend/Look_Schema.php:392
 #: src/blocks/search/edit.js:415
 msgid "Dot color (active)"
 msgstr "Couleur des points (actif)"
@@ -1231,12 +1430,13 @@ msgstr "Tous"
 msgid "Search by %s (opens in a new tab)"
 msgstr "Recherche par %s (s’ouvre dans un nouvel onglet)"
 
-#: includes/Frontend/Placement_Preview.php:83
+#: includes/Frontend/Placement_Preview.php:86
 msgid "This preview opens from the Placement tab of the Searcio settings."
 msgstr "Cet aperçu s’ouvre depuis l’onglet Intégration des réglages de Searcio."
 
-#: includes/Frontend/Placement_Preview.php:84
-#: src/admin/settings/components/tabs/PlacementTab.js:766
+#: includes/Frontend/Placement_Preview.php:87
+#: src/admin/settings/components/look/LookEditor.js:332
+#: src/admin/settings/components/tabs/PlacementTab.js:705
 msgid "Preview"
 msgstr "Aperçu"
 
@@ -1449,7 +1649,7 @@ msgstr "Aucun site trouvé pour ces identifiants."
 msgid "Invalid indexing configuration payload."
 msgstr "Données de configuration d’indexation non valides."
 
-#: includes/Routing/Placement_Endpoint.php:52
+#: includes/Routing/Placement_Endpoint.php:56
 msgid "The placement settings were missing from the request."
 msgstr "Les réglages d’intégration manquaient dans la requête."
 
@@ -1612,7 +1812,7 @@ msgid "The category on the page"
 msgstr "La catégorie de la page"
 
 #: includes/Widgets/Classic_Products_Widget.php:126
-#: src/admin/settings/components/tabs/PlacementTab.js:912
+#: src/admin/settings/components/tabs/PlacementTab.js:851
 msgid "Number of products"
 msgstr "Nombre de produits"
 
@@ -1621,23 +1821,22 @@ msgid "The Searcio search: a magnifier or a search field."
 msgstr "La recherche Searcio : une loupe ou un champ de recherche."
 
 #: includes/Widgets/Classic_Search_Widget.php:109
-#: src/admin/settings/components/tabs/PlacementTab.js:651
-#: src/admin/settings/components/tabs/PlacementTab.js:810
+#: src/admin/settings/components/tabs/PlacementTab.js:345
+#: src/admin/settings/components/tabs/PlacementTab.js:749
 msgid "Shown as"
 msgstr "Affichée comme"
 
 #: includes/Widgets/Classic_Search_Widget.php:113
-#: src/admin/settings/components/tabs/PlacementTab.js:604
-#: src/admin/settings/components/tabs/PlacementTab.js:636
-#: src/admin/settings/components/tabs/PlacementTab.js:655
-#: src/admin/settings/components/tabs/PlacementTab.js:736
-#: src/admin/settings/components/tabs/PlacementTab.js:814
+#: src/admin/settings/components/tabs/PlacementTab.js:349
+#: src/admin/settings/components/tabs/PlacementTab.js:638
+#: src/admin/settings/components/tabs/PlacementTab.js:670
+#: src/admin/settings/components/tabs/PlacementTab.js:753
 msgid "Magnifier"
 msgstr "Loupe"
 
 #: includes/Widgets/Classic_Search_Widget.php:117
-#: src/admin/settings/components/tabs/PlacementTab.js:659
-#: src/admin/settings/components/tabs/PlacementTab.js:818
+#: src/admin/settings/components/tabs/PlacementTab.js:353
+#: src/admin/settings/components/tabs/PlacementTab.js:757
 #: src/blocks/search/edit.js:237
 msgid "Placeholder"
 msgstr "Texte indicatif"
@@ -1690,7 +1889,7 @@ msgid "Search Config"
 msgstr "Configuration de la recherche"
 
 #: src/admin/settings/components/SettingsPanel.js:114
-#: src/admin/settings/components/tabs/PlacementTab.js:988
+#: src/admin/settings/components/tabs/PlacementTab.js:927
 msgid "Placement"
 msgstr "Intégration"
 
@@ -1729,7 +1928,7 @@ msgstr "Enregistrer les réglages"
 #: src/admin/settings/components/SettingsPanel.js:189
 #: src/admin/settings/components/tabs/IndexingTab.js:574
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:87
-#: src/admin/settings/components/tabs/PlacementTab.js:390
+#: src/admin/settings/components/tabs/PlacementTab.js:333
 #: src/admin/settings/components/tabs/SearchConfigTab.js:765
 msgid "No unsaved changes."
 msgstr "Aucune modification non enregistrée."
@@ -1740,7 +1939,7 @@ msgstr "Configurez les réglages de l’extension depuis une interface d’admin
 
 #: src/admin/settings/components/SettingsPanel.js:235
 #: src/admin/settings/components/tabs/IndexingTab.js:561
-#: src/admin/settings/components/tabs/PlacementTab.js:335
+#: src/admin/settings/components/tabs/PlacementTab.js:278
 #: src/admin/settings/components/tabs/SearchConfigTab.js:753
 #: src/frontend/search/components/AiAssistant.js:303
 msgid "Try again"
@@ -2181,8 +2380,8 @@ msgstr "Ajouter un champ"
 #: src/admin/settings/components/tabs/IndexingTab.js:487
 #: src/admin/settings/components/tabs/IndexingTab.js:527
 #: src/admin/settings/components/tabs/IndexingTab.js:556
-#: src/admin/settings/components/tabs/PlacementTab.js:49
-#: src/admin/settings/components/tabs/PlacementTab.js:301
+#: src/admin/settings/components/tabs/PlacementTab.js:46
+#: src/admin/settings/components/tabs/PlacementTab.js:244
 #: src/admin/settings/components/tabs/SearchConfigTab.js:544
 #: src/admin/settings/components/tabs/SearchConfigTab.js:748
 #: src/settings/store/provider.js:95
@@ -2209,7 +2408,7 @@ msgstr "La configuration d’indexation n’a pas pu être enregistrée : %s"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:571
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:84
-#: src/admin/settings/components/tabs/PlacementTab.js:389
+#: src/admin/settings/components/tabs/PlacementTab.js:332
 #: src/admin/settings/components/tabs/SearchConfigTab.js:762
 msgid "Saving…"
 msgstr "Enregistrement…"
@@ -2294,131 +2493,137 @@ msgstr "Tester la connexion"
 msgid "Test uses your saved credentials - save first."
 msgstr "Le test utilise vos identifiants enregistrés - enregistrez d’abord."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:129
+#: src/admin/settings/components/tabs/PlacementTab.js:126
 msgid "Copied."
 msgstr "Copié."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:131
+#: src/admin/settings/components/tabs/PlacementTab.js:128
 msgid "The browser did not allow copying. Select the text and copy it yourself."
 msgstr "Le navigateur n’a pas autorisé la copie. Sélectionnez le texte et copiez-le vous-même."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:135
+#: src/admin/settings/components/tabs/PlacementTab.js:132
 msgid "Copy"
 msgstr "Copier"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:158
+#: src/admin/settings/components/look/ColorField.js:28
+#: src/admin/settings/components/look/LookControl.js:219
+#: src/admin/settings/components/look/LookControl.js:231
+#: src/admin/settings/components/look/LookControl.js:237
+#: src/admin/settings/components/look/LookControl.js:244
+#: src/admin/settings/components/look/LookControl.js:256
 msgid "Default"
 msgstr "Par défaut"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:172
+#: src/admin/settings/components/look/ColorField.js:42
+#: src/admin/settings/components/look/LookControl.js:320
 msgid "Use the default"
 msgstr "Utiliser la valeur par défaut"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:282
+#: src/admin/settings/components/tabs/PlacementTab.js:225
 msgid "Placement saved."
 msgstr "Intégration enregistrée."
 
 #. translators: %s: reason the save failed, as reported by the REST API.
-#: src/admin/settings/components/tabs/PlacementTab.js:287
+#: src/admin/settings/components/tabs/PlacementTab.js:230
 #, js-format
 msgid "The placement could not be saved: %s"
 msgstr "L’intégration n’a pas pu être enregistrée : %s"
 
 #. translators: %s: reason the request failed.
-#: src/admin/settings/components/tabs/PlacementTab.js:300
+#: src/admin/settings/components/tabs/PlacementTab.js:243
 #, js-format
 msgid "The placement settings could not be loaded: %s"
 msgstr "Les réglages d’intégration n’ont pas pu être chargés : %s"
 
 #. translators: %s: the selectors, one after another.
-#: src/admin/settings/components/tabs/PlacementTab.js:306
+#: src/admin/settings/components/tabs/PlacementTab.js:249
 #, js-format
 msgid "A browser cannot read these, so they open nothing: %s"
 msgstr "Un navigateur ne peut pas les lire, ils n’ouvrent donc rien : %s"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:324
+#: src/admin/settings/components/tabs/PlacementTab.js:267
 msgid "Loading the placement settings"
 msgstr "Chargement des réglages d’intégration"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:351
+#: src/admin/settings/components/tabs/PlacementTab.js:294
 msgid "Translate it under Languages > Translations, in the Searcio group."
 msgstr "Traduisez-le dans Langues > Traductions, dans le groupe Searcio."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:353
+#: src/admin/settings/components/tabs/PlacementTab.js:296
 msgid "Translate it under WPML > String Translation, in the Searcio domain."
 msgstr "Traduisez-le dans WPML > Traduction de chaînes, dans le domaine Searcio."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:357
-#: src/admin/settings/components/tabs/PlacementTab.js:637
+#: src/admin/settings/components/tabs/PlacementTab.js:300
+#: src/admin/settings/components/tabs/PlacementTab.js:671
 msgid "All content"
 msgstr "Tout le contenu"
 
 #: includes/Elementor/Widgets/Search_Widget.php:203
-#: src/admin/settings/components/tabs/PlacementTab.js:361
+#: src/admin/settings/components/tabs/PlacementTab.js:304
 #: src/blocks/search/edit.js:142
 msgid "When Enter is pressed"
 msgstr "Quand on appuie sur Entrée"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:362
+#: src/admin/settings/components/tabs/PlacementTab.js:305
 msgid "As the visitor types"
 msgstr "Pendant la saisie"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:365
+#: src/admin/settings/components/tabs/PlacementTab.js:308
 msgid "The newest products"
 msgstr "Les produits les plus récents"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:366
+#: src/admin/settings/components/tabs/PlacementTab.js:309
 msgid "Featured products"
 msgstr "Produits mis en avant"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:376
+#: src/admin/settings/components/tabs/PlacementTab.js:319
 msgid "Drawn by the plugin"
 msgstr "Dessinées par l’extension"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:377
+#: src/admin/settings/components/tabs/PlacementTab.js:320
 msgid "Templates from Searcio"
 msgstr "Modèles de Searcio"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:389
+#: src/admin/settings/components/tabs/PlacementTab.js:332
 msgid "Save placement"
 msgstr "Enregistrer l’intégration"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:395
+#: src/admin/settings/components/tabs/PlacementTab.js:429
 msgid "To check a change, save it, open your site in a new tab and click its search."
 msgstr "Pour vérifier une modification, enregistrez-la, ouvrez votre site dans un nouvel onglet et cliquez sur sa recherche."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:398
+#: src/admin/settings/components/tabs/PlacementTab.js:432
 msgid "Open your site"
 msgstr "Ouvrir votre site"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:408
-#: src/admin/settings/components/tabs/PlacementTab.js:415
+#: src/admin/settings/components/tabs/PlacementTab.js:442
+#: src/admin/settings/components/tabs/PlacementTab.js:449
 msgid "Search forms"
 msgstr "Formulaires de recherche"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:410
+#: src/admin/settings/components/tabs/PlacementTab.js:444
 msgid "Drawn as Searcio"
 msgstr "Remplacés par Searcio"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:416
+#: src/admin/settings/components/tabs/PlacementTab.js:450
 msgid "For a theme that draws its own search. Searcio takes its place on every page, with nothing to edit in the theme."
 msgstr "Pour un thème qui dessine sa propre recherche. Searcio prend sa place sur chaque page, sans rien modifier dans le thème."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:420
+#: src/admin/settings/components/tabs/PlacementTab.js:454
 msgid "Use Searcio for the site's search forms"
 msgstr "Utiliser Searcio pour les formulaires de recherche du site"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:421
+#: src/admin/settings/components/tabs/PlacementTab.js:455
 msgid "The theme's search form, WooCommerce's product search and the Search blocks become a Searcio search field. Without JavaScript they still search WordPress."
 msgstr "Le formulaire de recherche du thème, la recherche de produits de WooCommerce et les blocs Recherche deviennent un champ de recherche Searcio. Sans JavaScript, ils continuent de chercher dans WordPress."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:432
-#: src/admin/settings/components/tabs/PlacementTab.js:447
+#: src/admin/settings/components/tabs/PlacementTab.js:466
+#: src/admin/settings/components/tabs/PlacementTab.js:481
 msgid "The theme's search"
 msgstr "Recherche du thème"
 
 #. translators: %d: number of CSS selectors.
-#: src/admin/settings/components/tabs/PlacementTab.js:437
+#: src/admin/settings/components/tabs/PlacementTab.js:471
 #, js-format
 msgid "%d selector"
 msgid_plural "%d selectors"
@@ -2426,361 +2631,351 @@ msgstr[0] "%d sélecteur"
 msgstr[1] "%d sélecteurs"
 
 #. translators: %s: the theme's name.
-#: src/admin/settings/components/tabs/PlacementTab.js:442
+#: src/admin/settings/components/tabs/PlacementTab.js:476
 #, js-format
 msgid "Theme: %s"
 msgstr "Thème : %s"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:448
+#: src/admin/settings/components/tabs/PlacementTab.js:482
 msgid "For a theme whose header has a search icon or field of its own."
 msgstr "Pour un thème dont l’en-tête a sa propre icône ou son propre champ de recherche."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:453
+#: src/admin/settings/components/tabs/PlacementTab.js:487
 msgid "Open Searcio from the theme's own search"
 msgstr "Ouvrir Searcio depuis la recherche du thème"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:454
+#: src/admin/settings/components/tabs/PlacementTab.js:488
 msgid "A click on an element these selectors find opens Searcio, and the theme's own search stays closed. A search field opens it with what was typed."
 msgstr "Un clic sur un élément trouvé par ces sélecteurs ouvre Searcio, et la recherche du thème reste fermée. Un champ de recherche l’ouvre avec ce qui a été saisi."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:462
+#: src/admin/settings/components/tabs/PlacementTab.js:496
 msgid "CSS selectors"
 msgstr "Sélecteurs CSS"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:463
+#: src/admin/settings/components/tabs/PlacementTab.js:497
 msgid "One per line, e.g. #menu-item-search > a. To find one, right-click the theme's search icon, choose Inspect, and copy a class or id it has."
 msgstr "Un par ligne, par ex. #menu-item-search > a. Pour en trouver un, faites un clic droit sur l’icône de recherche du thème, choisissez Inspecter et copiez une classe ou un identifiant qu’elle porte."
 
 #. translators: 1: a theme's or a builder's name, 2: its CSS selectors.
-#: src/admin/settings/components/tabs/PlacementTab.js:485
+#: src/admin/settings/components/tabs/PlacementTab.js:519
 #, js-format
 msgid "For %1$s: %2$s"
 msgstr "Pour %1$s : %2$s"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:502
+#: src/admin/settings/components/tabs/PlacementTab.js:536
 msgid "In the list"
 msgstr "Dans la liste"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:502
+#: src/admin/settings/components/tabs/PlacementTab.js:536
 msgid "Use the suggestion"
 msgstr "Utiliser la suggestion"
 
 #. translators: %s: the theme's name.
-#: src/admin/settings/components/tabs/PlacementTab.js:512
+#: src/admin/settings/components/tabs/PlacementTab.js:546
 #, js-format
 msgid "Searcio has no suggestion for %s yet."
 msgstr "Searcio n’a pas encore de suggestion pour %s."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:527
-#: src/admin/settings/components/tabs/PlacementTab.js:534
+#: src/admin/settings/components/tabs/PlacementTab.js:561
+#: src/admin/settings/components/tabs/PlacementTab.js:568
 msgid "Keyboard shortcut"
 msgstr "Raccourci clavier"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:529
+#: src/admin/settings/components/tabs/PlacementTab.js:563
 msgid "Ctrl+K and /"
 msgstr "Ctrl+K et /"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:535
+#: src/admin/settings/components/tabs/PlacementTab.js:569
 msgid "Ctrl+K, Cmd+K on a Mac, and \"/\" outside a field open the search."
 msgstr "Ctrl+K, Cmd+K sur Mac, et « / » hors d’un champ ouvrent la recherche."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:539
+#: src/admin/settings/components/tabs/PlacementTab.js:573
 msgid "Use the keyboard shortcut"
 msgstr "Utiliser le raccourci clavier"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:550
-#: src/admin/settings/components/tabs/PlacementTab.js:559
+#: src/admin/settings/components/tabs/PlacementTab.js:584
+#: src/admin/settings/components/tabs/PlacementTab.js:593
 msgid "Floating search button"
 msgstr "Bouton de recherche flottant"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:554
+#: src/admin/settings/components/tabs/PlacementTab.js:588
 msgid "On every screen"
 msgstr "Sur tous les écrans"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:554
+#: src/admin/settings/components/tabs/PlacementTab.js:588
 msgid "On phones"
 msgstr "Sur les téléphones"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:560
+#: src/admin/settings/components/tabs/PlacementTab.js:594
 msgid "A button fixed to a bottom corner of every page, for a theme that has no search on a phone."
 msgstr "Un bouton fixé dans un coin inférieur de chaque page, pour un thème sans recherche sur téléphone."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:565
+#: src/admin/settings/components/tabs/PlacementTab.js:599
 msgid "Show a floating search button"
 msgstr "Afficher un bouton de recherche flottant"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:577
+#: src/admin/settings/components/tabs/PlacementTab.js:611
 msgid "Corner"
 msgstr "Coin"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:588
+#: src/admin/settings/components/tabs/PlacementTab.js:622
 msgid "Shown on"
 msgstr "Affiché sur"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:589
+#: src/admin/settings/components/tabs/PlacementTab.js:623
 msgid "Phones are screens narrower than 782px."
 msgstr "Les téléphones sont les écrans de moins de 782 px."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:593
+#: src/admin/settings/components/tabs/PlacementTab.js:627
 msgid "Phones"
 msgstr "Téléphones"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:594
+#: src/admin/settings/components/tabs/PlacementTab.js:628
 msgid "Every screen"
 msgstr "Tous les écrans"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:600
+#: src/admin/settings/components/tabs/PlacementTab.js:634
 msgid "Button"
 msgstr "Bouton"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:605
+#: src/admin/settings/components/tabs/PlacementTab.js:639
 msgid "With \"Search\""
 msgstr "Avec « Rechercher »"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:610
+#: src/admin/settings/components/tabs/PlacementTab.js:644
 msgid "Distance from the bottom (px)"
 msgstr "Distance depuis le bas (px)"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:611
+#: src/admin/settings/components/tabs/PlacementTab.js:645
 msgid "Lift it above a cookie notice or a cart bar."
 msgstr "Remontez-le au-dessus d’un bandeau de cookies ou d’une barre de panier."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:623
+#: src/admin/settings/components/tabs/PlacementTab.js:657
 msgid "Preview of the floating search button"
 msgstr "Aperçu du bouton de recherche flottant"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:634
+#: src/admin/settings/components/tabs/PlacementTab.js:668
 msgid "Look"
 msgstr "Apparence"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:642
+#: src/admin/settings/components/tabs/PlacementTab.js:681
 msgid "Look of the shortcode and the widgets"
 msgstr "Apparence du shortcode et des widgets"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:643
+#: src/admin/settings/components/tabs/PlacementTab.js:682
 msgid "How [searcio], the Searcio Search widget, a form Searcio takes over and the floating button look and behave, unless one of them says otherwise. The block and the Elementor widget keep their own settings."
 msgstr "L’apparence et le comportement de [searcio], du widget Recherche Searcio, d’un formulaire repris par Searcio et du bouton flottant, sauf si l’un d’eux indique autre chose. Le bloc et le widget Elementor gardent leurs propres réglages."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:665
-#: src/admin/settings/components/tabs/PlacementTab.js:823
+#: src/admin/settings/components/tabs/PlacementTab.js:359
+#: src/admin/settings/components/tabs/PlacementTab.js:762
 msgid "Content to search"
 msgstr "Contenu recherché"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:673
+#: src/admin/settings/components/tabs/PlacementTab.js:367
 msgid "Width of the field (px)"
 msgstr "Largeur du champ (px)"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:674
+#: src/admin/settings/components/tabs/PlacementTab.js:368
 msgid "0 fills the space it is placed in."
 msgstr "0 remplit l’espace où il est placé."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:687
+#: src/admin/settings/components/tabs/PlacementTab.js:381
 msgid "Start"
 msgstr "Début"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:688
+#: src/admin/settings/components/tabs/PlacementTab.js:382
 msgid "Centre"
 msgstr "Centre"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:689
+#: src/admin/settings/components/tabs/PlacementTab.js:383
 msgid "End"
 msgstr "Fin"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:692
+#: src/admin/settings/components/tabs/PlacementTab.js:386
 msgid "Search starts"
 msgstr "La recherche démarre"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:696
+#: src/admin/settings/components/tabs/PlacementTab.js:390
 msgid "Before a search, the window shows"
 msgstr "Avant une recherche, la fenêtre affiche"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:703
+#: src/admin/settings/components/tabs/PlacementTab.js:397
 msgid "0 shows \"All filters\" alone."
 msgstr "0 affiche « Tous les filtres » seul."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:710
+#: src/admin/settings/components/tabs/PlacementTab.js:404
 msgid "Opening animation"
 msgstr "Animation à l’ouverture"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:719
+#: src/admin/settings/components/tabs/PlacementTab.js:413
 msgid "Voice search"
 msgstr "Recherche vocale"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:725
+#: src/admin/settings/components/tabs/PlacementTab.js:419
 msgid "Show how many results each filter leaves"
 msgstr "Afficher combien de résultats chaque filtre laisse"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:730
-msgid "Colours"
-msgstr "Couleurs"
-
-#: src/admin/settings/components/tabs/PlacementTab.js:733
 #: src/blocks/search/edit.js:220
 msgid "Accent"
 msgstr "Accent"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:734
-msgid "Window background"
-msgstr "Fond de la fenêtre"
-
-#: src/admin/settings/components/tabs/PlacementTab.js:750
-msgid "Corner radius of the window (px)"
-msgstr "Rayon des coins de la fenêtre (px)"
-
-#: src/admin/settings/components/tabs/PlacementTab.js:770
+#: src/admin/settings/components/look/LookEditor.js:336
+#: src/admin/settings/components/tabs/PlacementTab.js:709
 msgid "On the page"
 msgstr "Sur la page"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:771
+#: src/admin/settings/components/look/LookEditor.js:337
+#: src/admin/settings/components/tabs/PlacementTab.js:710
 msgid "Window open"
 msgstr "Fenêtre ouverte"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:777
+#: src/admin/settings/components/look/LookEditor.js:364
+#: src/admin/settings/components/tabs/PlacementTab.js:716
 msgid "Preview of the search on a page of the site"
 msgstr "Aperçu de la recherche sur une page du site"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:780
+#: src/admin/settings/components/tabs/PlacementTab.js:719
 msgid "Drawn in your theme's styles, from the settings on screen. Save to put them on the site."
 msgstr "Dessiné dans les styles de votre thème, à partir des réglages affichés. Enregistrez pour les appliquer au site."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:790
+#: src/admin/settings/components/tabs/PlacementTab.js:729
 msgid "Shortcodes"
 msgstr "Shortcodes"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:801
+#: src/admin/settings/components/tabs/PlacementTab.js:740
 msgid "Shortcode for the search"
 msgstr "Shortcode de la recherche"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:802
+#: src/admin/settings/components/tabs/PlacementTab.js:741
 msgid "Change what one place needs; what the Look section already sets is left out of the shortcode."
 msgstr "Modifiez ce dont un emplacement a besoin ; ce que la section Apparence règle déjà reste hors du shortcode."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:826
+#: src/admin/settings/components/tabs/PlacementTab.js:765
 msgid "The search shortcode"
 msgstr "Le shortcode de la recherche"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:832
+#: src/admin/settings/components/tabs/PlacementTab.js:771
 msgid "Shortcode for a product row"
 msgstr "Shortcode d’une rangée de produits"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:833
+#: src/admin/settings/components/tabs/PlacementTab.js:772
 msgid "Similar products on a product page, or a category listing on a category page. On a page without either, it shows nothing."
 msgstr "Des produits similaires sur une page produit, ou la liste d’une catégorie sur une page de catégorie. Sur une page sans l’un ni l’autre, il n’affiche rien."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:845
-#: src/admin/settings/components/tabs/PlacementTab.js:876
-#: src/admin/settings/components/tabs/PlacementTab.js:894
+#: src/admin/settings/components/tabs/PlacementTab.js:784
+#: src/admin/settings/components/tabs/PlacementTab.js:815
+#: src/admin/settings/components/tabs/PlacementTab.js:833
 msgid "Similar"
 msgstr "Similaires"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:846
-#: src/admin/settings/components/tabs/PlacementTab.js:876
-#: src/admin/settings/components/tabs/PlacementTab.js:895
+#: src/admin/settings/components/tabs/PlacementTab.js:785
+#: src/admin/settings/components/tabs/PlacementTab.js:815
+#: src/admin/settings/components/tabs/PlacementTab.js:834
 msgid "Category"
 msgstr "Catégorie"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:864
+#: src/admin/settings/components/tabs/PlacementTab.js:803
 msgid "The product row shortcode"
 msgstr "Le shortcode d’une rangée de produits"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:874
+#: src/admin/settings/components/tabs/PlacementTab.js:813
 msgid "Product rows"
 msgstr "Rangées de produits"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:882
+#: src/admin/settings/components/tabs/PlacementTab.js:821
 msgid "Defaults of a product row"
 msgstr "Valeurs par défaut d’une rangée de produits"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:883
+#: src/admin/settings/components/tabs/PlacementTab.js:822
 msgid "What [searcio_products] and the Searcio Products widget show unless they say otherwise."
 msgstr "Ce qu’affichent [searcio_products] et le widget Produits Searcio, sauf indication contraire."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:913
+#: src/admin/settings/components/tabs/PlacementTab.js:852
 msgid "Empty or 0 is 6 similar products, or 12 in a category."
 msgstr "Vide ou 0 donne 6 produits similaires, ou 12 dans une catégorie."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:929
+#: src/admin/settings/components/tabs/PlacementTab.js:868
 msgid "Show a category's banner"
 msgstr "Afficher la bannière d’une catégorie"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:930
+#: src/admin/settings/components/tabs/PlacementTab.js:869
 msgid "A merchandising rule's banner, above a category listing."
 msgstr "La bannière d’une règle de merchandising, au-dessus de la liste d’une catégorie."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:941
-#: src/admin/settings/components/tabs/PlacementTab.js:948
+#: src/admin/settings/components/tabs/PlacementTab.js:880
+#: src/admin/settings/components/tabs/PlacementTab.js:887
 msgid "Other ways to place it"
 msgstr "Autres façons de l’intégrer"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:943
+#: src/admin/settings/components/tabs/PlacementTab.js:882
 msgid "Blocks, widgets, menus and links"
 msgstr "Blocs, widgets, menus et liens"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:949
+#: src/admin/settings/components/tabs/PlacementTab.js:888
 msgid "Each of these uses the settings of the Look section, unless it has settings of its own."
 msgstr "Chacun reprend les réglages de la section Apparence, sauf s’il a ses propres réglages."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:953
+#: src/admin/settings/components/tabs/PlacementTab.js:892
 msgid "Block editor"
 msgstr "Éditeur de blocs"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:954
+#: src/admin/settings/components/tabs/PlacementTab.js:893
 msgid "The Searcio Search and Searcio Products blocks, in a page, a template or a block widget area. They have settings and styles of their own."
 msgstr "Les blocs Recherche Searcio et Produits Searcio, dans une page, un modèle ou une zone de widgets en blocs. Ils ont leurs propres réglages et styles."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:957
+#: src/admin/settings/components/tabs/PlacementTab.js:896
 msgid "Elementor"
 msgstr "Elementor"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:958
+#: src/admin/settings/components/tabs/PlacementTab.js:897
 msgid "The Searcio Search and Searcio Products widgets, under Searcio in the panel, with settings and styles of their own."
 msgstr "Les widgets Recherche Searcio et Produits Searcio, sous Searcio dans le panneau, avec leurs propres réglages et styles."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:961
+#: src/admin/settings/components/tabs/PlacementTab.js:900
 msgid "Classic widgets"
 msgstr "Widgets classiques"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:962
+#: src/admin/settings/components/tabs/PlacementTab.js:901
 msgid "Searcio Search and Searcio Products under Appearance > Widgets, for a theme with classic widget areas."
 msgstr "Recherche Searcio et Produits Searcio dans Apparence > Widgets, pour un thème avec des zones de widgets classiques."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:965
+#: src/admin/settings/components/tabs/PlacementTab.js:904
 msgid "Menu item"
 msgstr "Élément de menu"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:966
+#: src/admin/settings/components/tabs/PlacementTab.js:905
 msgid "Under Appearance > Menus, the Searcio box adds a search item to a menu. In a Navigation block, add a custom link to #searcio."
 msgstr "Dans Apparence > Menus, la boîte Searcio ajoute un élément de recherche à un menu. Dans un bloc Navigation, ajoutez un lien personnalisé vers #searcio."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:969
+#: src/admin/settings/components/tabs/PlacementTab.js:908
 msgid "A link or a button"
 msgstr "Un lien ou un bouton"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:970
+#: src/admin/settings/components/tabs/PlacementTab.js:909
 msgid "A link to #searcio, or any element with the class searcio-open, opens the search: a page builder's button, a theme option's link, an icon."
 msgstr "Un lien vers #searcio, ou tout élément ayant la classe searcio-open, ouvre la recherche : le bouton d’un constructeur de pages, le lien d’une option du thème, une icône."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:971
+#: src/admin/settings/components/tabs/PlacementTab.js:910
 msgid "A link that opens the search"
 msgstr "Un lien qui ouvre la recherche"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:974
+#: src/admin/settings/components/tabs/PlacementTab.js:913
 msgid "PHP in a child theme"
 msgstr "PHP dans un thème enfant"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:975
+#: src/admin/settings/components/tabs/PlacementTab.js:914
 msgid "Where a template of the theme should draw the search itself, for example in header.php."
 msgstr "Là où un modèle du thème doit dessiner lui-même la recherche, par exemple dans header.php."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:976
+#: src/admin/settings/components/tabs/PlacementTab.js:915
 msgid "PHP that draws the search"
 msgstr "Le PHP qui dessine la recherche"
 
-#: src/admin/settings/components/tabs/PlacementTab.js:989
+#: src/admin/settings/components/tabs/PlacementTab.js:928
 msgid "Puts the search where a block or an Elementor widget cannot go: into the theme's own search, a floating button, shortcodes and classic widgets. Every way here is off until you turn it on."
 msgstr "Place la recherche là où un bloc ou un widget Elementor ne peut pas aller : dans la recherche du thème, un bouton flottant, des shortcodes et des widgets classiques. Chaque option ici reste désactivée jusqu’à ce que vous l’activiez."
 
-#: src/admin/settings/components/tabs/PlacementTab.js:995
+#: src/admin/settings/components/tabs/PlacementTab.js:934
 msgid "Placement settings"
 msgstr "Réglages d’intégration"
 
@@ -3052,6 +3247,7 @@ msgstr "Les champs sur lesquels porte la recherche plein texte, et le poids de c
 msgid "Field"
 msgstr "Champ"
 
+#: src/admin/settings/components/look/LookControl.js:286
 #: src/admin/settings/components/tabs/SearchConfigTab.js:812
 msgid "Weight"
 msgstr "Poids"
@@ -4095,6 +4291,7 @@ msgstr "Vérifiez l’orthographe ou essayez un terme plus général."
 msgid "Reset filters"
 msgstr "Réinitialiser les filtres"
 
+#: src/admin/settings/components/look/LookEditor.js:306
 #: src/frontend/search/components/SearchModal.js:1647
 msgid "Done"
 msgstr "Terminé"
@@ -4111,6 +4308,7 @@ msgid_plural "Show %d results"
 msgstr[0] "Afficher %d résultat"
 msgstr[1] "Afficher %d résultats"
 
+#: src/admin/settings/components/look/LookControl.js:129
 #: src/frontend/search/components/SearchModal.js:1676
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -4206,3 +4404,214 @@ msgstr "Recherche Searcio"
 msgctxt "block description"
 msgid "A full-screen search box or icon powered by Searcio."
 msgstr "Une barre ou une icône de recherche plein écran, propulsée par Searcio."
+
+#: src/admin/settings/components/look/LookControl.js:15
+msgid "for desktops"
+msgstr "pour les ordinateurs"
+
+#: src/admin/settings/components/look/LookControl.js:16
+msgid "for tablets"
+msgstr "pour les tablettes"
+
+#: src/admin/settings/components/look/LookControl.js:17
+msgid "for phones"
+msgstr "pour les téléphones"
+
+#: src/admin/settings/components/look/LookControl.js:43
+msgid "The same as on a larger screen, until you change it here."
+msgstr "Comme sur un écran plus grand, jusqu’à ce que vous le changiez ici."
+
+#: src/admin/settings/components/look/LookControl.js:88
+msgid "Top"
+msgstr "Haut"
+
+#: src/admin/settings/components/look/LookControl.js:88
+msgid "Bottom"
+msgstr "Bas"
+
+#. translators: %s: name of a font family.
+#: src/admin/settings/components/look/LookControl.js:150
+#, js-format
+msgid "%s (Google Fonts)"
+msgstr "%s (Google Fonts)"
+
+#: src/admin/settings/components/look/LookControl.js:164
+msgid "A Google font: the visitor's browser loads it from Google's servers when the search opens."
+msgstr "Une police Google : le navigateur du visiteur la charge depuis les serveurs de Google à l’ouverture de la recherche."
+
+#: src/admin/settings/components/look/LookControl.js:167
+msgid "The theme's font"
+msgstr "La police du thème"
+
+#: src/admin/settings/components/look/LookControl.js:220
+msgid "100 - Thin"
+msgstr "100 - Fin"
+
+#: src/admin/settings/components/look/LookControl.js:221
+msgid "200 - Extra light"
+msgstr "200 - Très léger"
+
+#: src/admin/settings/components/look/LookControl.js:222
+msgid "300 - Light"
+msgstr "300 - Léger"
+
+#: src/admin/settings/components/look/LookControl.js:223
+msgid "400 - Normal"
+msgstr "400 - Normal"
+
+#: src/admin/settings/components/look/LookControl.js:224
+msgid "500 - Medium"
+msgstr "500 - Moyen"
+
+#: src/admin/settings/components/look/LookControl.js:225
+msgid "600 - Semi bold"
+msgstr "600 - Demi-gras"
+
+#: src/admin/settings/components/look/LookControl.js:226
+msgid "700 - Bold"
+msgstr "700 - Gras"
+
+#: src/admin/settings/components/look/LookControl.js:227
+msgid "800 - Extra bold"
+msgstr "800 - Très gras"
+
+#: src/admin/settings/components/look/LookControl.js:228
+msgid "900 - Black"
+msgstr "900 - Noir"
+
+#: src/admin/settings/components/look/LookControl.js:233
+msgid "Italic"
+msgstr "Italique"
+
+#: src/admin/settings/components/look/LookControl.js:234
+msgid "Oblique"
+msgstr "Oblique"
+
+#: src/admin/settings/components/look/LookControl.js:238
+msgid "As written"
+msgstr "Tel quel"
+
+#: src/admin/settings/components/look/LookControl.js:239
+msgid "Uppercase"
+msgstr "Majuscules"
+
+#: src/admin/settings/components/look/LookControl.js:240
+msgid "Lowercase"
+msgstr "Minuscules"
+
+#: src/admin/settings/components/look/LookControl.js:241
+msgid "Capitalised"
+msgstr "Initiales en majuscule"
+
+#: src/admin/settings/components/look/LookControl.js:247
+msgid "Overline"
+msgstr "Surligné"
+
+#: src/admin/settings/components/look/LookControl.js:248
+msgid "Line through"
+msgstr "Barré"
+
+#: src/admin/settings/components/look/LookControl.js:276
+msgid "Size"
+msgstr "Taille"
+
+#: src/admin/settings/components/look/LookControl.js:287
+#: src/admin/settings/components/look/LookEditor.js:213
+msgid "Style"
+msgstr "Style"
+
+#: src/admin/settings/components/look/LookControl.js:288
+msgid "Letter case"
+msgstr "Casse"
+
+#: src/admin/settings/components/look/LookControl.js:289
+msgid "Decoration"
+msgstr "Décoration"
+
+#: src/admin/settings/components/look/LookControl.js:292
+msgid "Line height"
+msgstr "Hauteur de ligne"
+
+#: src/admin/settings/components/look/LookControl.js:302
+msgid "Letter spacing"
+msgstr "Espacement des lettres"
+
+#: src/admin/settings/components/look/LookEditor.js:70
+msgid "State"
+msgstr "État"
+
+#: src/admin/settings/components/look/LookEditor.js:80
+msgid "Nothing here applies to the search as it is shown now. Change \"Shown as\" under Content to see the rest."
+msgstr "Rien ici ne s’applique à la recherche telle qu’elle est affichée. Changez « Affichée comme » sous Contenu pour voir le reste."
+
+#: src/admin/settings/components/look/LookEditor.js:108
+msgid "Reset this part"
+msgstr "Réinitialiser cette partie"
+
+#: src/admin/settings/components/look/LookEditor.js:202
+msgid "Look editor"
+msgstr "Éditeur d’apparence"
+
+#: src/admin/settings/components/look/LookEditor.js:212
+msgid "Content"
+msgstr "Contenu"
+
+#: src/admin/settings/components/look/LookEditor.js:225
+msgid "Pick a part of the search. A setting with a screen beside its name is set for the screen chosen above the preview."
+msgstr "Choisissez une partie de la recherche. Un réglage avec un écran à côté de son nom vaut pour l’écran choisi au-dessus de l’aperçu."
+
+#. translators: %d: number of style settings that are set.
+#: src/admin/settings/components/look/LookEditor.js:243
+#, js-format
+msgid "%d set"
+msgid_plural "%d set"
+msgstr[0] "%d défini"
+msgstr[1] "%d définis"
+
+#: src/admin/settings/components/look/LookEditor.js:263
+msgid "All parts"
+msgstr "Toutes les parties"
+
+#: src/admin/settings/components/look/LookEditor.js:318
+msgid "Screen"
+msgstr "Écran"
+
+#: src/admin/settings/components/look/LookEditor.js:322
+msgid "Desktop"
+msgstr "Ordinateur"
+
+#: src/admin/settings/components/look/LookEditor.js:323
+msgid "Tablet"
+msgstr "Tablette"
+
+#: src/admin/settings/components/look/LookEditor.js:324
+msgid "Phone"
+msgstr "Téléphone"
+
+#. translators: %s: reason the request failed, as reported by the REST API.
+#: src/admin/settings/components/look/LookEditor.js:347
+#, js-format
+msgid "The preview could not show the last change: %s"
+msgstr "L’aperçu n’a pas pu afficher la dernière modification : %s"
+
+#. translators: %d: width of the preview in pixels.
+#: src/admin/settings/components/look/LookEditor.js:376
+#, js-format
+msgid "Drawn %dpx wide, in your theme's styles. Type in it to see results and filters."
+msgstr "Dessiné sur %d px de large, dans les styles de votre thème. Tapez-y pour voir les résultats et les filtres."
+
+#. translators: %d: number of style settings that are set.
+#: src/admin/settings/components/tabs/PlacementTab.js:674
+#, js-format
+msgid "%d style setting"
+msgid_plural "%d style settings"
+msgstr[0] "%d réglage de style"
+msgstr[1] "%d réglages de style"
+
+#: src/admin/settings/components/tabs/PlacementTab.js:691
+msgid "Open the look editor"
+msgstr "Ouvrir l’éditeur d’apparence"
+
+#: src/admin/settings/components/tabs/PlacementTab.js:694
+msgid "Colours, fonts, sizes and spacing of every part, for desktops, tablets and phones."
+msgstr "Couleurs, polices, tailles et espacements de chaque partie, pour ordinateurs, tablettes et téléphones."

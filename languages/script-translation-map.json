@@ -5,6 +5,15 @@
     "src/admin/settings/components/SettingsSkeleton.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/look/ColorField.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/look/LookControl.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/look/LookEditor.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/tabs/CacheClearCard.js": [
         "public/bundle.settings.js"
     ],

@@ -148,6 +148,11 @@ final class Placement_Config {
 			'types'        => $this->index_config->indexable_post_type_labels(),
 			'home'         => home_url( '/' ),
 			'preview'      => Placement_Preview::url_base(),
+			'look'         => Look_Schema::groups(),
+			'fonts'        => [
+				'site'   => Google_Fonts::site_families(),
+				'google' => Google_Fonts::FAMILIES,
+			],
 			'multilingual' => $this->multilingual_provider(),
 		];
 	}

@@ -19,11 +19,7 @@ export const SEARCH_DEFAULTS = {
 	cards: 'plugin',
 	width: 0,
 	align: 'start',
-	accent: '',
-	background: '',
-	text: '',
-	icon_color: '',
-	radius: null,
+	look: {},
 };
 
 /** The product row's defaults (`Products_Placement`). */
@@ -45,6 +41,23 @@ export const FLOATING_DEFAULTS = {
 };
 
 /**
+ * The search's settings, with the look as an object: the server writes an
+ * empty one as a list.
+ *
+ * @param {Object} [search]
+ * @return {Object} The settings.
+ */
+const normalizeSearch = ( search = {} ) => {
+	const look = search?.look;
+
+	return {
+		...SEARCH_DEFAULTS,
+		...( search || {} ),
+		look: look && 'object' === typeof look && ! Array.isArray( look ) ? look : {},
+	};
+};
+
+/**
  * The settings as the endpoint sent them, with every key there: a key the
  * endpoint left out is the plugin's default.
  *
@@ -57,7 +70,7 @@ export const normalizePlacement = ( data = {} ) => ( {
 	selectors: Array.isArray( data.selectors ) ? data.selectors.filter( ( s ) => 'string' === typeof s ) : [],
 	shortcut: Boolean( data.shortcut ),
 	floating: { ...FLOATING_DEFAULTS, ...( data.floating || {} ) },
-	search: { ...SEARCH_DEFAULTS, ...( data.search || {} ) },
+	search: normalizeSearch( data.search ),
 	products: { ...PRODUCTS_DEFAULTS, ...( data.products || {} ) },
 } );
 

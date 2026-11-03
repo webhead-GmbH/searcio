@@ -62,6 +62,14 @@ describe( 'normalizePlacement', () => {
 		expect( placement.floating.offset ).toBe( 24 );
 		expect( placement.products.layout ).toBe( 'carousel' );
 	} );
+
+	// PHP writes an empty array as a list; a list here would count as a change
+	// the moment a setting of the look is set and taken away again.
+	it( 'holds the look as an object, empty or not', () => {
+		expect( normalizePlacement( { search: { look: [] } } ).search.look ).toEqual( {} );
+		expect( normalizePlacement( {} ).search.look ).toEqual( {} );
+		expect( normalizePlacement( { search: { look: { field_bg: '#fff' } } } ).search.look ).toEqual( { field_bg: '#fff' } );
+	} );
 } );
 
 describe( 'previewUrl', () => {
