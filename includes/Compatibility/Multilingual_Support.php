@@ -19,6 +19,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Compatibility;
 
+use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Compatibility\Compatibility_Manager;
 
 defined( 'ABSPATH' ) || exit;
@@ -82,7 +83,7 @@ final class Multilingual_Support {
 			array_map(
 				static fn( array $language ): array => [
 					'code' => (string) ( $language['language_code'] ?? '' ),
-					'name' => (string) ( $language['native_name'] ?? $language['translated_name'] ?? $language['language_code'] ?? '' ),
+					'name' => Term_Names::decode( (string) ( $language['native_name'] ?? $language['translated_name'] ?? $language['language_code'] ?? '' ) ),
 				],
 				array_filter( $languages, 'is_array' )
 			)
@@ -124,7 +125,8 @@ final class Multilingual_Support {
 			array_map(
 				static fn( $language ): array => [
 					'code' => (string) ( $language->slug ?? '' ),
-					'name' => (string) ( $language->name ?? $language->slug ?? '' ),
+					// A Polylang language is a term, and its name is stored escaped.
+					'name' => Term_Names::decode( (string) ( $language->name ?? $language->slug ?? '' ) ),
 				],
 				$languages
 			)

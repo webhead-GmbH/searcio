@@ -126,6 +126,8 @@ The search window's filters are one bar under the search field (`FilterBar`), a 
 - The placeholder and the heading are registered as the strings *Search placeholder* and *Products heading* in the *Searcio* group: with Polylang on every admin request (`pll_register_string()` keeps a string for the request), with WPML when they are saved.
 - The selectors suggested per theme are in `Frontend\Theme_Presets`, each read from the theme's own markup; the class says where each came from.
 
+**Names WordPress keeps escaped.** Terms, the site's title, display names, a post type's label as the plugin that registered it gave it, WooCommerce's attribute names and price settings, and custom fields saved by a user without `unfiltered_html` can hold HTML entities (`&amp;`, `&lt;`, `&nbsp;`). The plugin prints all of them as text (React, the index, Searcio's dashboard), so it decodes each where it hands it on, once, with `Indexing\Term_Names::decode()` (`wp_strip_all_tags()` first where the source may hold markup, as `Field_Source_Resolver::clean()` does). A value a filter sends back has to match the index, so a name is decoded on both sides or on neither. Decode only for output that escapes again: React text, `esc_html()` at echo time.
+
 **What a search tells Searcio for the site's statistics.** Every `/search` the storefront sends carries hints that never change its results (`searchHints()` in `src/utils/api.js`):
 
 - `surface`: where its results are shown. `overlay` is the search window's results, including "load more" and a listing by a filter alone; `highlights` is the window's empty-field carousel; `category` is a category product row; `quiz` is the product finder.

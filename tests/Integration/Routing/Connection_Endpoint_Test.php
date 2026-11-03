@@ -207,6 +207,35 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 'sk_test_123', $this->settings()->get( Plugin_Settings::SEARCH_KEY ) );
 	}
 
+	/**
+	 * WordPress stores the site's title and a display name escaped. Left to
+	 * them, the site was named "Fisch &amp; Me" at Searcio; typed in, it was
+	 * "Fisch & Me".
+	 */
+	public function test_connect_names_the_site_and_the_admin_as_they_read(): void {
+		// Elementor copies the title into its kit, which this suite has none of.
+		remove_all_actions( 'update_option_blogname' );
+		update_option( 'blogname', 'Fisch & Me' );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator', 'display_name' => 'Tom & Jerry' ] ) );
+
+		$sent = [];
+		$this->fake_http( function ( string $url, array $args ) use ( &$sent ): array {
+			if ( str_contains( $url, '/connect' ) ) {
+				$sent = json_decode( (string) $args['body'], true );
+			}
+
+			return $this->http_ok( [ 'status' => 'pending_claim' ], 201 );
+		} );
+
+		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request->set_param( 'terms_privacy', true );
+		$this->server->dispatch( $request );
+
+		$this->assertSame( 'Fisch &amp; Me', get_option( 'blogname' ), 'WordPress keeps it escaped.' );
+		$this->assertSame( 'Fisch & Me', $sent['site_name'] );
+		$this->assertSame( 'Tom & Jerry', $sent['admin_name'] );
+	}
+
 	public function test_connect_persists_a_pending_claim_notice_when_the_email_is_already_registered(): void {
 		$this->login_admin();
 		$this->fake_http( fn ( string $url ): array => $this->http_ok( [ 'status' => 'pending_claim' ], 201 ) );

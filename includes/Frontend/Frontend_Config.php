@@ -22,6 +22,7 @@ use Webhead\WP\SearchCloud\DTO\Storefront_Facet;
 use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
+use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Language;
@@ -93,8 +94,10 @@ final class Frontend_Config {
 			'symbol'      => html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ),
 			'position'    => (string) get_option( 'woocommerce_currency_pos', 'left' ),
 			'decimals'    => function_exists( 'wc_get_price_decimals' ) ? (int) wc_get_price_decimals() : 2,
-			'decimalSep'  => function_exists( 'wc_get_price_decimal_separator' ) ? wc_get_price_decimal_separator() : '.',
-			'thousandSep' => function_exists( 'wc_get_price_thousand_separator' ) ? wc_get_price_thousand_separator() : ',',
+			// A space cannot be saved as a separator, so a shop types "&nbsp;",
+			// which WooCommerce prints into HTML and the search window as text.
+			'decimalSep'  => function_exists( 'wc_get_price_decimal_separator' ) ? Term_Names::decode( wc_get_price_decimal_separator() ) : '.',
+			'thousandSep' => function_exists( 'wc_get_price_thousand_separator' ) ? Term_Names::decode( wc_get_price_thousand_separator() ) : ',',
 			// The store's price suffix, e.g. "inkl. MwSt. zzgl. Versandkosten".
 			// Only used when it is plain text (no {price_*} placeholders, which
 			// need a computed per-product value we don't have client-side).
@@ -120,10 +123,14 @@ final class Frontend_Config {
 		return [ 'url' => 'https://searcio.com/' ];
 	}
 
+	/**
+	 * The suffix as text: WooCommerce prints it as HTML, so a shop may have
+	 * written an entity or a tag into it.
+	 */
 	private function price_suffix(): string {
 		$suffix = (string) get_option( 'woocommerce_price_display_suffix', '' );
 
-		return str_contains( $suffix, '{' ) ? '' : $suffix;
+		return str_contains( $suffix, '{' ) ? '' : trim( Term_Names::decode( wp_strip_all_tags( $suffix ) ) );
 	}
 
 	/**
@@ -142,7 +149,8 @@ final class Frontend_Config {
 			'endpoint'        => rtrim( (string) $host, '/' ) . '/api/v1',
 			'searchKey'       => (string) $this->settings->get( Plugin_Settings::SEARCH_KEY ),
 			'siteHome'        => home_url( '/' ),
-			'popularSearches' => array_values( (array) $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
+			// Read through the setting's own cleaning, for a list saved before it decoded.
+			'popularSearches' => Plugin_Settings::plain_text_list( $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
 			'typeLabels'      => $this->index_config->indexable_post_type_labels(),
 			// Facet headings, comparison rows and quiz answers for the fields the
 			// site names itself (WooCommerce attributes, mapped taxonomies), in

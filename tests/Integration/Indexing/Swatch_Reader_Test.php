@@ -177,6 +177,14 @@ final class Swatch_Reader_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'Extra Large' => 'XL' ], $this->read()->labels );
 	}
 
+	/** A label is text: what a swatches screen saved escaped is shown as it was typed. */
+	public function test_a_label_saved_escaped_reads_as_it_was_typed(): void {
+		$this->attribute( 'label' );
+		update_term_meta( $this->term( 'Kurz' ), 'swatches_label', '&lt;1 m &amp; <b>mehr</b>' );
+
+		$this->assertSame( [ 'Kurz' => '<1 m & mehr' ], $this->read()->labels );
+	}
+
 	/** ThemeHigh keeps one value whose meaning is the attribute's type. */
 	public function test_themehigh_by_the_type_of_the_attribute(): void {
 		$this->attribute( 'color' );

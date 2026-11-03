@@ -16,6 +16,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Settings;
 
+use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Setting;
 
 defined( 'ABSPATH' ) || exit;
@@ -221,7 +222,8 @@ final class Plugin_Settings {
 		show_in_rest: true,
 		label: 'Popular searches',
 		description: 'Curated list of queries shown as suggestions before the visitor types anything.',
-		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
+		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ],
+		sanitize_callback: 'plain_text_list'
 	)]
 	public const POPULAR_SEARCHES = 'popular_searches';
 
@@ -347,6 +349,24 @@ final class Plugin_Settings {
 				'description' => __( 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio.', 'searcio' ),
 			],
 		];
+	}
+
+	/**
+	 * The items of a list of text as they were typed. The schema's text-field
+	 * sanitizing writes a "<" with no ">" after it, and every "&" behind it, as
+	 * entities, so "Kabel <2m" was kept as "Kabel &lt;2m", which the admin read
+	 * in the field and the search window searched for. Every reader of such a
+	 * list prints it as text.
+	 *
+	 * @return array<int,string>
+	 */
+	public static function plain_text_list( mixed $value ): array {
+		return array_values(
+			array_map(
+				static fn ( mixed $item ): string => Term_Names::decode( (string) $item ),
+				array_filter( is_array( $value ) ? $value : [], 'is_scalar' )
+			)
+		);
 	}
 
 	/**

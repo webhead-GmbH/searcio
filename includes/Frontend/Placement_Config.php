@@ -26,6 +26,7 @@ use Webhead\WP\SearchCloud\DTO\Placement_Options;
 use Webhead\WP\SearchCloud\DTO\Products_Placement;
 use Webhead\WP\SearchCloud\DTO\Search_Placement;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
+use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Compatibility\Compatibility_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
@@ -141,7 +142,8 @@ final class Placement_Config {
 		return [
 			'placement'    => $this->options()->to_array(),
 			'theme'        => [
-				'name'       => (string) $theme->get( 'Name' ),
+				// A theme's header may hold tags and entities, and the tab prints the name as text.
+				'name'       => trim( Term_Names::decode( wp_strip_all_tags( (string) $theme->get( 'Name' ) ) ) ),
 				'suggestion' => Theme_Presets::for_theme( get_template(), get_stylesheet() ),
 				'builders'   => array_values( array_filter( $builders ) ),
 			],
