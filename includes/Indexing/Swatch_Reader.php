@@ -176,7 +176,8 @@ final class Swatch_Reader {
 		};
 		$label = function ( mixed $value ) use ( &$found ): void {
 			if ( '' === $found['label'] && is_scalar( $value ) ) {
-				$found['label'] = trim( wp_strip_all_tags( (string) $value ) );
+				// Tags out first, then entities, so "&lt;1 m" is the text "<1 m".
+				$found['label'] = trim( Term_Names::decode( wp_strip_all_tags( (string) $value ) ) );
 			}
 		};
 

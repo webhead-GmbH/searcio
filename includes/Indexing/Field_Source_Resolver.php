@@ -68,6 +68,25 @@ final class Field_Source_Resolver {
 			return null;
 		}
 
+		return $this->decoded( $value );
+	}
+
+	/**
+	 * A meta value's text as it was typed. ACF and the custom fields box save
+	 * what a user without `unfiltered_html` sends through kses, which writes an
+	 * "&" as "&amp;", and a field is shown and filtered on as text, as the title
+	 * is ({@see self::clean()}). Numbers and flags stay what they are, and a
+	 * list stays a list.
+	 */
+	private function decoded( mixed $value ): mixed {
+		if ( is_string( $value ) ) {
+			return Term_Names::decode( $value );
+		}
+
+		if ( is_array( $value ) ) {
+			return array_map( fn ( mixed $one ): mixed => $this->decoded( $one ), $value );
+		}
+
 		return $value;
 	}
 

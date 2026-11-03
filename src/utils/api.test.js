@@ -163,6 +163,23 @@ describe( 'suggest / fetchCardTemplates / fetchPopularSearches', () => {
 		expect( urls[ 1 ] ).toContain( '/card-templates?' );
 		expect( urls[ 2 ] ).toContain( '/search/popular?' );
 	} );
+
+	// A German page suggested the English titles too: suggestions are filtered
+	// by the page's language, as a search is.
+	it( 'suggests in the language of the page on a multilingual site', async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'de' } );
+		let api = loadApi();
+
+		await api.suggest( 'jac' );
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'filter[lang]' ) ).toBe( 'de' );
+
+		global.fetch.mockClear();
+		setConfig( {} );
+		api = loadApi();
+
+		await api.suggest( 'jac' );
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'filter[lang]' ) ).toBe( false );
+	} );
 } );
 
 describe( 'trackClick', () => {

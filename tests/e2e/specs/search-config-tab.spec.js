@@ -362,6 +362,34 @@ test.describe( 'Search Config tab', () => {
 	} );
 
 	/**
+	 * Whether a filter's picked values combine as OR or as AND is Searcio's
+	 * to keep, so it is offered only once Searcio reports it.
+	 */
+	test( 'offers OR or AND per filter field once Searcio reports it, and saves the choice', async ( { page } ) => {
+		const sent = [];
+
+		await mockSearchConfig( page, sent );
+		await page.goto( SETTINGS_URL );
+		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+		await expect( page.getByRole( 'group', { name: 'When a shopper picks several values of one filter' } ) ).toHaveCount( 0 );
+
+		await page.unrouteAll( { behavior: 'ignoreErrors' } );
+		await mockSearchConfig( page, sent, { ...CONFIG, facet_fields: [ 'brand', 'features' ], facet_match: { features: 'all' } } );
+		await page.reload();
+
+		const group = page.getByRole( 'group', { name: 'When a shopper picks several values of one filter' } );
+
+		await expect( group ).toBeVisible( LOADED );
+		await expect( group.getByRole( 'radiogroup', { name: 'features' } ).getByRole( 'radio', { name: 'All (AND)' } ) ).toBeChecked();
+
+		await group.getByRole( 'radiogroup', { name: 'brand' } ).getByRole( 'radio', { name: 'All (AND)' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.facet_match ).toEqual( { brand: 'all', features: 'all' } );
+	} );
+
+	/**
 	 * The suggestions used to be a hand-kept list in the tab that offered
 	 * `tags` (never written - the field is `product_tags`) and left out
 	 * `in_stock`, `on_sale`, the price range and every attribute.

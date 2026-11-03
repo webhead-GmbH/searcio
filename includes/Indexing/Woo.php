@@ -96,9 +96,10 @@ final class Woo {
 			}
 
 			$slug  = function_exists( 'wc_attribute_taxonomy_name' ) ? wc_attribute_taxonomy_name( $name ) : 'pa_' . $name;
-			$label = isset( $attribute->attribute_label ) && '' !== $attribute->attribute_label
-				? (string) $attribute->attribute_label
-				: $name;
+			// WooCommerce saves an attribute's name through wc_clean(), which
+			// writes a "<" with no ">" after it, and an "&" behind it, as entities.
+			$label = trim( Term_Names::decode( (string) ( $attribute->attribute_label ?? '' ) ) );
+			$label = '' !== $label ? $label : $name;
 
 			$out[] = [
 				'slug'  => $slug,

@@ -24,6 +24,7 @@ use Webhead\WP\SearchCloud\Connection\Api_Response;
 use Webhead\WP\SearchCloud\Connection\Connect_Request;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -107,13 +108,15 @@ final class Connection_Endpoint extends Rest_API {
 
 		$connect_request = Connect_Request::create(
 			platform: $this->woo->is_active() ? 'woocommerce' : 'wordpress',
-			site_name: '' !== $site_name ? $site_name : (string) get_bloginfo( 'name' ),
+			// WordPress stores the site's title and a display name escaped; Searcio
+			// is sent them as text, as it is what the admin types in their place.
+			site_name: '' !== $site_name ? $site_name : trim( Term_Names::decode( (string) get_bloginfo( 'name' ) ) ),
 			site_url: home_url(),
 			// Points Searcio's async domain-ownership ping straight at our
 			// own Verify_Endpoint instead of it having to guess a WordPress path.
 			verify_url: rest_url( 'search-cloud/v1/verify' ),
 			admin_email: '' !== $email ? $email : (string) get_option( 'admin_email' ),
-			admin_name: '' !== $admin_name ? $admin_name : (string) wp_get_current_user()->display_name,
+			admin_name: '' !== $admin_name ? $admin_name : trim( Term_Names::decode( (string) wp_get_current_user()->display_name ) ),
 			idempotency_key: $this->connection_state->idempotency_key(),
 			terms_privacy: $terms_privacy,
 			dpa: $dpa

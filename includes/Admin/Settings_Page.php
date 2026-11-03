@@ -83,8 +83,7 @@ final class Settings_Page extends Page {
 	}
 
 	protected function get_localize_script_data(): array {
-		$current_user = wp_get_current_user();
-		$pending      = $this->connection_state->pending_claim();
+		$pending = $this->connection_state->pending_claim();
 
 		return [
 			'api' => [
@@ -127,9 +126,7 @@ final class Settings_Page extends Page {
 				'isConnected'  => $this->client->is_configured(),
 				'pendingClaim' => $pending,
 				'defaults'     => [
-					'email'     => (string) get_option( 'admin_email' ),
-					'adminName' => (string) $current_user->display_name,
-					'siteName'  => (string) get_bloginfo( 'name' ),
+					'email' => (string) get_option( 'admin_email' ),
 				],
 			],
 			// Synchronous, no-network fallback shown until the Connection tab's

@@ -66,6 +66,18 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 		$this->assertCredentialsAbsent( $this->read() );
 	}
 
+	/**
+	 * Saved as text-field, a "<" with no ">" after it came back as "&lt;",
+	 * which the admin then read in the field and the search window searched for.
+	 */
+	public function test_popular_searches_are_kept_as_they_were_typed(): void {
+		$this->as_admin();
+
+		$this->save( [ Plugin_Settings::POPULAR_SEARCHES => [ 'Kabel <2m', 'Fisch & Chips' ] ] );
+
+		$this->assertSame( [ 'Kabel <2m', 'Fisch & Chips' ], $this->read()->get_data()['settings'][ Plugin_Settings::POPULAR_SEARCHES ] );
+	}
+
 	/** An unconnected site reads as empty, so the screen can still tell the two apart. */
 	public function test_reading_reports_an_empty_credential_as_empty(): void {
 		$this->settings()->set( Plugin_Settings::WRITE_KEY, '' );

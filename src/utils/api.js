@@ -209,15 +209,22 @@ export const search = ( q, options = {} ) => {
 };
 
 /**
+ * Titles that start with what was typed, in the language of the page on a
+ * multilingual site, as a search is (`filter[lang]`).
+ *
  * @param {string} q
  * @param {{limit?: number, signal?: AbortSignal}} [options]
  */
-export const suggest = ( q, options = {} ) => request(
-	'/search/suggest',
-	{ q, limit: options.limit || 5 },
-	SUGGEST_TTL,
-	options.signal
-);
+export const suggest = ( q, options = {} ) => {
+	const { lang } = currentLangFilter();
+
+	return request(
+		'/search/suggest',
+		{ q, limit: options.limit || 5, 'filter[lang]': lang },
+		SUGGEST_TTL,
+		options.signal
+	);
+};
 
 /**
  * @param {string} [type]

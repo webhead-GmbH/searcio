@@ -305,12 +305,17 @@ final class Index_Config {
 		return array_values( $objects );
 	}
 
+	/**
+	 * A post type's name as a person reads it. The code that registers a type
+	 * may hand its label over HTML-escaped, so "Fisch&Me(hr)" arrived as
+	 * "Fisch&amp;Me(hr)": wp-admin prints a label as HTML and shows the "&",
+	 * while the search window, the block editor and the settings screens print
+	 * it as text and showed the entity.
+	 */
 	private function post_type_label( \WP_Post_Type $object ): string {
-		if ( isset( $object->labels->name ) && '' !== $object->labels->name ) {
-			return (string) $object->labels->name;
-		}
+		$label = trim( Term_Names::decode( (string) ( $object->labels->name ?? '' ) ) );
 
-		return $object->name;
+		return '' !== $label ? $label : $object->name;
 	}
 
 	/**
@@ -324,11 +329,12 @@ final class Index_Config {
 				continue;
 			}
 
+			// Escaped as a post type's label may be ({@see self::post_type_label()}).
+			$label = trim( Term_Names::decode( (string) ( $taxonomy->labels->name ?? '' ) ) );
+
 			$out[] = [
 				'slug'  => $taxonomy->name,
-				'label' => isset( $taxonomy->labels->name ) && '' !== $taxonomy->labels->name
-					? (string) $taxonomy->labels->name
-					: $taxonomy->name,
+				'label' => '' !== $label ? $label : $taxonomy->name,
 			];
 		}
 

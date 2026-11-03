@@ -1,6 +1,12 @@
 import { useContext, useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { Button, FormTokenField, RangeControl } from '@wordpress/components';
-import { Card, CheckboxControl, InputControl, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
+import {
+	Button,
+	FormTokenField,
+	RangeControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+} from '@wordpress/components';
+import { Card, CheckboxControl, Fieldset, InputControl, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -901,6 +907,31 @@ const SearchConfigTab = () => {
 								fields={ unindexedFields( config.facet_fields, indexed ) }
 								message={ unindexedFacetMessage }
 							/>
+							{ /* Offered once Searcio reports the setting, which it keeps. */ }
+							{ config.facet_match && config.facet_fields.length > 0 && (
+								<Fieldset.Root className="whsc-facet-match">
+									<Fieldset.Legend>{ __( 'When a shopper picks several values of one filter', 'searcio' ) }</Fieldset.Legend>
+									<Stack direction="column" gap="md">
+										<Text render={ <p /> } variant="body-sm" className="whsc-facet-match__description">
+											{ __( 'Any: a product that has one of them is shown. All: only a product that has every one of them, for a field a product holds several values of, such as features or tags.', 'searcio' ) }
+										</Text>
+										{ config.facet_fields.map( ( field ) => (
+											<ToggleGroupControl
+												key={ field }
+												__next40pxDefaultSize
+												__nextHasNoMarginBottom
+												isBlock
+												label={ field }
+												value={ 'all' === config.facet_match[ field ] ? 'all' : 'any' }
+												onChange={ ( mode ) => set( 'facet_match', { ...config.facet_match, [ field ]: mode } ) }
+											>
+												<ToggleGroupControlOption value="any" label={ __( 'Any (OR)', 'searcio' ) } />
+												<ToggleGroupControlOption value="all" label={ __( 'All (AND)', 'searcio' ) } />
+											</ToggleGroupControl>
+										) ) }
+									</Stack>
+								</Fieldset.Root>
+							) }
 						</Stack>
 					</Card.Content>
 				</Card.Root>
