@@ -54,9 +54,44 @@ final class Placement_Options {
 			selectors: self::clean_selectors( $data['selectors'] ?? [] ),
 			shortcut: Value::flag( $data['shortcut'] ?? null, false ),
 			floating: Floating_Button::from_array( is_array( $data['floating'] ?? null ) ? $data['floating'] : [] ),
-			search: Search_Placement::from_array( is_array( $data['search'] ?? null ) ? $data['search'] : [] ),
+			search: Search_Placement::from_array( self::with_look( is_array( $data['search'] ?? null ) ? $data['search'] : [] ) ),
 			products: Products_Placement::from_array( is_array( $data['products'] ?? null ) ? $data['products'] : [] )
 		);
+	}
+
+	/**
+	 * Settings saved before the Look editor had four colours and a radius of
+	 * their own; they are the editor's now, where a shop finds them beside the
+	 * rest. Settings saved since carry `look`, and are read as they are.
+	 *
+	 * @param  array<string,mixed>  $search
+	 * @return array<string,mixed>
+	 */
+	private static function with_look( array $search ): array {
+		if ( array_key_exists( 'look', $search ) ) {
+			return $search;
+		}
+
+		$moved = [
+			'accent'     => 'modal_accent',
+			'background' => 'modal_bg',
+			'text'       => 'modal_text',
+			'icon_color' => 'trigger_icon_color',
+			'radius'     => 'modal_radius',
+		];
+		$look  = [];
+
+		foreach ( $moved as $key => $control ) {
+			if ( isset( $search[ $key ] ) && '' !== $search[ $key ] ) {
+				$look[ $control ] = $search[ $key ];
+			}
+
+			$search[ $key ] = 'radius' === $key ? null : '';
+		}
+
+		$search['look'] = $look;
+
+		return $search;
 	}
 
 	/**

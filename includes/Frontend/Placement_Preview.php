@@ -35,6 +35,9 @@ final class Placement_Preview {
 
 	private const VIEWS = [ 'trigger', 'modal', 'floating' ];
 
+	/** The instance class the preview draws the search under, which the editor's Look styles name. */
+	public const INSTANCE = 'whsc-instance-preview';
+
 	public function __construct(
 		private Placement_Config $config,
 		private Search_Surface $surface
@@ -132,6 +135,39 @@ final class Placement_Preview {
 	echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by Trigger_Markup and Style_Tokens.
 	wp_footer();
 	?>
+	<?php
+	/*
+	 * The Look editor sends the CSS of what it has on screen here, as it
+	 * changes (`/placement/look-css`, for this instance class), and this page
+	 * draws it without loading again. Only a message from the admin's
+	 * origin counts, which a site may serve apart from its pages, and what
+	 * it carries is set as text.
+	 */
+	$admin = wp_parse_url( admin_url() );
+	$admin = is_array( $admin ) && isset( $admin['scheme'], $admin['host'] )
+		? $admin['scheme'] . '://' . $admin['host'] . ( isset( $admin['port'] ) ? ':' . $admin['port'] : '' )
+		: '';
+	?>
+	<link id="whsc-look-fonts" rel="stylesheet" href="data:text/css,">
+	<style id="whsc-look-live"></style>
+	<script>
+		( function () {
+			var origin = <?php echo wp_json_encode( $admin ); ?> || window.location.origin;
+
+			window.addEventListener( 'message', function ( event ) {
+				if ( event.origin !== origin || ! event.data || 'searcio-look' !== event.data.type ) {
+					return;
+				}
+
+				document.getElementById( 'whsc-look-live' ).textContent = String( event.data.css || '' );
+				document.getElementById( 'whsc-look-fonts' ).href = /^https:\/\/fonts\.googleapis\.com\//.test( event.data.fonts || '' ) ? event.data.fonts : 'data:text/css,';
+			} );
+
+			if ( window.parent !== window ) {
+				window.parent.postMessage( { type: 'searcio-look-ready' }, origin );
+			}
+		}() );
+	</script>
 </body>
 </html>
 		<?php

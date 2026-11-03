@@ -176,6 +176,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- New on the Placement tab: a look editor with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
 - On phones the search window fills the screen and its results scroll down in a grid; recent and popular searches take one row each, so products are in sight at once.
 - No Search button beside the search field any more: Enter searches, and the phone keyboard shows a Search key.
 - On phones the AI assistant fills the screen with its message field at the bottom, and the tabs no longer jump in as the window opens.

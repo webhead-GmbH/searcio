@@ -17,6 +17,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Frontend;
 
 use Webhead\WP\SearchCloud\DTO\Floating_Button;
+use Webhead\WP\SearchCloud\DTO\Look;
 use Webhead\WP\SearchCloud\DTO\Products_Placement;
 use Webhead\WP\SearchCloud\DTO\Search_Placement;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Assets\Asset_Registry;
@@ -56,7 +57,7 @@ final class Search_Surface {
 			$attributes['triggerBoxWidth'] = $placement->width;
 		}
 
-		[ $instance_class, $style ] = $this->instance( $attributes );
+		[ $instance_class, $style ] = $this->instance( $attributes, $placement->look );
 
 		// A box fills its wrapper, or the width it was given.
 		$class_name = trim(
@@ -105,7 +106,7 @@ final class Search_Surface {
 			);
 		}
 
-		[ $instance_class, $style ] = $this->instance( $attributes );
+		[ $instance_class, $style ] = $this->instance( $attributes, $placement->look );
 
 		return $style . Trigger_Markup::render(
 			array_merge(
@@ -145,14 +146,32 @@ final class Search_Surface {
 	 * @param  array<string,mixed>  $attributes
 	 * @return array{0:string,1:string}
 	 */
-	private function instance( array $attributes ): array {
+	/**
+	 * The instance class of a surface and the styles to print with it: the
+	 * Look editor's, then the attributes' own, so what a shortcode says
+	 * outweighs what the tab says. Surfaces that look the same share a class
+	 * and print it once.
+	 *
+	 * The Placement tab's preview draws the Look the editor sends it while it
+	 * is changed (`Placement_Preview`), so there the class is a fixed one and
+	 * the stored Look is left out.
+	 *
+	 * @return array{0: string, 1: string}
+	 */
+	private function instance( array $attributes, Look $look ): array {
 		$declarations = Style_Tokens::declarations( $attributes );
 
-		if ( '' === $declarations ) {
+		if ( Placement_Preview::is_preview() ) {
+			return [ Placement_Preview::INSTANCE, Style_Tokens::style_element( Placement_Preview::INSTANCE, $attributes ) ];
+		}
+
+		$look_key = $look->is_empty() ? '' : (string) wp_json_encode( $look->to_array() );
+
+		if ( '' === $declarations && '' === $look_key ) {
 			return [ '', '' ];
 		}
 
-		$instance_class = 'whsc-instance-p' . substr( md5( $declarations ), 0, 8 );
+		$instance_class = 'whsc-instance-p' . substr( md5( $declarations . $look_key ), 0, 8 );
 
 		if ( isset( $this->styled[ $instance_class ] ) ) {
 			return [ $instance_class, '' ];
@@ -160,6 +179,23 @@ final class Search_Surface {
 
 		$this->styled[ $instance_class ] = true;
 
-		return [ $instance_class, Style_Tokens::style_element( $instance_class, $attributes ) ];
+		return [ $instance_class, self::look_styles( $look, $instance_class ) . Style_Tokens::style_element( $instance_class, $attributes ) ];
+	}
+
+	/**
+	 * A Look's CSS for an instance class, after the stylesheet of the Google
+	 * fonts it asks for, as elements to print.
+	 */
+	public static function look_styles( Look $look, string $instance_class ): string {
+		$css = Look_Styles::css( $look, $instance_class );
+
+		if ( '' === $css ) {
+			return '';
+		}
+
+		$fonts = Google_Fonts::url( Look_Styles::google_families( $look, Google_Fonts::site_families() ) );
+
+		return ( '' !== $fonts ? sprintf( '<link rel="stylesheet" href="%s">', esc_url( $fonts ) ) : '' )
+			. '<style>' . $css . '</style>';
 	}
 }

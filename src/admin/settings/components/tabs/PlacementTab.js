@@ -1,15 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import {
 	Button,
-	ColorIndicator,
-	ColorPicker,
-	Dropdown,
 	RangeControl,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { Card, Fieldset, InputControl, Link, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
+import { Card, InputControl, Link, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
+import { styles as stylesIcon } from '@wordpress/icons';
 import { __, _n, isRTL, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -17,11 +15,13 @@ import {
 	buildShortcode,
 	invalidSelectors,
 	normalizePlacement,
-	previewUrl,
 	selectorsToText,
 	textToSelectors,
 	withSuggestion,
 } from '../../placement';
+import { withValue } from '../../look';
+import LookEditor from '../look/LookEditor';
+import LookPreview from '../look/LookPreview';
 import { selectProps } from '../../../../utils/select';
 import { Grid } from '../../../../components/Layout';
 import SectionList from '../../../../components/SectionList';
@@ -42,9 +42,6 @@ const PRODUCTS_TAG = 'searcio_products';
 /** The order the generator writes a shortcode's attributes in. */
 const SEARCH_ORDER = [ 'mode', 'placeholder', 'type', 'width', 'align' ];
 const PRODUCTS_ORDER = [ 'source', 'layout', 'limit', 'heading', 'banner' ];
-
-/** How long the preview waits after a change before it draws again. */
-const PREVIEW_DELAY = 500;
 
 const reasonOf = ( error ) => error?.message || __( 'the request to the REST API failed.', 'searcio' );
 
@@ -138,75 +135,6 @@ const Snippet = ( { code, label } ) => (
 );
 
 /**
- * One colour: a button with its swatch, its name and its value, which opens a
- * picker. Empty is the storefront's own colour.
- */
-const ColorField = ( { label, value, onChange } ) => (
-	<Dropdown
-		className="whsc-placement-color"
-		popoverProps={ { placement: 'bottom-start' } }
-		renderToggle={ ( { isOpen, onToggle } ) => (
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				className="whsc-placement-color__toggle"
-				aria-expanded={ isOpen }
-				onClick={ onToggle }
-			>
-				<ColorIndicator colorValue={ value || 'transparent' } className="whsc-placement-color__swatch" />
-				<span className="whsc-placement-color__name">{ label }</span>
-				<span className="whsc-placement-color__value">{ value || __( 'Default', 'searcio' ) }</span>
-			</Button>
-		) }
-		renderContent={ () => (
-			<Stack direction="column" gap="sm" className="whsc-placement-color__panel">
-				<ColorPicker color={ value || '#ffffff' } enableAlpha={ false } onChange={ onChange } />
-				<Stack direction="row" gap="sm">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						accessibleWhenDisabled
-						disabled={ ! value }
-						onClick={ () => onChange( '' ) }
-					>
-						{ __( 'Use the default', 'searcio' ) }
-					</Button>
-				</Stack>
-			</Stack>
-		) }
-	/>
-);
-
-/**
- * A page of the site with the search drawn from the settings on screen, in
- * the theme's own styles. It is drawn again a moment after the last change,
- * not on every key.
- */
-const Preview = ( { preview, view, placement, title, className = '' } ) => {
-	const target = previewUrl( preview, view, placement );
-	const [ src, setSrc ] = useState( target );
-
-	useEffect( () => {
-		const timer = window.setTimeout( () => setSrc( target ), PREVIEW_DELAY );
-
-		return () => window.clearTimeout( timer );
-	}, [ target ] );
-
-	if ( ! src ) {
-		return null;
-	}
-
-	return (
-		<iframe
-			className={ `whsc-placement-preview whsc-placement-preview--${ view } ${ className }`.trim() }
-			title={ title }
-			src={ src }
-			loading="lazy"
-		/>
-	);
-};
-
-/**
  * Where a block or an Elementor widget cannot place the search: the theme's
  * own search, a floating button, shortcodes and classic widgets.
  *
@@ -227,7 +155,11 @@ const PlacementTab = () => {
 	const [ previewView, setPreviewView ] = useState( 'trigger' );
 	const [ searchShortcode, setSearchShortcode ] = useState( {} );
 	const [ productsShortcode, setProductsShortcode ] = useState( {} );
+	const [ isEditingLook, setIsEditingLook ] = useState( false );
 	const mounted = useRef( true );
+	// The house modal takes focus again whenever its close handler changes,
+	// which would close a colour picker open in it on every change.
+	const closeLookEditor = useCallback( () => setIsEditingLook( false ), [] );
 
 	useEffect( () => () => {
 		mounted.current = false;
@@ -261,6 +193,17 @@ const PlacementTab = () => {
 	const setSearch = ( key, value ) => setPlacement( ( current ) => ( { ...current, search: { ...current.search, [ key ]: value } } ) );
 	const setProducts = ( key, value ) => setPlacement( ( current ) => ( { ...current, products: { ...current.products, [ key ]: value } } ) );
 	const setFloating = ( key, value ) => setPlacement( ( current ) => ( { ...current, floating: { ...current.floating, [ key ]: value } } ) );
+	const setLookValue = ( id, value ) => setPlacement( ( current ) => ( {
+		...current,
+		search: { ...current.search, look: withValue( current.search.look, id, value ) },
+	} ) );
+	const resetLookGroup = ( group ) => setPlacement( ( current ) => ( {
+		...current,
+		search: {
+			...current.search,
+			look: group.controls.reduce( ( look, control ) => withValue( look, control.id, undefined ), current.search.look ),
+		},
+	} ) );
 
 	const onSelectorsChange = ( text ) => {
 		setSelectorsText( text );
@@ -388,6 +331,97 @@ const PlacementTab = () => {
 	const saveDisabled = isSaving || ! hasUnsavedChanges;
 	const saveLabel = isSaving ? __( 'Saving…', 'searcio' ) : __( 'Save placement', 'searcio' );
 	const saveDescription = ! isSaving && ! hasUnsavedChanges ? __( 'No unsaved changes.', 'searcio' ) : undefined;
+
+	const lookCount = Object.keys( search.look || {} ).length;
+
+	// What the search does and shows, apart from its style: in the Look
+	// section, and under Content in the Look editor.
+	const searchOptions = (
+		<Stack direction="column" gap="lg">
+			<ToggleGroupControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				isBlock
+				label={ __( 'Shown as', 'searcio' ) }
+				value={ search.mode }
+				onChange={ ( value ) => setSearch( 'mode', value ) }
+			>
+				<ToggleGroupControlOption value="icon" label={ __( 'Magnifier', 'searcio' ) } />
+				<ToggleGroupControlOption value="box" label={ __( 'Search field', 'searcio' ) } />
+			</ToggleGroupControl>
+			<InputControl
+				label={ __( 'Placeholder', 'searcio' ) }
+				description={ translateHint }
+				value={ search.placeholder }
+				onValueChange={ ( value ) => setSearch( 'placeholder', value ) }
+			/>
+			<SelectControl
+				label={ __( 'Content to search', 'searcio' ) }
+				{ ...selectProps( typeItems, search.type, ( value ) => setSearch( 'type', value || '' ) ) }
+			/>
+			{ 'box' === search.mode && (
+				<InputControl
+					type="number"
+					min={ 0 }
+					max={ 1200 }
+					label={ __( 'Width of the field (px)', 'searcio' ) }
+					description={ __( '0 fills the space it is placed in.', 'searcio' ) }
+					value={ String( search.width ?? 0 ) }
+					onValueChange={ ( value ) => setSearch( 'width', Math.max( 0, parseInt( value, 10 ) || 0 ) ) }
+				/>
+			) }
+			<ToggleGroupControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				isBlock
+				label={ __( 'Alignment', 'searcio' ) }
+				value={ search.align }
+				onChange={ ( value ) => setSearch( 'align', value ) }
+			>
+				<ToggleGroupControlOption value="start" label={ __( 'Start', 'searcio' ) } />
+				<ToggleGroupControlOption value="center" label={ __( 'Centre', 'searcio' ) } />
+				<ToggleGroupControlOption value="end" label={ __( 'End', 'searcio' ) } />
+			</ToggleGroupControl>
+			<SelectControl
+				label={ __( 'Search starts', 'searcio' ) }
+				{ ...selectProps( triggerItems, search.trigger, ( value ) => setSearch( 'trigger', value || 'submit' ) ) }
+			/>
+			<SelectControl
+				label={ __( 'Before a search, the window shows', 'searcio' ) }
+				{ ...selectProps( highlightItems, search.highlights, ( value ) => setSearch( 'highlights', value || 'newest' ) ) }
+			/>
+			<RangeControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={ __( 'Filter buttons in the bar', 'searcio' ) }
+				help={ __( '0 shows "All filters" alone.', 'searcio' ) }
+				min={ 0 }
+				max={ 8 }
+				value={ search.filters }
+				onChange={ ( value ) => setSearch( 'filters', Number.isFinite( value ) ? value : 5 ) }
+			/>
+			<SelectControl
+				label={ __( 'Opening animation', 'searcio' ) }
+				{ ...selectProps( animationItems, search.animation, ( value ) => setSearch( 'animation', value || 'fade' ) ) }
+			/>
+			<SelectControl
+				label={ __( 'Result cards', 'searcio' ) }
+				{ ...selectProps( cardItems, search.cards, ( value ) => setSearch( 'cards', value || 'plugin' ) ) }
+			/>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Voice search', 'searcio' ) }
+				checked={ search.voice }
+				onChange={ ( checked ) => setSearch( 'voice', checked ) }
+			/>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Show how many results each filter leaves', 'searcio' ) }
+				checked={ search.count }
+				onChange={ ( checked ) => setSearch( 'count', checked ) }
+			/>
+		</Stack>
+	);
 
 	// A site-wide way shows on the site once it is saved: the line under each.
 	const checkLine = (
@@ -616,7 +650,7 @@ const PlacementTab = () => {
 											onChange={ ( value ) => setFloating( 'offset', Number.isFinite( value ) ? value : 24 ) }
 										/>
 									</Stack>
-									<Preview
+									<LookPreview
 										preview={ catalog?.preview }
 										view="floating"
 										placement={ placement }
@@ -635,6 +669,11 @@ const PlacementTab = () => {
 			summary: [
 				'box' === search.mode ? __( 'Search field', 'searcio' ) : __( 'Magnifier', 'searcio' ),
 				typeLabels[ search.type ] || __( 'All content', 'searcio' ),
+				...( lookCount > 0 ? [ sprintf(
+					/* translators: %d: number of style settings that are set. */
+					_n( '%d style setting', '%d style settings', lookCount, 'searcio' ),
+					lookCount
+				) ] : [] ),
 			],
 			content: (
 				<>
@@ -642,121 +681,21 @@ const PlacementTab = () => {
 						title={ __( 'Look of the shortcode and the widgets', 'searcio' ) }
 						description={ __( 'How [searcio], the Searcio Search widget, a form Searcio takes over and the floating button look and behave, unless one of them says otherwise. The block and the Elementor widget keep their own settings.', 'searcio' ) }
 					>
-						<Grid className="whsc-placement-split" columns={ { base: 1, md: 2 } } gap="var(--wpds-dimension-gap-xl)" align="start">
-							<Stack direction="column" gap="lg">
-								<ToggleGroupControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									isBlock
-									label={ __( 'Shown as', 'searcio' ) }
-									value={ search.mode }
-									onChange={ ( value ) => setSearch( 'mode', value ) }
-								>
-									<ToggleGroupControlOption value="icon" label={ __( 'Magnifier', 'searcio' ) } />
-									<ToggleGroupControlOption value="box" label={ __( 'Search field', 'searcio' ) } />
-								</ToggleGroupControl>
-								<InputControl
-									label={ __( 'Placeholder', 'searcio' ) }
-									description={ translateHint }
-									value={ search.placeholder }
-									onValueChange={ ( value ) => setSearch( 'placeholder', value ) }
-								/>
-								<SelectControl
-									label={ __( 'Content to search', 'searcio' ) }
-									{ ...selectProps( typeItems, search.type, ( value ) => setSearch( 'type', value || '' ) ) }
-								/>
-								{ 'box' === search.mode && (
-									<InputControl
-										type="number"
-										min={ 0 }
-										max={ 1200 }
-										label={ __( 'Width of the field (px)', 'searcio' ) }
-										description={ __( '0 fills the space it is placed in.', 'searcio' ) }
-										value={ String( search.width ?? 0 ) }
-										onValueChange={ ( value ) => setSearch( 'width', Math.max( 0, parseInt( value, 10 ) || 0 ) ) }
-									/>
-								) }
-								<ToggleGroupControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									isBlock
-									label={ __( 'Alignment', 'searcio' ) }
-									value={ search.align }
-									onChange={ ( value ) => setSearch( 'align', value ) }
-								>
-									<ToggleGroupControlOption value="start" label={ __( 'Start', 'searcio' ) } />
-									<ToggleGroupControlOption value="center" label={ __( 'Centre', 'searcio' ) } />
-									<ToggleGroupControlOption value="end" label={ __( 'End', 'searcio' ) } />
-								</ToggleGroupControl>
-								<SelectControl
-									label={ __( 'Search starts', 'searcio' ) }
-									{ ...selectProps( triggerItems, search.trigger, ( value ) => setSearch( 'trigger', value || 'submit' ) ) }
-								/>
-								<SelectControl
-									label={ __( 'Before a search, the window shows', 'searcio' ) }
-									{ ...selectProps( highlightItems, search.highlights, ( value ) => setSearch( 'highlights', value || 'newest' ) ) }
-								/>
-								<RangeControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Filter buttons in the bar', 'searcio' ) }
-									help={ __( '0 shows "All filters" alone.', 'searcio' ) }
-									min={ 0 }
-									max={ 8 }
-									value={ search.filters }
-									onChange={ ( value ) => setSearch( 'filters', Number.isFinite( value ) ? value : 5 ) }
-								/>
-								<SelectControl
-									label={ __( 'Opening animation', 'searcio' ) }
-									{ ...selectProps( animationItems, search.animation, ( value ) => setSearch( 'animation', value || 'fade' ) ) }
-								/>
-								<SelectControl
-									label={ __( 'Result cards', 'searcio' ) }
-									{ ...selectProps( cardItems, search.cards, ( value ) => setSearch( 'cards', value || 'plugin' ) ) }
-								/>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Voice search', 'searcio' ) }
-									checked={ search.voice }
-									onChange={ ( checked ) => setSearch( 'voice', checked ) }
-								/>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show how many results each filter leaves', 'searcio' ) }
-									checked={ search.count }
-									onChange={ ( checked ) => setSearch( 'count', checked ) }
-								/>
-								<Fieldset.Root className="whsc-placement-colors">
-									<Fieldset.Legend>{ __( 'Colours', 'searcio' ) }</Fieldset.Legend>
-									<Grid auto={ 200 } gap="var(--wpds-dimension-gap-sm)" align="start">
-										{ [
-											[ 'accent', __( 'Accent', 'searcio' ) ],
-											[ 'background', __( 'Window background', 'searcio' ) ],
-											[ 'text', __( 'Text', 'searcio' ) ],
-											[ 'icon_color', __( 'Magnifier', 'searcio' ) ],
-										].map( ( [ key, label ] ) => (
-											<ColorField
-												key={ key }
-												label={ label }
-												value={ search[ key ] }
-												onChange={ ( value ) => setSearch( key, value || '' ) }
-											/>
-										) ) }
-									</Grid>
-								</Fieldset.Root>
-								<RangeControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Corner radius of the window (px)', 'searcio' ) }
-									min={ 0 }
-									max={ 48 }
-									allowReset
-									// The storefront's own radius, where the slider rests while none is set.
-									initialPosition={ 14 }
-									value={ search.radius ?? undefined }
-									onChange={ ( value ) => setSearch( 'radius', Number.isFinite( value ) ? value : null ) }
-								/>
-							</Stack>
+						<Stack direction="row" gap="md" align="center" wrap="wrap" className="whsc-look-open">
+							<Button
+								__next40pxDefaultSize
+								variant="secondary"
+								icon={ stylesIcon }
+								onClick={ () => setIsEditingLook( true ) }
+							>
+								{ __( 'Open the look editor', 'searcio' ) }
+							</Button>
+							<Text render={ <p /> } variant="body-sm" className="whsc-placement-preview-note">
+								{ __( 'Colours, fonts, sizes and spacing of every part, for desktops, tablets and phones.', 'searcio' ) }
+							</Text>
+						</Stack>
+						<Grid className="whsc-placement-split" columns={ { base: 1, md: 'minmax(0, 2fr) minmax(0, 3fr)' } } gap="var(--wpds-dimension-gap-xl)" align="start">
+							{ searchOptions }
 
 							<Stack direction="column" gap="md" className="whsc-placement-preview-column">
 								<ToggleGroupControl
@@ -770,7 +709,7 @@ const PlacementTab = () => {
 									<ToggleGroupControlOption value="trigger" label={ __( 'On the page', 'searcio' ) } />
 									<ToggleGroupControlOption value="modal" label={ __( 'Window open', 'searcio' ) } />
 								</ToggleGroupControl>
-								<Preview
+								<LookPreview
 									preview={ catalog?.preview }
 									view={ previewView }
 									placement={ placement }
@@ -993,6 +932,25 @@ const PlacementTab = () => {
 			/>
 
 			<SectionList label={ __( 'Placement settings', 'searcio' ) } sections={ sections } />
+
+			<LookEditor
+				isOpen={ isEditingLook }
+				onClose={ closeLookEditor }
+				catalog={ catalog }
+				placement={ placement }
+				onLookChange={ setLookValue }
+				onGroupReset={ resetLookGroup }
+				content={ searchOptions }
+				save={ {
+					onSave,
+					isSaving,
+					disabled: saveDisabled,
+					label: saveLabel,
+					description: saveDescription,
+					error: saveError,
+					onDismissError: () => setSaveError( null ),
+				} }
+			/>
 
 			{ saveError && (
 				<Notice.Root intent="error">

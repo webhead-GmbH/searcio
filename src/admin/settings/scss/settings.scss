@@ -450,10 +450,6 @@
   pointer-events: none;
 }
 
-.whsc-placement-colors {
-  min-width: 0;
-}
-
 // A colour is one row: its swatch, its name, and its value at the end.
 .whsc-placement-color,
 .whsc-placement-color__toggle {
@@ -486,5 +482,263 @@
   .whsc-placement-preview-column {
     position: sticky;
     top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wpds-dimension-gap-lg));
+  }
+}
+
+// The tab's preview is as tall as the open window needs to show its rows.
+.whsc-placement-preview-column .whsc-placement-preview--modal {
+  height: 640px;
+}
+
+/* -------------------------------------------------------------------------
+ * Look editor
+ * ---------------------------------------------------------------------- */
+
+// The editor fills the screen: the house modal at its full size, as tall as
+// it may be, with its body handing its height to the two columns, each of
+// which scrolls on its own.
+.webhead-search-cloud-modal.whsc-look-editor-modal {
+  height: calc(100svh - (2 * var(--wpds-dimension-padding-2xl)));
+
+  .webhead-search-cloud-modal__body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+
+    > * {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+  }
+}
+
+.whsc-look-editor {
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+}
+
+.whsc-look-editor__panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.whsc-look-editor__tabs {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.whsc-look-editor__tab-list {
+  flex: none;
+  padding-inline: var(--wpds-dimension-padding-lg);
+  border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.whsc-look-editor__tab-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-md);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+// A screen of the panel scrolls on its own and would cut off the focus ring
+// of a control at its edge, so its content keeps the ring's room round it.
+.whsc-look-editor__screen {
+  padding: var(--wpds-dimension-padding-xs);
+}
+
+.whsc-look-editor__footer {
+  flex: none;
+  padding: var(--wpds-dimension-padding-lg);
+  border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.whsc-look-editor__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-md);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--wpds-dimension-padding-xl);
+  background: var(--wpds-color-background-surface-neutral-weak);
+}
+
+// The page is drawn at the device's width and scaled to the room there is,
+// from its top corner, so a phone shows as a phone does.
+.whsc-look-editor__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.whsc-look-editor__device {
+  position: relative;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.whsc-look-editor__frame.whsc-placement-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+}
+
+// The parts of the search, one row each: its name, how many of its settings
+// are set, and the way into it.
+.whsc-look-parts__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    margin: 0;
+  }
+
+  li + li {
+    border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+  }
+}
+
+.whsc-look-parts__item.components-button {
+  width: 100%;
+  min-height: var(--wpds-dimension-size-lg);
+  gap: var(--wpds-dimension-gap-sm);
+  justify-content: flex-start;
+  text-align: start;
+}
+
+.whsc-look-parts__name {
+  flex: 1 1 auto;
+}
+
+.whsc-look-parts__count {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+  font-size: var(--wpds-typography-font-size-xs);
+}
+
+.whsc-look-parts__chevron {
+  flex: none;
+  fill: currentColor;
+}
+
+.whsc-look-heading {
+  margin: 0;
+}
+
+.whsc-look-help {
+  margin: 0;
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// A run of settings under a heading of its own, after the one before it.
+.whsc-look-run + .whsc-look-run {
+  padding-top: var(--wpds-dimension-padding-lg);
+  border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+// A control's name with its unit and the screen its value is for.
+.whsc-look-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wpds-dimension-gap-xs);
+}
+
+.whsc-look-label__unit {
+  color: var(--wpds-color-foreground-content-neutral-weak);
+  font-weight: var(--wpds-typography-font-weight-default);
+}
+
+.whsc-look-label__device {
+  flex: none;
+  fill: currentColor;
+}
+
+.whsc-look-spacing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-sm);
+  min-width: 0;
+}
+
+.whsc-look-spacing__sides {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--wpds-dimension-gap-sm);
+}
+
+// The preview's two views are as wide as their longer name needs, on one line.
+.whsc-look-editor__view {
+  flex: 0 1 260px;
+  min-width: 0;
+}
+
+.whsc-look-typography {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.whsc-look-typography__chevron {
+  flex: none;
+  fill: currentColor;
+}
+
+// Opened, its settings hang under its button as a panel of their own, framed
+// by a line on the column's own surface: wp-admin paints a text field's input
+// white, and the font field's input is narrower than its frame, so on a tinted
+// panel it showed as a white box inside a grey one.
+.whsc-look-typography__panel {
+  padding: var(--wpds-dimension-padding-lg);
+  border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+  border-top: 0;
+  border-radius: 0 0 var(--wpds-border-radius-sm) var(--wpds-border-radius-sm);
+  background: var(--wpds-color-background-surface-neutral);
+}
+
+.whsc-look-typography__pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--wpds-dimension-gap-lg) var(--wpds-dimension-gap-sm);
+}
+
+// Narrower than a tablet, the preview goes above the settings, at a height
+// that leaves the settings room.
+@media (max-width: 960px) {
+  .whsc-look-editor {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(260px, 45%) minmax(0, 1fr);
+  }
+
+  .whsc-look-editor__panel {
+    grid-row: 2;
+    border-inline-end: 0;
+    border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+  }
+
+  .whsc-look-editor__preview {
+    grid-row: 1;
+    gap: var(--wpds-dimension-gap-sm);
+    padding: var(--wpds-dimension-padding-md);
+  }
+}
+
+// On a phone the preview's room goes to the page, not to the line under it.
+@media (max-width: 600px) {
+  .whsc-look-editor__note {
+    display: none;
   }
 }
