@@ -176,6 +176,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR), once your Searcio service offers it.
 - Names with an "&" (post types, attributes, custom fields, price separators, popular searches) show as typed instead of as "&amp;".
 - New on the Placement tab: a look editor with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
 - On phones the search window fills the screen and its results scroll down in a grid; recent and popular searches take one row each, so products are in sight at once.

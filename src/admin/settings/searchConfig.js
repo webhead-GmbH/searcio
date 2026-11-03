@@ -73,6 +73,32 @@ export const isBlankRedirect = ( rule ) =>
  * @param {Object} raw The `/search-config` response.
  * @return {Object} The tab's working copy.
  */
+/** How a filter combines the values picked in it: OR, the default, or AND. */
+export const FACET_MATCHES = [ 'any', 'all' ];
+
+/**
+ * Per filter field, whether a result has to carry any of the values picked in
+ * it (`any`) or all of them (`all`), as Searcio reports it in `facet_match`.
+ *
+ * Null when Searcio leaves the key out, as a service without the setting
+ * does: the tab then offers no choice the service would not keep. An empty
+ * map arrives as a list from PHP, and is a service that has the setting.
+ *
+ * @param {*} raw `facet_match` from `GET /search-config`.
+ * @return {Object<string,string>|null} Field => `any` or `all`.
+ */
+export const normalizeFacetMatch = ( raw ) => {
+	if ( Array.isArray( raw ) ) {
+		return {};
+	}
+
+	if ( ! raw || 'object' !== typeof raw ) {
+		return null;
+	}
+
+	return Object.fromEntries( Object.entries( raw ).filter( ( [ , mode ] ) => FACET_MATCHES.includes( mode ) ) );
+};
+
 export const normalizeConfig = ( raw ) => ( {
 	searchable_fields: Array.isArray( raw?.searchable_fields )
 		? raw.searchable_fields.map( ( row ) => ( {
@@ -87,6 +113,7 @@ export const normalizeConfig = ( raw ) => ( {
 		} ) )
 		: [],
 	facet_fields: Array.isArray( raw?.facet_fields ) ? raw.facet_fields : [],
+	facet_match: normalizeFacetMatch( raw?.facet_match ),
 	suggest_fields: Array.isArray( raw?.suggest_fields ) ? raw.suggest_fields : [],
 	synonyms: Array.isArray( raw?.synonyms ) ? raw.synonyms : [],
 	languages: Array.isArray( raw?.languages ) ? raw.languages : [],
@@ -119,6 +146,11 @@ export const toPayload = ( config ) => ( {
 	// silently lose it on the next read; drop it here so the form shows what was
 	// actually stored.
 	redirects: ( config.redirects || [] ).filter( ( rule ) => ! isBlankRedirect( rule ) ),
+	// Every filter field once, and none that is no longer one; left out for a
+	// service that does not report the setting.
+	facet_match: config.facet_match
+		? Object.fromEntries( ( config.facet_fields || [] ).map( ( field ) => [ field, 'all' === config.facet_match[ field ] ? 'all' : 'any' ] ) )
+		: undefined,
 	/*
 	 * Only switches this plan can actually carry. Enabling a feature the plan
 	 * does not include is a 422 on `features.<name>.enabled` - and because the

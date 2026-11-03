@@ -10,6 +10,7 @@ import {
 	isBlankRedirect,
 	listError,
 	normalizeConfig,
+	normalizeFacetMatch,
 	normalizeFeatures,
 	normalizeMerchandising,
 	normalizeRedirects,
@@ -145,6 +146,25 @@ describe( 'normalizeConfig', () => {
 		expect( config.features.ai_search.status ).toBe( 'indexing' );
 		expect( config.features.visual_tagging.available ).toBe( false );
 		expect( config.features.visual_search.available ).toBe( false );
+	} );
+} );
+
+describe( 'facet_match', () => {
+	it( 'is not offered by a service that does not report it', () => {
+		expect( normalizeConfig( { facet_fields: [ 'brand' ] } ).facet_match ).toBeNull();
+		// What goes over the wire.
+		expect( JSON.parse( JSON.stringify( toPayload( normalizeConfig( { facet_fields: [ 'brand' ] } ) ) ) ) ).not.toHaveProperty( 'facet_match' );
+	} );
+
+	it( 'reads the mode of each field, and an empty map PHP writes as a list', () => {
+		expect( normalizeFacetMatch( { features: 'all', brand: 'any', color: 'some' } ) ).toEqual( { features: 'all', brand: 'any' } );
+		expect( normalizeFacetMatch( [] ) ).toEqual( {} );
+	} );
+
+	it( 'writes back every filter field once, any by default, and none that is gone', () => {
+		const payload = toPayload( { facet_fields: [ 'brand', 'features' ], facet_match: { features: 'all', removed: 'all' } } );
+
+		expect( payload.facet_match ).toEqual( { brand: 'any', features: 'all' } );
 	} );
 } );
 

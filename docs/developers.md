@@ -46,7 +46,7 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 | `/connection/connect` | POST | manage_settings | Zero-friction connect: sends the admin's email and name, the site's name and address and the two consents. Stores the keys when a new account was created; answers `flow: pending_claim` when the email already has one |
 | `/connection/disconnect` | POST | manage_settings | Calls Searcio's `DELETE /disconnect`, which deletes the site and its index there, then clears the stored credentials. A call that fails for any reason other than Searcio no longer knowing the keys (`401`, `404`) keeps them, so that it can be tried again |
 | `/indexing/config` | GET / POST | view / manage_settings | Per-post-type indexing field mapping, plus `indexed_fields`: every field a document can carry under the saved mapping (`Index_Config::indexed_fields()`, with product fields from `Woo::TOGGLE_FIELDS`) |
-| `/search-config` | GET / PUT | view / manage_settings | Proxies Searcio's own search configuration (fields, weights, boosts, facets, suggestions, synonyms, languages) |
+| `/search-config` | GET / PUT | view / manage_settings | Proxies Searcio's own search configuration (fields, weights, boosts, facets and how each combines its values, suggestions, synonyms, languages). The tab offers *Any (OR)* / *All (AND)* per facet field only while the response carries `facet_match`, and then saves it with every facet field |
 | `/sync/status` | GET | view | Current sync state and indexable-type summary |
 | `/sync/start` | POST | run_sync | Start a sync (`?force=true` re-sends everything) |
 | `/sync/pause`, `/sync/resume`, `/sync/cancel` | POST | run_sync | Control the active run |

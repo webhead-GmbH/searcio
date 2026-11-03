@@ -261,6 +261,12 @@
   overflow-y: auto;
 }
 
+// The line that says what "Any" and "All" do, in the weight of a card's own sentence.
+.whsc-facet-match__description {
+  margin: 0;
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
 // A redirect is two fields and a delete, on one row. On a phone the row has no
 // room for two fields: they stack, with the delete under them at the end.
 .whsc-redirect-rule {
