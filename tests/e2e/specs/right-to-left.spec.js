@@ -34,7 +34,8 @@ test.describe( 'In a right-to-left page', () => {
 		const widget = new SearchWidget( page );
 
 		await widget.openModal();
-		await widget.search( 'shirt' );
+		// The highlights' carousel: a phone's results are a grid that scrolls down.
+		await expect( widget.cards.first() ).toBeVisible();
 
 		const track = widget.modal.locator( '.whsc-carousel-track' );
 		const dots = widget.modal.locator( '.whsc-carousel-dot' );
@@ -73,7 +74,8 @@ test.describe( 'In a right-to-left page', () => {
 		const widget = new SearchWidget( page );
 
 		await widget.openModal();
-		await widget.search( 'shirt' );
+		// The highlights' carousel: a phone's results are a grid that scrolls down.
+		await expect( widget.cards.first() ).toBeVisible();
 
 		const track = widget.modal.locator( '.whsc-carousel-track' );
 		const previous = widget.modal.locator( '.whsc-carousel-arrow--prev' );

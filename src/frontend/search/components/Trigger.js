@@ -1,6 +1,7 @@
-import { Button, SearchControl } from '@wordpress/components';
+import { SearchControl } from '@wordpress/components';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import Button from './Button';
 
 /**
  * Hydrates a server-rendered `[data-whsc-trigger]` placeholder with a real

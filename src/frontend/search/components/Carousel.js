@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import Button from './Button';
 
 const DRAG_THRESHOLD = 6;
 

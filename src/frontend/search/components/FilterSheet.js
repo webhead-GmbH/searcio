@@ -1,7 +1,8 @@
 import { useId, useLayoutEffect, useRef } from '@wordpress/element';
-import { Button, Modal } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import Button from './Button';
 
 import { tabbables } from './FilterPopover';
 

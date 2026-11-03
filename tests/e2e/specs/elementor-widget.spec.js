@@ -135,7 +135,13 @@ test.describe( 'Elementor widget', () => {
 		await expect
 			.poll( () => styleOf( widget.modal.locator( '.whsc-card__badge' ).first(), [ 'background-color', 'color', 'border-top-left-radius' ] ) )
 			.toEqual( [ 'rgb(124, 45, 18)', 'rgb(254, 243, 199)', '0px' ] );
-		await expect.poll( () => styleOf( widget.modal.locator( '.whsc-carousel-item' ).first(), [ 'width' ] ) ).toEqual( [ '260px' ] );
+		// The card width is the carousel's. A phone lays its results out in a
+		// grid, two to a row, whatever the width asked for.
+		if ( await widget.modal.locator( '.whsc-results__grid' ).count() ) {
+			await expect( widget.modal.locator( '.whsc-carousel-item' ) ).toHaveCount( 0 );
+		} else {
+			await expect.poll( () => styleOf( widget.modal.locator( '.whsc-carousel-item' ).first(), [ 'width' ] ) ).toEqual( [ '260px' ] );
+		}
 		// A colour picked for the group name is used as picked, on the title of
 		// the group's popover (or, on a phone, of its sheet).
 		await widget.openGroup( 'Categories' );

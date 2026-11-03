@@ -54,6 +54,7 @@ use Webhead\WP\SearchCloud\Routing\Search_Config_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Placement_Endpoint;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
+use Webhead\WP\SearchCloud\Indexing\Swatch_Reader;
 use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Indexing\Field_Source_Resolver;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
@@ -165,6 +166,7 @@ final class Plugin extends Base_Plugin {
 			}
 		);
 		$container->add( 'woo', Woo::class );
+		$container->add( 'swatch_reader', Swatch_Reader::class );
 		$container->add(
 			'connection_endpoint',
 			static function () use ( $container ): Connection_Endpoint {
@@ -213,7 +215,7 @@ final class Plugin extends Base_Plugin {
 				return new Facet_Config(
 					$container->get( Settings_Manager::class ),
 					$container->get( 'index_config' ),
-					$container->get( 'woo' )
+					$container->get( 'swatch_reader' )
 				);
 			}
 		);

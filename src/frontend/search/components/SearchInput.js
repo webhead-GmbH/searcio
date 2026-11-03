@@ -1,7 +1,8 @@
 import { forwardRef } from '@wordpress/element';
-import { Button, Icon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { search, closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import Button from './Button';
 
 /**
  * A fully custom-built search input (icon + plain `<input>` + clear button)
@@ -39,6 +40,9 @@ const SearchInput = forwardRef( ( {
 			aria-activedescendant={ activeSuggestionId || undefined }
 			autoFocus={ autoFocus }
 			autoComplete="off"
+			// There is no Search button beside the field: Enter searches, and a
+			// phone's keyboard says so on its key.
+			enterKeyHint="search"
 			onChange={ ( event ) => onChange( event.target.value ) }
 			onKeyDown={ onKeyDown }
 		/>

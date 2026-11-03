@@ -200,7 +200,7 @@ final class Search_Widget extends Widget {
 				'type'        => Controls_Manager::SELECT,
 				'default'     => 'submit',
 				'options'     => [
-					'submit' => __( 'On submit (Enter / button)', 'searcio' ),
+					'submit' => __( 'When Enter is pressed', 'searcio' ),
 					'type'   => __( 'While typing', 'searcio' ),
 				],
 				'description' => __( "'While typing' searches automatically after 3 characters.", 'searcio' ),
@@ -545,10 +545,10 @@ final class Search_Widget extends Widget {
 				// properties (it has no custom-property output mode), so it
 				// can't sidestep the specificity fight the same way the
 				// controls above do, and is boosted instead. Targets the
-				// container, not the `<input>` itself -
-				// `@wordpress/components`' `SearchControl` draws the visible
-				// border/box around that shared container, not the input.
-				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__container' ),
+				// backdrop, not the `<input>` or the container round it:
+				// `@wordpress/components`' `SearchControl` draws the line
+				// there, on an element laid over both.
+				'selector'  => $this->boosted_selector( '{{WRAPPER}} .whsc-trigger-box .components-input-control__backdrop' ),
 			]
 		);
 		$this->add_responsive_control(
@@ -791,7 +791,7 @@ final class Search_Widget extends Widget {
 			'submit_note',
 			[
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => __( 'The Search button, "Load more" under the results and the price filter\'s Apply.', 'searcio' ),
+				'raw'             => __( '"Load more" under the results and the price filter\'s Apply.', 'searcio' ),
 				'content_classes' => 'elementor-descriptor',
 			]
 		);
@@ -814,7 +814,6 @@ final class Search_Widget extends Widget {
 				'name'     => 'submit_typography',
 				'label'    => __( 'Typography', 'searcio' ),
 				'selector' => $this->boosted_selector(
-					'.whsc-instance-{{ID}} .whsc-submit-btn',
 					'.whsc-instance-{{ID}} .whsc-load-more__button',
 					'.whsc-instance-{{ID}} .whsc-range__apply'
 				),

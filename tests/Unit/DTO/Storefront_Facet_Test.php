@@ -49,4 +49,37 @@ final class Storefront_Facet_Test extends TestCase {
 
 		$this->assertSame( '{"38":"#000000"}', json_encode( $facet->to_array()['colors'] ) );
 	}
+
+	public function test_what_a_swatches_plugin_gave_goes_with_it_only_when_there_is_some(): void {
+		$facet = new Storefront_Facet(
+			'attr_color',
+			1,
+			Facet_Display::Auto,
+			[ 'Zebra' => '#000000' ],
+			[ 'Zebra' => '#ffffff' ],
+			[ 'Leinen' => 'https://shop.test/leinen.jpg' ],
+			[ 'Extra Large' => 'XL' ]
+		);
+
+		$this->assertSame(
+			[
+				'field'        => 'attr_color',
+				'order'        => 1,
+				'display'      => 'auto',
+				'colors'       => [ 'Zebra' => '#000000' ],
+				'secondColors' => [ 'Zebra' => '#ffffff' ],
+				'images'       => [ 'Leinen' => 'https://shop.test/leinen.jpg' ],
+				'labels'       => [ 'Extra Large' => 'XL' ],
+			],
+			$facet->to_array()
+		);
+	}
+
+	public function test_a_tree_goes_with_it_when_there_is_one(): void {
+		$tree  = [ 'depth' => 2, 'parents' => [ 'Jacken' => 'Kleidung' ] ];
+		$facet = new Storefront_Facet( 'categories', 0, tree: $tree );
+
+		$this->assertSame( $tree, $facet->to_array()['tree'] );
+		$this->assertArrayNotHasKey( 'tree', ( new Storefront_Facet( 'categories', 0 ) )->to_array() );
+	}
 }

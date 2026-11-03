@@ -31,7 +31,7 @@ export const sparkleIcon = (
 		fill="currentColor"
 		aria-hidden="true"
 	>
-		<path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z" />
+		<path d="M12 5.5l1.9 4.6L18.5 12 13.9 13.9 12 18.5l-1.9-4.6L5.5 12l4.6-1.9L12 5.5z" />
 	</svg>
 );
 

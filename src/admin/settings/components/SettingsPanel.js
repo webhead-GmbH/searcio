@@ -39,6 +39,8 @@ const CONNECTION_KEYS = pluginData.connectionKeys || [
 ];
 const POPULAR_SEARCHES_KEYS = pluginData.popularSearchesKeys || [
 	'popular_searches',
+	'category_filter',
+	'category_filter_depth',
 ];
 // Drawn by its own card on the General tab, which knows the plan.
 const SUPPORT_SEARCIO_KEYS = ['support_searcio'];

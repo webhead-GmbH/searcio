@@ -1,7 +1,7 @@
 import { useEffect, useRef } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import Button from './Button';
 
 /**
  * The id of one option, which the search field names as its active descendant

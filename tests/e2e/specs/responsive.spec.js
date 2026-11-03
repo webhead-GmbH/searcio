@@ -106,7 +106,8 @@ test.describe( 'Responsive layout', () => {
 
 		const widget = new SearchWidget( page );
 		await widget.openModal();
-		await widget.search( 'shirt' );
+		// The highlights' carousel: a phone's results are a grid that scrolls down.
+		await expect( widget.cards.first() ).toBeVisible();
 
 		const dots = widget.modal.locator( '.whsc-carousel-dot' );
 		await expect( dots.first() ).toBeVisible();
@@ -117,11 +118,12 @@ test.describe( 'Responsive layout', () => {
 	} );
 
 	/**
-	 * Capped at a fixed height, the phone's chip row became a scroll box inside
-	 * the scrolling modal for the last few pixels of its fourth row, and a long
-	 * term never truncated, so the box scrolled sideways too.
+	 * Capped at a fixed height, the phone's chip rows became a scroll box inside
+	 * the scrolling modal for the last few pixels of their fourth row. They are
+	 * one row now, which scrolls sideways and never down, and a long term is
+	 * cut short in it rather than as wide as the screen.
 	 */
-	test( 'on a phone the popular searches never scroll inside the modal', async ( { page, requestUtils }, testInfo ) => {
+	test( 'on a phone the popular searches never scroll down inside the modal', async ( { page, requestUtils }, testInfo ) => {
 		test.skip( 'mobile-chrome' !== testInfo.project.name, 'The chip layout is the phone one.' );
 
 		await mockSearchCloud( page, {
@@ -141,9 +143,10 @@ test.describe( 'Responsive layout', () => {
 
 		const overflow = await list.evaluate( ( el ) => ( {
 			down: el.scrollHeight - el.clientHeight,
-			across: el.scrollWidth - el.clientWidth,
+			widest: Math.max( ...[ ...el.children ].map( ( item ) => Math.round( item.getBoundingClientRect().width ) ) ),
 		} ) );
-		expect( overflow ).toEqual( { down: 0, across: 0 } );
+		expect( overflow.down ).toBe( 0 );
+		expect( overflow.widest ).toBeLessThanOrEqual( 240 );
 	} );
 
 	/**
@@ -181,8 +184,9 @@ test.describe( 'Responsive layout', () => {
 
 	/**
 	 * At 320px the field kept 64px for text beside three 44px buttons, so the
-	 * placeholder was cut; with the Search button as well it had no room at
-	 * all. The button is an icon there, and the field's own padding tighter.
+	 * placeholder was cut. The field's own padding is tighter there, and there
+	 * is no Search button beside it at any width: Enter searches, and the
+	 * phone's keyboard says so on its key.
 	 */
 	test( 'at 320px the search field keeps room for its placeholder', async ( { page, requestUtils } ) => {
 		await page.setViewportSize( { width: 320, height: 568 } );
@@ -214,12 +218,13 @@ test.describe( 'Responsive layout', () => {
 
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon', searchTrigger: 'submit' } ) );
 		await widget.openModal();
-		const submit = widget.modal.getByRole( 'button', { name: 'Search', exact: true } );
-		await expect( submit ).toBeVisible();
-		const box = await submit.boundingBox();
-		expect( Math.round( box.width ) ).toBe( 44 );
-		expect( Math.round( box.height ) ).toBe( 44 );
+		await expect( widget.modal.getByRole( 'button', { name: 'Search', exact: true } ) ).toHaveCount( 0 );
+		await expect( widget.input ).toHaveAttribute( 'enterkeyhint', 'search' );
 		expect( ( await room() ).room ).toBeGreaterThanOrEqual( 80 );
+
+		await widget.input.fill( 'shirt' );
+		await widget.input.press( 'Enter' );
+		await expect( widget.cards.first() ).toBeVisible();
 	} );
 
 	/** Under 16px, iOS Safari zooms the page in when a field takes focus. */
@@ -270,7 +275,8 @@ test.describe( 'Responsive layout', () => {
 
 		const widget = new SearchWidget( page );
 		await widget.openModal();
-		await widget.search( 'shirt' );
+		// The highlights' carousel: a phone's results are a grid that scrolls down.
+		await expect( widget.cards.first() ).toBeVisible();
 		await expect( widget.modal.locator( '.whsc-carousel-dot' ).first() ).toBeAttached();
 
 		// Halve the content without touching the window.
@@ -299,7 +305,8 @@ test.describe( 'Responsive layout', () => {
 
 		const widget = new SearchWidget( page );
 		await widget.openModal();
-		await widget.search( 'shirt' );
+		// The highlights' carousel: a phone's results are a grid that scrolls down.
+		await expect( widget.cards.first() ).toBeVisible();
 		await expect( widget.modal.locator( '.whsc-carousel-dot' ).nth( 1 ) ).toBeAttached();
 
 		// Read in the same task as the click: a smooth scroll has not moved yet.
@@ -309,5 +316,129 @@ test.describe( 'Responsive layout', () => {
 			return modal.querySelector( '.whsc-carousel-track' ).scrollLeft;
 		} );
 		expect( scrolled ).toBeGreaterThan( 0 );
+	} );
+} );
+
+/**
+ * Where the window is the whole screen: a phone, a tablet held upright and a
+ * phone on its side. Sized to what it held, it changed height from tab to tab
+ * and showed the page under it, its end ran under the toolbar mobile Safari
+ * hides, and its results were a row that scrolled sideways, so a swipe down,
+ * the one people make, moved nothing.
+ */
+test.describe( 'The window on a phone', () => {
+	const RECENT = [ 'rain jacket', 'white sneakers', 'wool coat', 'headphones', 'linen shirt', 'backpack' ];
+	const POPULAR = [ 'hoodie', 'belt', 'cap', 'beanie', 'scarf', 'socks', 'gloves', 'boots' ].map( ( query ) => ( { query } ) );
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await configureSearchKey( requestUtils );
+	} );
+
+	test( 'is the whole screen, and its results are a grid that scrolls down', async ( { page, requestUtils } ) => {
+		await page.setViewportSize( { width: 390, height: 844 } );
+		await mockSearchCloud( page, { hits: MANY_HITS } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+
+		const frame = await widget.modal.boundingBox();
+		expect( [ Math.round( frame.y ), Math.round( frame.height ), Math.round( frame.width ) ] ).toEqual( [ 0, 844, 390 ] );
+
+		await widget.search( 'shirt' );
+		await expect( widget.cards.first() ).toBeVisible();
+		await expect( widget.modal.locator( '.whsc-results__grid' ) ).toBeVisible();
+		await expect( widget.modal.locator( '.whsc-results .whsc-carousel-track' ) ).toHaveCount( 0 );
+
+		// Two to a row.
+		const [ first, second, third ] = await Promise.all( [ 0, 1, 2 ].map( ( index ) => widget.cards.nth( index ).boundingBox() ) );
+		expect( Math.round( first.y ) ).toBe( Math.round( second.y ) );
+		expect( third.y ).toBeGreaterThan( first.y + first.height );
+
+		// The window scrolls, and its end does not hand the scroll on to the page.
+		const area = widget.modal.locator( '.components-modal__content' );
+		const scroll = await area.evaluate( ( el ) => [ el.scrollHeight > el.clientHeight, getComputedStyle( el ).overscrollBehaviorY ] );
+		expect( scroll ).toEqual( [ true, 'contain' ] );
+		await area.evaluate( ( el ) => el.scrollTo( 0, 600 ) );
+		await expect.poll( () => area.evaluate( ( el ) => el.scrollTop ) ).toBeGreaterThan( 0 );
+	} );
+
+	test( 'keeps the recent and the popular searches to a row each, with the highlights in sight', async ( { page, requestUtils } ) => {
+		await page.setViewportSize( { width: 320, height: 568 } );
+		await page.addInitScript( ( recent ) => {
+			window.localStorage.setItem( 'webheadSearchCloud.recentSearches', JSON.stringify( recent ) );
+		}, RECENT );
+		await mockSearchCloud( page, { hits: MANY_HITS, popular: POPULAR } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await expect( widget.modal.locator( '.whsc-chip' ).first() ).toBeVisible();
+
+		for ( const row of [ '.whsc-recent .whsc-chip-row', '.whsc-popular-list' ] ) {
+			const measured = await widget.modal.locator( row ).evaluate( ( el ) => ( {
+				oneRow: new Set( [ ...el.children ].map( ( child ) => Math.round( child.getBoundingClientRect().top ) ) ).size,
+				height: Math.round( el.getBoundingClientRect().height ),
+				scrolls: el.scrollWidth > el.clientWidth,
+				fades: el.classList.contains( 'has-more' ),
+			} ) );
+			expect( measured, row ).toEqual( { oneRow: 1, height: 44, scrolls: true, fades: true } );
+		}
+
+		await expect( widget.modal.getByRole( 'heading', { name: 'Current highlights' } ) ).toBeInViewport();
+
+		// A chip is 36px to see and 44px to touch.
+		const chip = await widget.modal.locator( '.whsc-popular-item' ).first().evaluate( ( el ) => [
+			Math.round( el.getBoundingClientRect().height ),
+			Math.round( parseFloat( getComputedStyle( el, '::after' ).top ) ),
+		] );
+		expect( chip ).toEqual( [ 36, -5 ] );
+	} );
+
+	test( 'on its side is the whole screen too, in one column', async ( { page, requestUtils } ) => {
+		await page.setViewportSize( { width: 844, height: 390 } );
+		await mockSearchCloud( page, { hits: MANY_HITS, popular: POPULAR } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await expect( widget.modal.locator( '.whsc-popular-item' ).first() ).toBeVisible();
+
+		expect( Math.round( ( await widget.modal.boundingBox() ).height ) ).toBe( 390 );
+		const browse = await widget.modal.locator( '.whsc-browse' ).evaluate( ( el ) => getComputedStyle( el ).gridTemplateColumns.split( ' ' ).length );
+		expect( browse ).toBe( 1 );
+		expect( Math.round( ( await widget.modal.locator( '.whsc-popular-list' ).boundingBox() ).height ) ).toBe( 44 );
+	} );
+
+	test( 'shows the whole of the assistant\'s welcome, and its message field at the bottom', async ( { page, requestUtils } ) => {
+		await page.setViewportSize( { width: 320, height: 568 } );
+		await mockSearchCloud( page, { assistant: true } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( 'AI Assistant' );
+
+		const intro = widget.modal.locator( '.whsc-assistant__intro' );
+		await expect( intro ).toBeInViewport( { ratio: 1 } );
+		const tabs = await widget.modal.locator( '.whsc-modal-tabbar' ).boundingBox();
+		expect( ( await intro.boundingBox() ).y ).toBeGreaterThanOrEqual( tabs.y + tabs.height );
+
+		const composer = await widget.modal.locator( '.whsc-assistant__composer' ).boundingBox();
+		expect( composer.y + composer.height ).toBeGreaterThan( 568 - 40 );
+		expect( composer.y + composer.height ).toBeLessThanOrEqual( 568 );
+	} );
+
+	test( 'leaves a desktop its row of results', async ( { page, requestUtils }, testInfo ) => {
+		test.skip( 'desktop-chrome' !== testInfo.project.name, 'A mouse and a wide screen.' );
+		await mockSearchCloud( page, { hits: MANY_HITS } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'shirt' );
+		await expect( widget.modal.locator( '.whsc-results .whsc-carousel-track' ) ).toBeVisible();
+		await expect( widget.modal.locator( '.whsc-results__grid' ) ).toHaveCount( 0 );
+		expect( ( await widget.modal.boundingBox() ).height ).toBeLessThan( page.viewportSize().height );
 	} );
 } );

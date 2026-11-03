@@ -136,10 +136,10 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						/>
 						<RadioControl
 							label={ __( 'When to search', 'searcio' ) }
-							help={ __( "'While typing' searches automatically after 3 characters; 'On submit' waits for Enter or the Search button.", 'searcio' ) }
+							help={ __( "'While typing' searches automatically after 3 characters.", 'searcio' ) }
 							selected={ searchTrigger }
 							options={ [
-								{ label: __( 'On submit (Enter / button)', 'searcio' ), value: 'submit' },
+								{ label: __( 'When Enter is pressed', 'searcio' ), value: 'submit' },
 								{ label: __( 'While typing', 'searcio' ), value: 'type' },
 							] }
 							onChange={ ( value ) => setAttributes( { searchTrigger: value } ) }
@@ -246,10 +246,10 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					title={ __( 'Buttons', 'searcio' ) }
 					initialOpen={ false }
 					colorSettings={ [
-						color( 'btnBg', __( 'Search button bg', 'searcio' ) ),
-						color( 'btnBgHover', __( 'Search button bg (hover)', 'searcio' ) ),
-						color( 'btnText', __( 'Search button text', 'searcio' ) ),
-						color( 'btnTextHover', __( 'Search button text (hover)', 'searcio' ) ),
+						color( 'btnBg', __( 'Primary button bg', 'searcio' ) ),
+						color( 'btnBgHover', __( 'Primary button bg (hover)', 'searcio' ) ),
+						color( 'btnText', __( 'Primary button text', 'searcio' ) ),
+						color( 'btnTextHover', __( 'Primary button text (hover)', 'searcio' ) ),
 						color( 'iconColor', __( 'Icon buttons', 'searcio' ) ),
 						color( 'iconColorHover', __( 'Icon buttons (hover)', 'searcio' ) ),
 						color( 'iconBgHover', __( 'Icon button bg (hover)', 'searcio' ) ),
@@ -271,7 +271,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						color( 'clearBtnBgHover', __( 'Clear bg (hover)', 'searcio' ) ),
 					] }
 				>
-					{ sizeControl( 'btnRadius', __( 'Search button radius', 'searcio' ), 999 ) }
+					{ sizeControl( 'btnRadius', __( 'Primary button radius', 'searcio' ), 999 ) }
 				</PanelColorSettings>
 
 				<PanelColorSettings
