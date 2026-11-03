@@ -40,6 +40,9 @@ const SearchInput = forwardRef( ( {
 			aria-activedescendant={ activeSuggestionId || undefined }
 			autoFocus={ autoFocus }
 			autoComplete="off"
+			// There is no Search button beside the field: Enter searches, and a
+			// phone's keyboard says so on its key.
+			enterKeyHint="search"
 			onChange={ ( event ) => onChange( event.target.value ) }
 			onKeyDown={ onKeyDown }
 		/>

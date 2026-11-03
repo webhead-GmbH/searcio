@@ -561,6 +561,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	max-width: var(--whsc-modal-width, 100%);
 	height: auto;
 	max-height: calc(92vh - var(--whsc-modal-offset, 0px));
+	max-height: calc(92dvh - var(--whsc-modal-offset, 0px));
 	margin: var(--whsc-modal-offset, 0) auto 0;
 	background: var(--whsc-bg);
 	color: var(--whsc-text);
@@ -571,8 +572,11 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 .whsc-modal .components-modal__content {
 	padding: 0;
 	max-height: calc(92vh - var(--whsc-modal-offset, 0px));
+	max-height: calc(92dvh - var(--whsc-modal-offset, 0px));
 	overflow-y: auto;
 	overflow-x: hidden;
+	// The page under the window does not scroll on when this reaches its end.
+	overscroll-behavior: contain;
 	margin-top: 0;
 	/* The filters lay themselves out by the modal's width, not the viewport's,
 	 * so a placement that narrows the modal gets the phone's layout too. */
@@ -581,6 +585,67 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 .whsc-modal .components-modal__content::before {
 	content: none;
+}
+
+/*
+ * On a phone, and on any screen as short as one on its side, the window is
+ * the whole screen. Sized to what it held, it changed height from tab to tab,
+ * showed the page under it, and at 92vh it ran under the toolbar mobile Safari
+ * hides as the page scrolls: `vh` counts that toolbar's room, so the end of the
+ * window was out of reach. `dvh` is what the browser shows. A placement's
+ * narrower, lowered window is a desktop's.
+ */
+@media screen and (max-width: 782px), screen and (max-height: 500px) {
+	.whsc-modal.components-modal__frame {
+		max-width: 100%;
+		height: 100vh;
+		height: 100dvh;
+		max-height: none;
+		margin: 0;
+		border-radius: 0;
+	}
+
+	.whsc-modal .components-modal__content {
+		height: 100%;
+		max-height: none;
+	}
+
+	/* What the window holds is at least as tall as the screen, so the
+	 * assistant's message field stands at the bottom of it. */
+	.whsc-modal .components-modal__children-container {
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+	}
+
+	.whsc-modal .whsc-modal-body {
+		flex: 1 0 auto;
+	}
+
+	/*
+	 * The assistant fills the screen and scrolls with the window. Its thread
+	 * and its products were boxes of their own capped at 30vh and 48vh: the
+	 * thread is anchored to its end, and on a phone 568px tall its welcome was
+	 * cut at the top and could not be scrolled back; the products scrolled
+	 * inside a window that scrolls too. The message field stays pinned to the
+	 * bottom of the screen. Under `.whsc-modal`, to outrank the phone's rules
+	 * further down, which come later.
+	 */
+	.whsc-modal .whsc-assistant {
+		flex: 1 0 auto;
+	}
+
+	.whsc-modal .whsc-assistant__thread {
+		flex: 1 0 auto;
+		max-height: none;
+		overflow: visible;
+	}
+
+	.whsc-modal .whsc-assistant__results {
+		flex: none;
+		max-height: none;
+		overflow: visible;
+	}
 }
 
 /*
@@ -663,27 +728,10 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	 * input shrinks (min-width: 0) instead of the buttons wrapping to a second
 	 * line under the field (which looked broken on phones).
 	 */
-	/* At 320px the field had 64px for text with only the three icon buttons
-	 * beside it - "Suchen ..." did not fit - and with the Search button as
-	 * well it had none at all. The button turns into its icon, a 44px target
-	 * like its neighbours, keeping its name for screen readers. */
+	/* At 320px the field had 64px for text beside the three icon buttons, and
+	 * "Suchen ..." did not fit. */
 	@media screen and (max-width: 480px) {
 		gap: 4px;
-
-		// Outranks the hidden default further down, which it precedes.
-		.whsc-submit-btn .whsc-submit-btn__icon {
-			display: block;
-		}
-
-		.whsc-submit-btn__label {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			margin: -1px;
-			overflow: hidden;
-			clip: rect(0, 0, 0, 0);
-			white-space: nowrap;
-		}
 	}
 }
 
@@ -799,51 +847,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /* -------------------------------------------------------------------------
- * Submit + icon buttons in the header row
+ * Icon buttons in the header row
  * ---------------------------------------------------------------------- */
-.whsc-modal .whsc-submit-btn {
-	flex-shrink: 0;
-	height: 48px;
-	padding-inline: 22px;
-	background: var(--whsc-btn-bg, var(--whsc-accent-strong));
-	color: var(--whsc-btn-text);
-	border-radius: var(--whsc-btn-radius);
-	box-shadow: none;
-
-	// The edge of a filled button where colours are forced and fills are not
-	// drawn. WordPress writes it for a primary button and the reset takes it
-	// off with the rest of what a site says about `button`. Not in focus,
-	// where the ring is the outline.
-	&:not(:focus) {
-		outline: 1px solid transparent;
-	}
-	transition: background-color 0.15s ease, color 0.15s ease;
-
-	// Icon-only on a phone (see `.whsc-input-row`): a 44px circle like the
-	// buttons beside it. Here, after the base values, so it wins at the same
-	// specificity - placed in the row's own query it lost to the 48px height.
-	@media screen and (max-width: 480px) {
-		width: 44px;
-		height: 44px;
-		padding: 0;
-		justify-content: center;
-	}
-
-	&:hover:not(:disabled),
-	&:focus:not(:disabled) {
-		background: var(--whsc-btn-bg-hover, var(--whsc-btn-bg, var(--whsc-accent-strong)));
-		color: var(--whsc-btn-text-hover, var(--whsc-btn-text));
-		box-shadow: none;
-	}
-}
-
-/* Shown only where the button is icon-only (see `.whsc-input-row`). */
-.whsc-modal .whsc-submit-btn__icon {
-	display: none;
-	flex-shrink: 0;
-	fill: currentColor;
-}
-
 .whsc-modal .whsc-voice-btn,
 .whsc-modal .whsc-modal-close {
 	flex-shrink: 0;
@@ -3392,6 +3397,43 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+/* The results where the window is the whole screen (SearchModal): two or
+ * more to a row, as wide as the screen allows, scrolling down with it. */
+.whsc-results__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+	gap: var(--whsc-carousel-gap, 12px);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	> .whsc-results__item {
+		display: flex;
+		min-width: 0;
+		margin: 0;
+	}
+
+	.whsc-card {
+		width: 100%;
+	}
+
+	/* Two to a row on the narrowest phones too, where 160px would leave one. */
+	@container whsc-modal (max-width: 399px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	/* Cut in templates.js for a card of the row; two to a row on a phone a
+	 * post's excerpt still ran to six lines and stretched its row of products
+	 * with it. Three, cut again here where it is longer. */
+	.whsc-card__excerpt {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		overflow: hidden;
+	}
+}
+
 /* While it is still loading there is nothing to reserve space for yet - the row
  * may turn out to be empty and remove itself - so the skeleton stays short. */
 .whsc-products--loading {
@@ -4448,6 +4490,152 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /* --------------------------------------------------------------------------
  * The phone's layout, and a modal set as narrow
  * ------------------------------------------------------------------------ */
+/*
+ * What a phone holds tighter than a desktop: the start's terms in a row each,
+ * smaller chips that are still 44px to touch, the tabs and the field.
+ */
+@mixin whsc-compact {
+	/*
+	 * The recent and the popular searches are a row each that scrolls
+	 * sideways. Wrapped, six recent and nine popular terms took 400px at
+	 * 390px (700px at 320px) and pushed the highlights out of sight; a row
+	 * is 44px. After a search that found nothing the popular ones still wrap
+	 * under the message, where there is room and they help most.
+	 */
+	.whsc-recent .whsc-chip-row,
+	.whsc-browse__aside:not(.whsc-browse__aside--after) .whsc-popular-list {
+		flex-direction: row;
+		flex-wrap: nowrap;
+		max-height: none;
+		gap: 8px;
+		margin-block: -4px;
+		/* Room for a focus ring and for the taller target of a chip, which a
+		 * scroller would cut. */
+		padding-block: 4px;
+		overflow-x: auto;
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		/* A long term is cut short with an ellipsis, as the recent ones are. */
+		> * {
+			flex: none;
+			max-width: 240px;
+		}
+
+		&.has-more {
+			-webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+			mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+		}
+
+		&.has-more:dir(rtl) {
+			-webkit-mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent);
+			mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent);
+		}
+	}
+
+	.whsc-recent__head {
+		margin-bottom: 8px;
+	}
+
+	.whsc-modal .whsc-section-title {
+		margin-bottom: 8px;
+	}
+
+	.whsc-modal .whsc-recent__head .whsc-section-title {
+		margin-bottom: 0;
+	}
+
+	/* A chip is 36px to see and 44px to touch: the target reaches 4px past
+	 * it above and below, into the row's padding. */
+	.whsc-modal .whsc-chip__label,
+	.whsc-modal .whsc-chip__label:hover,
+	.whsc-modal .whsc-chip__label:focus,
+	.whsc-modal .whsc-chip__label:active,
+	.whsc-modal .whsc-chip__remove,
+	.whsc-modal .whsc-popular-item,
+	.whsc-modal .whsc-popular-item:hover,
+	.whsc-modal .whsc-popular-item:focus,
+	.whsc-modal .whsc-popular-item:active {
+		position: relative;
+		min-height: 34px;
+	}
+
+	.whsc-modal .whsc-chip__label::after,
+	.whsc-modal .whsc-chip__remove::after,
+	.whsc-modal .whsc-popular-item::after {
+		content: '';
+		position: absolute;
+		inset: -5px 0;
+	}
+
+	.whsc-modal .whsc-chip__remove {
+		width: 32px;
+		height: 34px;
+		min-width: 32px;
+	}
+
+	/* A popular search draws its frame on itself, a recent one round the
+	 * label and its remove button: 34px inside a recent chip's line is 36px,
+	 * the popular one's height. */
+	.whsc-modal .whsc-popular-item,
+	.whsc-modal .whsc-popular-item:hover,
+	.whsc-modal .whsc-popular-item:focus,
+	.whsc-modal .whsc-popular-item:active {
+		min-height: 36px;
+	}
+
+	/* "Clear all", the field's clear button and "Load more" are 44px to
+	 * touch, whatever they show. */
+	.whsc-modal .whsc-clear-all,
+	.whsc-modal .whsc-search-input__clear {
+		position: relative;
+	}
+
+	.whsc-modal .whsc-clear-all::after {
+		content: '';
+		position: absolute;
+		inset: -9px 0;
+	}
+
+	.whsc-modal .whsc-search-input__clear::after {
+		content: '';
+		position: absolute;
+		inset: -7px;
+	}
+
+	.whsc-modal .whsc-modal-body .whsc-load-more__button {
+		min-height: 44px;
+		padding-inline: 20px;
+		font-size: 14px;
+	}
+
+	.whsc-modal .whsc-browse__aside:not(.whsc-browse__aside--after) .whsc-popular-item,
+	.whsc-modal .whsc-browse__aside:not(.whsc-browse__aside--after) .whsc-popular-item:hover,
+	.whsc-modal .whsc-browse__aside:not(.whsc-browse__aside--after) .whsc-popular-item:focus,
+	.whsc-modal .whsc-browse__aside:not(.whsc-browse__aside--after) .whsc-popular-item:active {
+		width: auto;
+		padding: 0 14px 0 12px;
+		background: var(--whsc-chip-bg);
+		border: 1px solid var(--whsc-chip-border);
+		border-radius: 999px;
+		font-size: 13px;
+	}
+
+	.whsc-modal-tab {
+		padding-block: 12px;
+		font-size: 14px;
+	}
+
+	/* The field is as tall as the 44px buttons beside it and the filters
+	 * under it. Its text stays 16px, under which a phone zooms in. */
+	.whsc-modal .whsc-search-input__field {
+		padding-block: 10px;
+	}
+}
+
 @container whsc-modal (max-width: 639px) {
 	.whsc-filterbar {
 		gap: 0;
@@ -4540,26 +4728,31 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		padding-inline: 10px;
 	}
 
-	/* The recent and popular searches are targets of 44px too, the button that
-	 * takes a recent search away included. */
-	.whsc-modal .whsc-chip__label,
-	.whsc-modal .whsc-chip__label:hover,
-	.whsc-modal .whsc-chip__label:focus,
-	.whsc-modal .whsc-chip__label:active {
-		min-height: 44px;
+	@include whsc-compact;
+
+}
+
+/*
+ * A phone on its side, and any screen as short: 390px of height held the tabs,
+ * the field, the recent searches and the start of a column of popular ones a
+ * desktop draws beside the highlights. It takes the phone's tighter layout and
+ * one column, with less air round it.
+ */
+@media screen and (max-height: 500px) {
+	@include whsc-compact;
+
+	.whsc-browse {
+		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.whsc-modal .whsc-chip__remove {
-		width: 44px;
-		height: 44px;
-		min-width: 44px;
+	.whsc-modal-body {
+		padding: 12px 16px;
+		gap: 14px;
 	}
 
-	.whsc-modal .whsc-popular-item,
-	.whsc-modal .whsc-popular-item:hover,
-	.whsc-modal .whsc-popular-item:focus,
-	.whsc-modal .whsc-popular-item:active {
-		min-height: 44px;
+	.whsc-modal-header {
+		margin-inline: -16px;
+		padding-inline: 16px;
 	}
 }
 

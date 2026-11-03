@@ -128,7 +128,7 @@ The search window's filters are one bar under the search field (`FilterBar`), a 
 
 - `surface`: where its results are shown. `overlay` is the search window's results, including "load more" and a listing by a filter alone; `highlights` is the window's empty-field carousel; `category` is a category product row; `quiz` is the product finder.
 - `live=1`: a search as you type in `type` mode that the visitor has not settled on. Searcio leaves it out of the counts unless one of its results is clicked. A settled search is sent without it, so it never answers from the cache the live request for the same words left behind.
-- `origin`: how a settled search was started, one of `typed` (Enter or the Search button), `suggestion`, `popular`, `recent`, `voice` and `filter` (a filter picked with words in the field).
+- `origin`: how a settled search was started, one of `typed` (Enter), `suggestion`, `popular`, `recent`, `voice` and `filter` (a filter picked with words in the field).
 - `preview=1`, also on `/search/similar`: the page is a page builder's editor. `Frontend_Config` tells the storefront so (`preview`) for Elementor, Divi, Beaver Builder, Oxygen, WPBakery's frontend editor, Bricks and the Customizer, and Elementor's frontend says so itself.
 
 `live` and `origin` are only sent on page one of a search with words: a listing without them and "load more" are never counted. Only a settled search outside an editor is saved as a recent search.

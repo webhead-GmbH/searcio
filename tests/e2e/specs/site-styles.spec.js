@@ -263,8 +263,8 @@ async function walk( page, url ) {
 	await expect( widget.cards.first() ).toBeVisible();
 	await away();
 	await keep( 'modal' );
-	await widget.modal.locator( '.whsc-submit-btn' ).hover();
-	await keep( 'modal, pointer on the search button' );
+	await widget.closeButton.hover();
+	await keep( 'modal, pointer on the close button' );
 	await widget.modal.locator( '.whsc-popular-item' ).first().hover();
 	await keep( 'modal, pointer on a popular search' );
 	await widget.cards.first().hover();
@@ -397,7 +397,7 @@ const PARTS = {
 	],
 	'the modal as it opens': [
 		'modal',
-		'modal, pointer on the search button',
+		'modal, pointer on the close button',
 		'modal, pointer on a popular search',
 		'modal, pointer on a card',
 		'modal, focus on the close button',

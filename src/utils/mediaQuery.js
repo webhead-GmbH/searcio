@@ -5,6 +5,21 @@ import { useEffect, useState } from '@wordpress/element';
  */
 export const NARROW = '(max-width: 782px)';
 
+/**
+ * Where the search window is the whole screen: a phone, a tablet held upright,
+ * and any screen as short as a phone on its side. The stylesheet's query is
+ * the same.
+ */
+export const FULL_SCREEN = '(max-width: 782px), (max-height: 500px)';
+
+/**
+ * Where the results are a grid that scrolls down rather than a row that
+ * scrolls sideways: where the window is the whole screen, and on a touch
+ * screen of any size, where a row is moved with a swipe across it and a swipe
+ * down, the one people make, moved nothing.
+ */
+export const GRID_RESULTS = `${ FULL_SCREEN }, (hover: none) and (pointer: coarse)`;
+
 const matches = ( query ) =>
 	'undefined' !== typeof window && 'function' === typeof window.matchMedia && window.matchMedia( query ).matches;
 

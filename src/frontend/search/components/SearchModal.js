@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from '@wordpress/element';
 import {Icon, Modal} from '@wordpress/components';
-import {chevronDown, closeSmall, search as searchIcon} from '@wordpress/icons';
+import {chevronDown, closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import Button from './Button';
 
@@ -10,6 +10,8 @@ import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buil
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
 import {redirectTarget} from '../../../utils/redirect';
 import {trackScrollEnd} from '../../../utils/scrollEnd';
+import {GRID_RESULTS, useMediaQuery} from '../../../utils/mediaQuery';
+import {rememberCapabilities, rememberedCapabilities} from '../../../utils/capabilities';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
@@ -220,6 +222,11 @@ const SearchModal = ({
 	const resultsHeadingRef = useRef(null);
 	const popoverId = useId();
 	const modalWidth = useModalWidth(bodyRef);
+	// The results scroll down with the window where it is the whole screen and
+	// on a touch screen, as a shop's own listing does; a row that scrolled
+	// sideways left the rest of the screen empty and the results behind a swipe
+	// nobody makes.
+	const gridResults = useMediaQuery(GRID_RESULTS);
 	const narrow = modalWidth > 0 && modalWidth < NARROW_WIDTH;
 	const tight = modalWidth > 0 && modalWidth < TIGHT_WIDTH;
 	const [suggestions, setSuggestions] = useState([]);
@@ -234,13 +241,15 @@ const SearchModal = ({
 	// Which of the extra modes this site may show - all read from
 	// /storefront-config, so an upgrade (or publishing a quiz) flips them on
 	// with no code change and nothing here ever offers a control the API would
-	// only answer 403 to.
-	const [assistantEnabled, setAssistantEnabled] = useState(false);
-	const [quizEnabled, setQuizEnabled] = useState(false);
-	const [visualEnabled, setVisualEnabled] = useState(false);
+	// only answer 403 to. Until the site answers, what this visit saw last
+	// (capabilities.js), so the tabs are where they will be as the window opens.
+	const [remembered] = useState(() => rememberedCapabilities(getConfig().searchKey || ''));
+	const [assistantEnabled, setAssistantEnabled] = useState(Boolean(remembered.assistant));
+	const [quizEnabled, setQuizEnabled] = useState(Boolean(remembered.quiz));
+	const [visualEnabled, setVisualEnabled] = useState(Boolean(remembered.visual_search));
 	// Semantic search changes what `total` in a `/search` response means - see
 	// `totalIsExact()`.
-	const [semanticEnabled, setSemanticEnabled] = useState(false);
+	const [semanticEnabled, setSemanticEnabled] = useState(Boolean(remembered.semantic_search));
 	const [activeTab, setActiveTab] = useState('search');
 	const [assistantOpened, setAssistantOpened] = useState(false);
 	const [quizOpened, setQuizOpened] = useState(false);
@@ -428,6 +437,7 @@ const SearchModal = ({
 				if (!cancelled) {
 					const capabilities = response?.capabilities || {};
 
+					rememberCapabilities(getConfig().searchKey || '', capabilities);
 					setAssistantEnabled(Boolean(capabilities.assistant));
 					setQuizEnabled(Boolean(capabilities.quiz));
 					setVisualEnabled(Boolean(capabilities.visual_search));
@@ -620,7 +630,7 @@ const SearchModal = ({
 
 		setQuery(q);
 
-		// A committed search (Enter, Search button, suggestion/chip/popular
+		// A committed search (Enter, suggestion/chip/popular
 		// click, voice) closes the autocomplete dropdown and tells the typing
 		// effect to skip its next re-open. A live "while typing" search leaves
 		// the dropdown alone so suggestions keep tracking the query.
@@ -1502,19 +1512,34 @@ const SearchModal = ({
 		mainContent = resultsHits.length > 0 ? (
 			<div className={`whsc-results${updating ? ' is-updating' : ''}`} aria-busy={updating || undefined}>
 			{photoQuery}
-			<Carousel
-				items={resultsHits}
-				getKey={(hit) => hit.id}
-				renderItem={(hit, index) => (
-					<ResultCard
-						hit={hit}
-						cardSource={cardSource}
-						serverTemplates={serverTemplates}
-						onClick={() => trackClick(results?.search_id, hit.id, index + 1)}
-					/>
-				)}
-				ariaLabel={__('Search results', 'searcio')}
-			/>
+			{gridResults ? (
+				<ul className="whsc-results__grid" aria-label={__('Search results', 'searcio')}>
+					{resultsHits.map((hit, index) => (
+						<li className="whsc-results__item" key={hit.id}>
+							<ResultCard
+								hit={hit}
+								cardSource={cardSource}
+								serverTemplates={serverTemplates}
+								onClick={() => trackClick(results?.search_id, hit.id, index + 1)}
+							/>
+						</li>
+					))}
+				</ul>
+			) : (
+				<Carousel
+					items={resultsHits}
+					getKey={(hit) => hit.id}
+					renderItem={(hit, index) => (
+						<ResultCard
+							hit={hit}
+							cardSource={cardSource}
+							serverTemplates={serverTemplates}
+							onClick={() => trackClick(results?.search_id, hit.id, index + 1)}
+						/>
+					)}
+					ariaLabel={__('Search results', 'searcio')}
+				/>
+			)}
 			{hasMore && (
 				<div className="whsc-load-more">
 					<button
@@ -1802,16 +1827,6 @@ const SearchModal = ({
 							suggestionsOpen={suggestionsOpen}
 							activeSuggestionId={suggestionsOpen && activeSuggestion >= 0 ? optionId(suggestionsId, activeSuggestion) : ''}
 						/>
-						{'submit' === searchTrigger && (
-							<Button
-								className="whsc-submit-btn"
-								onClick={() => void runSearch(query, {origin: 'typed'})}
-							>
-								{/* On a phone only the icon shows; the label stays the name. */}
-								<Icon icon={searchIcon} className="whsc-submit-btn__icon"/>
-								<span className="whsc-submit-btn__label">{__('Search', 'searcio')}</span>
-							</Button>
-						)}
 						{enableVoice && supportsVoice() && (
 							<Button
 								className="whsc-voice-btn"

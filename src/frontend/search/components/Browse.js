@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { Icon } from '@wordpress/components';
 import { closeSmall, trendingUp } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import Button from './Button';
+import { trackScrollEnd } from '../../../utils/scrollEnd';
 
 /**
  * The area under the search field.
@@ -13,6 +14,10 @@ import Button from './Button';
  * they are gone, and the results start right under the filter bar. While a
  * search is in flight (`busy`) every clickable term is disabled, so rapid
  * clicks cannot send overlapping requests.
+ *
+ * On a phone the recent and the popular searches are a row each that scrolls
+ * sideways, so the highlights start in sight; the rows fade out at their end
+ * while there is more (`has-more`).
  *
  * Picking a recent or popular search unmounts the button that was pressed,
  * and focus would fall to the page under the modal. It goes to the results
@@ -47,6 +52,8 @@ const Browse = ( {
 	onClearRecent,
 } ) => {
 	const ownHeadingRef = useRef( null );
+	const recentRowRef = useRef( null );
+	const popularRowRef = useRef( null );
 	const headingRef = givenHeadingRef || ownHeadingRef;
 	const mounted = useRef( false );
 	const showRecent = 'all' === helpers && recent.length > 0;
@@ -69,6 +76,9 @@ const Browse = ( {
 		}
 	}, [ helpers, headingRef ] );
 
+	useEffect( () => trackScrollEnd( recentRowRef.current ) );
+	useEffect( () => trackScrollEnd( popularRowRef.current ) );
+
 	const recentSearches = showRecent && (
 		<div className="whsc-recent">
 			<div className="whsc-recent__head">
@@ -77,7 +87,7 @@ const Browse = ( {
 					{ __( 'Clear all', 'searcio' ) }
 				</button>
 			</div>
-			<div className="whsc-chip-row">
+			<div className="whsc-chip-row" ref={ recentRowRef }>
 				{ recent.map( ( label ) => (
 					<span className="whsc-chip" key={ label }>
 						<button
@@ -106,7 +116,7 @@ const Browse = ( {
 	const popular = showPopular && (
 		<div className={ `whsc-browse__aside${ 'popular' === helpers ? ' whsc-browse__aside--after' : '' }` }>
 			<h3 className="whsc-section-title">{ __( 'Popular searches', 'searcio' ) }</h3>
-			<ul className="whsc-popular-list">
+			<ul className="whsc-popular-list" ref={ popularRowRef }>
 				{ popularSearches.map( ( label ) => (
 					<li key={ label }>
 						<button

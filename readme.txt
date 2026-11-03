@@ -176,6 +176,9 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- On phones the search window fills the screen and its results scroll down in a grid; recent and popular searches take one row each, so products are in sight at once.
+- No Search button beside the search field any more: Enter searches, and the phone keyboard shows a Search key.
+- On phones the AI assistant fills the screen with its message field at the bottom, and the tabs no longer jump in as the window opens.
 - A theme that styles WooCommerce's block buttons no longer turns the search window's icons white: the colours set in the widget or the block now reach them, with no custom CSS.
 - New on the Search Config tab: the category filter can show all categories, the main categories only, or the main categories with their subcategories under them, to the number of levels you choose.
 - The filters show what your swatches plugin or theme set up: images, two-colour pills and short labels as well as colours, from Variation Swatches by GetWooPlugins, RadiusTheme, CartFlows and Woosuite, WCBoost, WPC, Variation Swatches and Photos, Kadence Shop Kit, Choosly, ThemeHigh, YITH, Flatsome, Porto and WoodMart. A value you have not given a swatch yet no longer turns the filter into a plain list.

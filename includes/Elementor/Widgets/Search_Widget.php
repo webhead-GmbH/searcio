@@ -200,7 +200,7 @@ final class Search_Widget extends Widget {
 				'type'        => Controls_Manager::SELECT,
 				'default'     => 'submit',
 				'options'     => [
-					'submit' => __( 'On submit (Enter / button)', 'searcio' ),
+					'submit' => __( 'When Enter is pressed', 'searcio' ),
 					'type'   => __( 'While typing', 'searcio' ),
 				],
 				'description' => __( "'While typing' searches automatically after 3 characters.", 'searcio' ),
@@ -791,7 +791,7 @@ final class Search_Widget extends Widget {
 			'submit_note',
 			[
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => __( 'The Search button, "Load more" under the results and the price filter\'s Apply.', 'searcio' ),
+				'raw'             => __( '"Load more" under the results and the price filter\'s Apply.', 'searcio' ),
 				'content_classes' => 'elementor-descriptor',
 			]
 		);
@@ -814,7 +814,6 @@ final class Search_Widget extends Widget {
 				'name'     => 'submit_typography',
 				'label'    => __( 'Typography', 'searcio' ),
 				'selector' => $this->boosted_selector(
-					'.whsc-instance-{{ID}} .whsc-submit-btn',
 					'.whsc-instance-{{ID}} .whsc-load-more__button',
 					'.whsc-instance-{{ID}} .whsc-range__apply'
 				),

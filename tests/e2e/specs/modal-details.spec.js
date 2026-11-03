@@ -158,7 +158,14 @@ test.describe( 'the details of the search window', () => {
 				--whsc-arrow-color: rgb(1, 2, 3);
 			}` } );
 
-		for ( const selector of [ '.whsc-voice-btn', '.whsc-modal-close', '.whsc-search-input__clear', '.whsc-carousel-arrow--next' ] ) {
+		const selectors = [ '.whsc-voice-btn', '.whsc-modal-close', '.whsc-search-input__clear' ];
+
+		// A phone's results are a grid, with no carousel and no arrows.
+		if ( await widget.modal.locator( '.whsc-carousel-arrow--next' ).count() ) {
+			selectors.push( '.whsc-carousel-arrow--next' );
+		}
+
+		for ( const selector of selectors ) {
 			const control = widget.modal.locator( selector ).first();
 
 			await expect( control, selector ).not.toHaveClass( /components-button/ );
