@@ -697,13 +697,16 @@
   fill: currentColor;
 }
 
-// Opened, its settings hang under its button as a panel of their own.
+// Opened, its settings hang under its button as a panel of their own, framed
+// by a line on the column's own surface: wp-admin paints a text field's input
+// white, and the font field's input is narrower than its frame, so on a tinted
+// panel it showed as a white box inside a grey one.
 .whsc-look-typography__panel {
   padding: var(--wpds-dimension-padding-lg);
   border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
   border-top: 0;
   border-radius: 0 0 var(--wpds-border-radius-sm) var(--wpds-border-radius-sm);
-  background: var(--wpds-color-background-surface-neutral-weak);
+  background: var(--wpds-color-background-surface-neutral);
 }
 
 .whsc-look-typography__pair {
