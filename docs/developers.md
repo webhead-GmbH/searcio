@@ -147,7 +147,7 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
   }, 10, 2 );
   ```
 
-- **`webhead_search_cloud/storefront/facet_display`** - `(string $display, string $field)`. How the search window draws a field's values in its filter panels: `auto` (the default: colour pills when every value has a colour, image pills when every value has an image, tiles for sizes, shoe sizes and capacities, a checkbox list otherwise), `list`, `tiles`, `color`, `image` or `range`. Anything else is `auto`, and `color` without colours and `image` without images are a list. The filter is given `tiles` for an attribute a swatches plugin shows as labels or buttons:
+- **`webhead_search_cloud/storefront/facet_display`** - `(string $display, string $field)`. How the search window draws a field's values in its filter panels: `auto` (the default: colour pills when every value has a colour, image pills when every value has an image, tiles for sizes, shoe sizes and capacities, a checkbox list otherwise), `list`, `tiles`, `color`, `image` or `range`. Anything else is `auto`. `color` and `image` draw pills as soon as one value has a colour or an image, and a value that has none is an empty ring; with none at all they are a list. The filter is given `tiles` for an attribute a swatches plugin shows as labels or buttons, and `color` or `image` for one the shop set up as colour or image swatches, by the attribute's type or by a swatch type the plugin keeps per term, so a value the shop has not given a swatch yet does not turn the whole group into a list:
 
   ```php
   add_filter( 'webhead_search_cloud/storefront/facet_display', function ( $display, $field ) {
@@ -157,20 +157,28 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
 
 - **`webhead_search_cloud/storefront/facet_colors`** - `(array $colors, string $field, string $taxonomy)`. Value => hex colour for a field's values, in the language of the page. The plugin fills it for a WooCommerce attribute a swatches plugin has dressed (see below); `$taxonomy` is empty for a field that is not an attribute. A value without a valid hex colour is dropped.
 
-- **`webhead_search_cloud/storefront/facet_images`** - `(array $images, string $field, string $taxonomy)`. Value => image address, in the same way. An address that is not `http` or `https` is dropped. Use it, with `facet_colors`, for a theme or a plugin the list below does not name; Flatsome and Woodmart, whose source is not public, are not read.
+- **`webhead_search_cloud/storefront/facet_images`** - `(array $images, string $field, string $taxonomy)`. Value => image address, in the same way. An address that is not `http` or `https` is dropped. Use it, with `facet_colors`, for a theme or a plugin the list below does not name.
 
-**Swatches.** What a swatches plugin set for an attribute's terms reaches the filters by itself, in `Woo::attribute_swatches()`, with the keys read from each plugin's own source. The attribute's type (`wc_get_attribute()`) says which counts, since a plugin keeps what was set before the type changed:
+**Swatches.** What a swatches plugin or a theme set for an attribute's terms reaches the filters by itself, in `Swatch_Reader`, with the keys read from each one's own source and each checked by saving swatches in its own admin screens. The attribute's type (`wc_get_attribute()`) says which counts, since a plugin keeps what was set before the type changed:
 
-| Plugin | Colour | Image | Label |
+| Plugin or theme | Colour | Image | Label |
 |---|---|---|---|
-| Variation Swatches for WooCommerce, by GetWooPlugins | `product_attribute_color`, with `is_dual_color` and `secondary_color` | `product_attribute_image` | |
-| Variation Swatches for WooCommerce, by CartFlows | `cfvsw_color` | `cfvsw_image` | |
+| Variation Swatches for WooCommerce, by GetWooPlugins, and its Pro | `product_attribute_color`, with `is_dual_color` and `secondary_color` | `product_attribute_image` | |
+| Variation Swatches for WooCommerce, by RadiusTheme | as GetWooPlugins (a second colour is its Pro's) | as GetWooPlugins | |
+| Variation Swatches for WooCommerce, by CartFlows | `cfvsw_color` | `cfvsw_image` (an address) | |
 | Variation Swatches for WooCommerce, by Woosuite | `color` | `image` | `label` |
-| WCBoost - Variation Swatches | `color` | `image` | `label` |
-| Variation Swatches for WooCommerce, by RadiusTheme | as GetWooPlugins | | |
+| WCBoost - Variation Swatches | `swatches_color` | `swatches_image` | `swatches_label` |
+| WPC Variation Swatches | `wpcvs_color` | `wpcvs_image` | `wpcvs_button` |
+| Variation Swatches and Photos, of WooCommerce.com | `{taxonomy}_swatches_id_color`, when `{taxonomy}_swatches_id_type` is `color` | `{taxonomy}_swatches_id_photo`, when it is `photo` | |
+| Kadence Shop Kit | `_kt_woo_extras_swatch_color` (or the option `kt_woo_extras_tax_swatch_type` of older releases) | `_kt_woo_extras_swatch_image` | |
+| Choosly - Product Variations Swatches, by VillaTheme | `vi_wpvs_terms_params` `color`, one or two | `vi_wpvs_terms_params` `img_id` | |
+| Product Variation Swatches, by ThemeHigh | `product_{taxonomy}` | `product_{taxonomy}` | `product_{taxonomy}` |
 | YITH WooCommerce Color, Image & Label Variation Swatches | `_yith_wccl_value` | `_yith_wccl_value` | `_yith_wccl_value` |
+| Flatsome | `ux_color`, one or two | `ux_image` | `ux_label` |
+| Porto, with Porto Functionality | `color_value` | `image_value` | `label_value` |
+| WoodMart, while it is the theme | `color` | `image` | |
 
-An image may be an attachment's id or an address. `color`, `image` and `label` are names anything could use, so they count only on an attribute of a swatch type (`color`, `colorpicker`, `image`, `label`, `button`). A term the plugin has translated without its swatch has none on that language's page.
+An image may be an attachment's id, which gives its thumbnail, or an address. `color`, `image` and `label`, and the other names that are plain or whose meaning is the attribute's type (Woosuite's, WCBoost's, Porto's, ThemeHigh's and YITH's), count only on an attribute of a swatch type (`color`, `colorpicker`, `image`, `label`, `button`, or Flatsome's `ux_color`, `ux_image`, `ux_label`); WoodMart gives an attribute no type of its own, so its `color` and `image` count while `get_template()` is `woodmart`. XStore keeps its swatches in its own core plugin, which this list does not read. A term the plugin has translated without its swatch has none on that language's page.
 
 **The category filter** is set on the Search Config tab (`category_filter`: `all`, `main` or `nested`; `category_filter_depth`). `Facet_Config` then hands the `categories` filter a `tree`, the levels to show and each category's parent by name, read from `product_cat` and `category`, and `arrangeTree()` in `src/utils/facets.js` draws it. A search answers with names, so two categories of one name are one value, a main one if either is. The indexer writes every ancestor of a post's categories, so picking a main category finds what is in its subcategories.
 

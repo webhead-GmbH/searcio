@@ -38,7 +38,7 @@ final class Facet_Config {
 	public function __construct(
 		private Settings_Manager $settings,
 		private Index_Config $index_config,
-		private Woo $woo
+		private Swatch_Reader $swatches
 	) {}
 
 	/**
@@ -88,7 +88,7 @@ final class Facet_Config {
 
 		foreach ( $fields as $order => $field ) {
 			$taxonomy = $taxonomies[ $field ] ?? '';
-			$swatches = '' === $taxonomy ? new Attribute_Swatches() : $this->woo->attribute_swatches( $taxonomy );
+			$swatches = '' === $taxonomy ? new Attribute_Swatches() : $this->swatches->read( $taxonomy );
 			$display  = Facet_Display::from_storage(
 				apply_filters( 'webhead_search_cloud/storefront/facet_display', $swatches->display->value, $field )
 			);

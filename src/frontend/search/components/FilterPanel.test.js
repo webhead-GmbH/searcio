@@ -170,6 +170,20 @@ describe( 'FilterPanel', () => {
 		expect( container.querySelector( '.whsc-swatch__dot' ) ).toBeNull();
 	} );
 
+	it( 'draws an empty ring for a value the shop has not given a swatch yet', () => {
+		render( {
+			field: 'attr_material',
+			label: 'Material',
+			display: 'image',
+			values: [ { value: 'Leinen', count: 3 }, { value: 'Seide', count: 1 } ],
+			images: { Leinen: 'https://shop.test/leinen.jpg' },
+		} );
+
+		expect( container.querySelectorAll( '.whsc-swatch img' ) ).toHaveLength( 1 );
+		expect( container.querySelectorAll( '.whsc-swatch__dot' ) ).toHaveLength( 1 );
+		expect( container.querySelector( '.whsc-swatch__dot' ).style.getPropertyValue( '--whsc-dot' ) ).toBe( '' );
+	} );
+
 	it( 'shows a shop\'s short label on a tile, and filters by the value', () => {
 		const onToggle = jest.fn();
 

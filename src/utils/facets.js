@@ -567,8 +567,9 @@ export const freezeValueOrder = ( values, counts, selected, { natural = false, l
  * How a group's values are drawn, when the site has not said: `color` when
  * every value has a colour, `image` when every value has an image, `tiles`
  * when every value is a size, a number or a capacity, `list` otherwise. A
- * display the site set wins, except `color` without colours and `image`
- * without images, which are a list.
+ * display the site set wins: `color` and `image` as soon as one value has
+ * one, since the shop asked for swatches and a value still without one is
+ * drawn empty, and a list when none has.
  *
  * @param {string} field
  * @param {string[]} values
@@ -577,17 +578,17 @@ export const freezeValueOrder = ( values, counts, selected, { natural = false, l
  */
 export const detectFacetDisplay = ( field, values, config = {} ) => {
 	const list = ( values || [] ).filter( ( value ) => '' !== String( value ?? '' ).trim() );
-	const hasEvery = ( map ) => list.length > 0 && list.every( ( value ) => 'string' === typeof map?.[ value ] && '' !== map[ value ] );
-	const everyColored = hasEvery( config?.colors );
-	const everyImaged = hasEvery( config?.images );
+	const has = ( map, value ) => 'string' === typeof map?.[ value ] && '' !== map[ value ];
+	const everyColored = list.length > 0 && list.every( ( value ) => has( config?.colors, value ) );
+	const everyImaged = list.length > 0 && list.every( ( value ) => has( config?.images, value ) );
 	const set = String( config?.display || 'auto' );
 
 	if ( 'color' === set ) {
-		return everyColored ? 'color' : 'list';
+		return list.some( ( value ) => has( config?.colors, value ) ) ? 'color' : 'list';
 	}
 
 	if ( 'image' === set ) {
-		return everyImaged ? 'image' : 'list';
+		return list.some( ( value ) => has( config?.images, value ) ) ? 'image' : 'list';
 	}
 
 	if ( [ 'list', 'tiles', 'range' ].includes( set ) ) {

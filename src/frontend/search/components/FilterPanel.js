@@ -182,9 +182,9 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 						<li className="whsc-swatches__item" key={ entry.value }>
 							<label className={ `whsc-facet whsc-swatch${ entry.selected ? ' is-active' : '' }${ entry.disabled ? ' is-empty' : '' }` }>
 								<Checkbox field={ field } entry={ entry } onToggle={ onToggle } className="whsc-hidden-input" />
-								{ 'image' === display
+								{ 'image' === display && images[ entry.value ]
 									? <img className="whsc-swatch__image" src={ images[ entry.value ] } alt="" loading="lazy" />
-									: <span className="whsc-swatch__dot" style={ { '--whsc-dot': dot( entry.value ) } } /> }
+									: <span className="whsc-swatch__dot" style={ 'color' === display && colors[ entry.value ] ? { '--whsc-dot': dot( entry.value ) } : undefined } /> }
 								<span className="whsc-facet__label"><bdi>{ entry.value }</bdi></span>
 								{ count( entry ) }
 							</label>

@@ -603,7 +603,13 @@ describe( 'detectFacetDisplay with images', () => {
 
 	it( 'draws a list when a value has none', () => {
 		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Seide' ], { images } ) ).toBe( 'list' );
-		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Seide' ], { display: 'image', images } ) ).toBe( 'list' );
+		expect( detectFacetDisplay( 'attr_material', [ 'Seide' ], { display: 'image', images } ) ).toBe( 'list' );
+	} );
+
+	it( 'draws the swatches a shop asked for where only some values have one', () => {
+		expect( detectFacetDisplay( 'attr_material', [ 'Leinen', 'Seide' ], { display: 'image', images } ) ).toBe( 'image' );
+		expect( detectFacetDisplay( 'attr_color', [ 'Oliv', 'Sand' ], { display: 'color', colors: { Oliv: '#6f7a3a' } } ) ).toBe( 'color' );
+		expect( detectFacetDisplay( 'attr_color', [ 'Oliv', 'Sand' ], { colors: { Oliv: '#6f7a3a' } } ) ).toBe( 'list' );
 	} );
 
 	it( 'prefers colours where a value has both', () => {

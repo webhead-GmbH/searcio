@@ -3905,7 +3905,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	width: 16px;
 	height: 16px;
 	border-radius: 50%;
-	background: var(--whsc-dot);
+	/* A value the shop has not given a swatch yet is an empty ring. */
+	background: var(--whsc-dot, transparent);
 	box-shadow: inset 0 0 0 1px var(--whsc-swatch-border, rgba(0, 0, 0, 0.2));
 }
 
