@@ -154,13 +154,14 @@ final class Site_Placement_Test extends Integration_Test_Case {
 	public function test_the_floating_button_is_the_site_trigger_when_it_is_on(): void {
 		$this->skip_without_a_build();
 		$this->config()->save( [ 'floating' => [ 'enabled' => true, 'position' => 'start', 'offset' => 72, 'style' => 'label' ] ] );
+		$this->reset_styles();
 		$this->plugin()->get_assets()->enqueue( Frontend_Config::ENTRY );
 
 		$html = $this->site_trigger();
 
 		$this->assertStringContainsString( 'data-whsc-site="floating" data-floating="label"', $html );
 		$this->assertStringContainsString( 'whsc-trigger--floating whsc-floating--start whsc-floating--phones', $html );
-		$this->assertStringContainsString( '--whsc-floating-offset:72px', $html );
+		$this->assertStringContainsString( '--whsc-floating-offset:72px', $this->inline_styles() );
 	}
 
 	public function test_a_page_that_does_not_load_the_search_ends_without_a_trigger(): void {

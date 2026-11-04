@@ -72,7 +72,7 @@ final class Attribute_Value {
 			return '';
 		}
 
-		$text = trim( (string) preg_replace( '/\s+/u', ' ', strip_tags( (string) $value ) ) );
+		$text = trim( (string) preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $value ) ) );
 
 		return mb_substr( $text, 0, $length );
 	}

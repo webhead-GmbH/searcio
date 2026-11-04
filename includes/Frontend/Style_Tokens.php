@@ -196,15 +196,16 @@ final class Style_Tokens {
 	}
 
 	/**
-	 * A `<style>` element that sets the declarations on one instance class, or
-	 * nothing when the instance has no class or sets nothing.
+	 * The rule that sets the declarations on one instance class, or nothing
+	 * when the instance has no class or sets nothing. It is printed through
+	 * {@see Inline_Styles}.
 	 *
 	 * The search window is drawn in `body`, outside the trigger, so it takes the
 	 * properties from the same class copied onto it, not by inheritance.
 	 *
 	 * @param  array<string,mixed>  $attributes
 	 */
-	public static function style_element( string $instance_class, array $attributes ): string {
+	public static function rule( string $instance_class, array $attributes ): string {
 		$instance_class = (string) preg_replace( '/[^a-zA-Z0-9_-]/', '', $instance_class );
 		$declarations   = self::declarations( $attributes );
 
@@ -212,6 +213,6 @@ final class Style_Tokens {
 			return '';
 		}
 
-		return sprintf( '<style>.%1$s{%2$s}</style>', $instance_class, $declarations );
+		return sprintf( '.%1$s{%2$s}', $instance_class, $declarations );
 	}
 }

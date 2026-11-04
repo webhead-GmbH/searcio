@@ -1,8 +1,7 @@
 /**
  * The Searcio logo the search window ends with, linked to searcio.com: small,
- * at the end of the last line, below everything the window holds. A Free plan
- * always shows it; on any other plan Support Searcio decides, and it is on
- * until the shop turns it off.
+ * at the end of the last line, below everything the window holds, once the
+ * shop turns Support Searcio on, on any plan. Off until then.
  *
  * Runs on the desktop and mobile projects.
  */
@@ -63,9 +62,13 @@ test.describe( 'The Searcio logo in the search window', () => {
 		await configureSearchKey( requestUtils );
 	} );
 
+	test.beforeEach( async ( { requestUtils } ) => {
+		await setSupport( requestUtils, true );
+	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		setPlanTier( 'clear' );
-		await setSupport( requestUtils, true );
+		await setSupport( requestUtils, false );
 	} );
 
 	test( 'ends the window, small, in its corner, and links to Searcio in a new tab', async ( { page, requestUtils } ) => {
@@ -140,7 +143,7 @@ test.describe( 'The Searcio logo in the search window', () => {
 		await expect( widget.modal.locator( '.whsc-credit' ) ).toHaveCount( 0 );
 	} );
 
-	test( 'a Free plan shows it even with Support Searcio off', async ( { page, requestUtils } ) => {
+	test( 'a Free plan that left Support Searcio off shows none either', async ( { page, requestUtils } ) => {
 		setPlanTier( 'free' );
 		await setSupport( requestUtils, false );
 		await mockSearchCloud( page );
@@ -149,7 +152,8 @@ test.describe( 'The Searcio logo in the search window', () => {
 		const widget = new SearchWidget( page );
 		await widget.openModal();
 
-		await expect( widget.modal.getByRole( 'link', { name: 'Search by Searcio (opens in a new tab)' } ) ).toBeVisible();
+		await expect( widget.modal ).toBeVisible();
+		await expect( widget.modal.locator( '.whsc-credit' ) ).toHaveCount( 0 );
 	} );
 
 	test( 'sits at the left end in a right-to-left page', async ( { page, requestUtils } ) => {

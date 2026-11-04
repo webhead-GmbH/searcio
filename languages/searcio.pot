@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-04T07:07:53+00:00\n"
+"POT-Creation-Date: 2026-11-04T10:07:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: searcio\n"
@@ -51,7 +51,7 @@ msgstr ""
 
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:161
-#: includes/Frontend/Frontend_Config.php:191
+#: includes/Frontend/Frontend_Config.php:183
 #: src/admin/settings/components/tabs/PlacementTab.js:910
 #: src/frontend/search/components/SearchInput.js:33
 #: src/frontend/search/components/SearchModal.js:1732
@@ -264,7 +264,7 @@ msgid "Placeholder text"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:153
-#: includes/Frontend/Frontend_Config.php:176
+#: includes/Frontend/Frontend_Config.php:168
 #: src/blocks/search/edit.js:127
 msgid "Search…"
 msgstr ""
@@ -1374,69 +1374,69 @@ msgstr ""
 msgid "Dot color (active)"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:177
+#: includes/Frontend/Frontend_Config.php:169
 #: src/frontend/search/components/SearchModal.js:1567
 #: src/frontend/search/components/SearchModal.js:1983
 msgid "No results found."
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:178
+#: includes/Frontend/Frontend_Config.php:170
 #: src/frontend/search/components/SearchModal.js:1968
 msgid "Searching…"
 msgstr ""
 
 #. translators: shown before a variable product's lowest price, e.g. "from €42".
-#: includes/Frontend/Frontend_Config.php:180
+#: includes/Frontend/Frontend_Config.php:172
 msgctxt "variable product price prefix"
 msgid "from"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:181
+#: includes/Frontend/Frontend_Config.php:173
 #: src/frontend/search/components/templates.js:116
 msgid "Sale"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:182
+#: includes/Frontend/Frontend_Config.php:174
 #: src/frontend/search/components/SearchModal.js:754
 #: src/frontend/search/components/SearchModal.js:1300
 msgid "Search is unavailable right now."
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:183
+#: includes/Frontend/Frontend_Config.php:175
 #: src/frontend/search/components/Browse.js:85
 msgid "Recent searches"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:184
+#: includes/Frontend/Frontend_Config.php:176
 #: src/admin/settings/components/tabs/SearchConfigTab.js:231
 #: src/admin/settings/components/tabs/SearchConfigTab.js:239
 #: src/frontend/search/components/Browse.js:118
 msgid "Popular searches"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:185
+#: includes/Frontend/Frontend_Config.php:177
 #: src/frontend/search/components/SearchInput.js:53
 msgid "Clear"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:186
+#: includes/Frontend/Frontend_Config.php:178
 #: src/frontend/search/components/SearchModal.js:1807
 #: src/frontend/search/components/SearchModal.js:1861
 msgid "Close search"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:187
+#: includes/Frontend/Frontend_Config.php:179
 #: src/frontend/search/components/SearchModal.js:1848
 msgid "Search by voice"
 msgstr ""
 
-#: includes/Frontend/Frontend_Config.php:188
+#: includes/Frontend/Frontend_Config.php:180
 #: src/frontend/search/components/FilterBar.js:151
 msgid "All"
 msgstr ""
 
 #. translators: %s: the name of the search service, "Searcio".
-#: includes/Frontend/Frontend_Config.php:190
+#: includes/Frontend/Frontend_Config.php:182
 #, php-format
 msgid "Search by %s (opens in a new tab)"
 msgstr ""
@@ -1612,47 +1612,47 @@ msgstr ""
 msgid "You must accept the Terms of Service and Privacy Policy to connect."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:154
+#: includes/Routing/Connection_Endpoint.php:156
 msgid "Could not reach Searcio. Try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:161
+#: includes/Routing/Connection_Endpoint.php:163
 msgid "Could not disconnect from Searcio. Try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:188
-#: includes/Routing/Connection_Endpoint.php:265
+#: includes/Routing/Connection_Endpoint.php:190
+#: includes/Routing/Connection_Endpoint.php:267
 #: includes/Routing/Search_Config_Endpoint.php:76
 msgid "Could not reach Searcio."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:315
+#: includes/Routing/Connection_Endpoint.php:317
 msgid "This domain is already connected. Log into the Searcio dashboard to retrieve your keys and paste them below."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:319
+#: includes/Routing/Connection_Endpoint.php:321
 msgid "Too many connect attempts. Wait a while and try again."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:323
+#: includes/Routing/Connection_Endpoint.php:325
 msgid "Searcio cannot provision new accounts right now. Try again later."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:331
-#: includes/Routing/Connection_Endpoint.php:370
+#: includes/Routing/Connection_Endpoint.php:333
+#: includes/Routing/Connection_Endpoint.php:372
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:25
 msgid "Connection failed."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:367
+#: includes/Routing/Connection_Endpoint.php:369
 msgid "Invalid write credentials. Check the write key and secret."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:368
+#: includes/Routing/Connection_Endpoint.php:370
 msgid "Site is disabled in Searcio."
 msgstr ""
 
-#: includes/Routing/Connection_Endpoint.php:369
+#: includes/Routing/Connection_Endpoint.php:371
 msgid "No site found for these credentials."
 msgstr ""
 
@@ -1687,31 +1687,27 @@ msgstr ""
 msgid "That action is not available for the current run state."
 msgstr ""
 
-#: includes/Routing/Verify_Endpoint.php:69
-msgid "Missing verification token."
-msgstr ""
-
-#: includes/Routing/Verify_Endpoint.php:74
-msgid "No verification is in progress."
-msgstr ""
-
-#: includes/Routing/Verify_Endpoint.php:80
+#: includes/Routing/Verify_Endpoint.php:59
 msgid "Not connected."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:344
+#: includes/Routing/Verify_Endpoint.php:78
+msgid "No verification is in progress."
+msgstr ""
+
+#: includes/Settings/Plugin_Settings.php:361
 msgid "Keep history for (days)"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:345
+#: includes/Settings/Plugin_Settings.php:362
 msgid "How long finished sync runs are kept. Use 0 to keep them forever."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:348
+#: includes/Settings/Plugin_Settings.php:365
 msgid "Delete plugin data on uninstall"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:349
+#: includes/Settings/Plugin_Settings.php:366
 msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio."
 msgstr ""
 
@@ -3569,25 +3565,16 @@ msgstr ""
 msgid "No settings are registered for this tab yet."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:31
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:26
 msgid "Support Searcio"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:34
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:29
 msgid "Shows the Searcio logo, small in the bottom corner of the search window, linked to searcio.com."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:45
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:40
 msgid "Show the Searcio logo in the search window"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:47
-msgid "The Free plan always shows it. On a paid plan you can turn it off."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:62
-#: src/admin/settings/upgradeAction.js:25
-msgid "Upgrade plan"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SyncHistory.js:45
@@ -3860,6 +3847,10 @@ msgstr ""
 
 #: src/admin/settings/syncStatus.js:13
 msgid "Cancelled"
+msgstr ""
+
+#: src/admin/settings/upgradeAction.js:25
+msgid "Upgrade plan"
 msgstr ""
 
 #: src/blocks/products/edit.js:27

@@ -357,7 +357,7 @@ final class Plugin extends Base_Plugin {
 			}
 		);
 		// Shared: the settings are read once a request, and two placements
-		// that look the same share one `<style>`.
+		// that look the same share one style.
 		$container->addShared(
 			'placement_config',
 			static function () use ( $container ): Placement_Config {

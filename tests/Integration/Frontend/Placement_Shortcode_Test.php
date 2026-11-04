@@ -60,9 +60,10 @@ final class Placement_Shortcode_Test extends Integration_Test_Case {
 	}
 
 	public function test_a_width_and_colours_are_set_on_the_trigger_alone(): void {
+		$this->reset_styles();
 		$html = do_shortcode( '[searcio mode="box" width="288" accent="#123abc" class="my-search two"]' );
 
-		$this->assertMatchesRegularExpression( '/<style>\.whsc-instance-p[0-9a-f]{8}\{[^}]*--whsc-accent:#123abc[^}]*--whsc-trigger-box-width:288px/', $html );
+		$this->assertMatchesRegularExpression( '/^\.whsc-instance-p[0-9a-f]{8}\{[^}]*--whsc-accent:#123abc[^}]*--whsc-trigger-box-width:288px/', $this->inline_styles() );
 		$this->assertStringContainsString( 'whsc-trigger--box my-search two', $html );
 	}
 

@@ -17,7 +17,6 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Frontend;
 
-use Webhead\WP\SearchCloud\Enums\Plan_Tier;
 use Webhead\WP\SearchCloud\DTO\Storefront_Facet;
 use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
@@ -107,20 +106,13 @@ final class Frontend_Config {
 
 	/**
 	 * The Searcio logo the search window shows in its bottom corner, linked to
-	 * searcio.com, or null when it shows none. A Free plan always shows it;
-	 * on any other plan, or before the plan is known, Support Searcio decides,
-	 * and it is on until the shop turns it off.
+	 * searcio.com, or null when it shows none: only when the shop turned
+	 * Support Searcio on, whatever its plan.
 	 *
 	 * @return array{url:string}|null
 	 */
 	private function credit(): ?array {
-		$tier = Plan_Tier::tryFrom( (string) $this->settings->get( Plugin_Settings::PLAN_TIER ) );
-
-		if ( Plan_Tier::Free !== $tier && ! (bool) $this->settings->get( Plugin_Settings::SUPPORT_SEARCIO ) ) {
-			return null;
-		}
-
-		return [ 'url' => 'https://searcio.com/' ];
+		return (bool) $this->settings->get( Plugin_Settings::SUPPORT_SEARCIO ) ? [ 'url' => 'https://searcio.com/' ] : null;
 	}
 
 	/**

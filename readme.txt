@@ -72,7 +72,7 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 
 = Support Searcio =
 
-A small Searcio logo, linked to searcio.com, sits at the bottom of the search window. It is always shown on the Free plan; on a paid plan you can turn it off under Searcio > General.
+If you would like to support Searcio, you can show a small Searcio logo, linked to searcio.com, at the bottom of the search window. It is off unless you turn it on under Searcio > General, on every plan.
 
 👉 Rate us on [WordPress](https://wordpress.org/support/plugin/searcio/reviews/#new-post)
 
@@ -182,6 +182,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- Support Searcio, the small logo in the search window, is off unless you turn it on, on every plan. If you had turned it on, it stays on.
 - The plugin's settings page, blocks, widgets and everything it stores are named "searcio" now; the settings page is at `admin.php?page=searcio`. Your settings, sync history and connection move by themselves on the first page load after the update, and nothing has to be set up again. A theme or a snippet that uses the plugin's hooks, REST routes or CSS classes under the old name "webhead-search-cloud" should switch to "searcio": the old hooks still work for now, with a notice for developers.
 - New: a Search statistics button in the settings header, and a link on the Connection tab, open your search statistics on the Searcio dashboard.
 - New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.

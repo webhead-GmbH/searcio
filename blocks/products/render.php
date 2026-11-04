@@ -16,7 +16,7 @@ use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
 
 defined( 'ABSPATH' ) || exit;
 
-$markup = Product_List_Markup::render(
+$searcio_markup = Product_List_Markup::render(
 	[
 		'source'      => $attributes['source'] ?? 'similar',
 		'documentId'  => $attributes['documentId'] ?? '',
@@ -33,7 +33,7 @@ $markup = Product_List_Markup::render(
 
 // Renders nothing on a page with no product and no category to work from, so
 // only enqueue the front-end bundle when there is actually a row to hydrate.
-if ( '' === $markup ) {
+if ( '' === $searcio_markup ) {
 	return;
 }
 
@@ -46,5 +46,5 @@ Plugin::instance()?->get_assets()->enqueue( Frontend_Config::ENTRY );
 printf(
 	'<div %1$s>%2$s</div>',
 	wp_kses_data( get_block_wrapper_attributes( [ 'class' => 'searcio-products-block' ] ) ),
-	$markup // phpcs:ignore -- markup is escaped inside Product_List_Markup::render().
+	$searcio_markup // phpcs:ignore -- markup is escaped inside Product_List_Markup::render().
 );

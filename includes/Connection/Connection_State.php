@@ -48,12 +48,40 @@ final class Connection_State {
 	}
 
 	/**
-	 * Open the window in which the public `/verify` route will answer. Called
-	 * when this site asks Searcio to connect it, because the ownership
-	 * ping that follows is the only caller that route exists for.
+	 * Open the window in which the public `/verify` route will answer, and
+	 * return the one-time code its URL carries. Called when this site asks
+	 * Searcio to connect it, because the ownership ping that follows is the
+	 * only caller that route exists for, and Searcio is the only one told the
+	 * code. A retry while the window is open keeps the code, since Searcio may
+	 * answer it with the claim, and the `verify_url`, of the first attempt.
 	 */
-	public function open_verification_window(): void {
+	public function open_verification_window(): string {
+		$code = (string) $this->settings->get( Plugin_Settings::VERIFICATION_CODE );
+
+		if ( '' === $code || ! $this->verification_window_is_open() ) {
+			$code = wp_generate_password( 32, false );
+		}
+
+		$this->settings->set( Plugin_Settings::VERIFICATION_CODE, $code );
 		$this->settings->set( Plugin_Settings::VERIFICATION_OPENED_AT, time() );
+
+		return $code;
+	}
+
+	/**
+	 * Whether a code is the one this site sent with its last connection
+	 * attempt, while that attempt can still be answered.
+	 */
+	public function verification_code_matches( string $code ): bool {
+		$expected = (string) $this->settings->get( Plugin_Settings::VERIFICATION_CODE );
+
+		return '' !== $expected && $this->verification_window_is_open() && hash_equals( $expected, $code );
+	}
+
+	/** The ping was answered: the code is spent and the route is shut. */
+	public function close_verification_window(): void {
+		$this->settings->set( Plugin_Settings::VERIFICATION_CODE, '' );
+		$this->settings->set( Plugin_Settings::VERIFICATION_OPENED_AT, 0 );
 	}
 
 	/**
