@@ -21,7 +21,7 @@ msgstr "https://wordpress.org/plugins/searcio/"
 
 #. Description of the plugin
 #: searcio.php
-#: includes/Admin/Settings_Page.php:117
+#: includes/Admin/Settings_Page.php:118
 msgid "Connect WordPress and WooCommerce to Searcio."
 msgstr "Łączy WordPress i WooCommerce z Searcio."
 
@@ -36,11 +36,11 @@ msgid "https://webhead.at"
 msgstr "https://webhead.at"
 
 #: includes/Admin/Menu_Item.php:35
-#: includes/Admin/Settings_Page.php:35
-#: includes/Admin/Settings_Page.php:39
-#: includes/Admin/Settings_Page.php:116
+#: includes/Admin/Settings_Page.php:36
+#: includes/Admin/Settings_Page.php:40
+#: includes/Admin/Settings_Page.php:117
 #: includes/Plugin.php:476
-#: src/admin/settings/components/SettingsPanel.js:199
+#: src/admin/settings/components/SettingsPanel.js:204
 msgid "Searcio"
 msgstr "Searcio"
 
@@ -1610,38 +1610,38 @@ msgid "Could not disconnect from Searcio. Try again."
 msgstr "Nie udało się odłączyć od Searcio. Spróbuj ponownie."
 
 #: includes/Routing/Connection_Endpoint.php:188
-#: includes/Routing/Connection_Endpoint.php:249
+#: includes/Routing/Connection_Endpoint.php:265
 #: includes/Routing/Search_Config_Endpoint.php:76
 msgid "Could not reach Searcio."
 msgstr "Nie udało się połączyć z Searcio."
 
-#: includes/Routing/Connection_Endpoint.php:299
+#: includes/Routing/Connection_Endpoint.php:315
 msgid "This domain is already connected. Log into the Searcio dashboard to retrieve your keys and paste them below."
 msgstr "Ta domena jest już połączona. Zaloguj się do panelu Searcio, aby pobrać swoje klucze, i wklej je poniżej."
 
-#: includes/Routing/Connection_Endpoint.php:303
+#: includes/Routing/Connection_Endpoint.php:319
 msgid "Too many connect attempts. Wait a while and try again."
 msgstr "Zbyt wiele prób połączenia. Odczekaj chwilę i spróbuj ponownie."
 
-#: includes/Routing/Connection_Endpoint.php:307
+#: includes/Routing/Connection_Endpoint.php:323
 msgid "Searcio cannot provision new accounts right now. Try again later."
 msgstr "Searcio nie może teraz tworzyć nowych kont. Spróbuj ponownie później."
 
-#: includes/Routing/Connection_Endpoint.php:315
-#: includes/Routing/Connection_Endpoint.php:354
+#: includes/Routing/Connection_Endpoint.php:331
+#: includes/Routing/Connection_Endpoint.php:370
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:25
 msgid "Connection failed."
 msgstr "Połączenie nie powiodło się."
 
-#: includes/Routing/Connection_Endpoint.php:351
+#: includes/Routing/Connection_Endpoint.php:367
 msgid "Invalid write credentials. Check the write key and secret."
 msgstr "Nieprawidłowe dane uwierzytelniające zapisu. Sprawdź klucz zapisu i sekret."
 
-#: includes/Routing/Connection_Endpoint.php:352
+#: includes/Routing/Connection_Endpoint.php:368
 msgid "Site is disabled in Searcio."
 msgstr "Witryna jest wyłączona w Searcio."
 
-#: includes/Routing/Connection_Endpoint.php:353
+#: includes/Routing/Connection_Endpoint.php:369
 msgid "No site found for these credentials."
 msgstr "Nie znaleziono witryny dla tych danych uwierzytelniających."
 
@@ -1875,57 +1875,57 @@ msgstr "Synchronizacja anulowana."
 msgid "There is no active sync."
 msgstr "Brak aktywnej synchronizacji."
 
-#: src/admin/settings/components/SettingsPanel.js:101
+#: src/admin/settings/components/SettingsPanel.js:106
 #: src/admin/settings/components/tabs/SyncTab.js:184
 msgid "Sync"
 msgstr "Synchronizacja"
 
-#: src/admin/settings/components/SettingsPanel.js:106
+#: src/admin/settings/components/SettingsPanel.js:111
 msgid "Indexing"
 msgstr "Indeksowanie"
 
-#: src/admin/settings/components/SettingsPanel.js:110
+#: src/admin/settings/components/SettingsPanel.js:115
 msgid "Search Config"
 msgstr "Konfiguracja wyszukiwania"
 
-#: src/admin/settings/components/SettingsPanel.js:114
+#: src/admin/settings/components/SettingsPanel.js:119
 #: src/admin/settings/components/tabs/PlacementTab.js:927
 msgid "Placement"
 msgstr "Osadzanie"
 
-#: src/admin/settings/components/SettingsPanel.js:118
+#: src/admin/settings/components/SettingsPanel.js:123
 msgid "Connection"
 msgstr "Połączenie"
 
 #. translators: %s: reason the settings request failed.
-#: src/admin/settings/components/SettingsPanel.js:163
-#: src/admin/settings/components/SettingsPanel.js:229
+#: src/admin/settings/components/SettingsPanel.js:168
+#: src/admin/settings/components/SettingsPanel.js:234
 #, js-format
 msgid "The settings could not be loaded: %s"
 msgstr "Nie udało się wczytać ustawień: %s"
 
 #. translators: %s: reason the settings could not be saved, as reported by the REST API.
-#: src/admin/settings/components/SettingsPanel.js:168
-#: src/admin/settings/components/SettingsPanel.js:331
+#: src/admin/settings/components/SettingsPanel.js:173
+#: src/admin/settings/components/SettingsPanel.js:336
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:93
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:151
 #, js-format
 msgid "The settings could not be saved: %s"
 msgstr "Nie udało się zapisać ustawień: %s"
 
-#: src/admin/settings/components/SettingsPanel.js:181
+#: src/admin/settings/components/SettingsPanel.js:186
 msgid "Settings saved successfully."
 msgstr "Ustawienia zostały zapisane."
 
-#: src/admin/settings/components/SettingsPanel.js:186
+#: src/admin/settings/components/SettingsPanel.js:191
 msgid "Saving..."
 msgstr "Zapisywanie..."
 
-#: src/admin/settings/components/SettingsPanel.js:187
+#: src/admin/settings/components/SettingsPanel.js:192
 msgid "Save Settings"
 msgstr "Zapisz ustawienia"
 
-#: src/admin/settings/components/SettingsPanel.js:189
+#: src/admin/settings/components/SettingsPanel.js:194
 #: src/admin/settings/components/tabs/IndexingTab.js:574
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:87
 #: src/admin/settings/components/tabs/PlacementTab.js:333
@@ -1933,11 +1933,11 @@ msgstr "Zapisz ustawienia"
 msgid "No unsaved changes."
 msgstr "Brak niezapisanych zmian."
 
-#: src/admin/settings/components/SettingsPanel.js:200
+#: src/admin/settings/components/SettingsPanel.js:205
 msgid "Configure the plugin settings from one shared admin surface."
 msgstr "Konfiguruj ustawienia wtyczki w jednym wspólnym miejscu panelu administracyjnego."
 
-#: src/admin/settings/components/SettingsPanel.js:235
+#: src/admin/settings/components/SettingsPanel.js:240
 #: src/admin/settings/components/tabs/IndexingTab.js:561
 #: src/admin/settings/components/tabs/PlacementTab.js:278
 #: src/admin/settings/components/tabs/SearchConfigTab.js:759
@@ -4646,3 +4646,11 @@ msgstr "Dowolna (LUB)"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:929
 msgid "All (AND)"
 msgstr "Wszystkie (I)"
+
+#: src/admin/settings/statisticsAction.js:23
+msgid "Search statistics"
+msgstr "Statystyki wyszukiwania"
+
+#: src/admin/settings/components/tabs/UsageCard.js:123
+msgid "See what visitors searched for"
+msgstr "Zobacz, czego szukali odwiedzający"

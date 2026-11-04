@@ -100,6 +100,27 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 'free', $this->settings()->get( Plugin_Settings::PLAN_TIER ) );
 	}
 
+	/**
+	 * The header's "Search statistics" goes to the site's statistics page when
+	 * Searcio names it, and to the dashboard's sign-in when it does not: the
+	 * page sits under the owner's team, which the plugin does not know.
+	 */
+	public function test_test_connection_says_where_the_search_statistics_are(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected', 'statistics_url' => 'https://searcio.test/acme/sites/7' ] ] ) );
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) )->get_data();
+
+		$this->assertSame( 'https://searcio.test/acme/sites/7', $data['statistics_url'] );
+
+		remove_all_filters( 'pre_http_request' );
+		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected', 'statistics_url' => 'javascript:alert(1)' ] ] ) );
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) )->get_data();
+
+		$this->assertSame( untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/login', $data['statistics_url'] );
+	}
+
 	public function test_test_connection_surfaces_every_metered_allowance_not_just_documents(): void {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok(

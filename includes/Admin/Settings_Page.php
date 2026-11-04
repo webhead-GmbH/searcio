@@ -11,6 +11,7 @@ namespace Webhead\WP\SearchCloud\Admin;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Routing\Connection_Endpoint;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Admin\Page;
 
 defined( 'ABSPATH' ) || exit;
@@ -122,10 +123,13 @@ final class Settings_Page extends Page {
 				// The tier last seen, so the Support Searcio card can say at once
 				// whether a Free plan keeps the logo on. The card asks Searcio
 				// again as the page opens.
-				'planTier'     => $this->connection_state->plan_tier()?->value ?? '',
-				'isConnected'  => $this->client->is_configured(),
-				'pendingClaim' => $pending,
-				'defaults'     => [
+				'planTier'      => $this->connection_state->plan_tier()?->value ?? '',
+				'isConnected'   => $this->client->is_configured(),
+				'pendingClaim'  => $pending,
+				// The header offers the statistics at once, at the dashboard, and
+				// at the site's own page once the health check has named it.
+				'statisticsUrl' => $this->client->is_configured() ? Connection_Endpoint::statistics_url( null ) : '',
+				'defaults'      => [
 					'email' => (string) get_option( 'admin_email' ),
 				],
 			],

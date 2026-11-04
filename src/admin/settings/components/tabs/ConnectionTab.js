@@ -249,7 +249,7 @@ const ConnectionTab = () => {
 					{/* The same health response the notice above reads. A spent
 					    allowance is why a storefront stops returning results, so it
 					    belongs where an admin looks when search "breaks". */}
-					<UsageCard usage={connectedResult?.usage}/>
+					<UsageCard usage={connectedResult?.usage} statisticsUrl={connectedResult?.statistics_url}/>
 
 					<Stack direction="row" gap="sm" align="center" wrap="wrap">
 						<Button
