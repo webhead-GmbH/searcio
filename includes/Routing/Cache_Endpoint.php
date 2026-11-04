@@ -31,7 +31,7 @@ final class Cache_Endpoint extends Rest_API {
 	public function __construct( private Cache_Manager $cache_manager ) {}
 
 	protected function get_rest_namespace(): string {
-		return 'webhead-search-cloud/v1';
+		return 'searcio/v1';
 	}
 
 	#[Route( '/cache/clear', methods: 'POST', permission_callback: 'can_manage_settings' )]

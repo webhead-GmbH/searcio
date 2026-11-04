@@ -22,7 +22,7 @@ use WP_REST_Server;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Search_Config_Endpoint_Test extends Integration_Test_Case {
-	private const ROUTE = '/webhead-search-cloud/v1/search-config';
+	private const ROUTE = '/searcio/v1/search-config';
 
 	private WP_REST_Server $server;
 

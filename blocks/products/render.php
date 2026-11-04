@@ -45,6 +45,6 @@ Plugin::instance()?->get_assets()->enqueue( Frontend_Config::ENTRY );
 // which is the same contract the search block's trigger markup has.
 printf(
 	'<div %1$s>%2$s</div>',
-	wp_kses_data( get_block_wrapper_attributes( [ 'class' => 'webhead-search-cloud-products-block' ] ) ),
+	wp_kses_data( get_block_wrapper_attributes( [ 'class' => 'searcio-products-block' ] ) ),
 	$markup // phpcs:ignore -- markup is escaped inside Product_List_Markup::render().
 );

@@ -102,17 +102,17 @@ export default function SectionList( { sections, aliases = {}, label, className 
 			orientation={ narrow ? 'horizontal' : 'vertical' }
 			value={ current }
 			onValueChange={ ( value ) => setSection( value ) }
-			className={ `webhead-search-cloud-sections ${ className }`.trim() }
+			className={ `searcio-sections ${ className }`.trim() }
 		>
-			<Tabs.List aria-label={ label } className="webhead-search-cloud-sections__nav">
+			<Tabs.List aria-label={ label } className="searcio-sections__nav">
 				{ sections.map( ( item ) => (
-					<Tabs.Tab key={ item.id } value={ item.id } className="webhead-search-cloud-sections__tab">
-						<span className="webhead-search-cloud-sections__text">
-							<Text variant="heading-md" className="webhead-search-cloud-sections__label">
+					<Tabs.Tab key={ item.id } value={ item.id } className="searcio-sections__tab">
+						<span className="searcio-sections__text">
+							<Text variant="heading-md" className="searcio-sections__label">
 								{ item.label }
 							</Text>
 							{ ( item.summary || [] ).filter( Boolean ).map( ( line, index ) => (
-								<Text key={ index } variant="body-sm" className="webhead-search-cloud-sections__summary">
+								<Text key={ index } variant="body-sm" className="searcio-sections__summary">
 									{ line }
 								</Text>
 							) ) }
@@ -122,7 +122,7 @@ export default function SectionList( { sections, aliases = {}, label, className 
 			</Tabs.List>
 
 			{ sections.map( ( item ) => (
-				<Tabs.Panel key={ item.id } value={ item.id } className="webhead-search-cloud-sections__panel">
+				<Tabs.Panel key={ item.id } value={ item.id } className="searcio-sections__panel">
 					<Stack direction="column" gap="lg">
 						{ item.content }
 					</Stack>

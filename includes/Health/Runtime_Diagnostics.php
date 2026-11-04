@@ -35,7 +35,7 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.1.0
  */
 final class Runtime_Diagnostics {
-	public const SECTION_ID = 'webhead-search-cloud-runtime';
+	public const SECTION_ID = 'searcio-runtime';
 
 	public function __construct(
 		private Diagnostics_Manager $diagnostics_manager,

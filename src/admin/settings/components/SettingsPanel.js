@@ -23,7 +23,7 @@ import SearchConfigTab from './tabs/SearchConfigTab';
 import PlacementTab from './tabs/PlacementTab';
 import {useAnnounce} from '../../../utils/announce';
 
-const pluginData = window.webhead_search_cloudData || {};
+const pluginData = window.searcioData || {};
 
 const SYNC_TAB = 'sync';
 const INDEXING_TAB = 'indexing';
@@ -214,7 +214,7 @@ const SettingsPanel = () => {
 				// sections, so it is a skeleton until then rather than a set of
 				// tabs that grows after the page has settled.
 				<div className="settings-tabs settings-tabs--loading">
-					<div className="settings-tabs__list webhead-search-cloud-admin-page__tab-strip" aria-hidden="true">
+					<div className="settings-tabs__list searcio-admin-page__tab-strip" aria-hidden="true">
 						<Skeleton className="settings-tabs__tab-placeholder"/>
 						<Skeleton className="settings-tabs__tab-placeholder"/>
 						<Skeleton className="settings-tabs__tab-placeholder"/>

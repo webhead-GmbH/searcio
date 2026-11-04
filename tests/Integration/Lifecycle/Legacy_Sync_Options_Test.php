@@ -45,17 +45,17 @@ final class Legacy_Sync_Options_Test extends Integration_Test_Case {
 		// The list the cleanup was written against; a typo here or in the step
 		// would silently leave the option on real installs.
 		$expected = [
-			'webhead_search_cloud_discovery_status',
-			'webhead_search_cloud_discovered_products_count',
-			'webhead_search_cloud_queued_products_total',
-			'webhead_search_cloud_has_initial_sync_started',
-			'webhead_search_cloud_has_initial_sync_completed',
-			'webhead_search_cloud_last_full_sync_started_at',
-			'webhead_search_cloud_last_full_sync_completed_at',
-			'webhead_search_cloud_last_incremental_sync_run_at',
-			'webhead_search_cloud_last_sync_at',
-			'webhead_search_cloud_last_sync_status',
-			'webhead_search_cloud_sync_interval',
+			'searcio_discovery_status',
+			'searcio_discovered_products_count',
+			'searcio_queued_products_total',
+			'searcio_has_initial_sync_started',
+			'searcio_has_initial_sync_completed',
+			'searcio_last_full_sync_started_at',
+			'searcio_last_full_sync_completed_at',
+			'searcio_last_incremental_sync_run_at',
+			'searcio_last_sync_at',
+			'searcio_last_sync_status',
+			'searcio_sync_interval',
 		];
 
 		$this->assertSame( $expected, Delete_Legacy_Sync_Options::OPTIONS );
@@ -81,7 +81,7 @@ final class Legacy_Sync_Options_Test extends Integration_Test_Case {
 		$step->run();
 		$step->run();
 
-		$this->assertFalse( get_option( 'webhead_search_cloud_discovery_status' ) );
+		$this->assertFalse( get_option( 'searcio_discovery_status' ) );
 	}
 
 	public function test_the_step_leaves_live_options_alone(): void {
@@ -89,12 +89,12 @@ final class Legacy_Sync_Options_Test extends Integration_Test_Case {
 
 		// A live plugin option sharing the same prefix, plus the sync engine's
 		// own state keys: none of them may be caught by the cleanup.
-		update_option( 'webhead_search_cloud_search_key', 'sk_live' );
+		update_option( 'searcio_search_key', 'sk_live' );
 		update_option( Sync_Keys::OPTION_SNAPSHOT, [ 'post_1' ] );
 
 		( new Delete_Legacy_Sync_Options() )->run();
 
-		$this->assertSame( 'sk_live', get_option( 'webhead_search_cloud_search_key' ) );
+		$this->assertSame( 'sk_live', get_option( 'searcio_search_key' ) );
 		$this->assertSame( [ 'post_1' ], get_option( Sync_Keys::OPTION_SNAPSHOT ) );
 	}
 
@@ -124,9 +124,9 @@ final class Legacy_Sync_Options_Test extends Integration_Test_Case {
 
 		$cleanups = $this->plugin()->get_lifecycle_manager()->get_uninstall_manager()->all();
 
-		$this->assertArrayHasKey( 'webhead_search_cloud_legacy_options', $cleanups );
+		$this->assertArrayHasKey( 'searcio_legacy_options', $cleanups );
 
-		( $cleanups['webhead_search_cloud_legacy_options']['callback'] )();
+		( $cleanups['searcio_legacy_options']['callback'] )();
 
 		foreach ( Delete_Legacy_Sync_Options::option_keys() as $key ) {
 			$this->assertFalse( get_option( $key ), sprintf( 'Option [%s] survived uninstall cleanup.', $key ) );
@@ -169,17 +169,17 @@ final class Legacy_Sync_Options_Test extends Integration_Test_Case {
 		$blog_id = self::factory()->blog->create();
 
 		switch_to_blog( $blog_id );
-		update_option( 'webhead_search_cloud_discovery_status', 'running' );
+		update_option( 'searcio_discovery_status', 'running' );
 		restore_current_blog();
 
 		$this->seed_legacy_options();
 
 		( new Delete_Legacy_Sync_Options() )->run();
 
-		$this->assertFalse( get_option( 'webhead_search_cloud_discovery_status' ) );
+		$this->assertFalse( get_option( 'searcio_discovery_status' ) );
 
 		switch_to_blog( $blog_id );
-		$other_site_value = get_option( 'webhead_search_cloud_discovery_status' );
+		$other_site_value = get_option( 'searcio_discovery_status' );
 		restore_current_blog();
 
 		$this->assertSame( 'running', $other_site_value );

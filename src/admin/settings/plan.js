@@ -1,8 +1,8 @@
 import { useEffect, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 
-const pluginData = window.webhead_search_cloudData || {};
-const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
+const pluginData = window.searcioData || {};
+const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/searcio/v1/connection/test';
 
 // One health check per page load, however many places ask what it said.
 let asked = null;

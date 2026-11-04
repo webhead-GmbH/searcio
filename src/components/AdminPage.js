@@ -61,14 +61,14 @@ function HeaderActions( { actions } ) {
 
 	// Anything that is already an element is rendered as given.
 	if ( list.some( ( action ) => ! action || 'object' !== typeof action || ! ( 'label' in action ) ) ) {
-		return <div className="webhead-search-cloud-admin-page__actions">{ actions }</div>;
+		return <div className="searcio-admin-page__actions">{ actions }</div>;
 	}
 
 	const inline = list.slice( 0, HEADER_ACTION_LIMIT );
 	const overflow = list.slice( HEADER_ACTION_LIMIT );
 
 	return (
-		<div className="webhead-search-cloud-admin-page__actions">
+		<div className="searcio-admin-page__actions">
 			{ inline.map( ( action, index ) => (
 				<Button
 					__next40pxDefaultSize
@@ -79,12 +79,12 @@ function HeaderActions( { actions } ) {
 					// the difference, keyed to position.
 					variant="secondary"
 					className={ [
-						'webhead-search-cloud-admin-page__action',
-						`webhead-search-cloud-admin-page__action--${ 0 === index ? 'outline' : 'solid' }`,
+						'searcio-admin-page__action',
+						`searcio-admin-page__action--${ 0 === index ? 'outline' : 'solid' }`,
 						// The overflow menu honours `isDestructive`, so a header
 						// button that ignored it meant the same descriptor looked
 						// dangerous in third position and ordinary in first.
-						action.isDestructive ? 'webhead-search-cloud-admin-page__action--destructive' : '',
+						action.isDestructive ? 'searcio-admin-page__action--destructive' : '',
 					].filter( Boolean ).join( ' ' ) }
 					icon={ action.icon }
 					disabled={ action.disabled }
@@ -97,7 +97,7 @@ function HeaderActions( { actions } ) {
 
 			{ overflow.length > 0 && (
 				<Dropdown
-					className="webhead-search-cloud-admin-page__overflow"
+					className="searcio-admin-page__overflow"
 					popoverProps={ { placement: 'bottom-end' } }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
@@ -107,7 +107,7 @@ function HeaderActions( { actions } ) {
 							// for a control that is only a way in to the rest.
 							size="compact"
 							variant="tertiary"
-							className="webhead-search-cloud-admin-page__action webhead-search-cloud-admin-page__action--ghost"
+							className="searcio-admin-page__action searcio-admin-page__action--ghost"
 							icon={ moreVertical }
 							label={ __( 'More actions', 'searcio' ) }
 							aria-expanded={ isOpen }
@@ -149,22 +149,22 @@ function AdminPage( { title, description, icon = PageIcon, actions, tabbed = fal
 		// accent colours, card variants and badges to. The shell carries it so
 		// every screen receives them, and not only the one whose root element
 		// the stylesheet happens to name.
-		<div className={ `webhead-search-cloud-admin-page panel-container ${ className }`.trim() }>
-			<div className="webhead-search-cloud-admin-page__surface">
-				<motion.div className="webhead-search-cloud-admin-page__header" { ...headerMotion }>
-					<div className="webhead-search-cloud-admin-page__heading">
+		<div className={ `searcio-admin-page panel-container ${ className }`.trim() }>
+			<div className="searcio-admin-page__surface">
+				<motion.div className="searcio-admin-page__header" { ...headerMotion }>
+					<div className="searcio-admin-page__heading">
 						{ /* The icon is not optional. A header without one reads as a
 						     different plugin, so a page that passes none still gets a
 						     neutral default rather than an empty slot. */ }
-						<span className="webhead-search-cloud-admin-page__icon" aria-hidden="true">
+						<span className="searcio-admin-page__icon" aria-hidden="true">
 							<Icon icon={ icon } />
 						</span>
-						<div className="webhead-search-cloud-admin-page__titles">
-							<h1 className="webhead-search-cloud-admin-page__title">
+						<div className="searcio-admin-page__titles">
+							<h1 className="searcio-admin-page__title">
 								{ animateText( title ) }
 							</h1>
 							{ description ? (
-								<p className="webhead-search-cloud-admin-page__description">
+								<p className="searcio-admin-page__description">
 									{ animateText( description, 0.16 ) }
 								</p>
 							) : null }
@@ -174,8 +174,8 @@ function AdminPage( { title, description, icon = PageIcon, actions, tabbed = fal
 				</motion.div>
 				<motion.div
 					className={ [
-						'webhead-search-cloud-admin-page__content',
-						tabbed ? 'webhead-search-cloud-admin-page__content--tabbed' : '',
+						'searcio-admin-page__content',
+						tabbed ? 'searcio-admin-page__content--tabbed' : '',
 					].filter( Boolean ).join( ' ' ) }
 					{ ...contentMotion }
 				>

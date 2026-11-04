@@ -1,7 +1,7 @@
 /**
  * Pure helpers for scoping search by the visitor's current WPML/Polylang
  * language. Kept side-effect free and decoupled from
- * `window.webheadSearchCloudFrontend` so they're unit-testable - `api.js`
+ * `window.searcioFrontend` so they're unit-testable - `api.js`
  * supplies the live config values as plain arguments.
  */
 

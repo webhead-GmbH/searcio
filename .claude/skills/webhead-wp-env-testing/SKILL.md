@@ -35,7 +35,7 @@ npm run test:integration -- --filter Activation_Test
 2. Points `WP_TESTS_CONFIG_FILE_PATH` at `tests/Integration/wp-tests-config.php`, which reads the `WORDPRESS_DB_*` variables wp-env exports into the container.
 3. Requires `tests/Integration/bootstrap-extra.php` when it exists — your hook, see below.
 4. Registers the plugin's main file on `muplugins_loaded`, so it is active for every test.
-5. Captures the booted instance from the `webhead_search_cloud/after_load` action into `$GLOBALS['webhead_search_cloud_test_plugin']`.
+5. Captures the booted instance from the `searcio/after_load` action into `$GLOBALS['searcio_test_plugin']`.
 6. Boots WordPress, which drops and recreates every table in the test database.
 7. Calls `activate()` once, so the suite starts against the plugin's real schema, options, and capabilities.
 
@@ -141,4 +141,4 @@ npm run env:destroy && npm run env:start
 - Connection refused or unknown database — the containers are not up or MySQL is still starting. Run `npm run env:start`, then `npx wp-env run tests-cli wp db check`.
 - Changes to `.wp-env.json` not taking effect — wp-env caches its configuration. Run `npm run env:destroy` then `npm run env:start`.
 - Class not found for framework classes — Mozart has not run. Run `composer install`, which triggers it.
-- `--env-cwd` path errors — the plugin directory must be named `webhead-search-cloud`.
+- `--env-cwd` path errors — the plugin directory must be named `searcio`.

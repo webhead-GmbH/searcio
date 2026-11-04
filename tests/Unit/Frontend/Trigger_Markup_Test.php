@@ -55,7 +55,7 @@ final class Trigger_Markup_Test extends TestCase {
 	public function test_merges_custom_class_name_with_the_base_class(): void {
 		$html = Trigger_Markup::render( [ 'className' => 'my-extra-class' ] );
 
-		$this->assertStringContainsString( 'class="webhead-search-cloud-trigger my-extra-class"', $html );
+		$this->assertStringContainsString( 'class="searcio-trigger my-extra-class"', $html );
 	}
 
 	public function test_escapes_attribute_values(): void {

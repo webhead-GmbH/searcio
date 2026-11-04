@@ -181,7 +181,7 @@ body:has([data-webhead-frontend-root]) {
 $tags: "a, address, blockquote, button, caption, code, dd, dl, dt, fieldset, figcaption, figure, h1, h2, h3, h4, h5, h6, hr, img, input, kbd, label, legend, li, mark, ol, optgroup, p, pre, samp, select, table, tbody, td, textarea, tfoot, th, thead, tr, ul";
 $whole: ".components-button, .components-checkbox-control__input, .components-color-palette__custom-color-button, .components-form-toggle__input, .components-form-token-field__input, .components-radio-control__input, .components-text-control__input";
 $written-late: "[class*='css-'], [class*='dataviews-'], [class*='dataforms-']";
-$unlayered: "[class*='components-'], #{$written-late}, [class*='webhead-search-cloud-']";
+$unlayered: "[class*='components-'], #{$written-late}, [class*='searcio-']";
 $taken-off: ":where(:not([class]):not(:is([class*='dataviews-'], [class*='dataforms-']) *), [class*='__']:not(#{$unlayered}), :is(button, input):is(#{$whole}):not(#{$written-late}))";
 
 #{$scope} :where(#{$tags})#{$taken-off},

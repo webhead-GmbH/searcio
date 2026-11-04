@@ -15,18 +15,18 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 - Plugin name: `Searcio - Fast AI Product Search for WooCommerce`
 - Main plugin file: `searcio.php`
 - Scaffold preset: `Existing Plugin`
-- Plugin slug: `webhead-search-cloud`
+- Plugin slug: `searcio`
 - Namespace root: `Webhead\WP\SearchCloud`
 - Description: `Connect WordPress and WooCommerce to Searcio.`
 - Minimum WordPress version: `6.8`
 - Minimum PHP version: `8.3`
 - Required plugin slugs: `none`
 - Text domain: `searcio`
-- Hook prefix: `webhead_search_cloud`
-- Cache group: `webhead_search_cloud`
-- REST namespace: `webhead-search-cloud/v1`
-- Settings group: `webhead_search_cloud_settings`
-- Table versions key: `webhead_search_cloud_table_versions`
+- Hook prefix: `searcio`
+- Cache group: `searcio`
+- REST namespace: `searcio/v1`
+- Settings group: `searcio_settings`
+- Table versions key: `searcio_table_versions`
 - Default block metadata path: `blocks/example-notice/block.json`
 
 ## Enabled Features
@@ -36,7 +36,7 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
 - Block editor scaffold: enabled
 - Elementor widgets: enabled
 - REST API scaffold: enabled
-- Shortcodes scaffold: disabled
+- Shortcodes scaffold: enabled
 - Database example table: enabled
 - Jobs and scheduler layer: enabled by default
 - Cache facade, diagnostics, lifecycle, multisite, WPML, Polylang, and Wordfence support: enabled by default

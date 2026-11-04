@@ -23,8 +23,8 @@ $whsc_tree = [
 $whsc_mode = $args[0] ?? 'clear';
 
 if ( 'clear' === $whsc_mode ) {
-	delete_option( 'webhead_search_cloud_category_filter' );
-	delete_option( 'webhead_search_cloud_category_filter_depth' );
+	delete_option( 'searcio_category_filter' );
+	delete_option( 'searcio_category_filter_depth' );
 
 	foreach ( [ 'Rain jackets', 'Jackets', 'Clothing', 'Shoes' ] as $whsc_name ) {
 		$whsc_term = get_term_by( 'name', $whsc_name, 'category' );
@@ -58,7 +58,7 @@ foreach ( $whsc_tree as $whsc_main => $whsc_children ) {
 	}
 }
 
-update_option( 'webhead_search_cloud_category_filter', $whsc_mode );
-update_option( 'webhead_search_cloud_category_filter_depth', (int) ( $args[1] ?? 2 ) );
+update_option( 'searcio_category_filter', $whsc_mode );
+update_option( 'searcio_category_filter_depth', (int) ( $args[1] ?? 2 ) );
 
 echo 'OK';

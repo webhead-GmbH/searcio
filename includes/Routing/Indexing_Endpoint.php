@@ -35,7 +35,7 @@ final class Indexing_Endpoint extends Rest_API {
 	) {}
 
 	protected function get_rest_namespace(): string {
-		return 'webhead-search-cloud/v1';
+		return 'searcio/v1';
 	}
 
 	#[Route( '/indexing/config', methods: 'GET', permission_callback: 'can_view' )]

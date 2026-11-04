@@ -6,8 +6,8 @@ import apiFetch from '@wordpress/api-fetch';
 
 import { showToast } from '../../../../toast';
 
-const pluginData = window.webhead_search_cloudData || {};
-const CACHE_CLEAR_PATH = pluginData?.api?.cacheClearPath || '/webhead-search-cloud/v1/cache/clear';
+const pluginData = window.searcioData || {};
+const CACHE_CLEAR_PATH = pluginData?.api?.cacheClearPath || '/searcio/v1/cache/clear';
 
 /**
  * Not a settings field, so it lives as its own card on the General tab

@@ -104,7 +104,7 @@ export const useFadeInUpProps = ( delay = 0, y = 12, duration = motionToken.dura
 };
 
 export const renderAnimatedTabTitle = ( label, suffix = '', delay = 0 ) => (
-	<span className="webhead-search-cloud-animated-tab-label">
+	<span className="searcio-animated-tab-label">
 		{ animateText( label, delay, motionToken.duration.md ) }
 		{ suffix ? (
 			<motion.span
@@ -115,7 +115,7 @@ export const renderAnimatedTabTitle = ( label, suffix = '', delay = 0 ) => (
 					delay: delay + motionToken.duration.md,
 					ease: motionToken.easing.balanced,
 				} }
-				className="webhead-search-cloud-animated-tab-suffix"
+				className="searcio-animated-tab-suffix"
 			>
 				{ suffix }
 			</motion.span>

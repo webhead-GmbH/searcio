@@ -108,8 +108,8 @@ final class Site_Health_Registration_Test extends Integration_Test_Case {
 		$tests   = apply_filters( 'site_status_tests', [ 'direct' => [], 'async' => [] ] );
 		$section = apply_filters( 'debug_information', [] )[ Runtime_Diagnostics::SECTION_ID ] ?? [];
 
-		$this->assertSame( 'DE: Searcio connection', $tests['direct']['webhead_search_cloud_connection_configured']['label'] ?? null );
-		$this->assertSame( 'DE: Searcio reachability', $tests['async']['webhead_search_cloud_connection_reachable']['label'] ?? null );
+		$this->assertSame( 'DE: Searcio connection', $tests['direct']['searcio_connection_configured']['label'] ?? null );
+		$this->assertSame( 'DE: Searcio reachability', $tests['async']['searcio_connection_reachable']['label'] ?? null );
 		$this->assertSame( 'DE: Searcio runtime', $section['label'] ?? null );
 		$this->assertStringStartsWith( 'DE: Connection, indexing', $section['description'] ?? '' );
 		$this->assertSame( 'DE: Connection configured', $section['fields']['connection_configured']['label'] ?? null );
@@ -118,10 +118,10 @@ final class Site_Health_Registration_Test extends Integration_Test_Case {
 	public function test_the_health_tests_are_registered_with_their_labels(): void {
 		$tests = apply_filters( 'site_status_tests', [ 'direct' => [], 'async' => [] ] );
 
-		$this->assertSame( 'Searcio connection', $tests['direct']['webhead_search_cloud_connection_configured']['label'] ?? null );
-		$this->assertSame( 'Searcio indexing', $tests['direct']['webhead_search_cloud_indexing_configured']['label'] ?? null );
-		$this->assertSame( 'Searcio language coverage', $tests['direct']['webhead_search_cloud_language_coverage']['label'] ?? null );
-		$this->assertSame( 'Searcio reachability', $tests['async']['webhead_search_cloud_connection_reachable']['label'] ?? null );
+		$this->assertSame( 'Searcio connection', $tests['direct']['searcio_connection_configured']['label'] ?? null );
+		$this->assertSame( 'Searcio indexing', $tests['direct']['searcio_indexing_configured']['label'] ?? null );
+		$this->assertSame( 'Searcio language coverage', $tests['direct']['searcio_language_coverage']['label'] ?? null );
+		$this->assertSame( 'Searcio reachability', $tests['async']['searcio_connection_reachable']['label'] ?? null );
 	}
 
 	/** Values are read when Site Health Info is built, not when the section is registered. */

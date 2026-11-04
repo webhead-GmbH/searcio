@@ -17,7 +17,9 @@
 
 import { currentLangFilter as resolveCurrentLangFilter, isLanguageSupported as resolveLanguageSupported } from './language';
 
-const config = window.webheadSearchCloudFrontend || {};
+// A page a cache saved before 1.4.0 still prints the config under the
+// plugin's first name, while it loads this script.
+const config = window.searcioFrontend || window.webheadSearchCloudFrontend || {};
 
 const SEARCH_TTL = 60000; // 60s - results/prices stay fresh within a minute.
 const SUGGEST_TTL = 30000; // 30s - autocomplete is cheaper and more transient.
@@ -106,7 +108,7 @@ const request = async ( path, params, ttl, signal ) => {
 	const response = await fetch( url, { method: 'GET', credentials: 'omit', signal } );
 
 	if ( ! response.ok ) {
-		throw new Error( `webhead-search-cloud: ${ path } responded ${ response.status }` );
+		throw new Error( `searcio: ${ path } responded ${ response.status }` );
 	}
 
 	const data = await response.json();
@@ -325,7 +327,7 @@ export const visualSearch = async ( file, options = {} ) => {
 		// 403 (not turned on for this site), 422 (missing/not an image/too
 		// large) and 429 (monthly allowance or the endpoint's own rate limit)
 		// each need their own message, so carry the status to the caller.
-		const error = new Error( `webhead-search-cloud: /search/visual responded ${ response.status }` );
+		const error = new Error( `searcio: /search/visual responded ${ response.status }` );
 		error.status = response.status;
 
 		throw error;
@@ -356,7 +358,7 @@ export const askAssistant = async ( message, history = [], options = {} ) => {
 	} );
 
 	if ( ! response.ok ) {
-		const error = new Error( `webhead-search-cloud: /assistant responded ${ response.status }` );
+		const error = new Error( `searcio: /assistant responded ${ response.status }` );
 		error.status = response.status;
 
 		throw error;

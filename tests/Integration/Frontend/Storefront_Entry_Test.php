@@ -72,7 +72,7 @@ final class Storefront_Entry_Test extends Integration_Test_Case {
 	public function test_the_search_block_prints_the_entry_with_its_configuration(): void {
 		$this->skip_without_a_build();
 
-		render_block( [ 'blockName' => 'webhead-search-cloud/search', 'attrs' => [], 'innerBlocks' => [], 'innerHTML' => '', 'innerContent' => [] ] );
+		render_block( [ 'blockName' => 'searcio/search', 'attrs' => [], 'innerBlocks' => [], 'innerHTML' => '', 'innerContent' => [] ] );
 
 		$handle = $this->handle();
 
@@ -97,7 +97,7 @@ final class Storefront_Entry_Test extends Integration_Test_Case {
 	public function test_a_product_row_that_prints_nothing_does_not_print_the_entry(): void {
 		$this->skip_without_a_build();
 
-		$html = render_block( [ 'blockName' => 'webhead-search-cloud/products', 'attrs' => [ 'source' => 'similar' ], 'innerBlocks' => [], 'innerHTML' => '', 'innerContent' => [] ] );
+		$html = render_block( [ 'blockName' => 'searcio/products', 'attrs' => [ 'source' => 'similar' ], 'innerBlocks' => [], 'innerHTML' => '', 'innerContent' => [] ] );
 
 		$this->assertSame( '', trim( $html ) );
 		$this->assertFalse( wp_script_is( $this->handle(), 'enqueued' ) );

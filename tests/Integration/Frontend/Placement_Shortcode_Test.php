@@ -34,7 +34,7 @@ final class Placement_Shortcode_Test extends Integration_Test_Case {
 
 		$html = do_shortcode( '[searcio]' );
 
-		$this->assertStringContainsString( 'webhead-search-cloud-placement--center', $html );
+		$this->assertStringContainsString( 'searcio-placement--center', $html );
 		$this->assertStringContainsString( 'data-mode="box"', $html );
 		$this->assertStringContainsString( 'data-placeholder="Search the shop"', $html );
 		$this->assertStringContainsString( 'data-facet-bar-limit="3"', $html );

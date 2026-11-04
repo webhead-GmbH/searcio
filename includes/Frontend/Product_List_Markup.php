@@ -112,7 +112,7 @@ final class Product_List_Markup {
 			' ',
 			array_filter(
 				[
-					'webhead-search-cloud-products',
+					'searcio-products',
 					self::text( $attributes['instanceClass'] ?? '' ),
 					self::text( $attributes['className'] ?? '' ),
 				],

@@ -13,7 +13,7 @@
 
 import { test, expect } from '../utils';
 
-const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=indexing';
+const SETTINGS_URL = '/wp-admin/admin.php?page=searcio&tab=indexing';
 
 // A tab waits on the settings response, then on its own.
 const LOADED = { timeout: 30000 };

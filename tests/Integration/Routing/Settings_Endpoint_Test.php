@@ -26,7 +26,7 @@ use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Settings_Endpoint_Test extends Integration_Test_Case {
-	private const ROUTE = '/webhead-search-cloud/v1/settings';
+	private const ROUTE = '/searcio/v1/settings';
 
 	private WP_REST_Server $server;
 

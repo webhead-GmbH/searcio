@@ -366,7 +366,7 @@ test.describe( 'The window on a phone', () => {
 	test( 'keeps the recent and the popular searches to a row each, with the highlights in sight', async ( { page, requestUtils } ) => {
 		await page.setViewportSize( { width: 320, height: 568 } );
 		await page.addInitScript( ( recent ) => {
-			window.localStorage.setItem( 'webheadSearchCloud.recentSearches', JSON.stringify( recent ) );
+			window.localStorage.setItem( 'searcio.recentSearches', JSON.stringify( recent ) );
 		}, RECENT );
 		await mockSearchCloud( page, { hits: MANY_HITS, popular: POPULAR } );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );

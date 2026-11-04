@@ -18,7 +18,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	const { instanceId, mode, scopeType, cardSource, highlightsSource, placeholder, enableVoice, searchTrigger, showCount, facetBarLimit, animation } = attributes;
 	const { animationDuration } = attributes;
 	const [ postTypes, setPostTypes ] = useState( [] );
-	const blockProps = useBlockProps( { className: 'webhead-search-cloud-block-editor' } );
+	const blockProps = useBlockProps( { className: 'searcio-block-editor' } );
 
 	// A stable per-placement id, saved once into the block's own content so
 	// `render.php` can scope the modal's CSS custom properties to this exact
@@ -32,7 +32,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	useEffect( () => {
 		let cancelled = false;
 
-		apiFetch( { path: '/webhead-search-cloud/v1/indexing/config' } )
+		apiFetch( { path: '/searcio/v1/indexing/config' } )
 			.then( ( response ) => {
 				if ( ! cancelled ) {
 					setPostTypes( response.post_types || [] );
@@ -421,7 +421,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 			<div { ...blockProps }>
 				<span
-					className="webhead-search-cloud-block-preview"
+					className="searcio-block-preview"
 					style={ {
 						display: 'inline-flex',
 						alignItems: 'center',

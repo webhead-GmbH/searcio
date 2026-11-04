@@ -9,7 +9,7 @@ import SettingsProvider from '../../settings/store/provider';
 // shares, and this screen's own rules are written to follow it.
 import './scss/settings.scss';
 
-const container = document.getElementById( 'webhead-search-cloud-root' );
+const container = document.getElementById( 'searcio-root' );
 
 if ( container ) {
 	const root = createRoot( container );

@@ -24,7 +24,7 @@ import {
 
 test.use( { storageState: { cookies: [], origins: [] } } );
 
-const RECENT_KEY = 'webheadSearchCloud.recentSearches';
+const RECENT_KEY = 'searcio.recentSearches';
 const PIXEL = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
 
 const hint = ( url, name ) => url.searchParams.get( name );
@@ -226,8 +226,8 @@ test.describe( 'search analytics', () => {
 		} );
 		await page.goto( await createPage(
 			requestUtils,
-			'<!-- wp:webhead-search-cloud/products {"source":"similar","documentId":"product-9"} /-->' +
-			'<!-- wp:webhead-search-cloud/products {"source":"category","filterField":"categories","filterValue":"Jackets"} /-->'
+			'<!-- wp:searcio/products {"source":"similar","documentId":"product-9"} /-->' +
+			'<!-- wp:searcio/products {"source":"category","filterField":"categories","filterValue":"Jackets"} /-->'
 		) );
 
 		const similar = page.locator( '[data-source="similar"] .whsc-card' );

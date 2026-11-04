@@ -1,12 +1,12 @@
 <?php
 /**
- * Only the translations follow the plugin's slug on wordpress.org.
+ * Every name the plugin has follows its slug, searcio.
  *
- * The framework names its text domain, its hook prefix, its cache group and
- * the keys it keeps the installed version under after one slug. The plugin
- * translates under searcio and keeps every other name it had, so a site that
- * updates finds its settings, its sync history and its installed version
- * where they were, and the service finds the REST routes it calls.
+ * The framework names the text domain, the hook prefix, the cache group, the
+ * REST namespace and the keys it keeps the installed version under after the
+ * slug. Until 1.4.0 only the text domain was searcio; a site that ran an
+ * earlier release has its stored names moved by `Lifecycle\Legacy_Slug`, which
+ * `Legacy_Slug_Test` covers.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -19,29 +19,28 @@ namespace Webhead\WP\SearchCloud\Tests\Integration;
 use Webhead\WP\SearchCloud\Plugin;
 
 final class Text_Domain_Test extends Integration_Test_Case {
-	public function test_only_the_text_domain_is_searcio(): void {
+	public function test_every_name_is_searcio(): void {
 		$plugin = $this->plugin();
 
 		$this->assertSame( 'searcio', $plugin->text_domain() );
-		$this->assertSame( 'webhead-search-cloud', $plugin->plugin_slug() );
-		$this->assertSame( 'webhead_search_cloud', $plugin->hook_prefix() );
-		$this->assertSame( 'webhead_search_cloud', $plugin->cache_group() );
-		$this->assertContains( 'webhead-search-cloud/v1', rest_get_server()->get_namespaces() );
+		$this->assertSame( 'searcio', $plugin->plugin_slug() );
+		$this->assertSame( 'searcio', $plugin->hook_prefix() );
+		$this->assertSame( 'searcio', $plugin->cache_group() );
+		$this->assertContains( 'searcio/v1', rest_get_server()->get_namespaces() );
 	}
 
 	/**
-	 * Named after searcio, these would make a site that ran an earlier release
-	 * look like a new install.
+	 * The installed version is kept under the slug, where the move of an
+	 * earlier release's names puts it.
 	 */
 	public function test_the_installed_version_is_kept_where_it_was(): void {
-		$this->assertSame( 'webhead_search_cloud_lifecycle_state', $this->call( 'get_lifecycle_state_key' ) );
-		$this->assertSame( 'webhead_search_cloud_network_activated', $this->call( 'get_network_activation_state_key' ) );
+		$this->assertSame( 'searcio_lifecycle_state', $this->call( 'get_lifecycle_state_key' ) );
+		$this->assertSame( 'searcio_network_activated', $this->call( 'get_network_activation_state_key' ) );
 	}
 
 	/**
 	 * The German the plugin ships is read from the folder the plugin is in,
-	 * under searcio. wordpress.org installs it in a `searcio/` folder, which
-	 * is not named after the plugin slug.
+	 * under searcio, wherever the plugin is installed.
 	 */
 	public function test_the_translations_it_ships_load_under_searcio(): void {
 		$german = static fn (): string => 'de_DE';
@@ -63,9 +62,8 @@ final class Text_Domain_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The settings screen keeps its address, `page=webhead-search-cloud`, and
-	 * its script is translated under the text domain. Under the name in the
-	 * address the screen would be English for every language.
+	 * The settings screen, at `page=searcio`, has its script translated under
+	 * the text domain.
 	 */
 	public function test_the_settings_screen_is_translated_under_searcio(): void {
 		if ( ! function_exists( 'add_menu_page' ) ) {
@@ -75,11 +73,11 @@ final class Text_Domain_Test extends Integration_Test_Case {
 		$GLOBALS['wp_scripts'] = null;
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$page = $this->plugin()->get_page_registry()->get( 'webhead-search-cloud' );
+		$page = $this->plugin()->get_page_registry()->get( 'searcio' );
 		$page->add_page();
 		$page->enqueue_scripts( (string) $page->registered_hook_suffix() );
 
-		$translated = array_filter( wp_scripts()->registered, static fn ( \_WP_Dependency $script ): bool => ! empty( $script->textdomain ) && str_starts_with( $script->handle, 'webhead-search-cloud' ) );
+		$translated = array_filter( wp_scripts()->registered, static fn ( \_WP_Dependency $script ): bool => ! empty( $script->textdomain ) && str_starts_with( $script->handle, 'searcio' ) );
 
 		if ( [] === $translated && ! is_file( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'public/bundle.settings.asset.php' ) ) {
 			$this->markTestSkipped( 'The settings screen has not been built: run npm run build.' );

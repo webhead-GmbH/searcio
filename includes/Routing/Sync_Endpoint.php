@@ -62,7 +62,7 @@ final class Sync_Endpoint extends Rest_API {
 	) {}
 
 	protected function get_rest_namespace(): string {
-		return 'webhead-search-cloud/v1';
+		return 'searcio/v1';
 	}
 
 	#[Route( '/sync/status', methods: 'GET', permission_callback: 'can_view' )]

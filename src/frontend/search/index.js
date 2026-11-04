@@ -12,11 +12,11 @@ let mountedTriggers = [];
 let mountedLists = [];
 
 const getMountEl = () => {
-	let mountEl = document.getElementById( 'webhead-search-cloud-root' );
+	let mountEl = document.getElementById( 'searcio-root' );
 
 	if ( ! mountEl ) {
 		mountEl = document.createElement( 'div' );
-		mountEl.id = 'webhead-search-cloud-root';
+		mountEl.id = 'searcio-root';
 		// Scopes the shared frontend reset to the portalled modal, which lives
 		// under `document.body` and is not a descendant of any trigger's own
 		// `data-webhead-frontend-root` element (see `Trigger_Markup::render()`).
@@ -56,7 +56,8 @@ const collect = ( selector, mounted ) => {
 		hydrated.add( el );
 		// A site's own search form that Searcio took the place of stays beside
 		// the trigger until now, for a visitor without JavaScript.
-		el.parentElement?.querySelector( ':scope > .webhead-search-cloud-fallback' )?.remove();
+		// A page a cache saved before 1.4.0 names it by the plugin's first name.
+		el.parentElement?.querySelector( ':scope > .searcio-fallback' )?.remove();
 	} );
 
 	return [ ...stillConnected, ...newEls ];
@@ -80,7 +81,7 @@ const sync = () => {
 };
 
 const boot = () => {
-	attachOpeners( window.webheadSearchCloudFrontend?.placement || {} );
+	attachOpeners( window.searcioFrontend?.placement || {} );
 
 	sync();
 

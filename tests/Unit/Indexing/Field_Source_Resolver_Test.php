@@ -42,7 +42,7 @@ final class Field_Source_Resolver_Test extends TestCase {
 		$post = new WP_Post( [ 'ID' => 7 ] );
 		update_post_meta( 7, '_opt_in_field', 'now-visible' );
 
-		add_filter( 'webhead_search_cloud/index/allow_protected_meta', static fn (): bool => true );
+		add_filter( 'searcio/index/allow_protected_meta', static fn (): bool => true );
 
 		$this->assertSame( 'now-visible', $this->resolver->resolve( 'meta:_opt_in_field', $post ) );
 	}

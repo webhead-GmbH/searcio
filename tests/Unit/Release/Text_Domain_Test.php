@@ -8,9 +8,9 @@
  * language pack, and nothing on screen says so until a second locale is
  * tried. These tests read the files the domain is written in.
  *
- * Everything else the framework names after the plugin keeps the first slug,
- * webhead-search-cloud, which the main file sets whatever folder the plugin
- * is in.
+ * Since 1.4.0 every other name the framework gives after the plugin is the
+ * slug too: options, tables, capabilities, hooks, REST routes, blocks. An
+ * earlier release's are moved by `Lifecycle\Legacy_Slug`.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -105,9 +105,9 @@ final class Text_Domain_Test extends TestCase {
 		$this->assertStringContainsString( "require_once __DIR__ . '/" . self::DOMAIN . ".php';", (string) file_get_contents( $this->root() . '/uninstall.php' ) );
 	}
 
-	public function test_everything_else_keeps_the_first_slug(): void {
-		$this->assertSame( 'webhead-search-cloud', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\PLUGIN_SLUG',\s*'([^']+)'/", 'searcio.php' ) );
-		$this->assertSame( 'webhead_search_cloud', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\CACHE_GROUP', '([^']+)'/", 'searcio.php' ) );
+	public function test_every_other_name_follows_it(): void {
+		$this->assertSame( 'searcio', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\PLUGIN_SLUG',\s*'([^']+)'/", 'searcio.php' ) );
+		$this->assertSame( 'searcio', $this->find( "/'Webhead\\\\WP\\\\SearchCloud\\\\CACHE_GROUP', '([^']+)'/", 'searcio.php' ) );
 	}
 
 	/**

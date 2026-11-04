@@ -19,6 +19,6 @@
 
 $whsc_tier = isset( $args[0] ) ? (string) $args[0] : 'clear';
 
-update_option( 'webhead_search_cloud_plan_tier', in_array( $whsc_tier, [ 'free', 'paid' ], true ) ? $whsc_tier : '' );
+update_option( 'searcio_plan_tier', in_array( $whsc_tier, [ 'free', 'paid' ], true ) ? $whsc_tier : '' );
 
 echo 'OK';

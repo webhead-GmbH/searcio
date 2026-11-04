@@ -16,11 +16,11 @@ import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
 import {useAnnounce} from '../../../../utils/announce';
 
-const pluginData = window.webhead_search_cloudData || {};
-const CONNECT_PATH = pluginData?.api?.connectPath || '/webhead-search-cloud/v1/connection/connect';
-const DISCONNECT_PATH = pluginData?.api?.disconnectPath || '/webhead-search-cloud/v1/connection/disconnect';
-const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
-const CONNECTION_LEGAL_PATH = pluginData?.api?.connectionLegalPath || '/webhead-search-cloud/v1/connection/legal';
+const pluginData = window.searcioData || {};
+const CONNECT_PATH = pluginData?.api?.connectPath || '/searcio/v1/connection/connect';
+const DISCONNECT_PATH = pluginData?.api?.disconnectPath || '/searcio/v1/connection/disconnect';
+const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/searcio/v1/connection/test';
+const CONNECTION_LEGAL_PATH = pluginData?.api?.connectionLegalPath || '/searcio/v1/connection/legal';
 const CONNECTION_DEFAULTS = pluginData?.connection?.defaults || {};
 const FALLBACK_LEGAL_LINKS = {
 	termsUrl: pluginData?.legal?.termsUrl || '',
@@ -219,7 +219,7 @@ const ConnectionTab = () => {
 		<CollapsibleCard.Root
 			open={manualEntryExpanded}
 			onOpenChange={setManualEntryExpanded}
-			className="whsc-card whsc-card--dotted webhead-search-cloud-manual-entry-card"
+			className="whsc-card whsc-card--dotted searcio-manual-entry-card"
 		>
 			<CollapsibleCard.Header render={<h3/>}>
 				{isConnected
@@ -233,7 +233,7 @@ const ConnectionTab = () => {
 	);
 
 	return (
-		<Stack direction="column" gap="lg" className="webhead-search-cloud-connection">
+		<Stack direction="column" gap="lg" className="searcio-connection">
 			<TabIntro
 				title={__('Searcio connection', 'searcio')}
 				description={__(
@@ -292,7 +292,7 @@ const ConnectionTab = () => {
 					{/* The one column that centres what is in it: the connect
 					    moment is a button, two consents and a sentence, and each
 					    is meant to be as wide as it is. */}
-					<Stack direction="column" align="center" gap="lg" className="webhead-search-cloud-connect-hero">
+					<Stack direction="column" align="center" gap="lg" className="searcio-connect-hero">
 						<Button
 							__next40pxDefaultSize
 							accessibleWhenDisabled
@@ -306,12 +306,12 @@ const ConnectionTab = () => {
 							}
 							showTooltip={!termsPrivacy}
 							onClick={onConnect}
-							className="webhead-search-cloud-connect-cta"
+							className="searcio-connect-cta"
 						>
 							{connectLabel}
 						</Button>
 
-						<Stack direction="column" gap="md" className="webhead-search-cloud-connect-consents">
+						<Stack direction="column" gap="md" className="searcio-connect-consents">
 							<CheckboxControl
 								label={__('I accept the Terms of Service and Privacy Policy (required)', 'searcio')}
 								details={
@@ -339,7 +339,7 @@ const ConnectionTab = () => {
 							/>
 						</Stack>
 
-						<Text render={<p/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
+						<Text render={<p/>} variant="body-sm" className="searcio-connection-hint">
 							{effectiveEmail
 								? sprintf(
 									/* translators: %s: the email address used to connect. */
@@ -352,7 +352,7 @@ const ConnectionTab = () => {
 						<Stack direction="row" gap="lg" justify="center" align="center" wrap="wrap">
 							<Button
 								variant="link"
-								className="webhead-search-cloud-email-override-toggle"
+								className="searcio-email-override-toggle"
 								aria-expanded={showEmailOverride}
 								onClick={() => setShowEmailOverride((open) => !open)}
 							>
@@ -365,7 +365,7 @@ const ConnectionTab = () => {
 					</Stack>
 
 					{showEmailOverride && (
-						<Card.Root className="whsc-card whsc-card--dotted webhead-search-cloud-email-override">
+						<Card.Root className="whsc-card whsc-card--dotted searcio-email-override">
 							<Card.Content className="whsc-card__content">
 								<Grid minColumnWidth={{base: 200, md: 220}} gap="var(--wpds-dimension-gap-md)" align="start">
 									<InputControl

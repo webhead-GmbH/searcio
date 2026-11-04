@@ -11,11 +11,11 @@
 
 import { test, expect, setConnected, touchingInShell } from '../utils';
 
-const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=search-config';
+const SETTINGS_URL = '/wp-admin/admin.php?page=searcio&tab=search-config';
 
 // A notice is also read out, through a live region that holds the same words
 // outside the screen. What is asserted is what is drawn on it.
-const SCREEN = '#webhead-search-cloud-root';
+const SCREEN = '#searcio-root';
 
 const CONFIG = {
 	searchable_fields: [ { field: 'title', weight: 5 } ],

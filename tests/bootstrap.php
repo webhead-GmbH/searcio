@@ -227,8 +227,8 @@ if ( ! class_exists( 'WP_Error' ) ) {
 
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
-$webhead_search_cloud_prefixed_autoload_file = dirname( __DIR__ ) . '/includes/Dependencies/autoload.php';
+$searcio_prefixed_autoload_file = dirname( __DIR__ ) . '/includes/Dependencies/autoload.php';
 
-if ( is_readable( $webhead_search_cloud_prefixed_autoload_file ) ) {
-	require_once $webhead_search_cloud_prefixed_autoload_file;
+if ( is_readable( $searcio_prefixed_autoload_file ) ) {
+	require_once $searcio_prefixed_autoload_file;
 }

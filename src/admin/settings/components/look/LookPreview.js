@@ -3,8 +3,8 @@ import apiFetch from '@wordpress/api-fetch';
 
 import { previewUrl } from '../../placement';
 
-const pluginData = window.webhead_search_cloudData || {};
-const PLACEMENT_PATH = pluginData?.api?.placementPath || '/webhead-search-cloud/v1/placement';
+const pluginData = window.searcioData || {};
+const PLACEMENT_PATH = pluginData?.api?.placementPath || '/searcio/v1/placement';
 
 /** How long the page waits after a change of what it shows before it loads again. */
 const RELOAD_DELAY = 500;

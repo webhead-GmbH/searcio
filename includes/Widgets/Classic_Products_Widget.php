@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.4.0
  */
 final class Classic_Products_Widget extends WP_Widget {
-	public const ID_BASE = 'webhead_search_cloud_products';
+	public const ID_BASE = 'searcio_products';
 
 	private const SOURCES = [ 'similar', 'category' ];
 

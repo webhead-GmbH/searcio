@@ -38,7 +38,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	public function test_test_connection_requires_the_view_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) );
 
 		$this->assertSame( 403, $response->get_status() );
 	}
@@ -46,7 +46,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	public function test_connect_requires_the_manage_settings_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' ) );
 
 		$this->assertSame( 403, $response->get_status() );
 	}
@@ -68,7 +68,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			]
 		) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -85,7 +85,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok( [ 'plan' => [ 'is_free' => true, 'name' => 'Free' ] ] ) );
 
-		$this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) );
 
 		$this->assertSame( 'free', $this->settings()->get( Plugin_Settings::PLAN_TIER ) );
 	}
@@ -95,7 +95,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->settings()->set( Plugin_Settings::PLAN_TIER, 'free' );
 		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 1, 'status' => 'connected' ] ] ) );
 
-		$this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) );
 
 		$this->assertSame( 'free', $this->settings()->get( Plugin_Settings::PLAN_TIER ) );
 	}
@@ -109,14 +109,14 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected', 'statistics_url' => 'https://searcio.test/acme/sites/7' ] ] ) );
 
-		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) )->get_data();
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
 
 		$this->assertSame( 'https://searcio.test/acme/sites/7', $data['statistics_url'] );
 
 		remove_all_filters( 'pre_http_request' );
 		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected', 'statistics_url' => 'javascript:alert(1)' ] ] ) );
 
-		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) )->get_data();
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
 
 		$this->assertSame( untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/login', $data['statistics_url'] );
 	}
@@ -136,7 +136,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			]
 		) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -163,7 +163,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			]
 		) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/test' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) );
 		$data     = $response->get_data();
 
 		$this->assertFalse( $data['plan']['is_free'] );
@@ -176,7 +176,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		// No fake_http() registered - a real outbound call here would fail
 		// the test with a timeout/transport error rather than a clean 422,
 		// proving the consent check short-circuits before any request.
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 		$request->set_param( 'terms_privacy', false );
 
 		$response = $this->server->dispatch( $request );
@@ -211,7 +211,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			);
 		} );
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 		$request->set_param( 'terms_privacy', true );
 		$request->set_param( 'dpa', false );
 
@@ -248,7 +248,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			return $this->http_ok( [ 'status' => 'pending_claim' ], 201 );
 		} );
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 		$request->set_param( 'terms_privacy', true );
 		$this->server->dispatch( $request );
 
@@ -261,7 +261,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->login_admin();
 		$this->fake_http( fn ( string $url ): array => $this->http_ok( [ 'status' => 'pending_claim' ], 201 ) );
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 		$request->set_param( 'terms_privacy', true );
 		$request->set_param( 'email', 'owner@example.com' );
 
@@ -280,7 +280,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->login_admin();
 		$this->fake_http( fn ( string $url ): array => $this->http_ok( [ 'message' => 'Already connected.' ], 409 ) );
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 		$request->set_param( 'terms_privacy', true );
 
 		$response = $this->server->dispatch( $request );
@@ -303,7 +303,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		} );
 
 		$make_request = function (): void {
-			$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+			$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 			$request->set_param( 'terms_privacy', true );
 			$this->server->dispatch( $request );
 		};
@@ -327,7 +327,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			return $this->http_ok( [ 'message' => 'Already connected.' ], 409 );
 		} );
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/connect' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/connect' );
 		$request->set_param( 'terms_privacy', true );
 		$this->server->dispatch( $request );
 
@@ -338,7 +338,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	public function test_disconnect_requires_the_manage_settings_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/disconnect' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/disconnect' ) );
 
 		$this->assertSame( 403, $response->get_status() );
 	}
@@ -358,7 +358,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			return $this->http_ok( [ 'status' => 'disconnected' ] );
 		} );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/disconnect' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/disconnect' ) );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertTrue( $response->get_data()['ok'] );
@@ -385,7 +385,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			return $this->http_ok( [] );
 		} );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/disconnect' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/disconnect' ) );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertFalse( $called );
@@ -396,7 +396,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->connect_client();
 		$this->fake_http( fn (): array => $this->http_ok( [ 'message' => 'Invalid credentials.' ], 401 ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/disconnect' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/disconnect' ) );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertTrue( $response->get_data()['ok'] );
@@ -408,7 +408,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->connect_client();
 		$this->fake_http( fn (): array => $this->http_ok( [ 'message' => 'Server error.' ], 500 ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/connection/disconnect' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/disconnect' ) );
 
 		$this->assertSame( 502, $response->get_status() );
 		$this->assertFalse( $response->get_data()['ok'] );
@@ -418,7 +418,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	public function test_legal_requires_the_view_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/connection/legal' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/searcio/v1/connection/legal' ) );
 
 		$this->assertSame( 403, $response->get_status() );
 	}
@@ -429,7 +429,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 			[ 'legal' => [ 'terms' => 'https://sc.test/terms', 'privacy' => 'https://sc.test/privacy', 'dpa' => null ] ]
 		) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/connection/legal' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/searcio/v1/connection/legal' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -442,7 +442,7 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->login_admin();
 		add_filter( 'pre_http_request', static fn () => new \WP_Error( 'http_request_failed', 'timed out' ), 10, 3 );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/connection/legal' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/searcio/v1/connection/legal' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( \Webhead\WP\SearchCloud\LEGAL_TERMS_URL, $data['terms'] );

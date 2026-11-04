@@ -19,7 +19,7 @@ Four things, and a page is missing if any one of them is:
    menu slug followed by `-root` unless the class says otherwise:
 
 ```jsx
-const container = document.getElementById( 'webhead-search-cloud-reports-root' );
+const container = document.getElementById( 'searcio-reports-root' );
 
 if ( container ) {
     createRoot( container ).render(
@@ -46,7 +46,7 @@ flush against each other — and a fragment has no gap either. Two elements writ
 other inside a card touch, and nothing in the source shows it:
 
 ```jsx
-<Card.Content className="webhead-search-cloud-card__content">
+<Card.Content className="searcio-card__content">
     <Stack direction="column" gap="md">
         <Text>{ __( 'What this does.', 'searcio' ) }</Text>
         <Stack direction="row" gap="sm">
@@ -108,7 +108,7 @@ written into it stack, and touch. A header that carries something at its end —
 menu, a switch — holds both in one row:
 
 ```jsx
-<Card.Header className="webhead-search-cloud-card__header">
+<Card.Header className="searcio-card__header">
     <Stack direction="row" gap="md" justify="space-between" align="center" wrap="wrap">
         <Card.Title render={ <h2 /> }>{ __( 'Shortcode', 'searcio' ) }</Card.Title>
         <Stack direction="row" gap="sm" align="center">…</Stack>

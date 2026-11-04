@@ -13,12 +13,12 @@
 // nothing to say there was more. Wrap the value in this class from the field's
 // `render` and it takes two lines and ends in an ellipsis:
 //
-//     render: ( { item } ) => <span className="webhead-search-cloud-cell-clamp">{ item.note }</span>
+//     render: ( { item } ) => <span className="searcio-cell-clamp">{ item.note }</span>
 //
 // Clamping the cell itself does not work. DataViews makes the cell's wrapper a
 // flex row that does not wrap, through a selector more specific than a class of
 // ours.
-.webhead-search-cloud-cell-clamp {
+.searcio-cell-clamp {
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -33,12 +33,12 @@
 // over the media. With the box hidden they would sit over the title, so the
 // title keeps clear of both. Put this class on an element around the table:
 //
-//     <div className="webhead-search-cloud-dataviews--no-media"><DataViews … /></div>
+//     <div className="searcio-dataviews--no-media"><DataViews … /></div>
 //
 // This reaches into DataViews through its own class names, because the
 // component has no way to say that a dataset has no media. Remove it when it
 // has one.
-.webhead-search-cloud-dataviews--no-media {
+.searcio-dataviews--no-media {
 	.dataviews-view-grid__media--placeholder {
 		display: none;
 	}

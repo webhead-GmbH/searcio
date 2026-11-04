@@ -11,11 +11,11 @@
 
 import { test, expect, touchingInShell } from '../utils';
 
-const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=sync';
+const SETTINGS_URL = '/wp-admin/admin.php?page=searcio&tab=sync';
 
 // A notice is also read out, through a live region that holds the same words
 // outside the screen. What is asserted is what is drawn on it.
-const RUN_CARD = '#webhead-search-cloud-root .whsc-sync-run';
+const RUN_CARD = '#searcio-root .whsc-sync-run';
 
 const RUN = {
 	id: 41,
@@ -45,7 +45,7 @@ const RUN = {
  */
 async function mockActiveRun( page, run ) {
 	await page.route(
-		( url ) => decodeURIComponent( url.href ).includes( '/webhead-search-cloud/v1/sync/status' ),
+		( url ) => decodeURIComponent( url.href ).includes( '/searcio/v1/sync/status' ),
 		( route ) =>
 			route.fulfill( {
 				status: 200,
@@ -63,7 +63,7 @@ async function mockActiveRun( page, run ) {
  */
 async function mockHistory( page, items ) {
 	await page.route(
-		( url ) => decodeURIComponent( url.href ).includes( '/webhead-search-cloud/v1/sync/history' ),
+		( url ) => decodeURIComponent( url.href ).includes( '/searcio/v1/sync/history' ),
 		( route ) =>
 			route.fulfill( {
 				status: 200,

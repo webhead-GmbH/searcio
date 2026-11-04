@@ -46,7 +46,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * @since 1.0.0
  */
-final class Search_Widget extends Widget {
+class Search_Widget extends Widget {
 	/**
 	 * A no-op `:not()` that adds four ids of weight to a selector. No element
 	 * has the id, so matching is unchanged.
@@ -61,7 +61,7 @@ final class Search_Widget extends Widget {
 	private const SPECIFICITY_BOOST = ':not(#whsc#whsc#whsc#whsc)';
 
 	public function get_name(): string {
-		return 'webhead-search-cloud-search';
+		return 'searcio-search';
 	}
 
 	public function get_title(): string {
@@ -117,7 +117,7 @@ final class Search_Widget extends Widget {
 		// Control ids are unchanged from when all of these shared one section,
 		// so saved widgets keep every value; only the grouping is new.
 		$this->start_controls_section(
-			'webhead_search_cloud_content',
+			'searcio_content',
 			[ 'label' => __( 'Trigger', 'searcio' ) ]
 		);
 
@@ -157,7 +157,7 @@ final class Search_Widget extends Widget {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
-			'webhead_search_cloud_behaviour',
+			'searcio_behaviour',
 			[ 'label' => __( 'Search', 'searcio' ) ]
 		);
 
@@ -235,7 +235,7 @@ final class Search_Widget extends Widget {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
-			'webhead_search_cloud_results',
+			'searcio_results',
 			[ 'label' => __( 'Results', 'searcio' ) ]
 		);
 
@@ -270,7 +270,7 @@ final class Search_Widget extends Widget {
 		$this->end_controls_section();
 
 		$this->start_controls_section(
-			'webhead_search_cloud_modal',
+			'searcio_modal',
 			[ 'label' => __( 'Modal', 'searcio' ) ]
 		);
 
@@ -343,7 +343,7 @@ final class Search_Widget extends Widget {
 	 */
 	private function scope_type_options(): array {
 		$options = [ '' => __( 'All types', 'searcio' ) ];
-		$config  = get_option( 'webhead_search_cloud_index_config' );
+		$config  = get_option( 'searcio_index_config' );
 
 		if ( ! is_array( $config ) ) {
 			return $options;
@@ -504,7 +504,7 @@ final class Search_Widget extends Widget {
 				'condition'  => [ 'mode' => 'box' ],
 				'size_units' => [ '%', 'px' ],
 				'range'      => [ '%' => [ 'min' => 10, 'max' => 100 ], 'px' => [ 'min' => 120, 'max' => 1200 ] ],
-				'selectors'  => [ '{{WRAPPER}} .webhead-search-cloud-trigger' => '--whsc-trigger-box-width: {{SIZE}}{{UNIT}};' ],
+				'selectors'  => [ '{{WRAPPER}} .searcio-trigger' => '--whsc-trigger-box-width: {{SIZE}}{{UNIT}};' ],
 			]
 		);
 

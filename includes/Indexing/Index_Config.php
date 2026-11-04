@@ -2,7 +2,7 @@
 /**
  * Indexing configuration model.
  *
- * Single owner of the `webhead_search_cloud_index_config` option (stored through
+ * Single owner of the `searcio_index_config` option (stored through
  * the framework Settings_Manager, the single source of truth). One block per post
  * type describes which fields are pushed to Searcio. A global
  * `config_version` integer is bumped on every save so the sync engine can detect

@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) || exit;
 final class Placement_Preview {
 	public const QUERY = 'searcio-preview';
 
-	public const NONCE = 'webhead_search_cloud_placement_preview';
+	public const NONCE = 'searcio_placement_preview';
 
 	private const VIEWS = [ 'trigger', 'modal', 'floating' ];
 
@@ -68,7 +68,7 @@ final class Placement_Preview {
 	 * marks them `preview`, which Searcio meters but keeps out of the site's
 	 * search statistics.
 	 */
-	#[Filter( 'webhead_search_cloud/storefront/is_preview' )]
+	#[Filter( 'searcio/storefront/is_preview' )]
 	public function mark_preview( mixed $is_preview ): bool {
 		return self::is_preview() || (bool) $is_preview;
 	}
@@ -126,11 +126,11 @@ final class Placement_Preview {
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
 	<style>
-		html, body.webhead-search-cloud-preview { min-height: 100%; margin: 0; }
-		body.webhead-search-cloud-preview { padding: 24px; box-sizing: border-box; }
+		html, body.searcio-preview { min-height: 100%; margin: 0; }
+		body.searcio-preview { padding: 24px; box-sizing: border-box; }
 	</style>
 </head>
-<body <?php body_class( [ 'webhead-search-cloud-preview', 'webhead-search-cloud-preview--' . $view ] ); ?>>
+<body <?php body_class( [ 'searcio-preview', 'searcio-preview--' . $view ] ); ?>>
 	<?php
 	echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by Trigger_Markup and Style_Tokens.
 	wp_footer();

@@ -219,8 +219,8 @@ $lift: ':is(*, #whsc#whsc#whsc)';
  * the alignment set on the Elementor widget reaches the trigger by
  * inheritance. So these roots hand everything back to the page.
  */
-.webhead-search-cloud-trigger#{$lift},
-.webhead-search-cloud-products#{$lift} {
+.searcio-trigger#{$lift},
+.searcio-products#{$lift} {
 	background-color: transparent;
 	color: inherit;
 	font: inherit;
@@ -387,7 +387,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 /* -------------------------------------------------------------------------
  * Trigger
  * ---------------------------------------------------------------------- */
-.webhead-search-cloud-trigger {
+.searcio-trigger {
 	display: inline-flex;
 	color: inherit;
 	font: inherit;
@@ -2056,7 +2056,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * width it was given, and never more than the space there is; only these
  * placements give a trigger `whsc-trigger--box`.
  * ---------------------------------------------------------------------- */
-.webhead-search-cloud-placement {
+.searcio-placement {
 	display: flex;
 	justify-content: flex-start;
 
@@ -2069,7 +2069,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
-.webhead-search-cloud-trigger#{$lift}.whsc-trigger--box {
+.searcio-trigger#{$lift}.whsc-trigger--box {
 	width: var(--whsc-trigger-box-width, 100%);
 	max-width: 100%;
 }
@@ -2079,7 +2079,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * bottom edge is the Placement tab's, so it can stand above a cart bar or a
  * cookie notice, and a phone's home indicator is added to it.
  */
-.webhead-search-cloud-trigger#{$lift}.whsc-trigger--floating {
+.searcio-trigger#{$lift}.whsc-trigger--floating {
 	position: fixed;
 	z-index: 99990;
 	inset-block-end: calc(var(--whsc-floating-offset, 24px) + env(safe-area-inset-bottom, 0px));

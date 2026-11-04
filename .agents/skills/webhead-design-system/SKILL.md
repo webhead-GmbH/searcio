@@ -246,17 +246,17 @@ the component's own spacing, because `@wordpress/ui` ships inside `@layer wp-ui`
 rule beats a layered one however specific either is. `references/css-traps.md` has the anatomy.
 
 ```jsx
-<Card.Root className="webhead-search-cloud-card webhead-search-cloud-card--dotted">
-    <Card.Header className="webhead-search-cloud-card__header">
+<Card.Root className="searcio-card searcio-card--dotted">
+    <Card.Header className="searcio-card__header">
         <Card.Title render={ <h2 /> }>{ __( 'Title', 'searcio' ) }</Card.Title>
     </Card.Header>
-    <Card.Content className="webhead-search-cloud-card__content">…</Card.Content>
+    <Card.Content className="searcio-card__content">…</Card.Content>
 </Card.Root>
 ```
 
 - **Every part carries a class of yours.** The component emits hashed CSS-module names
   (`_02872bf2__root`, `bbccc92e__header`) that change with the build, so nothing here can target
-  them. Style `webhead-search-cloud-card`, `__header`, `__content`.
+  them. Style `searcio-card`, `__header`, `__content`.
 - **There is no `Card.Footer`.** A footer is content at the bottom — use `Card.Content`.
 - **There is no `variant` or `elevation` prop.** The variants are the surface classes in
   `src/components/Default/default.scss`, and they go **by nesting depth**: `--dotted` for a card
@@ -300,11 +300,11 @@ list.scrollWidth > list.clientWidth && document.documentElement.scrollWidth <= d
 // Where a screen starts and how wide it is. Run it on two screens of the plugin
 // and compare the two results; they must be the same.
 ( ( s ) => [ s.getBoundingClientRect().x, s.getBoundingClientRect().width ] )(
-    document.querySelector( '.webhead-search-cloud-admin-page__surface' ) );
+    document.querySelector( '.searcio-admin-page__surface' ) );
 
 // What a card's content stacks: the top and the bottom of each child. A bottom
 // equal to the next top means the two touch.
-[ ...document.querySelector( '.webhead-search-cloud-card__content' ).children ]
+[ ...document.querySelector( '.searcio-card__content' ).children ]
     .map( ( c ) => c.getBoundingClientRect() ).map( ( r ) => [ Math.round( r.top ), Math.round( r.bottom ) ] );
 
 // The tab strip under the header: as wide as the surface, with a line under it.

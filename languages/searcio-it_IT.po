@@ -39,7 +39,7 @@ msgstr "https://webhead.at"
 #: includes/Admin/Settings_Page.php:36
 #: includes/Admin/Settings_Page.php:40
 #: includes/Admin/Settings_Page.php:117
-#: includes/Plugin.php:476
+#: includes/Plugin.php:481
 #: src/admin/settings/components/SettingsPanel.js:204
 msgid "Searcio"
 msgstr "Searcio"

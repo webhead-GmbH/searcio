@@ -1,12 +1,12 @@
 /**
- * `api.js` captures `window.webheadSearchCloudFrontend` and keeps its
+ * `api.js` captures `window.searcioFrontend` and keeps its
  * request cache in module-level state, so each test resets the module
  * registry and re-requires it fresh rather than sharing one import across
  * the file (real cache state would otherwise leak between tests).
  */
 
 const setConfig = ( overrides = {} ) => {
-	window.webheadSearchCloudFrontend = {
+	window.searcioFrontend = {
 		endpoint: 'https://search-cloud.test/api/v1',
 		searchKey: 'sk_test',
 		enabledLanguages: [],
@@ -37,7 +37,7 @@ afterEach( () => {
 	jest.useRealTimers();
 	delete global.fetch;
 	delete global.navigator.sendBeacon;
-	delete window.webheadSearchCloudFrontend;
+	delete window.searcioFrontend;
 } );
 
 describe( 'isConfigured', () => {
@@ -57,7 +57,7 @@ describe( 'isConfigured', () => {
 } );
 
 describe( 'isLanguageSupported / currentLangFilter', () => {
-	it( 'delegate to the live config values from window.webheadSearchCloudFrontend', () => {
+	it( 'delegate to the live config values from window.searcioFrontend', () => {
 		setConfig( { enabledLanguages: [ 'de' ], currentLang: 'de' } );
 		const api = loadApi();
 

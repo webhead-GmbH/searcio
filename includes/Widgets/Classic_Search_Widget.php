@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.4.0
  */
 final class Classic_Search_Widget extends WP_Widget {
-	public const ID_BASE = 'webhead_search_cloud_search';
+	public const ID_BASE = 'searcio_search';
 
 	private const MODES = [ 'icon', 'box' ];
 

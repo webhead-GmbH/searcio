@@ -193,7 +193,7 @@ function Modal( {
 		}
 
 		return (
-			<div className="webhead-search-cloud-modal__actions">
+			<div className="searcio-modal__actions">
 				{ actions.map( ( action, index ) => (
 					<Button
 						__next40pxDefaultSize
@@ -223,7 +223,7 @@ function Modal( {
 			{ isOpen && (
 				<motion.div
 					key="backdrop"
-					className="webhead-search-cloud-modal__backdrop"
+					className="searcio-modal__backdrop"
 					{ ...backdropMotion }
 					onClick={ closeOnBackdropClick ? handleClose : undefined }
 				>
@@ -234,19 +234,19 @@ function Modal( {
 						aria-modal="true"
 						aria-labelledby={ titleId }
 						tabIndex={ -1 }
-						className={ `webhead-search-cloud-modal ${ className }`.trim() }
+						className={ `searcio-modal ${ className }`.trim() }
 						style={ { maxWidth: width } }
 						{ ...dialogMotion }
 						onClick={ ( event ) => event.stopPropagation() }
 					>
-						<div className="webhead-search-cloud-modal__header">
-							<h2 id={ titleId } className="webhead-search-cloud-modal__title">
+						<div className="searcio-modal__header">
+							<h2 id={ titleId } className="searcio-modal__title">
 								{ title }
 							</h2>
 							{ showCloseButton && (
 								<Button
 									__next40pxDefaultSize
-									className="webhead-search-cloud-modal__close"
+									className="searcio-modal__close"
 									icon={ CloseIcon }
 									label={ __( 'Close', 'searcio' ) }
 									onClick={ handleClose }
@@ -254,7 +254,7 @@ function Modal( {
 							) }
 						</div>
 
-						<div className="webhead-search-cloud-modal__body">
+						<div className="searcio-modal__body">
 							<Stack direction="column" gap="lg">
 								{ children }
 								{ renderFooter() }

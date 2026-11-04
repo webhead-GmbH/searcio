@@ -9,7 +9,7 @@ import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
 import {useAnnounce} from '../../../../utils/announce';
 
-const pluginData = window.webhead_search_cloudData || {};
+const pluginData = window.searcioData || {};
 const SECRET_PLACEHOLDER = '••••••••••••';
 
 /**
@@ -53,7 +53,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 			const response = await apiFetch({
 				path:
 					pluginData?.api?.testConnectionPath ||
-					'/webhead-search-cloud/v1/connection/test',
+					'/searcio/v1/connection/test',
 				method: 'POST',
 			});
 
@@ -95,7 +95,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 	) : '', 'assertive');
 
 	return (
-		<Stack direction="column" gap="lg" className="webhead-search-cloud-manual-entry">
+		<Stack direction="column" gap="lg" className="searcio-manual-entry">
 			<Text render={<p/>} variant="body-sm">
 				{__(
 					'Enter the credentials from your site page in the Searcio app. The write key and secret are stored encrypted and never sent to the browser in clear text.',
@@ -157,7 +157,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 			)}
 
 			<Stack
-				className="webhead-search-cloud-connection-actions"
+				className="searcio-connection-actions"
 				direction="row"
 				align="center"
 				gap="md"
@@ -187,7 +187,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 						? __('Testing…', 'searcio')
 						: __('Test connection', 'searcio')}
 				</Button>
-				<Text render={<span/>} variant="body-sm" className="webhead-search-cloud-connection-hint">
+				<Text render={<span/>} variant="body-sm" className="searcio-connection-hint">
 					{__('Test uses your saved credentials - save first.', 'searcio')}
 				</Text>
 			</Stack>

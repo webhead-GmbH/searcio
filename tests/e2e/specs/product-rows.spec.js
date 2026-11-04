@@ -33,7 +33,7 @@ const PRODUCTS = [
 async function createRowPost( requestUtils, attributes ) {
 	const post = await requestUtils.createPost( {
 		title: 'Product row page',
-		content: `<!-- wp:webhead-search-cloud/products ${ JSON.stringify( attributes ) } /-->`,
+		content: `<!-- wp:searcio/products ${ JSON.stringify( attributes ) } /-->`,
 		status: 'publish',
 	} );
 

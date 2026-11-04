@@ -37,17 +37,17 @@ final class Delete_Legacy_Sync_Options implements Upgrade_Step {
 	 * @var string[]
 	 */
 	public const OPTIONS = [
-		'webhead_search_cloud_discovery_status',
-		'webhead_search_cloud_discovered_products_count',
-		'webhead_search_cloud_queued_products_total',
-		'webhead_search_cloud_has_initial_sync_started',
-		'webhead_search_cloud_has_initial_sync_completed',
-		'webhead_search_cloud_last_full_sync_started_at',
-		'webhead_search_cloud_last_full_sync_completed_at',
-		'webhead_search_cloud_last_incremental_sync_run_at',
-		'webhead_search_cloud_last_sync_at',
-		'webhead_search_cloud_last_sync_status',
-		'webhead_search_cloud_sync_interval',
+		'searcio_discovery_status',
+		'searcio_discovered_products_count',
+		'searcio_queued_products_total',
+		'searcio_has_initial_sync_started',
+		'searcio_has_initial_sync_completed',
+		'searcio_last_full_sync_started_at',
+		'searcio_last_full_sync_completed_at',
+		'searcio_last_incremental_sync_run_at',
+		'searcio_last_sync_at',
+		'searcio_last_sync_status',
+		'searcio_sync_interval',
 	];
 
 	private const METADATA_SUFFIX = '_metadata';

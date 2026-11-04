@@ -20,22 +20,22 @@ use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 final class Delete_Legacy_Site_Id_Option_Test extends Integration_Test_Case {
 
 	public function test_it_removes_the_option_and_its_metadata_sibling(): void {
-		update_option( 'webhead_search_cloud_site_id', 5 );
-		update_option( 'webhead_search_cloud_site_id_metadata', [ 'version' => 1 ] );
+		update_option( 'searcio_site_id', 5 );
+		update_option( 'searcio_site_id_metadata', [ 'version' => 1 ] );
 
 		( new Delete_Legacy_Site_Id_Option() )->run();
 
-		$this->assertFalse( get_option( 'webhead_search_cloud_site_id', false ) );
-		$this->assertFalse( get_option( 'webhead_search_cloud_site_id_metadata', false ) );
+		$this->assertFalse( get_option( 'searcio_site_id', false ) );
+		$this->assertFalse( get_option( 'searcio_site_id_metadata', false ) );
 	}
 
 	/** Upgrade steps may be replayed, so a missing option must not be an error. */
 	public function test_it_is_safe_to_run_when_the_option_is_already_gone(): void {
-		delete_option( 'webhead_search_cloud_site_id' );
+		delete_option( 'searcio_site_id' );
 
 		( new Delete_Legacy_Site_Id_Option() )->run();
 
-		$this->assertFalse( get_option( 'webhead_search_cloud_site_id', false ) );
+		$this->assertFalse( get_option( 'searcio_site_id', false ) );
 	}
 
 	/** The step only runs on installs upgrading past this version. */

@@ -8,7 +8,7 @@
 
 import { test, expect, setConnected } from '../utils';
 
-const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud';
+const SETTINGS_URL = '/wp-admin/admin.php?page=searcio';
 const UPGRADE_URL = 'https://billing.example.test/upgrade';
 
 /** Mock the plugin's own health check so `plan` is deterministic. */
@@ -49,7 +49,7 @@ test.describe( 'Header upgrade action', () => {
 		await page.goto( SETTINGS_URL );
 
 		const action = page
-			.locator( '.webhead-search-cloud-admin-page__header' )
+			.locator( '.searcio-admin-page__header' )
 			.getByRole( 'button', { name: 'Upgrade plan' } );
 
 		await expect( action ).toBeVisible();
@@ -74,7 +74,7 @@ test.describe( 'Header upgrade action', () => {
 		await mockPlan( page, { is_free: true, name: 'Free', upgrade_url: UPGRADE_URL } );
 		await page.goto( SETTINGS_URL );
 
-		const action = page.locator( '.webhead-search-cloud-admin-page__action--outline' ).first();
+		const action = page.locator( '.searcio-admin-page__action--outline' ).first();
 
 		await expect( action ).toBeVisible();
 
@@ -104,7 +104,7 @@ test.describe( 'Header upgrade action', () => {
 			const probe = document.createElement( 'div' );
 
 			probe.style.cssText = 'position:absolute;width:var(--wpds-border-width-focus)';
-			document.querySelector( '.webhead-search-cloud-admin-page' ).append( probe );
+			document.querySelector( '.searcio-admin-page' ).append( probe );
 
 			const width = probe.getBoundingClientRect().width;
 
@@ -125,7 +125,7 @@ test.describe( 'Header upgrade action', () => {
 		await mockPlan( page, { is_free: false, name: 'Starter', upgrade_url: UPGRADE_URL } );
 		await page.goto( SETTINGS_URL );
 
-		const header = page.locator( '.webhead-search-cloud-admin-page__header' );
+		const header = page.locator( '.searcio-admin-page__header' );
 
 		await expect( header ).toBeVisible();
 		// The tabs are drawn after the health check has had its chance to add one.

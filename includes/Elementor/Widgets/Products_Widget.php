@@ -2,7 +2,7 @@
 /**
  * Elementor widget: a row of products from Searcio.
  *
- * The Elementor twin of the `webhead-search-cloud/products` block. Both render
+ * The Elementor twin of the `searcio/products` block. Both render
  * through {@see \Webhead\WP\SearchCloud\Frontend\Product_List_Markup}, so the
  * two embed points cannot drift apart.
  *
@@ -28,9 +28,9 @@ defined( 'ABSPATH' ) || exit;
 /**
  * @since 1.1.0
  */
-final class Products_Widget extends Widget {
+class Products_Widget extends Widget {
 	public function get_name(): string {
-		return 'webhead-search-cloud-products';
+		return 'searcio-products';
 	}
 
 	public function get_title(): string {

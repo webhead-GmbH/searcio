@@ -142,9 +142,9 @@ let photo;
  */
 const CONTENT = [
 	'<!-- wp:html --><button type="button" class="whsc-e2e-probe">Go</button><!-- /wp:html -->',
-	'<!-- wp:webhead-search-cloud/search {"mode":"icon","enableVoice":true} /-->',
-	'<!-- wp:webhead-search-cloud/search {"mode":"box","placeholder":"Search the shop","cardSource":"server"} /-->',
-	'<!-- wp:webhead-search-cloud/products {"source":"similar","heading":"You may also like","layout":"carousel"} /-->',
+	'<!-- wp:searcio/search {"mode":"icon","enableVoice":true} /-->',
+	'<!-- wp:searcio/search {"mode":"box","placeholder":"Search the shop","cardSource":"server"} /-->',
+	'<!-- wp:searcio/products {"source":"similar","heading":"You may also like","layout":"carousel"} /-->',
 ].join( '\n' );
 
 /** The computed style of every element the plugin draws, keyed by where it is. */

@@ -30,10 +30,10 @@ import { useAnnounce } from '../../../../utils/announce';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 
-const pluginData = window.webhead_search_cloudData || {};
+const pluginData = window.searcioData || {};
 // How long a pause in typing has to be before a selector counts as written.
 const TYPING_PAUSE = 1000;
-const PLACEMENT_PATH = pluginData?.api?.placementPath || '/webhead-search-cloud/v1/placement';
+const PLACEMENT_PATH = pluginData?.api?.placementPath || '/searcio/v1/placement';
 
 /** The shortcodes' tags (`Search_Shortcode::TAG`, `Products_Shortcode::TAG`). */
 const SEARCH_TAG = 'searcio';
@@ -922,7 +922,7 @@ const PlacementTab = () => {
 	];
 
 	return (
-		<Stack direction="column" gap="lg" className="webhead-search-cloud-placement-tab">
+		<Stack direction="column" gap="lg" className="searcio-placement-tab">
 			<TabIntro
 				title={ __( 'Placement', 'searcio' ) }
 				description={ __(

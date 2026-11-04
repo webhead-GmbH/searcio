@@ -34,7 +34,7 @@ abstract class Framework_Test_Case extends WP_UnitTestCase {
 	/* --------------------------------------------------------------------- */
 
 	protected function plugin(): Plugin {
-		$plugin = $GLOBALS['webhead_search_cloud_test_plugin'] ?? null;
+		$plugin = $GLOBALS['searcio_test_plugin'] ?? null;
 
 		if ( ! $plugin instanceof Plugin ) {
 			$this->fail( 'The plugin was not booted by tests/Integration/bootstrap.php.' );
@@ -90,7 +90,7 @@ abstract class Framework_Test_Case extends WP_UnitTestCase {
 	 * argument validation, and registered schemas all run.
 	 *
 	 * The route is relative to the REST root, for example
-	 * `/webhead-search-cloud/v1/example`.
+	 * `/searcio/v1/example`.
 	 *
 	 * @param array<string, mixed> $body Encoded as a JSON body when not empty.
 	 */

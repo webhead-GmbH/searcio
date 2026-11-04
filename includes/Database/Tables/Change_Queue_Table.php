@@ -31,7 +31,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Change_Queue_Table extends Table {
 	protected function get_table_name(): string {
-		return 'webhead_search_cloud_change_queue';
+		return 'searcio_change_queue';
 	}
 
 	protected function get_table_schema( Blueprint $table ): void {

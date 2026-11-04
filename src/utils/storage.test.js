@@ -15,17 +15,26 @@ describe( 'getRecentSearches', () => {
 	} );
 
 	it( 'ignores corrupted JSON and non-array values', () => {
-		window.localStorage.setItem( 'webheadSearchCloud.recentSearches', 'not json' );
+		window.localStorage.setItem( 'searcio.recentSearches', 'not json' );
 		expect( getRecentSearches() ).toEqual( [] );
 
-		window.localStorage.setItem( 'webheadSearchCloud.recentSearches', JSON.stringify( { not: 'an array' } ) );
+		window.localStorage.setItem( 'searcio.recentSearches', JSON.stringify( { not: 'an array' } ) );
 		expect( getRecentSearches() ).toEqual( [] );
 	} );
 
 	it( 'filters out any non-string entries from a corrupted list', () => {
-		window.localStorage.setItem( 'webheadSearchCloud.recentSearches', JSON.stringify( [ 'shirt', 42, null, 'cap' ] ) );
+		window.localStorage.setItem( 'searcio.recentSearches', JSON.stringify( [ 'shirt', 42, null, 'cap' ] ) );
 
 		expect( getRecentSearches() ).toEqual( [ 'shirt', 'cap' ] );
+	} );
+
+	// Kept under the plugin's first name until 1.4.0.
+	it( 'moves a visitor\'s recent searches from their earlier key', () => {
+		window.localStorage.setItem( 'webheadSearchCloud.recentSearches', JSON.stringify( [ 'jacket' ] ) );
+
+		expect( getRecentSearches() ).toEqual( [ 'jacket' ] );
+		expect( window.localStorage.getItem( 'searcio.recentSearches' ) ).toBe( JSON.stringify( [ 'jacket' ] ) );
+		expect( window.localStorage.getItem( 'webheadSearchCloud.recentSearches' ) ).toBeNull();
 	} );
 } );
 

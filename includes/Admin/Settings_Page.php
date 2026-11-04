@@ -25,7 +25,7 @@ final class Settings_Page extends Page {
 		private Connection_State $connection_state
 	) {}
 	protected function get_menu_slug(): string {
-		return 'webhead-search-cloud';
+		return \Webhead\WP\SearchCloud\PLUGIN_SLUG;
 	}
 
 	protected function get_menu_parent(): ?string {
@@ -53,7 +53,7 @@ final class Settings_Page extends Page {
 	}
 
 	protected function get_root_element_id(): string {
-		return 'webhead-search-cloud-root';
+		return 'searcio-root';
 	}
 
 	protected function get_asset_key(): ?string {
@@ -80,7 +80,7 @@ final class Settings_Page extends Page {
 	}
 
 	protected function get_localize_script_object_name(): ?string {
-		return 'webhead_search_cloudData';
+		return 'searcioData';
 	}
 
 	protected function get_localize_script_data(): array {
@@ -88,16 +88,16 @@ final class Settings_Page extends Page {
 
 		return [
 			'api' => [
-				'settingsPath'        => '/webhead-search-cloud/v1/settings',
-				'testConnectionPath'  => '/webhead-search-cloud/v1/connection/test',
-				'connectPath'         => '/webhead-search-cloud/v1/connection/connect',
-				'disconnectPath'      => '/webhead-search-cloud/v1/connection/disconnect',
-				'connectionLegalPath' => '/webhead-search-cloud/v1/connection/legal',
-				'indexingConfigPath'  => '/webhead-search-cloud/v1/indexing/config',
-				'syncBase'            => '/webhead-search-cloud/v1/sync',
-				'cacheClearPath'      => '/webhead-search-cloud/v1/cache/clear',
-				'searchConfigPath'    => '/webhead-search-cloud/v1/search-config',
-				'placementPath'       => '/webhead-search-cloud/v1/placement',
+				'settingsPath'        => '/searcio/v1/settings',
+				'testConnectionPath'  => '/searcio/v1/connection/test',
+				'connectPath'         => '/searcio/v1/connection/connect',
+				'disconnectPath'      => '/searcio/v1/connection/disconnect',
+				'connectionLegalPath' => '/searcio/v1/connection/legal',
+				'indexingConfigPath'  => '/searcio/v1/indexing/config',
+				'syncBase'            => '/searcio/v1/sync',
+				'cacheClearPath'      => '/searcio/v1/cache/clear',
+				'searchConfigPath'    => '/searcio/v1/search-config',
+				'placementPath'       => '/searcio/v1/placement',
 				'nonce'               => wp_create_nonce( 'wp_rest' ),
 			],
 			'caps' => [

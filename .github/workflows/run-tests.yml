@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     # The repository is named searcio, and wp-env mounts a plugin under the
     # name of the folder it is checked out in. The plugin's scripts, tests and
-    # seeds name it by its slug, webhead-search-cloud, so it is checked out
+    # seeds name it by its slug, searcio, so it is checked out
     # into a folder of that name and every step runs there.
     defaults:
       run:
-        working-directory: webhead-search-cloud
+        working-directory: searcio
 
     strategy:
       matrix:
@@ -30,7 +30,7 @@ jobs:
       -   name: Checkout repository
           uses: actions/checkout@v4
           with:
-            path: webhead-search-cloud
+            path: searcio
 
       # package.json asks for Node 22: the webpack configuration loads the
       # design system's token plugin, an ES module, with require().
@@ -152,17 +152,17 @@ jobs:
     runs-on: ubuntu-latest
     # The repository is named searcio, and wp-env mounts a plugin under the
     # name of the folder it is checked out in. The plugin's scripts, tests and
-    # seeds name it by its slug, webhead-search-cloud, so it is checked out
+    # seeds name it by its slug, searcio, so it is checked out
     # into a folder of that name and every step runs there.
     defaults:
       run:
-        working-directory: webhead-search-cloud
+        working-directory: searcio
 
     steps:
       -   name: Checkout repository
           uses: actions/checkout@v4
           with:
-            path: webhead-search-cloud
+            path: searcio
 
       -   name: Setup Node.js
           uses: actions/setup-node@v4
@@ -244,7 +244,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: playwright-artifacts
-            path: webhead-search-cloud/artifacts/
+            path: searcio/artifacts/
             retention-days: 7
 
       -   name: Stop wp-env

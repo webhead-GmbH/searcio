@@ -26,12 +26,12 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.4.0
  */
 final class Menu_Item {
-	private const PANEL = 'posttype-webhead-search-cloud';
+	private const PANEL = 'posttype-searcio';
 
 	#[Action( 'admin_head-nav-menus.php' )]
 	public function add_meta_box(): void {
 		add_meta_box(
-			'webhead-search-cloud-menu-item',
+			'searcio-menu-item',
 			__( 'Searcio', 'searcio' ),
 			[ $this, 'render' ],
 			'nav-menus',
@@ -45,8 +45,8 @@ final class Menu_Item {
 		?>
 		<div id="<?php echo esc_attr( self::PANEL ); ?>" class="posttypediv">
 			<p class="description"><?php esc_html_e( 'A menu item that opens the Searcio search.', 'searcio' ); ?></p>
-			<div id="tabs-panel-webhead-search-cloud" class="tabs-panel tabs-panel-active">
-				<ul id="webhead-search-cloud-checklist" class="categorychecklist form-no-clear">
+			<div id="tabs-panel-searcio" class="tabs-panel tabs-panel-active">
+				<ul id="searcio-checklist" class="categorychecklist form-no-clear">
 					<li>
 						<label class="menu-item-title">
 							<input type="checkbox" class="menu-item-checkbox" name="menu-item[-1][menu-item-object-id]" value="-1">

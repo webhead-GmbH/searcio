@@ -1,5 +1,5 @@
 {
-    "name": "webhead-search-cloud",
+    "name": "searcio",
     "version": "1.3.1",
     "description": "Connect WordPress and WooCommerce to Searcio.",
     "main": "src/admin/settings/index.js",
@@ -11,15 +11,15 @@
         "test:e2e:headed": "wp-scripts test-playwright --config playwright.config.js --headed",
         "test:e2e:desktop": "wp-scripts test-playwright --config playwright.config.js --project=desktop-chrome",
         "wp-env": "wp-env",
-        "composer": "wp-env run cli --env-cwd=wp-content/plugins/webhead-search-cloud composer",
-        "composer:tests-cli": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud composer",
-        "test:unit": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud ./vendor/bin/phpunit --configuration phpunit.xml.dist",
-        "test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud ./vendor/bin/phpunit --configuration phpunit-integration.xml.dist",
+        "composer": "wp-env run cli --env-cwd=wp-content/plugins/searcio composer",
+        "composer:tests-cli": "wp-env run tests-cli --env-cwd=wp-content/plugins/searcio composer",
+        "test:unit": "wp-env run tests-cli --env-cwd=wp-content/plugins/searcio ./vendor/bin/phpunit --configuration phpunit.xml.dist",
+        "test:integration": "wp-env run tests-cli --env-cwd=wp-content/plugins/searcio ./vendor/bin/phpunit --configuration phpunit-integration.xml.dist",
         "test:php": "npm run test:unit && npm run test:integration",
         "env:start": "wp-env start",
         "env:stop": "wp-env stop",
         "env:destroy": "wp-env destroy",
-        "test:integration:multisite": "wp-env run tests-cli --env-cwd=wp-content/plugins/webhead-search-cloud ./vendor/bin/phpunit --configuration phpunit-integration-multisite.xml.dist"
+        "test:integration:multisite": "wp-env run tests-cli --env-cwd=wp-content/plugins/searcio ./vendor/bin/phpunit --configuration phpunit-integration-multisite.xml.dist"
     },
     "author": "Mir Mohammad Hosseini <mh@webhead.dev>",
     "license": "GPL-3.0-or-later",

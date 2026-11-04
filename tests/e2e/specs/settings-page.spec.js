@@ -12,11 +12,11 @@
 
 import { test, expect, setConnected, touchingInShell } from '../utils';
 
-const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud';
+const SETTINGS_URL = '/wp-admin/admin.php?page=searcio';
 
 // A notice is also read out, through a live region that holds the same words
 // outside the screen. What is asserted is what is drawn on it.
-const SCREEN = '#webhead-search-cloud-root';
+const SCREEN = '#searcio-root';
 
 // A tab waits on the settings response, then on its own.
 const LOADED = { timeout: 30000 };
@@ -48,13 +48,13 @@ test.describe( 'Settings screen', () => {
 		await page.setViewportSize( { width: 2400, height: 1200 } );
 		await page.goto( SETTINGS_URL );
 
-		const shell = page.locator( '.webhead-search-cloud-admin-page' );
+		const shell = page.locator( '.searcio-admin-page' );
 
 		await expect( shell ).toBeVisible( LOADED );
 
 		const measured = await shell.evaluate( ( element ) => {
 			const frame = element.closest( '.wrap' ).getBoundingClientRect();
-			const surface = element.querySelector( '.webhead-search-cloud-admin-page__surface' ).getBoundingClientRect();
+			const surface = element.querySelector( '.searcio-admin-page__surface' ).getBoundingClientRect();
 			const style = window.getComputedStyle( element );
 
 			return {
@@ -109,7 +109,7 @@ test.describe( 'Settings screen', () => {
 			Element.prototype.animate = function ( ...given ) {
 				const animation = animate.apply( this, given );
 
-				if ( this.closest( '.webhead-search-cloud-admin-page__header' ) ) {
+				if ( this.closest( '.searcio-admin-page__header' ) ) {
 					const entrance = { element: this, afterwards: null };
 					const index = seen.push( entrance ) - 1;
 
@@ -122,11 +122,11 @@ test.describe( 'Settings screen', () => {
 
 		await page.goto( SETTINGS_URL );
 
-		await expect( page.locator( '.webhead-search-cloud-admin-page__header' ) ).toBeVisible( LOADED );
+		await expect( page.locator( '.searcio-admin-page__header' ) ).toBeVisible( LOADED );
 
 		const read = () => page.evaluate( () => {
-			const header = document.querySelector( '.webhead-search-cloud-admin-page__header' );
-			const words = [ ...header.querySelectorAll( '.webhead-search-cloud-admin-page__title span, .webhead-search-cloud-admin-page__description span' ) ];
+			const header = document.querySelector( '.searcio-admin-page__header' );
+			const words = [ ...header.querySelectorAll( '.searcio-admin-page__title span, .searcio-admin-page__description span' ) ];
 
 			return {
 				words: words.length,
@@ -152,7 +152,7 @@ test.describe( 'Settings screen', () => {
 	test( 'shows the Searcio icon in its header, in the colours of the logo', async ( { page } ) => {
 		await page.goto( SETTINGS_URL );
 
-		const icon = page.locator( '.webhead-search-cloud-admin-page__icon svg' );
+		const icon = page.locator( '.searcio-admin-page__icon svg' );
 
 		await expect( icon ).toBeVisible( LOADED );
 		await expect( icon.locator( 'rect' ) ).toHaveAttribute( 'fill', '#319B80' );
@@ -166,7 +166,7 @@ test.describe( 'Settings screen', () => {
 		await page.goto( `${ SETTINGS_URL }&tab=sync` );
 
 		await expect( page.getByRole( 'heading', { level: 1, name: 'Searcio' } ) ).toBeVisible( LOADED );
-		await expect( page.locator( '#webhead-search-cloud-root h1' ) ).toHaveCount( 1 );
+		await expect( page.locator( '#searcio-root h1' ) ).toHaveCount( 1 );
 		await expect( page.getByRole( 'heading', { level: 2, name: 'Sync', exact: true } ) ).toBeVisible( LOADED );
 	} );
 
@@ -183,7 +183,7 @@ test.describe( 'Settings screen', () => {
 		await expect( strip ).toBeVisible( LOADED );
 
 		const measured = await strip.evaluate( ( list ) => {
-			const surface = list.closest( '.webhead-search-cloud-admin-page__surface' ).getBoundingClientRect();
+			const surface = list.closest( '.searcio-admin-page__surface' ).getBoundingClientRect();
 			const tabs = [ ...list.querySelectorAll( '[role="tab"]' ) ].map( ( tab ) => tab.getBoundingClientRect().width );
 
 			return {
@@ -226,7 +226,7 @@ test.describe( 'Settings screen', () => {
 		let fail = true;
 
 		await page.route(
-			( url ) => /\/webhead-search-cloud\/v1\/settings(\?|&|$)/.test( decodeURIComponent( url.href ) ),
+			( url ) => /\/searcio\/v1\/settings(\?|&|$)/.test( decodeURIComponent( url.href ) ),
 			( route ) => {
 				if ( ! fail ) {
 					return route.continue();
@@ -258,7 +258,7 @@ test.describe( 'Settings screen', () => {
 	 */
 	test( 'reports a save that failed beside the Save button, with the reason', async ( { page } ) => {
 		await page.route(
-			( url ) => /\/webhead-search-cloud\/v1\/settings(\?|&|$)/.test( decodeURIComponent( url.href ) ),
+			( url ) => /\/searcio\/v1\/settings(\?|&|$)/.test( decodeURIComponent( url.href ) ),
 			( route ) => {
 				if ( 'GET' === route.request().method() ) {
 					return route.continue();

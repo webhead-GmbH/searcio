@@ -80,8 +80,11 @@ use Webhead\WP\SearchCloud\Frontend\Site_Placement;
 use Webhead\WP\SearchCloud\Shortcodes\Products_Shortcode;
 use Webhead\WP\SearchCloud\Shortcodes\Search_Shortcode;
 use Webhead\WP\SearchCloud\Widgets\Widget_Registrar;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Products_Widget;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Search_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
+use Webhead\WP\SearchCloud\Lifecycle\Legacy_Names;
 use Webhead\WP\SearchCloud\Health\Health_Tests;
 use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
 
@@ -420,6 +423,7 @@ final class Plugin extends Base_Plugin {
 		);
 		$container->add( 'widget_registrar', Widget_Registrar::class );
 		$container->add( 'menu_item', Menu_Item::class );
+		$container->add( 'legacy_names', Legacy_Names::class );
 
 		// How the storefront entry is registered, said before anything asks for
 		// it. The configuration is a callback: it is built when a block or a
@@ -453,6 +457,7 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'placement_preview' ) );
 		$hooks_manager->register( $container->get( 'widget_registrar' ) );
 		$hooks_manager->register( $container->get( 'menu_item' ) );
+		$hooks_manager->register( $container->get( 'legacy_names' ) );
 	}
 
 	/**
@@ -475,7 +480,10 @@ final class Plugin extends Base_Plugin {
 		$elementor_manager
 			->set_category( static fn (): string => __( 'Searcio', 'searcio' ), 'eicon-search' )
 			->register_widget( Search_Widget::class )
-			->register_widget( Products_Widget::class );
+			->register_widget( Products_Widget::class )
+			// Their names before 1.4.0, for a page that still saves them so.
+			->register_widget( Legacy_Search_Widget::class )
+			->register_widget( Legacy_Products_Widget::class );
 	}
 
 	protected function register_tables( Database_Manager $database_manager, Container $container ): void {
@@ -502,7 +510,7 @@ final class Plugin extends Base_Plugin {
 		$uninstall_manager->set_policy( Uninstall_Manager::POLICY_KEEP_DATA );
 
 		$uninstall_manager->register_cleanup(
-			'webhead_search_cloud_scheduled_hooks',
+			'searcio_scheduled_hooks',
 			static function (): void {
 				wp_clear_scheduled_hook( Sync_Keys::HOOK_TICK );
 				wp_clear_scheduled_hook( Sync_Keys::HOOK_DRAIN );
@@ -511,7 +519,7 @@ final class Plugin extends Base_Plugin {
 		);
 
 		$uninstall_manager->register_cleanup(
-			'webhead_search_cloud_sync_options',
+			'searcio_sync_options',
 			static function (): void {
 				delete_option( Sync_Keys::OPTION_SNAPSHOT );
 				delete_option( Sync_Keys::OPTION_SEEN );
@@ -530,10 +538,10 @@ final class Plugin extends Base_Plugin {
 		 * too. Framework settings cleanup doesn't know about them.
 		 */
 		$uninstall_manager->register_cleanup(
-			'webhead_search_cloud_legacy_options',
+			'searcio_legacy_options',
 			static function (): void {
-				delete_option( 'webhead_search_cloud_site_id' );
-				delete_option( 'webhead_search_cloud_site_id_metadata' );
+				delete_option( 'searcio_site_id' );
+				delete_option( 'searcio_site_id_metadata' );
 
 				Delete_Legacy_Sync_Options::delete();
 			},
@@ -544,12 +552,12 @@ final class Plugin extends Base_Plugin {
 			$this->get_database_manager(),
 			'post',
 			[ Sync_Keys::META_SYNCED_AT, Sync_Keys::META_DOC_HASH, Sync_Keys::META_CONFIG_VER ],
-			'webhead_search_cloud_post_meta'
+			'searcio_post_meta'
 		);
 
 		$uninstall_manager->register_database_tables_cleanup(
 			$this->get_database_manager(),
-			'webhead_search_cloud_tables'
+			'searcio_tables'
 		);
 	}
 

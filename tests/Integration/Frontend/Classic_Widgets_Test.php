@@ -67,8 +67,8 @@ final class Classic_Widgets_Test extends Integration_Test_Case {
 		( new Menu_Item() )->render();
 		$html = (string) ob_get_clean();
 
-		$this->assertStringContainsString( 'id="posttype-webhead-search-cloud"', $html );
-		$this->assertStringContainsString( 'id="submit-posttype-webhead-search-cloud"', $html );
+		$this->assertStringContainsString( 'id="posttype-searcio"', $html );
+		$this->assertStringContainsString( 'id="submit-posttype-searcio"', $html );
 		$this->assertStringContainsString( 'name="menu-item[-1][menu-item-url]" value="#searcio"', $html );
 		$this->assertStringContainsString( 'name="menu-item[-1][menu-item-classes]" value="searcio-open"', $html );
 	}

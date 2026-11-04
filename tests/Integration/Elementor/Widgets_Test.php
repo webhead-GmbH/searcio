@@ -3,7 +3,8 @@
  * Elementor widget integration tests.
  *
  * Covers the plugin's Elementor integration point: the two widgets it names
- * to the framework's Elementor manager in `Plugin::register_elementor()`, and
+ * to the framework's Elementor manager in `Plugin::register_elementor()` (and
+ * the same two under their names before 1.4.0, out of the panel), and
  * the {@see \Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget} contract
  * (name, category, keywords, and the shared runtime bundle it depends on). The
  * widget's rendered markup is the same `Trigger_Markup` output already covered
@@ -20,6 +21,8 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Tests\Integration\Elementor;
 
+use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Products_Widget;
+use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Search_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
@@ -36,9 +39,24 @@ final class Widgets_Test extends Integration_Test_Case {
 
 	public function test_both_widgets_are_named_to_the_framework_manager(): void {
 		$this->assertSame(
-			[ Search_Widget::class, Products_Widget::class ],
+			[ Search_Widget::class, Products_Widget::class, Legacy_Search_Widget::class, Legacy_Products_Widget::class ],
 			array_values( $this->plugin()->get_elementor_manager()->widgets() )
 		);
+	}
+
+	/**
+	 * A page saved before 1.4.0 that the move did not reach names the widgets
+	 * by their first names. They draw the same widgets, and only the new ones
+	 * are offered in the panel.
+	 */
+	public function test_a_page_saved_under_the_first_names_still_draws_both_widgets(): void {
+		$widgets = \Elementor\Plugin::$instance->widgets_manager;
+		$search  = $widgets->get_widget_types( 'webhead-search-cloud-search' );
+
+		$this->assertInstanceOf( Search_Widget::class, $search );
+		$this->assertInstanceOf( Products_Widget::class, $widgets->get_widget_types( 'webhead-search-cloud-products' ) );
+		$this->assertFalse( $search->show_in_panel() );
+		$this->assertTrue( $widgets->get_widget_types( 'searcio-search' )->show_in_panel() );
 	}
 
 	/**
@@ -48,8 +66,8 @@ final class Widgets_Test extends Integration_Test_Case {
 	public function test_elementor_holds_both_widgets_under_their_saved_names(): void {
 		$widgets = \Elementor\Plugin::$instance->widgets_manager;
 
-		$this->assertInstanceOf( Search_Widget::class, $widgets->get_widget_types( 'webhead-search-cloud-search' ) );
-		$this->assertInstanceOf( Products_Widget::class, $widgets->get_widget_types( 'webhead-search-cloud-products' ) );
+		$this->assertInstanceOf( Search_Widget::class, $widgets->get_widget_types( 'searcio-search' ) );
+		$this->assertInstanceOf( Products_Widget::class, $widgets->get_widget_types( 'searcio-products' ) );
 	}
 
 	/**
@@ -80,7 +98,7 @@ final class Widgets_Test extends Integration_Test_Case {
 	public function test_products_widget_identity(): void {
 		$widget = new Products_Widget();
 
-		$this->assertSame( 'webhead-search-cloud-products', $widget->get_name() );
+		$this->assertSame( 'searcio-products', $widget->get_name() );
 		$this->assertNotSame( '', $widget->get_title() );
 	}
 
@@ -94,7 +112,7 @@ final class Widgets_Test extends Integration_Test_Case {
 			[
 				'id'         => 'e4f5a6b',
 				'elType'     => 'widget',
-				'widgetType' => 'webhead-search-cloud-products',
+				'widgetType' => 'searcio-products',
 				'settings'   => [
 					'source'       => 'category',
 					'filter_field' => 'categories',
@@ -122,7 +140,7 @@ final class Widgets_Test extends Integration_Test_Case {
 	public function test_widget_identity(): void {
 		$widget = new Search_Widget();
 
-		$this->assertSame( 'webhead-search-cloud-search', $widget->get_name() );
+		$this->assertSame( 'searcio-search', $widget->get_name() );
 		$this->assertNotSame( '', $widget->get_title() );
 		// Listed under the plugin's own category in the panel.
 		$this->assertSame( [ $this->plugin()->get_elementor_manager()->category_slug() ], $widget->get_categories() );
@@ -204,7 +222,7 @@ final class Widgets_Test extends Integration_Test_Case {
 		}
 
 		foreach ( [ 'editor_preview', 'editor_preview_query', 'modal_animation' ] as $id ) {
-			$this->assertSame( 'webhead_search_cloud_modal', $ids[ $id ]['section'], $id );
+			$this->assertSame( 'searcio_modal', $ids[ $id ]['section'], $id );
 		}
 	}
 
@@ -284,7 +302,7 @@ final class Widgets_Test extends Integration_Test_Case {
 			[
 				'id'         => 'f1l7e2s',
 				'elType'     => 'widget',
-				'widgetType' => 'webhead-search-cloud-search',
+				'widgetType' => 'searcio-search',
 				'settings'   => [ 'facet_bar_limit' => 3 ],
 			],
 			[]
@@ -303,7 +321,7 @@ final class Widgets_Test extends Integration_Test_Case {
 			[
 				'id'         => 'a1b2c3d',
 				'elType'     => 'widget',
-				'widgetType' => 'webhead-search-cloud-search',
+				'widgetType' => 'searcio-search',
 				'settings'   => [ 'editor_preview' => 'yes', 'editor_preview_query' => 'shirt' ],
 			],
 			[]

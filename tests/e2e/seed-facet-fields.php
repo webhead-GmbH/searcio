@@ -20,6 +20,6 @@
 
 $whsc_fields = isset( $args[0] ) && 'clear' !== $args[0] ? array_values( array_filter( array_map( 'trim', explode( ',', (string) $args[0] ) ) ) ) : [];
 
-update_option( 'webhead_search_cloud_facet_fields', $whsc_fields );
+update_option( 'searcio_facet_fields', $whsc_fields );
 
 echo 'OK';
