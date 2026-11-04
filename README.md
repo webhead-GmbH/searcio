@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-	The plugin indexes your content into Searcio, keeps it in sync as content changes, and renders a client-side search modal (via a Gutenberg block or an Elementor widget) that searches, filters, and displays results without a page reload.
+	The plugin indexes your content into Searcio, keeps it in sync as content changes, and renders a client-side search modal (via a Gutenberg block, an Elementor widget, a shortcode, a classic widget, a menu item or the Placement tab's site-wide ways) that searches, filters, and displays results without a page reload.
 </p>
 
 <p align="center">
@@ -24,18 +24,23 @@
 
 ## Features
 
-- **Full-screen search modal** - a fast, keyboard-friendly overlay with search-as-you-type, autocomplete suggestions,
-  recent and popular searches, and an empty-state highlights carousel.
+- **Full-screen search modal** - a fast, keyboard-friendly overlay with autocomplete suggestions as you type, results
+  on Enter or as you type, recent and popular searches, and an empty-state highlights carousel. On a phone it fills the
+  screen and its results scroll down in a grid.
 - **Faceted filtering** - filter results by content type and by any field you've configured as a facet (category, tags,
   and so on), with a minimum/maximum for numeric fields such as price or rating. The filters sit in one bar under the
-  search field and apply as they are picked, in a popover, a side drawer or, on a phone, a sheet.
+  search field and apply as they are picked, in a popover, a side drawer or, on a phone, a sheet. Categories can be listed
+  in one list, as main categories only, or as the shop's tree; an attribute's swatches from a swatches plugin or theme
+  show as color, image or label pills; and a field can need every picked value (AND) instead of any (OR) once Searcio
+  offers it.
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
-- **Gutenberg block and Elementor widget** - the same search experience, fully themeable (colors, radius, typography,
-  spacing) from either editor, with no code required.
+- **Gutenberg block and Elementor widget** - the same search experience, themeable with no code: colors, sizes, radius
+  and spacing in the block's Styles sidebar, plus typography and a font family in the Elementor widget's Style tab.
 - **Any theme, any builder** - the Placement tab takes over the theme's own search forms, opens Searcio from the
   theme's search icon, adds a floating button and a Ctrl+K shortcut; `[searcio]` and `[searcio_products]`, two classic
-  widgets and a menu item place it anywhere else.
+  widgets and a menu item place it anywhere else. Its look editor styles all of these as fully as the Elementor widget,
+  part by part and per device, with any font of the site or of Google Fonts, beside a live preview.
 - **Server-designed result cards** - optionally use card templates designed in the Searcio dashboard instead of the
   plugin's built-in card layout.
 - **Configurable indexing** - choose which post types and WooCommerce products to index, and map custom fields,
@@ -52,6 +57,8 @@
 - **Category merchandising** - curate a category listing: pin products to the top, keep products out, show a banner.
 - **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
   results in their current language.
+- **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and
+  Polish.
 - **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental
   sync that pushes edits shortly after they happen. A sync that cannot reach Searcio tries again by itself. Full
   sync history, pause/resume/cancel controls, and retention settings are all available from the dashboard.
@@ -68,6 +75,13 @@ The AI Assistant, search by photo and the quiz appear when your Searcio plan and
 - WooCommerce 8.0+ (optional - only needed to index and search products)
 - WPML or Polylang (optional - only needed for multilingual search scoping)
 
+## Works with
+
+- **Swatches plugins** - Variation Swatches for WooCommerce by GetWooPlugins (and its Pro), by RadiusTheme, by CartFlows
+  and by Woosuite; WCBoost - Variation Swatches; WPC Variation Swatches; Variation Swatches and Photos; Kadence Shop Kit;
+  Choosly; Product Variation Swatches by ThemeHigh; the free YITH WooCommerce Color, Image & Label Variation Swatches.
+- **Themes** - Flatsome, Porto and WoodMart, whose own swatches show in the filters, and Miniture.
+
 ## Installation
 
 1. Install and activate the plugin like any other WordPress plugin. The package is the
@@ -75,8 +89,9 @@ The AI Assistant, search by photo and the quiz appear when your Searcio plan and
    [release](https://github.com/webhead-GmbH/searcio/releases).
 2. Go to **Searcio** in the WordPress admin menu. A site that is not connected yet opens on the **Connection**
    tab.
-3. Accept the terms and click **Connect to Searcio**. If you already have keys for this site, enter them under
-   **Advanced: manual key entry** instead.
+3. Accept the terms and click **Connect to Searcio**. If your email already has a Searcio account, Searcio emails a
+   confirmation link, and you paste the keys it gives you under **Advanced: manual key entry**, where keys you already
+   have for this site go too.
 4. Open the **Indexing** tab and choose which content should be searchable.
 5. Open the **Sync** tab and start your first sync.
 6. Add the **Searcio Search** block to a page (or the **Searcio Search** widget in Elementor) to place the search trigger

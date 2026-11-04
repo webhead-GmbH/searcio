@@ -10,7 +10,7 @@
 
 ## 1. Install the plugin
 
-Install the package of a release, `searcio-<version>.zip`, with **Upload Plugin** on the screen where WordPress adds a plugin, or extract it into `wp-content/plugins/webhead-search-cloud`, then activate it.
+Install the package of a release, `searcio-<version>.zip`, with **Upload Plugin** on the screen where WordPress adds a plugin, or extract it into `wp-content/plugins`, which gives the folder `wp-content/plugins/searcio`, then activate it.
 
 ## 2. Connect to Searcio
 
@@ -49,12 +49,12 @@ After the first sync, a scheduled sync runs daily and an incremental sync pushes
 
 ## 5. Add the search experience to your site
 
-Add the **Searcio Search** block to any page or template in the block editor, or the **Searcio Search** widget if you use Elementor (both widgets are listed under *Searcio* in Elementor's panel). Both offer the same options:
+Add the **Searcio Search** block to any page or template in the block editor, or the **Searcio Search** widget if you use Elementor (both widgets are listed under *Searcio* in Elementor's panel). Both offer the same options, except that typography and a font family are the Elementor widget's alone:
 
 - **Trigger style** - an icon button or a full search box
 - **Restrict to type** - scope this instance to one content type, or leave it open to all indexed types
 - **Card source** - the plugin's own built-in result card, or a template you've designed in the Searcio dashboard
-- Full color, spacing, radius, and typography controls for every part of the modal (trigger, input, buttons, facets, result cards, carousel)
+- Color, size, radius and spacing controls for every part of the modal (trigger, window, search field, buttons, suggestions, recent and popular searches, filters, mode tabs, assistant, banner, quiz, result cards, carousel)
 
 Multiple instances can exist on the same site with different settings - for example, an icon in the header scoped to everything, and a search box on a landing page scoped to one content type.
 
@@ -66,6 +66,9 @@ A theme with a header of its own (Enfold, Divi, Avada, Flatsome and most classic
 - **Open Searcio from the theme's own search** - a click on an element a CSS selector names opens Searcio, and the theme's own dropdown or overlay stays closed; a search field opens it with what was typed. The tab names your theme and suggests its selectors for Enfold, Flatsome, Astra, Kadence, Blocksy, GeneratePress, OceanWP, Storefront, Divi, Woodmart, Avada, The7 and Salient, and for Elementor Pro's search form. For another theme, right-click its search icon, choose *Inspect*, and copy a class or an id it has (Enfold's is `#menu-item-search > a`).
 - **Keyboard shortcut** - Ctrl+K (Cmd+K on a Mac) and `/` outside a field open the search.
 - **Floating search button** - a button in a bottom corner of every page, on phones only or on every screen, for a theme that hides its search on a phone. Lift it above a cookie notice or a cart bar with *Distance from the bottom*.
+
+- **Look** - how `[searcio]`, the *Searcio Search* classic widget, a form Searcio takes over and the floating button look and behave, unless one of them says otherwise. **Open the look editor** opens a full-screen editor with the Elementor widget's style settings, part by part and in each state, for desktops, tablets and phones, beside a page of your site drawn at that device's width that shows each change as you make it. A Google font you pick there is loaded from Google's servers by your visitors' browsers.
+- **Product rows** - what `[searcio_products]` and the *Searcio Products* classic widget show unless they say otherwise.
 
 The other ways, which the tab also lists:
 

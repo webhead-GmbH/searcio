@@ -8,7 +8,7 @@ Stable tag: 1.3.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Fast, AI-powered search for WordPress and WooCommerce: instant results as you type, smart filters, an AI shopping assistant and photo search.
+Fast, AI-powered search for WordPress and WooCommerce: suggestions as you type, smart filters, an AI shopping assistant and photo search.
 
 == Description ==
 
@@ -22,16 +22,16 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 
 = Lightning-fast, by design =
 
-* **Instant results** - results appear as visitors type (or when they press Enter, if you prefer), with autocomplete suggestions they can pick with the arrow keys.
+* **Instant results** - suggestions appear as visitors type, and they can pick one with the arrow keys. Results come when they press Enter, or as they type if you turn that on.
 * **Forgives typos** - a misspelled search still finds the right product.
 * **Light on your server** - every search goes from the visitor's browser straight to Searcio. Your WordPress database is not queried for a single search, so checkout and the rest of your site keep all the server they need.
-* **Loads only where it is used** - the search code is added only to pages that show a search box or icon.
+* **Loads only where it is used** - the search code is added only to pages that show a search box, a search icon or a product row. It goes on every page only when you turn on a way that needs it there: your theme's own search icon, the keyboard shortcut or the floating button.
 * **Always up to date** - a background sync sends only what changed, in small batches, picks up edits shortly after you save them, and tries again by itself when the service cannot be reached.
 
 = Built for WooCommerce =
 
 * **Product cards that sell** - images, prices as your shop shows them (with or without tax), sale badges, stock status and price ranges for variable and grouped products.
-* **Smart filters** - narrow results by content type, category, tags, attributes such as color or size, and a price range.
+* **Smart filters** - one bar under the search field narrows results by content type, category (all categories, the main ones, or a tree to the depth you choose), tags, attributes such as color or size, and a price range. Colors, images and labels come from your swatches plugin or theme.
 * **Product finder** - a short guided quiz that turns a few answers into a list of matching products.
 * **Merchandising** - pin products to the top of a search or a category page, keep products out, and show a promotional banner.
 * **Search redirects** - send searches like "shipping" or "returns" straight to the right page.
@@ -48,22 +48,27 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 
 = Fits your site =
 
-* **Gutenberg block and Elementor widgets** - put a search box or a search icon anywhere, for example in your header, and a row of products on any page.
+* **Gutenberg blocks and Elementor widgets** - put a search box or a search icon anywhere, for example in your header, and a row of products on any page.
 * **Any theme, any builder** - Searcio can take over your theme's own search, open from its search icon, sit in a floating button, or go anywhere as the `[searcio]` shortcode, a classic widget or a menu item.
-* **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. The search follows your site's font and text color.
+* **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, the look editor on the Placement tab does the same, fonts included, set apart for desktops, tablets and phones. Until you pick others, the search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
 * **Multilingual** - works with WPML and Polylang, so visitors only see results in their language.
 * **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and Polish.
 * **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
 * **WP-CLI** - run and watch syncs from the command line or a real system cron.
 
+= Works with =
+
+* **Swatches plugins** - Variation Swatches for WooCommerce by GetWooPlugins (and its Pro), by RadiusTheme, by CartFlows and by Woosuite; WCBoost - Variation Swatches; WPC Variation Swatches; Variation Swatches and Photos; Kadence Shop Kit; Choosly; Product Variation Swatches by ThemeHigh; and the free YITH WooCommerce Color, Image & Label Variation Swatches. Their colors, two-color values, images and labels show in the search window's filters.
+* **Themes** - Flatsome, Porto and WoodMart, whose own swatches show in the filters, and Miniture.
+
 = Get started in minutes =
 
 1. Install the plugin and open **Searcio** in your WordPress admin.
-2. Click **Connect to Searcio**. Your free Searcio account is set up for you in one click, or the one you already have is found.
+2. Click **Connect to Searcio**. Your free Searcio account is set up for you in one click. If your email already has one, Searcio emails you a link to confirm it instead.
 3. Choose what should be searchable on the **Indexing** tab.
 4. Start your first sync on the **Sync** tab.
-5. Add the **Searcio Search** block or Elementor widget where your visitors look for search.
+5. Add the **Searcio Search** block or Elementor widget where your visitors look for search, or, with any other theme or builder, turn on a way on the **Placement** tab.
 
 = Support Searcio =
 
@@ -77,10 +82,10 @@ A small Searcio logo, linked to searcio.com, sits at the bottom of the search wi
 
 1. In your WordPress admin, go to **Plugins > Add New Plugin**, search for **Searcio**, then install and activate it. Or upload the plugin zip under **Plugins > Add New Plugin > Upload Plugin**.
 2. Go to **Searcio** in the WordPress admin menu. A site that is not connected yet opens on the **Connection** tab.
-3. Accept the terms and click **Connect to Searcio**. Your free Searcio account is set up with your admin email address. If you already have keys for this site, enter them under **Advanced: manual key entry** instead.
+3. Accept the terms and click **Connect to Searcio**. Your free Searcio account is set up with your site's admin email address, or another one you enter under **Not this email?**. If that email already has a Searcio account, Searcio emails it a confirmation link: finish connecting on the Searcio dashboard, then paste the keys under **Advanced: manual key entry**. Keys you already have for this site go there too.
 4. Open the **Indexing** tab and choose which content should be searchable.
 5. Open the **Sync** tab and start your first sync.
-6. Add the **Searcio Search** block to a page or template part (or the **Searcio Search** widget in Elementor) to place the search box or icon anywhere on your site.
+6. Add the **Searcio Search** block to a page or template part (or the **Searcio Search** widget in Elementor) to place the search box or icon anywhere on your site. With any other theme or builder, open the **Placement** tab: let Searcio take over your theme's search, add a floating search button, or use the `[searcio]` shortcode.
 
 == Frequently Asked Questions ==
 
@@ -92,11 +97,11 @@ When you want AI search, the AI shopping assistant, photo search or higher limit
 
 = Do I have to sign up somewhere? =
 
-No sign-up form. The search runs on Searcio, a hosted service, and connecting from the plugin sets up your free Searcio account in one click with your admin email address, or finds the one you already have.
+No sign-up form. The search runs on Searcio, a hosted service, and connecting from the plugin sets up your free Searcio account in one click with your admin email address. If that email already has an account, Searcio emails a confirmation link, and you paste the keys it gives you on the Connection tab.
 
 = Will it slow down my site? =
 
-No. Searches go from the visitor's browser straight to Searcio, so your WordPress server and database are not involved in a single search. The search code loads only on pages that show a search box or icon, and the sync runs in the background in small batches.
+No. Searches go from the visitor's browser straight to Searcio, so your WordPress server and database are not involved in a single search. The search code loads only on pages that show a search box, icon or product row, and on every page only when you turn on your theme's search icon, the keyboard shortcut or the floating button on the Placement tab. The sync runs in the background in small batches.
 
 = Do I need WooCommerce? =
 
@@ -112,11 +117,11 @@ Yes. Use the Searcio Search block in the block editor or the Site Editor, or the
 
 = My theme has no block or Elementor support. Can I still use it? =
 
-Yes. Under Searcio > Placement, let Searcio take over your theme's search forms or open from your theme's own search icon (the tab suggests the selector for many popular themes), add a floating search button, or turn on the Ctrl+K shortcut. You can also place `[searcio]` in any page builder that runs shortcodes, use the classic widgets or add a search item to a menu. Every option is off until you turn it on.
+Yes. Under Searcio > Placement, let Searcio take over your theme's search forms or open from your theme's own search icon (the tab suggests the selector for many popular themes), add a floating search button, or turn on the keyboard shortcut (Ctrl+K, Cmd+K on a Mac, or / outside a field). You can also place `[searcio]` in any page builder that runs shortcodes, use the classic widgets or add a search item to a menu. Every option is off until you turn it on.
 
 = Can I change how it looks? =
 
-Yes. The block and the Elementor widget let you style the search box, the window, the filters, the result cards, the AI assistant and more. Developers can also theme it with `--whsc-*` CSS custom properties.
+Yes. The block and the Elementor widget let you style the search box, the window, the filters, the result cards, the AI assistant and more. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, open the look editor on the Placement tab: it has the Elementor widget's style settings, fonts included, for desktops, tablets and phones, with a large preview. Developers can also theme it with `--whsc-*` CSS custom properties.
 
 = Does it support multilingual sites? =
 
@@ -160,12 +165,13 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 
 This plugin sends data to Searcio, the hosted service that powers the search. Search does not work without it.
 
-* **When you connect:** the site's name and address, and the email address and name of the admin who connects. Searcio uses them to create your account, or to find the one you have.
+* **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, and which agreements you accepted. Searcio uses them to create your account, or to find the one you have.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
 * **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Searcio stores and applies.
-* **When a visitor searches:** the search term, and which result they open. Their browser contacts the service directly, so their IP address is visible to it.
+* **When a visitor searches:** the search term, the filters they pick or the answers they give in the product finder, the language of the page, how the search was started and where its results are shown, and which result they open. A product row asks for the products similar to the product on the page. Their browser contacts the service directly, so their IP address is visible to it.
 * **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
 * **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
+* **When you pick a Google font in the look editor on the Placement tab** (off unless you pick one, and never for a font your site already has): every visitor's browser loads that font from Google Fonts (https://fonts.googleapis.com) on the pages that show the search, so their IP address is visible to Google. Google's privacy policy: https://policies.google.com/privacy
 
 Nothing else is sent, and no visitor accounts are created.
 
@@ -176,15 +182,17 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.
+- The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.
 - Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR), once your Searcio service offers it.
 - Names with an "&" (post types, attributes, custom fields, price separators, popular searches) show as typed instead of as "&amp;".
-- New on the Placement tab: a look editor with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
+- New on the Placement tab: a look editor for the shortcode, the classic widgets, a search form Searcio takes over and the floating button, with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
 - On phones the search window fills the screen and its results scroll down in a grid; recent and popular searches take one row each, so products are in sight at once.
 - No Search button beside the search field any more: Enter searches, and the phone keyboard shows a Search key.
 - On phones the AI assistant fills the screen with its message field at the bottom, and the tabs no longer jump in as the window opens.
 - A theme that styles WooCommerce's block buttons no longer turns the search window's icons white: the colours set in the widget or the block now reach them, with no custom CSS.
 - New on the Search Config tab: the category filter can show all categories, the main categories only, or the main categories with their subcategories under them, to the number of levels you choose.
-- The filters show what your swatches plugin or theme set up: images, two-colour pills and short labels as well as colours, from Variation Swatches by GetWooPlugins, RadiusTheme, CartFlows and Woosuite, WCBoost, WPC, Variation Swatches and Photos, Kadence Shop Kit, Choosly, ThemeHigh, YITH, Flatsome, Porto and WoodMart. A value you have not given a swatch yet no longer turns the filter into a plain list.
+- The filters show what your swatches plugin or theme set up: images, two-colour pills and short labels as well as colours, from Variation Swatches by GetWooPlugins (and its Pro), RadiusTheme, CartFlows and Woosuite, WCBoost, WPC, Variation Swatches and Photos, Kadence Shop Kit, Choosly, ThemeHigh, the free YITH Color, Image & Label Variation Swatches, Flatsome, Porto and WoodMart. A value you have not given a swatch yet no longer turns the filter into a plain list.
 - Filters whose values are numbers are easier to read: the count is smaller and in brackets, and a value like "256 GB" is no longer cut.
 - Popular searches have a trending arrow.
 - The microphone, the assistant's icon and the words of the filter buttons stand in the middle of their buttons.
