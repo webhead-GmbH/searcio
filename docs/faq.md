@@ -30,11 +30,11 @@ WooCommerce isn't active, or is below the minimum supported version (8.0). Produ
 
 ### I changed the Indexing configuration but search results didn't change
 
-Indexing configuration only takes effect on the next sync. Either wait for the next scheduled sync or start one manually from the **Sync** tab. Search Config changes (weights, facets, synonyms, languages), by contrast, apply immediately on the next search - no sync required.
+Indexing configuration only takes effect on the next sync. Either wait for the next scheduled sync or start one manually from the **Sync** tab. Search Config changes (weights, facets, synonyms), by contrast, apply immediately on the next search - no sync required. Languages are the exception for content: posts in a language that was not enabled were never sent, so after enabling a language, run a sync to index them.
 
 ### I don't see the language options on the Search Config tab
 
-Language configuration only appears when Searcio's own service reports language support and a multilingual plugin (WPML or Polylang) is active on the site. With neither active, search is unrestricted by language and there's nothing to configure.
+The **Languages** section is always on the Search Config tab. With WPML or Polylang active it lists the site's languages to tick; with neither, it is a field for comma-separated language codes, and the plugin restricts neither indexing nor search by language while no multilingual plugin is active (see [`multilingual.md`](multilingual.md)).
 
 ### A sync run shows "Failed" or content is being skipped
 
