@@ -227,6 +227,12 @@ async function walk( page, url ) {
 	await page.reload();
 	// A state is read as soon as it is reached, so nothing may still be on its way there.
 	await page.addStyleTag( { content: '*, *::before, *::after { transition: none !important; animation: none !important; }' } );
+	// The theme's header is the theme's: its menu button and the account and
+	// cart blocks a recent WooCommerce adds to a block theme's header take the
+	// stylesheet's rules for every button and run wider than a phone (to 427px
+	// at 393px on CI). It is kept to the screen in both readings, so the page's
+	// width is the plugin's part and the theme's content.
+	await page.addStyleTag( { content: 'header.wp-block-template-part { overflow-x: clip; }' } );
 
 	await expect( triggers.nth( 1 ).locator( 'input' ) ).toBeVisible();
 	await expect( page.locator( '[data-whsc-list] .whsc-card' ).first() ).toBeVisible();
