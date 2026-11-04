@@ -29,6 +29,7 @@ import {
 	setSiteStyles,
 	clearSiteStyles,
 	postHit,
+	crossingTheEdge,
 } from '../utils';
 
 /** What a site's rule could change and a visitor could see. */
@@ -242,28 +243,7 @@ async function walk( page, url ) {
 	// modal with it, and the two readings would be of two different screens. So
 	// the site's own page has to fit, styled or not; the plugin's part of it is
 	// in that width too.
-	// What crosses the screen's right edge, innermost first, so a failure says
-	// which element made the page wider and not only by how much.
-	const beyond = await page.evaluate( () => {
-		const edge = document.documentElement.clientWidth;
-		const name = ( node ) => `${ node.tagName.toLowerCase() }${ node.id ? '#' + node.id : '' }${ [ ...node.classList ].slice( 0, 3 ).map( ( one ) => '.' + one ).join( '' ) }`;
-		// A carousel's cards run past its own box, which scrolls: not the page.
-		const clipped = ( node ) => {
-			for ( let parent = node.parentElement; parent && parent !== document.body; parent = parent.parentElement ) {
-				if ( 'visible' !== window.getComputedStyle( parent ).overflowX && parent.getBoundingClientRect().right <= edge + 1 ) {
-					return true;
-				}
-			}
-
-			return false;
-		};
-
-		return [ ...document.body.querySelectorAll( '*' ) ]
-			.filter( ( node ) => node.getBoundingClientRect().right > edge + 1 && ! clipped( node ) )
-			.filter( ( node ) => ! [ ...node.children ].some( ( child ) => child.getBoundingClientRect().right > edge + 1 ) )
-			.slice( 0, 6 )
-			.map( ( node ) => `${ name( node ) } ${ Math.round( node.getBoundingClientRect().width ) }px wide, to ${ Math.round( node.getBoundingClientRect().right ) }px, in ${ name( node.parentElement ) }` );
-	} );
+	const beyond = await crossingTheEdge( page );
 
 	expect(
 		await page.evaluate( () => document.documentElement.scrollWidth - document.documentElement.clientWidth ),

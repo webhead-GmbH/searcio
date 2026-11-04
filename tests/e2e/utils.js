@@ -505,6 +505,37 @@ export class SearchWidget {
 }
 
 /**
+ * What crosses the screen's right edge, innermost first, so a check that the
+ * page fits the screen says which element made it wider and not only by how
+ * much. What a box of its own keeps to the screen is left out: a carousel's
+ * cards run past its own box, which scrolls, not the page.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @return {Promise<string[]>} Six at most, as `textarea#comment 340px wide, to 370px, in p.comment-form-comment`.
+ */
+export async function crossingTheEdge( page ) {
+	return page.evaluate( () => {
+		const edge = document.documentElement.clientWidth;
+		const name = ( node ) => `${ node.tagName.toLowerCase() }${ node.id ? '#' + node.id : '' }${ [ ...node.classList ].slice( 0, 3 ).map( ( one ) => '.' + one ).join( '' ) }`;
+		const clipped = ( node ) => {
+			for ( let parent = node.parentElement; parent && parent !== document.body; parent = parent.parentElement ) {
+				if ( 'visible' !== window.getComputedStyle( parent ).overflowX && parent.getBoundingClientRect().right <= edge + 1 ) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		return [ ...document.body.querySelectorAll( '*' ) ]
+			.filter( ( node ) => node.getBoundingClientRect().right > edge + 1 && ! clipped( node ) )
+			.filter( ( node ) => ! [ ...node.children ].some( ( child ) => child.getBoundingClientRect().right > edge + 1 ) )
+			.slice( 0, 6 )
+			.map( ( node ) => `${ name( node ) } ${ Math.round( node.getBoundingClientRect().width ) }px wide, to ${ Math.round( node.getBoundingClientRect().right ) }px, in ${ name( node.parentElement ) }` );
+	} );
+}
+
+/**
  * What an admin screen stacks without a gap, as a list of sentences; empty
  * when nothing touches.
  *
