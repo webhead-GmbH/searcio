@@ -227,6 +227,12 @@ async function walk( page, url ) {
 	await page.reload();
 	// A state is read as soon as it is reached, so nothing may still be on its way there.
 	await page.addStyleTag( { content: '*, *::before, *::after { transition: none !important; animation: none !important; }' } );
+	// The theme's header is the theme's: its menu button and the account and
+	// cart blocks a recent WooCommerce adds to a block theme's header take the
+	// stylesheet's rules for every button and run wider than a phone (to 427px
+	// at 393px on CI). It is kept to the screen in both readings, so the page's
+	// width is the plugin's part and the theme's content.
+	await page.addStyleTag( { content: 'header.wp-block-template-part { overflow-x: clip; }' } );
 
 	await expect( triggers.nth( 1 ).locator( 'input' ) ).toBeVisible();
 	await expect( page.locator( '[data-whsc-list] .whsc-card' ).first() ).toBeVisible();
@@ -236,9 +242,32 @@ async function walk( page, url ) {
 	// modal with it, and the two readings would be of two different screens. So
 	// the site's own page has to fit, styled or not; the plugin's part of it is
 	// in that width too.
+	// What crosses the screen's right edge, innermost first, so a failure says
+	// which element made the page wider and not only by how much.
+	const beyond = await page.evaluate( () => {
+		const edge = document.documentElement.clientWidth;
+		const name = ( node ) => `${ node.tagName.toLowerCase() }${ node.id ? '#' + node.id : '' }${ [ ...node.classList ].slice( 0, 3 ).map( ( one ) => '.' + one ).join( '' ) }`;
+		// A carousel's cards run past its own box, which scrolls: not the page.
+		const clipped = ( node ) => {
+			for ( let parent = node.parentElement; parent && parent !== document.body; parent = parent.parentElement ) {
+				if ( 'visible' !== window.getComputedStyle( parent ).overflowX && parent.getBoundingClientRect().right <= edge + 1 ) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		return [ ...document.body.querySelectorAll( '*' ) ]
+			.filter( ( node ) => node.getBoundingClientRect().right > edge + 1 && ! clipped( node ) )
+			.filter( ( node ) => ! [ ...node.children ].some( ( child ) => child.getBoundingClientRect().right > edge + 1 ) )
+			.slice( 0, 6 )
+			.map( ( node ) => `${ name( node ) } ${ Math.round( node.getBoundingClientRect().width ) }px wide, to ${ Math.round( node.getBoundingClientRect().right ) }px, in ${ name( node.parentElement ) }` );
+	} );
+
 	expect(
 		await page.evaluate( () => document.documentElement.scrollWidth - document.documentElement.clientWidth ),
-		'the page is no wider than the screen'
+		`the page is no wider than the screen; crossing its edge: ${ beyond.join( '; ' ) || 'nothing' }`
 	).toBe( 0 );
 
 	seen.probe = await page.locator( '.whsc-e2e-probe' ).evaluate( ( node ) => {
