@@ -182,6 +182,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- New: a Search statistics button in the settings header, and a link on the Connection tab, open your search statistics on the Searcio dashboard.
 - New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.
 - The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.
 - Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR), once your Searcio service offers it.

@@ -41,7 +41,7 @@ Base route: `/wp-json/webhead-search-cloud/v1/`. Every endpoint lives under `inc
 | Route | Method | Capability | Purpose |
 |---|---|---|---|
 | `/settings` | GET / POST | view / manage_settings | Generic REST-exposed settings (schema + values). `write_key` and `write_secret` are write-only: a response carries `__stored__` when one is saved and `''` when not, never the value; posting back `__stored__` or an empty string leaves the stored credential untouched |
-| `/connection/test` | POST | view | Verify write credentials; returns site ID and document usage |
+| `/connection/test` | POST | view | Verify write credentials; returns site ID, every metered allowance, the plan (with `upgrade_url`) and `statistics_url`, the dashboard page with this site's search statistics (`site.statistics_url` from the health check, or the dashboard's sign-in when Searcio names none) |
 | `/connection/legal` | GET | view | The links of the consent checkboxes (terms, privacy, data processing), as Searcio configures them, with the plugin's own as fallback |
 | `/connection/connect` | POST | manage_settings | Zero-friction connect: sends the admin's email and name, the site's name and address and the two consents. Stores the keys when a new account was created; answers `flow: pending_claim` when the email already has one |
 | `/connection/disconnect` | POST | manage_settings | Calls Searcio's `DELETE /disconnect`, which deletes the site and its index there, then clears the stored credentials. A call that fails for any reason other than Searcio no longer knowing the keys (`401`, `404`) keeps them, so that it can be tried again |

@@ -4,19 +4,18 @@ import apiFetch from '@wordpress/api-fetch';
 const pluginData = window.webhead_search_cloudData || {};
 const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
 
+// One health check per page load, however many places ask what it said.
 let asked = null;
 
 /**
- * The health check's answer about the plan, asked for once however many parts
- * of the page want it: the header's upgrade action and the Support Searcio card
- * both do.
+ * The health check's answer (`/connection/test`), or null when it failed.
  *
- * @return {Promise<Object|null>} `{ is_free, name, upgrade_url }`, or null.
+ * @return {Promise<Object|null>} What `Connection_Endpoint::present()` returns.
  */
-const askForPlan = () => {
+const askForHealth = () => {
 	if ( ! asked ) {
 		asked = apiFetch( { path: TEST_CONNECTION_PATH, method: 'POST' } )
-			.then( ( response ) => ( response?.ok && response.plan ) || null )
+			.then( ( response ) => ( response?.ok ? response : null ) )
 			.catch( () => null );
 	}
 
@@ -24,17 +23,16 @@ const askForPlan = () => {
 };
 
 /**
- * The plan the connected account is on. Until Searcio answers, it is the
- * tier the site last kept (`connection.planTier`), so a Free plan is known as
- * one before the request returns. Null when the site is not connected, or no
- * tier is known.
+ * One value of the health check, for a connected site: `initial` at once,
+ * then what `pick` reads from the answer, when it reads something.
  *
- * @return {Object|null} `{ is_free, name?, upgrade_url? }`.
+ * @param {function(Object): *} pick
+ * @param {*}                   initial
+ * @return {*} The value, or null for a site that is not connected.
  */
-export const usePlan = () => {
+const useHealthValue = ( pick, initial ) => {
 	const isConnected = pluginData?.connection?.isConnected === true;
-	const kept = pluginData?.connection?.planTier || '';
-	const [ plan, setPlan ] = useState( isConnected && kept ? { is_free: 'free' === kept } : null );
+	const [ value, setValue ] = useState( isConnected ? initial : null );
 
 	useEffect( () => {
 		if ( ! isConnected ) {
@@ -43,16 +41,43 @@ export const usePlan = () => {
 
 		let cancelled = false;
 
-		askForPlan().then( ( answer ) => {
-			if ( ! cancelled && answer ) {
-				setPlan( answer );
+		askForHealth().then( ( answer ) => {
+			const picked = answer ? pick( answer ) : null;
+
+			if ( ! cancelled && picked ) {
+				setValue( picked );
 			}
 		} );
 
 		return () => {
 			cancelled = true;
 		};
+		// `pick` is fixed per caller.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isConnected ] );
 
-	return plan;
+	return value;
 };
+
+/**
+ * The connected account's plan, from the health check: `{ is_free, name,
+ * upgrade_url }`. Until it answers, the tier last seen (`planTier`) stands in,
+ * so a Free plan is known at once.
+ *
+ * @return {Object|null} `{ is_free, name?, upgrade_url? }`.
+ */
+export const usePlan = () => {
+	const kept = pluginData?.connection?.planTier || '';
+
+	return useHealthValue( ( answer ) => answer.plan || null, kept ? { is_free: 'free' === kept } : null );
+};
+
+/**
+ * Where this site's search statistics are on Searcio's dashboard: the
+ * dashboard at once, and the site's own statistics page once the health check
+ * names it (`Connection_Endpoint::statistics_url()`).
+ *
+ * @return {string|null} The address, or null for a site that is not connected.
+ */
+export const useStatisticsUrl = () =>
+	useHealthValue( ( answer ) => answer.statistics_url || null, pluginData?.connection?.statisticsUrl || null );

@@ -10,6 +10,7 @@ import {showToast} from '../../../toast';
 import {renderAnimatedTabTitle, useFadeInUpProps} from '../../../utils/animation';
 import SettingsContext from '../../../settings/store/context';
 import {useUpgradeAction} from '../upgradeAction';
+import {useStatisticsAction} from '../statisticsAction';
 import searcioIcon from '../searcioIcon';
 import SettingsSkeleton from './SettingsSkeleton';
 import SettingsGroupTab from './tabs/SettingsGroupTab';
@@ -77,6 +78,10 @@ const SettingsPanel = () => {
 	// rather than inline, since one of the panels renders inside a map.
 	const panelMotion = useFadeInUpProps(0.04);
 	const upgradeAction = useUpgradeAction();
+	const statisticsAction = useStatisticsAction();
+	// The shell draws the first outlined and the second solid: the statistics
+	// sit beside the upgrade, which stays the stronger of the two.
+	const headerActions = [statisticsAction, upgradeAction].filter(Boolean);
 
 	// All settings tabs require manage-settings; a view/run-sync-only user
 	// (e.g. a shop manager granted only "run sync") only sees the Sync tab.
@@ -199,7 +204,7 @@ const SettingsPanel = () => {
 			title={__('Searcio', 'searcio')}
 			description={pluginData?.plugin?.description || __('Configure the plugin settings from one shared admin surface.', 'searcio')}
 			icon={searcioIcon}
-			actions={upgradeAction ? [upgradeAction] : undefined}
+			actions={headerActions.length > 0 ? headerActions : undefined}
 			// The tab strip sits directly under the header. A load that failed has
 			// no strip, and its error notice wants the padding back.
 			tabbed={!loadError}

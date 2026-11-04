@@ -363,6 +363,11 @@
   background: currentColor;
 }
 
+// wp-admin gives a bare `p` margins of its own inside `.wrap`.
+.whsc-usage__statistics {
+  margin: 0;
+}
+
 /* -------------------------------------------------------------------------
  * Placement
  * ---------------------------------------------------------------------- */

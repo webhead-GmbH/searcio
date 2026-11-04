@@ -234,7 +234,23 @@ final class Connection_Endpoint extends Rest_API {
 				'name'        => isset( $plan['name'] ) ? (string) $plan['name'] : '',
 				'upgrade_url' => isset( $plan['upgrade_url'] ) && is_string( $plan['upgrade_url'] ) ? esc_url_raw( $plan['upgrade_url'] ) : '',
 			],
+			// Where the header's "Search statistics" and the usage card's link go.
+			'statistics_url'   => self::statistics_url( $body['site']['statistics_url'] ?? null ),
 		];
+	}
+
+	/**
+	 * Where this site's search statistics are on Searcio's dashboard: the
+	 * link the health check gives (`site.statistics_url`), or, from a service
+	 * that gives none, the dashboard's sign-in, which takes an owner who is
+	 * signed in on to their dashboard. The statistics page sits under the
+	 * owner's team in the dashboard's addresses, which the plugin does not
+	 * know, so it cannot write that link itself.
+	 */
+	public static function statistics_url( mixed $from_service ): string {
+		$url = is_string( $from_service ) ? esc_url_raw( $from_service, [ 'https', 'http' ] ) : '';
+
+		return '' !== $url ? $url : untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/login';
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import { Card, Stack, Text } from '@wordpress/ui';
+import { Card, Link, Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { formatNumber } from '../../../../utils/number';
@@ -36,7 +36,7 @@ const NOT_SITE_SCOPED = [ 'sites', 'members' ];
 const humanize = ( key ) =>
 	key.replace( /_/g, ' ' ).replace( /^./, ( character ) => character.toUpperCase() );
 
-const UsageCard = ( { usage } ) => {
+const UsageCard = ( { usage, statisticsUrl } ) => {
 	const labels = LABELS();
 	const entries = Object.entries( usage || {} )
 		.filter( ( [ key, metric ] ) => ! NOT_SITE_SCOPED.includes( key ) && null !== metric?.limit && undefined !== metric?.limit )
@@ -117,6 +117,13 @@ const UsageCard = ( { usage } ) => {
 							</Stack>
 						);
 					} ) }
+					{ statisticsUrl && (
+						<Text render={ <p /> } variant="body-sm" className="whsc-usage__statistics">
+							<Link href={ statisticsUrl } openInNewTab>
+								{ __( 'See what visitors searched for', 'searcio' ) }
+							</Link>
+						</Text>
+					) }
 				</Stack>
 			</Card.Content>
 		</Card.Root>

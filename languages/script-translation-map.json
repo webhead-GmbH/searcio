@@ -62,6 +62,9 @@
     "src/admin/settings/syncStatus.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/statisticsAction.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/upgradeAction.js": [
         "public/bundle.settings.js"
     ],
