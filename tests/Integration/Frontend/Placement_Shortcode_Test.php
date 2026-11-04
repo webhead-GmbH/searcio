@@ -101,6 +101,23 @@ final class Placement_Shortcode_Test extends Integration_Test_Case {
 		$this->assertFalse( $manager->is_dynamic_elementor_content( false, [ 'settings' => [ 'editor' => '[searcio-other]' ] ] ) );
 	}
 
+	/**
+	 * WordPress prints a shortcode through `wp_kses()` with the list the
+	 * shortcode allows. Both print an empty `div` with valueless and encoded
+	 * `data-*` attributes, and the filter takes nothing from it.
+	 */
+	public function test_wordpress_prints_the_markup_the_shortcodes_draw(): void {
+		$this->config()->save( [ 'search' => [ 'mode' => 'box', 'placeholder' => 'Søk & finn "alt"', 'voice' => true ] ] );
+		$manager = $this->service( 'shortcode_manager' );
+
+		foreach ( [ 'searcio class="my-search"' => [ 'searcio', [ 'class' => 'my-search' ] ], 'searcio_products id="product-12" heading="A & B"' => [ 'searcio_products', [ 'id' => 'product-12', 'heading' => 'A & B' ] ] ] as $shortcode => [ $tag, $attributes ] ) {
+			$drawn = $manager->render( $tag, $attributes );
+
+			$this->assertStringContainsString( 'data-webhead-frontend-root', $drawn );
+			$this->assertSame( $drawn, do_shortcode( '[' . $shortcode . ']' ), $tag );
+		}
+	}
+
 	public function test_a_product_row_without_a_product_or_a_category_prints_nothing(): void {
 		$this->assertSame( '', do_shortcode( '[searcio_products]' ) );
 		$this->assertSame( '', do_shortcode( '[searcio_products source="category"]' ) );
