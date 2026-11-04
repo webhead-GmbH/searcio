@@ -156,7 +156,7 @@ final class Look_Test extends Integration_Test_Case {
 		$wp_rest_server = new WP_REST_Server();
 		do_action( 'rest_api_init' );
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/placement/look-css' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/placement/look-css' );
 		$request->set_header( 'content-type', 'application/json' );
 		$request->set_body( (string) wp_json_encode( [ 'look' => [ 'field_bg' => '#123abc', 'modal_font_family' => 'Inter' ] ] ) );
 

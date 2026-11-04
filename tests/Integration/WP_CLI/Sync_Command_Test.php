@@ -1,6 +1,6 @@
 <?php
 /**
- * `wp webhead-search-cloud sync run` against a failing index.
+ * `wp searcio sync run` against a failing index.
  *
  * The command drives a sync itself, tick after tick, which is what makes it
  * fit a system cron entry. Nothing else runs the tick a run schedules for its

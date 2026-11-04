@@ -6,7 +6,7 @@
  * Kept per search key, since sites of one network can share an origin.
  */
 
-const PREFIX = 'webheadSearchCloud.capabilities.';
+const PREFIX = 'searcio.capabilities.';
 
 const NAMES = [ 'assistant', 'quiz', 'visual_search', 'semantic_search' ];
 

@@ -13,8 +13,8 @@ import SyncSkeleton from './SyncSkeleton';
 import SyncHistory from './SyncHistory';
 import {useAnnounce} from '../../../../utils/announce';
 
-const pluginData = window.webhead_search_cloudData || {};
-const SYNC_BASE = pluginData?.api?.syncBase || '/webhead-search-cloud/v1/sync';
+const pluginData = window.searcioData || {};
+const SYNC_BASE = pluginData?.api?.syncBase || '/searcio/v1/sync';
 const CAN_RUN_SYNC = pluginData?.caps?.runSync !== false;
 
 const tabUrl = (tab) => {
@@ -179,7 +179,7 @@ const SyncTab = () => {
 
 	return (
 		<>
-			<Stack direction="column" gap="lg" className="webhead-search-cloud-sync">
+			<Stack direction="column" gap="lg" className="searcio-sync">
 				<TabIntro
 					title={__('Sync', 'searcio')}
 					description={__(

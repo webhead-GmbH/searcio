@@ -133,7 +133,7 @@ An edit is sent shortly after you save it, and a scheduled sync runs every day. 
 
 = Can I run the sync from the command line? =
 
-Yes: `wp webhead-search-cloud sync run` runs a sync and waits for it, and `status`, `start`, `pause`, `resume` and `cancel` manage it.
+Yes: `wp searcio sync run` runs a sync and waits for it, and `status`, `start`, `pause`, `resume` and `cancel` manage it.
 
 = Where is the data hosted? Is it GDPR compliant? =
 
@@ -182,6 +182,7 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 == Changelog ==
 
 = Unreleased =
+- The plugin's settings page, blocks, widgets and everything it stores are named "searcio" now; the settings page is at `admin.php?page=searcio`. Your settings, sync history and connection move by themselves on the first page load after the update, and nothing has to be set up again. A theme or a snippet that uses the plugin's hooks, REST routes or CSS classes under the old name "webhead-search-cloud" should switch to "searcio": the old hooks still work for now, with a notice for developers.
 - New: a Search statistics button in the settings header, and a link on the Connection tab, open your search statistics on the Searcio dashboard.
 - New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.
 - The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.

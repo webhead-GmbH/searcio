@@ -42,19 +42,19 @@ final class Health_Tests {
 	 */
 	public function register(): void {
 		$this->site_health_manager->register_direct_test(
-			'webhead_search_cloud_connection_configured',
+			'searcio_connection_configured',
 			'Searcio connection',
 			$this->connection_configured( ... )
 		);
 
 		$this->site_health_manager->register_async_rest_test(
-			'webhead_search_cloud_connection_reachable',
+			'searcio_connection_reachable',
 			'Searcio reachability',
 			$this->connection_reachable( ... )
 		);
 
 		$this->site_health_manager->register_direct_test(
-			'webhead_search_cloud_indexing_configured',
+			'searcio_indexing_configured',
 			'Searcio indexing',
 			$this->indexing_configured( ... )
 		);
@@ -62,7 +62,7 @@ final class Health_Tests {
 		// Surface content left out of the index by language restriction instead
 		// of letting it go silently missing.
 		$this->site_health_manager->register_direct_test(
-			'webhead_search_cloud_language_coverage',
+			'searcio_language_coverage',
 			'Searcio language coverage',
 			$this->language_coverage( ... )
 		);
@@ -77,10 +77,10 @@ final class Health_Tests {
 	#[Filter( 'site_status_tests', priority: 11 )]
 	public function translate_labels( array $tests ): array {
 		$labels = [
-			'webhead_search_cloud_connection_configured' => __( 'Searcio connection', 'searcio' ),
-			'webhead_search_cloud_connection_reachable'  => __( 'Searcio reachability', 'searcio' ),
-			'webhead_search_cloud_indexing_configured'   => __( 'Searcio indexing', 'searcio' ),
-			'webhead_search_cloud_language_coverage'     => __( 'Searcio language coverage', 'searcio' ),
+			'searcio_connection_configured' => __( 'Searcio connection', 'searcio' ),
+			'searcio_connection_reachable'  => __( 'Searcio reachability', 'searcio' ),
+			'searcio_indexing_configured'   => __( 'Searcio indexing', 'searcio' ),
+			'searcio_language_coverage'     => __( 'Searcio language coverage', 'searcio' ),
 		];
 
 		foreach ( $tests as $type => $of_type ) {
@@ -98,7 +98,7 @@ final class Health_Tests {
 	private function connection_configured(): array {
 		if ( ! $this->client->is_configured() ) {
 			return Health_Result::recommended(
-				test: 'webhead_search_cloud_connection_configured',
+				test: 'searcio_connection_configured',
 				label: __( 'Searcio is not connected yet', 'searcio' ),
 				badge_label: 'Searcio',
 				description: '<p>' . esc_html__( 'Add your site ID, write key, and write secret on the Connection tab before syncing content.', 'searcio' ) . '</p>'
@@ -106,7 +106,7 @@ final class Health_Tests {
 		}
 
 		return Health_Result::good(
-			test: 'webhead_search_cloud_connection_configured',
+			test: 'searcio_connection_configured',
 			label: __( 'Searcio connection is configured', 'searcio' ),
 			badge_label: 'Searcio',
 			description: '<p>' . esc_html__( 'Connection credentials are saved.', 'searcio' ) . '</p>'
@@ -119,7 +119,7 @@ final class Health_Tests {
 	private function connection_reachable(): array {
 		if ( ! $this->client->is_configured() ) {
 			return Health_Result::recommended(
-				test: 'webhead_search_cloud_connection_reachable',
+				test: 'searcio_connection_reachable',
 				label: __( 'Searcio is not connected yet', 'searcio' ),
 				badge_label: 'Searcio',
 				description: '<p>' . esc_html__( 'Connect the plugin on the Connection tab, then re-run this check.', 'searcio' ) . '</p>'
@@ -130,7 +130,7 @@ final class Health_Tests {
 
 		if ( $response->transport_error || ! $response->ok() ) {
 			return Health_Result::critical(
-				test: 'webhead_search_cloud_connection_reachable',
+				test: 'searcio_connection_reachable',
 				label: __( 'Searcio could not be reached', 'searcio' ),
 				badge_label: 'Searcio',
 				description: '<p>' . esc_html__( 'The health check to Searcio failed. Check the Connection tab and verify your credentials.', 'searcio' ) . '</p>'
@@ -138,7 +138,7 @@ final class Health_Tests {
 		}
 
 		return Health_Result::good(
-			test: 'webhead_search_cloud_connection_reachable',
+			test: 'searcio_connection_reachable',
 			label: __( 'Searcio is reachable', 'searcio' ),
 			badge_label: 'Searcio',
 			description: '<p>' . esc_html__( 'The last health check succeeded.', 'searcio' ) . '</p>'
@@ -153,7 +153,7 @@ final class Health_Tests {
 
 		if ( [] === $indexable ) {
 			return Health_Result::recommended(
-				test: 'webhead_search_cloud_indexing_configured',
+				test: 'searcio_indexing_configured',
 				label: __( 'No content types are enabled for indexing', 'searcio' ),
 				badge_label: 'Searcio',
 				description: '<p>' . esc_html__( 'Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send.', 'searcio' ) . '</p>'
@@ -161,7 +161,7 @@ final class Health_Tests {
 		}
 
 		return Health_Result::good(
-			test: 'webhead_search_cloud_indexing_configured',
+			test: 'searcio_indexing_configured',
 			label: __( 'Content types are enabled for indexing', 'searcio' ),
 			badge_label: 'Searcio',
 			description: sprintf(
@@ -183,7 +183,7 @@ final class Health_Tests {
 
 		if ( $skipped > 0 ) {
 			return Health_Result::recommended(
-				test: 'webhead_search_cloud_language_coverage',
+				test: 'searcio_language_coverage',
 				label: sprintf(
 					/* translators: %d: number of posts skipped. */
 					__( '%d post(s) were skipped from the last sync due to language', 'searcio' ),
@@ -195,7 +195,7 @@ final class Health_Tests {
 		}
 
 		return Health_Result::good(
-			test: 'webhead_search_cloud_language_coverage',
+			test: 'searcio_language_coverage',
 			label: __( 'No content was skipped due to language', 'searcio' ),
 			badge_label: 'Searcio',
 			description: '<p>' . esc_html__( 'Every indexable post is in an enabled language, or the site has not restricted languages.', 'searcio' ) . '</p>'

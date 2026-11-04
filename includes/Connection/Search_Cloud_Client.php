@@ -177,7 +177,10 @@ final class Search_Cloud_Client {
 	}
 
 	private function is_development(): bool {
-		return defined( 'WEBHEAD_SEARCH_CLOUD_DEVELOPMENT' ) && WEBHEAD_SEARCH_CLOUD_DEVELOPMENT;
+		// The constant had the plugin's first name until 1.4.0, and a development
+		// site may still define it so.
+		return ( defined( 'SEARCIO_DEVELOPMENT' ) && SEARCIO_DEVELOPMENT )
+			|| ( defined( 'WEBHEAD_SEARCH_CLOUD_DEVELOPMENT' ) && WEBHEAD_SEARCH_CLOUD_DEVELOPMENT );
 	}
 
 	/**

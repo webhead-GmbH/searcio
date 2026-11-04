@@ -2,7 +2,7 @@
 /**
  * Sync REST endpoint integration tests.
  *
- * Verifies the `webhead-search-cloud/v1/sync/*` routes are registered with the
+ * Verifies the `searcio/v1/sync/*` routes are registered with the
  * right namespace, enforce the VIEW / RUN_SYNC capability split, and return the
  * documented success and 409 error payloads. Runs against the real REST server.
  *
@@ -41,16 +41,16 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_sync_routes_are_registered_under_the_plugin_namespace(): void {
 		$routes = $this->server->get_routes();
 
-		$this->assertArrayHasKey( '/webhead-search-cloud/v1/sync/status', $routes );
-		$this->assertArrayHasKey( '/webhead-search-cloud/v1/sync/start', $routes );
-		$this->assertArrayHasKey( '/webhead-search-cloud/v1/sync/pause', $routes );
-		$this->assertArrayHasKey( '/webhead-search-cloud/v1/sync/cancel', $routes );
+		$this->assertArrayHasKey( '/searcio/v1/sync/status', $routes );
+		$this->assertArrayHasKey( '/searcio/v1/sync/start', $routes );
+		$this->assertArrayHasKey( '/searcio/v1/sync/pause', $routes );
+		$this->assertArrayHasKey( '/searcio/v1/sync/cancel', $routes );
 	}
 
 	public function test_status_requires_the_view_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/sync/status' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/searcio/v1/sync/status' ) );
 
 		$this->assertSame( 403, $response->get_status() );
 	}
@@ -58,7 +58,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_status_returns_the_expected_shape_for_a_viewer(): void {
 		$this->login_operator();
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/sync/status' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/searcio/v1/sync/status' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -71,7 +71,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_start_requires_the_run_sync_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/sync/start' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/sync/start' ) );
 
 		$this->assertSame( 403, $response->get_status() );
 	}
@@ -79,7 +79,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_start_returns_409_when_not_configured(): void {
 		$this->login_operator();
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/sync/start' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/sync/start' ) );
 
 		$this->assertSame( 409, $response->get_status() );
 		$this->assertFalse( $response->get_data()['ok'] );
@@ -90,11 +90,11 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 		$this->connect_client();
 		$this->enable_indexing( 'post' );
 
-		$start = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/sync/start' ) );
+		$start = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/sync/start' ) );
 		$this->assertSame( 200, $start->get_status() );
 		$this->assertTrue( $start->get_data()['ok'] );
 
-		$status = $this->server->dispatch( new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/sync/status' ) );
+		$status = $this->server->dispatch( new WP_REST_Request( 'GET', '/searcio/v1/sync/status' ) );
 		$active = $status->get_data()['active'];
 
 		$this->assertNotNull( $active );
@@ -106,7 +106,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 		$id = $this->make_running_run();
 		$this->clear_tick();
 
-		$request = new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/sync/cancel' );
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/sync/cancel' );
 		$request->set_param( 'id', $id );
 		$response = $this->server->dispatch( $request );
 
@@ -118,7 +118,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_control_action_returns_409_when_no_run_is_active(): void {
 		$this->login_operator();
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/webhead-search-cloud/v1/sync/pause' ) );
+		$response = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/sync/pause' ) );
 
 		$this->assertSame( 409, $response->get_status() );
 	}
@@ -135,7 +135,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_a_value_of_the_wrong_shape_is_refused_before_the_method_runs( string $method, string $route, array $params ): void {
 		$this->login_operator();
 
-		$request = new WP_REST_Request( $method, '/webhead-search-cloud/v1' . $route );
+		$request = new WP_REST_Request( $method, '/searcio/v1' . $route );
 
 		foreach ( $params as $name => $value ) {
 			$request->set_param( $name, $value );
@@ -165,7 +165,7 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 	public function test_the_history_still_answers_what_the_table_sends(): void {
 		$this->login_operator();
 
-		$request = new WP_REST_Request( 'GET', '/webhead-search-cloud/v1/sync/history' );
+		$request = new WP_REST_Request( 'GET', '/searcio/v1/sync/history' );
 		$request->set_query_params(
 			[
 				'page'     => '1',

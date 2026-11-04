@@ -10,7 +10,7 @@
 
 import { test, expect, setConnected, touchingInShell } from '../utils';
 
-const CONNECTION_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=connection';
+const CONNECTION_URL = '/wp-admin/admin.php?page=searcio&tab=connection';
 
 // The tab waits on the settings response, then on the health check.
 const LOADED = { timeout: 30000 };

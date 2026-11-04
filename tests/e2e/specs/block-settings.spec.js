@@ -27,7 +27,7 @@ async function pick( page, select, label ) {
 test.describe( "The blocks' settings selects", () => {
 	test( 'keep what the products block is set to', async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'webhead-search-cloud/products' } );
+		await editor.insertBlock( { name: 'searcio/products' } );
 		await editor.openDocumentSettingsSidebar();
 
 		const inspector = page.getByRole( 'region', { name: 'Editor settings' } );
@@ -46,7 +46,7 @@ test.describe( "The blocks' settings selects", () => {
 
 	test( 'keep what the search block is set to', async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'webhead-search-cloud/search' } );
+		await editor.insertBlock( { name: 'searcio/search' } );
 		await editor.openDocumentSettingsSidebar();
 
 		const inspector = page.getByRole( 'region', { name: 'Editor settings' } );

@@ -29,9 +29,9 @@ declare( strict_types=1 );
 // __loaded.php, which exports WP_PHPUNIT__DIR.
 require_once dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-$webhead_search_cloud_wp_phpunit_dir = getenv( 'WP_PHPUNIT__DIR' );
+$searcio_wp_phpunit_dir = getenv( 'WP_PHPUNIT__DIR' );
 
-if ( false === $webhead_search_cloud_wp_phpunit_dir || ! is_dir( $webhead_search_cloud_wp_phpunit_dir ) ) {
+if ( false === $searcio_wp_phpunit_dir || ! is_dir( $searcio_wp_phpunit_dir ) ) {
 	echo 'Error: wp-phpunit was not found. Run `composer install` before the integration suite.' . PHP_EOL;
 	exit( 1 );
 }
@@ -40,15 +40,15 @@ if ( false === $webhead_search_cloud_wp_phpunit_dir || ! is_dir( $webhead_search
 // the placeholder bundled with wp-phpunit.
 define( 'WP_TESTS_CONFIG_FILE_PATH', __DIR__ . '/wp-tests-config.php' );
 
-require_once $webhead_search_cloud_wp_phpunit_dir . '/includes/functions.php';
+require_once $searcio_wp_phpunit_dir . '/includes/functions.php';
 
-$webhead_search_cloud_bootstrap_extra = __DIR__ . '/bootstrap-extra.php';
+$searcio_bootstrap_extra = __DIR__ . '/bootstrap-extra.php';
 
-if ( is_readable( $webhead_search_cloud_bootstrap_extra ) ) {
-	require_once $webhead_search_cloud_bootstrap_extra;
+if ( is_readable( $searcio_bootstrap_extra ) ) {
+	require_once $searcio_bootstrap_extra;
 }
 
-unset( $webhead_search_cloud_bootstrap_extra );
+unset( $searcio_bootstrap_extra );
 
 // Load the plugin as a mu-plugin so it is active for every test.
 tests_add_filter(
@@ -60,20 +60,20 @@ tests_add_filter(
 
 // Capture the booted instance so the suite can reach the container.
 tests_add_filter(
-	'webhead_search_cloud/after_load',
+	'searcio/after_load',
 	static function ( $plugin ): void {
-		$GLOBALS['webhead_search_cloud_test_plugin'] = $plugin;
+		$GLOBALS['searcio_test_plugin'] = $plugin;
 	}
 );
 
-require $webhead_search_cloud_wp_phpunit_dir . '/includes/bootstrap.php';
+require $searcio_wp_phpunit_dir . '/includes/bootstrap.php';
 
-unset( $webhead_search_cloud_wp_phpunit_dir );
+unset( $searcio_wp_phpunit_dir );
 
 // Run the real activation routine once against the freshly installed test
 // database, so every test starts against the plugin's actual schema, options,
 // and capabilities. Activation is idempotent, so running it once per suite is
 // enough, and the DDL it performs survives the per-test transaction rollback.
-if ( isset( $GLOBALS['webhead_search_cloud_test_plugin'] ) && $GLOBALS['webhead_search_cloud_test_plugin'] instanceof \Webhead\WP\SearchCloud\Plugin ) {
-	$GLOBALS['webhead_search_cloud_test_plugin']->activate( is_multisite() );
+if ( isset( $GLOBALS['searcio_test_plugin'] ) && $GLOBALS['searcio_test_plugin'] instanceof \Webhead\WP\SearchCloud\Plugin ) {
+	$GLOBALS['searcio_test_plugin']->activate( is_multisite() );
 }

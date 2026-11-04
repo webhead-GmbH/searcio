@@ -26,7 +26,7 @@ const ConnectionExplainer = ({legal}) => {
 		<>
 			<Button
 				variant="link"
-				className="webhead-search-cloud-connection-explainer-link"
+				className="searcio-connection-explainer-link"
 				onClick={() => setIsModalOpen(true)}
 			>
 				{__('How connecting works', 'searcio')}
@@ -37,7 +37,7 @@ const ConnectionExplainer = ({legal}) => {
 				onClose={() => setIsModalOpen(false)}
 				title={__('How connecting to Searcio works', 'searcio')}
 				size="medium"
-				className="webhead-search-cloud-connection-explainer-modal"
+				className="searcio-connection-explainer-modal"
 			>
 				<Text render={<p/>} variant="body-md">
 					{__(

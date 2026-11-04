@@ -232,7 +232,7 @@ final class Sync_Retry_Test extends Integration_Test_Case {
 		$this->assertFalse( $this->tick_is_scheduled() );
 	}
 
-	/** `wp webhead-search-cloud sync run` drives the run itself, and waits by this. */
+	/** `wp searcio sync run` drives the run itself, and waits by this. */
 	public function test_a_caller_that_drives_the_run_is_told_how_long_to_wait(): void {
 		$id = $this->start_a_sync_of( 1 );
 

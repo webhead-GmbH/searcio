@@ -96,7 +96,7 @@ final class Field_Source_Resolver {
 	 * transient handshakes). They are never pushed to Searcio by default so
 	 * an over-broad mapping cannot silently leak internal data into public
 	 * search. A site that deliberately needs one indexed can allow it per key
-	 * through the `webhead_search_cloud/index/allow_protected_meta` filter.
+	 * through the `searcio/index/allow_protected_meta` filter.
 	 */
 	private function is_protected_meta_key( string $key, WP_Post $post ): bool {
 		$protected = function_exists( 'is_protected_meta' )
@@ -107,7 +107,7 @@ final class Field_Source_Resolver {
 			return false;
 		}
 
-		return ! (bool) apply_filters( 'webhead_search_cloud/index/allow_protected_meta', false, $key, $post );
+		return ! (bool) apply_filters( 'searcio/index/allow_protected_meta', false, $key, $post );
 	}
 
 	/**

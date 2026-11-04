@@ -27,8 +27,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Delete_Legacy_Site_Id_Option implements Upgrade_Step {
 	private const OPTIONS = [
-		'webhead_search_cloud_site_id',
-		'webhead_search_cloud_site_id_metadata',
+		'searcio_site_id',
+		'searcio_site_id_metadata',
 	];
 
 	public function version(): string {

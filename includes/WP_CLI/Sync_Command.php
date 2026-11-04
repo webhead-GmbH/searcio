@@ -1,6 +1,6 @@
 <?php
 /**
- * `wp webhead-search-cloud sync` WP-CLI command.
+ * The plugin's `sync` WP-CLI command, under its slug.
  *
  * Real system cron is more reliable than WP-Cron (which depends on traffic), so
  * the plugin ships a CLI surface to drive and inspect syncs directly. `run`

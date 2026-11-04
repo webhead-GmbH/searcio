@@ -40,8 +40,8 @@ $whsc_action     = isset( $args[0] ) ? (string) $args[0] : 'set';
 $whsc_scope      = isset( $args[1] ) ? (string) $args[1] : 'elements';
 $whsc_elements   = in_array( $whsc_scope, [ 'elements', 'all' ], true );
 $whsc_body       = in_array( $whsc_scope, [ 'body', 'all' ], true );
-$whsc_kit_backup = 'webhead_search_cloud_e2e_kit_backup';
-$whsc_css_backup = 'webhead_search_cloud_e2e_css_backup';
+$whsc_kit_backup = 'searcio_e2e_kit_backup';
+$whsc_css_backup = 'searcio_e2e_css_backup';
 $whsc_kit_id     = (int) get_option( 'elementor_active_kit', 0 );
 $whsc_has_kit    = $whsc_kit_id > 0 && class_exists( '\Elementor\Plugin' ) && 'publish' === get_post_status( $whsc_kit_id );
 
@@ -223,7 +223,7 @@ if ( $whsc_has_kit ) {
  * nothing short of another one stops it.
  */
 $whsc_css = <<<'CSS'
-/* webhead-search-cloud e2e: a designed site */
+/* searcio e2e: a designed site */
 button, [type="button"], [type="submit"] { font-family: "Courier New", monospace; font-size: 25px; font-style: italic; letter-spacing: 5px; word-spacing: 9px; text-transform: uppercase; text-shadow: 2px 2px 0 #f00; text-decoration: underline wavy; border: 5px dashed #7c3aed; border-radius: 40px; padding: 25px 35px; margin: 12px; background: #111 linear-gradient(#444, #000); color: #ff0; box-shadow: 8px 8px 0 #f0f; min-height: 90px; min-width: 120px; line-height: 3; opacity: 0.7; transform: rotate(-2deg); filter: saturate(3); }
 button:hover { background: #ff0; color: #111; border-color: #0f0; transform: scale(1.2); }
 button:focus, button:focus-visible { outline: 6px dotted #0ff; outline-offset: 8px; box-shadow: 0 0 0 12px #f00; }
@@ -258,7 +258,7 @@ CSS;
 
 // A theme's own type, where there is no kit to set it on.
 $whsc_body_css = <<<'CSS'
-/* webhead-search-cloud e2e: the site's own type */
+/* searcio e2e: the site's own type */
 body { font-family: Georgia, serif; font-size: 22px; font-weight: 700; font-style: italic; line-height: 40px; letter-spacing: 3px; word-spacing: 6px; text-transform: uppercase; color: #b91c1c; }
 CSS;
 

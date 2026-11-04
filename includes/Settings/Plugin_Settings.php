@@ -22,7 +22,7 @@ use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Setting;
 defined( 'ABSPATH' ) || exit;
 
 final class Plugin_Settings {
-	public const GROUP = 'webhead_search_cloud_settings';
+	public const GROUP = 'searcio_settings';
 
 	private const CIPHER     = 'aes-256-gcm';
 	private const ENC_PREFIX = 'whsc1:';
@@ -30,7 +30,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: '',
-		option_key: 'webhead_search_cloud_search_key',
+		option_key: 'searcio_search_key',
 		show_in_rest: true,
 		label: 'Search key',
 		description: 'Public search key (sk_...) used by the browser. Restricted by your domain allowlist.',
@@ -41,7 +41,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: '',
-		option_key: 'webhead_search_cloud_write_key',
+		option_key: 'searcio_write_key',
 		show_in_rest: true,
 		masked: true,
 		label: 'Write key',
@@ -53,7 +53,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: '',
-		option_key: 'webhead_search_cloud_write_secret',
+		option_key: 'searcio_write_secret',
 		show_in_rest: true,
 		masked: true,
 		label: 'Write secret',
@@ -72,7 +72,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: '',
-		option_key: 'webhead_search_cloud_connect_idempotency_key',
+		option_key: 'searcio_connect_idempotency_key',
 		show_in_rest: false,
 		label: 'Connect idempotency key',
 		description: 'UUID generated once and replayed on every /connect retry for this site.',
@@ -105,7 +105,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'boolean',
 		default: false,
-		option_key: 'webhead_search_cloud_connect_pending_claim',
+		option_key: 'searcio_connect_pending_claim',
 		show_in_rest: true,
 		label: 'Connect pending claim',
 		description: 'Whether a /connect attempt is waiting on the owner to claim an existing account by email.'
@@ -119,7 +119,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: '',
-		option_key: 'webhead_search_cloud_connect_pending_email',
+		option_key: 'searcio_connect_pending_email',
 		show_in_rest: true,
 		label: 'Connect pending claim email',
 		description: 'The email address the pending-claim confirmation link was sent to.',
@@ -135,7 +135,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'object',
 		default: [],
-		option_key: 'webhead_search_cloud_index_config',
+		option_key: 'searcio_index_config',
 		show_in_rest: false,
 		label: 'Indexing configuration',
 		description: 'Per-post-type field mapping pushed to Searcio.'
@@ -150,7 +150,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'integer',
 		default: 1,
-		option_key: 'webhead_search_cloud_config_version',
+		option_key: 'searcio_config_version',
 		show_in_rest: false,
 		label: 'Config version',
 		description: 'Internal mapping revision used for dirty detection.'
@@ -166,7 +166,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'integer',
 		default: 90,
-		option_key: 'webhead_search_cloud_sync_retention_days',
+		option_key: 'searcio_sync_retention_days',
 		show_in_rest: true,
 		label: 'Keep history for (days)',
 		description: 'How long finished sync runs are kept. Use 0 to keep them forever.'
@@ -185,7 +185,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'array',
 		default: [],
-		option_key: 'webhead_search_cloud_enabled_languages',
+		option_key: 'searcio_enabled_languages',
 		show_in_rest: false,
 		label: 'Enabled languages',
 		description: "Local mirror of Searcio's configured languages.",
@@ -203,7 +203,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'array',
 		default: [],
-		option_key: 'webhead_search_cloud_facet_fields',
+		option_key: 'searcio_facet_fields',
 		show_in_rest: false,
 		label: 'Facet fields',
 		description: "Local mirror of Searcio's configured facet fields, in their order.",
@@ -218,7 +218,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'array',
 		default: [],
-		option_key: 'webhead_search_cloud_popular_searches',
+		option_key: 'searcio_popular_searches',
 		show_in_rest: true,
 		label: 'Popular searches',
 		description: 'Curated list of queries shown as suggestions before the visitor types anything.',
@@ -235,7 +235,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: 'all',
-		option_key: 'webhead_search_cloud_category_filter',
+		option_key: 'searcio_category_filter',
 		show_in_rest: true,
 		label: 'Categories in the filter',
 		description: 'All categories in one list, the main categories alone, or the main categories with their subcategories under them.',
@@ -250,7 +250,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'integer',
 		default: 2,
-		option_key: 'webhead_search_cloud_category_filter_depth',
+		option_key: 'searcio_category_filter_depth',
 		show_in_rest: true,
 		label: 'Category levels',
 		description: 'How many levels of categories the filter shows.'
@@ -267,7 +267,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'object',
 		default: [],
-		option_key: 'webhead_search_cloud_placement',
+		option_key: 'searcio_placement',
 		show_in_rest: false,
 		label: 'Placement',
 		description: 'Site-wide search placements and the defaults of the shortcodes and classic widgets.'
@@ -284,7 +284,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'boolean',
 		default: false,
-		option_key: 'webhead_search_cloud_delete_data_on_uninstall',
+		option_key: 'searcio_delete_data_on_uninstall',
 		show_in_rest: true,
 		label: 'Delete plugin data on uninstall',
 		description: 'When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio.'
@@ -301,7 +301,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'boolean',
 		default: true,
-		option_key: 'webhead_search_cloud_support_searcio',
+		option_key: 'searcio_support_searcio',
 		show_in_rest: true,
 		label: 'Support Searcio',
 		description: 'Show the Searcio logo, linked to searcio.com, in the search window.'
@@ -317,7 +317,7 @@ final class Plugin_Settings {
 	#[Setting(
 		type: 'string',
 		default: '',
-		option_key: 'webhead_search_cloud_plan_tier',
+		option_key: 'searcio_plan_tier',
 		show_in_rest: false,
 		label: 'Plan tier',
 		description: 'Local mirror of the Searcio plan tier.',
@@ -430,6 +430,8 @@ final class Plugin_Settings {
 	 * Derive a stable 32-byte key from WordPress salts.
 	 */
 	private static function encryption_key(): string {
+		// The plugin's first slug is part of the key, not a name: every saved
+		// key and secret is encrypted with it, so it stays as it was.
 		$salt = function_exists( 'wp_salt' ) ? wp_salt( 'secure_auth' ) : ( defined( 'SECURE_AUTH_SALT' ) ? SECURE_AUTH_SALT : 'webhead-search-cloud' );
 
 		return hash( 'sha256', 'webhead-search-cloud|' . $salt, true );

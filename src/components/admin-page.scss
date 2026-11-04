@@ -5,7 +5,7 @@
 // change the header here and every screen changes with it.
 @use "@wordpress/base-styles/variables" as wp-base;
 
-.webhead-search-cloud-admin-page {
+.searcio-admin-page {
 	// The content frame owns the page padding, the same on every side. Cards
 	// inside are siblings on a rhythm and never supply the gap that separates
 	// them.
@@ -33,7 +33,7 @@
 	--wp-components-color-accent-inverted: var(--wh-secondary, #fff);
 }
 
-.webhead-search-cloud-admin-page__surface {
+.searcio-admin-page__surface {
 	// A surface, not a card: `xl` here, `lg` for the cards inside, because a
 	// container and its immediate child must not share a radius.
 	border-radius: var(--wpds-border-radius-xl);
@@ -49,7 +49,7 @@
 	overflow: clip;
 }
 
-.webhead-search-cloud-admin-page__header {
+.searcio-admin-page__header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -60,7 +60,7 @@
 	color: var(--wh-secondary);
 }
 
-.webhead-search-cloud-admin-page__heading {
+.searcio-admin-page__heading {
 	display: flex;
 	// The icon belongs to the title, not to the block of title and description:
 	// centred against both it floated between the two lines.
@@ -69,7 +69,7 @@
 	min-width: 0;
 }
 
-.webhead-search-cloud-admin-page__icon {
+.searcio-admin-page__icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -83,7 +83,7 @@
 	}
 }
 
-.webhead-search-cloud-admin-page__titles {
+.searcio-admin-page__titles {
 	min-width: 0;
 }
 
@@ -93,7 +93,7 @@
 // 13px of padding nothing here asked for. Two classes win the specificity, and
 // the padding has to be zeroed explicitly — declaring only `margin` leaves
 // wp-admin's padding in place, which is exactly what happened.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__title {
+.searcio-admin-page__header .searcio-admin-page__title {
 	margin: 0;
 	padding: 0;
 	color: var(--wh-secondary);
@@ -106,7 +106,7 @@
 }
 
 // Same reasoning: wp-admin gives `p` its own margin inside the admin body.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__description {
+.searcio-admin-page__header .searcio-admin-page__description {
 	// gap-xs between a title and its description, as the rhythm rules say.
 	margin: var(--wpds-dimension-gap-xs) 0 0 0;
 	padding: 0;
@@ -116,7 +116,7 @@
 	line-height: var(--wpds-typography-line-height-sm);
 }
 
-.webhead-search-cloud-admin-page__actions {
+.searcio-admin-page__actions {
 	display: flex;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-sm);
@@ -126,7 +126,7 @@
 // Through the header, so it outranks the plugin stylesheet's own
 // `.panel-container .components-button`, which turns transitions off and would
 // otherwise win or lose on nothing but the order two files were bundled in.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__actions {
+.searcio-admin-page__header .searcio-admin-page__actions {
 	.components-button {
 		white-space: nowrap;
 		font-weight: 700;
@@ -176,7 +176,7 @@
 // source and did nothing on the screen — the ring stayed `#007d63`, a dark
 // green nobody can see on a black header. Both are set, so the ring is white
 // under either build.
-.webhead-search-cloud-admin-page__header {
+.searcio-admin-page__header {
 	--wpds-color-stroke-focus: var(--wh-secondary);
 	--focus-color: var(--wh-secondary);
 }
@@ -192,7 +192,7 @@
 //
 // So the whole border is stated here, and the whole of focus, and neither is
 // left to the build.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__actions .components-button {
+.searcio-admin-page__header .searcio-admin-page__actions .components-button {
 	border-style: solid;
 	border-width: var(--wpds-border-width-xs);
 
@@ -203,7 +203,7 @@
 	}
 }
 
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--outline.components-button {
+.searcio-admin-page__header .searcio-admin-page__action--outline.components-button {
 	color: var(--wh-secondary);
 	background: transparent;
 	border-color: var(--wh-secondary);
@@ -283,7 +283,7 @@
 // The filled action. The header is the brand's black, so the fill is what is
 // written on the brand: white, with a black label. It used to be the green
 // accent, which is for focus and for links and for nothing else.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--solid.components-button {
+.searcio-admin-page__header .searcio-admin-page__action--solid.components-button {
 	color: var(--wh-primary);
 	background: var(--wh-secondary);
 	border-color: var(--wh-secondary);
@@ -344,7 +344,7 @@
 // the size of its icon — bordered and full height, it read as a third action
 // and crowded the header, which is the thing the overflow menu exists to
 // prevent.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--ghost.components-button {
+.searcio-admin-page__header .searcio-admin-page__action--ghost.components-button {
 	color: var(--wh-secondary);
 	background: transparent;
 	border-color: transparent;
@@ -391,7 +391,7 @@
 // overflow menu already honours the same `isDestructive` descriptor, so without
 // this the identical action looked dangerous in third position and ordinary in
 // first.
-.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--destructive.components-button {
+.searcio-admin-page__header .searcio-admin-page__action--destructive.components-button {
 	color: var(--wh-secondary);
 	background: transparent;
 	border-color: var(--wpds-color-stroke-interactive-error);
@@ -413,7 +413,7 @@
 	}
 }
 
-.webhead-search-cloud-admin-page__content {
+.searcio-admin-page__content {
 	padding: var(--wpds-dimension-padding-2xl);
 
 	// The container supplies the rhythm between whatever a page puts in it, so a
@@ -435,7 +435,7 @@
 // Asked for with the `tabbed` prop rather than detected, because the strip is a
 // placeholder while its tabs are still loading and the padding must not move
 // when the real one arrives.
-.webhead-search-cloud-admin-page__content--tabbed {
+.searcio-admin-page__content--tabbed {
 	padding-block-start: 0;
 }
 
@@ -453,9 +453,9 @@
 // component's own shape, and so does a vertical list, which is a column beside
 // what it opens and not a strip above it. The last selector is for a
 // placeholder strip, which has no role while its tabs are still loading.
-.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"]:not([aria-orientation="vertical"]),
-.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"]:not([aria-orientation="vertical"]),
-.webhead-search-cloud-admin-page__content--tabbed .webhead-search-cloud-admin-page__tab-strip {
+.searcio-admin-page__content--tabbed > [role="tablist"]:not([aria-orientation="vertical"]),
+.searcio-admin-page__content--tabbed > * > [role="tablist"]:not([aria-orientation="vertical"]),
+.searcio-admin-page__content--tabbed .searcio-admin-page__tab-strip {
 	box-sizing: border-box;
 	display: flex;
 	width: auto;
@@ -469,25 +469,25 @@
 // wide as its tabs and lets each one grow to fill it (`flex: 1 0 auto`), which
 // changes nothing while the list fits its tabs. Made as wide as the surface it
 // stretched two tabs to half the strip each, 761px for the word "Overview".
-.webhead-search-cloud-admin-page__content--tabbed > [role="tablist"]:not([aria-orientation="vertical"]) > [role="tab"],
-.webhead-search-cloud-admin-page__content--tabbed > * > [role="tablist"]:not([aria-orientation="vertical"]) > [role="tab"] {
+.searcio-admin-page__content--tabbed > [role="tablist"]:not([aria-orientation="vertical"]) > [role="tab"],
+.searcio-admin-page__content--tabbed > * > [role="tablist"]:not([aria-orientation="vertical"]) > [role="tab"] {
 	flex: 0 0 auto;
 }
 
 // On a narrow screen the actions go under the title and take the width, rather
 // than wrapping to a second line at whatever width the labels happen to have.
 @media screen and (max-width: 767px) {
-	.webhead-search-cloud-admin-page__header {
+	.searcio-admin-page__header {
 		flex-direction: column;
 		align-items: stretch;
 	}
 
-	.webhead-search-cloud-admin-page__actions {
+	.searcio-admin-page__actions {
 		flex-wrap: wrap;
 	}
 
-	.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--outline.components-button,
-	.webhead-search-cloud-admin-page__header .webhead-search-cloud-admin-page__action--solid.components-button {
+	.searcio-admin-page__header .searcio-admin-page__action--outline.components-button,
+	.searcio-admin-page__header .searcio-admin-page__action--solid.components-button {
 		flex: 1 1 auto;
 		justify-content: center;
 	}

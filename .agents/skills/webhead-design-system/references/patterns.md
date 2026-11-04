@@ -15,7 +15,7 @@ Loaded from `webhead-design-system` when building one of these surfaces.
   panel and each label stays as wide as its text. `Tabs.List` draws neither, so the shell does —
   inside `<AdminPage tabbed>` every `[role="tablist"]` reaches the edges of the surface and
   carries the line. Do not style a strip per screen. A loading placeholder for the strip takes the
-  shell's `webhead-search-cloud-admin-page__tab-strip` class and gets the same line, so nothing appears
+  shell's `searcio-admin-page__tab-strip` class and gets the same line, so nothing appears
   when the tabs do. Tabs inside a card leave `tabbed` off.
 - **A tab strip must never make the page scroll sideways.** `overflow-x: auto` on the list, tabs
   sized to their labels. Verify at a narrow viewport rather than assuming.

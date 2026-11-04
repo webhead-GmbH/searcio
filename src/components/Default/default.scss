@@ -63,7 +63,7 @@ $surfaces: ".panel-container, #{$overlays}";
 // black brand, so it is set back here. Not on `body`: there it is the colour
 // scheme the person chose for WordPress, and WordPress's own buttons and links
 // read it.
-#webhead-search-cloud-root,
+#searcio-root,
 #{$surfaces} {
 	--wp-components-color-accent: var(--wh-primary);
 	--wp-components-color-accent-darker-10: var(--wh-primary-dark);
@@ -93,7 +93,7 @@ $surfaces: ".panel-container, #{$overlays}";
 // element, so these are set on `body`, which nothing else does, for whatever is
 // drawn outside the screen, and on the shell, which is inside the provider.
 body,
-#webhead-search-cloud-root,
+#searcio-root,
 #{$surfaces} {
 	--wpds-color-background-interactive-brand-strong: var(--wh-primary);
 	--wpds-color-background-interactive-brand-strong-active: var(--wh-primary-dark);

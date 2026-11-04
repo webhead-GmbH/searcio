@@ -67,7 +67,7 @@ final class Search_Surface {
 
 		return sprintf(
 			'<div class="%1$s">%2$s%3$s%4$s</div>',
-			esc_attr( 'webhead-search-cloud-placement webhead-search-cloud-placement--' . $placement->align ),
+			esc_attr( 'searcio-placement searcio-placement--' . $placement->align ),
 			$style,
 			Trigger_Markup::render(
 				array_merge(
@@ -79,7 +79,7 @@ final class Search_Surface {
 					]
 				)
 			),
-			'' !== $fallback ? '<div class="webhead-search-cloud-fallback">' . $fallback . '</div>' : ''
+			'' !== $fallback ? '<div class="searcio-fallback">' . $fallback . '</div>' : ''
 		);
 	}
 
@@ -136,7 +136,7 @@ final class Search_Surface {
 
 		$this->assets->enqueue( Frontend_Config::ENTRY );
 
-		return '<div class="webhead-search-cloud-products-placement">' . $markup . '</div>';
+		return '<div class="searcio-products-placement">' . $markup . '</div>';
 	}
 
 	/**

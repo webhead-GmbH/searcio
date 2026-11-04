@@ -1,5 +1,5 @@
 {
-    "name": "webhead/webhead-search-cloud",
+    "name": "webhead/searcio",
     "description": "Connect WordPress and WooCommerce to Searcio.",
     "type": "wordpress-plugin",
     "license": "GPL-3.0-or-later",

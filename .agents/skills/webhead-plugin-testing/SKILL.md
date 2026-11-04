@@ -52,7 +52,7 @@ npm run test:php                        # integration + multisite
 
 Run the narrowest useful suite first. Run a broader one when shared contracts, manifests, or bootstrap behavior changed.
 
-The wp-env scripts use `--env-cwd=wp-content/plugins/webhead-search-cloud`, so the plugin directory has to be named `webhead-search-cloud`.
+The wp-env scripts use `--env-cwd=wp-content/plugins/searcio`, so the plugin directory has to be named `searcio`.
 
 If `npm run env:start` fails with `Could not find the current WordPress version in the cache and the network is not available`, this machine blocks the raw DNS lookup wp-env uses to detect connectivity. Pinning `core` does not help — wp-env resolves the version before reading your configuration. See `webhead-wp-env-testing` for the mechanism and the actual remedies.
 
@@ -112,4 +112,4 @@ If this plugin was scaffolded before the harness existed, `.gitignore` may still
 - Check every state of a screen, not the screen at rest: click each action, open each overlay, make a field wrong, empty the list, narrow the window, and switch to a right-to-left language.
 - Measure that nothing a screen stacks touches what is above it. `leaves a gap between everything it stacks` in `tests/e2e/specs/settings-page.spec.js` does it for the settings screen; copy it for every page you add.
 - Open every admin screen you added beside the settings screen, at a width above 1920px as well as on a phone, and measure both: same left edge, same width, same header. A frame that stops growing at some maximum looks right on any screen narrower than that maximum.
-- Verify REST routes still use `webhead-search-cloud/v1` and permission callbacks remain explicit.
+- Verify REST routes still use `searcio/v1` and permission callbacks remain explicit.

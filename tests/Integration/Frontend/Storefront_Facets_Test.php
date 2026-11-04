@@ -32,12 +32,12 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 	private int $attribute_id = 0;
 
 	public function tear_down(): void {
-		remove_all_filters( 'webhead_search_cloud/storefront/facet_display' );
-		remove_all_filters( 'webhead_search_cloud/storefront/facet_colors' );
-		remove_all_filters( 'webhead_search_cloud/storefront/facet_images' );
+		remove_all_filters( 'searcio/storefront/facet_display' );
+		remove_all_filters( 'searcio/storefront/facet_colors' );
+		remove_all_filters( 'searcio/storefront/facet_images' );
 		remove_all_filters( 'product_attributes_type_selector' );
-		delete_option( 'webhead_search_cloud_category_filter' );
-		delete_option( 'webhead_search_cloud_category_filter_depth' );
+		delete_option( 'searcio_category_filter' );
+		delete_option( 'searcio_category_filter_depth' );
 
 		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
 			unregister_taxonomy( self::ATTRIBUTE );
@@ -84,7 +84,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->facet_config()->set_fields( [ 'attr_size', 'brand' ] );
 
 		add_filter(
-			'webhead_search_cloud/storefront/facet_display',
+			'searcio/storefront/facet_display',
 			static fn ( $display, string $field ) => 'brand' === $field ? 'tiles' : 'swatches',
 			10,
 			2
@@ -158,7 +158,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->facet_config()->set_fields( [ 'colour' ] );
 
 		add_filter(
-			'webhead_search_cloud/storefront/facet_colors',
+			'searcio/storefront/facet_colors',
 			static fn ( $colors, string $field, string $taxonomy ) => 'colour' === $field && '' === $taxonomy
 				? [ 'Blau' => '#2f6fd0', 'Rot' => 'not a colour' ]
 				: $colors,
@@ -269,7 +269,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->facet_config()->set_fields( [ 'attr_material' ] );
 
 		add_filter(
-			'webhead_search_cloud/storefront/facet_images',
+			'searcio/storefront/facet_images',
 			static fn (): array => [ 'Leinen' => 'https://shop.test/leinen.jpg', 'Wolle' => 'javascript:alert(1)', '' => 'https://shop.test/x.jpg' ]
 		);
 
@@ -285,7 +285,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 
 	public function test_the_main_categories_alone_are_a_tree_of_one_level(): void {
 		$this->facet_config()->set_fields( [ 'categories', 'brand' ] );
-		update_option( 'webhead_search_cloud_category_filter', 'main' );
+		update_option( 'searcio_category_filter', 'main' );
 
 		$main = self::factory()->category->create( [ 'name' => 'Kleidung' ] );
 		self::factory()->category->create( [ 'name' => 'Jacken', 'parent' => $main ] );
@@ -299,8 +299,8 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 
 	public function test_the_nested_filter_hands_on_the_levels_asked_for(): void {
 		$this->facet_config()->set_fields( [ 'categories' ] );
-		update_option( 'webhead_search_cloud_category_filter', 'nested' );
-		update_option( 'webhead_search_cloud_category_filter_depth', 3 );
+		update_option( 'searcio_category_filter', 'nested' );
+		update_option( 'searcio_category_filter_depth', 3 );
 
 		$main = self::factory()->category->create( [ 'name' => 'Kleidung & Mode' ] );
 		$sub  = self::factory()->category->create( [ 'name' => 'Jacken', 'parent' => $main ] );
@@ -316,7 +316,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 	/** A search answers with names, so two categories of one name are one value. */
 	public function test_a_name_that_is_a_main_category_anywhere_is_a_main_category(): void {
 		$this->facet_config()->set_fields( [ 'categories' ] );
-		update_option( 'webhead_search_cloud_category_filter', 'nested' );
+		update_option( 'searcio_category_filter', 'nested' );
 
 		$main = self::factory()->category->create( [ 'name' => 'Kleidung' ] );
 		self::factory()->category->create( [ 'name' => 'Sale' ] );

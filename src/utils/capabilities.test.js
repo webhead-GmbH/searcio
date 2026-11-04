@@ -20,7 +20,7 @@ describe( 'remembered capabilities', () => {
 	} );
 
 	it( 'read as none when what is stored is not an object', () => {
-		window.sessionStorage.setItem( 'webheadSearchCloud.capabilities.sk_one', '{not json' );
+		window.sessionStorage.setItem( 'searcio.capabilities.sk_one', '{not json' );
 
 		expect( rememberedCapabilities( 'sk_one' ) ).toEqual( {} );
 	} );

@@ -37,7 +37,7 @@ final class Frontend_Config {
 	public const ENTRY = 'bundle.search';
 
 	/** The global the entry's script reads this configuration from. */
-	public const OBJECT_NAME = 'webheadSearchCloudFrontend';
+	public const OBJECT_NAME = 'searcioFrontend';
 
 	/**
 	 * The query parameter each page builder's editor canvas is loaded with:
@@ -61,7 +61,7 @@ final class Frontend_Config {
 	 * storefront marks them `preview`, which Searcio meters but does not count
 	 * in the site's search statistics.
 	 *
-	 * Filterable through `webhead_search_cloud/storefront/is_preview` for an
+	 * Filterable through `searcio/storefront/is_preview` for an
 	 * editor this list does not know.
 	 */
 	private function is_preview(): bool {
@@ -74,7 +74,7 @@ final class Frontend_Config {
 			}
 		}
 
-		return (bool) apply_filters( 'webhead_search_cloud/storefront/is_preview', $editor );
+		return (bool) apply_filters( 'searcio/storefront/is_preview', $editor );
 	}
 
 	/**

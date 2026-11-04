@@ -22,7 +22,7 @@ import {
 test.use( { storageState: { cookies: [], origins: [] } } );
 
 const setSupport = ( requestUtils, value ) => requestUtils.rest( {
-	path: '/webhead-search-cloud/v1/settings',
+	path: '/searcio/v1/settings',
 	method: 'POST',
 	data: { settings: { support_searcio: value } },
 } );

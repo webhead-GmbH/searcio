@@ -29,7 +29,7 @@ final class Boot_Test extends Integration_Test_Case {
 	public function test_booting_the_plugin_sends_no_query(): void {
 		global $wpdb;
 
-		delete_option( 'webhead_search_cloud_delete_data_on_uninstall' );
+		delete_option( 'searcio_delete_data_on_uninstall' );
 		wp_cache_flush();
 		wp_load_alloptions();
 

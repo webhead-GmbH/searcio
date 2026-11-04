@@ -34,7 +34,7 @@ Specs run against `http://localhost:8889` — the wp-env **tests** site, not the
 
 | Fixture | Use |
 | --- | --- |
-| `admin` | `visitAdminPage( 'admin.php', 'page=webhead-search-cloud' )` |
+| `admin` | `visitAdminPage( 'admin.php', 'page=searcio' )` |
 | `page` | The Playwright page |
 | `requestUtils` | REST calls as an administrator: `createPost()`, `rest()`, cleanup |
 | `editor` | Block editor interactions |

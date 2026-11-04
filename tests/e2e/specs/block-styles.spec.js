@@ -18,7 +18,7 @@ test.describe( "The search block's Styles tab", () => {
 	test( 'leaves space between the size sliders', async ( { admin, editor, page } ) => {
 		// A post: a new page opens on the starter patterns, over the editor.
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'webhead-search-cloud/search' } );
+		await editor.insertBlock( { name: 'searcio/search' } );
 		await editor.openDocumentSettingsSidebar();
 
 		const inspector = page.getByRole( 'region', { name: 'Editor settings' } );

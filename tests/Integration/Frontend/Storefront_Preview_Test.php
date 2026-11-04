@@ -53,7 +53,7 @@ final class Storefront_Preview_Test extends Integration_Test_Case {
 	}
 
 	public function test_an_editor_the_list_does_not_know_can_say_so(): void {
-		add_filter( 'webhead_search_cloud/storefront/is_preview', '__return_true' );
+		add_filter( 'searcio/storefront/is_preview', '__return_true' );
 
 		$this->assertTrue( $this->preview() );
 	}

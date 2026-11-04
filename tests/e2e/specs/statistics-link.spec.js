@@ -7,7 +7,7 @@
 
 import { test, expect, setConnected } from '../utils';
 
-const SETTINGS_URL = '/wp-admin/admin.php?page=webhead-search-cloud';
+const SETTINGS_URL = '/wp-admin/admin.php?page=searcio';
 const STATISTICS_URL = 'https://dashboard.example.test/acme/sites/7';
 const UPGRADE_URL = 'https://billing.example.test/upgrade';
 
@@ -48,7 +48,7 @@ test.describe( 'Search statistics', () => {
 		await mockHealth( page, { plan: { is_free: true, name: 'Free', upgrade_url: UPGRADE_URL }, statistics_url: STATISTICS_URL } );
 		await page.goto( SETTINGS_URL );
 
-		const header = page.locator( '.webhead-search-cloud-admin-page__header' );
+		const header = page.locator( '.searcio-admin-page__header' );
 		const action = header.getByRole( 'button', { name: 'Search statistics' } );
 
 		// The first of the two is drawn outlined; the upgrade stays the solid one.
@@ -68,7 +68,7 @@ test.describe( 'Search statistics', () => {
 		await mockHealth( page, { plan: { is_free: false, name: 'Starter', upgrade_url: UPGRADE_URL } } );
 		await page.goto( SETTINGS_URL );
 
-		const header = page.locator( '.webhead-search-cloud-admin-page__header' );
+		const header = page.locator( '.searcio-admin-page__header' );
 
 		await expect( page.getByRole( 'tablist' ) ).toBeVisible();
 		await expect( header.getByRole( 'button', { name: 'Upgrade plan' } ) ).toHaveCount( 0 );

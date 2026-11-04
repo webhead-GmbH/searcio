@@ -4,8 +4,8 @@ import { __ } from '@wordpress/i18n';
 
 import SettingsContext from './context';
 
-const pluginData = window.webhead_search_cloudData || {};
-const SETTINGS_PATH = pluginData?.api?.settingsPath || '/webhead-search-cloud/v1/settings';
+const pluginData = window.searcioData || {};
+const SETTINGS_PATH = pluginData?.api?.settingsPath || '/searcio/v1/settings';
 
 if ( pluginData?.api?.nonce ) {
 	apiFetch.use( apiFetch.createNonceMiddleware( pluginData.api.nonce ) );

@@ -78,7 +78,7 @@ final class Escaped_Labels_Test extends Integration_Test_Case {
 		update_option( 'woocommerce_price_thousand_sep', '&nbsp;' );
 		update_option( 'woocommerce_price_display_suffix', 'inkl. MwSt. &amp; <b>Versand</b>' );
 		// Saved before the setting decoded what it keeps.
-		update_option( 'webhead_search_cloud_popular_searches', [ 'Kabel &lt;2m', 'Fisch & Chips' ] );
+		update_option( 'searcio_popular_searches', [ 'Kabel &lt;2m', 'Fisch & Chips' ] );
 
 		$config = $this->service( 'frontend_config' )->to_array();
 

@@ -19,7 +19,7 @@ import InspectorStack from '../InspectorStack';
  */
 const Edit = ( { attributes, setAttributes } ) => {
 	const { source, documentId, filterField, filterValue, heading, limit, layout, showBanner, cardSource } = attributes;
-	const blockProps = useBlockProps( { className: 'webhead-search-cloud-block-editor' } );
+	const blockProps = useBlockProps( { className: 'searcio-block-editor' } );
 
 	const isSimilar = 'similar' === source;
 
@@ -138,7 +138,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 			</InspectorControls>
 
 			<div { ...blockProps }>
-				<div className="webhead-search-cloud-block-editor__preview">
+				<div className="searcio-block-editor__preview">
 					<Icon icon={ GridIcon } />
 					{ /* Plain elements with literal values, like the search block's
 					     preview: this renders in the editor canvas, which does not

@@ -18,7 +18,7 @@
  * exposes the write secret.
  *
  * Deliberately registered under `search-cloud/v1`, not this plugin's own
- * `webhead-search-cloud/v1` namespace, so the URL sent as `verify_url` stays
+ * `searcio/v1` namespace, so the URL sent as `verify_url` stays
  * stable even if this plugin's slug ever changes.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>

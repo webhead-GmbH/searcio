@@ -1,6 +1,6 @@
 # Configuration Reference
 
-All settings live under **Searcio** in the WordPress admin menu, split across six tabs: **Sync**, **Indexing**, **Search Config**, **Placement**, **Connection** and **General**. They are described here in the order you set a site up in. Viewing the dashboard requires the `webhead-search-cloud_view` capability; changing connection credentials, indexing, or search configuration requires `webhead-search-cloud_manage_settings`; running or managing syncs requires `webhead-search-cloud_run_sync`. All three are granted to Administrators by default - see [`developers.md`](developers.md#capabilities) to grant them to other roles. A user without `manage_settings` sees the Sync tab only.
+All settings live under **Searcio** in the WordPress admin menu, split across six tabs: **Sync**, **Indexing**, **Search Config**, **Placement**, **Connection** and **General**. They are described here in the order you set a site up in. Viewing the dashboard requires the `searcio_view` capability; changing connection credentials, indexing, or search configuration requires `searcio_manage_settings`; running or managing syncs requires `searcio_run_sync`. All three are granted to Administrators by default - see [`developers.md`](developers.md#capabilities) to grant them to other roles. A user without `manage_settings` sees the Sync tab only.
 
 ## Connection
 

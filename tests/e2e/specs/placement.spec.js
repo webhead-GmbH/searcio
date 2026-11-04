@@ -9,9 +9,9 @@
 
 import { test, expect, configureSearchKey, mockSearchCloud, touchingInShell } from '../utils';
 
-const TAB_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=placement';
-const PLACEMENT_PATH = '/webhead-search-cloud/v1/placement';
-const SCREEN = '#webhead-search-cloud-root';
+const TAB_URL = '/wp-admin/admin.php?page=searcio&tab=placement';
+const PLACEMENT_PATH = '/searcio/v1/placement';
+const SCREEN = '#searcio-root';
 const LOADED = { timeout: 15000 };
 
 const savePlacement = ( requestUtils, placement ) =>
@@ -252,10 +252,10 @@ test.describe( 'On the site', () => {
 		await mockSearchCloud( page );
 		await page.goto( pageUrl );
 
-		const box = page.locator( '.webhead-search-cloud-placement .whsc-trigger-box input' );
+		const box = page.locator( '.searcio-placement .whsc-trigger-box input' );
 
 		await expect( box ).toHaveAttribute( 'placeholder', 'Search the shop' );
-		await expect( page.locator( '.webhead-search-cloud-fallback' ) ).toHaveCount( 0 );
+		await expect( page.locator( '.searcio-fallback' ) ).toHaveCount( 0 );
 
 		await box.click();
 		await expect( page.locator( '.whsc-modal-overlay' ) ).toBeVisible();
@@ -265,7 +265,7 @@ test.describe( 'On the site', () => {
 		await page.goto( pageUrl );
 
 		await expect( page.locator( '.wp-block-search' ) ).toBeVisible();
-		await expect( page.locator( '.webhead-search-cloud-placement' ) ).toHaveCount( 0 );
+		await expect( page.locator( '.searcio-placement' ) ).toHaveCount( 0 );
 	} );
 
 	test( 'the theme\'s search icon opens Searcio, and the theme\'s own dropdown stays closed', async ( { page, requestUtils } ) => {

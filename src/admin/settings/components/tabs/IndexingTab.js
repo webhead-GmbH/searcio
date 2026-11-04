@@ -12,9 +12,9 @@ import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 import {useAnnounce} from '../../../../utils/announce';
 
-const pluginData = window.webhead_search_cloudData || {};
+const pluginData = window.searcioData || {};
 const CONFIG_PATH =
-	pluginData?.api?.indexingConfigPath || '/webhead-search-cloud/v1/indexing/config';
+	pluginData?.api?.indexingConfigPath || '/searcio/v1/indexing/config';
 
 const NONE = '';
 
@@ -575,7 +575,7 @@ const IndexingTab = () => {
 		: undefined;
 
 	return (
-		<Stack direction="column" gap="lg" className="webhead-search-cloud-indexing">
+		<Stack direction="column" gap="lg" className="searcio-indexing">
 			<TabIntro
 				title={__('What to index', 'searcio')}
 				description={__(

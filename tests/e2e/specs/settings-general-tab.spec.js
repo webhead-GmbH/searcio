@@ -7,7 +7,7 @@
 
 import { test, expect, setConnected, setPlanTier } from '../utils';
 
-const GENERAL_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=general';
+const GENERAL_URL = '/wp-admin/admin.php?page=searcio&tab=general';
 
 // The tab waits on the settings REST response before it can render.
 const LOADED = { timeout: 30000 };
@@ -73,7 +73,7 @@ test.describe( 'Support Searcio', () => {
 		setConnected( false );
 		setPlanTier( 'clear' );
 		await requestUtils.rest( {
-			path: '/webhead-search-cloud/v1/settings',
+			path: '/searcio/v1/settings',
 			method: 'POST',
 			data: { settings: { support_searcio: true } },
 		} );
@@ -101,7 +101,7 @@ test.describe( 'Support Searcio', () => {
 	test( 'a Free plan keeps it on and says why, whatever was saved', async ( { page, requestUtils } ) => {
 		setPlanTier( 'free' );
 		await requestUtils.rest( {
-			path: '/webhead-search-cloud/v1/settings',
+			path: '/searcio/v1/settings',
 			method: 'POST',
 			data: { settings: { support_searcio: false } },
 		} );

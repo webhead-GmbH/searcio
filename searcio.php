@@ -48,26 +48,26 @@ defined( 'Webhead\WP\SearchCloud\PLUGIN_URL' ) || define(
 	plugin_dir_url( \Webhead\WP\SearchCloud\PLUGIN_FILE )
 );
 /**
- * The name the framework gives everything after: the hook prefix, the cache
- * group, the asset handles, the admin page. It is the plugin's first slug and
- * stays, whatever folder the plugin is installed in: wordpress.org installs it
- * as `searcio/`, the text domain.
+ * The name the framework gives everything after: the options, the tables, the
+ * capabilities, the hook prefix, the cache group, the REST namespace, the
+ * asset handles, the admin page. It is the plugin's slug on wordpress.org, and
+ * was `webhead-search-cloud` until 1.4.0 (`Lifecycle\Legacy_Slug` moves what a
+ * site stored under that name).
  */
 defined( 'Webhead\WP\SearchCloud\PLUGIN_SLUG' ) || define(
 	'Webhead\WP\SearchCloud\PLUGIN_SLUG',
-	'webhead-search-cloud'
+	'searcio'
 );
 /**
- * The plugin's slug on wordpress.org, which files its translations under that
- * name. Only the translations follow it: what a site stores, and what the
- * service calls, keep the names of the slug above.
+ * The text domain, which wordpress.org files the plugin's translations under:
+ * the slug.
  */
 defined( 'Webhead\WP\SearchCloud\TEXT_DOMAIN' ) || define(
 	'Webhead\WP\SearchCloud\TEXT_DOMAIN',
 	'searcio'
 );
 defined( 'Webhead\WP\SearchCloud\CACHE_GROUP' )
-|| define( 'Webhead\WP\SearchCloud\CACHE_GROUP', 'webhead_search_cloud' );
+|| define( 'Webhead\WP\SearchCloud\CACHE_GROUP', 'searcio' );
 
 defined( 'Webhead\WP\SearchCloud\SERVICE_URL' )
 || define( 'Webhead\WP\SearchCloud\SERVICE_URL', 'https://searcio.com' );
@@ -86,6 +86,11 @@ defined( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL' )
 defined( 'Webhead\WP\SearchCloud\LEGAL_DPA_URL' )
 || define( 'Webhead\WP\SearchCloud\LEGAL_DPA_URL', 'https://searcio.com/data-processing-agreement' );
 
+// What a site stored under the plugin's first slug, moved before anything
+// reads it under the new one; on a network, for each site as it is reached.
+\Webhead\WP\SearchCloud\Lifecycle\Legacy_Slug::migrate();
+add_action( 'switch_blog', [ \Webhead\WP\SearchCloud\Lifecycle\Legacy_Slug::class, 'migrate' ], 0, 0 );
+
 register_activation_hook(
 	__FILE__,
 	static function ( bool $network_wide ): void {
@@ -101,9 +106,11 @@ register_deactivation_hook(
 );
 
 add_action( 'plugins_loaded', static function (): void {
-	do_action( 'webhead_search_cloud/before_load' );
+	do_action( 'searcio/before_load' );
+	do_action_deprecated( 'webhead_search_cloud/before_load', [], '1.4.0', 'searcio/before_load' );
 
 	$plugin = new \Webhead\WP\SearchCloud\Plugin();
 
-	do_action( 'webhead_search_cloud/after_load', $plugin );
+	do_action( 'searcio/after_load', $plugin );
+	do_action_deprecated( 'webhead_search_cloud/after_load', [ $plugin ], '1.4.0', 'searcio/after_load' );
 } );

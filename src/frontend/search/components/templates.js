@@ -1,7 +1,7 @@
 /**
  * Per-type result card renderers, shared by the highlights and search-results
- * carousels. `window.webheadSearchCloudSearch.registerTemplate` lets a theme
- * or plugin override or add a per-type template client-side.
+ * carousels. `registerTemplate()` overrides a type's template or adds one
+ * client-side.
  */
 import { __ } from '@wordpress/i18n';
 

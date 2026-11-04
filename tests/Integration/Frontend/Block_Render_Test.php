@@ -1,6 +1,6 @@
 <?php
 /**
- * Block editor render tests for `webhead-search-cloud/search`.
+ * Block editor render tests for `searcio/search`.
  *
  * The block is a dynamic (server-rendered) block: its `render.php` builds the
  * front-end trigger markup and a per-instance scoped `<style>` from the saved
@@ -22,7 +22,7 @@ use WP_Block_Type_Registry;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Block_Render_Test extends Integration_Test_Case {
-	private const BLOCK = 'webhead-search-cloud/search';
+	private const BLOCK = 'searcio/search';
 
 	public function test_block_is_registered_from_metadata(): void {
 		$this->assertTrue(
@@ -35,7 +35,7 @@ final class Block_Render_Test extends Integration_Test_Case {
 		$html = $this->render_search_block( [] );
 
 		$this->assertStringContainsString( 'data-whsc-trigger', $html );
-		$this->assertStringContainsString( 'webhead-search-cloud-search-block', $html );
+		$this->assertStringContainsString( 'searcio-search-block', $html );
 		// Trigger_Markup falls back to icon mode when none is given.
 		$this->assertStringContainsString( 'data-mode="icon"', $html );
 	}

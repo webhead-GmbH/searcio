@@ -35,7 +35,7 @@ $whsc_data = [
 					[
 						'id'         => 'whscwid',
 						'elType'     => 'widget',
-						'widgetType' => 'webhead-search-cloud-search',
+						'widgetType' => 'searcio-search',
 						'settings'   => [ 'mode' => $whsc_mode ],
 					],
 				],

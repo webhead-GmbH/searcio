@@ -72,7 +72,7 @@ values live in `@wordpress/base-styles`:
 ```scss
 @use "@wordpress/base-styles/variables" as wp-base;
 
-.webhead-search-cloud-card { box-shadow: wp-base.$elevation-x-small; }
+.searcio-card { box-shadow: wp-base.$elevation-x-small; }
 ```
 
 `$elevation-x-small` for cards and grouped content, `$elevation-small` for tooltips and snackbars,

@@ -61,7 +61,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 	public function test_retention_purges_finished_runs_past_the_cutoff(): void {
 		global $wpdb;
 
-		$table = $wpdb->prefix . 'webhead_search_cloud_sync_runs';
+		$table = $wpdb->prefix . 'searcio_sync_runs';
 		$wpdb->query(
 			$wpdb->prepare(
 				"INSERT INTO {$table} (status, trigger_type, control, created_at) VALUES ('completed', 'manual', '', %s)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -152,7 +152,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 
 		// A zero budget is "every document is already over time", which is what a
 		// slow API looks like without making the test wait for one.
-		add_filter( 'webhead_search_cloud/sync/tick_budget', static fn(): int => 0 );
+		add_filter( 'searcio/sync/tick_budget', static fn(): int => 0 );
 
 		$this->fake_http( fn(): array => $this->http_ok( [] ) );
 

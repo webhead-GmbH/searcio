@@ -18,8 +18,8 @@
  */
 
 $whsc_action = isset( $args[0] ) ? (string) $args[0] : 'set';
-$whsc_key    = 'webhead_search_cloud_write_key';
-$whsc_secret = 'webhead_search_cloud_write_secret';
+$whsc_key    = 'searcio_write_key';
+$whsc_secret = 'searcio_write_secret';
 
 if ( 'clear' === $whsc_action ) {
 	// Restore whatever was there before (a real connection, or empty) and drop

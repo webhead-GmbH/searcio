@@ -30,7 +30,7 @@ echo Style_Tokens::style_element( $instance_class, $attributes ); // phpcs:ignor
 printf(
 	'<div %1$s>%2$s</div>',
 	wp_kses_data(
-		get_block_wrapper_attributes( [ 'class' => 'webhead-search-cloud-search-block' ] )
+		get_block_wrapper_attributes( [ 'class' => 'searcio-search-block' ] )
 	),
 	Trigger_Markup::render( array_merge( $attributes, [ 'instanceClass' => $instance_class ] ) ) // phpcs:ignore -- markup is escaped inside Trigger_Markup::render().
 );

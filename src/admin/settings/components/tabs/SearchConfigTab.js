@@ -27,13 +27,13 @@ import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 import { useAnnounce } from '../../../../utils/announce';
 
-const pluginData = window.webhead_search_cloudData || {};
+const pluginData = window.searcioData || {};
 const SEARCH_CONFIG_PATH =
-	pluginData?.api?.searchConfigPath || '/webhead-search-cloud/v1/search-config';
+	pluginData?.api?.searchConfigPath || '/searcio/v1/search-config';
 const INDEXING_CONFIG_PATH =
-	pluginData?.api?.indexingConfigPath || '/webhead-search-cloud/v1/indexing/config';
+	pluginData?.api?.indexingConfigPath || '/searcio/v1/indexing/config';
 const TEST_CONNECTION_PATH =
-	pluginData?.api?.testConnectionPath || '/webhead-search-cloud/v1/connection/test';
+	pluginData?.api?.testConnectionPath || '/searcio/v1/connection/test';
 
 /**
  * One editable boost row per content type this site indexes, preserving any
@@ -772,7 +772,7 @@ const SearchConfigTab = () => {
 		: undefined;
 
 	return (
-		<Stack direction="column" gap="lg" className="webhead-search-cloud-search-config">
+		<Stack direction="column" gap="lg" className="searcio-search-config">
 			<TabIntro
 				title={ __( 'Search configuration', 'searcio' ) }
 				description={ __(

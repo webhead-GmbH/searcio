@@ -8,9 +8,9 @@
 
 import { test, expect, configureSearchKey, mockSearchCloud } from '../utils';
 
-const TAB_URL = '/wp-admin/admin.php?page=webhead-search-cloud&tab=placement&section=look';
-const PLACEMENT_PATH = '/webhead-search-cloud/v1/placement';
-const SCREEN = '#webhead-search-cloud-root';
+const TAB_URL = '/wp-admin/admin.php?page=searcio&tab=placement&section=look';
+const PLACEMENT_PATH = '/searcio/v1/placement';
+const SCREEN = '#searcio-root';
 const LOADED = { timeout: 15000 };
 
 const savePlacement = ( requestUtils, placement ) =>

@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sync_Runs_Table extends Table {
 	protected function get_table_name(): string {
-		return 'webhead_search_cloud_sync_runs';
+		return 'searcio_sync_runs';
 	}
 
 	/**

@@ -23,26 +23,26 @@ declare( strict_types=1 );
 /**
  * Read an environment variable, falling back to a default.
  */
-$webhead_search_cloud_env = static function ( string $name, string $default ): string {
+$searcio_env = static function ( string $name, string $default ): string {
 	$value = getenv( $name );
 
 	return false === $value || '' === $value ? $default : $value;
 };
 
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', rtrim( $webhead_search_cloud_env( 'WP_TESTS_ABSPATH', '/var/www/html' ), '/\\' ) . '/' );
+	define( 'ABSPATH', rtrim( $searcio_env( 'WP_TESTS_ABSPATH', '/var/www/html' ), '/\\' ) . '/' );
 }
 
-define( 'DB_NAME', $webhead_search_cloud_env( 'WORDPRESS_DB_NAME', 'tests-wordpress' ) );
-define( 'DB_USER', $webhead_search_cloud_env( 'WORDPRESS_DB_USER', 'root' ) );
-define( 'DB_PASSWORD', $webhead_search_cloud_env( 'WORDPRESS_DB_PASSWORD', 'password' ) );
-define( 'DB_HOST', $webhead_search_cloud_env( 'WORDPRESS_DB_HOST', 'tests-mysql' ) );
+define( 'DB_NAME', $searcio_env( 'WORDPRESS_DB_NAME', 'tests-wordpress' ) );
+define( 'DB_USER', $searcio_env( 'WORDPRESS_DB_USER', 'root' ) );
+define( 'DB_PASSWORD', $searcio_env( 'WORDPRESS_DB_PASSWORD', 'password' ) );
+define( 'DB_HOST', $searcio_env( 'WORDPRESS_DB_HOST', 'tests-mysql' ) );
 define( 'DB_CHARSET', 'utf8' );
 define( 'DB_COLLATE', '' );
 
-$table_prefix = $webhead_search_cloud_env( 'WP_TESTS_TABLE_PREFIX', 'wptests_' );
+$table_prefix = $searcio_env( 'WP_TESTS_TABLE_PREFIX', 'wptests_' );
 
-define( 'WP_TESTS_DOMAIN', $webhead_search_cloud_env( 'WP_TESTS_DOMAIN', 'example.org' ) );
+define( 'WP_TESTS_DOMAIN', $searcio_env( 'WP_TESTS_DOMAIN', 'example.org' ) );
 define( 'WP_TESTS_EMAIL', 'admin@example.org' );
 define( 'WP_TESTS_TITLE', 'Searcio - Fast AI Product Search for WooCommerce Tests' );
 

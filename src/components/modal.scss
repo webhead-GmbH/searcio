@@ -9,7 +9,7 @@
 // decision".
 @use "@wordpress/base-styles/variables" as wp-base;
 
-.webhead-search-cloud-modal__backdrop {
+.searcio-modal__backdrop {
 	position: fixed;
 	inset: 0;
 	z-index: 100000;
@@ -23,7 +23,7 @@
 	perspective: 1000px;
 }
 
-.webhead-search-cloud-modal {
+.searcio-modal {
 	width: 100%;
 	// `lg` is the documented radius for dialogs. The backdrop is not a surface,
 	// so nothing here shares a radius with its parent.
@@ -46,7 +46,7 @@
 	}
 }
 
-.webhead-search-cloud-modal__header {
+.searcio-modal__header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -55,7 +55,7 @@
 	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
 }
 
-.webhead-search-cloud-modal__title {
+.searcio-modal__title {
 	margin: 0;
 	font-family: var(--wpds-typography-font-family-heading);
 	font-size: var(--wpds-typography-font-size-lg);
@@ -64,13 +64,13 @@
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
-.webhead-search-cloud-modal__body {
+.searcio-modal__body {
 	padding: var(--wpds-dimension-padding-2xl);
 	overflow-y: auto;
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
-.webhead-search-cloud-modal__actions {
+.searcio-modal__actions {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: flex-end;

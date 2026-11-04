@@ -224,7 +224,7 @@ export async function mockSearchCloud( page, options = {} ) {
  */
 export async function configureSearchKey( requestUtils, key = SEARCH_KEY ) {
 	await requestUtils.rest( {
-		path: '/webhead-search-cloud/v1/settings',
+		path: '/searcio/v1/settings',
 		method: 'POST',
 		data: { settings: { search_key: key } },
 	} );
@@ -240,7 +240,7 @@ export async function createBlockPost( requestUtils, attributes = {} ) {
 	const attrs = Object.keys( attributes ).length ? ' ' + JSON.stringify( attributes ) : '';
 	const post = await requestUtils.createPost( {
 		title: 'Search block page',
-		content: `<!-- wp:webhead-search-cloud/search${ attrs } /-->`,
+		content: `<!-- wp:searcio/search${ attrs } /-->`,
 		status: 'publish',
 	} );
 
@@ -279,7 +279,7 @@ export async function isPluginActive( requestUtils, plugin ) {
 function wpEvalFile( file, ...args ) {
 	const port = new URL( process.env.WP_BASE_URL || 'http://localhost:8889' ).port;
 	const container = '8888' === port ? 'cli' : 'tests-cli';
-	const seed = `wp-content/plugins/webhead-search-cloud/tests/e2e/${ file }`;
+	const seed = `wp-content/plugins/searcio/tests/e2e/${ file }`;
 
 	return execSync(
 		`npx wp-env run ${ container } wp eval-file ${ seed } ${ args.join( ' ' ) }`.trim(),
@@ -519,10 +519,10 @@ export class SearchWidget {
  * @param {import('@playwright/test').Page} page
  */
 export async function touchingInShell( page ) {
-	return page.locator( '.webhead-search-cloud-admin-page' ).evaluate( ( element ) => {
+	return page.locator( '.searcio-admin-page' ).evaluate( ( element ) => {
 		const panels = [ ...element.querySelectorAll( '[role="tabpanel"]' ) ];
 		const containers = [
-			element.querySelector( '.webhead-search-cloud-admin-page__content' ),
+			element.querySelector( '.searcio-admin-page__content' ),
 			...panels,
 			// A panel animates what it holds in one wrapper; the tab's own
 			// column is the first thing inside that.

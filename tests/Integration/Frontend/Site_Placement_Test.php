@@ -53,7 +53,7 @@ final class Site_Placement_Test extends Integration_Test_Case {
 
 		$this->assertStringContainsString( 'data-mode="box"', $html );
 		$this->assertStringContainsString( 'data-placeholder="Find it"', $html );
-		$this->assertMatchesRegularExpression( '/class="webhead-search-cloud-fallback"><form[^>]+role="search"/', $html );
+		$this->assertMatchesRegularExpression( '/class="searcio-fallback"><form[^>]+role="search"/', $html );
 		$this->assertStringContainsString( 'name="s"', $html );
 	}
 
@@ -183,11 +183,11 @@ final class Site_Placement_Test extends Integration_Test_Case {
 	 * flag, they are marked `preview` and left out of the search statistics.
 	 */
 	public function test_the_preview_marks_its_searches_as_a_preview(): void {
-		$this->assertFalse( (bool) apply_filters( 'webhead_search_cloud/storefront/is_preview', false ) );
+		$this->assertFalse( (bool) apply_filters( 'searcio/storefront/is_preview', false ) );
 
 		$_GET[ Placement_Preview::QUERY ] = '1';
 
-		$this->assertTrue( (bool) apply_filters( 'webhead_search_cloud/storefront/is_preview', false ) );
+		$this->assertTrue( (bool) apply_filters( 'searcio/storefront/is_preview', false ) );
 	}
 
 	public function test_the_storefront_is_told_the_selectors_only_while_they_are_on(): void {

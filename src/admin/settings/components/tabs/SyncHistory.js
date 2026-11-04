@@ -12,12 +12,12 @@ import {showToast} from '../../../../toast';
 import {statusIntent, statusLabels} from '../../syncStatus';
 import {formatNumber} from '../../../../utils/number';
 
-const pluginData = window.webhead_search_cloudData || {};
+const pluginData = window.searcioData || {};
 const CAN_RUN_SYNC = pluginData?.caps?.runSync !== false;
 
 // Scoped to this plugin + screen + table so Appearance, layout, visible
 // fields, density, per-page, sort, filters, and search survive reloads.
-const VIEW_STORAGE_KEY = 'webhead-search-cloud:settings:sync-history:view';
+const VIEW_STORAGE_KEY = 'searcio.settings.sync-history.view';
 
 const loadStoredView = () => {
 	try {
@@ -348,7 +348,7 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 
 			{/* The dataset has no media; the class keeps an empty media box out of
 			    every layout that would draw one. */}
-			<div className="webhead-search-cloud-dataviews--no-media">
+			<div className="searcio-dataviews--no-media">
 				<DataViews
 					data={items}
 					fields={fields}

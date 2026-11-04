@@ -446,7 +446,7 @@ final class Sync_Service {
 	/**
 	 * Seconds until the active run sends a batch the index did not take again,
 	 * or 0 when it is not waiting to. For a caller that drives the run itself,
-	 * as `wp webhead-search-cloud sync run` does, and so has to wait as WP-Cron
+	 * as the WP-CLI command's `sync run` does, and so has to wait as WP-Cron
 	 * would.
 	 */
 	public function seconds_until_retry(): int {
@@ -780,7 +780,7 @@ final class Sync_Service {
 		 *
 		 * @param  int  $budget  Default {@see self::TICK_BUDGET}.
 		 */
-		$budget = (int) apply_filters( 'webhead_search_cloud/sync/tick_budget', self::TICK_BUDGET );
+		$budget = (int) apply_filters( 'searcio/sync/tick_budget', self::TICK_BUDGET );
 
 		return max( 0, $budget );
 	}

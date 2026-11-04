@@ -34,24 +34,24 @@ final class Sync_Keys {
 	 * prune phase also treats every post carrying {@see self::META_DOC_HASH} as
 	 * indexed, because the incremental drain pushes documents no snapshot names.
 	 */
-	public const OPTION_SNAPSHOT = 'webhead_search_cloud_index_snapshot';
-	public const OPTION_SEEN     = 'webhead_search_cloud_sync_seen';
+	public const OPTION_SNAPSHOT = 'searcio_index_snapshot';
+	public const OPTION_SEEN     = 'searcio_sync_seen';
 
 	/** Document ids still pending deletion in the prune phase (resumable). */
-	public const OPTION_PRUNE = 'webhead_search_cloud_sync_prune';
+	public const OPTION_PRUNE = 'searcio_sync_prune';
 
 	/**
 	 * Document ids a delete could not remove from the index, kept until one
 	 * succeeds. See {@see Failed_Deletes}.
 	 */
-	public const OPTION_FAILED_DELETES = 'webhead_search_cloud_failed_deletes';
+	public const OPTION_FAILED_DELETES = 'searcio_failed_deletes';
 
 	/** Recurring scheduled sync. */
-	public const HOOK_SCHEDULED = 'webhead_search_cloud_scheduled_sync';
+	public const HOOK_SCHEDULED = 'searcio_scheduled_sync';
 
 	/** Resumable, self-rescheduling batch worker. */
-	public const HOOK_TICK = 'webhead_search_cloud_sync_tick';
+	public const HOOK_TICK = 'searcio_sync_tick';
 
 	/** Coalescing drain worker for incremental changes (Phase 4). */
-	public const HOOK_DRAIN = 'webhead_search_cloud_change_drain';
+	public const HOOK_DRAIN = 'searcio_change_drain';
 }

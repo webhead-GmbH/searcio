@@ -103,7 +103,7 @@ final class Trigger_Markup {
 		// leaves a doubled space in the class attribute.
 		$classes = implode(
 			' ',
-			array_filter( [ 'webhead-search-cloud-trigger', $instance_class, $class_name ], static fn ( string $part ): bool => '' !== $part )
+			array_filter( [ 'searcio-trigger', $instance_class, $class_name ], static fn ( string $part ): bool => '' !== $part )
 		);
 
 		// `data-webhead-frontend-root` scopes the shared frontend reset

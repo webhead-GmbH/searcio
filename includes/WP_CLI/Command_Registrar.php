@@ -16,6 +16,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\WP_CLI;
 
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Contracts\Hooks\Actions;
+use Webhead\WP\SearchCloud\Lifecycle\Legacy_Slug;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,6 +40,8 @@ final class Command_Registrar implements Actions {
 			return;
 		}
 
-		\WP_CLI::add_command( 'webhead-search-cloud sync', $this->command );
+		\WP_CLI::add_command( \Webhead\WP\SearchCloud\PLUGIN_SLUG . ' sync', $this->command );
+		// Its name before 1.4.0, which a system cron may still call.
+		\WP_CLI::add_command( Legacy_Slug::OLD_SLUG . ' sync', $this->command );
 	}
 }
