@@ -165,13 +165,16 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 
 This plugin sends data to Searcio, the hosted service that powers the search. Search does not work without it.
 
+* **Before you connect:** opening the Connection tab asks Searcio for the current addresses of its terms of use, privacy policy and data processing agreement, to link them beside the consent boxes. Nothing about your site is sent.
 * **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, which agreements you accepted, and an address on your site with a one-time code. Searcio uses them to create your account, or to find the one you have, and calls that address once to confirm that the site is yours.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
 * **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Searcio stores and applies.
+* **While you are connected:** the Connection and Search Config tabs, Site Health and the daily sync ask Searcio for the site's status, its search configuration and what your plan has used this month. These requests carry the site's keys and nothing else.
 * **When you disconnect:** a request to remove the site, after which Searcio deletes its search index.
 * **When a visitor searches:** the search term, the filters they pick or the answers they give in the product finder, the language of the page, how the search was started and where its results are shown, and which result they open. A product row asks for the products similar to the product on the page. Their browser contacts the service directly, so their IP address is visible to it. The list of a visitor's recent searches stays in their own browser.
 * **When a visitor uses the AI shopping assistant** (off unless you turn it on): the message they type.
 * **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
+* **When a visitor searches by voice** (off unless you turn it on): the visitor's browser turns what they say into the search term with its own speech recognition, which some browsers, Chrome among them, run on their maker's servers. The plugin receives only the text, and searches it as above.
 * **When you pick a Google font in the look editor on the Placement tab** (off unless you pick one, and never for a font your site already has): every visitor's browser loads that font from Google Fonts (https://fonts.googleapis.com) on the pages that show the search, so their IP address is visible to Google. Google's privacy policy: https://policies.google.com/privacy
 
 Nothing else is sent, and no visitor accounts are created.
