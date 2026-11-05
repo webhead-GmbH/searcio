@@ -188,6 +188,8 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = Unreleased =
+- Updated the webhead plugin framework to 1.9.0.
+- Messages on the settings screen, such as "Placement saved.", appear as WordPress's own notices at the bottom of the window.
 - The previews on the Placement tab and in the look editor show a placeholder while their page loads, instead of an empty white frame, and caching plugins are told never to keep a preview, so a visitor never gets one with settings you have not saved.
 - When your Searcio account has no active plan, has an overdue payment or is suspended, the Connection tab and Site Health say so, with a link to choose a plan, to pay on the billing page or to contact support. Syncing stops at once instead of trying again for an hour, and picks up again once your account is active. Meanwhile a search your shoppers submit goes to WordPress's own search.
 - Support Searcio, the small logo in the search window, is off unless you turn it on, on every plan. If you had turned it on, it stays on.

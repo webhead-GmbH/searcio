@@ -62,6 +62,7 @@ This plugin was scaffolded by the webhead WordPress Plugin Framework. Keep the g
   - `Asset_Registry`, from `get_assets()`, for front-end scripts and stylesheets on the pages that render them
   - `Cache_Manager`, `Filesystem`, and diagnostics services for operational work
 - Keep stable identifiers aligned: slug, namespace, text domain, hook prefix, cache group, REST namespace, option keys, table names, and capability names.
+- Name the plugin's own hooks `searcio_{area}_{name}`, with underscores, never `searcio/{area}/{name}`. Plugin Check guesses a plugin's prefix from the names it declares, splitting each on `_` (and `-`, `\`) but never on `/`; with slashed hook names it guesses wrong and reports every hook and every global of a block template as unprefixed, with `InvalidPrefixPassed`, at the severity wordpress.org reads. The framework's own hooks (`searcio/after_load`, `searcio/activation/before`) keep their names and pass once the guess is right.
 - The framework's helper functions (`arr_get`, `arr_has`, `arr_set`, `value`, `sanitizer`, `sanitize_key`, `sanitize_slug`, `sanitize_snake_key`, `str_slug`, `str_snake`) are functions of this plugin's bundle, not global ones: import each with `use function Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Helpers\arr_get;`. `includes/autoload.php` loads them; do not `require` the file yourself. The global names `webhead_wp_framework_*` no longer exist.
 
 ## DTOs, Value Objects, And Enums

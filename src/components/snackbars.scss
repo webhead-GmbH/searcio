@@ -1,0 +1,38 @@
+// Webhead scaffold managed file. scaffold:update may refresh this file.
+//
+// Where this plugin's snackbars sit: low in the window, clear of the admin
+// menu, which is 160px wide, 36px when it is folded and gone on a phone. In
+// logical properties, so the menu is on the right in a right-to-left admin and
+// the list moves with it.
+@use "@wordpress/base-styles/breakpoints" as wp-break;
+@use "@wordpress/base-styles/variables" as wp-base;
+
+.components-snackbar-list.searcio-snackbars {
+	position: fixed;
+	// Above the admin bar, as WordPress's own snackbars are.
+	z-index: 100000;
+	inset-block-end: var(--wpds-dimension-gap-xl);
+	inset-inline-start: calc(#{wp-base.$admin-sidebar-width} + var(--wpds-dimension-gap-xl));
+	inset-inline-end: var(--wpds-dimension-gap-xl);
+	width: auto;
+}
+
+.folded .components-snackbar-list.searcio-snackbars {
+	inset-inline-start: calc(#{wp-base.$admin-sidebar-width-collapsed} + var(--wpds-dimension-gap-xl));
+}
+
+// Where WordPress folds the menu by itself.
+@media screen and (max-width: wp-break.$break-large) {
+	.auto-fold .components-snackbar-list.searcio-snackbars {
+		inset-inline-start: calc(#{wp-base.$admin-sidebar-width-collapsed} + var(--wpds-dimension-gap-xl));
+	}
+}
+
+// Where it takes the menu away.
+@media screen and (max-width: wp-break.$break-medium) {
+	.components-snackbar-list.searcio-snackbars,
+	.auto-fold .components-snackbar-list.searcio-snackbars {
+		inset-inline-start: var(--wpds-dimension-gap-lg);
+		inset-inline-end: var(--wpds-dimension-gap-lg);
+	}
+}

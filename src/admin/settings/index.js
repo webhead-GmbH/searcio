@@ -1,7 +1,5 @@
 import { createRoot } from '@wordpress/element';
-import { ToastContainer } from 'react-toastify';
 import { ThemeProvider } from '@wordpress/theme';
-import 'react-toastify/dist/ReactToastify.css';
 
 import SettingsPanel from './components/SettingsPanel';
 import SettingsProvider from '../../settings/store/provider';
@@ -18,7 +16,6 @@ if ( container ) {
 		<ThemeProvider isRoot color={ { primary: '#101010' } }>
 			<SettingsProvider>
 				<SettingsPanel />
-				<ToastContainer />
 			</SettingsProvider>
 		</ThemeProvider>
 	);

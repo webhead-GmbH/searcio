@@ -35,6 +35,7 @@ import { Icon } from '@wordpress/ui';
 import { motion } from 'motion/react';
 
 import { animateText, useFadeInUpProps } from '../utils/animation';
+import Snackbars from './Snackbars';
 
 // The design tokens and the plugin's own variables, card variants and accent
 // colours. Imported here and not left to the page's PHP class to enqueue: a
@@ -182,6 +183,8 @@ function AdminPage( { title, description, icon = PageIcon, actions, tabbed = fal
 					{ children }
 				</motion.div>
 			</div>
+			{ /* What `showToast()` says, drawn once for the screen. */ }
+			<Snackbars />
 		</div>
 	);
 }
