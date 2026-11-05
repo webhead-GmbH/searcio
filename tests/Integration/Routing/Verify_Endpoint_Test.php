@@ -1,6 +1,6 @@
 <?php
 /**
- * Verify REST endpoint integration tests (`search-cloud/v1/verify`).
+ * Verify REST endpoint integration tests (`search-cloud/v1/verify/<code>`).
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -35,100 +35,90 @@ final class Verify_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	public function test_verify_is_registered_under_the_search_cloud_namespace_not_the_plugin_one(): void {
-		$routes = $this->server->get_routes();
-
-		$this->assertArrayHasKey( '/search-cloud/v1/verify', $routes );
+		$this->assertArrayHasKey( '/search-cloud/v1/verify/(?P<code>[A-Za-z0-9]{32})', $this->server->get_routes() );
 	}
 
-	public function test_verify_is_public_and_requires_no_authentication(): void {
-		wp_set_current_user( 0 );
-
-		$response = $this->server->dispatch( $this->verify_request() );
-
-		$this->assertNotSame( 401, $response->get_status() );
-		$this->assertNotSame( 403, $response->get_status() );
-	}
-
-	public function test_verify_rejects_a_request_without_a_token(): void {
+	/**
+	 * Searcio's ping signs in as nobody: what lets it in is the code this site
+	 * sent it, not a user.
+	 */
+	public function test_searcio_gets_only_the_write_key_with_the_code_it_was_sent(): void {
 		wp_set_current_user( 0 );
 		$this->connect_client();
+		$code = $this->state()->open_verification_window();
 
-		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/search-cloud/v1/verify' ) );
+		$response = $this->server->dispatch( $this->verify_request( $code ) );
 		$data     = $response->get_data();
 
-		$this->assertSame( 400, $response->get_status() );
-		$this->assertArrayNotHasKey( 'write_key', $data );
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( [ 'write_key' => 'test-write-key' ], $data );
+	}
+
+	/**
+	 * The token is an HMAC over Searcio's own application key, which the
+	 * plugin cannot check, so a token with any other code gets nothing.
+	 */
+	public function test_any_other_code_is_told_the_route_does_not_exist(): void {
+		wp_set_current_user( 0 );
+		$this->connect_client();
+		$code = $this->state()->open_verification_window();
+
+		foreach ( [ str_repeat( 'a', 32 ), strtoupper( $code ) === $code ? strtolower( $code ) : strtoupper( $code ) ] as $wrong ) {
+			$response = $this->server->dispatch( $this->verify_request( $wrong ) );
+
+			$this->assertSame( 404, $response->get_status(), $wrong );
+			$this->assertArrayNotHasKey( 'write_key', (array) $response->get_data() );
+		}
+
+		$this->assertSame( 404, $this->server->dispatch( new WP_REST_Request( 'GET', '/search-cloud/v1/verify' ) )->get_status(), 'The old route without a code is gone.' );
+	}
+
+	public function test_the_code_answers_once(): void {
+		wp_set_current_user( 0 );
+		$this->connect_client();
+		$code = $this->state()->open_verification_window();
+
+		$this->assertSame( 200, $this->server->dispatch( $this->verify_request( $code ) )->get_status() );
+		$this->assertSame( 404, $this->server->dispatch( $this->verify_request( $code ) )->get_status() );
+	}
+
+	public function test_the_code_expires_with_the_connection_attempt(): void {
+		wp_set_current_user( 0 );
+		$this->connect_client();
+		$code = $this->state()->open_verification_window();
+		$this->settings()->set( Plugin_Settings::VERIFICATION_OPENED_AT, time() - ( 2 * HOUR_IN_SECONDS ) );
+
+		$response = $this->server->dispatch( $this->verify_request( $code ) );
+
+		$this->assertSame( 404, $response->get_status() );
+		$this->assertArrayNotHasKey( 'write_key', (array) $response->get_data() );
+	}
+
+	/** A retried connect may be answered with the first attempt's `verify_url`. */
+	public function test_a_retry_within_the_window_keeps_the_code(): void {
+		$first = $this->state()->open_verification_window();
+
+		$this->assertMatchesRegularExpression( '/^[A-Za-z0-9]{32}$/', $first );
+		$this->assertSame( $first, $this->state()->open_verification_window() );
+
+		$this->settings()->set( Plugin_Settings::VERIFICATION_OPENED_AT, time() - ( 2 * HOUR_IN_SECONDS ) );
+
+		$this->assertNotSame( $first, $this->state()->open_verification_window(), 'A new attempt after the window gets a new code.' );
 	}
 
 	public function test_verify_returns_404_when_not_connected(): void {
 		wp_set_current_user( 0 );
-		$this->open_window();
+		$code = $this->state()->open_verification_window();
 
-		$response = $this->server->dispatch( $this->verify_request() );
-
-		$this->assertSame( 404, $response->get_status() );
+		$this->assertSame( 404, $this->server->dispatch( $this->verify_request( $code ) )->get_status() );
 	}
 
-	public function test_verify_returns_only_the_write_key_when_connected(): void {
-		wp_set_current_user( 0 );
-		$this->connect_client();
-		$this->open_window();
-
-		$response = $this->server->dispatch( $this->verify_request() );
-		$data     = $response->get_data();
-
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertSame( 'test-write-key', $data['write_key'] );
-		$this->assertArrayNotHasKey( 'write_secret', $data );
+	private function state(): \Webhead\WP\SearchCloud\Connection\Connection_State {
+		return $this->service( 'connection_state' );
 	}
 
-	/**
-	 * The ownership ping is dispatched once, minutes after a connection attempt,
-	 * and never repeated - so outside that window the route has no legitimate
-	 * caller and must not hand the write key to whoever asks.
-	 */
-	public function test_verify_is_closed_outside_a_connection_attempt(): void {
-		wp_set_current_user( 0 );
-		$this->connect_client();
-
-		$response = $this->server->dispatch( $this->verify_request() );
-
-		$this->assertSame( 404, $response->get_status() );
-		$this->assertArrayNotHasKey( 'write_key', (array) $response->get_data() );
-	}
-
-	public function test_verify_is_closed_again_once_the_window_has_passed(): void {
-		wp_set_current_user( 0 );
-		$this->connect_client();
-		$this->open_window( time() - ( 2 * HOUR_IN_SECONDS ) );
-
-		$response = $this->server->dispatch( $this->verify_request() );
-
-		$this->assertSame( 404, $response->get_status() );
-		$this->assertArrayNotHasKey( 'write_key', (array) $response->get_data() );
-	}
-
-	/**
-	 * The token is an HMAC over Searcio's own application key, so the
-	 * plugin can never check it - which is exactly why the window exists. A
-	 * present-but-meaningless token is still refused outside one.
-	 */
-	public function test_a_token_alone_no_longer_opens_the_endpoint(): void {
-		wp_set_current_user( 0 );
-		$this->connect_client();
-
-		$request = new WP_REST_Request( 'GET', '/search-cloud/v1/verify' );
-		$request->set_param( 'token', 'anything-at-all' );
-
-		$this->assertSame( 404, $this->server->dispatch( $request )->get_status() );
-	}
-
-	private function open_window( ?int $at = null ): void {
-		$this->settings()->set( Plugin_Settings::VERIFICATION_OPENED_AT, $at ?? time() );
-	}
-
-	private function verify_request(): WP_REST_Request {
-		$request = new WP_REST_Request( 'GET', '/search-cloud/v1/verify' );
+	private function verify_request( string $code ): WP_REST_Request {
+		$request = new WP_REST_Request( 'GET', '/search-cloud/v1/verify/' . $code );
 		$request->set_param( 'token', 'signed-token-from-search-cloud' );
 
 		return $request;

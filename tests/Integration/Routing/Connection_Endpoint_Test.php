@@ -376,7 +376,12 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->server->dispatch( $request );
 
 		$this->assertNotEmpty( $sent_verify_url );
-		$this->assertStringContainsString( 'search-cloud/v1/verify', $sent_verify_url );
+		$this->assertSame(
+			rest_url( 'search-cloud/v1/verify/' . $this->settings()->get( \Webhead\WP\SearchCloud\Settings\Plugin_Settings::VERIFICATION_CODE ) ),
+			$sent_verify_url,
+			'The ping has to carry back the code only Searcio was told.'
+		);
+		$this->assertMatchesRegularExpression( '#/verify/[A-Za-z0-9]{32}$#', $sent_verify_url );
 	}
 
 	public function test_disconnect_requires_the_manage_settings_capability(): void {

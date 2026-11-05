@@ -13,10 +13,11 @@ declare( strict_types=1 );
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
-$markup = Product_List_Markup::render(
+$searcio_markup = Product_List_Markup::render(
 	[
 		'source'      => $attributes['source'] ?? 'similar',
 		'documentId'  => $attributes['documentId'] ?? '',
@@ -33,18 +34,20 @@ $markup = Product_List_Markup::render(
 
 // Renders nothing on a page with no product and no category to work from, so
 // only enqueue the front-end bundle when there is actually a row to hydrate.
-if ( '' === $markup ) {
+if ( '' === $searcio_markup ) {
 	return;
 }
 
 // WordPress includes this file itself, so it asks for the running plugin.
 Plugin::instance()?->get_assets()->enqueue( Frontend_Config::ENTRY );
 
-// Not run through kses: it would strip the `data-*` attributes the front-end
-// hydrates from. Every part is escaped inside Product_List_Markup::render(),
-// which is the same contract the search block's trigger markup has.
-printf(
-	'<div %1$s>%2$s</div>',
-	wp_kses_data( get_block_wrapper_attributes( [ 'class' => 'searcio-products-block' ] ) ),
-	$markup // phpcs:ignore -- markup is escaped inside Product_List_Markup::render().
+// The markup a shortcode may print, as the framework lists it: the row is an
+// empty `div` with `data-*` attributes, which the list keeps.
+echo wp_kses(
+	sprintf(
+		'<div %1$s>%2$s</div>',
+		get_block_wrapper_attributes( [ 'class' => 'searcio-products-block' ] ),
+		$searcio_markup
+	),
+	Allowed_Html::defaults()
 );

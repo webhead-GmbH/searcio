@@ -30,19 +30,19 @@ final class Style_Tokens_Test extends TestCase {
 		$this->assertSame( '', Style_Tokens::color( [ '#fff' ] ) );
 	}
 
-	public function test_the_style_element_sets_the_declarations_on_the_instance(): void {
+	public function test_the_rule_sets_the_declarations_on_the_instance(): void {
 		$this->assertSame(
-			'<style>.whsc-instance-abc{--whsc-floating-offset:80px}</style>',
-			Style_Tokens::style_element( 'whsc-instance-abc', [ 'floatingOffset' => 80 ] )
+			'.whsc-instance-abc{--whsc-floating-offset:80px}',
+			Style_Tokens::rule( 'whsc-instance-abc', [ 'floatingOffset' => 80 ] )
 		);
 	}
 
-	public function test_no_style_element_without_a_class_or_a_declaration(): void {
-		$this->assertSame( '', Style_Tokens::style_element( '', [ 'accentColor' => '#000' ] ) );
-		$this->assertSame( '', Style_Tokens::style_element( 'whsc-instance-abc', [] ) );
+	public function test_no_rule_without_a_class_or_a_declaration(): void {
+		$this->assertSame( '', Style_Tokens::rule( '', [ 'accentColor' => '#000' ] ) );
+		$this->assertSame( '', Style_Tokens::rule( 'whsc-instance-abc', [] ) );
 		$this->assertSame(
-			'<style>.whsc-instance-xscript{--whsc-accent:#000}</style>',
-			Style_Tokens::style_element( 'whsc-instance-x"><script>', [ 'accentColor' => '#000' ] )
+			'.whsc-instance-xscript{--whsc-accent:#000}',
+			Style_Tokens::rule( 'whsc-instance-x"><script>', [ 'accentColor' => '#000' ] )
 		);
 	}
 }

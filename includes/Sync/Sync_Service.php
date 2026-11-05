@@ -817,7 +817,7 @@ final class Sync_Service {
 		 *
 		 * @param  int  $budget  Default {@see self::TICK_BUDGET}.
 		 */
-		$budget = (int) apply_filters( 'searcio/sync/tick_budget', self::TICK_BUDGET );
+		$budget = (int) apply_filters( 'searcio_sync_tick_budget', self::TICK_BUDGET );
 
 		return max( 0, $budget );
 	}

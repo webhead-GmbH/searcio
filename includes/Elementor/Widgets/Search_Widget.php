@@ -40,6 +40,7 @@ use Elementor\Group_Control_Typography;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Widget;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -1495,12 +1496,10 @@ class Search_Widget extends Widget {
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
 
-		// Every value is escaped inside Trigger_Markup::render(), which returns a
-		// finished attribute-escaped element. The disable/enable pair spans the
-		// whole call: a single-line phpcs:ignore only covers the `echo` itself, so
-		// each array element was still reported.
-		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo Trigger_Markup::render(
+		// The trigger is an empty `div` with `data-*` attributes, which the
+		// framework's list of a shortcode's markup keeps; the icons are in them,
+		// escaped, as attribute values.
+		$markup = Trigger_Markup::render(
 			[
 				'mode'          => (string) ( $settings['mode'] ?? 'icon' ),
 				'scopeType'     => (string) ( $settings['scope_type'] ?? '' ),
@@ -1519,6 +1518,7 @@ class Search_Widget extends Widget {
 				'editorQuery'   => (string) ( $settings['editor_preview_query'] ?? '' ),
 			]
 		);
-		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		echo wp_kses( $markup, Allowed_Html::defaults() );
 	}
 }

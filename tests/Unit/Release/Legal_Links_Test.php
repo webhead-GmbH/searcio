@@ -29,11 +29,14 @@ final class Legal_Links_Test extends TestCase {
 		}
 	}
 
-	public function test_the_readme_names_the_same_privacy_policy(): void {
-		$this->assertSame(
-			$this->constant( 'LEGAL_PRIVACY_URL' ),
-			$this->find( '/^Service: \S+ - Privacy policy: (\S+)\s*$/m', 'readme.txt' )
-		);
+	/**
+	 * The readme links the terms in English, which the plugin and Searcio
+	 * link in German, and the other documents as they do.
+	 */
+	public function test_the_readme_names_the_same_documents(): void {
+		$this->assertSame( $this->constant( 'LEGAL_PRIVACY_URL' ), $this->find( '/^Privacy policy: (\S+)\s*$/m', 'readme.txt' ) );
+		$this->assertSame( $this->constant( 'LEGAL_DPA_URL' ), $this->find( '/^Data Processing Agreement: (\S+)\s*$/m', 'readme.txt' ) );
+		$this->assertStringStartsWith( $this->constant( 'SERVICE_URL' ) . '/', $this->find( '/^Terms of use: (\S+)\s*$/m', 'readme.txt' ) );
 	}
 
 	/**

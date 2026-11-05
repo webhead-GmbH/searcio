@@ -14,6 +14,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Widgets;
 
 use WP_Widget;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Shortcodes\Products_Shortcode;
 
@@ -82,14 +83,14 @@ final class Classic_Products_Widget extends WP_Widget {
 
 		$title = (string) apply_filters( 'widget_title', (string) ( $instance['title'] ?? '' ), $instance, $this->id_base );
 
-		echo $args['before_widget'] ?? ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the theme's own markup.
+		echo wp_kses_post( $args['before_widget'] ?? '' );
 
 		if ( '' !== $title ) {
-			echo ( $args['before_title'] ?? '' ) . esc_html( $title ) . ( $args['after_title'] ?? '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the theme's own markup around an escaped title.
+			echo wp_kses_post( $args['before_title'] ?? '' ) . esc_html( $title ) . wp_kses_post( $args['after_title'] ?? '' );
 		}
 
-		echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by Product_List_Markup.
-		echo $args['after_widget'] ?? ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the theme's own markup.
+		echo wp_kses( $markup, Allowed_Html::defaults() );
+		echo wp_kses_post( $args['after_widget'] ?? '' );
 	}
 
 	/**

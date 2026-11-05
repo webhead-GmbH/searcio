@@ -144,7 +144,7 @@ final class Placement_Options {
 				continue;
 			}
 
-			$selector = trim( (string) preg_replace( '/[{};<\\\\]|\s+/', ' ', strip_tags( $selector ) ) );
+			$selector = trim( (string) preg_replace( '/[{};<\\\\]|\s+/', ' ', wp_strip_all_tags( $selector ) ) );
 			$selector = trim( (string) preg_replace( '/\s{2,}/', ' ', $selector ), " \t," );
 
 			if ( '' === $selector || strlen( $selector ) > self::SELECTOR_LENGTH ) {

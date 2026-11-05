@@ -138,13 +138,16 @@ final class Look_Test extends Integration_Test_Case {
 	public function test_the_shortcode_carries_the_look_and_its_own_colour_outweighs_it(): void {
 		$this->config()->save( [ 'search' => [ 'mode' => 'box', 'look' => [ 'modal_accent' => '#00aa00', 'field_radius' => 6 ] ] ] );
 
+		$this->reset_styles();
 		$html = do_shortcode( '[searcio accent="#123abc"]' );
 
 		$this->assertMatchesRegularExpression( '/class="[^"]*(whsc-instance-p[0-9a-f]{8})/', $html );
+		$this->assertStringNotContainsString( '<style', $html );
 		preg_match( '/whsc-instance-p[0-9a-f]{8}/', $html, $instance );
 
-		$look   = strpos( $html, '.' . $instance[0] . '{--whsc-accent:#00aa00;--whsc-input-radius:6px}' );
-		$tokens = strpos( $html, '--whsc-accent:#123abc' );
+		$css    = $this->inline_styles();
+		$look   = strpos( $css, '.' . $instance[0] . '{--whsc-accent:#00aa00;--whsc-input-radius:6px}' );
+		$tokens = strpos( $css, '--whsc-accent:#123abc' );
 
 		$this->assertNotFalse( $look );
 		$this->assertNotFalse( $tokens );
@@ -197,11 +200,17 @@ final class Look_Test extends Integration_Test_Case {
 
 		$this->assertStringContainsString( Placement_Preview::INSTANCE, $markup );
 		$this->assertStringNotContainsString( '#123abc', $markup, 'The stored look is the editor\'s to send.' );
-		$this->assertStringContainsString( '<style id="whsc-look-live"></style>', $page );
-		$admin = (array) wp_parse_url( admin_url() );
+		$this->assertStringNotContainsString( '<style', $page, 'WordPress prints the page\'s styles and scripts.' );
+		$this->assertStringNotContainsString( 'whsc-look-live', $page );
+
+		$script = implode( "\n", (array) wp_scripts()->get_data( \Webhead\WP\SearchCloud\PLUGIN_SLUG . '-preview', 'after' ) );
+		$admin  = (array) wp_parse_url( admin_url() );
+
+		$this->assertTrue( wp_script_is( \Webhead\WP\SearchCloud\PLUGIN_SLUG . '-preview', 'enqueued' ) );
+		$this->assertStringContainsString( "css.id = 'whsc-look-live'", $script );
 		$this->assertStringContainsString(
 			'var origin = ' . wp_json_encode( $admin['scheme'] . '://' . $admin['host'] . ( isset( $admin['port'] ) ? ':' . $admin['port'] : '' ) ),
-			$page
+			$script
 		);
 	}
 

@@ -32,9 +32,9 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 	private int $attribute_id = 0;
 
 	public function tear_down(): void {
-		remove_all_filters( 'searcio/storefront/facet_display' );
-		remove_all_filters( 'searcio/storefront/facet_colors' );
-		remove_all_filters( 'searcio/storefront/facet_images' );
+		remove_all_filters( 'searcio_storefront_facet_display' );
+		remove_all_filters( 'searcio_storefront_facet_colors' );
+		remove_all_filters( 'searcio_storefront_facet_images' );
 		remove_all_filters( 'product_attributes_type_selector' );
 		delete_option( 'searcio_category_filter' );
 		delete_option( 'searcio_category_filter_depth' );
@@ -84,7 +84,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->facet_config()->set_fields( [ 'attr_size', 'brand' ] );
 
 		add_filter(
-			'searcio/storefront/facet_display',
+			'searcio_storefront_facet_display',
 			static fn ( $display, string $field ) => 'brand' === $field ? 'tiles' : 'swatches',
 			10,
 			2
@@ -158,7 +158,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->facet_config()->set_fields( [ 'colour' ] );
 
 		add_filter(
-			'searcio/storefront/facet_colors',
+			'searcio_storefront_facet_colors',
 			static fn ( $colors, string $field, string $taxonomy ) => 'colour' === $field && '' === $taxonomy
 				? [ 'Blau' => '#2f6fd0', 'Rot' => 'not a colour' ]
 				: $colors,
@@ -269,7 +269,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		$this->facet_config()->set_fields( [ 'attr_material' ] );
 
 		add_filter(
-			'searcio/storefront/facet_images',
+			'searcio_storefront_facet_images',
 			static fn (): array => [ 'Leinen' => 'https://shop.test/leinen.jpg', 'Wolle' => 'javascript:alert(1)', '' => 'https://shop.test/x.jpg' ]
 		);
 

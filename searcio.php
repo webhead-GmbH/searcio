@@ -78,7 +78,7 @@ defined( 'Webhead\WP\SearchCloud\SERVICE_URL' )
  * `GET /connect` names, at the address of the service.
  */
 defined( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL' )
-|| define( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL', 'https://searcio.com/impressum' );
+|| define( 'Webhead\WP\SearchCloud\LEGAL_TERMS_URL', 'https://searcio.com/nutzungsbedingungen' );
 
 defined( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL' )
 || define( 'Webhead\WP\SearchCloud\LEGAL_PRIVACY_URL', 'https://searcio.com/datenschutz' );

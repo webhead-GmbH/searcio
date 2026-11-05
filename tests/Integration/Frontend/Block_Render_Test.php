@@ -3,8 +3,8 @@
  * Block editor render tests for `searcio/search`.
  *
  * The block is a dynamic (server-rendered) block: its `render.php` builds the
- * front-end trigger markup and a per-instance scoped `<style>` from the saved
- * attributes. These tests drive the block through WordPress's own
+ * front-end trigger markup from the saved attributes, and hands WordPress a
+ * per-instance rule to print as an inline style (`Inline_Styles`). These tests drive the block through WordPress's own
  * `render_block()` so a change to the block metadata, the render template, or
  * the shared `Trigger_Markup` shows up as a failure here. They need neither
  * Elementor nor WooCommerce, and run without a JS build (the render callback is
@@ -74,7 +74,11 @@ final class Block_Render_Test extends Integration_Test_Case {
 		$this->assertStringContainsString( 'data-animation="fade"', $html );
 	}
 
-	public function test_emits_a_scoped_style_block_for_a_named_instance(): void {
+	/**
+	 * The rule is enqueued, never printed into the block: WordPress prints
+	 * styles itself (plugin directory review).
+	 */
+	public function test_hands_wordpress_a_scoped_rule_for_a_named_instance(): void {
 		$html = $this->render_search_block(
 			[
 				'instanceId' => 'abc123',
@@ -84,9 +88,11 @@ final class Block_Render_Test extends Integration_Test_Case {
 		);
 
 		$this->assertStringContainsString( 'whsc-instance-abc123', $html );
-		$this->assertStringContainsString( '.whsc-instance-abc123{', $html );
-		$this->assertStringContainsString( '--whsc-bg:#ff0000', $html );
-		$this->assertStringContainsString( '--whsc-gap:24px', $html );
+		$this->assertStringNotContainsString( '<style', $html );
+		$this->assertTrue( wp_style_is( \Webhead\WP\SearchCloud\Frontend\Inline_Styles::handle( 'whsc-instance-abc123' ), 'enqueued' ) );
+		$this->assertStringContainsString( '.whsc-instance-abc123{', $this->inline_styles() );
+		$this->assertStringContainsString( '--whsc-bg:#ff0000', $this->inline_styles() );
+		$this->assertStringContainsString( '--whsc-gap:24px', $this->inline_styles() );
 	}
 
 	/**
@@ -102,17 +108,19 @@ final class Block_Render_Test extends Integration_Test_Case {
 			]
 		);
 
-		$this->assertStringContainsString( '.whsc-instance-stock1{', $html );
-		$this->assertStringContainsString( '--whsc-stock-in-color:#1d4ed8', $html );
-		$this->assertStringContainsString( '--whsc-stock-out-color:#7c2d12', $html );
+		$this->assertStringContainsString( 'whsc-instance-stock1', $html );
+		$this->assertStringContainsString( '.whsc-instance-stock1{', $this->inline_styles() );
+		$this->assertStringContainsString( '--whsc-stock-in-color:#1d4ed8', $this->inline_styles() );
+		$this->assertStringContainsString( '--whsc-stock-out-color:#7c2d12', $this->inline_styles() );
 	}
 
 	/** A colour left unset declares nothing, so the stylesheet's default applies. */
 	public function test_an_unset_stock_colour_declares_nothing(): void {
-		$html = $this->render_search_block( [ 'instanceId' => 'stock2', 'stockInColor' => '', 'bgColor' => '#fff' ] );
+		$this->render_search_block( [ 'instanceId' => 'stock2', 'stockInColor' => '', 'bgColor' => '#fff' ] );
 
-		$this->assertStringNotContainsString( '--whsc-stock-in-color', $html );
-		$this->assertStringNotContainsString( '--whsc-stock-out-color', $html );
+		$this->assertStringContainsString( '--whsc-bg:#fff', $this->inline_styles() );
+		$this->assertStringNotContainsString( '--whsc-stock-in-color', $this->inline_styles() );
+		$this->assertStringNotContainsString( '--whsc-stock-out-color', $this->inline_styles() );
 	}
 
 	public function test_block_metadata_declares_the_stock_colours(): void {
@@ -153,7 +161,7 @@ final class Block_Render_Test extends Integration_Test_Case {
 			'--whsc-drawer-width:480px',
 			'--whsc-sheet-radius:12px',
 		] as $declaration ) {
-			$this->assertStringContainsString( $declaration, $html );
+			$this->assertStringContainsString( $declaration, $this->inline_styles() );
 		}
 	}
 
@@ -174,7 +182,8 @@ final class Block_Render_Test extends Integration_Test_Case {
 
 	public function test_filters_unsafe_characters_out_of_a_color_value(): void {
 		// The render template filters CSS values to a safe character set, so an
-		// injected `}</style><script>` cannot escape the scoped style rule.
+		// injected `}</style><script>` cannot leave the inline style WordPress
+		// prints the rule in.
 		$html = $this->render_search_block(
 			[
 				'instanceId' => 'inst',
@@ -183,15 +192,17 @@ final class Block_Render_Test extends Integration_Test_Case {
 		);
 
 		$this->assertStringNotContainsString( '<script>', $html );
-		// Exactly one closing tag - the legitimate scoped `<style>` block - which
-		// means the injected `</style>` was stripped rather than passed through.
-		$this->assertSame( 1, substr_count( $html, '</style>' ) );
+		$this->assertStringContainsString( '.whsc-instance-inst{', $this->inline_styles() );
+		$this->assertStringNotContainsString( '<', $this->inline_styles() );
+		$this->assertSame( 1, substr_count( $this->inline_styles(), '}' ), 'The injected brace was stripped, so the rule is one rule.' );
 	}
 
 	/**
 	 * @param  array<string,mixed>  $attrs
 	 */
 	private function render_search_block( array $attrs ): string {
+		$this->reset_styles();
+
 		return render_block(
 			[
 				'blockName'    => self::BLOCK,

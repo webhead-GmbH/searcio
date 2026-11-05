@@ -28,15 +28,6 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.4.0
  */
 final class Search_Surface {
-	/**
-	 * The instance classes whose `<style>` this request has printed. Two
-	 * placements that look the same share a class, and its rule is printed
-	 * once.
-	 *
-	 * @var array<string,true>
-	 */
-	private array $styled = [];
-
 	public function __construct( private Asset_Registry $assets ) {}
 
 	/**
@@ -57,7 +48,7 @@ final class Search_Surface {
 			$attributes['triggerBoxWidth'] = $placement->width;
 		}
 
-		[ $instance_class, $style ] = $this->instance( $attributes, $placement->look );
+		$instance_class = $this->instance( $attributes, $placement->look );
 
 		// A box fills its wrapper, or the width it was given.
 		$class_name = trim(
@@ -66,9 +57,8 @@ final class Search_Surface {
 		);
 
 		return sprintf(
-			'<div class="%1$s">%2$s%3$s%4$s</div>',
+			'<div class="%1$s">%2$s%3$s</div>',
 			esc_attr( 'searcio-placement searcio-placement--' . $placement->align ),
-			$style,
 			Trigger_Markup::render(
 				array_merge(
 					$attributes,
@@ -106,9 +96,9 @@ final class Search_Surface {
 			);
 		}
 
-		[ $instance_class, $style ] = $this->instance( $attributes, $placement->look );
+		$instance_class = $this->instance( $attributes, $placement->look );
 
-		return $style . Trigger_Markup::render(
+		return Trigger_Markup::render(
 			array_merge(
 				$attributes,
 				[
@@ -140,62 +130,52 @@ final class Search_Surface {
 	}
 
 	/**
-	 * The class a placement's style is set on, named after the style itself,
-	 * and its `<style>` the first time this request draws it.
-	 *
-	 * @param  array<string,mixed>  $attributes
-	 * @return array{0:string,1:string}
-	 */
-	/**
-	 * The instance class of a surface and the styles to print with it: the
-	 * Look editor's, then the attributes' own, so what a shortcode says
-	 * outweighs what the tab says. Surfaces that look the same share a class
-	 * and print it once.
+	 * The instance class of a surface, named after its style, with that style
+	 * handed to WordPress to print ({@see Inline_Styles}): the Look editor's,
+	 * then the attributes' own, so what a shortcode says outweighs what the
+	 * tab says. Surfaces that look the same share a class and its style.
 	 *
 	 * The Placement tab's preview draws the Look the editor sends it while it
 	 * is changed (`Placement_Preview`), so there the class is a fixed one and
 	 * the stored Look is left out.
 	 *
-	 * @return array{0: string, 1: string}
+	 * @param  array<string,mixed>  $attributes
 	 */
-	private function instance( array $attributes, Look $look ): array {
+	private function instance( array $attributes, Look $look ): string {
 		$declarations = Style_Tokens::declarations( $attributes );
 
 		if ( Placement_Preview::is_preview() ) {
-			return [ Placement_Preview::INSTANCE, Style_Tokens::style_element( Placement_Preview::INSTANCE, $attributes ) ];
+			Inline_Styles::add( Placement_Preview::INSTANCE, Style_Tokens::rule( Placement_Preview::INSTANCE, $attributes ) );
+
+			return Placement_Preview::INSTANCE;
 		}
 
 		$look_key = $look->is_empty() ? '' : (string) wp_json_encode( $look->to_array() );
 
 		if ( '' === $declarations && '' === $look_key ) {
-			return [ '', '' ];
+			return '';
 		}
 
 		$instance_class = 'whsc-instance-p' . substr( md5( $declarations . $look_key ), 0, 8 );
 
-		if ( isset( $this->styled[ $instance_class ] ) ) {
-			return [ $instance_class, '' ];
-		}
+		self::add_look( $look, $instance_class );
+		Inline_Styles::add( $instance_class, Style_Tokens::rule( $instance_class, $attributes ) );
 
-		$this->styled[ $instance_class ] = true;
-
-		return [ $instance_class, self::look_styles( $look, $instance_class ) . Style_Tokens::style_element( $instance_class, $attributes ) ];
+		return $instance_class;
 	}
 
 	/**
 	 * A Look's CSS for an instance class, after the stylesheet of the Google
-	 * fonts it asks for, as elements to print.
+	 * fonts it asks for, handed to WordPress to print.
 	 */
-	public static function look_styles( Look $look, string $instance_class ): string {
+	public static function add_look( Look $look, string $instance_class ): void {
 		$css = Look_Styles::css( $look, $instance_class );
 
 		if ( '' === $css ) {
-			return '';
+			return;
 		}
 
-		$fonts = Google_Fonts::url( Look_Styles::google_families( $look, Google_Fonts::site_families() ) );
-
-		return ( '' !== $fonts ? sprintf( '<link rel="stylesheet" href="%s">', esc_url( $fonts ) ) : '' )
-			. '<style>' . $css . '</style>';
+		Inline_Styles::add_stylesheet( Google_Fonts::url( Look_Styles::google_families( $look, Google_Fonts::site_families() ) ) );
+		Inline_Styles::add( $instance_class, $css );
 	}
 }

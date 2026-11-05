@@ -54,6 +54,9 @@ spl_autoload_register(
 ( static function (): void {
 	$bundle = dirname( __DIR__ ) . '/includes/Dependencies';
 
+	// Mozart's own loader for the bundle. `bundle:prune` removes it when the
+	// map above reaches every class in the bundle, as it does for a bundle
+	// under `includes/`, and keeps it where it is still needed.
 	if ( is_readable( $bundle . '/autoload.php' ) ) {
 		require_once $bundle . '/autoload.php';
 	}

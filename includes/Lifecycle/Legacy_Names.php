@@ -42,8 +42,8 @@ final class Legacy_Names {
 	 * The others came after the slug moved and never had the old name.
 	 */
 	private const FILTERS = [
-		'webhead_search_cloud/index/allow_protected_meta' => [ 'searcio/index/allow_protected_meta', 3 ],
-		'webhead_search_cloud/sync/tick_budget'           => [ 'searcio/sync/tick_budget', 1 ],
+		'webhead_search_cloud/index/allow_protected_meta' => [ 'searcio_index_allow_protected_meta', 3 ],
+		'webhead_search_cloud/sync/tick_budget'           => [ 'searcio_sync_tick_budget', 1 ],
 	];
 
 	/**
@@ -101,7 +101,7 @@ final class Legacy_Names {
 	#[Action( 'admin_init' )]
 	public function redirect_settings_page(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only reads which page is asked for.
-		if ( ! isset( $_GET['page'] ) || Legacy_Slug::OLD_SLUG !== $_GET['page'] ) {
+		if ( ! isset( $_GET['page'] ) || Legacy_Slug::OLD_SLUG !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
 			return;
 		}
 

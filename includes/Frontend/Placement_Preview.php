@@ -22,6 +22,7 @@ use Webhead\WP\SearchCloud\DTO\Floating_Button;
 use Webhead\WP\SearchCloud\DTO\Placement_Options;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -68,7 +69,7 @@ final class Placement_Preview {
 	 * marks them `preview`, which Searcio meters but keeps out of the site's
 	 * search statistics.
 	 */
-	#[Filter( 'searcio/storefront/is_preview' )]
+	#[Filter( 'searcio_storefront_is_preview' )]
 	public function mark_preview( mixed $is_preview ): bool {
 		return self::is_preview() || (bool) $is_preview;
 	}
@@ -93,7 +94,7 @@ final class Placement_Preview {
 		$view = in_array( $view, self::VIEWS, true ) ? $view : 'trigger';
 
 		// Settings the admin has not saved yet, cleaned as a save would clean them.
-		$sent    = isset( $_GET['placement'] ) ? json_decode( wp_unslash( $_GET['placement'] ), true ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- cleaned field by field by Placement_Options.
+		$sent    = isset( $_GET['placement'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_GET['placement'] ) ), true ) : null;
 		$options = is_array( $sent ) ? Placement_Options::from_array( $sent ) : $this->config->options();
 
 		nocache_headers();
@@ -118,6 +119,15 @@ final class Placement_Preview {
 	}
 
 	private function print_page( string $markup, string $view ): void {
+		$handle = \Webhead\WP\SearchCloud\PLUGIN_SLUG . '-preview';
+
+		wp_register_style( $handle, false, [], \Webhead\WP\SearchCloud\VERSION );
+		wp_add_inline_style( $handle, 'html, body.searcio-preview { min-height: 100%; margin: 0; } body.searcio-preview { padding: 24px; box-sizing: border-box; }' );
+		wp_enqueue_style( $handle );
+
+		wp_register_script( $handle, false, [], \Webhead\WP\SearchCloud\VERSION, [ 'in_footer' => true ] );
+		wp_add_inline_script( $handle, self::live_look_script() );
+		wp_enqueue_script( $handle );
 		?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -125,51 +135,57 @@ final class Placement_Preview {
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
-	<style>
-		html, body.searcio-preview { min-height: 100%; margin: 0; }
-		body.searcio-preview { padding: 24px; box-sizing: border-box; }
-	</style>
 </head>
 <body <?php body_class( [ 'searcio-preview', 'searcio-preview--' . $view ] ); ?>>
 	<?php
-	echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by Trigger_Markup and Style_Tokens.
+	echo wp_kses( $markup, Allowed_Html::defaults() );
 	wp_footer();
 	?>
-	<?php
-	/*
-	 * The Look editor sends the CSS of what it has on screen here, as it
-	 * changes (`/placement/look-css`, for this instance class), and this page
-	 * draws it without loading again. Only a message from the admin's
-	 * origin counts, which a site may serve apart from its pages, and what
-	 * it carries is set as text.
-	 */
-	$admin = wp_parse_url( admin_url() );
-	$admin = is_array( $admin ) && isset( $admin['scheme'], $admin['host'] )
-		? $admin['scheme'] . '://' . $admin['host'] . ( isset( $admin['port'] ) ? ':' . $admin['port'] : '' )
-		: '';
-	?>
-	<link id="whsc-look-fonts" rel="stylesheet" href="data:text/css,">
-	<style id="whsc-look-live"></style>
-	<script>
-		( function () {
-			var origin = <?php echo wp_json_encode( $admin ); ?> || window.location.origin;
-
-			window.addEventListener( 'message', function ( event ) {
-				if ( event.origin !== origin || ! event.data || 'searcio-look' !== event.data.type ) {
-					return;
-				}
-
-				document.getElementById( 'whsc-look-live' ).textContent = String( event.data.css || '' );
-				document.getElementById( 'whsc-look-fonts' ).href = /^https:\/\/fonts\.googleapis\.com\//.test( event.data.fonts || '' ) ? event.data.fonts : 'data:text/css,';
-			} );
-
-			if ( window.parent !== window ) {
-				window.parent.postMessage( { type: 'searcio-look-ready' }, origin );
-			}
-		}() );
-	</script>
 </body>
 </html>
 		<?php
+	}
+
+	/**
+	 * The Look editor sends the CSS of what it has on screen here, as it
+	 * changes (`/placement/look-css`, for this instance class), and this page
+	 * draws it without loading again. Only a message from the admin's origin
+	 * counts, which a site may serve apart from its pages, and what it carries
+	 * is set as text. The style comes last in the page, after the footer's, so
+	 * it outweighs the stored placement's.
+	 */
+	public static function live_look_script(): string {
+		$admin  = wp_parse_url( admin_url() );
+		$origin = is_array( $admin ) && isset( $admin['scheme'], $admin['host'] )
+			? $admin['scheme'] . '://' . $admin['host'] . ( isset( $admin['port'] ) ? ':' . $admin['port'] : '' )
+			: '';
+
+		return 'var origin = ' . wp_json_encode( $origin ) . ' || window.location.origin;' . <<<'JS'
+
+( function () {
+	var fonts = document.createElement( 'link' );
+	var css = document.createElement( 'style' );
+
+	fonts.id = 'whsc-look-fonts';
+	fonts.rel = 'stylesheet';
+	fonts.href = 'data:text/css,';
+	css.id = 'whsc-look-live';
+	document.body.appendChild( fonts );
+	document.body.appendChild( css );
+
+	window.addEventListener( 'message', function ( event ) {
+		if ( event.origin !== origin || ! event.data || 'searcio-look' !== event.data.type ) {
+			return;
+		}
+
+		css.textContent = String( event.data.css || '' );
+		fonts.href = /^https:\/\/fonts\.googleapis\.com\//.test( event.data.fonts || '' ) ? event.data.fonts : 'data:text/css,';
+	} );
+
+	if ( window.parent !== window ) {
+		window.parent.postMessage( { type: 'searcio-look-ready' }, origin );
+	}
+}() );
+JS;
 	}
 }

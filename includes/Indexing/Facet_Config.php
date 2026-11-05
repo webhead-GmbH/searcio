@@ -66,11 +66,11 @@ final class Facet_Config {
 	 *
 	 * How a field is drawn is the storefront's to decide (`auto`) unless the
 	 * attribute's type says or a shop does, through
-	 * `searcio/storefront/facet_display`, which is given that and
+	 * `searcio_storefront_facet_display`, which is given that and
 	 * the field and answers `list`, `tiles`, `color`, `image` or `range`.
 	 * Colours and images can be given or corrected through
-	 * `searcio/storefront/facet_colors` and
-	 * `searcio/storefront/facet_images`, which are given the value
+	 * `searcio_storefront_facet_colors` and
+	 * `searcio_storefront_facet_images`, which are given the value
 	 * => hex or address map, the field and its taxonomy (empty when it has
 	 * none).
 	 *
@@ -90,10 +90,10 @@ final class Facet_Config {
 			$taxonomy = $taxonomies[ $field ] ?? '';
 			$swatches = '' === $taxonomy ? new Attribute_Swatches() : $this->swatches->read( $taxonomy );
 			$display  = Facet_Display::from_storage(
-				apply_filters( 'searcio/storefront/facet_display', $swatches->display->value, $field )
+				apply_filters( 'searcio_storefront_facet_display', $swatches->display->value, $field )
 			);
-			$colors   = apply_filters( 'searcio/storefront/facet_colors', $swatches->colors, $field, $taxonomy );
-			$images   = apply_filters( 'searcio/storefront/facet_images', $swatches->images, $field, $taxonomy );
+			$colors   = apply_filters( 'searcio_storefront_facet_colors', $swatches->colors, $field, $taxonomy );
+			$images   = apply_filters( 'searcio_storefront_facet_images', $swatches->images, $field, $taxonomy );
 
 			$facets[] = new Storefront_Facet(
 				$field,

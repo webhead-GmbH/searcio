@@ -3,10 +3,9 @@
  * The Searcio logo in the search window.
  *
  * The storefront is told whether to show it in its configuration
- * (`credit`), decided from the plan tier the site keeps and Support Searcio:
- * a Free plan always shows it, any other plan while the shop leaves the
- * setting on, which it is until it is turned off. The daily job keeps the tier
- * current without an admin opening the settings screen.
+ * (`credit`): only when the shop turned Support Searcio on, on any plan. The
+ * plan tier the site keeps decides nothing here; the daily job keeps it current
+ * for the settings screen's Upgrade action.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -20,7 +19,10 @@ use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Searcio_Credit_Test extends Integration_Test_Case {
-	public function test_the_logo_is_shown_by_default_and_links_to_searcio(): void {
+	public function test_the_logo_is_off_until_the_shop_turns_it_on(): void {
+		$this->assertNull( $this->config()['credit'] );
+
+		$this->settings()->set( Plugin_Settings::SUPPORT_SEARCIO, true );
 		$config = $this->config();
 
 		$this->assertSame( [ 'url' => 'https://searcio.com/' ], $config['credit'] );
@@ -30,7 +32,7 @@ final class Searcio_Credit_Test extends Integration_Test_Case {
 	/**
 	 * @dataProvider plans
 	 */
-	public function test_who_can_turn_the_logo_off( string $tier, bool $support, bool $shown ): void {
+	public function test_no_plan_decides_for_the_shop( string $tier, bool $support, bool $shown ): void {
 		$this->settings()->set( Plugin_Settings::PLAN_TIER, $tier );
 		$this->settings()->set( Plugin_Settings::SUPPORT_SEARCIO, $support );
 
@@ -43,12 +45,11 @@ final class Searcio_Credit_Test extends Integration_Test_Case {
 	public static function plans(): array {
 		return [
 			// plan tier, Support Searcio, shown.
-			'a Free plan that turned it off'          => [ 'free', false, true ],
-			'a Free plan that leaves it on'           => [ 'free', true, true ],
-			'a paid plan that turned it off'          => [ 'paid', false, false ],
-			'a paid plan that leaves it on'           => [ 'paid', true, true ],
-			'a plan not known yet, turned off'        => [ '', false, false ],
-			'a plan not known yet, left on'           => [ '', true, true ],
+			'a Free plan, off'        => [ 'free', false, false ],
+			'a Free plan, turned on'  => [ 'free', true, true ],
+			'a paid plan, off'        => [ 'paid', false, false ],
+			'a paid plan, turned on'  => [ 'paid', true, true ],
+			'a plan not known yet'    => [ '', false, false ],
 		];
 	}
 
@@ -65,7 +66,7 @@ final class Searcio_Credit_Test extends Integration_Test_Case {
 		( $this->service( 'scheduled_sync_job' ) )();
 
 		$this->assertSame( 'free', $this->settings()->get( Plugin_Settings::PLAN_TIER ) );
-		$this->assertNotNull( $this->config()['credit'], 'A plan that became Free shows the logo again.' );
+		$this->assertNull( $this->config()['credit'], 'A plan that became Free does not turn the logo on.' );
 	}
 
 	public function test_the_daily_job_asks_nothing_of_a_site_that_is_not_connected(): void {
