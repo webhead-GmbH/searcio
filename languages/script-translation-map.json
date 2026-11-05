@@ -14,6 +14,9 @@
     "src/admin/settings/components/look/LookEditor.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/look/LookPreview.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/tabs/CacheClearCard.js": [
         "public/bundle.settings.js"
     ],
