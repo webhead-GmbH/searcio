@@ -12,6 +12,22 @@
  */
 
 /**
+ * A range bound as a number, or null when it is missing or not a number.
+ *
+ * @param {*} value
+ * @return {number|null}
+ */
+const boundOrNull = ( value ) => {
+	if ( null === value || undefined === value || '' === value ) {
+		return null;
+	}
+
+	const number = Number( value );
+
+	return Number.isFinite( number ) ? number : null;
+};
+
+/**
  * The API is the source of truth, but a malformed quiz must not be able to
  * crash the modal - every field is defaulted rather than trusted.
  *
@@ -37,6 +53,13 @@ export const normalizeQuiz = ( raw ) => {
 				tags_matched: ( Array.isArray( option?.tags_matched ) ? option.tags_matched : [] )
 					.filter( ( tag ) => tag && 'string' === typeof tag.field && '' !== tag.field )
 					.map( ( tag ) => ( { field: tag.field, value: String( tag.value ?? '' ) } ) ),
+				// Both optional (`quiz.md`): words the products must contain,
+				// and numeric ranges such as a budget.
+				keywords: 'string' === typeof option?.keywords ? option.keywords.trim() : '',
+				ranges_matched: ( Array.isArray( option?.ranges_matched ) ? option.ranges_matched : [] )
+					.filter( ( range ) => range && 'string' === typeof range.field && '' !== range.field )
+					.map( ( range ) => ( { field: range.field, min: boundOrNull( range.min ), max: boundOrNull( range.max ) } ) )
+					.filter( ( range ) => null !== range.min || null !== range.max ),
 			} ) ),
 		} ) );
 
@@ -112,6 +135,35 @@ export const applyOption = ( tags, option ) => {
 
 	return { ...tags, ...fromThisAnswer };
 };
+
+/**
+ * Fold an answer's ranges into the accumulated ones, as `range[field]=min:max`
+ * values. Like a filter, a later answer's range on a field replaces an
+ * earlier one; a missing bound is left blank ("50:" is "at least 50").
+ *
+ * @param {Object<string,string>} ranges
+ * @param {Object}                option
+ * @return {Object<string,string>} A new map; the input is left alone.
+ */
+export const applyRanges = ( ranges, option ) => {
+	const fromThisAnswer = {};
+
+	( option?.ranges_matched || [] ).forEach( ( range ) => {
+		fromThisAnswer[ range.field ] = `${ range.min ?? '' }:${ range.max ?? '' }`;
+	} );
+
+	return { ...ranges, ...fromThisAnswer };
+};
+
+/**
+ * The words this answer asks the products to contain, or '' when it asks for
+ * none. Unlike filters they never replace each other: every answered group has
+ * to be met, so they are kept as a list, one entry per answer.
+ *
+ * @param {Object} option
+ * @return {string}
+ */
+export const answerKeywords = ( option ) => ( 'string' === typeof option?.keywords ? option.keywords.trim() : '' );
 
 /**
  * Where the quiz goes after this answer.

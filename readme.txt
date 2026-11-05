@@ -188,6 +188,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = Unreleased =
+- The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
 - Updated the webhead plugin framework to 1.9.0.
 - Messages on the settings screen, such as "Placement saved.", appear as WordPress's own notices at the bottom of the window.
 - The previews on the Placement tab and in the look editor show a placeholder while their page loads, instead of an empty white frame, and caching plugins are told never to keep a preview, so a visitor never gets one with settings you have not saved.

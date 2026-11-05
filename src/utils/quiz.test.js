@@ -1,5 +1,7 @@
 import {
+	answerKeywords,
 	applyOption,
+	applyRanges,
 	findQuestion,
 	firstQuestion,
 	nextQuestion,
@@ -220,5 +222,37 @@ describe( 'quizProgress', () => {
 		const quiz = quizOf( question( 'a', 'b' ), question( 'b', 'a' ) );
 
 		expect( quizProgress( quiz, 0 ) ).toEqual( { current: 1, total: 2 } );
+	} );
+} );
+
+describe( 'search words and ranges', () => {
+	const option = ( extra ) => normalizeQuiz( {
+		questions: [ { id: 'q', text: 'Q', options: [ { id: 'o', label: 'O', next_question_id: null, tags_matched: [], ...extra } ] } ],
+	} ).questions[ 0 ].options[ 0 ];
+
+	it( 'keeps an answer\'s words and ranges, and defaults them when absent', () => {
+		expect( option( { keywords: ' Panzerriegel, Zusatzschloss ', ranges_matched: [ { field: 'price', min: null, max: 150 } ] } ) ).toMatchObject( {
+			keywords: 'Panzerriegel, Zusatzschloss',
+			ranges_matched: [ { field: 'price', min: null, max: 150 } ],
+		} );
+		expect( option( {} ) ).toMatchObject( { keywords: '', ranges_matched: [] } );
+	} );
+
+	it( 'drops a range without a field or without any bound', () => {
+		expect( option( { ranges_matched: [ { field: '', min: 1, max: 2 }, { field: 'price', min: 'cheap', max: null }, { field: 'price', min: '10', max: '' } ] } ).ranges_matched )
+			.toEqual( [ { field: 'price', min: 10, max: null } ] );
+	} );
+
+	it( 'spells ranges as min:max, a later answer replacing an earlier one on the same field', () => {
+		const budget = option( { ranges_matched: [ { field: 'price', min: null, max: 150 } ] } );
+		const premium = option( { ranges_matched: [ { field: 'price', min: 300, max: null } ] } );
+
+		expect( applyRanges( {}, budget ) ).toEqual( { price: ':150' } );
+		expect( applyRanges( applyRanges( {}, budget ), premium ) ).toEqual( { price: '300:' } );
+	} );
+
+	it( 'reads the words an answer asks for', () => {
+		expect( answerKeywords( option( { keywords: 'Regen' } ) ) ).toBe( 'Regen' );
+		expect( answerKeywords( option( {} ) ) ).toBe( '' );
 	} );
 } );
