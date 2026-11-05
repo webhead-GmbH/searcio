@@ -209,6 +209,13 @@ export const search = ( q, options = {} ) => {
 		}
 	} );
 
+	// `keywords[]` - words every result must contain, one group per quiz
+	// answer that asked for some (comma-separated alternatives, any of which
+	// may match). Indexed, so PHP reads them back as a list.
+	( options.keywords || [] ).filter( Boolean ).forEach( ( words, index ) => {
+		params[ `keywords[${ index }]` ] = words;
+	} );
+
 	return request( '/search', params, SEARCH_TTL, options.signal );
 };
 
