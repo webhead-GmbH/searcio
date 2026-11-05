@@ -189,6 +189,9 @@ Legal notice: https://searcio.com/impressum
 
 = Unreleased =
 - The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
+- On a multilingual shop, photo search, similar products and the products the AI shopping assistant shows keep to the language of the page.
+- The AI shopping assistant numbers the products it suggests 1, 2, 3, where a reply with a blank line between them showed "1." for each.
+- Text in neighbouring paragraphs, headings and list items is indexed as separate words: a list of "Wool" and "Silk" was found only as "WoolSilk". The daily sync updates content that is already indexed.
 
 = 1.4.0 =
 - Updated the webhead plugin framework to 1.10.0, which is licensed under the GPL like the plugin.
