@@ -18,6 +18,7 @@ import {
 	postHit,
 	rightToLeft,
 	setFacetFields,
+	crossingTheEdge,
 } from '../utils';
 
 test.use( { storageState: { cookies: [], origins: [] } } );
@@ -281,6 +282,16 @@ test.describe( 'the filter bar', () => {
 			await mock( page );
 
 			const widget = await openWithResults( page, requestUtils );
+
+			// The page under the window is the theme's, and a phone lays a page
+			// wider than its screen out on a wider one, the window with it. On a
+			// site whose WordPress had lost the comment form block's stylesheet,
+			// a post's comment field ran to 370px at 320px: the window was laid
+			// out 370px wide, and its second column of results ran off the
+			// screen. The theme's page is kept to the screen, so what is
+			// measured here is the window on this phone.
+			await page.addStyleTag( { content: '.wp-site-blocks { overflow-x: clip; }' } );
+
 			const small = await widget.modal.evaluate( ( modal ) => [ ...modal.querySelectorAll( '.whsc-filterbar button, .whsc-modal-header button' ) ]
 				.filter( ( node ) => node.getClientRects().length > 0 )
 				.map( ( node ) => [ node.textContent.trim() || node.getAttribute( 'aria-label' ), node.getBoundingClientRect() ] )
@@ -297,7 +308,32 @@ test.describe( 'the filter bar', () => {
 			expect( bar.height ).toBeLessThanOrEqual( 52 );
 			expect( bar.y ).toBeGreaterThan( field.y + field.height );
 			expect( heading.y ).toBeGreaterThan( bar.y + bar.height );
-			expect( await page.evaluate( () => document.documentElement.scrollWidth - document.documentElement.clientWidth ) ).toBe( 0 );
+
+			// The window is fixed, so it never makes the page wider: what is
+			// left to cross the edge is drawn in `body` beside it.
+			const beyond = await crossingTheEdge( page );
+
+			expect(
+				await page.evaluate( () => document.documentElement.scrollWidth - document.documentElement.clientWidth ),
+				`the page is no wider than the screen; crossing its edge: ${ beyond.join( '; ' ) || 'nothing' }`
+			).toBe( 0 );
+
+			// So the window and its results are measured against the screen:
+			// two to a row, the narrowest phone too, and each whole on it.
+			const modal = await widget.modal.boundingBox();
+			const cards = await widget.modal.locator( '.whsc-results__grid .whsc-card' ).evaluateAll( ( nodes ) => nodes
+				.map( ( node ) => node.getBoundingClientRect() )
+				.map( ( { left, right, top } ) => ( { left, right, top } ) ) );
+
+			expect( modal.x ).toBeGreaterThanOrEqual( 0 );
+			expect( modal.x + modal.width ).toBeLessThanOrEqual( width );
+			expect( cards[ 1 ].top ).toBe( cards[ 0 ].top );
+			expect( cards[ 2 ].top ).toBeGreaterThan( cards[ 0 ].top );
+			expect(
+				cards
+					.filter( ( card ) => card.left < 0 || card.right > width )
+					.map( ( card ) => `a card from ${ Math.round( card.left ) } to ${ Math.round( card.right ) }px` )
+			).toEqual( [] );
 		} );
 	}
 
