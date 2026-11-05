@@ -135,7 +135,7 @@ wrong; the state that was wrong had never been on the screen.
 
 **Opening a screen checks one state of it.** Before saying a screen works:
 
-- **Click every action** and look at what appears: the notice, the busy button, the toast.
+- **Click every action** and look at what appears: the notice, the busy button, the snackbar.
 - **Open every overlay**: the menu, the confirmation, the modal. Tick what gates a button and
   look at the button again.
 - **Make every field wrong** once, and make a save fail, and read what the screen says.

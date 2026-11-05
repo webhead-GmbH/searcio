@@ -40,7 +40,7 @@ use Elementor\Group_Control_Typography;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Widget;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 

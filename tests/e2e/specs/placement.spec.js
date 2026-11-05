@@ -98,7 +98,7 @@ test.describe( 'Placement tab', () => {
 		await expect( save ).toBeEnabled();
 		await save.click();
 
-		await expect( page.getByText( 'Placement saved.' ) ).toBeVisible();
+		await expect( page.locator( '.components-snackbar' ).filter( { hasText: 'Placement saved.' } ) ).toBeVisible();
 		await expect( save ).toBeDisabled();
 
 		const stored = await requestUtils.rest( { path: PLACEMENT_PATH } );
@@ -126,7 +126,7 @@ test.describe( 'Placement tab', () => {
 		await screen.getByRole( 'button', { name: 'Save placement' } ).click();
 
 		await expect( screen.getByText( 'The placement could not be saved: The database is read-only.' ) ).toBeVisible();
-		await expect( page.getByText( 'Placement saved.' ) ).toHaveCount( 0 );
+		await expect( page.locator( '.components-snackbar' ).filter( { hasText: 'Placement saved.' } ) ).toHaveCount( 0 );
 	} );
 
 	test( 'writes a shortcode with what differs from the look, and copies it', async ( { page, context } ) => {
@@ -144,7 +144,7 @@ test.describe( 'Placement tab', () => {
 		await expect( code ).toHaveText( '[searcio mode="box" placeholder="Find a jacket"]' );
 
 		await card.getByRole( 'button', { name: 'Copy' } ).click();
-		await expect( page.getByText( 'Copied.' ) ).toBeVisible();
+		await expect( page.locator( '.components-snackbar' ).filter( { hasText: 'Copied.' } ) ).toBeVisible();
 		expect( await page.evaluate( () => navigator.clipboard.readText() ) ).toBe( '[searcio mode="box" placeholder="Find a jacket"]' );
 	} );
 

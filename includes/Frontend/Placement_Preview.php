@@ -22,7 +22,7 @@ use Webhead\WP\SearchCloud\DTO\Floating_Button;
 use Webhead\WP\SearchCloud\DTO\Placement_Options;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -5,8 +5,6 @@
 @use "@wordpress/base-styles/variables" as wp-base;
 
 :root {
-	--wh-toastify-admin-offset: var(--wpds-dimension-gap-xl);
-	--toastify-toast-top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wh-toastify-admin-offset));
 	// Black is the brand. Every control, every fill and every button takes it,
 	// from the rules further down. The theme provider is given the same colour
 	// where a screen is mounted (`primary: '#101010'`) and works out the rest of
@@ -33,16 +31,6 @@
 	--wh-panel-gap: var(--wpds-dimension-gap-xl);
 	--wh-card-gap: var(--wpds-dimension-gap-lg);
 	--wh-copy-gap: var(--wpds-dimension-gap-xs);
-}
-
-.Toastify__toast-container {
-	--toastify-toast-top: calc(var(--wp-admin--admin-bar--height, 32px) + var(--wh-toastify-admin-offset));
-}
-
-body .Toastify__toast-container--top-left,
-body .Toastify__toast-container--top-center,
-body .Toastify__toast-container--top-right {
-	top: var(--toastify-toast-top);
 }
 
 // Where a screen draws. `.panel-container` is the class the AdminPage shell

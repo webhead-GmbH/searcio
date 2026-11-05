@@ -22,7 +22,7 @@ use Elementor\Controls_Manager;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Widget;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 

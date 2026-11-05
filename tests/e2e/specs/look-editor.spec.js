@@ -131,7 +131,7 @@ test.describe( 'Look editor', () => {
 		const save = dialog.getByRole( 'button', { name: 'Save placement' } );
 
 		await save.click();
-		await expect( page.getByText( 'Placement saved.' ) ).toBeVisible();
+		await expect( page.locator( '.components-snackbar' ).filter( { hasText: 'Placement saved.' } ) ).toBeVisible();
 		await expect( save ).toBeDisabled();
 
 		const stored = await requestUtils.rest( { path: PLACEMENT_PATH } );

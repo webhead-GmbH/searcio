@@ -27,13 +27,13 @@ if ( container ) {
             <AdminPage title={ __( 'Reports', 'searcio' ) } icon={ ChartIcon }>
                 …cards…
             </AdminPage>
-            <ToastContainer />
         </ThemeProvider>
     );
 }
 ```
 
-Then copy the last two tests of `tests/e2e/specs/settings-page.spec.js` for the
+The shell draws the snackbars `showToast()` raises; a screen draws none of its
+own. Then copy the last two tests of `tests/e2e/specs/settings-page.spec.js` for the
 new page. One measures the screen in a browser 2400px wide, and two screens that
 both pass it start at the same place and are the same width. The other measures
 that nothing the screen stacks touches what is above it.
