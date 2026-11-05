@@ -15,7 +15,7 @@ use Webhead\WP\SearchCloud\Frontend\Inline_Styles;
 use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Frontend\Style_Tokens;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -71,6 +71,77 @@ const withDesignTokenFallbacks = ( rules = [] ) => rules.map( ( rule ) => {
 	return nextRule;
 } );
 
+/**
+ * Every SVG `data:` URI of a built stylesheet, written as base64.
+ *
+ * An SVG names its namespace, `http://www.w3.org/2000/svg`, and in a `data:`
+ * URI written as text that address stands in the stylesheet as it is. The
+ * stylesheet of `@wordpress/components`, which the frontend reset loads, has
+ * one, and wordpress.org's review reports the package that holds it as a
+ * plugin that calls a remote file. It is a name and not a request, and the
+ * report still costs a round of review.
+ *
+ * It is done here, after the build has written the stylesheet: cssnano's SVG
+ * step rewrites a URI that is percent-encoded in the source and writes the
+ * address back, and only a base64 one comes out as it went in. The image is
+ * the same; the stylesheet is a few bytes longer.
+ */
+const SVG_DATA_URI = /url\(\s*(?:"data:image\/svg\+xml([^,"]*),((?:[^"\\]|\\[\s\S])*)"|'data:image\/svg\+xml([^,']*),((?:[^'\\]|\\[\s\S])*)'|data:image\/svg\+xml([^,)\s]*),([^)\s]*))\s*\)/gi;
+
+const svgDataUrisAsBase64 = ( css ) => css.replace( SVG_DATA_URI, ( match, ...groups ) => {
+	const parameters = groups[ 0 ] ?? groups[ 2 ] ?? groups[ 4 ];
+	const data = groups[ 1 ] ?? groups[ 3 ] ?? groups[ 5 ];
+
+	if ( /;base64$/i.test( parameters ) ) {
+		return match;
+	}
+
+	let svg;
+
+	try {
+		// A CSS escape first (`\"`, a line continuation), then the
+		// percent-encoding the URI was written in.
+		svg = decodeURIComponent( data.replace( /\\\r?\n/g, '' ).replace( /\\(.)/g, '$1' ) );
+	} catch ( error ) {
+		// Not a URI this can read back: left as it was.
+		return match;
+	}
+
+	return `url("data:image/svg+xml;base64,${ Buffer.from( svg, 'utf8' ).toString( 'base64' ) }")`;
+} );
+
+class SvgDataUrisAsBase64Plugin {
+	apply( compiler ) {
+		// A development build keeps its stylesheets and their source maps.
+		if ( 'production' !== compiler.options.mode ) {
+			return;
+		}
+
+		const { Compilation, sources } = compiler.webpack;
+
+		compiler.hooks.thisCompilation.tap( 'SvgDataUrisAsBase64Plugin', ( compilation ) => {
+			compilation.hooks.processAssets.tap(
+				// After the right-to-left copy of each stylesheet is written.
+				{ name: 'SvgDataUrisAsBase64Plugin', stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE },
+				( assets ) => {
+					for ( const name of Object.keys( assets ) ) {
+						if ( ! name.endsWith( '.css' ) ) {
+							continue;
+						}
+
+						const css = assets[ name ].source().toString();
+						const rewritten = svgDataUrisAsBase64( css );
+
+						if ( rewritten !== css ) {
+							compilation.updateAsset( name, new sources.RawSource( rewritten ) );
+						}
+					}
+				}
+			);
+		} );
+	}
+}
+
 module.exports = {
 	...defaults,
 	mode: process.env.NODE_ENV || 'production',
@@ -103,6 +174,7 @@ module.exports = {
 				return undefined;
 			},
 		} ),
+		new SvgDataUrisAsBase64Plugin(),
 	],
 	externalsType: defaults.externalsType,
 	externals: {

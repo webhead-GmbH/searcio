@@ -128,9 +128,11 @@ final class Brand_Test extends TestCase {
 
 		$this->assertGreaterThan( 100, count( $files ) );
 
+		// The slug where it is a name for code: a text domain, the shortcode's
+		// tag, and the context the framework's snackbars keep their notices in.
 		foreach ( $files as $file ) {
 			$code = (string) preg_replace(
-				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TAG = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
+				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TAG = 'searcio'/", "/SNACKBAR_CONTEXT = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
 				'',
 				(string) file_get_contents( $file )
 			);

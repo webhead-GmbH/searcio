@@ -23,7 +23,7 @@ Elementor widgets need matching frontend output, editor preview behavior, scoped
 
 - Register widgets only after Elementor is loaded, and keep registration behind the framework hook layer, which `register_elementor()` is.
 - Implement `render()` for frontend output. Implement `content_template()` as well when the editor can rebuild the same markup from the control values alone, so the preview reacts immediately when a control value changes. Leave `content_template()` out when `render()` shows something the editor's JavaScript cannot know, such as rows from the database: Elementor then asks the server to render the widget again whenever a control changes.
-- `render()` escapes with `esc_html()`, `esc_attr()` and `esc_url()`. `content_template()` prints with `{{ }}`, which escapes; `{{{ }}}` does not and is only for markup the widget built itself.
+- `render()` escapes with `esc_html()`, `esc_attr()` and `esc_url()`, and markup a renderer built is echoed as `wp_kses( $markup, Allowed_Html::defaults() )` (`Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Allowed_Html`), never behind `phpcs:ignore`. `content_template()` prints with `{{ }}`, which escapes; `{{{ }}}` does not and is only for markup the widget built itself.
 - Keep controls organized in logical Content and Style sections. Separate style controls by widget part so users can style headings, body copy, media, buttons, wrappers, and states independently.
 - Use Elementor style control tabs for stateful styling: at minimum Normal and Hover for interactive colors, and Active when the widget has a selected/current state.
 - Use responsive Elementor controls for padding, margin, width, gap, alignment, typography, and sizing whenever the value affects layout at different breakpoints.

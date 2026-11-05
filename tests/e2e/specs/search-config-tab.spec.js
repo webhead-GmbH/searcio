@@ -241,7 +241,7 @@ test.describe( 'Search Config tab', () => {
 		await expect(
 			page.locator( SCREEN ).getByText( 'The search configuration could not be saved: A redirect needs a URL.' )
 		).toBeVisible();
-		await expect( page.getByText( 'Search configuration saved.' ) ).toHaveCount( 0 );
+		await expect( page.locator( '.components-snackbar' ).filter( { hasText: 'Search configuration saved.' } ) ).toHaveCount( 0 );
 		// What was typed is still there to be corrected.
 		await expect( rule.locator( 'input' ).nth( 1 ) ).toHaveValue( 'https://example.test/other' );
 	} );

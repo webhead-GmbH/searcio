@@ -19,7 +19,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Widgets;
 
 use WP_Widget;
-use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Allowed_Html;
 use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Shortcodes\Search_Shortcode;
 
