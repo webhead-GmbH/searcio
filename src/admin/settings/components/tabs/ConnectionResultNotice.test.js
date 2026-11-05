@@ -81,6 +81,13 @@ describe( 'ConnectionResultNotice', () => {
 		expect( links() ).toEqual( [ [ expect.stringContaining( 'Choose a plan' ), 'https://searcio.test/acme/billing' ] ] );
 	} );
 
+	it( 'links an overdue payment to billing, where the plan link leads and it is settled', async () => {
+		await render( refused( 'payment_overdue' ) );
+
+		expect( container.textContent ).toContain( 'Title of payment_overdue' );
+		expect( links() ).toEqual( [ [ expect.stringContaining( 'Go to billing' ), 'https://searcio.test/acme/billing' ] ] );
+	} );
+
 	it( 'links a suspended account to support, which is the only way back', async () => {
 		await render( refused( 'account_suspended' ) );
 

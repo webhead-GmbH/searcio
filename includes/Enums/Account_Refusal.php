@@ -2,8 +2,9 @@
 /**
  * Why Searcio does not serve the connected account.
  *
- * An account without an active plan, and a suspended one, is refused
- * searching, indexing and MCP. A refused call answers `402` or `403` with
+ * An account without an active plan, one whose payment is overdue, and a
+ * suspended one, is refused searching, indexing and MCP. A refused call
+ * answers `402` (no plan, payment overdue) or `403` (suspended) with
  * `{ message, reason }`, and `/health` keeps answering `200` with the same
  * reason in `account`. The value of each case is that `reason`.
  *
@@ -21,8 +22,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.4.0
  */
 enum Account_Refusal: string {
-	case NoActivePlan = 'no_active_plan';
-	case Suspended    = 'account_suspended';
+	case NoActivePlan   = 'no_active_plan';
+	case PaymentOverdue = 'payment_overdue';
+	case Suspended      = 'account_suspended';
 
 	/**
 	 * The refusal a call was answered with, or null when it was not one. A
@@ -58,8 +60,9 @@ enum Account_Refusal: string {
 
 	public function label(): string {
 		return match ( $this ) {
-			self::NoActivePlan => __( 'Your Searcio account has no active plan', 'searcio' ),
-			self::Suspended    => __( 'Your Searcio account is suspended', 'searcio' ),
+			self::NoActivePlan   => __( 'Your Searcio account has no active plan', 'searcio' ),
+			self::PaymentOverdue => __( 'Your Searcio payment is overdue', 'searcio' ),
+			self::Suspended      => __( 'Your Searcio account is suspended', 'searcio' ),
 		};
 	}
 
@@ -69,8 +72,9 @@ enum Account_Refusal: string {
 	 */
 	public function message(): string {
 		return match ( $this ) {
-			self::NoActivePlan => __( 'Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync.', 'searcio' ),
-			self::Suspended    => __( 'Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored.', 'searcio' ),
+			self::NoActivePlan   => __( 'Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync.', 'searcio' ),
+			self::PaymentOverdue => __( 'Searcio does not search or index for this site until the overdue payment is settled. Pay it on the Billing page of your Searcio dashboard, then run a sync.', 'searcio' ),
+			self::Suspended      => __( 'Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored.', 'searcio' ),
 		};
 	}
 }

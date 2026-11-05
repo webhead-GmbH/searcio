@@ -22,7 +22,7 @@ test.describe( 'Storefront of an account that is not served', () => {
 		await configureSearchKey( requestUtils );
 	} );
 
-	for ( const reason of [ 'no_active_plan', 'account_suspended' ] ) {
+	for ( const reason of [ 'no_active_plan', 'payment_overdue', 'account_suspended' ] ) {
 		test( `a submitted search falls back to WordPress search (${ reason })`, async ( { page, requestUtils } ) => {
 			await mockSearchCloud( page, { accountRefusal: reason } );
 			await page.goto( await createBlockPost( requestUtils, { mode: 'icon', searchTrigger: 'submit' } ) );
@@ -46,7 +46,7 @@ test.describe( 'Storefront of an account that is not served', () => {
 				( response ) => response.url().includes( '/search?' ) && 'boots' === new URL( response.url() ).searchParams.get( 'q' )
 			);
 			await widget.input.fill( 'boots' );
-			expect( ( await refused ).status() ).toBe( 'no_active_plan' === reason ? 402 : 403 );
+			expect( ( await refused ).status() ).toBe( 'account_suspended' === reason ? 403 : 402 );
 
 			await expect( widget.modal.getByRole( 'alert' ) ).toBeVisible();
 			await expect( widget.input ).toHaveValue( 'boots' );

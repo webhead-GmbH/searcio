@@ -162,8 +162,10 @@ final class Health_Tests {
 	}
 
 	/**
-	 * The way back from a refusal: the plan the account is missing, or
-	 * support, which only the platform can lift a suspension through.
+	 * The way back from a refusal: the plan the account is missing, the
+	 * billing page an overdue payment is settled on (the plan's upgrade link
+	 * leads there), or support, which only the platform can lift a suspension
+	 * through.
 	 *
 	 * @param  array<string,mixed>  $health  The `/health` body.
 	 */
@@ -172,8 +174,9 @@ final class Health_Tests {
 		$plan_url = is_string( $plan_url ) ? esc_url_raw( $plan_url, [ 'https', 'http' ] ) : '';
 
 		[ $url, $text ] = match ( $refusal ) {
-			Account_Refusal::NoActivePlan => [ $plan_url, __( 'Choose a plan', 'searcio' ) ],
-			Account_Refusal::Suspended    => [ Connection_Endpoint::support_url( $health['account']['support_url'] ?? null ), __( 'Contact Searcio support', 'searcio' ) ],
+			Account_Refusal::NoActivePlan   => [ $plan_url, __( 'Choose a plan', 'searcio' ) ],
+			Account_Refusal::PaymentOverdue => [ $plan_url, __( 'Go to billing', 'searcio' ) ],
+			Account_Refusal::Suspended      => [ Connection_Endpoint::support_url( $health['account']['support_url'] ?? null ), __( 'Contact Searcio support', 'searcio' ) ],
 		};
 
 		if ( '' === $url ) {

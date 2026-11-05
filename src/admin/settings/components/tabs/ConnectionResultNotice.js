@@ -24,18 +24,24 @@ export const accountRefusal = (result) => (
 );
 
 /**
- * The way back from a refusal: a plan for an account without one, support
- * for a suspended one.
+ * The way back from a refusal: a plan for an account without one, the
+ * billing page for an overdue payment (the plan's upgrade link leads there),
+ * support for a suspended one.
  *
  * @param {Object} result
  * @param {Object} refusal
  * @return {{url: string, label: string}} The link, with an empty url when there is none.
  */
-const refusalAction = (result, refusal) => (
-	'no_active_plan' === refusal.reason
-		? {url: result.plan?.upgrade_url || '', label: __('Choose a plan', 'searcio')}
-		: {url: refusal.support_url || '', label: __('Contact Searcio support', 'searcio')}
-);
+const refusalAction = (result, refusal) => {
+	switch (refusal.reason) {
+		case 'no_active_plan':
+			return {url: result.plan?.upgrade_url || '', label: __('Choose a plan', 'searcio')};
+		case 'payment_overdue':
+			return {url: result.plan?.upgrade_url || '', label: __('Go to billing', 'searcio')};
+		default:
+			return {url: refusal.support_url || '', label: __('Contact Searcio support', 'searcio')};
+	}
+};
 
 /**
  * What a result says, in the words its notice prints.

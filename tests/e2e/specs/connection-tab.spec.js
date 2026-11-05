@@ -45,7 +45,7 @@ const HEALTH = {
  * What the plugin's health route says of an account Searcio does not serve.
  * The keys work, so it is `ok`; without a plan every limit is 0.
  *
- * @param {string} reason `no_active_plan` or `account_suspended`.
+ * @param {string} reason `no_active_plan`, `payment_overdue` or `account_suspended`.
  */
 const unserved = ( reason ) => ( {
 	...HEALTH,
@@ -58,10 +58,16 @@ const unserved = ( reason ) => ( {
 	account: {
 		served: false,
 		reason,
-		title: 'no_active_plan' === reason ? 'Your Searcio account has no active plan' : 'Your Searcio account is suspended',
-		message: 'no_active_plan' === reason
-			? 'Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync.'
-			: 'Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored.',
+		title: {
+			no_active_plan: 'Your Searcio account has no active plan',
+			payment_overdue: 'Your Searcio payment is overdue',
+			account_suspended: 'Your Searcio account is suspended',
+		}[ reason ],
+		message: {
+			no_active_plan: 'Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync.',
+			payment_overdue: 'Searcio does not search or index for this site until the overdue payment is settled. Pay it on the Billing page of your Searcio dashboard, then run a sync.',
+			account_suspended: 'Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored.',
+		}[ reason ],
 		support_url: 'https://searcio.test/acme/support',
 	},
 } );
@@ -254,6 +260,20 @@ test.describe( 'Connection tab of an account Searcio does not serve', () => {
 		// Allowances of 0 are not spent allowances, and the notice says why.
 		await expect( page.getByRole( 'heading', { name: 'This month' } ) ).toHaveCount( 0 );
 		await expect( page.getByRole( 'button', { name: 'Disconnect' } ) ).toBeVisible();
+	} );
+
+	test( 'says the payment is overdue, and links to billing', async ( { page } ) => {
+		await mockHealth( page, unserved( 'payment_overdue' ) );
+		await page.goto( CONNECTION_URL );
+
+		const notice = page.locator( '.searcio-account-refusal' );
+
+		await expect( notice ).toContainText( 'Your Searcio payment is overdue', LOADED );
+		// The plan's upgrade link leads to the billing page, where it is settled.
+		await expect( notice.getByRole( 'link', { name: /Go to billing/ } ) )
+			.toHaveAttribute( 'href', 'https://searcio.test/acme/billing' );
+		await expect( notice.getByRole( 'link', { name: /Contact Searcio support/ } ) ).toHaveCount( 0 );
+		await expect( page.getByRole( 'heading', { name: 'This month' } ) ).toHaveCount( 0 );
 	} );
 
 	test( 'says the account is suspended, and links to support', async ( { page } ) => {

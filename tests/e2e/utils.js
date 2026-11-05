@@ -102,7 +102,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		visualDelay = 0,
 		similarSearchId = '',
 		visualSearchId = '',
-		// `no_active_plan` or `account_suspended`: the account is not served,
+		// `no_active_plan`, `payment_overdue` or `account_suspended`: the account is not served,
 		// and every call is refused as the service refuses it.
 		accountRefusal = null,
 	} = options;
@@ -120,7 +120,7 @@ export async function mockSearchCloud( page, options = {} ) {
 		if ( accountRefusal ) {
 			return json(
 				{ message: 'This account is not served.', reason: accountRefusal },
-				'no_active_plan' === accountRefusal ? 402 : 403
+				'account_suspended' === accountRefusal ? 403 : 402
 			);
 		}
 

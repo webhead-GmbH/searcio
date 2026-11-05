@@ -46,6 +46,27 @@ final class Connection_Reachable_Test extends Integration_Test_Case {
 		$this->assertStringContainsString( 'Choose a plan', $result['actions'] );
 	}
 
+	/**
+	 * The plan's upgrade link leads to the billing page, where an overdue
+	 * payment is settled.
+	 */
+	public function test_an_overdue_payment_is_critical_and_links_to_billing(): void {
+		$this->answer_health(
+			[
+				'account' => [ 'served' => false, 'reason' => 'payment_overdue', 'support_url' => 'https://searcio.test/acme/support' ],
+				'plan'    => [ 'id' => 4, 'is_free' => false, 'upgrade_url' => 'https://searcio.test/acme/billing' ],
+			]
+		);
+
+		$result = $this->run_check();
+
+		$this->assertSame( 'critical', $result['status'] );
+		$this->assertSame( Account_Refusal::PaymentOverdue->label(), $result['label'] );
+		$this->assertStringContainsString( esc_html( Account_Refusal::PaymentOverdue->message() ), $result['description'] );
+		$this->assertStringContainsString( 'href="https://searcio.test/acme/billing"', $result['actions'] );
+		$this->assertStringContainsString( 'Go to billing', $result['actions'] );
+	}
+
 	public function test_a_suspended_account_is_critical_and_links_to_support(): void {
 		$this->answer_health(
 			[

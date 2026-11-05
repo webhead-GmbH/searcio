@@ -14,6 +14,7 @@ use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 final class Account_Refusal_Test extends TestCase {
 	public function test_its_values_are_the_reasons_the_service_answers_with(): void {
 		$this->assertSame( 'no_active_plan', Account_Refusal::NoActivePlan->value );
+		$this->assertSame( 'payment_overdue', Account_Refusal::PaymentOverdue->value );
 		$this->assertSame( 'account_suspended', Account_Refusal::Suspended->value );
 	}
 
@@ -21,6 +22,10 @@ final class Account_Refusal_Test extends TestCase {
 		$this->assertSame(
 			Account_Refusal::NoActivePlan,
 			Account_Refusal::from_response( 402, [ 'message' => 'This account has no active plan.', 'reason' => 'no_active_plan' ] )
+		);
+		$this->assertSame(
+			Account_Refusal::PaymentOverdue,
+			Account_Refusal::from_response( 402, [ 'message' => 'This account has an overdue payment.', 'reason' => 'payment_overdue' ] )
 		);
 		$this->assertSame(
 			Account_Refusal::Suspended,
@@ -60,6 +65,10 @@ final class Account_Refusal_Test extends TestCase {
 			Account_Refusal::from_health( [ 'account' => [ 'served' => false, 'reason' => 'no_active_plan' ] ] )
 		);
 		$this->assertSame(
+			Account_Refusal::PaymentOverdue,
+			Account_Refusal::from_health( [ 'account' => [ 'served' => false, 'reason' => 'payment_overdue' ] ] )
+		);
+		$this->assertSame(
 			Account_Refusal::Suspended,
 			Account_Refusal::from_health( [ 'account' => [ 'served' => false, 'reason' => 'account_suspended' ] ] )
 		);
@@ -93,6 +102,8 @@ final class Account_Refusal_Test extends TestCase {
 	public function test_each_refusal_names_what_it_is_and_the_way_back(): void {
 		$this->assertStringContainsString( 'no active plan', Account_Refusal::NoActivePlan->label() );
 		$this->assertStringContainsString( 'Choose a plan', Account_Refusal::NoActivePlan->message() );
+		$this->assertStringContainsString( 'payment is overdue', Account_Refusal::PaymentOverdue->label() );
+		$this->assertStringContainsString( 'Billing page', Account_Refusal::PaymentOverdue->message() );
 		$this->assertStringContainsString( 'suspended', Account_Refusal::Suspended->label() );
 		$this->assertStringContainsString( 'Contact Searcio support', Account_Refusal::Suspended->message() );
 	}

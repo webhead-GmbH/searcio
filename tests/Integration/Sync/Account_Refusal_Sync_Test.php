@@ -61,8 +61,9 @@ final class Account_Refusal_Sync_Test extends Integration_Test_Case {
 	 */
 	public static function refusals(): array {
 		return [
-			'no active plan' => [ Account_Refusal::NoActivePlan ],
-			'suspended'      => [ Account_Refusal::Suspended ],
+			'no active plan'  => [ Account_Refusal::NoActivePlan ],
+			'payment overdue' => [ Account_Refusal::PaymentOverdue ],
+			'suspended'       => [ Account_Refusal::Suspended ],
 		];
 	}
 
@@ -202,7 +203,7 @@ final class Account_Refusal_Sync_Test extends Integration_Test_Case {
 
 				return $this->http_ok(
 					[ 'message' => 'Not served.', 'reason' => $refusal->value ],
-					Account_Refusal::NoActivePlan === $refusal ? 402 : 403
+					Account_Refusal::Suspended === $refusal ? 403 : 402
 				);
 			}
 		);

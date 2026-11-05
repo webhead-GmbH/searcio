@@ -1494,39 +1494,39 @@ msgstr "Searcio è raggiungibile"
 msgid "The last health check succeeded."
 msgstr "L'ultimo controllo di stato è riuscito."
 
-#: includes/Health/Health_Tests.php:199
+#: includes/Health/Health_Tests.php:202
 msgid "No content types are enabled for indexing"
 msgstr "Nessun tipo di contenuto è abilitato per l'indicizzazione"
 
-#: includes/Health/Health_Tests.php:201
+#: includes/Health/Health_Tests.php:204
 msgid "Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send."
 msgstr "Abilita almeno un tipo di contenuto o i prodotti WooCommerce nella scheda Indicizzazione, così la sincronizzazione ha qualcosa da inviare."
 
-#: includes/Health/Health_Tests.php:207
+#: includes/Health/Health_Tests.php:210
 msgid "Content types are enabled for indexing"
 msgstr "Ci sono tipi di contenuto abilitati per l'indicizzazione"
 
 #. translators: %d: number of enabled content types.
-#: includes/Health/Health_Tests.php:211
+#: includes/Health/Health_Tests.php:214
 #, php-format
 msgid "%d content type(s) are enabled for indexing."
 msgstr "Tipi di contenuto abilitati per l'indicizzazione: %d."
 
 #. translators: %d: number of posts skipped.
-#: includes/Health/Health_Tests.php:231
+#: includes/Health/Health_Tests.php:234
 #, php-format
 msgid "%d post(s) were skipped from the last sync due to language"
 msgstr "Contenuti esclusi dall'ultima sincronizzazione a causa della lingua: %d"
 
-#: includes/Health/Health_Tests.php:235
+#: includes/Health/Health_Tests.php:238
 msgid "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally."
 msgstr "Questi contenuti sono in una lingua non abilitata nella scheda Configurazione ricerca. Abilita lì la loro lingua, oppure lasciali fuori dalla ricerca di proposito."
 
-#: includes/Health/Health_Tests.php:241
+#: includes/Health/Health_Tests.php:244
 msgid "No content was skipped due to language"
 msgstr "Nessun contenuto escluso a causa della lingua"
 
-#: includes/Health/Health_Tests.php:243
+#: includes/Health/Health_Tests.php:246
 msgid "Every indexable post is in an enabled language, or the site has not restricted languages."
 msgstr "Ogni contenuto indicizzabile è in una lingua abilitata, oppure il sito non ha limitato le lingue."
 
@@ -1629,7 +1629,7 @@ msgstr "Al momento Searcio non può creare nuovi account. Riprova più tardi."
 
 #: includes/Routing/Connection_Endpoint.php:364
 #: includes/Routing/Connection_Endpoint.php:403
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:52
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:58
 msgid "Connection failed."
 msgstr "Connessione non riuscita."
 
@@ -2009,21 +2009,21 @@ msgid "Accepting the Terms of Service and Privacy Policy is required to continue
 msgstr "Per continuare è necessario accettare i Termini di servizio e l'Informativa sulla privacy. L'accettazione dell'Accordo sul trattamento dei dati è facoltativa."
 
 #. translators: 1: used documents, 2: document limit.
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:66
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:72
 #, js-format
 msgid "Connected - %1$s / %2$s documents indexed."
 msgstr "Connesso - %1$s / %2$s documenti indicizzati."
 
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:69
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:75
 msgid "unlimited"
 msgstr "illimitati"
 
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:72
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:78
 msgid "Connected."
 msgstr "Connesso."
 
 #. translators: %d: the Searcio site id.
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:76
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:82
 #, js-format
 msgid " (site #%d)"
 msgstr " (sito #%d)"
@@ -4631,29 +4631,43 @@ msgstr "Statistiche di ricerca"
 msgid "See what visitors searched for"
 msgstr "Guarda cosa hanno cercato i visitatori"
 
-
-#: includes/Enums/Account_Refusal.php:61
+#: includes/Enums/Account_Refusal.php:63
 msgid "Your Searcio account has no active plan"
 msgstr "Il tuo account Searcio non ha un piano attivo"
 
-#: includes/Enums/Account_Refusal.php:62
+#: includes/Enums/Account_Refusal.php:65
 msgid "Your Searcio account is suspended"
 msgstr "Il tuo account Searcio è sospeso"
 
-#: includes/Enums/Account_Refusal.php:72
+#: includes/Enums/Account_Refusal.php:75
 msgid "Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync."
 msgstr "Searcio non effettua ricerche né indicizzazioni per questo sito finché l'account non ha un piano attivo. Scegli un piano nella tua dashboard di Searcio, poi esegui una sincronizzazione."
 
-#: includes/Enums/Account_Refusal.php:73
+#: includes/Enums/Account_Refusal.php:77
 msgid "Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored."
 msgstr "Searcio non effettua ricerche né indicizzazioni per questo sito finché l'account è sospeso. Contatta il supporto di Searcio per farlo ripristinare."
 
-#: includes/Health/Health_Tests.php:175
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:36
+#: includes/Health/Health_Tests.php:177
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:38
 msgid "Choose a plan"
 msgstr "Scegli un piano"
 
-#: includes/Health/Health_Tests.php:176
-#: src/admin/settings/components/tabs/ConnectionResultNotice.js:37
+#: includes/Health/Health_Tests.php:179
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:42
 msgid "Contact Searcio support"
 msgstr "Contatta il supporto di Searcio"
+
+
+#: includes/Enums/Account_Refusal.php:64
+msgid "Your Searcio payment is overdue"
+msgstr "Il tuo pagamento Searcio è scaduto"
+
+#: includes/Enums/Account_Refusal.php:76
+msgid "Searcio does not search or index for this site until the overdue payment is settled. Pay it on the Billing page of your Searcio dashboard, then run a sync."
+msgstr "Searcio non effettua ricerche né indicizzazioni per questo sito finché il pagamento scaduto non viene saldato. Pagalo nella pagina Fatturazione della tua dashboard di Searcio, poi esegui una sincronizzazione."
+
+#: includes/Health/Health_Tests.php:178
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:40
+msgid "Go to billing"
+msgstr "Vai alla fatturazione"
+
