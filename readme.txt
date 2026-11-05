@@ -52,7 +52,7 @@ AI search and similar products come with every paid plan, and the AI shopping as
 * **Any theme, any builder** - Searcio can take over your theme's own search, open from its search icon, sit in a floating button, or go anywhere as the `[searcio]` shortcode, a classic widget or a menu item.
 * **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, the look editor on the Placement tab does the same, fonts included, set apart for desktops, tablets and phones. Until you pick others, the search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
-* **Multilingual** - works with WPML and Polylang, so visitors only see results in their language. The Free plan searches one language, the paid plans more.
+* **Multilingual** - works with WPML and Polylang, so visitors only see results in their language. How many languages are searched depends on your plan.
 * **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and Polish.
 * **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
 * **WP-CLI** - run and watch syncs from the command line or a real system cron.
@@ -125,7 +125,7 @@ Yes. The block and the Elementor widget let you style the search box, the window
 
 = Does it support multilingual sites? =
 
-Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You choose which languages are indexed, as many as your plan allows: one on the Free plan.
+Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You choose which languages are indexed, as many as your plan allows.
 
 = When do changes in my shop show up in the search? =
 
