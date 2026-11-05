@@ -3,7 +3,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { currentLangFilter, fetchQuizzes, getConfig, search, trackClick } from '../../../utils/api';
 import { appendHits, buildFilterParams, hasMorePages, humanizeFieldLabel } from '../../../utils/facets';
-import { applyOption, firstQuestion, nextQuestion, normalizeQuizzes, quizProgress } from '../../../utils/quiz';
+import { answerKeywords, applyOption, applyRanges, firstQuestion, nextQuestion, normalizeQuizzes, quizProgress } from '../../../utils/quiz';
 import { ResultCard } from './templates';
 import SearchResultsSkeleton from './SearchResultsSkeleton';
 
@@ -36,6 +36,11 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	// value ("m"); showing that back reads as an internal code, not as the
 	// answer they gave ("Medium").
 	const [ answerLabels, setAnswerLabels ] = useState( {} );
+	// What the answers asked for besides filters (`quiz.md`, "Widget flow
+	// contract"): one entry per answer that wanted words, kept with its wording
+	// for the answer list, and the ranges by field.
+	const [ keywordAnswers, setKeywordAnswers ] = useState( [] );
+	const [ ranges, setRanges ] = useState( {} );
 	const [ results, setResults ] = useState( null );
 	const [ isSearching, setIsSearching ] = useState( false );
 	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
@@ -51,6 +56,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	// The answers the results on screen came from, so another page can be asked
 	// for without walking the quiz again.
 	const appliedTagsRef = useRef( {} );
+	const appliedCriteriaRef = useRef( { keywords: [], ranges: {} } );
 
 	// Fetched once when the tab is first opened. An empty list is a normal
 	// answer, not a failure - it means nothing is published yet.
@@ -108,7 +114,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		}
 	}, [ stepMoves ] );
 
-	const runFinalSearch = useCallback( async ( finalTags ) => {
+	const runFinalSearch = useCallback( async ( finalTags, finalKeywords = [], finalRanges = {} ) => {
 		setIsSearching( true );
 		setError( '' );
 
@@ -117,10 +123,13 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		abortRef.current = controller;
 
 		appliedTagsRef.current = finalTags;
+		appliedCriteriaRef.current = { keywords: finalKeywords, ranges: finalRanges };
 
 		try {
 			const response = await search( '', {
 				filters: buildFilterParams( {}, { ...finalTags, ...currentLangFilter() } ),
+				keywords: finalKeywords,
+				ranges: finalRanges,
 				surface: 'quiz',
 				signal: controller.signal,
 			} );
@@ -147,6 +156,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		try {
 			const response = await search( '', {
 				filters: buildFilterParams( {}, { ...appliedTagsRef.current, ...currentLangFilter() } ),
+				keywords: appliedCriteriaRef.current.keywords,
+				ranges: appliedCriteriaRef.current.ranges,
 				page: nextPage,
 				surface: 'quiz',
 			} );
@@ -166,16 +177,23 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 
 	const answer = ( option ) => {
 		const nextTags = applyOption( tags, option );
+		const nextRanges = applyRanges( ranges, option );
+		const words = answerKeywords( option );
+		const nextKeywordAnswers = '' === words
+			? keywordAnswers
+			: [ ...keywordAnswers, { words, question: question.text, label: option.label } ];
 		const visited = [ ...history.map( ( step ) => step.question.id ), question.id ];
 		const upcoming = nextQuestion( quiz, option, visited );
 
-		setHistory( ( current ) => [ ...current, { question, tags, answerLabels } ] );
+		setHistory( ( current ) => [ ...current, { question, tags, ranges, keywordAnswers, answerLabels } ] );
 		setTags( nextTags );
+		setRanges( nextRanges );
+		setKeywordAnswers( nextKeywordAnswers );
 		setAnswerLabels( ( current ) => {
 			const next = { ...current };
 
-			( option.tags_matched || [] ).forEach( ( tag ) => {
-				next[ tag.field ] = option.label;
+			[ ...( option.tags_matched || [] ), ...( option.ranges_matched || [] ) ].forEach( ( criterion ) => {
+				next[ criterion.field ] = option.label;
 			} );
 
 			return next;
@@ -185,7 +203,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 
 		if ( null === upcoming ) {
 			setQuestion( null );
-			void runFinalSearch( nextTags );
+			void runFinalSearch( nextTags, nextKeywordAnswers.map( ( entry ) => entry.words ), nextRanges );
 
 			return;
 		}
@@ -204,6 +222,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setHistory( ( current ) => current.slice( 0, -1 ) );
 		setQuestion( previous.question );
 		setTags( previous.tags );
+		setRanges( previous.ranges || {} );
+		setKeywordAnswers( previous.keywordAnswers || [] );
 		setAnswerLabels( previous.answerLabels );
 		setResults( null );
 		setError( '' );
@@ -215,6 +235,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		abortRef.current?.abort();
 		setHistory( [] );
 		setTags( {} );
+		setRanges( {} );
+		setKeywordAnswers( [] );
 		setAnswerLabels( {} );
 		setResults( null );
 		setError( '' );
@@ -228,6 +250,8 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		setQuestion( firstQuestion( chosen ) );
 		setHistory( [] );
 		setTags( {} );
+		setRanges( {} );
+		setKeywordAnswers( [] );
 		setAnswerLabels( {} );
 		setResults( null );
 		setStepMoves( ( n ) => n + 1 );
@@ -266,7 +290,20 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		);
 	}
 
-	const answers = Object.entries( tags );
+	// A range shows like a filter, under its field. An answer that asked for
+	// words has no field, so it is listed under the question it answered.
+	const answers = [
+		...Object.entries( { ...tags, ...ranges } ).map( ( [ field, value ] ) => ( {
+			key: field,
+			name: humanizeFieldLabel( field, getConfig().fieldLabels ),
+			value: answerLabels[ field ] || value,
+		} ) ),
+		...keywordAnswers.map( ( entry, index ) => ( {
+			key: `keywords-${ index }`,
+			name: entry.question,
+			value: entry.label,
+		} ) ),
+	];
 	const progress = quizProgress( quiz, history.length, question );
 	const hits = results?.hits || [];
 	// The quiz always searches with an empty term, which the service answers on
@@ -359,10 +396,10 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 
 					{ answers.length > 0 && (
 						<ul className="whsc-quiz__answers" aria-label={ __( 'Your answers', 'searcio' ) }>
-							{ answers.map( ( [ field, value ] ) => (
-								<li className="whsc-quiz__answer" key={ field }>
-									<span className="whsc-quiz__answer-field">{ humanizeFieldLabel( field, getConfig().fieldLabels ) }</span>
-									<span className="whsc-quiz__answer-value">{ answerLabels[ field ] || value }</span>
+							{ answers.map( ( answerChip ) => (
+								<li className="whsc-quiz__answer" key={ answerChip.key }>
+									<span className="whsc-quiz__answer-field">{ answerChip.name }</span>
+									<span className="whsc-quiz__answer-value">{ answerChip.value }</span>
 								</li>
 							) ) }
 						</ul>

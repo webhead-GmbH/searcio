@@ -187,6 +187,9 @@ Legal notice: https://searcio.com/impressum
 
 == Changelog ==
 
+= Unreleased =
+- The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
+
 = 1.4.0 =
 - Updated the webhead plugin framework to 1.10.0, which is licensed under the GPL like the plugin.
 - Messages on the settings screen, such as "Placement saved.", appear as WordPress's own notices at the bottom of the window.

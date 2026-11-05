@@ -113,6 +113,18 @@ describe( 'search', () => {
 		expect( url ).toContain( 'page=2' );
 	} );
 
+	it( 'sends each group of required words as its own keywords[] entry', async () => {
+		const api = loadApi();
+
+		await api.search( '', { keywords: [ 'Panzerriegel, Zusatzschloss', '', 'ABUS' ] } );
+
+		const [ url ] = global.fetch.mock.calls[ 0 ];
+
+		expect( url ).toContain( 'keywords%5B0%5D=Panzerriegel%2C+Zusatzschloss' );
+		expect( url ).toContain( 'keywords%5B1%5D=ABUS' );
+		expect( url ).not.toContain( 'keywords%5B2%5D' );
+	} );
+
 	it( 'throws when the response is not ok', async () => {
 		global.fetch.mockResolvedValue( jsonResponse( {}, false, 500 ) );
 		const api = loadApi();
