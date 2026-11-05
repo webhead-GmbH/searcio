@@ -74,11 +74,33 @@ final class Placement_Preview {
 		return self::is_preview() || (bool) $is_preview;
 	}
 
+	/**
+	 * The preview is a page at the site's own address, with settings nobody
+	 * saved and the floating button drawn whether it is on or not: a page
+	 * cache that kept it would hand it to every visitor. WordPress's no-cache
+	 * headers stop a proxy or a CDN that reads them; the caching plugins read
+	 * `DONOTCACHEPAGE` (WP Rocket, W3 Total Cache, WP Super Cache, LiteSpeed
+	 * Cache, SiteGround), and LiteSpeed Cache its action as well.
+	 */
+	public static function keep_out_of_caches(): void {
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- the name the caching plugins read.
+			define( 'DONOTCACHEPAGE', true );
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- LiteSpeed Cache's own action.
+		do_action( 'litespeed_control_set_nocache', 'Searcio preview' );
+
+		nocache_headers();
+	}
+
 	#[Action( 'template_redirect', priority: 1 )]
 	public function render(): void {
 		if ( ! self::is_preview() ) {
 			return;
 		}
+
+		self::keep_out_of_caches();
 
 		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
 
@@ -97,7 +119,6 @@ final class Placement_Preview {
 		$sent    = isset( $_GET['placement'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_GET['placement'] ) ), true ) : null;
 		$options = is_array( $sent ) ? Placement_Options::from_array( $sent ) : $this->config->options();
 
-		nocache_headers();
 		header( 'X-Robots-Tag: noindex, nofollow' );
 		show_admin_bar( false );
 

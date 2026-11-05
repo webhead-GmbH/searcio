@@ -1430,11 +1430,11 @@ msgstr "Tous"
 msgid "Search by %s (opens in a new tab)"
 msgstr "Recherche par %s (s’ouvre dans un nouvel onglet)"
 
-#: includes/Frontend/Placement_Preview.php:87
+#: includes/Frontend/Placement_Preview.php:109
 msgid "This preview opens from the Placement tab of the Searcio settings."
 msgstr "Cet aperçu s’ouvre depuis l’onglet Intégration des réglages de Searcio."
 
-#: includes/Frontend/Placement_Preview.php:88
+#: includes/Frontend/Placement_Preview.php:110
 #: src/admin/settings/components/look/LookEditor.js:332
 #: src/admin/settings/components/tabs/PlacementTab.js:705
 msgid "Preview"
@@ -4586,7 +4586,7 @@ msgid "The preview could not show the last change: %s"
 msgstr "L’aperçu n’a pas pu afficher la dernière modification : %s"
 
 #. translators: %d: width of the preview in pixels.
-#: src/admin/settings/components/look/LookEditor.js:376
+#: src/admin/settings/components/look/LookEditor.js:377
 #, js-format
 msgid "Drawn %dpx wide, in your theme's styles. Type in it to see results and filters."
 msgstr "Dessiné sur %d px de large, dans les styles de votre thème. Tapez-y pour voir les résultats et les filtres."
@@ -4657,7 +4657,6 @@ msgstr "Choisir un forfait"
 msgid "Contact Searcio support"
 msgstr "Contacter le support Searcio"
 
-
 #: includes/Enums/Account_Refusal.php:64
 msgid "Your Searcio payment is overdue"
 msgstr "Votre paiement Searcio est en retard"
@@ -4671,3 +4670,6 @@ msgstr "Searcio n'effectue plus de recherche ni d'indexation pour ce site tant q
 msgid "Go to billing"
 msgstr "Accéder à la facturation"
 
+#: src/admin/settings/components/look/LookPreview.js:158
+msgid "Loading the preview"
+msgstr "Chargement de l'aperçu"
