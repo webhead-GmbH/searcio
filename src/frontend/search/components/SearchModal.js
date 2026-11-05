@@ -856,8 +856,10 @@ const SearchModal = ({
 			setVisualPreview('');
 			void loadHighlights(scopeType || '', {}, {});
 
-			if (403 === e.status) {
-				// The capability said yes but the site has since turned it off.
+			if (403 === e.status || 402 === e.status) {
+				// The capability said yes but the site has since turned it off,
+				// or the account has no active plan any more: another photo
+				// would be refused the same way.
 				setVisualEnabled(false);
 				setError(__('Photo search is not available on this store.', 'searcio'));
 			} else if (422 === e.status) {

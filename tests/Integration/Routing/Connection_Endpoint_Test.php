@@ -13,6 +13,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Routing;
 
 use WP_REST_Request;
 use WP_REST_Server;
+use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
@@ -75,6 +76,49 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertTrue( $data['plan']['is_free'] );
 		$this->assertSame( 'Free', $data['plan']['name'] );
 		$this->assertSame( 'https://search.example.com/acme/billing', $data['plan']['upgrade_url'] );
+	}
+
+	/**
+	 * The keys work, so the check is `ok`, and still nothing does: the tab
+	 * says why, in the reader's language, and where to go from there.
+	 */
+	public function test_test_connection_says_when_searcio_does_not_serve_the_account(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok(
+			[
+				'site'    => [ 'id' => 7, 'status' => 'connected' ],
+				'account' => [ 'served' => false, 'reason' => 'account_suspended', 'support_url' => 'https://searcio.test/acme/support' ],
+				'plan'    => [ 'id' => 4, 'is_free' => false, 'upgrade_url' => 'https://searcio.test/acme/billing' ],
+			]
+		) );
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
+
+		$this->assertTrue( $data['ok'] );
+		$this->assertSame(
+			[
+				'served'      => false,
+				'reason'      => 'account_suspended',
+				'title'       => Account_Refusal::Suspended->label(),
+				'message'     => Account_Refusal::Suspended->message(),
+				'support_url' => 'https://searcio.test/acme/support',
+			],
+			$data['account']
+		);
+		$this->assertSame( 'https://searcio.test/acme/billing', $data['plan']['upgrade_url'] );
+	}
+
+	/** A service from before the refusal says nothing about the account, and serves it. */
+	public function test_test_connection_reads_an_answer_without_account_as_served(): void {
+		$this->login_admin();
+		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected' ] ] ) );
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
+
+		$this->assertTrue( $data['account']['served'] );
+		$this->assertNull( $data['account']['reason'] );
+		$this->assertNull( $data['account']['message'] );
+		$this->assertSame( untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/login', $data['account']['support_url'] );
 	}
 
 	/**

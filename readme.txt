@@ -185,6 +185,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = Unreleased =
+- When your Searcio account has no active plan, has an overdue payment or is suspended, the Connection tab and Site Health say so, with a link to choose a plan, to pay on the billing page or to contact support. Syncing stops at once instead of trying again for an hour, and picks up again once your account is active. Meanwhile a search your shoppers submit goes to WordPress's own search.
 - Support Searcio, the small logo in the search window, is off unless you turn it on, on every plan. If you had turned it on, it stays on.
 - Security: when you connect, the address Searcio calls to confirm that the site is yours answers only to the one-time code that connect sent, and only once.
 - The styles of the search block, the shortcode, the widgets, the floating button and the look editor are added through WordPress's stylesheet queue instead of being printed into the page.
