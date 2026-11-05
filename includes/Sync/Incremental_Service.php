@@ -9,6 +9,7 @@
  * aggregated sync_runs row (trigger = incremental). Dirty tracking is honoured,
  * so an upsert whose document has not changed is skipped. Reschedules itself
  * while the queue is non-empty, and yields to a full sync if one is running.
+ * An account the service does not serve stops it until the next change.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -115,9 +116,17 @@ final class Incremental_Service {
 
 				$pushed += count( $documents );
 			} else {
-				// Leave the rows queued and retry later; a plan limit needs admin action.
+				$refusal = $response->account_refusal();
+
+				// Leave the rows queued and retry later; a plan limit needs admin
+				// action. An account the service does not serve is not tried again
+				// at all: it refuses every try until the owner has a plan again, and
+				// the next change, or the next scheduled sync, finds out when.
 				$failed += count( $documents );
-				$this->reschedule( self::RETRY_DELAY );
+
+				if ( null === $refusal ) {
+					$this->reschedule( self::RETRY_DELAY );
+				}
 
 				// Every failure is recorded, not only a plan limit: a run in the
 				// history with no reason is the hardest kind of sync problem to
@@ -126,7 +135,7 @@ final class Incremental_Service {
 					0,
 					0,
 					$failed,
-					$response->is_plan_limit() ? $this->plan_limit_message() : $this->failure_message( $response )
+					$refusal?->message() ?? ( $response->is_plan_limit() ? $this->plan_limit_message() : $this->failure_message( $response ) )
 				);
 
 				return;
@@ -137,9 +146,23 @@ final class Incremental_Service {
 		$delete_error = null;
 		$removed      = [];
 		$refused      = [];
+		$refusal      = null;
 
-		foreach ( $delete_docs as $doc_id ) {
+		foreach ( $delete_docs as $index => $doc_id ) {
 			$response = $this->client->delete( $doc_id );
+			$refusal  = $response->account_refusal();
+
+			// Every delete after this one would be refused the same way. They
+			// all go to the full sync's prune phase, which sends them again
+			// once the account is served.
+			if ( null !== $refusal ) {
+				$rest         = array_slice( $delete_docs, $index );
+				$refused      = array_merge( $refused, $rest );
+				$failed      += count( $rest );
+				$delete_error = $refusal->message();
+
+				break;
+			}
 
 			if ( $response->ok() || 404 === $response->status ) {
 				$this->dirty->clear_for_document( $doc_id );
@@ -171,7 +194,7 @@ final class Incremental_Service {
 			$this->state->record_incremental( $pushed, $deleted, $failed, $delete_error );
 		}
 
-		if ( $this->queue->pending_count() > 0 ) {
+		if ( null === $refusal && $this->queue->pending_count() > 0 ) {
 			$this->reschedule( self::FOLLOWUP_DELAY );
 		}
 	}

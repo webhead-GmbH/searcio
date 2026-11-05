@@ -17,7 +17,9 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Health;
 
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
+use Webhead\WP\SearchCloud\Routing\Connection_Endpoint;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Health_Result;
@@ -137,12 +139,55 @@ final class Health_Tests {
 			)->to_wordpress_result();
 		}
 
+		// Searcio answers the health check whatever the account's state, so a
+		// reachable service can still be refusing every search and sync.
+		$refusal = Account_Refusal::from_health( $response->body() );
+
+		if ( null !== $refusal ) {
+			return Health_Result::critical(
+				test: 'searcio_connection_reachable',
+				label: $refusal->label(),
+				badge_label: 'Searcio',
+				description: '<p>' . esc_html( $refusal->message() ) . '</p>',
+				actions: $this->refusal_action( $refusal, $response->body() )
+			)->to_wordpress_result();
+		}
+
 		return Health_Result::good(
 			test: 'searcio_connection_reachable',
 			label: __( 'Searcio is reachable', 'searcio' ),
 			badge_label: 'Searcio',
 			description: '<p>' . esc_html__( 'The last health check succeeded.', 'searcio' ) . '</p>'
 		)->to_wordpress_result();
+	}
+
+	/**
+	 * The way back from a refusal: the plan the account is missing, the
+	 * billing page an overdue payment is settled on (the plan's upgrade link
+	 * leads there), or support, which only the platform can lift a suspension
+	 * through.
+	 *
+	 * @param  array<string,mixed>  $health  The `/health` body.
+	 */
+	private function refusal_action( Account_Refusal $refusal, array $health ): string {
+		$plan_url = $health['plan']['upgrade_url'] ?? null;
+		$plan_url = is_string( $plan_url ) ? esc_url_raw( $plan_url, [ 'https', 'http' ] ) : '';
+
+		[ $url, $text ] = match ( $refusal ) {
+			Account_Refusal::NoActivePlan   => [ $plan_url, __( 'Choose a plan', 'searcio' ) ],
+			Account_Refusal::PaymentOverdue => [ $plan_url, __( 'Go to billing', 'searcio' ) ],
+			Account_Refusal::Suspended      => [ Connection_Endpoint::support_url( $health['account']['support_url'] ?? null ), __( 'Contact Searcio support', 'searcio' ) ],
+		};
+
+		if ( '' === $url ) {
+			return '';
+		}
+
+		return sprintf(
+			'<p><a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a></p>',
+			esc_url( $url ),
+			esc_html( $text )
+		);
 	}
 
 	/**
