@@ -152,7 +152,7 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 
 		// A zero budget is "every document is already over time", which is what a
 		// slow API looks like without making the test wait for one.
-		add_filter( 'searcio/sync/tick_budget', static fn(): int => 0 );
+		add_filter( 'searcio_sync_tick_budget', static fn(): int => 0 );
 
 		$this->fake_http( fn(): array => $this->http_ok( [] ) );
 

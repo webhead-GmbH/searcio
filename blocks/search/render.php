@@ -15,6 +15,7 @@ use Webhead\WP\SearchCloud\Frontend\Inline_Styles;
 use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Frontend\Style_Tokens;
 use Webhead\WP\SearchCloud\Frontend\Trigger_Markup;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,10 +29,13 @@ $searcio_instance_class = '' !== $searcio_instance_id ? 'whsc-instance-' . $sear
 // onto it for these custom properties to reach it.
 Inline_Styles::add( $searcio_instance_class, Style_Tokens::rule( $searcio_instance_class, $attributes ) );
 
-printf(
-	'<div %1$s>%2$s</div>',
-	wp_kses_data(
-		get_block_wrapper_attributes( [ 'class' => 'searcio-search-block' ] )
+// The markup a shortcode may print, as the framework lists it: the trigger is
+// an empty `div` with `data-*` attributes, which the list keeps.
+echo wp_kses(
+	sprintf(
+		'<div %1$s>%2$s</div>',
+		get_block_wrapper_attributes( [ 'class' => 'searcio-search-block' ] ),
+		Trigger_Markup::render( array_merge( $attributes, [ 'instanceClass' => $searcio_instance_class ] ) )
 	),
-	Trigger_Markup::render( array_merge( $attributes, [ 'instanceClass' => $searcio_instance_class ] ) ) // phpcs:ignore -- markup is escaped inside Trigger_Markup::render().
+	Allowed_Html::defaults()
 );

@@ -30,6 +30,7 @@ use Webhead\WP\SearchCloud\DTO\Search_Placement;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Assets\Asset_Registry;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -148,7 +149,7 @@ final class Site_Placement {
 
 		$options = $this->config->options();
 
-		echo $this->surface->site( $this->config->search(), $options->floating ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by Trigger_Markup and Style_Tokens.
+		echo wp_kses( $this->surface->site( $this->config->search(), $options->floating ), Allowed_Html::defaults() );
 	}
 
 	/**

@@ -28,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
 final class Inline_Styles {
 	/**
 	 * @param  string  $id   The instance class the CSS is written for.
-	 * @param  string  $css  Rules, without a `<style>` element.
+	 * @param  string  $css  Rules alone, with no style element around them.
 	 */
 	public static function add( string $id, string $css ): void {
 		$id = (string) preg_replace( '/[^a-zA-Z0-9_-]/', '', $id );

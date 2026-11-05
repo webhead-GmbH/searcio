@@ -60,7 +60,7 @@ final class Frontend_Config {
 	 * storefront marks them `preview`, which Searcio meters but does not count
 	 * in the site's search statistics.
 	 *
-	 * Filterable through `searcio/storefront/is_preview` for an
+	 * Filterable through `searcio_storefront_is_preview` for an
 	 * editor this list does not know.
 	 */
 	private function is_preview(): bool {
@@ -73,7 +73,7 @@ final class Frontend_Config {
 			}
 		}
 
-		return (bool) apply_filters( 'searcio/storefront/is_preview', $editor );
+		return (bool) apply_filters( 'searcio_storefront_is_preview', $editor );
 	}
 
 	/**

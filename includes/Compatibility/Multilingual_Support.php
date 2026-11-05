@@ -73,6 +73,7 @@ final class Multilingual_Support {
 	 * @return array<int,array{code:string,name:string}>
 	 */
 	private function wpml_active_languages(): array {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filter, asked as WPML documents it.
 		$languages = apply_filters( 'wpml_active_languages', null, [ 'skip_missing' => 0 ] );
 
 		if ( ! is_array( $languages ) ) {
@@ -93,14 +94,13 @@ final class Multilingual_Support {
 	private function wpml_post_language( int $post_id ): ?string {
 		$post_type = get_post_type( $post_id );
 
-		$details = apply_filters(
-			'wpml_element_language_details',
-			null,
-			[
-				'element_id'   => $post_id,
-				'element_type' => false !== $post_type ? 'post_' . $post_type : 'post',
-			]
-		);
+		$args = [
+			'element_id'   => $post_id,
+			'element_type' => false !== $post_type ? 'post_' . $post_type : 'post',
+		];
+
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filter, asked as WPML documents it.
+		$details = apply_filters( 'wpml_element_language_details', null, $args );
 
 		$code = is_object( $details ) ? ( $details->language_code ?? null ) : null;
 

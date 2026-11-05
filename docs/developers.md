@@ -145,25 +145,27 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
 
 ### Filters
 
-- **`searcio/index/allow_protected_meta`** - `(bool $allow, string $meta_key, WP_Post $post)`. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
+The plugin's filters are named `searcio_{area}_{name}`, in WordPress's own form, which Plugin Check reads as carrying the plugin's prefix. The framework's two actions in `searcio.php` keep theirs, `searcio/before_load` and `searcio/after_load`.
+
+- **`searcio_index_allow_protected_meta`** - `(bool $allow, string $meta_key, WP_Post $post)`. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
 
   ```php
-  add_filter( 'searcio/index/allow_protected_meta', function ( $allow, $key ) {
+  add_filter( 'searcio_index_allow_protected_meta', function ( $allow, $key ) {
       return '_my_public_field' === $key ? true : $allow;
   }, 10, 2 );
   ```
 
-- **`searcio/storefront/facet_display`** - `(string $display, string $field)`. How the search window draws a field's values in its filter panels: `auto` (the default: colour pills when every value has a colour, image pills when every value has an image, tiles for sizes, shoe sizes and capacities, a checkbox list otherwise), `list`, `tiles`, `color`, `image` or `range`. Anything else is `auto`. `color` and `image` draw pills as soon as one value has a colour or an image, and a value that has none is an empty ring; with none at all they are a list. The filter is given `tiles` for an attribute a swatches plugin shows as labels or buttons, and `color` or `image` for one the shop set up as colour or image swatches, by the attribute's type or by a swatch type the plugin keeps per term, so a value the shop has not given a swatch yet does not turn the whole group into a list:
+- **`searcio_storefront_facet_display`** - `(string $display, string $field)`. How the search window draws a field's values in its filter panels: `auto` (the default: colour pills when every value has a colour, image pills when every value has an image, tiles for sizes, shoe sizes and capacities, a checkbox list otherwise), `list`, `tiles`, `color`, `image` or `range`. Anything else is `auto`. `color` and `image` draw pills as soon as one value has a colour or an image, and a value that has none is an empty ring; with none at all they are a list. The filter is given `tiles` for an attribute a swatches plugin shows as labels or buttons, and `color` or `image` for one the shop set up as colour or image swatches, by the attribute's type or by a swatch type the plugin keeps per term, so a value the shop has not given a swatch yet does not turn the whole group into a list:
 
   ```php
-  add_filter( 'searcio/storefront/facet_display', function ( $display, $field ) {
+  add_filter( 'searcio_storefront_facet_display', function ( $display, $field ) {
       return 'attr_fit' === $field ? 'tiles' : $display;
   }, 10, 2 );
   ```
 
-- **`searcio/storefront/facet_colors`** - `(array $colors, string $field, string $taxonomy)`. Value => hex colour for a field's values, in the language of the page. The plugin fills it for a WooCommerce attribute a swatches plugin has dressed (see below); `$taxonomy` is empty for a field that is not an attribute. A value without a valid hex colour is dropped.
+- **`searcio_storefront_facet_colors`** - `(array $colors, string $field, string $taxonomy)`. Value => hex colour for a field's values, in the language of the page. The plugin fills it for a WooCommerce attribute a swatches plugin has dressed (see below); `$taxonomy` is empty for a field that is not an attribute. A value without a valid hex colour is dropped.
 
-- **`searcio/storefront/facet_images`** - `(array $images, string $field, string $taxonomy)`. Value => image address, in the same way. An address that is not `http` or `https` is dropped. Use it, with `facet_colors`, for a theme or a plugin the list below does not name.
+- **`searcio_storefront_facet_images`** - `(array $images, string $field, string $taxonomy)`. Value => image address, in the same way. An address that is not `http` or `https` is dropped. Use it, with `facet_colors`, for a theme or a plugin the list below does not name.
 
 **Swatches.** What a swatches plugin or a theme set for an attribute's terms reaches the filters by itself, in `Swatch_Reader`, with the keys read from each one's own source and each checked by saving swatches in its own admin screens. The attribute's type (`wc_get_attribute()`) says which counts, since a plugin keeps what was set before the type changed:
 
@@ -188,16 +190,16 @@ An image may be an attachment's id, which gives its thumbnail, or an address. `c
 
 **The category filter** is set on the Search Config tab (`category_filter`: `all`, `main` or `nested`; `category_filter_depth`). `Facet_Config` then hands the `categories` filter a `tree`, the levels to show and each category's parent by name, read from `product_cat` and `category`, and `arrangeTree()` in `src/utils/facets.js` draws it. A search answers with names, so two categories of one name are one value, a main one if either is. The WooCommerce mapping writes every ancestor of a product's categories (`Term_Names::for_post()` with `$with_ancestors`), so picking a main category finds the products in its subcategories. A field mapped from a taxonomy, such as `taxonomy:category`, sends only the terms the post carries.
 
-- **`searcio/storefront/is_preview`** - `(bool $is_preview)`. Whether the page is a page builder's editor, whose searches Searcio meters but keeps out of the site's statistics. The plugin knows Elementor, Divi, Beaver Builder, Oxygen, WPBakery's frontend editor and Bricks by their editor's address, and the Customizer; return `true` for another editor:
+- **`searcio_storefront_is_preview`** - `(bool $is_preview)`. Whether the page is a page builder's editor, whose searches Searcio meters but keeps out of the site's statistics. The plugin knows Elementor, Divi, Beaver Builder, Oxygen, WPBakery's frontend editor and Bricks by their editor's address, and the Customizer; return `true` for another editor:
 
   ```php
-  add_filter( 'searcio/storefront/is_preview', function ( $is_preview ) {
+  add_filter( 'searcio_storefront_is_preview', function ( $is_preview ) {
       return $is_preview || isset( $_GET['my_builder_edit'] );
   } );
   ```
 
 - **`woocommerce_product_is_visible`** - WooCommerce's own filter, `(bool $visible, int $product_id)`, is also applied when a product mapping has "Only index published, visible products" on. The value it receives is whether WooCommerce's search would list the product (`Woo::is_visible_product()`), not whether the shop would, and a callback runs where the sync runs - WP-Cron, WP-CLI or REST - so `is_search()` is false and there is usually no logged-in user. Return `false` to keep a product out of the index.
-- **`searcio/sync/tick_budget`** - `(int $budget)`. How many seconds one tick of a full sync may run, checked between batches, 20 by default. Lower it where PHP's execution limit is shorter, so a tick ends before it is stopped.
+- **`searcio_sync_tick_budget`** - `(int $budget)`. How many seconds one tick of a full sync may run, checked between batches, 20 by default. Lower it where PHP's execution limit is shorter, so a tick ends before it is stopped.
 
 ## Testing
 

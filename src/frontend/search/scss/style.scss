@@ -3812,7 +3812,10 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 	&:checked {
 		border-color: var(--whsc-accent-strong);
-		background: var(--whsc-accent-strong) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 13px no-repeat;
+		// The tick, a white check mark: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>.
+		// In base64, which the build keeps as it is, so the stylesheet names no
+		// address a reader could take for a file fetched from elsewhere.
+		background: var(--whsc-accent-strong) url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCcgZmlsbD0nbm9uZScgc3Ryb2tlPSd3aGl0ZScgc3Ryb2tlLXdpZHRoPSczLjInIHN0cm9rZS1saW5lY2FwPSdyb3VuZCcgc3Ryb2tlLWxpbmVqb2luPSdyb3VuZCc+PHBhdGggZD0nbTUgMTIuNSA0LjUgNC41TDE5IDcuNScvPjwvc3ZnPg==") center / 13px no-repeat;
 	}
 
 	&:disabled {

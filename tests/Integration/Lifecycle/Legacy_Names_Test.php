@@ -35,9 +35,9 @@ final class Legacy_Names_Test extends Integration_Test_Case {
 		$this->setExpectedDeprecated( 'webhead_search_cloud/sync/tick_budget' );
 
 		add_filter( 'webhead_search_cloud/sync/tick_budget', static fn (): int => 7 );
-		add_filter( 'searcio/sync/tick_budget', static fn ( int $budget ): int => $budget + 1 );
+		add_filter( 'searcio_sync_tick_budget', static fn ( int $budget ): int => $budget + 1 );
 
-		$this->assertSame( 8, apply_filters( 'searcio/sync/tick_budget', 20 ) );
+		$this->assertSame( 8, apply_filters( 'searcio_sync_tick_budget', 20 ) );
 	}
 
 	public function test_the_settings_page_under_its_first_address_leads_to_the_new_one(): void {

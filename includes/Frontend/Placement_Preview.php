@@ -22,6 +22,7 @@ use Webhead\WP\SearchCloud\DTO\Floating_Button;
 use Webhead\WP\SearchCloud\DTO\Placement_Options;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -68,7 +69,7 @@ final class Placement_Preview {
 	 * marks them `preview`, which Searcio meters but keeps out of the site's
 	 * search statistics.
 	 */
-	#[Filter( 'searcio/storefront/is_preview' )]
+	#[Filter( 'searcio_storefront_is_preview' )]
 	public function mark_preview( mixed $is_preview ): bool {
 		return self::is_preview() || (bool) $is_preview;
 	}
@@ -93,7 +94,7 @@ final class Placement_Preview {
 		$view = in_array( $view, self::VIEWS, true ) ? $view : 'trigger';
 
 		// Settings the admin has not saved yet, cleaned as a save would clean them.
-		$sent    = isset( $_GET['placement'] ) ? json_decode( wp_unslash( $_GET['placement'] ), true ) : null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- cleaned field by field by Placement_Options.
+		$sent    = isset( $_GET['placement'] ) ? json_decode( sanitize_textarea_field( wp_unslash( $_GET['placement'] ) ), true ) : null;
 		$options = is_array( $sent ) ? Placement_Options::from_array( $sent ) : $this->config->options();
 
 		nocache_headers();
@@ -137,7 +138,7 @@ final class Placement_Preview {
 </head>
 <body <?php body_class( [ 'searcio-preview', 'searcio-preview--' . $view ] ); ?>>
 	<?php
-	echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by Trigger_Markup.
+	echo wp_kses( $markup, Allowed_Html::defaults() );
 	wp_footer();
 	?>
 </body>
