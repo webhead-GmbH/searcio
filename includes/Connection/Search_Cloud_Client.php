@@ -176,13 +176,6 @@ final class Search_Cloud_Client {
 		return rtrim( (string) $host, '/' ) . '/api/v1';
 	}
 
-	private function is_development(): bool {
-		// The constant had the plugin's first name until 1.4.0, and a development
-		// site may still define it so.
-		return ( defined( 'SEARCIO_DEVELOPMENT' ) && SEARCIO_DEVELOPMENT )
-			|| ( defined( 'WEBHEAD_SEARCH_CLOUD_DEVELOPMENT' ) && WEBHEAD_SEARCH_CLOUD_DEVELOPMENT );
-	}
-
 	/**
 	 * @param  array<string,mixed>|null  $body
 	 */
@@ -198,11 +191,13 @@ final class Search_Cloud_Client {
 			$headers['X-Write-Secret'] = $write_secret;
 		}
 
+		// The certificate is always verified, WordPress's default. A development
+		// site whose service has a certificate of a local authority says so for
+		// its own host with the `http_request_args` filter.
 		$args = [
-			'method'    => $method,
-			'timeout'   => self::TIMEOUT,
-			'sslverify' => ! $this->is_development(),
-			'headers'   => $headers,
+			'method'  => $method,
+			'timeout' => self::TIMEOUT,
+			'headers' => $headers,
 		];
 
 		if ( null !== $body ) {

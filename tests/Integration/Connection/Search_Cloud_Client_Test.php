@@ -48,4 +48,29 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertSame( 'DELETE', $captured['method'] );
 		$this->assertSame( 'test-write-key', $captured['headers']['X-Write-Key'] );
 	}
+
+	/**
+	 * The certificate is verified on every request, with the development
+	 * constant that once turned that off defined as well. A local service with
+	 * a certificate of its own authority is the development site's to allow.
+	 */
+	public function test_every_request_verifies_the_certificate(): void {
+		if ( ! defined( 'WEBHEAD_SEARCH_CLOUD_DEVELOPMENT' ) ) {
+			define( 'WEBHEAD_SEARCH_CLOUD_DEVELOPMENT', true );
+		}
+
+		$this->connect_client();
+
+		$verify = [];
+		$this->fake_http( function ( string $url, array $args ) use ( &$verify ): array {
+			$verify[] = $args['sslverify'];
+
+			return $this->http_ok( [ 'status' => 'ok' ] );
+		} );
+
+		$this->client()->health();
+		$this->client()->disconnect();
+
+		$this->assertSame( [ true, true ], $verify );
+	}
 }
