@@ -198,17 +198,17 @@ final class Legacy_Slug {
 			}
 
 			if ( self::table_exists( $new ) ) {
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- a table name, built from the prefix.
-				if ( (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$new}`" ) > 0 ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- a one-time move of the plugin's own tables.
+				if ( (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $new ) ) > 0 ) {
 					continue;
 				}
 
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- as above.
-				$wpdb->query( "DROP TABLE `{$new}`" );
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- as above.
+				$wpdb->query( $wpdb->prepare( 'DROP TABLE %i', $new ) );
 			}
 
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- as above.
-			$wpdb->query( "RENAME TABLE `{$old}` TO `{$new}`" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- as above.
+			$wpdb->query( $wpdb->prepare( 'RENAME TABLE %i TO %i', $old, $new ) );
 		}
 	}
 

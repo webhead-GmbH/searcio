@@ -22,6 +22,7 @@ use Elementor\Controls_Manager;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Product_List_Markup;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Elementor\Widget;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Shortcodes\Allowed_Html;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -180,9 +181,8 @@ class Products_Widget extends Widget {
 			]
 		);
 
-		// Echoed as built, not through kses: kses strips the `data-*` attributes
-		// the front-end hydrates from. Every part is escaped inside
-		// Product_List_Markup::render().
-		echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup is escaped inside Product_List_Markup::render().
+		// The row is an empty `div` with `data-*` attributes, which the
+		// framework's list of a shortcode's markup keeps.
+		echo wp_kses( $markup, Allowed_Html::defaults() );
 	}
 }

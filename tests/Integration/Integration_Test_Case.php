@@ -117,6 +117,28 @@ abstract class Integration_Test_Case extends Framework_Test_Case {
 	 * @param  array<string,mixed>  $body
 	 * @return array<string,mixed>
 	 */
+	/**
+	 * The CSS the plugin handed WordPress to print inline, in the order it is
+	 * printed. A test that reads it starts from empty styles ({@see self::reset_styles()}).
+	 */
+	protected function inline_styles(): string {
+		$css = [];
+
+		foreach ( wp_styles()->queue as $handle ) {
+			$after = wp_styles()->get_data( $handle, 'after' );
+
+			if ( str_starts_with( $handle, \Webhead\WP\SearchCloud\PLUGIN_SLUG . '-' ) && is_array( $after ) ) {
+				$css = array_merge( $css, $after );
+			}
+		}
+
+		return implode( "\n", $css );
+	}
+
+	protected function reset_styles(): void {
+		$GLOBALS['wp_styles'] = null;
+	}
+
 	protected function http_ok( array $body = [], int $status = 200 ): array {
 		return [
 			'headers'  => [],

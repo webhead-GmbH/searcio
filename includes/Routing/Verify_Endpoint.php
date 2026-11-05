@@ -3,19 +3,20 @@
  * Domain-ownership verification callback for the zero-friction connect flow.
  *
  * `Connection_Endpoint::connect()` sends this route's URL as `verify_url` on
- * `POST /connect`. After a new-account connect, Searcio pings
- * `GET {verify_url}?token=<hmac>` in the background and expects
- * `{"write_key": "<the write key you were issued>"}` back - see
+ * `POST /connect`, with a one-time code in its path. After a new-account
+ * connect, Searcio pings `GET {verify_url}?token=<hmac>` in the background
+ * and expects `{"write_key": "<the write key you were issued>"}` back - see
  * docs/api/building-a-plugin.md "Domain ownership verification (informational)".
- * The `token` proves itself on Searcio's side when it compares our
- * response against its own record of the write key it issued; this plugin
- * has no way to recompute it (it's derived from Searcio's own secret)
- * and doesn't need to try - which is also why its presence protects nothing:
- * `?token=x` passes that check. What keeps the write key from a scanner is the
- * verification window {@see Connection_State::open_verification_window()}
- * opens when this site starts a connection; outside it the route answers 404.
- * This route only ever echoes the write key already stored locally and never
- * exposes the write secret.
+ *
+ * The `token` is an HMAC over Searcio's own application key, which this
+ * plugin cannot recompute, so it protects nothing here. The code does: this
+ * site sent it to Searcio alone, over HTTPS, and the route answers only a
+ * request that carries it, only while the connection attempt that sent it can
+ * still be answered ({@see Connection_State::open_verification_window()}),
+ * and only once. Any other request is told the route does not exist. It is in
+ * the path because Searcio replaces the query string of `verify_url` with its
+ * own. The route only ever answers with the write key already stored locally
+ * and never exposes the write secret.
  *
  * Deliberately registered under `search-cloud/v1`, not this plugin's own
  * `searcio/v1` namespace, so the URL sent as `verify_url` stays
@@ -29,6 +30,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Routing;
 
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
@@ -51,39 +53,28 @@ final class Verify_Endpoint extends Rest_API {
 		return 'search-cloud/v1';
 	}
 
-	#[Route( '/verify', methods: 'GET', permission_callback: 'is_public', args: [ 'token' => [ 'type' => 'string' ] ] )]
+	#[Route( '/verify/(?P<code>[A-Za-z0-9]{32})', methods: 'GET', permission_callback: 'is_searcio', args: [ 'token' => [ 'type' => 'string' ] ] )]
 	public function verify( WP_REST_Request $request ): WP_REST_Response {
-		/*
-		 * The only legitimate caller is Searcio's domain-ownership ping,
-		 * which carries `?token=<hmac>`. That HMAC is computed over the
-		 * service's own application key, so no plugin can ever recompute it -
-		 * requiring the parameter proves nothing about who is asking, and on
-		 * its own it handed the write key to anyone who appended `?token=x`.
-		 *
-		 * What can be checked is timing. The ping is dispatched once, minutes
-		 * after this site asked to be connected, and is never repeated - so the
-		 * route answers only while a connection attempt this site started is
-		 * still expecting it, and is closed the rest of the time.
-		 */
-		if ( '' === trim( (string) $request->get_param( 'token' ) ) ) {
-			return new WP_REST_Response( [ 'message' => __( 'Missing verification token.', 'searcio' ) ], 400 );
-		}
-
-		if ( ! $this->connection_state->verification_window_is_open() ) {
-			return new WP_REST_Response(
-				[ 'message' => __( 'No verification is in progress.', 'searcio' ) ],
-				404
-			);
-		}
-
 		if ( ! $this->client->is_configured() ) {
 			return new WP_REST_Response( [ 'message' => __( 'Not connected.', 'searcio' ) ], 404 );
 		}
 
+		$this->connection_state->close_verification_window();
+
 		return new WP_REST_Response( [ 'write_key' => $this->client->write_key() ] );
 	}
 
-	public function is_public(): bool {
-		return true;
+	/**
+	 * Whether the request is Searcio's ownership ping: it carries the code
+	 * this site sent with its last connection attempt, while that attempt can
+	 * still be answered. No user is signed in for it, so the code is what is
+	 * checked. Anything else is told the route does not exist.
+	 */
+	public function is_searcio( WP_REST_Request $request ): bool|WP_Error {
+		if ( $this->connection_state->verification_code_matches( (string) $request->get_param( 'code' ) ) ) {
+			return true;
+		}
+
+		return new WP_Error( 'rest_no_route', __( 'No verification is in progress.', 'searcio' ), [ 'status' => 404 ] );
 	}
 }

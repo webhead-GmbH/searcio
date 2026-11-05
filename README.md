@@ -31,8 +31,7 @@
   and so on), with a minimum/maximum for numeric fields such as price or rating. The filters sit in one bar under the
   search field and apply as they are picked, in a popover, a side drawer or, on a phone, a sheet. Categories can be listed
   in one list, as main categories only, or as the shop's tree; an attribute's swatches from a swatches plugin or theme
-  show as color, image or label pills; and a field can need every picked value (AND) instead of any (OR) once Searcio
-  offers it.
+  show as color, image or label pills; and a field can need every picked value (AND) instead of any (OR).
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, themeable with no code: colors, sizes, radius

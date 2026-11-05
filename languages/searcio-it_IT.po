@@ -46,7 +46,7 @@ msgstr "Searcio"
 
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:161
-#: includes/Frontend/Frontend_Config.php:191
+#: includes/Frontend/Frontend_Config.php:183
 #: src/admin/settings/components/tabs/PlacementTab.js:910
 #: src/frontend/search/components/SearchInput.js:33
 #: src/frontend/search/components/SearchModal.js:1732
@@ -259,7 +259,7 @@ msgid "Placeholder text"
 msgstr "Testo segnaposto"
 
 #: includes/Elementor/Widgets/Search_Widget.php:153
-#: includes/Frontend/Frontend_Config.php:176
+#: includes/Frontend/Frontend_Config.php:168
 #: src/blocks/search/edit.js:127
 msgid "Search…"
 msgstr "Cerca…"
@@ -1363,69 +1363,69 @@ msgstr "Colore punti"
 msgid "Dot color (active)"
 msgstr "Colore punti (attivo)"
 
-#: includes/Frontend/Frontend_Config.php:177
+#: includes/Frontend/Frontend_Config.php:169
 #: src/frontend/search/components/SearchModal.js:1567
 #: src/frontend/search/components/SearchModal.js:1983
 msgid "No results found."
 msgstr "Nessun risultato trovato."
 
-#: includes/Frontend/Frontend_Config.php:178
+#: includes/Frontend/Frontend_Config.php:170
 #: src/frontend/search/components/SearchModal.js:1968
 msgid "Searching…"
 msgstr "Ricerca in corso…"
 
 #. translators: shown before a variable product's lowest price, e.g. "from €42".
-#: includes/Frontend/Frontend_Config.php:180
+#: includes/Frontend/Frontend_Config.php:172
 msgctxt "variable product price prefix"
 msgid "from"
 msgstr "da"
 
-#: includes/Frontend/Frontend_Config.php:181
+#: includes/Frontend/Frontend_Config.php:173
 #: src/frontend/search/components/templates.js:116
 msgid "Sale"
 msgstr "In offerta"
 
-#: includes/Frontend/Frontend_Config.php:182
+#: includes/Frontend/Frontend_Config.php:174
 #: src/frontend/search/components/SearchModal.js:754
 #: src/frontend/search/components/SearchModal.js:1300
 msgid "Search is unavailable right now."
 msgstr "La ricerca non è disponibile al momento."
 
-#: includes/Frontend/Frontend_Config.php:183
+#: includes/Frontend/Frontend_Config.php:175
 #: src/frontend/search/components/Browse.js:85
 msgid "Recent searches"
 msgstr "Ricerche recenti"
 
-#: includes/Frontend/Frontend_Config.php:184
+#: includes/Frontend/Frontend_Config.php:176
 #: src/admin/settings/components/tabs/SearchConfigTab.js:231
 #: src/admin/settings/components/tabs/SearchConfigTab.js:239
 #: src/frontend/search/components/Browse.js:118
 msgid "Popular searches"
 msgstr "Ricerche popolari"
 
-#: includes/Frontend/Frontend_Config.php:185
+#: includes/Frontend/Frontend_Config.php:177
 #: src/frontend/search/components/SearchInput.js:53
 msgid "Clear"
 msgstr "Cancella"
 
-#: includes/Frontend/Frontend_Config.php:186
+#: includes/Frontend/Frontend_Config.php:178
 #: src/frontend/search/components/SearchModal.js:1807
 #: src/frontend/search/components/SearchModal.js:1861
 msgid "Close search"
 msgstr "Chiudi la ricerca"
 
-#: includes/Frontend/Frontend_Config.php:187
+#: includes/Frontend/Frontend_Config.php:179
 #: src/frontend/search/components/SearchModal.js:1848
 msgid "Search by voice"
 msgstr "Cerca con la voce"
 
-#: includes/Frontend/Frontend_Config.php:188
+#: includes/Frontend/Frontend_Config.php:180
 #: src/frontend/search/components/FilterBar.js:151
 msgid "All"
 msgstr "Tutti"
 
 #. translators: %s: the name of the search service, "Searcio".
-#: includes/Frontend/Frontend_Config.php:190
+#: includes/Frontend/Frontend_Config.php:182
 #, php-format
 msgid "Search by %s (opens in a new tab)"
 msgstr "Ricerca offerta da %s (si apre in una nuova scheda)"
@@ -1601,47 +1601,47 @@ msgstr "Autore"
 msgid "You must accept the Terms of Service and Privacy Policy to connect."
 msgstr "Per connetterti devi accettare i Termini di servizio e l'Informativa sulla privacy."
 
-#: includes/Routing/Connection_Endpoint.php:154
+#: includes/Routing/Connection_Endpoint.php:156
 msgid "Could not reach Searcio. Try again."
 msgstr "Impossibile raggiungere Searcio. Riprova."
 
-#: includes/Routing/Connection_Endpoint.php:161
+#: includes/Routing/Connection_Endpoint.php:163
 msgid "Could not disconnect from Searcio. Try again."
 msgstr "Impossibile disconnettersi da Searcio. Riprova."
 
-#: includes/Routing/Connection_Endpoint.php:188
-#: includes/Routing/Connection_Endpoint.php:265
+#: includes/Routing/Connection_Endpoint.php:190
+#: includes/Routing/Connection_Endpoint.php:267
 #: includes/Routing/Search_Config_Endpoint.php:76
 msgid "Could not reach Searcio."
 msgstr "Impossibile raggiungere Searcio."
 
-#: includes/Routing/Connection_Endpoint.php:315
+#: includes/Routing/Connection_Endpoint.php:317
 msgid "This domain is already connected. Log into the Searcio dashboard to retrieve your keys and paste them below."
 msgstr "Questo dominio è già connesso. Accedi alla dashboard di Searcio per recuperare le tue chiavi e incollale qui sotto."
 
-#: includes/Routing/Connection_Endpoint.php:319
+#: includes/Routing/Connection_Endpoint.php:321
 msgid "Too many connect attempts. Wait a while and try again."
 msgstr "Troppi tentativi di connessione. Attendi un po' e riprova."
 
-#: includes/Routing/Connection_Endpoint.php:323
+#: includes/Routing/Connection_Endpoint.php:325
 msgid "Searcio cannot provision new accounts right now. Try again later."
 msgstr "Al momento Searcio non può creare nuovi account. Riprova più tardi."
 
-#: includes/Routing/Connection_Endpoint.php:331
-#: includes/Routing/Connection_Endpoint.php:370
+#: includes/Routing/Connection_Endpoint.php:333
+#: includes/Routing/Connection_Endpoint.php:372
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:25
 msgid "Connection failed."
 msgstr "Connessione non riuscita."
 
-#: includes/Routing/Connection_Endpoint.php:367
+#: includes/Routing/Connection_Endpoint.php:369
 msgid "Invalid write credentials. Check the write key and secret."
 msgstr "Credenziali di scrittura non valide. Controlla la chiave e il segreto di scrittura."
 
-#: includes/Routing/Connection_Endpoint.php:368
+#: includes/Routing/Connection_Endpoint.php:370
 msgid "Site is disabled in Searcio."
 msgstr "Il sito è disattivato in Searcio."
 
-#: includes/Routing/Connection_Endpoint.php:369
+#: includes/Routing/Connection_Endpoint.php:371
 msgid "No site found for these credentials."
 msgstr "Nessun sito trovato per queste credenziali."
 
@@ -1676,31 +1676,27 @@ msgstr "Impossibile eliminare questa esecuzione. L'esecuzione attiva è protetta
 msgid "That action is not available for the current run state."
 msgstr "Questa azione non è disponibile per lo stato attuale dell'esecuzione."
 
-#: includes/Routing/Verify_Endpoint.php:69
-msgid "Missing verification token."
-msgstr "Token di verifica mancante."
-
-#: includes/Routing/Verify_Endpoint.php:74
+#: includes/Routing/Verify_Endpoint.php:78
 msgid "No verification is in progress."
 msgstr "Nessuna verifica in corso."
 
-#: includes/Routing/Verify_Endpoint.php:80
+#: includes/Routing/Verify_Endpoint.php:59
 msgid "Not connected."
 msgstr "Non connesso."
 
-#: includes/Settings/Plugin_Settings.php:344
+#: includes/Settings/Plugin_Settings.php:361
 msgid "Keep history for (days)"
 msgstr "Conserva la cronologia per (giorni)"
 
-#: includes/Settings/Plugin_Settings.php:345
+#: includes/Settings/Plugin_Settings.php:362
 msgid "How long finished sync runs are kept. Use 0 to keep them forever."
 msgstr "Per quanto tempo vengono conservate le sincronizzazioni terminate. Usa 0 per conservarle per sempre."
 
-#: includes/Settings/Plugin_Settings.php:348
+#: includes/Settings/Plugin_Settings.php:365
 msgid "Delete plugin data on uninstall"
 msgstr "Elimina i dati del plugin alla disinstallazione"
 
-#: includes/Settings/Plugin_Settings.php:349
+#: includes/Settings/Plugin_Settings.php:366
 msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio."
 msgstr "Se attivo, l'eliminazione di questo plugin rimuove da questo sito anche le sue impostazioni, le tabelle di sincronizzazione e i metadati di sincronizzazione di ogni contenuto. Non elimina mai i documenti già inviati a Searcio."
 
@@ -3331,23 +3327,18 @@ msgstr "Modifica il valore JSON di questa impostazione."
 msgid "No settings are registered for this tab yet."
 msgstr "Nessuna impostazione è ancora registrata per questa scheda."
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:31
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:26
 msgid "Support Searcio"
 msgstr "Supporta Searcio"
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:34
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:29
 msgid "Shows the Searcio logo, small in the bottom corner of the search window, linked to searcio.com."
 msgstr "Mostra il logo Searcio, piccolo nell'angolo in basso della finestra di ricerca, con un link a searcio.com."
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:45
+#: src/admin/settings/components/tabs/SupportSearcioCard.js:40
 msgid "Show the Searcio logo in the search window"
 msgstr "Mostra il logo Searcio nella finestra di ricerca"
 
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:47
-msgid "The Free plan always shows it. On a paid plan you can turn it off."
-msgstr "Il piano Free lo mostra sempre. Con un piano a pagamento puoi disattivarlo."
-
-#: src/admin/settings/components/tabs/SupportSearcioCard.js:62
 #: src/admin/settings/upgradeAction.js:25
 msgid "Upgrade plan"
 msgstr "Aggiorna il piano"

@@ -97,6 +97,22 @@ final class Plugin_Settings {
 	public const VERIFICATION_OPENED_AT = 'verification_opened_at';
 
 	/**
+	 * The one-time code in the `verify_url` this site last sent Searcio, which
+	 * the ownership ping has to carry back in the route's path. Only Searcio
+	 * was told it, so only Searcio can have the write key read back to it.
+	 * Emptied once the ping is answered. See {@see \Webhead\WP\SearchCloud\Routing\Verify_Endpoint}.
+	 */
+	#[Setting(
+		type: 'string',
+		default: '',
+		show_in_rest: false,
+		label: 'Verification code',
+		description: 'One-time code in the verify URL sent with the last /connect attempt.',
+		schema: [ 'format' => 'text-field' ]
+	)]
+	public const VERIFICATION_CODE = 'verification_code';
+
+	/**
 	 * Set when `/connect` returns `pending_claim` (the admin email already has a
 	 * Searcio account) so the Connection tab can keep showing the
 	 * "check your inbox" notice across page reloads. Cleared once working
@@ -293,14 +309,15 @@ final class Plugin_Settings {
 
 	/**
 	 * Whether the search window shows the Searcio logo, linked to searcio.com.
-	 * On a Free plan it is shown whatever this says, see
-	 * {@see \Webhead\WP\SearchCloud\Frontend\Frontend_Config}. The General
-	 * tab draws it in a card of its own, which knows the plan, so it is not one
-	 * of the settings the schema-driven grid renders.
+	 * Off until the shop turns it on, on every plan: a credit on a shop's pages
+	 * is the shop's choice (WordPress.org plugin guideline 10), and no plan may
+	 * take that choice away (guideline 5). The General tab draws it in a card
+	 * of its own, so it is not one of the settings the schema-driven grid
+	 * renders.
 	 */
 	#[Setting(
 		type: 'boolean',
-		default: true,
+		default: false,
 		option_key: 'searcio_support_searcio',
 		show_in_rest: true,
 		label: 'Support Searcio',

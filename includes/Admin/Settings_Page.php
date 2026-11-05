@@ -120,9 +120,8 @@ final class Settings_Page extends Page {
 			// Drives the Connection tab's default-open behavior and its initial
 			// state before the settings/health REST calls resolve.
 			'connection' => [
-				// The tier last seen, so the Support Searcio card can say at once
-				// whether a Free plan keeps the logo on. The card asks Searcio
-				// again as the page opens.
+				// The tier last seen, so the header can offer "Upgrade plan" at
+				// once on a Free plan. The page asks Searcio again as it opens.
 				'planTier'      => $this->connection_state->plan_tier()?->value ?? '',
 				'isConnected'   => $this->client->is_configured(),
 				'pendingClaim'  => $pending,

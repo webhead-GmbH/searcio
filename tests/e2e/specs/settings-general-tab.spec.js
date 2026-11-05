@@ -60,9 +60,9 @@ async function mockPlan( page, plan ) {
 }
 
 /**
- * Support Searcio: the Searcio logo in the search window. A paid plan can turn
- * it off, and saves it with the rest of the tab; a Free plan always shows it,
- * so its switch is on, cannot be moved, and the card says why.
+ * Support Searcio: the Searcio logo in the search window. Off until the shop
+ * turns it on, and a Free plan neither forces it on nor locks the switch: a
+ * credit on the shop's pages is the shop's choice.
  */
 test.describe( 'Support Searcio', () => {
 	test.beforeAll( () => {
@@ -75,42 +75,39 @@ test.describe( 'Support Searcio', () => {
 		await requestUtils.rest( {
 			path: '/searcio/v1/settings',
 			method: 'POST',
-			data: { settings: { support_searcio: true } },
+			data: { settings: { support_searcio: false } },
 		} );
 	} );
 
 	const card = ( page ) => page.locator( '.whsc-settings-card' ).filter( { has: page.getByRole( 'heading', { name: 'Support Searcio' } ) } );
 	const toggle = ( page ) => card( page ).getByRole( 'checkbox', { name: 'Show the Searcio logo in the search window' } );
 
-	test( 'a paid plan turns the logo off, and it stays off', async ( { page } ) => {
-		await mockPlan( page, { is_free: false, name: 'Pro', upgrade_url: '' } );
-		await page.goto( GENERAL_URL );
+	for ( const plan of [ { is_free: true, name: 'Free', upgrade_url: 'https://searcio.example/billing' }, { is_free: false, name: 'Pro', upgrade_url: '' } ] ) {
+		test( `on the ${ plan.name } plan the logo is off until it is turned on, and both stay`, async ( { page, requestUtils } ) => {
+			setPlanTier( plan.is_free ? 'free' : 'paid' );
+			await requestUtils.rest( {
+				path: '/searcio/v1/settings',
+				method: 'POST',
+				data: { settings: { support_searcio: false } },
+			} );
+			await mockPlan( page, plan );
+			await page.goto( GENERAL_URL );
 
-		await expect( toggle( page ) ).toBeChecked( LOADED );
-		await expect( toggle( page ) ).toBeEnabled();
+			await expect( toggle( page ) ).not.toBeChecked( LOADED );
+			await expect( toggle( page ) ).toBeEnabled();
+			await expect( card( page ).getByRole( 'link', { name: 'Upgrade plan' } ) ).toHaveCount( 0 );
 
-		await toggle( page ).click();
-		await expect( toggle( page ) ).not.toBeChecked();
-		await page.getByRole( 'button', { name: 'Save Settings' } ).click();
-		await expect( page.getByRole( 'button', { name: 'Save Settings' } ) ).toBeDisabled( LOADED );
+			await toggle( page ).click();
+			await page.getByRole( 'button', { name: 'Save Settings' } ).click();
+			await expect( page.getByRole( 'button', { name: 'Save Settings' } ) ).toBeDisabled( LOADED );
+			await page.reload();
+			await expect( toggle( page ) ).toBeChecked( LOADED );
 
-		await page.reload();
-		await expect( toggle( page ) ).not.toBeChecked( LOADED );
-	} );
-
-	test( 'a Free plan keeps it on and says why, whatever was saved', async ( { page, requestUtils } ) => {
-		setPlanTier( 'free' );
-		await requestUtils.rest( {
-			path: '/searcio/v1/settings',
-			method: 'POST',
-			data: { settings: { support_searcio: false } },
+			await toggle( page ).click();
+			await page.getByRole( 'button', { name: 'Save Settings' } ).click();
+			await expect( page.getByRole( 'button', { name: 'Save Settings' } ) ).toBeDisabled( LOADED );
+			await page.reload();
+			await expect( toggle( page ) ).not.toBeChecked( LOADED );
 		} );
-		await mockPlan( page, { is_free: true, name: 'Free', upgrade_url: 'https://searcio.example/billing' } );
-		await page.goto( GENERAL_URL );
-
-		await expect( toggle( page ) ).toBeChecked( LOADED );
-		await expect( toggle( page ) ).toBeDisabled();
-		await expect( card( page ) ).toContainText( 'The Free plan always shows it. On a paid plan you can turn it off.' );
-		await expect( card( page ).getByRole( 'link', { name: 'Upgrade plan' } ) ).toHaveAttribute( 'href', 'https://searcio.example/billing' );
-	} );
+	}
 } );

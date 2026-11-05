@@ -211,15 +211,12 @@ final class Sync_Runs_Table extends Table {
 		 * the DELETE never ran and history grew without bound. Comparison
 		 * operators here stay on an explicitly prepared statement.
 		 */
-		$connection   = $this->get_connection();
-		$placeholders = implode( ', ', array_fill( 0, count( $statuses ), '%s' ) );
-		$table        = $this->get_table_name_with_prefix();
+		$connection = $this->get_connection();
 
 		$result = $connection->query(
 			$connection->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name and placeholder list are built from trusted values.
-				"DELETE FROM `{$table}` WHERE `status` IN ({$placeholders}) AND `created_at` < %s",
-				[ ...$statuses, $cutoff_gmt ]
+				'DELETE FROM %i WHERE `status` IN (' . implode( ', ', array_fill( 0, count( $statuses ), '%s' ) ) . ') AND `created_at` < %s',
+				[ $this->get_table_name_with_prefix(), ...$statuses, $cutoff_gmt ]
 			)
 		);
 

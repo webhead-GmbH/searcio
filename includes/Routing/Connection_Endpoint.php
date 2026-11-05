@@ -106,6 +106,11 @@ final class Connection_Endpoint extends Rest_API {
 		$admin_name = trim( (string) $request->get_param( 'admin_name' ) );
 		$site_name  = trim( (string) $request->get_param( 'site_name' ) );
 
+		// The ownership ping follows within minutes; nothing else ever calls
+		// `/verify`, so the route stays shut outside this window, and answers
+		// only a request that carries the code this site gives Searcio here.
+		$verification_code = $this->connection_state->open_verification_window();
+
 		$connect_request = Connect_Request::create(
 			platform: $this->woo->is_active() ? 'woocommerce' : 'wordpress',
 			// WordPress stores the site's title and a display name escaped; Searcio
@@ -114,17 +119,14 @@ final class Connection_Endpoint extends Rest_API {
 			site_url: home_url(),
 			// Points Searcio's async domain-ownership ping straight at our
 			// own Verify_Endpoint instead of it having to guess a WordPress path.
-			verify_url: rest_url( 'search-cloud/v1/verify' ),
+			// The code is in the path: Searcio sets the query string itself.
+			verify_url: rest_url( 'search-cloud/v1/verify/' . $verification_code ),
 			admin_email: '' !== $email ? $email : (string) get_option( 'admin_email' ),
 			admin_name: '' !== $admin_name ? $admin_name : trim( Term_Names::decode( (string) wp_get_current_user()->display_name ) ),
 			idempotency_key: $this->connection_state->idempotency_key(),
 			terms_privacy: $terms_privacy,
 			dpa: $dpa
 		);
-
-		// The ownership ping follows within minutes; nothing else ever calls
-		// `/verify`, so the route stays shut outside this window.
-		$this->connection_state->open_verification_window();
 
 		$response = $this->client->connect( $connect_request->to_payload() );
 

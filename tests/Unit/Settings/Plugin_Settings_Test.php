@@ -71,14 +71,14 @@ final class Plugin_Settings_Test extends TestCase {
 	}
 
 	/**
-	 * On until the shop turns it off, and saved with the General tab, whose own
-	 * card draws it.
+	 * Off until the shop turns it on (a credit on its pages is its choice), and
+	 * saved with the General tab, whose own card draws it.
 	 */
-	public function test_support_searcio_defaults_to_on_and_is_rest_exposed(): void {
+	public function test_support_searcio_defaults_to_off_and_is_rest_exposed(): void {
 		$instance = $this->setting( 'SUPPORT_SEARCIO' );
 
 		$this->assertSame( 'boolean', $instance->type );
-		$this->assertTrue( $instance->default );
+		$this->assertFalse( $instance->default );
 		$this->assertTrue( $instance->show_in_rest );
 	}
 

@@ -44,7 +44,7 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 * **Search by photo** - shoppers upload a photo instead of typing and find products that look like it.
 * **Similar products** - a "you may also like" row on product pages, matched by meaning rather than by shared tags.
 
-AI search comes with every paid plan, and the AI shopping assistant and photo search with the Pro and Business plans. [Compare the plans](https://searcio.com/preise).
+AI search and similar products come with every paid plan, and the AI shopping assistant and photo search with the Pro and Business plans. [Compare the plans](https://searcio.com/preise).
 
 = Fits your site =
 
@@ -52,7 +52,7 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 * **Any theme, any builder** - Searcio can take over your theme's own search, open from its search icon, sit in a floating button, or go anywhere as the `[searcio]` shortcode, a classic widget or a menu item.
 * **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, the look editor on the Placement tab does the same, fonts included, set apart for desktops, tablets and phones. Until you pick others, the search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
-* **Multilingual** - works with WPML and Polylang, so visitors only see results in their language.
+* **Multilingual** - works with WPML and Polylang, so visitors only see results in their language. How many languages are searched depends on your plan.
 * **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and Polish.
 * **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
 * **WP-CLI** - run and watch syncs from the command line or a real system cron.
@@ -65,18 +65,18 @@ AI search comes with every paid plan, and the AI shopping assistant and photo se
 = Get started in minutes =
 
 1. Install the plugin and open **Searcio** in your WordPress admin.
-2. Click **Connect to Searcio**. Your free Searcio account is set up for you in one click. If your email already has one, Searcio emails you a link to confirm it instead.
+2. Accept the terms and click **Connect to Searcio**. Your free Searcio account is set up for you in one click. If your email already has one, Searcio emails you a link to confirm it instead.
 3. Choose what should be searchable on the **Indexing** tab.
 4. Start your first sync on the **Sync** tab.
 5. Add the **Searcio Search** block or Elementor widget where your visitors look for search, or, with any other theme or builder, turn on a way on the **Placement** tab.
 
 = Support Searcio =
 
-A small Searcio logo, linked to searcio.com, sits at the bottom of the search window. It is always shown on the Free plan; on a paid plan you can turn it off under Searcio > General.
+If you would like to support Searcio, you can show a small Searcio logo, linked to searcio.com, at the bottom of the search window. It is off unless you turn it on under Searcio > General, on every plan.
 
 👉 Rate us on [WordPress](https://wordpress.org/support/plugin/searcio/reviews/#new-post)
 
-💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/searcio)
+💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/searcio). The full source code is there, including the JavaScript and CSS before they are built: the files in the plugin's `public/` folder are built from its `src/` folder with `npm install` and `npm run build`.
 
 == Installation ==
 
@@ -91,13 +91,13 @@ A small Searcio logo, linked to searcio.com, sits at the bottom of the search wi
 
 = Is it free? =
 
-Yes. The core search is free forever on Searcio's Free plan, and no payment details are needed: instant results, typo tolerance, autocomplete, filters, merchandising, search redirects and the product finder, for 1,000 searches a month and 500 indexed documents. That is enough for many small shops and blogs.
+Yes. The core search is free forever on Searcio's Free plan, and no payment details are needed: instant results, typo tolerance, autocomplete, filters, merchandising, search redirects, the product finder and search statistics, with a monthly allowance of searches and indexed documents made for small shops and blogs.
 
-When you want AI search, the AI shopping assistant, photo search or higher limits, upgrade to a paid plan whenever you like. [See the plans and pricing](https://searcio.com/preise).
+When you want AI search, the AI shopping assistant, photo search, more languages or higher limits, upgrade to a paid plan whenever you like. [See the plans and pricing](https://searcio.com/preise).
 
 = Do I have to sign up somewhere? =
 
-No sign-up form. The search runs on Searcio, a hosted service, and connecting from the plugin sets up your free Searcio account in one click with your admin email address. If that email already has an account, Searcio emails a confirmation link, and you paste the keys it gives you on the Connection tab.
+You need a free Searcio account, but there is no sign-up form. The search runs on Searcio, a hosted service, and connecting from the plugin sets up your account in one click with your admin email address. If that email already has an account, Searcio emails a confirmation link, and you paste the keys it gives you on the Connection tab.
 
 = Will it slow down my site? =
 
@@ -109,7 +109,7 @@ No. It searches posts, pages and custom post types on any WordPress site. With W
 
 = What happens when my plan's searches run out? =
 
-Your visitors can still search: the search window falls back to WordPress's own search until your allowance renews or you upgrade. Searcio emails you before you reach a limit, and the Connection tab shows what your plan has used this month.
+Your visitors can still search: a search they send with Enter opens WordPress's own search results until your allowance renews or you upgrade. Searcio emails you before you reach a limit, and the Connection tab shows what your plan has used this month.
 
 = Does it work with my theme and page builder? =
 
@@ -125,7 +125,7 @@ Yes. The block and the Elementor widget let you style the search box, the window
 
 = Does it support multilingual sites? =
 
-Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You can also limit which languages are indexed.
+Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You choose which languages are indexed, as many as your plan allows.
 
 = When do changes in my shop show up in the search? =
 
@@ -165,28 +165,36 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 
 This plugin sends data to Searcio, the hosted service that powers the search. Search does not work without it.
 
-* **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, and which agreements you accepted. Searcio uses them to create your account, or to find the one you have.
+* **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, which agreements you accepted, and an address on your site with a one-time code. Searcio uses them to create your account, or to find the one you have, and calls that address once to confirm that the site is yours.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
 * **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Searcio stores and applies.
-* **When a visitor searches:** the search term, the filters they pick or the answers they give in the product finder, the language of the page, how the search was started and where its results are shown, and which result they open. A product row asks for the products similar to the product on the page. Their browser contacts the service directly, so their IP address is visible to it.
-* **When a visitor uses the AI Assistant** (off unless you turn it on): the message they type.
+* **When you disconnect:** a request to remove the site, after which Searcio deletes its search index.
+* **When a visitor searches:** the search term, the filters they pick or the answers they give in the product finder, the language of the page, how the search was started and where its results are shown, and which result they open. A product row asks for the products similar to the product on the page. Their browser contacts the service directly, so their IP address is visible to it. The list of a visitor's recent searches stays in their own browser.
+* **When a visitor uses the AI shopping assistant** (off unless you turn it on): the message they type.
 * **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
 * **When you pick a Google font in the look editor on the Placement tab** (off unless you pick one, and never for a font your site already has): every visitor's browser loads that font from Google Fonts (https://fonts.googleapis.com) on the pages that show the search, so their IP address is visible to Google. Google's privacy policy: https://policies.google.com/privacy
 
 Nothing else is sent, and no visitor accounts are created.
 
-Service: https://searcio.com - Privacy policy: https://searcio.com/datenschutz
-Legal notice and terms: https://searcio.com/impressum
+Service: https://searcio.com
+Terms of use: https://searcio.com/en/terms-of-use
+Privacy policy: https://searcio.com/datenschutz
 Data Processing Agreement: https://searcio.com/data-processing-agreement
+Legal notice: https://searcio.com/impressum
 
 == Changelog ==
 
 = Unreleased =
+- Support Searcio, the small logo in the search window, is off unless you turn it on, on every plan. If you had turned it on, it stays on.
+- Security: when you connect, the address Searcio calls to confirm that the site is yours answers only to the one-time code that connect sent, and only once.
+- The styles of the search block, the shortcode, the widgets, the floating button and the look editor are added through WordPress's stylesheet queue instead of being printed into the page.
+- Updated the webhead plugin framework to 1.8.0.
 - The plugin's settings page, blocks, widgets and everything it stores are named "searcio" now; the settings page is at `admin.php?page=searcio`. Your settings, sync history and connection move by themselves on the first page load after the update, and nothing has to be set up again. A theme or a snippet that uses the plugin's hooks, REST routes or CSS classes under the old name "webhead-search-cloud" should switch to "searcio": the old hooks still work for now, with a notice for developers.
 - New: a Search statistics button in the settings header, and a link on the Connection tab, open your search statistics on the Searcio dashboard.
 - New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.
 - The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.
-- Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR), once your Searcio service offers it.
+- Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR).
+- On a multilingual site the search suggestions are in the language of the page, as the results are.
 - Names with an "&" (post types, attributes, custom fields, price separators, popular searches) show as typed instead of as "&amp;".
 - New on the Placement tab: a look editor for the shortcode, the classic widgets, a search form Searcio takes over and the floating button, with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
 - On phones the search window fills the screen and its results scroll down in a grid; recent and popular searches take one row each, so products are in sight at once.

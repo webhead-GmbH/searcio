@@ -1,8 +1,6 @@
-import { Button, ToggleControl } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { Card, Stack, Text } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-import { usePlan } from '../../plan';
 
 const KEY = 'support_searcio';
 
@@ -10,19 +8,16 @@ const KEY = 'support_searcio';
  * Support Searcio: the Searcio logo, small in the bottom corner of the search
  * window and linked to searcio.com.
  *
- * Its own card rather than a field of the schema-driven grid, because it
- * depends on the plan: a Free plan always shows the logo, so there the switch
- * is on and cannot be turned off, and the card says why. The value is a setting
- * like the others on this tab and is saved with them.
+ * Its own card rather than a field of the schema-driven grid, so it reads as
+ * the shop's choice to credit Searcio, which it is on every plan: off until the
+ * shop turns it on. The value is a setting like the others on this tab and is
+ * saved with them.
  *
  * @param {Object}   props
  * @param {Object}   props.settings      The settings being edited.
  * @param {Function} props.updateSetting Changes one of them.
  */
 const SupportSearcioCard = ( { settings, updateSetting } ) => {
-	const plan = usePlan();
-	const isFree = true === plan?.is_free;
-
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<Card.Header className="whsc-settings-card-header">
@@ -43,26 +38,9 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show the Searcio logo in the search window', 'searcio' ) }
-						help={ isFree
-							? __( 'The Free plan always shows it. On a paid plan you can turn it off.', 'searcio' )
-							: undefined }
-						checked={ isFree || false !== settings?.[ KEY ] }
-						disabled={ isFree }
+						checked={ true === settings?.[ KEY ] }
 						onChange={ ( value ) => updateSetting( KEY, value ) }
 					/>
-					{ isFree && plan?.upgrade_url && (
-						<Stack direction="row" gap="sm" wrap="wrap">
-							<Button
-								__next40pxDefaultSize
-								variant="secondary"
-								href={ plan.upgrade_url }
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{ __( 'Upgrade plan', 'searcio' ) }
-							</Button>
-						</Stack>
-					) }
 				</Stack>
 			</Card.Content>
 		</Card.Root>
