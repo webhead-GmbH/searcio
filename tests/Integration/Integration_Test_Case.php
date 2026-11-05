@@ -25,6 +25,26 @@ use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
 
 abstract class Integration_Test_Case extends Framework_Test_Case {
+	/**
+	 * WooCommerce bundles the MCP adapter, and since 5 November 2026 the
+	 * latest releases report it as deprecated the first time a test fires
+	 * `rest_api_init`; whichever test does that first failed on it. It is
+	 * WooCommerce's notice, so it is not counted. Every other deprecation
+	 * still fails the test that raises it.
+	 *
+	 * @param string $function_name
+	 * @param string $replacement
+	 * @param string $version
+	 * @param string $message
+	 */
+	public function deprecated_function_run( $function_name, $replacement, $version, $message = '' ) {
+		if ( is_string( $function_name ) && str_starts_with( $function_name, 'WP\\MCP\\' ) ) {
+			return;
+		}
+
+		parent::deprecated_function_run( $function_name, $replacement, $version, $message );
+	}
+
 	protected function sync_service(): Sync_Service {
 		return $this->service( 'sync_service' );
 	}
