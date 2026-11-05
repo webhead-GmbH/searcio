@@ -35,6 +35,14 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Field_Source_Resolver {
 	/**
+	 * A tag that ends a word where it stands: a line break, a rule, or the
+	 * start or end of a block-level element. Stripped like any other tag,
+	 * `<li>Wool</li><li>Silk</li>` read "WoolSilk", and "list.</p><h2>Road"
+	 * read "list.Road", which a search tokenizer keeps as one word.
+	 */
+	private const WORD_BREAK = '#<(?:br|hr|/?(?:p|div|h[1-6]|ul|ol|li|dl|dt|dd|blockquote|pre|table|caption|thead|tbody|tfoot|tr|th|td|figure|figcaption|section|article|aside|header|footer|nav|main|address|details|summary))\b[^>]*>#i';
+
+	/**
 	 * Resolve a source string for a post.
 	 *
 	 * @return mixed Scalar, array of strings, or null when nothing resolves.
@@ -146,6 +154,14 @@ final class Field_Source_Resolver {
 	 * (script enqueues, counters) that are unsafe to trigger during bulk sync.
 	 */
 	private function render_content( WP_Post $post ): ?string {
+		return $this->clean( $this->content_markup( $post ) );
+	}
+
+	/**
+	 * The post's content without the blocks an excerpt leaves out and without
+	 * shortcodes, still as markup.
+	 */
+	private function content_markup( WP_Post $post ): string {
 		$content = (string) $post->post_content;
 
 		if ( function_exists( 'excerpt_remove_blocks' ) ) {
@@ -156,15 +172,27 @@ final class Field_Source_Resolver {
 			$content = strip_shortcodes( $content );
 		}
 
-		return $this->clean( $content );
+		return $content;
 	}
 
+	/**
+	 * The excerpt as written, or the first 55 words of the content. Still
+	 * HTML-encoded either way: {@see clean()} decodes it once.
+	 */
 	private function excerpt( WP_Post $post ): string {
 		if ( '' !== trim( (string) $post->post_excerpt ) ) {
 			return (string) $post->post_excerpt;
 		}
 
-		return wp_trim_words( wp_strip_all_tags( (string) $post->post_content ), 55, '' );
+		return wp_trim_words( $this->with_word_breaks( $this->content_markup( $post ) ), 55, '' );
+	}
+
+	/**
+	 * A space in place of every tag that ends a word, so the text on either
+	 * side of it stays two words once the tags are stripped.
+	 */
+	private function with_word_breaks( string $markup ): string {
+		return (string) preg_replace( self::WORD_BREAK, ' ', $markup );
 	}
 
 	private function permalink( WP_Post $post ): ?string {
@@ -211,12 +239,15 @@ final class Field_Source_Resolver {
 	 * title of a private post: the index holds the title as it was typed.
 	 *
 	 * Tags are stripped before entities are decoded, so `&lt;b&gt;` stays the
-	 * text it is. A hard space becomes a space, which a search tokenizer splits
-	 * words on.
+	 * text it is. A tag that ends a word leaves a space ({@see WORD_BREAK}),
+	 * and a hard space becomes a space, which a search tokenizer splits words
+	 * on. A run of spaces then becomes one, and a line loses the spaces at
+	 * its ends.
 	 */
 	private function clean( string $value ): ?string {
-		$value = html_entity_decode( wp_strip_all_tags( $value ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
-		$value = trim( str_replace( "\u{00A0}", ' ', $value ) );
+		$value = html_entity_decode( wp_strip_all_tags( $this->with_word_breaks( $value ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$value = str_replace( "\u{00A0}", ' ', $value );
+		$value = trim( (string) preg_replace( [ '/[ \t]{2,}/', '/ *\n */' ], [ ' ', "\n" ], $value ) );
 
 		return '' === $value ? null : $value;
 	}
