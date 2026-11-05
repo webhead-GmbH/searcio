@@ -15,7 +15,7 @@
  * On any failure the modal falls back to native `?s=` search (see the caller).
  */
 
-import { currentLangFilter as resolveCurrentLangFilter, isLanguageSupported as resolveLanguageSupported } from './language';
+import { currentLangFilter as resolveCurrentLangFilter, inLanguage, isLanguageSupported as resolveLanguageSupported } from './language';
 
 // A page a cache saved before 1.4.0 still prints the config under the
 // plugin's first name, while it loads this script.
@@ -40,6 +40,8 @@ const QUIZZES_TTL = 600000; // 10 minutes.
 // "More like this" changes only when the catalogue does, and it is not metered
 // as a search - so a visitor browsing several products pays for it once.
 const SIMILAR_TTL = 600000; // 10 minutes.
+// The most `/search/similar` returns in one answer.
+const SIMILAR_MAX = 20;
 const CACHE_MAX = 60;
 
 const cache = new Map();
@@ -282,17 +284,27 @@ export const fetchQuizzes = ( options = {} ) =>
  * `search_id` for its clicks (a service without it answers with none, and a
  * click then sends nothing).
  *
+ * On a multilingual site only the products in the page's language are kept,
+ * and as many more are asked for as the site has languages, so the row still
+ * fills.
+ *
  * @param {string}                            id        The source product's document id.
  * @param {{limit?: number, signal?: AbortSignal}} [options]
  * @return {Promise<{similar: Array<Object>}>}
  */
-export const fetchSimilar = ( id, options = {} ) =>
-	request(
+export const fetchSimilar = async ( id, options = {} ) => {
+	const limit = options.limit || 6;
+	const { lang } = currentLangFilter();
+	const asked = lang ? Math.min( SIMILAR_MAX, limit * Math.max( 1, ( config.enabledLanguages || [] ).length ) ) : limit;
+	const response = await request(
 		'/search/similar',
-		{ id, limit: options.limit || 6, preview: isPreview() ? 1 : undefined },
+		{ id, limit: asked, preview: isPreview() ? 1 : undefined },
 		SIMILAR_TTL,
 		options.signal
 	);
+
+	return { ...response, similar: inLanguage( response?.similar, lang ).slice( 0, limit ) };
+};
 
 /**
  * Search by photo (see `docs/api/visual-search.md`). A vision model describes
@@ -333,7 +345,9 @@ export const visualSearch = async ( file, options = {} ) => {
 		throw error;
 	}
 
-	return response.json();
+	const result = await response.json();
+
+	return { ...result, hits: inLanguage( result?.hits, currentLangFilter().lang ) };
 };
 
 /**
@@ -364,7 +378,9 @@ export const askAssistant = async ( message, history = [], options = {} ) => {
 		throw error;
 	}
 
-	return response.json();
+	const result = await response.json();
+
+	return { ...result, products: inLanguage( result?.products, currentLangFilter().lang ) };
 };
 
 /**

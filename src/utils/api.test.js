@@ -284,6 +284,18 @@ describe( 'askAssistant', () => {
 
 		await expect( api.askAssistant( 'x' ) ).rejects.toMatchObject( { status: 429 } );
 	} );
+
+	/** It takes no language, so on a German and English shop it named products in both. */
+	it( "keeps the products in the page's language on a multilingual site", async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'en' } );
+		global.fetch.mockResolvedValue( jsonResponse( { reply: 'Two jackets', products: [ { id: 'p-en', source: { lang: 'en' } }, { id: 'p-de', source: { lang: 'de' } }, { id: 'post-1', source: {} } ] } ) );
+		const api = loadApi();
+
+		const result = await api.askAssistant( 'a rain jacket' );
+
+		expect( result.products.map( ( hit ) => hit.id ) ).toEqual( [ 'p-en', 'post-1' ] );
+		expect( result.reply ).toBe( 'Two jackets' );
+	} );
 } );
 
 describe( 'visualSearch', () => {
@@ -330,6 +342,26 @@ describe( 'visualSearch', () => {
 
 		expect( result.hits ).toEqual( [] );
 		expect( result.tags ).toEqual( [] );
+	} );
+
+	it( "keeps the hits in the page's language on a multilingual site", async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'de' } );
+		global.fetch.mockResolvedValue( jsonResponse( { tags: [ 'headphones' ], total: 3, hits: [ { id: 'p-en', source: { lang: 'en' } }, { id: 'p-de', source: { lang: 'de' } }, { id: 'post-1', source: {} } ] } ) );
+		const api = loadApi();
+
+		const result = await api.visualSearch( new File( [ 'x' ], 'p.jpg', { type: 'image/jpeg' } ) );
+
+		expect( result.hits.map( ( hit ) => hit.id ) ).toEqual( [ 'p-de', 'post-1' ] );
+		expect( result.tags ).toEqual( [ 'headphones' ] );
+	} );
+
+	it( 'keeps every hit on a single-language site', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { tags: [], total: 3, hits: [ { id: 'p-en', source: { lang: 'en' } }, { id: 'p-de', source: { lang: 'de' } }, { id: 'post-1', source: {} } ] } ) );
+		const api = loadApi();
+
+		const result = await api.visualSearch( new File( [ 'x' ], 'p.jpg', { type: 'image/jpeg' } ) );
+
+		expect( result.hits ).toHaveLength( 3 );
 	} );
 } );
 
@@ -404,6 +436,33 @@ describe( 'fetchSimilar', () => {
 		await api.fetchSimilar( 'product-1' );
 
 		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	/**
+	 * A product's nearest neighbour is its own translation: on the English page
+	 * of a rain jacket the row opened with the same jacket in German.
+	 */
+	it( "asks for one row per language and keeps the page's language on a multilingual site", async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'en' } );
+		const similar = [ 'de', 'en', 'de', 'en', 'en', 'de', 'en', 'en' ].map( ( lang, index ) => ( { id: `p-${ index }`, source: { lang } } ) );
+		global.fetch.mockResolvedValue( jsonResponse( { search_id: 's-1', similar } ) );
+		const api = loadApi();
+
+		const result = await api.fetchSimilar( 'product-1', { limit: 4 } );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'limit' ) ).toBe( '8' );
+		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'p-1', 'p-3', 'p-4', 'p-6' ] );
+		expect( result.search_id ).toBe( 's-1' );
+	} );
+
+	it( 'never asks for more than the service answers', async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en', 'fr' ], currentLang: 'fr' } );
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+		const api = loadApi();
+
+		await api.fetchSimilar( 'product-1', { limit: 8 } );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'limit' ) ).toBe( '20' );
 	} );
 } );
 
