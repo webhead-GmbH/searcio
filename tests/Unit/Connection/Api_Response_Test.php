@@ -11,6 +11,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit\Connection;
 use PHPUnit\Framework\TestCase;
 use WP_Error;
 use Webhead\WP\SearchCloud\Connection\Api_Response;
+use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 
 final class Api_Response_Test extends TestCase {
 	public function test_ok_is_true_only_for_2xx_status(): void {
@@ -70,6 +71,20 @@ final class Api_Response_Test extends TestCase {
 
 		$plan_limit = Api_Response::from_http( 429, [ 'body' => '{"metric":"documents"}' ] );
 		$this->assertFalse( $plan_limit->should_retry() );
+	}
+
+	/** Choosing a plan, or support lifting a suspension, is what ends it. */
+	public function test_an_account_the_service_does_not_serve_is_refused_and_never_retried(): void {
+		$no_plan   = Api_Response::from_http( 402, [ 'body' => '{"message":"This account has no active plan.","reason":"no_active_plan"}' ] );
+		$suspended = Api_Response::from_http( 403, [ 'body' => '{"message":"This account is suspended.","reason":"account_suspended"}' ] );
+		$disabled  = Api_Response::from_http( 403, [ 'body' => '{"message":"This site is disabled."}' ] );
+
+		$this->assertSame( Account_Refusal::NoActivePlan, $no_plan->account_refusal() );
+		$this->assertSame( Account_Refusal::Suspended, $suspended->account_refusal() );
+		$this->assertNull( $disabled->account_refusal() );
+		$this->assertFalse( $no_plan->should_retry() );
+		$this->assertFalse( $suspended->should_retry() );
+		$this->assertFalse( $no_plan->is_plan_limit() );
 	}
 
 	public function test_should_retry_is_true_for_5xx_and_false_for_a_normal_4xx_or_2xx(): void {

@@ -38,7 +38,7 @@ The **Languages** section is always on the Search Config tab. With WPML or Polyl
 
 ### A sync run shows "Failed" or content is being skipped
 
-Open the sync history row for the failed run - the last error message is shown there. Common causes: the Searcio plan's document limit was reached (upgrade your plan or reduce what you index), or Searcio could not be reached for over an hour. A sync that cannot write stays *Running* and tries again by itself, waiting longer each time; only when the last of those tries fails does it end as *Failed*. Nothing has to be done then: changes made in the shop are sent as soon as Searcio answers again, and the next scheduled sync runs a full one.
+Open the sync history row for the failed run - the last error message is shown there. Common causes: the Searcio plan's document limit was reached (upgrade your plan or reduce what you index), your Searcio account has no active plan, has an overdue payment or is suspended (the Connection tab says which, with a link to choose a plan, to pay on the billing page or to contact support; such a sync stops at once), or Searcio could not be reached for over an hour. A sync that cannot write stays *Running* and tries again by itself, waiting longer each time; only when the last of those tries fails does it end as *Failed*. Nothing has to be done then: changes made in the shop are sent as soon as Searcio answers again, and the next scheduled sync runs a full one.
 
 ### How do I stop the plugin from deleting my data if I uninstall it?
 

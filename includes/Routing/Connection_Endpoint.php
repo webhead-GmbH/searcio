@@ -24,6 +24,7 @@ use Webhead\WP\SearchCloud\Connection\Api_Response;
 use Webhead\WP\SearchCloud\Connection\Connect_Request;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
@@ -205,6 +206,7 @@ final class Connection_Endpoint extends Rest_API {
 
 		$plan      = is_array( $body['plan'] ?? null ) ? $body['plan'] : [];
 		$languages = is_array( $plan['languages'] ?? null ) ? $plan['languages'] : [];
+		$refusal   = Account_Refusal::from_health( $body );
 
 		return [
 			'ok'               => true,
@@ -214,6 +216,16 @@ final class Connection_Endpoint extends Rest_API {
 			'site_status'      => isset( $body['site']['status'] ) ? (string) $body['site']['status'] : '',
 			'last_synced_at'   => $body['site']['last_synced_at'] ?? null,
 			'engine_reachable' => (bool) ( $body['engine']['reachable'] ?? false ),
+			// The keys work, but searching and indexing are refused for an
+			// account without an active plan or a suspended one. A body that
+			// says nothing about the account is from a service that serves it.
+			'account'          => [
+				'served'      => null === $refusal,
+				'reason'      => $refusal?->value,
+				'title'       => $refusal?->label(),
+				'message'     => $refusal?->message(),
+				'support_url' => self::support_url( $body['account']['support_url'] ?? null ),
+			],
 			'documents'        => [
 				'used'       => isset( $documents['used'] ) ? (int) $documents['used'] : null,
 				'limit'      => isset( $documents['limit'] ) ? ( null === $documents['limit'] ? null : (int) $documents['limit'] ) : null,
@@ -250,6 +262,25 @@ final class Connection_Endpoint extends Rest_API {
 	 * know, so it cannot write that link itself.
 	 */
 	public static function statistics_url( mixed $from_service ): string {
+		return self::dashboard_link( $from_service );
+	}
+
+	/**
+	 * Where the owner of a suspended account asks Searcio for help: the link
+	 * the health check gives (`account.support_url`), or the dashboard's
+	 * sign-in, which leads a signed-in owner to their dashboard, where support
+	 * is. Support sits under the owner's team, as the statistics do, and is
+	 * open to a suspended account.
+	 */
+	public static function support_url( mixed $from_service ): string {
+		return self::dashboard_link( $from_service );
+	}
+
+	/**
+	 * A page of the dashboard the health check links to, or the dashboard's
+	 * sign-in when it gives no link.
+	 */
+	private static function dashboard_link( mixed $from_service ): string {
 		$url = is_string( $from_service ) ? esc_url_raw( $from_service, [ 'https', 'http' ] ) : '';
 
 		return '' !== $url ? $url : untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/login';
