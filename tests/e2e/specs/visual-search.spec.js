@@ -229,6 +229,22 @@ test.describe( 'search by photo', () => {
 		await expect( chips.first() ).toBeVisible();
 	} );
 
+	/**
+	 * An account without an active plan is refused with a 402, which no other
+	 * photo would get past. The shopper was told to try another photo.
+	 */
+	test( 'a photo search the account is refused takes the photo button away', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, { visualSearch: true, visualStatus: 402 } );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.searchByPhoto( photo );
+
+		await expect( widget.modal.getByRole( 'alert' ) ).toHaveText( 'Photo search is not available on this store.' );
+		await expect( widget.photoButton ).toHaveCount( 0 );
+	} );
+
 	/** An empty submit after a photo search left an empty results column. */
 	test( 'an empty search after a photo search goes back to the highlights', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, { visualSearch: true } );

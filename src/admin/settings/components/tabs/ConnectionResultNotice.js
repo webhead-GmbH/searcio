@@ -10,6 +10,33 @@ import {useAnnounce} from '../../../../utils/announce';
  * the manual "Test connection" action - both hit the same `/connection/test`
  * response shape.
  */
+
+/**
+ * Why Searcio refuses the account the keys belong to, or null when it serves
+ * it: `{ reason, title, message, support_url }` from `/connection/test`. The
+ * keys work either way, so the result itself is `ok`.
+ *
+ * @param {?Object} result
+ * @return {?Object} The account part of the result, for a refused account.
+ */
+export const accountRefusal = (result) => (
+	result?.ok && false === result?.account?.served ? result.account : null
+);
+
+/**
+ * The way back from a refusal: a plan for an account without one, support
+ * for a suspended one.
+ *
+ * @param {Object} result
+ * @param {Object} refusal
+ * @return {{url: string, label: string}} The link, with an empty url when there is none.
+ */
+const refusalAction = (result, refusal) => (
+	'no_active_plan' === refusal.reason
+		? {url: result.plan?.upgrade_url || '', label: __('Choose a plan', 'searcio')}
+		: {url: refusal.support_url || '', label: __('Contact Searcio support', 'searcio')}
+);
+
 /**
  * What a result says, in the words its notice prints.
  *
@@ -23,6 +50,12 @@ const resultMessage = (result) => {
 
 	if (!result.ok) {
 		return result.message || __('Connection failed.', 'searcio');
+	}
+
+	const refusal = accountRefusal(result);
+
+	if (refusal) {
+		return `${refusal.title} ${refusal.message}`;
 	}
 
 	const docs = result.documents || {};
@@ -50,13 +83,34 @@ const resultMessage = (result) => {
 
 const ConnectionResultNotice = ({result}) => {
 	const message = resultMessage(result);
+	const refusal = accountRefusal(result);
 
 	// The answer of a test or a connect is read out as it arrives: a failure
 	// at once, a success when the screen reader is free.
-	useAnnounce(message, result?.ok ? 'polite' : 'assertive');
+	useAnnounce(message, result?.ok && !refusal ? 'polite' : 'assertive');
 
 	if (!result) {
 		return null;
+	}
+
+	// Connected, and still nothing works: every search and sync is refused
+	// until the owner chooses a plan, or support lifts the suspension.
+	if (refusal) {
+		const action = refusalAction(result, refusal);
+
+		return (
+			<Notice.Root intent="error" className="searcio-account-refusal">
+				<Notice.Title>{refusal.title}</Notice.Title>
+				<Notice.Description>{refusal.message}</Notice.Description>
+				{action.url && (
+					<Notice.Actions>
+						<Notice.ActionLink href={action.url} openInNewTab>
+							{action.label}
+						</Notice.ActionLink>
+					</Notice.Actions>
+				)}
+			</Notice.Root>
+		);
 	}
 
 	return (

@@ -22,6 +22,7 @@ namespace Webhead\WP\SearchCloud\Sync;
 use WP_Post;
 use Webhead\WP\SearchCloud\Connection\Api_Response;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 use Webhead\WP\SearchCloud\Enums\Sync_Control;
 use Webhead\WP\SearchCloud\Enums\Sync_Status;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
@@ -219,8 +220,16 @@ final class Sync_Service {
 
 			if ( 'prune' === $cursor['phase'] ) {
 				$prune_error = null;
-				$done        = $this->prune_step( $counters, $deadline, $prune_error );
+				$refusal     = null;
+				$done        = $this->prune_step( $counters, $deadline, $prune_error, $refusal );
 				$this->persist( $id, $cursor, $counters );
+
+				if ( null !== $refusal ) {
+					$this->state->finish( $id, Sync_Status::Failed, $refusal->message() );
+					$this->clear_tick();
+
+					return;
+				}
 
 				if ( null !== $prune_error ) {
 					$this->state->save( $id, [ 'last_error' => $prune_error ] );
@@ -248,7 +257,10 @@ final class Sync_Service {
 			$before = $counters;
 			$result = $this->index_batch( $type, (int) $cursor['last_id'], $force, $cv, $counters );
 
-			if ( 'plan_limit' === $result['outcome'] ) {
+			// Neither a plan limit nor an account the service does not serve
+			// passes by itself, so the run ends here rather than waiting to
+			// send the batch again.
+			if ( 'plan_limit' === $result['outcome'] || 'refused' === $result['outcome'] ) {
 				$this->state->finish( $id, Sync_Status::Failed, $result['message'] );
 				$this->clear_tick();
 
@@ -565,6 +577,17 @@ final class Sync_Service {
 				];
 			}
 
+			$refusal = $response->account_refusal();
+
+			if ( null !== $refusal ) {
+				return [
+					'outcome'   => 'refused',
+					'exhausted' => false,
+					'last_id'   => $after_id,
+					'message'   => $refusal->message(),
+				];
+			}
+
 			if ( ! $response->ok() ) {
 				return [
 					'outcome'   => 'error',
@@ -649,11 +672,17 @@ final class Sync_Service {
 	}
 
 	/**
-	 * @param  array<string,int>  $counters
-	 * @param  int                $deadline Unix time this tick must stop by.
-	 * @param  string|null        $error    First failure seen, for the run's last_error.
+	 * A delete refused because the service does not serve the account stops
+	 * the step: every delete after it would be refused the same way. That
+	 * document and the rest of the queue stay where they are, and none of
+	 * them counts as failed or goes on the list of refused deletes.
+	 *
+	 * @param  array<string,int>     $counters
+	 * @param  int                   $deadline Unix time this tick must stop by.
+	 * @param  string|null           $error    First failure seen, for the run's last_error.
+	 * @param  Account_Refusal|null  $refusal  Set when the service refused the account.
 	 */
-	private function prune_step( array &$counters, int $deadline, ?string &$error = null ): bool {
+	private function prune_step( array &$counters, int $deadline, ?string &$error = null, ?Account_Refusal &$refusal = null ): bool {
 		$queue = $this->read_ids( Sync_Keys::OPTION_PRUNE );
 
 		if ( [] === $queue ) {
@@ -677,6 +706,14 @@ final class Sync_Service {
 			}
 
 			$response = $this->client->delete( $doc_id );
+			$refusal  = $response->account_refusal();
+
+			if ( null !== $refusal ) {
+				$remaining = array_merge( array_slice( $slice, $done ), $remaining );
+
+				break;
+			}
+
 			$done++;
 
 			if ( $response->ok() || 404 === $response->status ) {

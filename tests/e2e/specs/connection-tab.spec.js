@@ -41,14 +41,44 @@ const HEALTH = {
 	},
 };
 
-/** Answer the plugin's own health route locally - it is a real round trip otherwise. */
-async function mockHealth( page ) {
+/**
+ * What the plugin's health route says of an account Searcio does not serve.
+ * The keys work, so it is `ok`; without a plan every limit is 0.
+ *
+ * @param {string} reason `no_active_plan` or `account_suspended`.
+ */
+const unserved = ( reason ) => ( {
+	...HEALTH,
+	plan: { name: '', is_free: false, upgrade_url: 'https://searcio.test/acme/billing' },
+	usage: {
+		searches: { used: 0, limit: 0, percent: 100, exceeded: true, near_limit: true },
+		documents: { used: 96, limit: 0, percent: 100, exceeded: true, near_limit: true },
+		ai_messages: metric( 3, 500 ),
+	},
+	account: {
+		served: false,
+		reason,
+		title: 'no_active_plan' === reason ? 'Your Searcio account has no active plan' : 'Your Searcio account is suspended',
+		message: 'no_active_plan' === reason
+			? 'Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync.'
+			: 'Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored.',
+		support_url: 'https://searcio.test/acme/support',
+	},
+} );
+
+/**
+ * Answer the plugin's own health route locally - it is a real round trip otherwise.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {Object}                          health What `/connection/test` answers.
+ */
+async function mockHealth( page, health = HEALTH ) {
 	await page.route(
 		( url ) => decodeURIComponent( url.href ).includes( '/connection/test' ),
 		( route ) => route.fulfill( {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify( HEALTH ),
+			body: JSON.stringify( health ),
 		} )
 	);
 }
@@ -188,6 +218,64 @@ test.describe( 'Connection tab allowances', () => {
 				page.locator( '[class*="__notice"]' ).filter( { hasText: 'documents indexed' } )
 			).toContainText( 'Connected - 96 / 300,000 documents indexed.' );
 		} );
+	} );
+} );
+
+/**
+ * Searcio refuses searching and indexing for an account without an active plan
+ * and for a suspended one, and keeps answering the health check. The tab is
+ * where the owner learns that search has stopped, why, and the way back.
+ */
+test.describe( 'Connection tab of an account Searcio does not serve', () => {
+	test.beforeAll( () => {
+		setConnected( true );
+	} );
+
+	test.afterAll( () => {
+		setConnected( false );
+	} );
+
+	test( 'says the account has no active plan, and links to choosing one', async ( { page } ) => {
+		await mockHealth( page, unserved( 'no_active_plan' ) );
+		await page.goto( CONNECTION_URL );
+
+		const notice = page.locator( '.searcio-account-refusal' );
+
+		await expect( notice ).toContainText( 'Your Searcio account has no active plan', LOADED );
+		await expect( notice ).toContainText( 'until the account has an active plan' );
+
+		const link = notice.getByRole( 'link', { name: /Choose a plan/ } );
+
+		await expect( link ).toHaveAttribute( 'href', 'https://searcio.test/acme/billing' );
+		await expect( link ).toHaveAttribute( 'target', '_blank' );
+
+		// Not also "Connected": the keys work, and still nothing does.
+		await expect( page.getByText( 'documents indexed' ) ).toHaveCount( 0 );
+		// Allowances of 0 are not spent allowances, and the notice says why.
+		await expect( page.getByRole( 'heading', { name: 'This month' } ) ).toHaveCount( 0 );
+		await expect( page.getByRole( 'button', { name: 'Disconnect' } ) ).toBeVisible();
+	} );
+
+	test( 'says the account is suspended, and links to support', async ( { page } ) => {
+		await mockHealth( page, unserved( 'account_suspended' ) );
+		await page.goto( CONNECTION_URL );
+
+		const notice = page.locator( '.searcio-account-refusal' );
+
+		await expect( notice ).toContainText( 'Your Searcio account is suspended', LOADED );
+		await expect( notice.getByRole( 'link', { name: /Contact Searcio support/ } ) )
+			.toHaveAttribute( 'href', 'https://searcio.test/acme/support' );
+		await expect( notice.getByRole( 'link', { name: /Choose a plan/ } ) ).toHaveCount( 0 );
+		await expect( page.getByRole( 'heading', { name: 'This month' } ) ).toHaveCount( 0 );
+	} );
+
+	test( 'leaves a gap between everything the tab stacks', async ( { page } ) => {
+		await mockHealth( page, unserved( 'no_active_plan' ) );
+		await page.goto( CONNECTION_URL );
+
+		await expect( page.locator( '.searcio-account-refusal' ) ).toBeVisible( LOADED );
+
+		expect( await touchingInShell( page ) ).toEqual( [] );
 	} );
 } );
 

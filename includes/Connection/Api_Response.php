@@ -4,7 +4,8 @@
  *
  * Wraps a wp_remote_request result so callers can branch on the two `429`
  * kinds (transient rate-limit with `Retry-After` vs. non-transient plan limit
- * carrying `{ metric, limit }`) and on transport failures.
+ * carrying `{ metric, limit }`), on an account the service does not serve
+ * (`402`/`403` with a `reason`), and on transport failures.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -15,6 +16,7 @@ declare( strict_types=1 );
 namespace Webhead\WP\SearchCloud\Connection;
 
 use WP_Error;
+use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -60,6 +62,16 @@ final class Api_Response {
 	 */
 	public function is_plan_limit(): bool {
 		return 429 === $this->status && isset( $this->body['metric'] );
+	}
+
+	/**
+	 * An account without an active plan, or a suspended one, is refused with
+	 * `402`/`403` and a `reason`. Only choosing a plan or the end of the
+	 * suspension changes that, so the call is never tried again: a `402` or
+	 * `403` is not one {@see self::should_retry()} retries.
+	 */
+	public function account_refusal(): ?Account_Refusal {
+		return Account_Refusal::from_response( $this->status, $this->body );
 	}
 
 	public function should_retry(): bool {

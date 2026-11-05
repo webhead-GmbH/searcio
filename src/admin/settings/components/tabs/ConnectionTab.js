@@ -10,7 +10,7 @@ import Modal from '../../../../components/Modal';
 import {showToast} from '../../../../toast';
 import TabIntro from '../TabIntro';
 import ConnectionExplainer from './ConnectionExplainer';
-import ConnectionResultNotice from './ConnectionResultNotice';
+import ConnectionResultNotice, {accountRefusal} from './ConnectionResultNotice';
 import LegalLinks from './LegalLinks';
 import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
@@ -248,8 +248,12 @@ const ConnectionTab = () => {
 
 					{/* The same health response the notice above reads. A spent
 					    allowance is why a storefront stops returning results, so it
-					    belongs where an admin looks when search "breaks". */}
-					<UsageCard usage={connectedResult?.usage} statisticsUrl={connectedResult?.statistics_url}/>
+					    belongs where an admin looks when search "breaks". An account
+					    that is refused altogether has no allowance to spend: without
+					    a plan every limit reads 0, and the notice says why. */}
+					{!accountRefusal(connectedResult) && (
+						<UsageCard usage={connectedResult?.usage} statisticsUrl={connectedResult?.statistics_url}/>
+					)}
 
 					<Stack direction="row" gap="sm" align="center" wrap="wrap">
 						<Button

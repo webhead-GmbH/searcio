@@ -102,6 +102,9 @@ export async function mockSearchCloud( page, options = {} ) {
 		visualDelay = 0,
 		similarSearchId = '',
 		visualSearchId = '',
+		// `no_active_plan` or `account_suspended`: the account is not served,
+		// and every call is refused as the service refuses it.
+		accountRefusal = null,
 	} = options;
 
 	await page.route( '**/api/v1/**', async ( route ) => {
@@ -113,6 +116,13 @@ export async function mockSearchCloud( page, options = {} ) {
 		const url = new URL( route.request().url() );
 		const path = url.pathname.replace( /.*\/api\/v1/, '' );
 		const json = ( body, status = 200 ) => route.fulfill( { status, headers: CORS, body: JSON.stringify( body ) } );
+
+		if ( accountRefusal ) {
+			return json(
+				{ message: 'This account is not served.', reason: accountRefusal },
+				'no_active_plan' === accountRefusal ? 402 : 403
+			);
+		}
 
 		if ( '/storefront-config' === path ) {
 			return json( {
