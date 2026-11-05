@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
+import { Skeleton } from '@wordpress/ui';
 
 import { previewUrl } from '../../placement';
 
@@ -49,22 +51,29 @@ const originOf = ( url ) => {
  * the last change. The look does not: its CSS is asked for and sent into the
  * page (`Placement_Preview`), which draws it at once.
  *
+ * While the page loads, the first time and after each change that loads it
+ * again, a placeholder stands over it, so an empty frame is never taken for a
+ * broken one.
+ *
  * @param {Object}  props
- * @param {Object}  props.preview   `{ url, nonce }` from the endpoint.
- * @param {string}  props.view      `trigger`, `modal` or `floating`.
- * @param {Object}  props.placement The settings to draw.
- * @param {string}  props.title     The frame's name.
- * @param {string}  [props.className]
- * @param {Object}  [props.style]
+ * @param {Object}  props.preview         `{ url, nonce }` from the endpoint.
+ * @param {string}  props.view            `trigger`, `modal` or `floating`.
+ * @param {Object}  props.placement       The settings to draw.
+ * @param {string}  props.title           The frame's name.
+ * @param {string}  [props.className]     The frame's.
+ * @param {Object}  [props.style]         The frame's.
+ * @param {string}  [props.hostClassName] The box round the frame and its placeholder.
  * @param {Function} [props.onStyleError] Told the reason when the look's CSS could not be had, and '' once it could.
  */
-const LookPreview = ( { preview, view, placement, title, className = '', style, onStyleError } ) => {
+const LookPreview = ( { preview, view, placement, title, className = '', style, hostClassName = '', onStyleError } ) => {
 	const look = placement?.search?.look || {};
 	// The page is drawn without the look, so a change of the look leaves its
 	// address alone.
 	const page = { ...placement, search: { ...( placement?.search || {} ), look: {} } };
 	const target = previewUrl( preview, view, page );
 	const [ src, setSrc ] = useState( target );
+	// The address whose page the frame shows; until it is `src`, it loads.
+	const [ loadedSrc, setLoadedSrc ] = useState( '' );
 	const frame = useRef( null );
 	const latest = useRef( null );
 	const errorHandler = useRef( onStyleError );
@@ -128,15 +137,29 @@ const LookPreview = ( { preview, view, placement, title, className = '', style, 
 		return null;
 	}
 
+	const isLoading = loadedSrc !== src;
+
 	return (
-		<iframe
-			ref={ frame }
-			className={ `whsc-placement-preview whsc-placement-preview--${ view } ${ className }`.trim() }
-			style={ style }
-			title={ title }
-			src={ src }
-			onLoad={ send }
-		/>
+		<div className={ `whsc-placement-preview-host ${ hostClassName }`.trim() }>
+			<iframe
+				ref={ frame }
+				className={ `whsc-placement-preview whsc-placement-preview--${ view } ${ className }`.trim() }
+				style={ style }
+				title={ title }
+				src={ src }
+				aria-busy={ isLoading }
+				onLoad={ () => {
+					setLoadedSrc( src );
+					send();
+				} }
+			/>
+			{ isLoading && (
+				// Decorative, so the box says what it is: one polite status with a name.
+				<div className="whsc-placement-preview-loading" role="status" aria-label={ __( 'Loading the preview', 'searcio' ) }>
+					<Skeleton className="whsc-placement-preview-loading__shape" />
+				</div>
+			) }
+		</div>
 	);
 };
 

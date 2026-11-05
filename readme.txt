@@ -185,6 +185,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = Unreleased =
+- The previews on the Placement tab and in the look editor show a placeholder while their page loads, instead of an empty white frame, and caching plugins are told never to keep a preview, so a visitor never gets one with settings you have not saved.
 - Support Searcio, the small logo in the search window, is off unless you turn it on, on every plan. If you had turned it on, it stays on.
 - Security: when you connect, the address Searcio calls to confirm that the site is yours answers only to the one-time code that connect sent, and only once.
 - The styles of the search block, the shortcode, the widgets, the floating button and the look editor are added through WordPress's stylesheet queue instead of being printed into the page.

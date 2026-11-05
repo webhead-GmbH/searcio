@@ -191,6 +191,26 @@ final class Site_Placement_Test extends Integration_Test_Case {
 		$this->assertTrue( (bool) apply_filters( 'searcio_storefront_is_preview', false ) );
 	}
 
+	/**
+	 * The preview is a page at the site's address, with unsaved settings and
+	 * the floating button drawn on: a page cache that kept it would hand it
+	 * to visitors.
+	 */
+	public function test_the_preview_keeps_itself_out_of_page_caches(): void {
+		$told = [];
+		add_action(
+			'litespeed_control_set_nocache',
+			static function ( string $reason ) use ( &$told ): void {
+				$told[] = $reason;
+			}
+		);
+
+		Placement_Preview::keep_out_of_caches();
+
+		$this->assertTrue( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE );
+		$this->assertSame( [ 'Searcio preview' ], $told );
+	}
+
 	public function test_the_storefront_is_told_the_selectors_only_while_they_are_on(): void {
 		$this->config()->save( [ 'selectors' => [ '.search-toggle-open' ], 'shortcut' => true ] );
 		$this->assertSame( [ 'selectors' => [], 'shortcut' => true ], $this->storefront_placement() );

@@ -363,6 +363,7 @@ const LookEditor = ( { isOpen, onClose, catalog, placement, onLookChange, onGrou
 									placement={ placement }
 									title={ __( 'Preview of the search on a page of the site', 'searcio' ) }
 									className="whsc-look-editor__frame"
+									hostClassName="whsc-look-editor__host"
 									style={ { width: frame.width, height: frame.height, transform: `scale(${ frame.scale })` } }
 									onStyleError={ setStyleError }
 								/>

@@ -408,6 +408,25 @@
   height: 560px;
 }
 
+// The box round a preview, and what stands over it while its page loads: the
+// frame is empty until then, which reads as broken.
+.whsc-placement-preview-host {
+  position: relative;
+}
+
+.whsc-placement-preview-loading {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--wpds-border-radius-md);
+  background: var(--wpds-color-background-surface-neutral);
+}
+
+.whsc-placement-preview-loading__shape {
+  width: 100%;
+  height: 100%;
+}
+
 .whsc-placement-preview--floating {
   height: 260px;
 }
@@ -596,6 +615,11 @@
   position: relative;
   max-width: 100%;
   margin-inline: auto;
+}
+
+.whsc-look-editor__host {
+  position: absolute;
+  inset: 0;
 }
 
 .whsc-look-editor__frame.whsc-placement-preview {
