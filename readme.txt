@@ -32,7 +32,7 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 
 * **Product cards that sell** - images, prices as your shop shows them (with or without tax), sale badges, stock status and price ranges for variable and grouped products.
 * **Smart filters** - one bar under the search field narrows results by content type, category (all categories, the main ones, or a tree to the depth you choose), tags, attributes such as color or size, and a price range. Colors, images and labels come from your swatches plugin or theme.
-* **Product finder** - a short guided quiz that turns a few answers into a list of matching products.
+* **Product finder** - a short guided quiz that turns a few answers into a list of matching products. Make and edit the quizzes right in WordPress, on the Product finder tab, with a check of every way through a quiz before it goes live.
 * **Merchandising** - pin products to the top of a search or a category page, keep products out, and show a promotional banner.
 * **Search redirects** - send searches like "shipping" or "returns" straight to the right page.
 * **Relevance you control** - field weights, per-type boosts, synonyms and suggestion fields, all from your WordPress admin. Results that visitors click most can rise for everyone, without cookies.
@@ -168,6 +168,7 @@ This plugin sends data to Searcio, the hosted service that powers the search. Se
 * **Before you connect:** opening the Connection tab asks Searcio for the current addresses of its terms of use, privacy policy and data processing agreement, to link them beside the consent boxes. Nothing about your site is sent.
 * **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, which agreements you accepted, and an address on your site with a one-time code. Searcio uses them to create your account, or to find the one you have, and calls that address once to confirm that the site is yours.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
+* **When you make or change a quiz on the Product finder tab:** the quiz - its name, language, questions, answers and the conditions each answer filters by - which Searcio stores and shows in the product finder. Opening the tab asks Searcio for the site's quizzes and for the values of its filters, and checking a quiz's endings sends its questions to count the products at the end of each way through it. These requests carry the site's keys.
 * **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - and the shop's currency, which Searcio stores and applies.
 * **While you are connected:** the Connection and Search Config tabs, Site Health and the daily sync ask Searcio for the site's status, its search configuration and what your plan has used this month. These requests carry the site's keys and nothing else, except that the daily sync also sends the shop's currency, which the AI shopping assistant writes prices in.
 * **When you disconnect:** a request to remove the site, after which Searcio deletes its search index.
@@ -188,6 +189,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.0 =
+- New Product finder tab: make, edit, publish and delete the product finder's quizzes in WordPress instead of the Searcio panel. Answers offer the values your filters really have, and before a quiz is published every way through it is checked for how many products it shows.
 - The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
 - The AI shopping assistant shows its reply as it is written, and the products as soon as it has found them, and writes prices in your shop's currency.
 - On a multilingual shop, the product finder offers the quizzes in the language of the page, popular searches are those searched in it, and photo search, similar products and the products the AI shopping assistant shows keep to it. A merchandising rule can be kept to one language.
