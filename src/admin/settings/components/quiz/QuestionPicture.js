@@ -1,6 +1,6 @@
 import { useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { InputControl, Stack, Text } from '@wordpress/ui';
+import { Fieldset, InputControl, Stack, Text } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 import { isSecurePicture, pictureUrl } from '../../quizEditor';
@@ -54,29 +54,31 @@ const QuestionPicture = ( { value, onChange } ) => {
 	};
 
 	return (
-		<Stack direction="column" gap="sm" className="whsc-quiz-picture">
-			<Text render={ <p /> } variant="body-md" className="whsc-quiz-picture__label">
-				{ __( 'Picture (optional)', 'searcio' ) }
-			</Text>
-			{ '' !== value && (
-				<img className="whsc-quiz-picture__preview" src={ value } alt={ __( 'The question\'s picture', 'searcio' ) } />
-			) }
-			<Text render={ <p /> } variant="body-sm" className={ `whsc-quiz-picture__note${ insecure ? ' is-warning' : '' }` }>
-				{ insecure
-					? __( 'Searcio shows only pictures served over https, and this one is not. Choose another, or serve the site over https.', 'searcio' )
-					: __( 'Shown above the question in the product finder.', 'searcio' ) }
-			</Text>
-			<Stack direction="row" gap="sm" wrap="wrap">
-				<Button __next40pxDefaultSize variant="secondary" onClick={ choose }>
-					{ '' === value ? __( 'Choose a picture', 'searcio' ) : __( 'Replace', 'searcio' ) }
-				</Button>
+		// The picture, a line about it and two buttons: one group under one
+		// label, drawn as the other fields' labels are.
+		<Fieldset.Root className="whsc-quiz-picture">
+			<Fieldset.Legend>{ __( 'Picture (optional)', 'searcio' ) }</Fieldset.Legend>
+			<Stack direction="column" gap="sm">
 				{ '' !== value && (
-					<Button __next40pxDefaultSize variant="tertiary" onClick={ () => onChange( '' ) }>
-						{ __( 'Remove', 'searcio' ) }
-					</Button>
+					<img className="whsc-quiz-picture__preview" src={ value } alt={ __( "The question's picture", 'searcio' ) } />
 				) }
+				<Text render={ <p /> } variant="body-sm" className={ `whsc-quiz-picture__note${ insecure ? ' is-warning' : '' }` }>
+					{ insecure
+						? __( 'Searcio shows only pictures served over https, and this one is not. Choose another, or serve the site over https.', 'searcio' )
+						: __( 'Shown above the question in the product finder.', 'searcio' ) }
+				</Text>
+				<Stack direction="row" gap="sm" wrap="wrap">
+					<Button __next40pxDefaultSize variant="secondary" onClick={ choose }>
+						{ '' === value ? __( 'Choose a picture', 'searcio' ) : __( 'Replace', 'searcio' ) }
+					</Button>
+					{ '' !== value && (
+						<Button __next40pxDefaultSize variant="tertiary" onClick={ () => onChange( '' ) }>
+							{ __( 'Remove', 'searcio' ) }
+						</Button>
+					) }
+				</Stack>
 			</Stack>
-		</Stack>
+		</Fieldset.Root>
 	);
 };
 

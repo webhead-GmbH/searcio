@@ -195,6 +195,7 @@ Legal notice: https://searcio.com/impressum
 - On a multilingual shop, the product finder offers the quizzes in the language of the page, popular searches are those searched in it, and photo search, similar products and the products the AI shopping assistant shows keep to it. A merchandising rule can be kept to one language.
 - A filter value with a comma in it, such as a category named "Jackets, Coats & Knitwear", finds its products; it found none.
 - Search as you type answers sooner after a pause in typing.
+- Ctrl+K and Cmd+K open the search with a keyboard layout that has no Latin letters, such as Persian or Russian, where they opened the browser's own search.
 - The AI shopping assistant numbers the products it suggests 1, 2, 3, where a reply with a blank line between them showed "1." for each.
 - Text in neighbouring paragraphs, headings and list items is indexed as separate words: a list of "Wool" and "Silk" was found only as "WoolSilk". The daily sync updates content that is already indexed.
 - Updated the webhead plugin framework to 1.10.0, which is licensed under the GPL like the plugin.
