@@ -7,6 +7,7 @@ import { positionInSearch } from '../../../utils/clicks';
 import { NARROW, useMediaQuery } from '../../../utils/mediaQuery';
 import CompareTable, { comparisonRows } from './CompareTable';
 import Markdown from './markdown';
+import { useTypewriter } from '../../../utils/typewriter';
 import { compareIcon, gridIcon, sendIcon, sparkleIcon } from './icons';
 import { ResultCard } from './templates';
 
@@ -31,18 +32,40 @@ const errorFor = ( status ) => {
 	return __( 'The assistant is unavailable right now. Try searching instead.', 'searcio' );
 };
 
-const Message = ( { role, content } ) => {
+/**
+ * One turn of the thread. A reply is typed out as it arrives, with a caret
+ * at its end while more is to come: still streaming, or typed behind what has
+ * arrived. A reply typed out once is drawn whole when it is drawn again.
+ *
+ * @param {Object}   props
+ * @param {string}   props.role      `assistant` or `user`.
+ * @param {string}   props.content   The text so far.
+ * @param {boolean}  [props.live]    Whether the reply is still arriving.
+ * @param {boolean}  [props.animate] Whether to type it out.
+ * @param {Function} [props.onType]  Called after each typed frame.
+ * @param {Function} [props.onDone]  Called once the reply is all on screen.
+ */
+const Message = ( { role, content, live = false, animate = false, onType, onDone } ) => {
 	const isAssistant = 'assistant' === role;
+	const typed = useTypewriter( content, { animate: isAssistant && animate, onType } );
+	const writing = isAssistant && ( live || typed.typing );
+
+	useEffect( () => {
+		if ( isAssistant && animate && ! writing ) {
+			onDone?.();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- onDone is a new function on every render.
+	}, [ isAssistant, animate, writing ] );
 
 	return (
 		<div className={ `whsc-assistant__msg whsc-assistant__msg--${ isAssistant ? 'assistant' : 'user' }` }>
 			{ isAssistant && (
 				<span className="whsc-assistant__avatar" aria-hidden="true">{ sparkleIcon }</span>
 			) }
-			<div className="whsc-assistant__bubble">
+			<div className={ `whsc-assistant__bubble${ writing ? ' is-writing' : '' }` }>
 				{ /* The assistant answers in Markdown; the visitor's own message is
 				     literal text and must never be reinterpreted as formatting. */ }
-				{ isAssistant ? <Markdown content={ content } /> : content }
+				{ isAssistant ? <Markdown content={ typed.text } /> : content }
 			</div>
 		</div>
 	);
@@ -72,6 +95,9 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	const [ error, setError ] = useState( '' );
 	const [ compare, setCompare ] = useState( false );
 	const threadRef = useRef( null );
+	// The replies of this visit, by turn, and those already typed out.
+	const turnId = useRef( 0 );
+	const typedTurns = useRef( new Set() );
 	const abortRef = useRef( null );
 	const lastAttemptRef = useRef( null );
 	const isNarrow = useMediaQuery( NARROW );
@@ -138,7 +164,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		const controller = new AbortController();
 		abortRef.current = controller;
 
-		const turn = { role: 'assistant', content: '', products: [] };
+		const turn = { id: ++turnId.current, role: 'assistant', content: '', products: [], live: true };
 		let shown = false;
 		const draw = () => {
 			const next = { ...turn };
@@ -163,6 +189,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 
 			turn.content = response.reply || '';
 			turn.products = response.products || [];
+			turn.live = false;
 			draw();
 		} catch ( e ) {
 			if ( 'AbortError' !== e.name ) {
@@ -226,6 +253,16 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		threadRef.current?.scrollTo( { top: threadRef.current.scrollHeight } );
 	}, [ messages, isSending, error ] );
 
+	// And its end while it is typed out, unless the visitor has scrolled up
+	// to read. On a phone the window scrolls, not the thread: nothing to do.
+	const keepInView = useCallback( () => {
+		const thread = threadRef.current;
+
+		if ( thread && thread.scrollHeight - thread.scrollTop - thread.clientHeight < 120 ) {
+			thread.scrollTop = thread.scrollHeight;
+		}
+	}, [] );
+
 	const onSubmit = ( event ) => {
 		event.preventDefault();
 		send();
@@ -287,7 +324,15 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 					) }
 
 					{ messages.map( ( message, index ) => '' !== message.content && (
-						<Message key={ index } role={ message.role } content={ message.content } />
+						<Message
+							key={ index }
+							role={ message.role }
+							content={ message.content }
+							live={ Boolean( message.live ) }
+							animate={ undefined !== message.id && ! typedTurns.current.has( message.id ) }
+							onType={ keepInView }
+							onDone={ () => typedTurns.current.add( message.id ) }
+						/>
 					) ) }
 
 					{ /* A bare spinner reads as "something is loading", not as the

@@ -2172,6 +2172,10 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	to { opacity: 1; }
 }
 
+@keyframes whsc-caret-blink {
+	50% { opacity: 0; }
+}
+
 @keyframes whsc-fade-in {
 	from { opacity: 0; }
 	to { opacity: 1; }
@@ -2589,6 +2593,29 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	padding: 1px 0 0;
 	background: none;
 	color: var(--whsc-assistant-text, var(--whsc-text, inherit));
+}
+
+/*
+ * A caret at the end of a reply that is still being written: typed out
+ * behind what has arrived, or waiting for the next piece. It stands after the
+ * last word, in the last paragraph or the last item of a closing list, and
+ * blinks but for a visitor who asks for less motion.
+ */
+.whsc-assistant__bubble.is-writing > :last-child:not(ol, ul)::after,
+.whsc-assistant__bubble.is-writing > :is(ol, ul):last-child > li:last-child::after,
+.whsc-assistant__bubble.is-writing:empty::after {
+	content: '';
+	display: inline-block;
+	width: 2px;
+	height: 1em;
+	margin-inline-start: 2px;
+	vertical-align: text-bottom;
+	background: currentColor;
+	animation: whsc-caret-blink 1s steps(1, end) infinite;
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+	}
 }
 
 /* A tinted block rather than loose red text, so a failure reads as a message
