@@ -19,10 +19,9 @@ import { isSecurePicture, pictureUrl } from '../../quizEditor';
  */
 const QuestionPicture = ( { value, onChange } ) => {
 	const frame = useRef( null );
-	const media = window.wp?.media;
 	const insecure = '' !== value && ! isSecurePicture( value );
 
-	if ( 'function' !== typeof media ) {
+	if ( 'function' !== typeof window.wp?.media ) {
 		return (
 			<InputControl
 				type="url"
@@ -35,9 +34,10 @@ const QuestionPicture = ( { value, onChange } ) => {
 	}
 
 	const choose = () => {
-		// One frame, opened again, keeps the library where it was left.
+		// One frame, opened again, keeps the library where it was left. The
+		// library is looked up when it is asked for, not when the editor drew.
 		if ( ! frame.current ) {
-			frame.current = media( {
+			frame.current = window.wp.media( {
 				title: __( 'Choose the question\'s picture', 'searcio' ),
 				library: { type: 'image' },
 				button: { text: __( 'Use this picture', 'searcio' ) },
