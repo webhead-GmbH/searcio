@@ -53,7 +53,7 @@ AI search and similar products come with every paid plan, and the AI shopping as
 * **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, the look editor on the Placement tab does the same, fonts included, set apart for desktops, tablets and phones. Until you pick others, the search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
 * **Multilingual** - works with WPML and Polylang, so visitors only see results in their language. How many languages are searched depends on your plan.
-* **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and Polish.
+* **In your language** - translated into German (Germany, informal and formal, Austria and Switzerland), French, Spanish, Italian and Polish.
 * **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
 * **WP-CLI** - run and watch syncs from the command line or a real system cron.
 
@@ -188,6 +188,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.0 =
+- German for sites set to "Deutsch (Sie)": the search window, the blocks and the settings speak to shoppers and shop owners as "Sie" there. Such a site showed everything in English.
 - New Product finder tab: make, edit, publish and delete the product finder's quizzes in WordPress instead of the Searcio panel. A question's picture comes from the Media Library, answers offer the values your filters really have, and before a quiz is published every way through it is checked for how many products it shows.
 - The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
 - The AI shopping assistant shows its reply as it is written, and the products as soon as it has found them, and writes prices in your shop's currency.
