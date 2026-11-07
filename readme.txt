@@ -196,6 +196,7 @@ Legal notice: https://searcio.com/impressum
 - Search as you type answers sooner after a pause in typing.
 - Ctrl+K and Cmd+K open the search with a keyboard layout that has no Latin letters, such as Persian or Russian, where they opened the browser's own search.
 - The AI shopping assistant numbers the products it suggests 1, 2, 3, where a reply with a blank line between them showed "1." for each.
+- The search window opens faster: the connection to Searcio is made as the page loads, what the window shows before typing is asked for as the pointer reaches the search and kept for the next pages of the visit, so there it opens full at once, and result cards load an image of half the weight (sent with the next sync).
 - Text in neighbouring paragraphs, headings and list items is indexed as separate words: a list of "Wool" and "Silk" was found only as "WoolSilk". The daily sync updates content that is already indexed.
 - Updated the webhead plugin framework to 1.10.0, which is licensed under the GPL like the plugin.
 - Messages on the settings screen, such as "Placement saved.", appear as WordPress's own notices at the bottom of the window.

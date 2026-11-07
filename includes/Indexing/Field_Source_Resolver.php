@@ -208,7 +208,11 @@ final class Field_Source_Resolver {
 			return null;
 		}
 
-		$url = wp_get_attachment_image_url( (int) $id, 'large' );
+		// A result card is at most about 260px wide, so 520 on a screen of two
+		// pixels to the point: WordPress's 768px size is plenty, and weighs about
+		// half the 1024px one the card used to load. An image narrower than
+		// that is sent as it is.
+		$url = wp_get_attachment_image_url( (int) $id, 'medium_large' );
 
 		return false === $url || null === $url ? null : (string) $url;
 	}

@@ -29,6 +29,8 @@ const loadApi = () => {
 
 beforeEach( () => {
 	jest.useFakeTimers( { doNotFake: [ 'queueMicrotask' ] } );
+	// What the window shows before the visitor types is kept across pages.
+	window.sessionStorage.clear();
 	setConfig();
 	global.fetch = jest.fn().mockResolvedValue( jsonResponse( { hits: [] } ) );
 } );
@@ -773,5 +775,151 @@ describe( 'streamAssistant', () => {
 		expect( JSON.parse( global.fetch.mock.calls[ 0 ][ 1 ].body ).filter ).toEqual( { lang: 'en' } );
 		expect( onProducts.mock.calls[ 0 ][ 0 ].map( ( hit ) => hit.id ) ).toEqual( [ 'p-en' ] );
 		expect( result.products.map( ( hit ) => hit.id ) ).toEqual( [ 'p-en' ] );
+	} );
+} );
+
+describe( 'what the window shows before the visitor types', () => {
+	/**
+	 * The next page of the visit: the script loaded anew, in the same tab. A
+	 * plain counter, since a module registry reset clears a mock's calls.
+	 *
+	 * @param {Object} body What the service answers.
+	 */
+	const nextPages = ( body ) => {
+		const asked = [];
+
+		global.fetch = ( url ) => {
+			asked.push( new URL( url ).pathname + ( new URL( url ).searchParams.get( 'q' ) || '' ) );
+
+			return Promise.resolve( jsonResponse( body ) );
+		};
+
+		const page = () => {
+			let api;
+
+			jest.isolateModules( () => {
+				api = require( './api' );
+			} );
+
+			return api;
+		};
+
+		return { asked, page };
+	};
+
+	it( 'is kept for the next page of the visit', async () => {
+		const { asked, page } = nextPages( { features: { assistant: true } } );
+
+		await page().fetchStorefrontConfig();
+		const config = await page().fetchStorefrontConfig();
+
+		expect( config ).toEqual( { features: { assistant: true } } );
+		expect( asked ).toHaveLength( 1 );
+	} );
+
+	it( 'keeps the highlights, and not a typed search', async () => {
+		const { asked, page } = nextPages( { hits: [] } );
+		const first = page();
+
+		await first.search( '', { surface: 'highlights' } );
+		await first.search( 'jacket' );
+
+		const second = page();
+
+		await second.search( '', { surface: 'highlights' } );
+		await second.search( 'jacket' );
+
+		expect( asked ).toEqual( [ '/api/v1/search', '/api/v1/searchjacket', '/api/v1/searchjacket' ] );
+	} );
+
+	it( 'is asked once by two that ask at the same time', async () => {
+		const api = loadApi();
+
+		await Promise.all( [ api.fetchPopularSearches(), api.fetchPopularSearches() ] );
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'still reaches the caller that waits when another stops waiting', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { features: {} } ) );
+		const api = loadApi();
+		const controller = new AbortController();
+		const stopped = api.fetchStorefrontConfig( { signal: controller.signal } );
+		const waiting = api.fetchStorefrontConfig();
+
+		controller.abort();
+
+		await expect( stopped ).rejects.toMatchObject( { name: 'AbortError' } );
+		await expect( waiting ).resolves.toEqual( { features: {} } );
+	} );
+
+	it( 'is asked again on the next page without a sessionStorage', async () => {
+		const { asked, page } = nextPages( { features: {} } );
+		const storage = jest.spyOn( Storage.prototype, 'getItem' ).mockImplementation( () => {
+			throw new Error( 'SecurityError' );
+		} );
+
+		await page().fetchStorefrontConfig();
+		await page().fetchStorefrontConfig();
+
+		expect( asked ).toHaveLength( 2 );
+		storage.mockRestore();
+	} );
+} );
+
+describe( 'warmUp', () => {
+	it( 'asks for the storefront config and the popular searches once, and no search', async () => {
+		const api = loadApi();
+
+		api.warmUp();
+		api.warmUp();
+		await Promise.resolve();
+
+		const paths = global.fetch.mock.calls.map( ( [ url ] ) => new URL( url ).pathname );
+
+		expect( paths.sort() ).toEqual( [ '/api/v1/search/popular', '/api/v1/storefront-config' ] );
+	} );
+
+	it( 'hands the window the request it started', async () => {
+		const api = loadApi();
+
+		api.warmUp();
+		await api.fetchStorefrontConfig();
+		await api.fetchPopularSearches();
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'asks for nothing when search is not set up', () => {
+		setConfig( { searchKey: '' } );
+		loadApi().warmUp();
+
+		expect( global.fetch ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'preconnect', () => {
+	afterEach( () => {
+		document.head.querySelectorAll( 'link[rel="preconnect"]' ).forEach( ( link ) => link.remove() );
+	} );
+
+	it( 'opens the connection to the service once, for requests without credentials', () => {
+		const api = loadApi();
+
+		api.preconnect();
+		api.preconnect();
+
+		const links = document.head.querySelectorAll( 'link[rel="preconnect"]' );
+
+		expect( links ).toHaveLength( 1 );
+		expect( links[ 0 ].getAttribute( 'href' ) ).toBe( 'https://search-cloud.test' );
+		expect( links[ 0 ].getAttribute( 'crossorigin' ) ).toBe( 'anonymous' );
+	} );
+
+	it( 'does nothing without an endpoint', () => {
+		setConfig( { endpoint: '' } );
+		loadApi().preconnect();
+
+		expect( document.head.querySelectorAll( 'link[rel="preconnect"]' ) ).toHaveLength( 0 );
 	} );
 } );
