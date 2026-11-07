@@ -168,12 +168,12 @@ This plugin sends data to Searcio, the hosted service that powers the search. Se
 * **Before you connect:** opening the Connection tab asks Searcio for the current addresses of its terms of use, privacy policy and data processing agreement, to link them beside the consent boxes. Nothing about your site is sent.
 * **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, which agreements you accepted, and an address on your site with a one-time code. Searcio uses them to create your account, or to find the one you have, and calls that address once to confirm that the site is yours.
 * **When you sync:** the content you chose to index - for example a post's title, text and link.
-* **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - which Searcio stores and applies.
-* **While you are connected:** the Connection and Search Config tabs, Site Health and the daily sync ask Searcio for the site's status, its search configuration and what your plan has used this month. These requests carry the site's keys and nothing else.
+* **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, merchandising rules and redirects - and the shop's currency, which Searcio stores and applies.
+* **While you are connected:** the Connection and Search Config tabs, Site Health and the daily sync ask Searcio for the site's status, its search configuration and what your plan has used this month. These requests carry the site's keys and nothing else, except that the daily sync also sends the shop's currency, which the AI shopping assistant writes prices in.
 * **When you disconnect:** a request to remove the site, after which Searcio deletes its search index.
 * **When a visitor searches:** the search term, the filters they pick or the answers they give in the product finder, the language of the page, how the search was started and where its results are shown, and which result they open. A product row asks for the products similar to the product on the page. Their browser contacts the service directly, so their IP address is visible to it. The list of a visitor's recent searches stays in their own browser.
-* **When a visitor uses the AI shopping assistant** (off unless you turn it on): the message they type.
-* **When a visitor searches by photo** (off unless you turn it on): the photo they upload.
+* **When a visitor uses the AI shopping assistant** (off unless you turn it on): the message they type, and the language of the page.
+* **When a visitor searches by photo** (off unless you turn it on): the photo they upload, and the language of the page.
 * **When a visitor searches by voice** (off unless you turn it on): the visitor's browser turns what they say into the search term with its own speech recognition, which some browsers, Chrome among them, run on their maker's servers. The plugin receives only the text, and searches it as above.
 * **When you pick a Google font in the look editor on the Placement tab** (off unless you pick one, and never for a font your site already has): every visitor's browser loads that font from Google Fonts (https://fonts.googleapis.com) on the pages that show the search, so their IP address is visible to Google. Google's privacy policy: https://policies.google.com/privacy
 
@@ -187,13 +187,14 @@ Legal notice: https://searcio.com/impressum
 
 == Changelog ==
 
-= Unreleased =
+= 1.4.0 =
 - The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
-- On a multilingual shop, photo search, similar products and the products the AI shopping assistant shows keep to the language of the page.
+- The AI shopping assistant shows its reply as it is written, and the products as soon as it has found them, and writes prices in your shop's currency.
+- On a multilingual shop, the product finder offers the quizzes in the language of the page, popular searches are those searched in it, and photo search, similar products and the products the AI shopping assistant shows keep to it. A merchandising rule can be kept to one language.
+- A filter value with a comma in it, such as a category named "Jackets, Coats & Knitwear", finds its products; it found none.
+- Search as you type answers sooner after a pause in typing.
 - The AI shopping assistant numbers the products it suggests 1, 2, 3, where a reply with a blank line between them showed "1." for each.
 - Text in neighbouring paragraphs, headings and list items is indexed as separate words: a list of "Wool" and "Silk" was found only as "WoolSilk". The daily sync updates content that is already indexed.
-
-= 1.4.0 =
 - Updated the webhead plugin framework to 1.10.0, which is licensed under the GPL like the plugin.
 - Messages on the settings screen, such as "Placement saved.", appear as WordPress's own notices at the bottom of the window.
 - The previews on the Placement tab and in the look editor show a placeholder while their page loads, instead of an empty white frame, and caching plugins are told never to keep a preview, so a visitor never gets one with settings you have not saved.
