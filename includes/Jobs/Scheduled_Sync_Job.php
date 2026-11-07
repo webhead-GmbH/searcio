@@ -3,7 +3,7 @@
  * Recurring scheduled full sync.
  *
  * Daily, per-site, lock-aware. It also asks Searcio for the plan tier
- * once a day. It does not do the work itself - it asks the sync
+ * once a day, and tells it the shop's currency. It does not do the work itself - it asks the sync
  * service to start a run when the site is connected and idle (and applies the
  * history retention policy). The heavy lifting happens in the resumable tick
  * worker so a single cron invocation never blocks.
@@ -21,6 +21,7 @@ namespace Webhead\WP\SearchCloud\Jobs;
 
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
+use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Cron_Event;
@@ -37,7 +38,8 @@ final class Scheduled_Sync_Job implements Job {
 	public function __construct(
 		private Sync_Service $service,
 		private Search_Cloud_Client $client,
-		private Connection_State $connection_state
+		private Connection_State $connection_state,
+		private Woo $woo
 	) {}
 
 	public function __invoke( mixed ...$args ): void {
@@ -46,6 +48,14 @@ final class Scheduled_Sync_Job implements Job {
 		// changed is noticed here within a day.
 		if ( $this->client->is_configured() ) {
 			$this->connection_state->remember_plan( $this->client->health() );
+
+			// A shop that changes its currency, or never saves the Search
+			// Config tab, is told within a day.
+			$currency = $this->woo->currency();
+
+			if ( null !== $currency ) {
+				$this->client->update_search_config( [ 'currency' => $currency ] );
+			}
 		}
 
 		$this->service->run_scheduled();

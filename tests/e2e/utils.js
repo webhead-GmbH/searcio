@@ -69,6 +69,11 @@ export const postHit = ( source = {}, id = 'post-1' ) => ( {
  * @param {number}         [options.visualDelay]  Hold the `/search/visual` answer this many ms.
  * @param {string}         [options.similarSearchId] A `search_id` on `/search/similar`, as a service that records them sends.
  * @param {string}         [options.visualSearchId]  A `search_id` on `/search/visual`, likewise.
+ * @param {boolean}        [options.assistantStream] Answer `/assistant/stream` with server-sent events;
+ *                                               without it the path is a 404, as on a service
+ *                                               from before the stream, and the widget asks
+ *                                               `/assistant`.
+ * @param {Function}       [options.onAssistantPath] Called with the path of each assistant request.
  */
 export async function mockSearchCloud( page, options = {} ) {
 	const {
@@ -88,6 +93,8 @@ export async function mockSearchCloud( page, options = {} ) {
 		assistantProducts = [],
 		assistantStatus = 200,
 		assistantDelay = 0,
+		assistantStream = false,
+		onAssistantPath,
 		onAssistant,
 		onSearch,
 		searchDelay = 0,
@@ -156,6 +163,22 @@ export async function mockSearchCloud( page, options = {} ) {
 				total: visualHits.length,
 				hits: visualHits,
 				facets: {},
+			} );
+		}
+		if ( path.startsWith( '/assistant' ) && onAssistantPath ) {
+			onAssistantPath( path );
+		}
+		if ( '/assistant/stream' === path && assistantStream ) {
+			// The products, the reply word by word, then the whole turn.
+			const event = ( name, data ) => `event: ${ name }\ndata: ${ JSON.stringify( data ) }\n\n`;
+			const words = assistantReply.split( /(?<= )/ );
+
+			return route.fulfill( {
+				status: 200,
+				headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'text/event-stream; charset=utf-8' },
+				body: event( 'products', { products: assistantProducts } )
+					+ words.map( ( word ) => event( 'delta', { text: word } ) ).join( '' )
+					+ event( 'done', { reply: assistantReply, products: assistantProducts } ),
 			} );
 		}
 		if ( '/assistant' === path ) {

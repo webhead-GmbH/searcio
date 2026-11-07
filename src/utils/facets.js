@@ -35,7 +35,23 @@ export const extractFieldFacets = ( facets ) => {
 };
 
 /**
- * `filter[field]=v1,v2` values from the active per-field selections, with any
+ * The values of one filter as `search()` sends them: comma-joined, which
+ * `/search` reads as "any of these", while no value holds a comma - the form
+ * every version of the service reads. A value with a comma of its own, such
+ * as the category "Jacken, Mäntel & Strick", would be split at it, so the
+ * values then go as a list instead, each one whole (`filter[field][]=`).
+ *
+ * @param {Array<string>} values
+ * @return {string|Array<string>} The comma-joined values, or the list.
+ */
+export const filterValue = ( values ) => {
+	const list = [ ...new Set( ( values || [] ).map( String ).filter( ( value ) => '' !== value ) ) ];
+
+	return list.some( ( value ) => value.includes( ',' ) ) ? list : list.join( ',' );
+};
+
+/**
+ * `filter[field]` values from the active per-field selections, with any
  * forced extra filters (e.g. `{featured: 'true'}` for curated highlights,
  * §3.3) merged in on top - a forced value always wins over an active
  * selection for the same field.
@@ -45,7 +61,7 @@ export const buildFilterParams = ( activeFacets, extra = {} ) => {
 
 	Object.entries( activeFacets || {} ).forEach( ( [ field, values ] ) => {
 		if ( Array.isArray( values ) && values.length > 0 ) {
-			params[ field ] = values.join( ',' );
+			params[ field ] = filterValue( values );
 		}
 	} );
 

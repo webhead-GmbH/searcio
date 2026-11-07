@@ -11,6 +11,7 @@ import {
 	extractRangeFields,
 	facetCoverage,
 	filterButtonLabel,
+	filterValue,
 	fitFilterButtons,
 	formatCount,
 	freezeValueOrder,
@@ -680,5 +681,33 @@ describe( 'arrangeTree', () => {
 
 	it( 'does not take a name from an object\'s prototype for a parent', () => {
 		expect( rows( arrangeTree( [ entry( 'constructor' ) ], { depth: 1, parents } ) ) ).toEqual( [ [ 'constructor', 0 ] ] );
+	} );
+} );
+
+/**
+ * `/search` reads a comma as "or" between values, so a category named
+ * "Jacken, Mäntel & Strick" was split into two that do not exist and found
+ * nothing, while its filter offered it with a count.
+ */
+describe( 'filterValue', () => {
+	it( 'comma-joins values that hold no comma, the form every service reads', () => {
+		expect( filterValue( [ 'Black', 'Navy' ] ) ).toBe( 'Black,Navy' );
+	} );
+
+	it( 'sends the values as a list when one holds a comma', () => {
+		expect( filterValue( [ 'Jacken, Mäntel & Strick', 'Herrenmode' ] ) ).toEqual( [ 'Jacken, Mäntel & Strick', 'Herrenmode' ] );
+	} );
+
+	it( 'sends each value once, and none that is empty', () => {
+		expect( filterValue( [ 'Black', 'Black', '' ] ) ).toBe( 'Black' );
+		expect( filterValue( [] ) ).toBe( '' );
+		expect( filterValue( undefined ) ).toBe( '' );
+	} );
+
+	it( 'is how buildFilterParams sends a selection', () => {
+		expect( buildFilterParams( { categories: [ 'Jacken, Mäntel & Strick' ], color: [ 'Black', 'Navy' ] } ) ).toEqual( {
+			categories: [ 'Jacken, Mäntel & Strick' ],
+			color: 'Black,Navy',
+		} );
 	} );
 } );

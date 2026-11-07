@@ -24,6 +24,7 @@ use Webhead\WP\SearchCloud\Connection\Api_Response;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
+use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
 
@@ -36,7 +37,8 @@ final class Search_Config_Endpoint extends Rest_API {
 	public function __construct(
 		private Search_Cloud_Client $client,
 		private Language_Config $language_config,
-		private Facet_Config $facet_config
+		private Facet_Config $facet_config,
+		private Woo $woo
 	) {}
 
 	protected function get_rest_namespace(): string {
@@ -57,6 +59,13 @@ final class Search_Config_Endpoint extends Rest_API {
 				[ 'message' => __( 'Invalid search configuration payload.', 'searcio' ) ],
 				400
 			);
+		}
+
+		// The shop's currency goes with every save; the tab has no field for it.
+		$currency = $this->woo->currency();
+
+		if ( null !== $currency ) {
+			$payload['currency'] = $currency;
 		}
 
 		return $this->respond( $this->client->update_search_config( $payload ) );

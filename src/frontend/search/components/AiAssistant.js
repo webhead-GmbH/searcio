@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@word
 import { __, _n, sprintf } from '@wordpress/i18n';
 import Button from './Button';
 
-import { askAssistant, trackClick } from '../../../utils/api';
+import { streamAssistant, trackClick } from '../../../utils/api';
 import { positionInSearch } from '../../../utils/clicks';
 import { NARROW, useMediaQuery } from '../../../utils/mediaQuery';
 import CompareTable, { comparisonRows } from './CompareTable';
@@ -51,8 +51,9 @@ const Message = ( { role, content } ) => {
 /**
  * The conversational shopping assistant tab: a chat thread on the left and the
  * assistant's found products (as a card grid, or an attribute Compare table) on
- * the right. Talks to the stateless `POST /assistant` endpoint, resending recent
- * turns as history. Rendered only when `/storefront-config` reports the plan
+ * the right. Talks to the stateless `POST /assistant/stream` endpoint,
+ * resending recent turns as history: the products show as soon as the
+ * assistant has searched, and its reply as it is written. Rendered only when `/storefront-config` reports the plan
  * includes the assistant (see SearchModal).
  *
  * On a narrow screen the chat and the products stack in one column, and the
@@ -101,6 +102,10 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		( message ) => 'assistant' === message.role && ( message.products || [] ).length > 0
 	);
 	const products = withProducts?.products || [];
+	// Once the reply has begun to arrive, it says that the assistant is at
+	// work; "Thinking" stays only until then.
+	const lastMessage = messages[ messages.length - 1 ];
+	const replyStarted = 'assistant' === lastMessage?.role && '' !== lastMessage.content;
 	// Each product was found by a catalogue search of its own, whose
 	// `search_id` it carries; its click counts in that search's list.
 	const openProduct = ( index ) =>
@@ -118,6 +123,59 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		__( 'Help me find a gift', 'searcio' ),
 		__( "What's on sale?", 'searcio' ),
 	];
+
+	/**
+	 * Ask for one reply and draw it as it comes: the turn joins the thread
+	 * with the products, and its text grows piece by piece. A turn that fails
+	 * part-way leaves the thread, so "Try again" does not put a second copy
+	 * of it beside the first.
+	 *
+	 * @param {string} message
+	 * @param {Array}  history
+	 */
+	const runTurn = async ( message, history ) => {
+		abortRef.current?.abort();
+		const controller = new AbortController();
+		abortRef.current = controller;
+
+		const turn = { role: 'assistant', content: '', products: [] };
+		let shown = false;
+		const draw = () => {
+			const next = { ...turn };
+			const replace = shown;
+
+			shown = true;
+			setMessages( ( current ) => ( replace ? [ ...current.slice( 0, -1 ), next ] : [ ...current, next ] ) );
+		};
+
+		try {
+			const response = await streamAssistant( message, history, {
+				signal: controller.signal,
+				onProducts: ( products ) => {
+					turn.products = products;
+					draw();
+				},
+				onDelta: ( text ) => {
+					turn.content += text;
+					draw();
+				},
+			} );
+
+			turn.content = response.reply || '';
+			turn.products = response.products || [];
+			draw();
+		} catch ( e ) {
+			if ( 'AbortError' !== e.name ) {
+				if ( shown ) {
+					setMessages( ( current ) => current.slice( 0, -1 ) );
+				}
+
+				setError( errorFor( e.status ) );
+			}
+		} finally {
+			setIsSending( false );
+		}
+	};
 
 	const send = useCallback( async ( preset ) => {
 		const trimmed = ( 'string' === typeof preset ? preset : input ).trim().slice( 0, MESSAGE_MAX );
@@ -140,24 +198,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		// retype what they already sent.
 		lastAttemptRef.current = { message: trimmed, history };
 
-		abortRef.current?.abort();
-		const controller = new AbortController();
-		abortRef.current = controller;
-
-		try {
-			const response = await askAssistant( trimmed, history, { signal: controller.signal } );
-
-			setMessages( ( current ) => [
-				...current,
-				{ role: 'assistant', content: response.reply || '', products: response.products || [] },
-			] );
-		} catch ( e ) {
-			if ( 'AbortError' !== e.name ) {
-				setError( errorFor( e.status ) );
-			}
-		} finally {
-			setIsSending( false );
-		}
+		await runTurn( trimmed, history );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- runTurn reads only refs and state setters.
 	}, [ input, isSending, messages ] );
 
 	/**
@@ -175,24 +217,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		setCompare( false );
 		setIsSending( true );
 
-		abortRef.current?.abort();
-		const controller = new AbortController();
-		abortRef.current = controller;
-
-		try {
-			const response = await askAssistant( attempt.message, attempt.history, { signal: controller.signal } );
-
-			setMessages( ( current ) => [
-				...current,
-				{ role: 'assistant', content: response.reply || '', products: response.products || [] },
-			] );
-		} catch ( e ) {
-			if ( 'AbortError' !== e.name ) {
-				setError( errorFor( e.status ) );
-			}
-		} finally {
-			setIsSending( false );
-		}
+		await runTurn( attempt.message, attempt.history );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- runTurn reads only refs and state setters.
 	}, [ isSending ] );
 
 	// Keep the newest turn in view.
@@ -260,14 +286,14 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 						</div>
 					) }
 
-					{ messages.map( ( message, index ) => (
+					{ messages.map( ( message, index ) => '' !== message.content && (
 						<Message key={ index } role={ message.role } content={ message.content } />
 					) ) }
 
 					{ /* A bare spinner reads as "something is loading", not as the
 					     assistant working on an answer - so say so, and animate it
 					     so the wait feels alive rather than frozen. */ }
-					{ isSending && (
+					{ isSending && ! replyStarted && (
 						<div className="whsc-assistant__msg whsc-assistant__msg--assistant">
 							<span
 								className="whsc-assistant__avatar whsc-assistant__avatar--thinking"

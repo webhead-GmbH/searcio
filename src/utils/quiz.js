@@ -11,6 +11,8 @@
  * mocked `fetch`.
  */
 
+import { filterValue } from './facets';
+
 /**
  * A range bound as a number, or null when it is missing or not a number.
  *
@@ -110,7 +112,8 @@ export const findQuestion = ( quiz, id ) =>
  * - One answer carrying several values for the same field means "any of
  *   these" - a "Clothing" answer tagging both `clothing` and `tshirts` is
  *   asking for either. They are comma-joined, which is how `/search` spells
- *   OR for a filter.
+ *   OR for a filter, or sent as a list when a value holds a comma of its own
+ *   ({@see filterValue}). Each tag is one whole value.
  * - A *later* answer for a field replaces whatever an earlier one put there,
  *   because the visitor's most recent choice is the one that counts.
  *
@@ -122,18 +125,15 @@ export const applyOption = ( tags, option ) => {
 	const fromThisAnswer = {};
 
 	( option?.tags_matched || [] ).forEach( ( tag ) => {
-		const seen = fromThisAnswer[ tag.field ];
-
-		// Skip a repeat of the same value: `red,red` filters no differently
-		// and only makes the URL harder to read.
-		if ( undefined === seen ) {
-			fromThisAnswer[ tag.field ] = tag.value;
-		} else if ( ! seen.split( ',' ).includes( tag.value ) ) {
-			fromThisAnswer[ tag.field ] = `${ seen },${ tag.value }`;
-		}
+		( fromThisAnswer[ tag.field ] ||= [] ).push( tag.value );
 	} );
 
-	return { ...tags, ...fromThisAnswer };
+	// A repeat of the same value is sent once: `red,red` filters no
+	// differently and only makes the URL harder to read.
+	return {
+		...tags,
+		...Object.fromEntries( Object.entries( fromThisAnswer ).map( ( [ field, values ] ) => [ field, filterValue( values ) ] ) ),
+	};
 };
 
 /**

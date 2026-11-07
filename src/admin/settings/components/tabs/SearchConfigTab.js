@@ -361,19 +361,28 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
  * banner. An empty trigger applies the rule to every search, which is how a
  * product is hidden site-wide.
  *
+ * On a multilingual site each rule also names the language it fires in:
+ * without one, a German rule "jacke" fired on the English search "jacket" too.
+ *
  * @param {Object}   props
  * @param {Array}    props.rules
- * @param {Function} props.onChange Called with the full replacement list.
+ * @param {Object}   props.errors
+ * @param {Array}    props.languages The site's languages, `{ code, name }`; none on a single-language site.
+ * @param {Function} props.onChange  Called with the full replacement list.
  */
-const MerchandisingCard = ( { rules, errors, onChange } ) => {
+const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
 	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
 	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
 	// Every field the normalizer produces, or the new row's category-trigger
 	// inputs are uncontrolled and show whatever the row at this index held.
 	const add = () => onChange( [
 		...rules,
-		{ query: '', filter_field: '', filter_value: '', pinned: [], hidden: [], banner: '' },
+		{ query: '', filter_field: '', filter_value: '', pinned: [], hidden: [], banner: '', lang: null },
 	] );
+	const languageItems = [
+		{ value: null, label: __( 'Every language', 'searcio' ) },
+		...languages.map( ( language ) => ( { value: language.code, label: `${ language.name } (${ language.code })` } ) ),
+	];
 
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
@@ -420,6 +429,14 @@ const MerchandisingCard = ( { rules, errors, onChange } ) => {
 										value={ rule.query }
 										onValueChange={ ( query ) => update( index, { ...rule, query } ) }
 									/>
+									{ languages.length > 1 && (
+										<SelectControl
+											label={ __( 'Language', 'searcio' ) }
+											description={ rowError( errors, 'merchandising', index, 'lang' )
+												|| __( 'The rule fires only for searches on pages in this language.', 'searcio' ) }
+											{ ...selectProps( languageItems, rule.lang, ( lang ) => update( index, { ...rule, lang } ) ) }
+										/>
+									) }
 									{ /* The optional category trigger. Both halves are needed
 									     for either to mean anything, so they sit together. */ }
 									<Grid auto={ 220 } gap="var(--wpds-dimension-gap-md)" align="start">
@@ -1046,6 +1063,7 @@ const SearchConfigTab = () => {
 				<MerchandisingCard
 					rules={ config.merchandising }
 					errors={ fieldErrors }
+					languages={ catalog?.languages?.active ? catalog.languages.available || [] : [] }
 					onChange={ ( rules ) => set( 'merchandising', rules ) }
 				/>
 

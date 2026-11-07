@@ -29,8 +29,10 @@ import SearchResultsSkeleton from './SearchResultsSkeleton';
 import VisualSearchButton from './VisualSearchButton';
 import SearcioCredit from './SearcioCredit';
 
-const SUGGEST_DEBOUNCE = 200;
-const LIVE_SEARCH_DEBOUNCE = 300;
+// A live search answers in about a quarter of a second, the server's share
+// of it well under a tenth, so the pause before one is most of the wait.
+const SUGGEST_DEBOUNCE = 120;
+const LIVE_SEARCH_DEBOUNCE = 150;
 const LIVE_SEARCH_MIN_LENGTH = 3;
 // Picks made in quick succession share one request.
 const FILTER_DEBOUNCE = 250;

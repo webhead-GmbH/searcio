@@ -602,3 +602,176 @@ describe( 'search analytics hints', () => {
 		} );
 	} );
 } );
+
+describe( 'filters whose values hold a comma', () => {
+	it( 'sends a list as one filter[field][] per value, and a string as before', async () => {
+		const api = loadApi();
+
+		await api.search( '', { filters: { categories: [ 'Jacken, Mäntel & Strick', 'Herrenmode' ], color: 'Black,Navy' } } );
+
+		const params = new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams;
+		expect( params.getAll( 'filter[categories][]' ) ).toEqual( [ 'Jacken, Mäntel & Strick', 'Herrenmode' ] );
+		expect( params.has( 'filter[categories]' ) ).toBe( false );
+		expect( params.get( 'filter[color]' ) ).toBe( 'Black,Navy' );
+	} );
+
+	it( 'leaves an empty list out', async () => {
+		const api = loadApi();
+
+		await api.search( 'x', { filters: { categories: [] } } );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'filter[categories][]' ) ).toBe( false );
+	} );
+} );
+
+/**
+ * Quizzes, popular searches, photo search and the assistant each take the
+ * page's language, so a German page is not offered the English quiz, English
+ * searches or English products.
+ */
+describe( 'the page language on every request that takes one', () => {
+	const multilingual = () => setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'de' } );
+	const photo = () => new File( [ 'x' ], 'p.jpg', { type: 'image/jpeg' } );
+	const lastUrl = () => new URL( global.fetch.mock.calls[ 0 ][ 0 ] );
+
+	it( 'asks for the quizzes in the page\'s language', async () => {
+		multilingual();
+		global.fetch.mockResolvedValue( jsonResponse( { quizzes: [] } ) );
+
+		await loadApi().fetchQuizzes();
+
+		expect( lastUrl().searchParams.get( 'filter[lang]' ) ).toBe( 'de' );
+	} );
+
+	it( 'asks for the popular searches of the page\'s language', async () => {
+		multilingual();
+		global.fetch.mockResolvedValue( jsonResponse( { popular: [] } ) );
+
+		await loadApi().fetchPopularSearches();
+
+		expect( lastUrl().searchParams.get( 'filter[lang]' ) ).toBe( 'de' );
+	} );
+
+	it( 'searches by photo in the page\'s language', async () => {
+		multilingual();
+		global.fetch.mockResolvedValue( jsonResponse( { tags: [], hits: [] } ) );
+
+		await loadApi().visualSearch( photo() );
+
+		expect( lastUrl().searchParams.get( 'filter[lang]' ) ).toBe( 'de' );
+	} );
+
+	it( 'sends the page\'s language with an assistant message', async () => {
+		multilingual();
+		global.fetch.mockResolvedValue( jsonResponse( { reply: '', products: [] } ) );
+
+		await loadApi().askAssistant( 'eine Regenjacke' );
+
+		expect( JSON.parse( global.fetch.mock.calls[ 0 ][ 1 ].body ).filter ).toEqual( { lang: 'de' } );
+	} );
+
+	it( 'sends no language on a single-language site', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { quizzes: [], popular: [], reply: '', products: [], tags: [], hits: [] } ) );
+		const api = loadApi();
+
+		await api.fetchQuizzes();
+		await api.fetchPopularSearches();
+		await api.visualSearch( photo() );
+		await api.askAssistant( 'a rain jacket' );
+
+		global.fetch.mock.calls.slice( 0, 3 ).forEach( ( [ url ] ) => expect( new URL( url ).searchParams.has( 'filter[lang]' ) ).toBe( false ) );
+		expect( JSON.parse( global.fetch.mock.calls[ 3 ][ 1 ].body ) ).not.toHaveProperty( 'filter' );
+	} );
+} );
+
+/**
+ * `POST /assistant/stream` answers with server-sent events: the products once
+ * the assistant has searched, then the reply in pieces, then `done`.
+ */
+describe( 'streamAssistant', () => {
+	const { TextDecoder: NodeTextDecoder, TextEncoder } = require( 'util' );
+	const encoder = new TextEncoder();
+
+	beforeAll( () => {
+		global.TextDecoder = global.TextDecoder || NodeTextDecoder;
+	} );
+
+	/** A 200 event stream whose body arrives in these chunks. */
+	const streamResponse = ( chunks ) => {
+		const queue = chunks.map( ( chunk ) => encoder.encode( chunk ) );
+
+		return {
+			ok: true,
+			status: 200,
+			headers: { get: () => 'text/event-stream; charset=utf-8' },
+			body: {
+				getReader: () => ( {
+					read: () => Promise.resolve( queue.length > 0 ? { value: queue.shift(), done: false } : { value: undefined, done: true } ),
+				} ),
+			},
+		};
+	};
+
+	const event = ( name, data ) => `event: ${ name }\ndata: ${ JSON.stringify( data ) }\n\n`;
+
+	it( 'hands over the products and the pieces of the reply as they arrive', async () => {
+		const whole = event( 'products', { products: [ { id: 'p-1' } ] } ) + event( 'delta', { text: 'Two ' } ) + event( 'delta', { text: 'jackets.' } ) + event( 'done', { reply: 'Two jackets.', products: [ { id: 'p-1' } ] } );
+		// Cut anywhere, inside a line too: the reader keeps what is unfinished.
+		global.fetch.mockResolvedValue( streamResponse( [ whole.slice( 0, 7 ), whole.slice( 7, 50 ), whole.slice( 50 ) ] ) );
+		const onProducts = jest.fn();
+		const pieces = [];
+
+		const result = await loadApi().streamAssistant( 'a rain jacket', [], { onProducts, onDelta: ( text ) => pieces.push( text ) } );
+
+		const [ url, options ] = global.fetch.mock.calls[ 0 ];
+		expect( url ).toContain( '/assistant/stream?' );
+		expect( options.headers.Accept ).toBe( 'text/event-stream' );
+		expect( onProducts ).toHaveBeenCalledWith( [ { id: 'p-1' } ] );
+		expect( pieces ).toEqual( [ 'Two ', 'jackets.' ] );
+		expect( result ).toEqual( { reply: 'Two jackets.', products: [ { id: 'p-1' } ] } );
+	} );
+
+	it( 'asks POST /assistant instead when the service has no stream (404)', async () => {
+		global.fetch
+			.mockResolvedValueOnce( jsonResponse( {}, false, 404 ) )
+			.mockResolvedValueOnce( jsonResponse( { reply: 'Here you go', products: [] } ) );
+
+		const result = await loadApi().streamAssistant( 'a rain jacket' );
+
+		expect( global.fetch.mock.calls[ 1 ][ 0 ] ).toMatch( /\/assistant\?/ );
+		expect( result.reply ).toBe( 'Here you go' );
+	} );
+
+	it( 'throws with the status of a refusal, which comes before the stream', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( {}, false, 429 ) );
+
+		await expect( loadApi().streamAssistant( 'x' ) ).rejects.toMatchObject( { status: 429 } );
+	} );
+
+	it( 'throws when the turn fails part-way, or the stream ends before it does', async () => {
+		global.fetch.mockResolvedValueOnce( streamResponse( [ event( 'delta', { text: 'Two' } ) + event( 'error', { error: 'Provider unreachable' } ) ] ) );
+		await expect( loadApi().streamAssistant( 'x' ) ).rejects.toThrow( 'failed' );
+
+		global.fetch.mockResolvedValueOnce( streamResponse( [ event( 'delta', { text: 'Two' } ) ] ) );
+		await expect( loadApi().streamAssistant( 'x' ) ).rejects.toThrow( 'ended before' );
+	} );
+
+	it( 'reads an answer that is not a stream as a whole reply', async () => {
+		global.fetch.mockResolvedValue( { ...jsonResponse( { reply: 'Whole', products: [ { id: 'p-2' } ] } ), headers: { get: () => 'application/json' } } );
+
+		await expect( loadApi().streamAssistant( 'x' ) ).resolves.toEqual( { reply: 'Whole', products: [ { id: 'p-2' } ] } );
+	} );
+
+	it( 'sends the page\'s language and keeps the products to it', async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'en' } );
+		const products = [ { id: 'p-en', source: { lang: 'en' } }, { id: 'p-de', source: { lang: 'de' } } ];
+		global.fetch.mockResolvedValue( streamResponse( [ event( 'products', { products } ) + event( 'done', { reply: 'One.', products } ) ] ) );
+		const onProducts = jest.fn();
+
+		const result = await loadApi().streamAssistant( 'a rain jacket', [], { onProducts } );
+
+		expect( JSON.parse( global.fetch.mock.calls[ 0 ][ 1 ].body ).filter ).toEqual( { lang: 'en' } );
+		expect( onProducts.mock.calls[ 0 ][ 0 ].map( ( hit ) => hit.id ) ).toEqual( [ 'p-en' ] );
+		expect( result.products.map( ( hit ) => hit.id ) ).toEqual( [ 'p-en' ] );
+	} );
+} );
