@@ -239,6 +239,19 @@ $lift: ':is(*, #whsc#whsc#whsc)';
  * on, and the spacing a theme sets for all of its text. Its colours and its
  * background are its own, from the `--whsc-*` properties.
  */
+/*
+ * Under WordPress's toolbar, which a theme may lift above anything a window
+ * can be (fisch-gruber.at gives it `z-index: 2147483647`): the overlays start
+ * where the toolbar ends, `--whsc-admin-bar`, which the search window measures
+ * as it opens and is 0 for a visitor. What fills them, the "All filters"
+ * drawer and a phone's sheet, takes its height from them; the window says so
+ * below.
+ */
+.whsc-modal-overlay#{$lift},
+.whsc-sheet-overlay#{$lift} {
+	top: var(--whsc-admin-bar, 0px);
+}
+
 .whsc-modal-overlay#{$lift},
 .whsc-sheet-overlay#{$lift} {
 	color: inherit;
@@ -560,8 +573,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	border: 0;
 	max-width: var(--whsc-modal-width, 100%);
 	height: auto;
-	max-height: calc(92vh - var(--whsc-modal-offset, 0px));
-	max-height: calc(92dvh - var(--whsc-modal-offset, 0px));
+	max-height: calc(92vh - var(--whsc-modal-offset, 0px) - var(--whsc-admin-bar, 0px));
+	max-height: calc(92dvh - var(--whsc-modal-offset, 0px) - var(--whsc-admin-bar, 0px));
 	margin: var(--whsc-modal-offset, 0) auto 0;
 	background: var(--whsc-bg);
 	color: var(--whsc-text);
@@ -571,8 +584,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 .whsc-modal .components-modal__content {
 	padding: 0;
-	max-height: calc(92vh - var(--whsc-modal-offset, 0px));
-	max-height: calc(92dvh - var(--whsc-modal-offset, 0px));
+	max-height: calc(92vh - var(--whsc-modal-offset, 0px) - var(--whsc-admin-bar, 0px));
+	max-height: calc(92dvh - var(--whsc-modal-offset, 0px) - var(--whsc-admin-bar, 0px));
 	overflow-y: auto;
 	overflow-x: hidden;
 	// The page under the window does not scroll on when this reaches its end.
@@ -598,8 +611,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 @media screen and (max-width: 782px), screen and (max-height: 500px) {
 	.whsc-modal.components-modal__frame {
 		max-width: 100%;
-		height: 100vh;
-		height: 100dvh;
+		height: calc(100vh - var(--whsc-admin-bar, 0px));
+		height: calc(100dvh - var(--whsc-admin-bar, 0px));
 		max-height: none;
 		margin: 0;
 		border-radius: 0;

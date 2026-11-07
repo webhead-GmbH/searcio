@@ -12,6 +12,7 @@ import {redirectTarget} from '../../../utils/redirect';
 import {trackScrollEnd} from '../../../utils/scrollEnd';
 import {GRID_RESULTS, useMediaQuery} from '../../../utils/mediaQuery';
 import {rememberCapabilities, rememberedCapabilities} from '../../../utils/capabilities';
+import {adminBarOffset} from '../../../utils/adminBar';
 import {ResultCard} from './templates';
 import {micIcon} from './icons';
 import AiAssistant from './AiAssistant';
@@ -393,6 +394,25 @@ const SearchModal = ({
 		const overlay = document.querySelector('.whsc-modal-overlay');
 
 		overlay?.setAttribute('data-webhead-frontend-root', '');
+	}, []);
+
+	// The window and the sheets over it start under WordPress's toolbar, which
+	// a theme may lift above anything a window can be: `--whsc-admin-bar` is
+	// how far the toolbar reaches down the screen, 0 for a visitor. Set on
+	// `body`, the parent of every overlay the package portals, and measured
+	// again when the screen changes size, since the toolbar is 32px tall on a
+	// desktop, 46px up to 782px and scrolls away below 601px.
+	useEffect(() => {
+		const {body} = document;
+		const measure = () => body.style.setProperty('--whsc-admin-bar', `${adminBarOffset()}px`);
+
+		measure();
+		window.addEventListener('resize', measure);
+
+		return () => {
+			window.removeEventListener('resize', measure);
+			body.style.removeProperty('--whsc-admin-bar');
+		};
 	}, []);
 
 	// Fetched once per modal session (not per query) per `card-templates.md`'s
