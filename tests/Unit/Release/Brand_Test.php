@@ -202,7 +202,7 @@ final class Brand_Test extends TestCase {
 	private function translations(): array {
 		$files = array_map( fn ( string $path ): string => 'languages/' . basename( $path ), glob( $this->root() . '/languages/searcio-*.po' ) );
 
-		$this->assertCount( 7, $files );
+		$this->assertCount( 9, $files );
 
 		return $files;
 	}
