@@ -4,6 +4,7 @@ import domReady from '@wordpress/dom-ready';
 import './scss/style.scss';
 import App from './components/App';
 import { attachOpeners } from './openers';
+import { preconnect, warmUp } from '../../utils/api';
 
 const hydrated = new WeakSet();
 
@@ -80,7 +81,32 @@ const sync = () => {
 	render();
 };
 
+/*
+ * A visitor about to search: the pointer reaches a search control, it takes
+ * focus or a finger touches it. What the window asks for as it opens is asked
+ * then, a few hundred milliseconds before the click (`warmUp()`), once.
+ */
+const INTENT_EVENTS = [ 'pointerover', 'focusin', 'touchstart' ];
+const SEARCH_CONTROLS = '[data-whsc-trigger], .searcio-open, a[href="#searcio"]';
+
+const onIntent = ( event ) => {
+	const control = event.target instanceof window.Element ? event.target.closest( SEARCH_CONTROLS ) : null;
+
+	if ( control ) {
+		// The highlights the window of this control opens on: its own scope and
+		// source, or the site's trigger's for a link that opens the search.
+		const trigger = control.closest( '[data-whsc-trigger]' ) || document.querySelector( '[data-whsc-trigger][data-whsc-site]' );
+
+		warmUp( { type: trigger?.dataset.type || '', source: trigger?.dataset.highlightsSource || 'newest' } );
+		INTENT_EVENTS.forEach( ( type ) => document.removeEventListener( type, onIntent, true ) );
+	}
+};
+
 const boot = () => {
+	// The connection to the service opens while the page loads.
+	preconnect();
+	INTENT_EVENTS.forEach( ( type ) => document.addEventListener( type, onIntent, { capture: true, passive: true } ) );
+
 	attachOpeners( window.searcioFrontend?.placement || {} );
 
 	sync();

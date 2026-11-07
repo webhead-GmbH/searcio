@@ -4,7 +4,7 @@ import {chevronDown, closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import Button from './Button';
 
-import {currentLangFilter, fetchCardTemplates, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
+import {currentLangFilter, fetchCardTemplates, fetchHighlights, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
 import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
@@ -527,14 +527,13 @@ const SearchModal = ({
 		// all for an unsupported/unrestricted language, since there's no
 		// sensible native-search fallback for a passive, empty-query carousel
 		// (unlike a real committed search below).
-		const forced = {...currentLangFilter(), ...('featured' === highlightsSource ? {featured: 'true'} : {})};
 		const appliedFacets = facetsOverride ?? activeFacets;
 		const appliedRanges = rangesOverride ?? activeRanges;
-		const filters = buildFilterParams(appliedFacets, forced);
-		const ranges = buildRangeParams(appliedRanges);
 
+		// Built by `fetchHighlights()`, which the warm-up on the search control
+		// asks with too, so the row the window opens on is often there already.
 		try {
-			const response = await search('', {type, filters, ranges, perPage: 12, surface: 'highlights'});
+			const response = await fetchHighlights({type, source: highlightsSource, facets: appliedFacets, ranges: appliedRanges});
 
 			if (!isLatest()) {
 				return;

@@ -5,10 +5,16 @@
  * - A tiny in-memory, TTL'd LRU caches identical GET responses for the current
  *   page view, so repeats (clicking the same recent/popular term, typing then
  *   backspacing, re-opening the modal) are instant and never re-hit the server.
- *   The cache is intentionally ephemeral - it lives only in this page's JS
- *   memory, so a reload always starts fresh; entries also expire after a short
- *   TTL, so results/prices are never more than that stale. There is no manual
- *   purge to maintain: navigation and TTL are the only invalidation.
+ *   Entries expire after a short TTL, so results and prices are never more
+ *   than that stale; the TTL is the only invalidation.
+ * - What the window asks for whichever page it opens on - the storefront
+ *   config, card templates, popular searches, quizzes and the highlights - is
+ *   kept in `sessionStorage` as well, under the same TTL, so the window opens
+ *   full on the next page of the visit; and two callers that ask for one of
+ *   those at the same time share one request ({@see warmUp}). A typed search
+ *   is kept in this page's memory only.
+ * - `preconnect()` opens the connection to the service as the page loads, so
+ *   the first search does not wait for DNS, TCP and TLS.
  * - Callers pass an `AbortSignal` so a superseded query (rapid clicks/typing)
  *   is cancelled instead of racing to completion.
  *
@@ -16,12 +22,16 @@
  */
 
 import { currentLangFilter as resolveCurrentLangFilter, inLanguage, isLanguageSupported as resolveLanguageSupported } from './language';
+import { buildFilterParams, buildRangeParams } from './facets';
 
 // A page a cache saved before 1.4.0 still prints the config under the
 // plugin's first name, while it loads this script.
 const config = window.searcioFrontend || window.webheadSearchCloudFrontend || {};
 
 const SEARCH_TTL = 60000; // 60s - results/prices stay fresh within a minute.
+// The highlights (newest or featured products) are the same for every visitor
+// and change when the catalogue does: kept a few minutes, across pages too.
+const HIGHLIGHTS_TTL = 300000; // 5 minutes.
 const SUGGEST_TTL = 30000; // 30s - autocomplete is cheaper and more transient.
 // Card templates are designed in the Searcio panel and change rarely -
 // per `card-templates.md`, fetch once per page load rather than per query.
@@ -44,7 +54,14 @@ const SIMILAR_TTL = 600000; // 10 minutes.
 const SIMILAR_MAX = 20;
 const CACHE_MAX = 60;
 
+// The answers kept across the pages of a visit: what the window shows before
+// the visitor types, the same on every page.
+const KEPT_PATHS = [ '/storefront-config', '/card-templates', '/search/popular', '/quizzes' ];
+const STORE_PREFIX = 'searcio.cache:';
+
 const cache = new Map();
+// Requests of kept answers on their way, shared by every caller that asks.
+const pending = new Map();
 
 const buildUrl = ( path, params ) => {
 	const url = new URL( `${ config.endpoint || '' }${ path }` );
@@ -93,6 +110,64 @@ const writeCache = ( key, data ) => {
 	}
 };
 
+const isKept = ( path, params ) => KEPT_PATHS.includes( path ) || ( '/search' === path && 'highlights' === params.surface );
+
+// `sessionStorage` can be missing, full or refused (a private window, a
+// blocked site): the answer is then asked for again, as it always was.
+const readStored = ( key, ttl ) => {
+	try {
+		const kept = JSON.parse( window.sessionStorage.getItem( STORE_PREFIX + key ) || 'null' );
+
+		return kept && Date.now() - kept.at <= ttl ? kept.data : undefined;
+	} catch ( e ) {
+		return undefined;
+	}
+};
+
+const writeStored = ( key, data ) => {
+	try {
+		window.sessionStorage.setItem( STORE_PREFIX + key, JSON.stringify( { at: Date.now(), data } ) );
+	} catch ( e ) {
+		// Not kept across pages, still kept in memory.
+	}
+};
+
+const fetchJson = async ( url, path, signal ) => {
+	const response = await fetch( url, { method: 'GET', credentials: 'omit', signal } );
+
+	if ( ! response.ok ) {
+		throw new Error( `searcio: ${ path } responded ${ response.status }` );
+	}
+
+	return response.json();
+};
+
+/**
+ * A shared request, as one caller waits for it: the caller's signal stops its
+ * own wait, not the request the others wait for too.
+ *
+ * @param {Promise}     promise
+ * @param {AbortSignal} [signal]
+ */
+const awaitShared = ( promise, signal ) => {
+	if ( ! signal ) {
+		return promise;
+	}
+
+	return new Promise( ( resolve, reject ) => {
+		const abort = () => reject( new DOMException( 'The request was aborted.', 'AbortError' ) );
+
+		if ( signal.aborted ) {
+			abort();
+
+			return;
+		}
+
+		signal.addEventListener( 'abort', abort, { once: true } );
+		promise.then( resolve, reject );
+	} );
+};
+
 /**
  * @param {string}      path
  * @param {Object}      params
@@ -110,19 +185,102 @@ const request = async ( path, params, ttl, signal ) => {
 		}
 	}
 
-	const response = await fetch( url, { method: 'GET', credentials: 'omit', signal } );
+	if ( ttl > 0 && isKept( path, params ) ) {
+		const stored = readStored( url, ttl );
 
-	if ( ! response.ok ) {
-		throw new Error( `searcio: ${ path } responded ${ response.status }` );
+		if ( undefined !== stored ) {
+			writeCache( url, stored );
+
+			return stored;
+		}
+
+		if ( ! pending.has( url ) ) {
+			pending.set(
+				url,
+				fetchJson( url, path )
+					.then( ( data ) => {
+						writeCache( url, data );
+						writeStored( url, data );
+
+						return data;
+					} )
+					.finally( () => pending.delete( url ) )
+			);
+		}
+
+		return awaitShared( pending.get( url ), signal );
 	}
 
-	const data = await response.json();
+	const data = await fetchJson( url, path, signal );
 
 	if ( ttl > 0 ) {
 		writeCache( url, data );
 	}
 
 	return data;
+};
+
+/**
+ * Opens the connection to the service while the page loads, so the first
+ * search a visitor makes does not wait for DNS, TCP and TLS. The requests omit
+ * credentials, which is what `crossorigin` (anonymous) prepares for.
+ */
+export const preconnect = () => {
+	let origin;
+
+	try {
+		origin = new URL( config.endpoint ).origin;
+	} catch ( e ) {
+		return;
+	}
+
+	if ( origin === window.location.origin || document.querySelector( `link[rel="preconnect"][href="${ origin }"]` ) ) {
+		return;
+	}
+
+	const link = document.createElement( 'link' );
+
+	link.rel = 'preconnect';
+	link.href = origin;
+	link.crossOrigin = 'anonymous';
+	document.head.appendChild( link );
+};
+
+let warmed = false;
+
+/**
+ * The highlights row: the newest products, or the featured ones, in the page's
+ * language, with the filters the visitor has picked. The window asks for it
+ * as it opens and whenever a filter changes with the field empty, and
+ * {@see warmUp} asks for the same address, so the two share one answer.
+ *
+ * @param {{type?: string, source?: string, facets?: Object, ranges?: Object, signal?: AbortSignal}} [options]
+ */
+export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
+	const forced = { ...currentLangFilter(), ...( 'featured' === source ? { featured: 'true' } : {} ) };
+
+	return search( '', { type, filters: buildFilterParams( facets, forced ), ranges: buildRangeParams( ranges ), perPage: 12, surface: 'highlights', signal } );
+};
+
+/**
+ * Asks for what the window shows as it opens, a moment before the visitor
+ * opens it: as the pointer reaches a search control, it takes focus or a
+ * finger touches it (search-cloud #164). The storefront config, the popular
+ * searches and the highlights row of the control it reached; the highlights
+ * are kept for the visit, so they are asked for at most every few minutes.
+ * Once per page.
+ *
+ * @param {{type?: string, source?: string}} [instance] The search control's scope and highlights source.
+ */
+export const warmUp = ( instance = {} ) => {
+	if ( warmed || ! isConfigured() ) {
+		return;
+	}
+
+	warmed = true;
+	fetchStorefrontConfig().catch( () => {} );
+	fetchPopularSearches().catch( () => {} );
+	fetchHighlights( { type: instance.type || '', source: instance.source || 'newest' } ).catch( () => {} );
 };
 
 /** How a settled search was started, as the service records it (`origin` on `/search`). */
@@ -194,7 +352,10 @@ export const search = ( q, options = {} ) => {
 	// The hints are part of the address, so a settled search never answers
 	// from the cache a live request for the same words left behind: it goes
 	// out, and the service counts it.
-	const params = { q, type: options.type, page, per_page: options.perPage || 20, ...searchHints( q, page, options ) };
+	// `highlight=0`: the window never shows a hit's highlighted fragments, and
+	// highlighting is the most expensive part of a search for the engine
+	// (search-cloud #164: about 40% of its time on the demo shop's index).
+	const params = { q, type: options.type, page, per_page: options.perPage || 20, highlight: 0, ...searchHints( q, page, options ) };
 
 	// Filterable fields must already be configured as facet fields server-side
 	// (search.md) - an unfiltered chip list never sends a field the API would
@@ -226,7 +387,7 @@ export const search = ( q, options = {} ) => {
 		params[ `keywords[${ index }]` ] = words;
 	} );
 
-	return request( '/search', params, SEARCH_TTL, options.signal );
+	return request( '/search', params, 'highlights' === params.surface ? HIGHLIGHTS_TTL : SEARCH_TTL, options.signal );
 };
 
 /**

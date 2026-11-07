@@ -132,4 +132,31 @@ final class Field_Source_Resolver_Test extends Integration_Test_Case {
 
 		$this->assertSame( 'Smith & Sons', ( new Field_Source_Resolver() )->resolve( 'property:author', get_post( $post_id ) ) );
 	}
+
+	/**
+	 * A result card is at most about 260px wide: the image sent for it is
+	 * WordPress's 768px size, about half the bytes of the 1024px one.
+	 */
+	public function test_the_thumbnail_is_the_768px_size(): void {
+		$post_id = self::factory()->post->create();
+		$image   = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg', $post_id );
+		$asked   = [];
+
+		set_post_thumbnail( $post_id, $image );
+		add_filter(
+			'wp_get_attachment_image_src',
+			static function ( $source, $id, $size ) use ( &$asked ) {
+				$asked[] = $size;
+
+				return $source;
+			},
+			10,
+			3
+		);
+
+		$url = ( new Field_Source_Resolver() )->resolve( 'property:thumbnail', get_post( $post_id ) );
+
+		$this->assertSame( [ 'medium_large' ], $asked );
+		$this->assertSame( wp_get_attachment_image_url( $image, 'medium_large' ), $url );
+	}
 }
