@@ -194,6 +194,7 @@ Legal notice: https://searcio.com/impressum
 - For a logged-in user, the search window opens under WordPress's toolbar instead of behind it, also where a theme draws the toolbar above everything else.
 - The AI shopping assistant shows its reply as it is written, and the products as soon as it has found them, and writes prices in your shop's currency.
 - On a multilingual shop, the product finder offers the quizzes in the language of the page, popular searches are those searched in it, and photo search, similar products and the products the AI shopping assistant shows keep to it. A merchandising rule can be kept to one language.
+- The AI shopping assistant types its reply out as it arrives, with a blinking cursor while more is coming, instead of showing it a sentence at a time.
 - A filter value with a comma in it, such as a category named "Jackets, Coats & Knitwear", finds its products; it found none.
 - Search as you type answers sooner after a pause in typing.
 - Ctrl+K and Cmd+K open the search with a keyboard layout that has no Latin letters, such as Persian or Russian, where they opened the browser's own search.
