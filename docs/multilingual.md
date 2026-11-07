@@ -8,7 +8,7 @@ The plugin works with either **WPML** or **Polylang** to scope indexing and sear
 - During a sync, each post's language (resolved through WPML/Polylang) is tagged on its document. A post whose language isn't in your enabled set is skipped entirely - it's never sent to Searcio, so it never spends indexing quota and never appears in search.
 - A post whose language can't be resolved (a multilingual plugin is active, but the post itself has no language assigned) is treated as unrestricted rather than excluded, since there's nothing concrete to exclude it for.
 - On the front end, the search modal automatically scopes results to the visitor's current language, and asks for suggestions in it too (`filter[lang]`). So do the product finder (the quizzes in that language and those for every language), the popular searches, photo search and the AI shopping assistant; similar products keep to the language of the product. If the visitor's language isn't one of the enabled languages, search falls back to WordPress's native search instead of returning empty or wrongly-scoped results.
-- A merchandising rule on the Search Config tab can be kept to one language, so a German rule "jacke" does not fire on the English search "jacket". A quiz's language is set in the Searcio panel.
+- A merchandising rule on the Search Config tab can be kept to one language, so a German rule "jacke" does not fire on the English search "jacket". A quiz's language is set on the Product finder tab (or in the Searcio panel, which holds the same quizzes): one of the site's languages, or *Every language*.
 - Leaving the enabled-languages list empty means the site is unrestricted - every language is searchable, matching the default single-language behavior.
 
 ## WPML and Polylang together

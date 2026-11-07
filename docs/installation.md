@@ -107,3 +107,7 @@ The placeholder and the product row's heading set on the Placement tab are trans
 ## 6. Fine-tune search relevance (optional)
 
 Go to **Searcio → Search Config** to control which fields are searched and how heavily, per-type ranking boosts, which fields become filters (facets) or autocomplete suggestions, and synonyms. This data lives on Searcio's side, so changes take effect on the very next search - see [`configuration.md`](configuration.md#search-config) for the full reference.
+
+## 7. Add a product finder (optional)
+
+A product finder asks shoppers a few questions and shows the products that fit their answers, in the search window's *Product finder* tab. Go to **Searcio → Product finder**, click **Add a quiz**, write its questions and answers, check where it ends with **Check the endings**, and publish it - see [`configuration.md`](configuration.md#product-finder).
