@@ -96,7 +96,7 @@ const ProductList = ( {
 				}
 
 				const response = await search( '', {
-					filters: buildFilterParams( {}, { [ filterField ]: filterValue, ...currentLangFilter() } ),
+					filters: buildFilterParams( { [ filterField ]: [ filterValue ] }, currentLangFilter() ),
 					perPage: limit || 12,
 					surface: 'category',
 					signal: controller.signal,

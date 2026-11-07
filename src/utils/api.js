@@ -50,7 +50,10 @@ const buildUrl = ( path, params ) => {
 	const url = new URL( `${ config.endpoint || '' }${ path }` );
 
 	Object.entries( params ).forEach( ( [ key, value ] ) => {
-		if ( value !== undefined && value !== null && value !== '' ) {
+		// A list goes as one parameter per entry, `key[]=a&key[]=b`.
+		if ( Array.isArray( value ) ) {
+			value.forEach( ( entry ) => url.searchParams.append( key, entry ) );
+		} else if ( value !== undefined && value !== null && value !== '' ) {
 			url.searchParams.set( key, value );
 		}
 	} );
@@ -180,8 +183,11 @@ export const searchHints = ( q, page, options ) => {
 };
 
 /**
+ * A filter's value is the comma-joined values or, when one of them holds a
+ * comma, the list of them ({@see filterValue}), sent as `filter[field][]`.
+ *
  * @param {string} q
- * @param {{type?: string, filters?: Object<string,string>, ranges?: Object<string,string>, page?: number, perPage?: number, live?: boolean, origin?: string, surface?: string, signal?: AbortSignal}} [options]
+ * @param {{type?: string, filters?: Object<string,(string|Array<string>)>, ranges?: Object<string,string>, keywords?: Array<string>, page?: number, perPage?: number, live?: boolean, origin?: string, surface?: string, signal?: AbortSignal}} [options]
  */
 export const search = ( q, options = {} ) => {
 	const page = options.page || 1;
@@ -195,7 +201,11 @@ export const search = ( q, options = {} ) => {
 	// reject, since every chip only exists because a `/search` response
 	// already returned it as a facet.
 	Object.entries( options.filters || {} ).forEach( ( [ field, value ] ) => {
-		if ( value ) {
+		if ( Array.isArray( value ) ) {
+			if ( value.length > 0 ) {
+				params[ `filter[${ field }][]` ] = value;
+			}
+		} else if ( value ) {
 			params[ `filter[${ field }]` ] = value;
 		}
 	} );
@@ -253,7 +263,8 @@ export const fetchCardTemplates = ( type, options = {} ) => request(
  */
 export const fetchPopularSearches = ( options = {} ) => request(
 	'/search/popular',
-	{ limit: options.limit || 10 },
+	// What was searched on pages in this language, on a multilingual site.
+	{ limit: options.limit || 10, 'filter[lang]': currentLangFilter().lang },
 	POPULAR_TTL,
 	options.signal
 );
@@ -278,7 +289,9 @@ export const fetchStorefrontConfig = ( options = {} ) =>
  * @return {Promise<{quizzes: Array<Object>}>}
  */
 export const fetchQuizzes = ( options = {} ) =>
-	request( '/quizzes', {}, QUIZZES_TTL, options.signal );
+	// The quizzes in the page's language and those for every language, on a
+	// multilingual site.
+	request( '/quizzes', { 'filter[lang]': currentLangFilter().lang }, QUIZZES_TTL, options.signal );
 
 /**
  * Products similar to a given one, for a "you may also like" row (see
@@ -335,7 +348,7 @@ export const visualSearch = async ( file, options = {} ) => {
 
 	body.append( 'photo', file );
 
-	const response = await fetch( buildUrl( '/search/visual', {} ), {
+	const response = await fetch( buildUrl( '/search/visual', { 'filter[lang]': currentLangFilter().lang } ), {
 		method: 'POST',
 		credentials: 'omit',
 		body,
@@ -358,6 +371,18 @@ export const visualSearch = async ( file, options = {} ) => {
 };
 
 /**
+ * `{ filter: { lang } }` for an assistant request on a multilingual site, or
+ * nothing.
+ *
+ * @return {Object} The keys to add to the request body.
+ */
+const assistantFilter = () => {
+	const { lang } = currentLangFilter();
+
+	return lang ? { filter: { lang } } : {};
+};
+
+/**
  * The conversational shopping assistant (see docs/api/search.md `POST
  * /assistant`). Stateless: pass recent turns back as `history` to continue a
  * conversation. Resolves to `{ reply, products }`; on a non-2xx it throws an
@@ -374,7 +399,9 @@ export const askAssistant = async ( message, history = [], options = {} ) => {
 		method: 'POST',
 		credentials: 'omit',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify( { message, history } ),
+		// The page's language keeps the products it searches for to that
+		// language, and the reply in it, on a multilingual site.
+		body: JSON.stringify( { message, history, ...assistantFilter() } ),
 		signal: options.signal,
 	} );
 
@@ -388,6 +415,135 @@ export const askAssistant = async ( message, history = [], options = {} ) => {
 	const result = await response.json();
 
 	return { ...result, products: inLanguage( result?.products, currentLangFilter().lang ) };
+};
+
+/**
+ * The events of a `text/event-stream` body, as they arrive: `{ event, data }`
+ * per block, `data` parsed from JSON. An event's lines end at a blank line,
+ * and a chunk of the body can end anywhere, inside a line too.
+ *
+ * @param {ReadableStream} body
+ * @return {AsyncGenerator<{event: string, data: Object}>} The events.
+ */
+async function* serverEvents( body ) {
+	const reader = body.getReader();
+	const decoder = new TextDecoder();
+	let buffer = '';
+
+	const parse = ( block ) => {
+		let event = 'message';
+		const data = [];
+
+		block.split( /\r?\n/ ).forEach( ( line ) => {
+			if ( line.startsWith( 'event:' ) ) {
+				event = line.slice( 6 ).trim();
+			} else if ( line.startsWith( 'data:' ) ) {
+				data.push( line.slice( 5 ).replace( /^ /, '' ) );
+			}
+		} );
+
+		if ( 0 === data.length ) {
+			return null;
+		}
+
+		try {
+			return { event, data: JSON.parse( data.join( '\n' ) ) };
+		} catch ( e ) {
+			return null;
+		}
+	};
+
+	for ( ;; ) {
+		const { value, done } = await reader.read();
+
+		buffer += done ? decoder.decode() : decoder.decode( value, { stream: true } );
+
+		const blocks = buffer.split( /\r?\n\r?\n/ );
+		buffer = done ? '' : blocks.pop();
+
+		for ( const block of blocks ) {
+			const parsed = parse( block );
+
+			if ( parsed ) {
+				yield parsed;
+			}
+		}
+
+		if ( done ) {
+			return;
+		}
+	}
+}
+
+/**
+ * The shopping assistant, its reply shown as it is written
+ * (`docs/api/search.md`, `POST /assistant/stream`). The products come first,
+ * once the assistant has searched (`onProducts`, the whole list so far each
+ * time), then the reply in pieces (`onDelta`). Resolves to `{ reply,
+ * products }` when the turn is complete, as `askAssistant()` does.
+ *
+ * A refusal comes before the stream, with the status `askAssistant()` throws
+ * with. A service without the endpoint (404), a browser that cannot read a
+ * response as a stream, or an answer that is not a stream is answered by
+ * `askAssistant()` instead, without the pieces.
+ *
+ * @param {string}                                                  message
+ * @param {Array<{role: string, content: string}>}                  [history]
+ * @param {{signal?: AbortSignal, onProducts?: Function, onDelta?: Function}} [options]
+ * @return {Promise<{reply: string, products: Array<Object>}>}
+ */
+export const streamAssistant = async ( message, history = [], options = {} ) => {
+	if ( 'function' !== typeof TextDecoder ) {
+		return askAssistant( message, history, options );
+	}
+
+	const { lang } = currentLangFilter();
+	const response = await fetch( buildUrl( '/assistant/stream', {} ), {
+		method: 'POST',
+		credentials: 'omit',
+		headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+		body: JSON.stringify( { message, history, ...assistantFilter() } ),
+		signal: options.signal,
+	} );
+
+	if ( 404 === response.status ) {
+		return askAssistant( message, history, options );
+	}
+
+	if ( ! response.ok ) {
+		const error = new Error( `searcio: /assistant/stream responded ${ response.status }` );
+		error.status = response.status;
+
+		throw error;
+	}
+
+	if ( ! ( response.headers?.get?.( 'Content-Type' ) || '' ).includes( 'text/event-stream' ) || ! response.body?.getReader ) {
+		const result = await response.json();
+
+		return { ...result, products: inLanguage( result?.products, lang ) };
+	}
+
+	let products = [];
+
+	for await ( const { event, data } of serverEvents( response.body ) ) {
+		if ( 'products' === event ) {
+			products = inLanguage( data?.products, lang );
+			options.onProducts?.( products );
+		} else if ( 'delta' === event && 'string' === typeof data?.text ) {
+			options.onDelta?.( data.text );
+		} else if ( 'done' === event ) {
+			return {
+				reply: 'string' === typeof data?.reply ? data.reply : '',
+				products: Array.isArray( data?.products ) ? inLanguage( data.products, lang ) : products,
+			};
+		} else if ( 'error' === event ) {
+			// The turn failed part-way, and nothing was metered.
+			throw new Error( `searcio: /assistant/stream failed: ${ data?.error || '' }` );
+		}
+	}
+
+	// The stream ended without a `done`: the connection was cut part-way.
+	throw new Error( `searcio: /assistant/stream ended before the reply did` );
 };
 
 /**

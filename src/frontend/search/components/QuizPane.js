@@ -296,7 +296,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		...Object.entries( { ...tags, ...ranges } ).map( ( [ field, value ] ) => ( {
 			key: field,
 			name: humanizeFieldLabel( field, getConfig().fieldLabels ),
-			value: answerLabels[ field ] || value,
+			value: answerLabels[ field ] || ( Array.isArray( value ) ? value.join( ', ' ) : value ),
 		} ) ),
 		...keywordAnswers.map( ( entry, index ) => ( {
 			key: `keywords-${ index }`,

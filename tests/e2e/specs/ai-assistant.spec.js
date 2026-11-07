@@ -66,6 +66,35 @@ test.describe( 'AI Assistant tab', () => {
 	} );
 
 	/**
+	 * The reply shows as it is written, from `/assistant/stream`; a service
+	 * without the stream answers 404 and the turn above asks `/assistant`.
+	 */
+	test( 'streams the reply and the products from the assistant\'s stream', async ( { page, requestUtils } ) => {
+		const paths = [];
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantStream: true,
+			assistantReply: 'Two warm jackets for the rain.',
+			assistantProducts: [ postHit( { title: 'Pure Snow Shell' }, 'p-1' ), postHit( { title: 'Jet Black Padded' }, 'p-2' ) ],
+			onAssistantPath: ( path ) => paths.push( path ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await page.getByRole( 'tab', { name: /assistant/i } ).click();
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'a warm jacket' );
+		await input.press( 'Enter' );
+
+		await expect( page.locator( '.whsc-assistant__bubble', { hasText: 'Two warm jackets for the rain.' } ) ).toBeVisible();
+		await expect( page.locator( '.whsc-assistant__grid .whsc-card' ) ).toHaveCount( 2 );
+		await expect( page.locator( '.whsc-assistant__thinking' ) ).toHaveCount( 0 );
+		expect( paths ).toEqual( [ '/assistant/stream' ] );
+	} );
+
+	/**
 	 * Products that carry nothing beyond a title, link, image and price have no
 	 * attribute to compare; Compare used to open a table with a header and no
 	 * body.

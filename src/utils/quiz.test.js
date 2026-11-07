@@ -256,3 +256,18 @@ describe( 'search words and ranges', () => {
 		expect( answerKeywords( option( {} ) ) ).toBe( '' );
 	} );
 } );
+
+describe( 'applyOption with a value that holds a comma', () => {
+	it( 'keeps each tag one whole value and sends them as a list', () => {
+		const option = {
+			tags_matched: [
+				{ field: 'categories', value: 'Jacken, Mäntel & Strick' },
+				{ field: 'categories', value: 'Jackets, Coats & Knitwear' },
+			],
+		};
+
+		expect( applyOption( {}, option ) ).toEqual( {
+			categories: [ 'Jacken, Mäntel & Strick', 'Jackets, Coats & Knitwear' ],
+		} );
+	} );
+} );
