@@ -64,6 +64,7 @@ use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Compatibility\Woo_Compatibility;
 use Webhead\WP\SearchCloud\Compatibility\Multilingual_Support;
+use Webhead\WP\SearchCloud\Compatibility\Translation_Fallback;
 use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
@@ -246,6 +247,10 @@ final class Plugin extends Base_Plugin {
 			static function () use ( $container ): Woo_Compatibility {
 				return new Woo_Compatibility( $container->get( 'woo' ) );
 			}
+		);
+		$container->add(
+			'translation_fallback',
+			static fn (): Translation_Fallback => new Translation_Fallback( \Webhead\WP\SearchCloud\PLUGIN_DIR . 'languages', \Webhead\WP\SearchCloud\TEXT_DOMAIN )
 		);
 		// Shared: a table is registered with the Database_Manager once, and
 		// every service that is handed one has to be handed that same object.
@@ -456,6 +461,7 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'verify_endpoint' ) );
 		$hooks_manager->register( $container->get( 'indexing_endpoint' ) );
 		$hooks_manager->register( $container->get( 'woo_compatibility' ) );
+		$hooks_manager->register( $container->get( 'translation_fallback' ) );
 		$hooks_manager->register( $container->get( 'sync_endpoint' ) );
 		$hooks_manager->register( $container->get( 'cache_endpoint' ) );
 		$hooks_manager->register( $container->get( 'search_config_endpoint' ) );

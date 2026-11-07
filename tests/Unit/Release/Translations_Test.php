@@ -38,7 +38,7 @@ final class Translations_Test extends TestCase {
 
 	public function test_the_plugin_ships_the_languages_it_names(): void {
 		$this->assertEqualsCanonicalizing(
-			[ 'de_DE', 'de_DE_formal', 'de_AT', 'de_CH', 'fr_FR', 'es_ES', 'it_IT', 'pl_PL' ],
+			[ 'de_DE', 'de_DE_formal', 'de_AT', 'de_CH', 'de_CH_informal', 'fr_FR', 'es_ES', 'it_IT', 'pl_PL' ],
 			array_keys( self::locales() )
 		);
 	}

@@ -343,7 +343,7 @@ msgstr "Ergebnisse"
 #: includes/Elementor/Widgets/Search_Widget.php:253
 #: src/blocks/search/edit.js:102
 msgid "Design templates per content type in the Searcio panel's card builder. Any type without a published template there falls back to this plugin's own card."
-msgstr "Gestalte Vorlagen pro Inhaltstyp im Card-Builder des Searcio-Panels. Jeder Typ ohne veröffentlichte Vorlage dort verwendet stattdessen die eigene Karte dieses Plugins."
+msgstr "Gestalten Sie Vorlagen pro Inhaltstyp im Card-Builder des Searcio-Panels. Jeder Typ ohne veröffentlichte Vorlage dort verwendet stattdessen die eigene Karte dieses Plugins."
 
 #: includes/Elementor/Widgets/Search_Widget.php:260
 #: src/blocks/search/edit.js:113
@@ -423,7 +423,7 @@ msgstr "Beim Bearbeiten geöffnet lassen"
 
 #: includes/Elementor/Widgets/Search_Widget.php:318
 msgid "Shows the modal in the editor so you can see the Style settings as you change them. Visitors never see it open by itself."
-msgstr "Zeigt das Modal im Editor, damit du die Stil-Einstellungen beim Ändern direkt siehst. Besucher sehen es nie von selbst geöffnet."
+msgstr "Zeigt das Modal im Editor, damit Sie die Stil-Einstellungen beim Ändern direkt sehen. Besucher sehen es nie von selbst geöffnet."
 
 #: includes/Elementor/Widgets/Search_Widget.php:325
 msgid "Preview search"
@@ -705,7 +705,7 @@ msgstr "Inhaltsbreite"
 
 #: includes/Elementor/Widgets/Search_Widget.php:659
 msgid "The widest the content grows inside the full-width modal. Use your theme's container width to line it up with the page."
-msgstr "Die maximale Breite des Inhalts im Modal in voller Breite. Verwende die Container-Breite deines Themes, um ihn an der Seite auszurichten."
+msgstr "Die maximale Breite des Inhalts im Modal in voller Breite. Verwenden Sie die Container-Breite Ihres Themes, um ihn an der Seite auszurichten."
 
 #: includes/Elementor/Widgets/Search_Widget.php:665
 #: includes/Frontend/Look_Schema.php:137
@@ -743,7 +743,7 @@ msgstr "Modus-Tabs"
 
 #: includes/Elementor/Widgets/Search_Widget.php:706
 msgid "The row of tabs above the search box. It only appears when the AI assistant or a guided quiz is on for your site."
-msgstr "Die Tab-Leiste über dem Suchfeld. Sie erscheint nur, wenn der KI-Assistent oder ein Produktfinder für deine Website aktiv ist."
+msgstr "Die Tab-Leiste über dem Suchfeld. Sie erscheint nur, wenn der KI-Assistent oder ein Produktfinder für Ihre Website aktiv ist."
 
 #: includes/Elementor/Widgets/Search_Widget.php:713
 #: includes/Elementor/Widgets/Search_Widget.php:716
@@ -1108,13 +1108,13 @@ msgstr "Antworttext"
 #: includes/Frontend/Look_Schema.php:401
 #: src/blocks/search/edit.js:358
 msgid "Your message background"
-msgstr "Hintergrund deiner Nachricht"
+msgstr "Hintergrund Ihrer Nachricht"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1129
 #: includes/Frontend/Look_Schema.php:402
 #: src/blocks/search/edit.js:359
 msgid "Your message text"
-msgstr "Text deiner Nachricht"
+msgstr "Text Ihrer Nachricht"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1130
 #: includes/Frontend/Look_Schema.php:403
@@ -1464,7 +1464,7 @@ msgstr "Searcio ist noch nicht verbunden"
 
 #: includes/Health/Health_Tests.php:106
 msgid "Add your site ID, write key, and write secret on the Connection tab before syncing content."
-msgstr "Trage Website-ID, Write Key und Write Secret im Tab \"Verbindung\" ein, bevor du Inhalte synchronisierst."
+msgstr "Tragen Sie Website-ID, Write Key und Write Secret im Tab \"Verbindung\" ein, bevor Sie Inhalte synchronisieren."
 
 #: includes/Health/Health_Tests.php:112
 msgid "Searcio connection is configured"
@@ -1476,7 +1476,7 @@ msgstr "Verbindungsdaten sind gespeichert."
 
 #: includes/Health/Health_Tests.php:127
 msgid "Connect the plugin on the Connection tab, then re-run this check."
-msgstr "Verbinde das Plugin im Tab \"Verbindung\" und führe diese Prüfung dann erneut aus."
+msgstr "Verbinden Sie das Plugin im Tab \"Verbindung\" und führen Sie diese Prüfung dann erneut aus."
 
 #: includes/Health/Health_Tests.php:136
 msgid "Searcio could not be reached"
@@ -1484,7 +1484,7 @@ msgstr "Searcio konnte nicht erreicht werden"
 
 #: includes/Health/Health_Tests.php:138
 msgid "The health check to Searcio failed. Check the Connection tab and verify your credentials."
-msgstr "Der Health-Check zu Searcio ist fehlgeschlagen. Prüfe den Tab \"Verbindung\" und deine Zugangsdaten."
+msgstr "Der Health-Check zu Searcio ist fehlgeschlagen. Prüfen Sie den Tab \"Verbindung\" und Ihre Zugangsdaten."
 
 #: includes/Health/Health_Tests.php:158
 msgid "Searcio is reachable"
@@ -1500,7 +1500,7 @@ msgstr "Keine Inhaltstypen sind für die Indexierung aktiviert"
 
 #: includes/Health/Health_Tests.php:204
 msgid "Enable at least one post type or WooCommerce products on the Indexing tab so sync has something to send."
-msgstr "Aktiviere mindestens einen Beitragstyp oder WooCommerce-Produkte im Tab \"Indexierung\", damit die Synchronisierung etwas zu senden hat."
+msgstr "Aktivieren Sie mindestens einen Beitragstyp oder WooCommerce-Produkte im Tab \"Indexierung\", damit die Synchronisierung etwas zu senden hat."
 
 #: includes/Health/Health_Tests.php:210
 msgid "Content types are enabled for indexing"
@@ -1520,7 +1520,7 @@ msgstr "%d Beitrag/Beiträge wurden bei der letzten Synchronisierung aufgrund de
 
 #: includes/Health/Health_Tests.php:238
 msgid "These posts are in a language that isn't enabled on the Search Config tab. Enable their language there, or leave them out of search intentionally."
-msgstr "Diese Beiträge sind in einer Sprache verfasst, die im Tab \"Sucheinstellungen\" nicht aktiviert ist. Aktiviere dort ihre Sprache, oder lasse sie absichtlich aus der Suche heraus."
+msgstr "Diese Beiträge sind in einer Sprache verfasst, die im Tab \"Sucheinstellungen\" nicht aktiviert ist. Aktivieren Sie dort ihre Sprache, oder lassen Sie sie absichtlich aus der Suche heraus."
 
 #: includes/Health/Health_Tests.php:244
 msgid "No content was skipped due to language"
@@ -1599,15 +1599,15 @@ msgstr "Autor"
 
 #: includes/Routing/Connection_Endpoint.php:100
 msgid "You must accept the Terms of Service and Privacy Policy to connect."
-msgstr "Du musst die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren, um die Verbindung herzustellen."
+msgstr "Sie müssen die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren, um die Verbindung herzustellen."
 
 #: includes/Routing/Connection_Endpoint.php:157
 msgid "Could not reach Searcio. Try again."
-msgstr "Searcio konnte nicht erreicht werden. Versuche es erneut."
+msgstr "Searcio konnte nicht erreicht werden. Versuchen Sie es erneut."
 
 #: includes/Routing/Connection_Endpoint.php:164
 msgid "Could not disconnect from Searcio. Try again."
-msgstr "Die Verbindung zu Searcio konnte nicht getrennt werden. Versuche es erneut."
+msgstr "Die Verbindung zu Searcio konnte nicht getrennt werden. Versuchen Sie es erneut."
 
 #: includes/Routing/Connection_Endpoint.php:191
 #: includes/Routing/Connection_Endpoint.php:298
@@ -1618,15 +1618,15 @@ msgstr "Searcio konnte nicht erreicht werden."
 
 #: includes/Routing/Connection_Endpoint.php:348
 msgid "This domain is already connected. Log into the Searcio dashboard to retrieve your keys and paste them below."
-msgstr "Diese Domain ist bereits verbunden. Melde dich im Searcio-Dashboard an, um deine Schlüssel abzurufen, und füge sie unten ein."
+msgstr "Diese Domain ist bereits verbunden. Melden Sie sich im Searcio-Dashboard an, um Ihre Schlüssel abzurufen, und fügen Sie sie unten ein."
 
 #: includes/Routing/Connection_Endpoint.php:352
 msgid "Too many connect attempts. Wait a while and try again."
-msgstr "Zu viele Verbindungsversuche. Warte eine Weile und versuche es dann erneut."
+msgstr "Zu viele Verbindungsversuche. Warten Sie eine Weile und versuchen Sie es dann erneut."
 
 #: includes/Routing/Connection_Endpoint.php:356
 msgid "Searcio cannot provision new accounts right now. Try again later."
-msgstr "Searcio kann gerade keine neuen Konten anlegen. Versuche es später erneut."
+msgstr "Searcio kann gerade keine neuen Konten anlegen. Versuchen Sie es später erneut."
 
 #: includes/Routing/Connection_Endpoint.php:364
 #: includes/Routing/Connection_Endpoint.php:403
@@ -1636,7 +1636,7 @@ msgstr "Verbindung fehlgeschlagen."
 
 #: includes/Routing/Connection_Endpoint.php:400
 msgid "Invalid write credentials. Check the write key and secret."
-msgstr "Ungültige Write-Zugangsdaten. Prüfe Write Key und Write Secret."
+msgstr "Ungültige Write-Zugangsdaten. Prüfen Sie Write Key und Write Secret."
 
 #: includes/Routing/Connection_Endpoint.php:401
 msgid "Site is disabled in Searcio."
@@ -1711,7 +1711,7 @@ msgstr "Die Searcio-Suche: eine Lupe oder ein Suchfeld, das das Suchfenster öff
 
 #: includes/Sync/Incremental_Service.php:232
 msgid "Incremental sync paused: your Searcio plan limit was reached."
-msgstr "Inkrementelle Synchronisierung pausiert: Dein Searcio-Tariflimit wurde erreicht."
+msgstr "Inkrementelle Synchronisierung pausiert: Ihr Searcio-Tariflimit wurde erreicht."
 
 #. translators: %s: transport error message.
 #: includes/Sync/Incremental_Service.php:245
@@ -1734,7 +1734,7 @@ msgstr "Searcio hat die Aktualisierung abgelehnt (HTTP %d)."
 
 #: includes/Sync/Sync_Service.php:111
 msgid "Add and save your Searcio credentials before syncing."
-msgstr "Trage deine Searcio-Zugangsdaten ein und speichere sie, bevor du synchronisierst."
+msgstr "Tragen Sie Ihre Searcio-Zugangsdaten ein und speichern Sie sie, bevor Sie synchronisieren."
 
 #: includes/Sync/Sync_Service.php:120
 #: src/admin/settings/components/tabs/SyncTab.js:207
@@ -1753,11 +1753,11 @@ msgstr "Der Sync-Lauf konnte nicht gestartet werden."
 #: includes/Sync/Sync_Service.php:916
 #, php-format
 msgid "Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync."
-msgstr "Tariflimit für %1$s erreicht (Limit %2$s). Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
+msgstr "Tariflimit für %1$s erreicht (Limit %2$s). Upgraden Sie Ihren Tarif oder reduzieren Sie die zu indexierenden Inhalte und starten Sie die Synchronisierung erneut."
 
 #: includes/Sync/Sync_Service.php:922
 msgid "Your Searcio plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
-msgstr "Dein Searcio-Tariflimit wurde erreicht. Upgrade deinen Tarif oder reduziere die zu indexierenden Inhalte und starte die Synchronisierung erneut."
+msgstr "Ihr Searcio-Tariflimit wurde erreicht. Upgraden Sie Ihren Tarif oder reduzieren Sie die zu indexierenden Inhalte und starten Sie die Synchronisierung erneut."
 
 #. translators: %s: a length of time, such as "5 mins".
 #: includes/Sync/Sync_Service.php:936
@@ -1933,7 +1933,7 @@ msgstr "Keine ungespeicherten Änderungen."
 
 #: src/admin/settings/components/SettingsPanel.js:211
 msgid "Configure the plugin settings from one shared admin surface."
-msgstr "Konfiguriere die Plugin-Einstellungen an einer zentralen Stelle im Adminbereich."
+msgstr "Konfigurieren Sie die Plugin-Einstellungen an einer zentralen Stelle im Adminbereich."
 
 #: src/admin/settings/components/quiz/QuizEditor.js:214
 #: src/admin/settings/components/quiz/QuizList.js:332
@@ -1998,7 +1998,7 @@ msgstr "So funktioniert die Verbindung mit Searcio"
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:43
 msgid "Clicking Connect sends the email address shown on the Connection tab (or the one you enter under \"Not this email?\") to Searcio, along with this site's address."
-msgstr "Ein Klick auf \"Verbinden\" sendet die im Tab \"Verbindung\" angezeigte E-Mail-Adresse (oder die, die du unter \"Nicht diese E-Mail-Adresse?\" eingibst) zusammen mit der Adresse dieser Website an Searcio."
+msgstr "Ein Klick auf \"Verbinden\" sendet die im Tab \"Verbindung\" angezeigte E-Mail-Adresse (oder die, die Sie unter \"Nicht diese E-Mail-Adresse?\" eingeben) zusammen mit der Adresse dieser Website an Searcio."
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:49
 msgid "If that email has no Searcio account yet, one is created automatically and this site is connected right away - no further steps."
@@ -2006,11 +2006,11 @@ msgstr "Hat diese E-Mail-Adresse noch kein Searcio-Konto, wird automatisch eins 
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:55
 msgid "If that email already has a Searcio account, nothing is created or changed yet. Searcio emails a confirmation link to that address; once its owner clicks it, they choose which account to connect this site to. Come back here afterwards and paste the resulting keys into \"Advanced: manual key entry\" below."
-msgstr "Hat diese E-Mail-Adresse bereits ein Searcio-Konto, wird vorerst nichts erstellt oder geändert. Searcio sendet einen Bestätigungslink an diese Adresse; nach dem Klick darauf lässt sich auswählen, mit welchem Konto diese Website verbunden wird. Komm danach hierher zurück und füge die erhaltenen Schlüssel unten unter \"Erweitert: Schlüssel manuell eingeben\" ein."
+msgstr "Hat diese E-Mail-Adresse bereits ein Searcio-Konto, wird vorerst nichts erstellt oder geändert. Searcio sendet einen Bestätigungslink an diese Adresse; nach dem Klick darauf lässt sich auswählen, mit welchem Konto diese Website verbunden wird. Kommen Sie danach hierher zurück und fügen Sie die erhaltenen Schlüssel unten unter \"Erweitert: Schlüssel manuell eingeben\" ein."
 
 #: src/admin/settings/components/tabs/ConnectionExplainer.js:61
 msgid "Accepting the Terms of Service and Privacy Policy is required to continue. Accepting the Data Processing Agreement is optional."
-msgstr "Um fortzufahren, musst du die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren. Der Auftragsverarbeitungsvertrag ist optional."
+msgstr "Um fortzufahren, müssen Sie die Nutzungsbedingungen und die Datenschutzerklärung akzeptieren. Der Auftragsverarbeitungsvertrag ist optional."
 
 #. translators: 1: used documents, 2: document limit.
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:72
@@ -2046,7 +2046,7 @@ msgstr "Die Testanfrage ist fehlgeschlagen."
 #: src/admin/settings/components/tabs/ConnectionTab.js:280
 #, js-format
 msgid "An account already exists for %s. Check that inbox for a confirmation link, finish connecting on the Searcio dashboard, then paste the resulting keys below."
-msgstr "Für %s gibt es bereits ein Konto. Sieh in diesem Postfach nach dem Bestätigungslink, schliesse die Verbindung im Searcio-Dashboard ab und füge dann die erhaltenen Schlüssel unten ein."
+msgstr "Für %s gibt es bereits ein Konto. Sehen Sie in diesem Postfach nach dem Bestätigungslink, schliessen Sie die Verbindung im Searcio-Dashboard ab und fügen Sie dann die erhaltenen Schlüssel unten ein."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:201
 msgid "Disconnected from Searcio."
@@ -2074,7 +2074,7 @@ msgstr "Erweitert: Schlüssel manuell eingeben"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:239
 msgid "Connect this site to Searcio to start syncing content and enable search."
-msgstr "Verbinde diese Website mit Searcio, um Inhalte zu synchronisieren und die Suche zu aktivieren."
+msgstr "Verbinden Sie diese Website mit Searcio, um Inhalte zu synchronisieren und die Suche zu aktivieren."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:267
 msgid "Disconnect"
@@ -2082,7 +2082,7 @@ msgstr "Trennen"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:308
 msgid "Accept the Terms of Service and Privacy Policy to continue."
-msgstr "Akzeptiere die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
+msgstr "Akzeptieren Sie die Nutzungsbedingungen und die Datenschutzerklärung, um fortzufahren."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:320
 msgid "I accept the Terms of Service and Privacy Policy (required)"
@@ -2096,7 +2096,7 @@ msgstr "Ich akzeptiere den Auftragsverarbeitungsvertrag (optional)"
 #: src/admin/settings/components/tabs/ConnectionTab.js:350
 #, js-format
 msgid "You'll connect using %s. A new Searcio account is created if it doesn't have one yet; otherwise this site connects to its existing account."
-msgstr "Du verbindest dich mit %s. Gibt es dafür noch kein Searcio-Konto, wird ein neues erstellt; andernfalls wird diese Website mit dem vorhandenen Konto verbunden."
+msgstr "Sie verbinden sich mit %s. Gibt es dafür noch kein Searcio-Konto, wird ein neues erstellt; andernfalls wird diese Website mit dem vorhandenen Konto verbunden."
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:353
 msgid "An admin email is required to connect."
@@ -2116,7 +2116,7 @@ msgstr "E-Mail"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:382
 msgid "Your name (optional)"
-msgstr "Dein Name (optional)"
+msgstr "Ihr Name (optional)"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:387
 msgid "Company name (optional)"
@@ -2145,7 +2145,7 @@ msgstr "Trennen und Index löschen"
 
 #: src/admin/settings/components/tabs/ConnectionTab.js:426
 msgid "This removes the site from Searcio and permanently deletes its search index there. The storefront falls back to WordPress's own search until you connect again and run a sync. Nothing in WordPress is deleted."
-msgstr "Dadurch wird die Website aus Searcio entfernt und ihr Suchindex dort endgültig gelöscht. Der Shop verwendet wieder die eigene Suche von WordPress, bis du dich erneut verbindest und eine Synchronisierung ausführst. In WordPress wird nichts gelöscht."
+msgstr "Dadurch wird die Website aus Searcio entfernt und ihr Suchindex dort endgültig gelöscht. Der Shop verwendet wieder die eigene Suche von WordPress, bis Sie sich erneut verbinden und eine Synchronisierung ausführen. In WordPress wird nichts gelöscht."
 
 #: src/admin/settings/components/tabs/IndexingSkeleton.js:9
 msgid "Loading the indexing configuration"
@@ -2216,7 +2216,7 @@ msgstr "Feld entfernen"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:171
 msgid "Activate WooCommerce to index product data."
-msgstr "Aktiviere WooCommerce, um Produktdaten zu indexieren."
+msgstr "Aktivieren Sie WooCommerce, um Produktdaten zu indexieren."
 
 #. translators: 1: current version, 2: minimum version.
 #: src/admin/settings/components/tabs/IndexingTab.js:183
@@ -2266,7 +2266,7 @@ msgstr "Produktdetails"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:223
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
-msgstr "Wähle aus, welche WooCommerce-Daten gesendet werden. Variable Produkte werden einmal (als übergeordnetes Produkt) mit einer Preisspanne indexiert."
+msgstr "Wählen Sie aus, welche WooCommerce-Daten gesendet werden. Variable Produkte werden einmal (als übergeordnetes Produkt) mit einer Preisspanne indexiert."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:230
 msgid "Only index published, visible products"
@@ -2294,7 +2294,7 @@ msgstr "%s zur Suche hinzufügen"
 #: src/admin/settings/components/tabs/IndexingTab.js:305
 #, js-format
 msgid "When on, your %s are sent to Searcio and appear in search results."
-msgstr "Wenn aktiviert, werden deine %s an Searcio gesendet und erscheinen in den Suchergebnissen."
+msgstr "Wenn aktiviert, werden Ihre %s an Searcio gesendet und erscheinen in den Suchergebnissen."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:315
 msgid "What appears in results"
@@ -2302,7 +2302,7 @@ msgstr "Was in den Ergebnissen erscheint"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:316
 msgid "Choose where each part of a search result comes from. The defaults work for most sites."
-msgstr "Wähle aus, woher jeder Teil eines Suchergebnisses stammt. Die Standardwerte passen für die meisten Websites."
+msgstr "Wählen Sie aus, woher jeder Teil eines Suchergebnisses stammt. Die Standardwerte passen für die meisten Websites."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:324
 msgid "The main heading of each result. Required."
@@ -2374,7 +2374,7 @@ msgstr "Zusätzliche Felder"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:413
 msgid "Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose."
-msgstr "Sende zusätzliche Daten (ein Custom Field, eine Taxonomie oder ein integriertes Feld) unter einem Namen deiner Wahl."
+msgstr "Senden Sie zusätzliche Daten (ein Custom Field, eine Taxonomie oder ein integriertes Feld) unter einem Namen Ihrer Wahl."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:433
 #: src/admin/settings/components/tabs/SearchConfigTab.js:853
@@ -2428,11 +2428,11 @@ msgstr "Was indexiert wird"
 
 #: src/admin/settings/components/tabs/IndexingTab.js:581
 msgid "Turn on the content you want to be searchable and choose which information is sent for each. Changes take effect after the next sync."
-msgstr "Aktiviere die Inhalte, die durchsuchbar sein sollen, und wähle jeweils aus, welche Informationen gesendet werden. Änderungen werden nach der nächsten Synchronisierung wirksam."
+msgstr "Aktivieren Sie die Inhalte, die durchsuchbar sein sollen, und wählen Sie jeweils aus, welche Informationen gesendet werden. Änderungen werden nach der nächsten Synchronisierung wirksam."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:589
 msgid "Sending a field here makes the data available. To let visitors search by it, also enable that field (with a weight) in the Search Config tab."
-msgstr "Wenn du hier ein Feld sendest, stehen die Daten zur Verfügung. Damit Besucher danach suchen können, aktiviere das Feld zusätzlich (mit einer Gewichtung) im Tab \"Sucheinstellungen\"."
+msgstr "Wenn Sie hier ein Feld senden, stehen die Daten zur Verfügung. Damit Besucher danach suchen können, aktivieren Sie das Feld zusätzlich (mit einer Gewichtung) im Tab \"Sucheinstellungen\"."
 
 #. translators: %d: number of enabled content types.
 #: src/admin/settings/components/tabs/IndexingTab.js:639
@@ -2452,7 +2452,7 @@ msgstr "Verbindung speichern"
 
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:100
 msgid "Enter the credentials from your site page in the Searcio app. The write key and secret are stored encrypted and never sent to the browser in clear text."
-msgstr "Gib die Zugangsdaten von der Seite deiner Website in der Searcio-App ein. Write Key und Write Secret werden verschlüsselt gespeichert und nie im Klartext an den Browser gesendet."
+msgstr "Geben Sie die Zugangsdaten von der Seite Ihrer Website in der Searcio-App ein. Write Key und Write Secret werden verschlüsselt gespeichert und nie im Klartext an den Browser gesendet."
 
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:106
 msgid "Search key"
@@ -2496,7 +2496,7 @@ msgstr "Verbindung testen"
 
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:191
 msgid "Test uses your saved credentials - save first."
-msgstr "Der Test verwendet deine gespeicherten Zugangsdaten - speichere zuerst."
+msgstr "Der Test verwendet Ihre gespeicherten Zugangsdaten - speichern Sie zuerst."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:126
 msgid "Copied."
@@ -2504,7 +2504,7 @@ msgstr "Kopiert."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:128
 msgid "The browser did not allow copying. Select the text and copy it yourself."
-msgstr "Der Browser hat das Kopieren nicht erlaubt. Markiere den Text und kopiere ihn selbst."
+msgstr "Der Browser hat das Kopieren nicht erlaubt. Markieren Sie den Text und kopieren Sie ihn selbst."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:132
 msgid "Copy"
@@ -2552,11 +2552,11 @@ msgstr "Einstellungen zur Einbindung werden geladen"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:294
 msgid "Translate it under Languages > Translations, in the Searcio group."
-msgstr "Übersetze ihn unter Sprachen > Übersetzungen, in der Gruppe Searcio."
+msgstr "Übersetzen Sie ihn unter Sprachen > Übersetzungen, in der Gruppe Searcio."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:296
 msgid "Translate it under WPML > String Translation, in the Searcio domain."
-msgstr "Übersetze ihn unter WPML > String-Übersetzung, in der Domain Searcio."
+msgstr "Übersetzen Sie ihn unter WPML > String-Übersetzung, in der Domain Searcio."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:300
 #: src/admin/settings/components/tabs/PlacementTab.js:671
@@ -2595,7 +2595,7 @@ msgstr "Einbindung speichern"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:429
 msgid "To check a change, save it, open your site in a new tab and click its search."
-msgstr "Um eine Änderung zu prüfen, speichere sie, öffne deine Website in einem neuen Tab und klicke auf ihre Suche."
+msgstr "Um eine Änderung zu prüfen, speichern Sie sie, öffnen Sie Ihre Website in einem neuen Tab und klicken Sie auf ihre Suche."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:432
 msgid "Open your site"
@@ -2612,7 +2612,7 @@ msgstr "Von Searcio übernommen"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:450
 msgid "For a theme that draws its own search. Searcio takes its place on every page, with nothing to edit in the theme."
-msgstr "Für ein Theme, das seine eigene Suche zeichnet. Searcio tritt auf jeder Seite an ihre Stelle, ohne dass du im Theme etwas ändern musst."
+msgstr "Für ein Theme, das seine eigene Suche zeichnet. Searcio tritt auf jeder Seite an ihre Stelle, ohne dass Sie im Theme etwas ändern müssen."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:454
 msgid "Use Searcio for the site's search forms"
@@ -2659,7 +2659,7 @@ msgstr "CSS-Selektoren"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:497
 msgid "One per line, e.g. #menu-item-search > a. To find one, right-click the theme's search icon, choose Inspect, and copy a class or id it has."
-msgstr "Einer pro Zeile, z. B. #menu-item-search > a. Um einen zu finden, klicke mit der rechten Maustaste auf das Suchsymbol des Themes, wähle Untersuchen und kopiere eine Klasse oder ID, die es hat."
+msgstr "Einer pro Zeile, z. B. #menu-item-search > a. Um einen zu finden, klicken Sie mit der rechten Maustaste auf das Suchsymbol des Themes, wählen Sie Untersuchen und kopieren Sie eine Klasse oder ID, die es hat."
 
 #. translators: 1: a theme's or a builder's name, 2: its CSS selectors.
 #: src/admin/settings/components/tabs/PlacementTab.js:519
@@ -2841,7 +2841,7 @@ msgstr "Vorschau der Suche auf einer Seite der Website"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:719
 msgid "Drawn in your theme's styles, from the settings on screen. Save to put them on the site."
-msgstr "In den Styles deines Themes gezeichnet, aus den Einstellungen auf dem Bildschirm. Speichere, um sie auf die Website zu bringen."
+msgstr "In den Styles Ihres Themes gezeichnet, aus den Einstellungen auf dem Bildschirm. Speichern Sie, um sie auf die Website zu bringen."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:729
 msgid "Shortcodes"
@@ -2853,7 +2853,7 @@ msgstr "Shortcode für die Suche"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:741
 msgid "Change what one place needs; what the Look section already sets is left out of the shortcode."
-msgstr "Ändere, was eine Stelle braucht; was der Bereich \"Aussehen\" schon festlegt, bleibt aus dem Shortcode heraus."
+msgstr "Ändern Sie, was eine Stelle braucht; was der Bereich \"Aussehen\" schon festlegt, bleibt aus dem Shortcode heraus."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:765
 msgid "The search shortcode"
@@ -2950,7 +2950,7 @@ msgstr "Menüpunkt"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:905
 msgid "Under Appearance > Menus, the Searcio box adds a search item to a menu. In a Navigation block, add a custom link to #searcio."
-msgstr "Unter Design > Menüs fügt die Box \"Searcio\" einem Menü einen Suchpunkt hinzu. In einem Navigations-Block füge einen individuellen Link zu #searcio hinzu."
+msgstr "Unter Design > Menüs fügt die Box \"Searcio\" einem Menü einen Suchpunkt hinzu. In einem Navigations-Block fügen Sie einen individuellen Link zu #searcio hinzu."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:908
 msgid "A link or a button"
@@ -2978,7 +2978,7 @@ msgstr "PHP, das die Suche zeichnet"
 
 #: src/admin/settings/components/tabs/PlacementTab.js:928
 msgid "Puts the search where a block or an Elementor widget cannot go: into the theme's own search, a floating button, shortcodes and classic widgets. Every way here is off until you turn it on."
-msgstr "Bringt die Suche dorthin, wo kein Block und kein Elementor-Widget hinkommt: in die eigene Suche des Themes, einen schwebenden Button, Shortcodes und klassische Widgets. Jeder Weg hier ist aus, bis du ihn einschaltest."
+msgstr "Bringt die Suche dorthin, wo kein Block und kein Elementor-Widget hinkommt: in die eigene Suche des Themes, einen schwebenden Button, Shortcodes und klassische Widgets. Jeder Weg hier ist aus, bis Sie ihn einschalten."
 
 #: src/admin/settings/components/tabs/PlacementTab.js:934
 msgid "Placement settings"
@@ -2989,16 +2989,16 @@ msgstr "Einstellungen zur Einbindung"
 #, js-format
 msgid "No document on this site has a %s field, so its facet will always be empty. Choose a field from the list, or start indexing it in the Indexing tab."
 msgid_plural "No document on this site has the fields %s, so their facets will always be empty. Choose fields from the list, or start indexing them in the Indexing tab."
-msgstr[0] "Kein Dokument dieser Website hat ein Feld %s, daher bleibt seine Facette immer leer. Wähle ein Feld aus der Liste oder indexiere es künftig im Tab \"Indexierung\"."
-msgstr[1] "Kein Dokument dieser Website hat die Felder %s, daher bleiben ihre Facetten immer leer. Wähle Felder aus der Liste oder indexiere sie künftig im Tab \"Indexierung\"."
+msgstr[0] "Kein Dokument dieser Website hat ein Feld %s, daher bleibt seine Facette immer leer. Wählen Sie ein Feld aus der Liste oder indexieren Sie es künftig im Tab \"Indexierung\"."
+msgstr[1] "Kein Dokument dieser Website hat die Felder %s, daher bleiben ihre Facetten immer leer. Wählen Sie Felder aus der Liste oder indexieren Sie sie künftig im Tab \"Indexierung\"."
 
 #. translators: %s: one or more quoted field names, e.g. "category".
 #: src/admin/settings/components/tabs/SearchConfigTab.js:96
 #, js-format
 msgid "No document on this site has a %s field, so it will never add a suggestion. Choose a field from the list, or start indexing it in the Indexing tab."
 msgid_plural "No document on this site has the fields %s, so they will never add a suggestion. Choose fields from the list, or start indexing them in the Indexing tab."
-msgstr[0] "Kein Dokument dieser Website hat ein Feld %s, daher liefert es nie einen Vorschlag. Wähle ein Feld aus der Liste oder indexiere es künftig im Tab \"Indexierung\"."
-msgstr[1] "Kein Dokument dieser Website hat die Felder %s, daher liefern sie nie einen Vorschlag. Wähle Felder aus der Liste oder indexiere sie künftig im Tab \"Indexierung\"."
+msgstr[0] "Kein Dokument dieser Website hat ein Feld %s, daher liefert es nie einen Vorschlag. Wählen Sie ein Feld aus der Liste oder indexieren Sie es künftig im Tab \"Indexierung\"."
+msgstr[1] "Kein Dokument dieser Website hat die Felder %s, daher liefern sie nie einen Vorschlag. Wählen Sie Felder aus der Liste oder indexieren Sie sie künftig im Tab \"Indexierung\"."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:133
 msgid "Preparing…"
@@ -3060,7 +3060,7 @@ msgstr "Eine Suchanfrage pro Zeile. Wird als Ersatz verwendet, wenn die live erm
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:267
 msgid "Your plan does not include this."
-msgstr "Dein Tarif enthält diese Funktion nicht."
+msgstr "Ihr Tarif enthält diese Funktion nicht."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:272
 msgid "AI & ranking"
@@ -3076,7 +3076,7 @@ msgstr "KI-Suche"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:288
 msgid "Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working."
-msgstr "Suchen liefern hybride Ergebnisse (Stichwort + semantisch). Beim Einschalten wird dein Katalog im Hintergrund neu indexiert; das Ausschalten wirkt sofort, und die Stichwortsuche funktioniert weiter."
+msgstr "Suchen liefern hybride Ergebnisse (Stichwort + semantisch). Beim Einschalten wird Ihr Katalog im Hintergrund neu indexiert; das Ausschalten wirkt sofort, und die Stichwortsuche funktioniert weiter."
 
 #. translators: %s: index status, e.g. "Ready".
 #: src/admin/settings/components/tabs/SearchConfigTab.js:298
@@ -3115,7 +3115,7 @@ msgstr "Merchandising-Regeln"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:391
 msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
-msgstr "Kuratiere die Ergebnisse ausgewählter Suchen. Lass den Trigger leer, um eine Regel auf jede Suche anzuwenden - so hältst du ein Produkt überall aus der Suche heraus."
+msgstr "Kuratieren Sie die Ergebnisse ausgewählter Suchen. Lassen Sie den Trigger leer, um eine Regel auf jede Suche anzuwenden - so halten Sie ein Produkt überall aus der Suche heraus."
 
 #. translators: %d: the rule's position in the list.
 #: src/admin/settings/components/tabs/SearchConfigTab.js:407
@@ -3145,7 +3145,7 @@ msgstr "Optional. Ein Facettenfeld, z. B. \"categories\"."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:454
 msgid "With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself."
-msgstr "Mit einem Feld greift die Regel auf dieser Listenseite - lass den Trigger leer, um die Seite selbst zu kuratieren."
+msgstr "Mit einem Feld greift die Regel auf dieser Listenseite - lassen Sie den Trigger leer, um die Seite selbst zu kuratieren."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:464
 msgid "Pin to top (document ids)"
@@ -3177,7 +3177,7 @@ msgstr "Such-Weiterleitungen"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:519
 msgid "Send a search straight to a page instead of showing results. The term has to match exactly - capitalisation and surrounding spaces are ignored, but \"black friday\" will not fire on \"black friday deals\"."
-msgstr "Leite eine Suche direkt auf eine Seite weiter, statt Ergebnisse anzuzeigen. Der Begriff muss genau übereinstimmen - Gross- und Kleinschreibung sowie Leerzeichen am Anfang und Ende werden ignoriert, aber \"black friday\" greift nicht bei \"black friday deals\"."
+msgstr "Leiten Sie eine Suche direkt auf eine Seite weiter, statt Ergebnisse anzuzeigen. Der Begriff muss genau übereinstimmen - Gross- und Kleinschreibung sowie Leerzeichen am Anfang und Ende werden ignoriert, aber \"black friday\" greift nicht bei \"black friday deals\"."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:531
 msgid "Search term (exact)"
@@ -3238,7 +3238,7 @@ msgstr "Sucheinstellungen"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:795
 msgid "Controls how Searcio itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Searcio's side, not in this plugin's own settings, so changes take effect on the very next search."
-msgstr "Steuert, wie Searcio selbst deine Inhalte rankt und filtert - welche Felder durchsucht werden und wie stark, Ranking-Boosts pro Typ, welche Felder Facetten und Vorschläge liefern, und Synonyme. Das meiste davon liegt bei Searcio, nicht in den Einstellungen dieses Plugins, daher wirken Änderungen schon bei der nächsten Suche."
+msgstr "Steuert, wie Searcio selbst Ihre Inhalte rankt und filtert - welche Felder durchsucht werden und wie stark, Ranking-Boosts pro Typ, welche Felder Facetten und Vorschläge liefern, und Synonyme. Das meiste davon liegt bei Searcio, nicht in den Einstellungen dieses Plugins, daher wirken Änderungen schon bei der nächsten Suche."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:815
 msgid "Searchable fields & weights"
@@ -3267,7 +3267,7 @@ msgstr "Ranking-Boost pro Inhaltstyp (0,1-100). Über 1 rankt diesen Typ insgesa
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:893
 msgid "Enable at least one content type in the Indexing tab to set a type boost."
-msgstr "Aktiviere mindestens einen Inhaltstyp im Tab \"Indexierung\", um einen Typ-Boost festzulegen."
+msgstr "Aktivieren Sie mindestens einen Inhaltstyp im Tab \"Indexierung\", um einen Typ-Boost festzulegen."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:905
 #: src/admin/settings/components/tabs/SearchConfigTab.js:917
@@ -3276,7 +3276,7 @@ msgstr "Facettenfelder"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:906
 msgid "Fields returned as facets on search results and allowed as filters. Click the field to browse every available field, or type to search."
-msgstr "Felder, die bei Suchergebnissen als Facetten zurückgegeben und als Filter zugelassen werden. Klicke in das Feld, um alle verfügbaren Felder zu sehen, oder tippe, um zu suchen."
+msgstr "Felder, die bei Suchergebnissen als Facetten zurückgegeben und als Filter zugelassen werden. Klicken Sie in das Feld, um alle verfügbaren Felder zu sehen, oder tippen Sie, um zu suchen."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:960
 #: src/admin/settings/components/tabs/SearchConfigTab.js:972
@@ -3285,7 +3285,7 @@ msgstr "Vorschlagsfelder"
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:961
 msgid "Fields queried for search-as-you-type suggestions. Defaults to \"title\" when left empty. Click to browse, or type to search."
-msgstr "Felder, die für Vorschläge während der Eingabe abgefragt werden. Bleibt die Liste leer, wird \"title\" verwendet. Klicke, um alle zu sehen, oder tippe, um zu suchen."
+msgstr "Felder, die für Vorschläge während der Eingabe abgefragt werden. Bleibt die Liste leer, wird \"title\" verwendet. Klicken Sie, um alle zu sehen, oder tippen Sie, um zu suchen."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:988
 #: src/admin/settings/components/tabs/SearchConfigTab.js:996
@@ -3309,11 +3309,11 @@ msgstr "Sprachen"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1017
 #, js-format
 msgid "Which of this site's languages to index and search. Your plan allows up to %d."
-msgstr "Welche Sprachen dieser Website indexiert und durchsucht werden. Dein Tarif erlaubt bis zu %d."
+msgstr "Welche Sprachen dieser Website indexiert und durchsucht werden. Ihr Tarif erlaubt bis zu %d."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1020
 msgid "Which of this site's languages to index and search. Leave every language unchecked for unrestricted."
-msgstr "Welche Sprachen dieser Website indexiert und durchsucht werden. Lass alle Sprachen abgewählt, um nicht einzuschränken."
+msgstr "Welche Sprachen dieser Website indexiert und durchsucht werden. Lassen Sie alle Sprachen abgewählt, um nicht einzuschränken."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1021
 msgid "No WPML/Polylang installation was detected, so languages can only be entered manually here. Leave empty for unrestricted."
@@ -3326,11 +3326,11 @@ msgstr "Durch Kommas getrennte ISO-Sprachcodes, z. B. \"de, en\"."
 #: src/admin/settings/components/tabs/SettingsGroupTab.js:55
 #: src/admin/settings/components/tabs/SettingsGroupTab.js:86
 msgid "This is not valid JSON yet, so the change has not been applied. Finish the value to save it."
-msgstr "Das ist noch kein gültiges JSON, deshalb wurde die Änderung nicht übernommen. Vervollständige den Wert, um ihn zu speichern."
+msgstr "Das ist noch kein gültiges JSON, deshalb wurde die Änderung nicht übernommen. Vervollständigen Sie den Wert, um ihn zu speichern."
 
 #: src/admin/settings/components/tabs/SettingsGroupTab.js:65
 msgid "Edit the JSON value for this setting."
-msgstr "Bearbeite den JSON-Wert dieser Einstellung."
+msgstr "Bearbeiten Sie den JSON-Wert dieser Einstellung."
 
 #: src/admin/settings/components/tabs/SettingsGroupTab.js:201
 msgid "No settings are registered for this tab yet."
@@ -3469,7 +3469,7 @@ msgstr "Alles neu synchronisieren?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:44
 msgid "This re-sends your entire catalog to Searcio, ignoring what’s already indexed. It can take a while and uses more of your document quota. Continue?"
-msgstr "Dadurch wird dein gesamter Katalog erneut an Searcio gesendet, unabhängig davon, was bereits indexiert ist. Das kann eine Weile dauern und verbraucht mehr von deinem Dokumentkontingent. Fortfahren?"
+msgstr "Dadurch wird Ihr gesamter Katalog erneut an Searcio gesendet, unabhängig davon, was bereits indexiert ist. Das kann eine Weile dauern und verbraucht mehr von Ihrem Dokumentkontingent. Fortfahren?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:45
 #: src/admin/settings/components/tabs/SyncTab.js:314
@@ -3482,7 +3482,7 @@ msgstr "Diese Synchronisierung abbrechen?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:49
 msgid "This stops the current run. Progress made so far is kept, and you can start a new sync anytime. Continue?"
-msgstr "Dadurch wird der aktuelle Lauf gestoppt. Der bisherige Fortschritt bleibt erhalten, und du kannst jederzeit eine neue Synchronisierung starten. Fortfahren?"
+msgstr "Dadurch wird der aktuelle Lauf gestoppt. Der bisherige Fortschritt bleibt erhalten, und Sie können jederzeit eine neue Synchronisierung starten. Fortfahren?"
 
 #: src/admin/settings/components/tabs/SyncTab.js:50
 msgid "Cancel sync"
@@ -3498,11 +3498,11 @@ msgstr "Vollständige Neusynchronisierung gestartet."
 
 #: src/admin/settings/components/tabs/SyncTab.js:185
 msgid "Send your content to Searcio. Only new and changed items are sent on each run, so repeat syncs are fast."
-msgstr "Sende deine Inhalte an Searcio. Bei jedem Lauf werden nur neue und geänderte Inhalte gesendet, daher sind wiederholte Synchronisierungen schnell."
+msgstr "Senden Sie Ihre Inhalte an Searcio. Bei jedem Lauf werden nur neue und geänderte Inhalte gesendet, daher sind wiederholte Synchronisierungen schnell."
 
 #: src/admin/settings/components/tabs/SyncTab.js:194
 msgid "Add and save your Searcio credentials first."
-msgstr "Trage zuerst deine Searcio-Zugangsdaten ein und speichere sie."
+msgstr "Tragen Sie zuerst Ihre Searcio-Zugangsdaten ein und speichern Sie sie."
 
 #: src/admin/settings/components/tabs/SyncTab.js:198
 msgid "Go to Connection"
@@ -3538,7 +3538,7 @@ msgstr "Übersprungen"
 
 #: src/admin/settings/components/tabs/SyncTab.js:272
 msgid "While a sync is paused, changes in your shop are not sent to Searcio. The next scheduled sync continues it, if nobody resumes it before."
-msgstr "Solange eine Synchronisierung pausiert ist, werden Änderungen in deinem Shop nicht an Searcio gesendet. Die nächste geplante Synchronisierung setzt sie fort, falls niemand sie vorher fortsetzt."
+msgstr "Solange eine Synchronisierung pausiert ist, werden Änderungen in Ihrem Shop nicht an Searcio gesendet. Die nächste geplante Synchronisierung setzt sie fort, falls niemand sie vorher fortsetzt."
 
 #: src/admin/settings/components/tabs/SyncTab.js:280
 msgid "Pause"
@@ -3578,7 +3578,7 @@ msgstr "Dieser Monat"
 
 #: src/admin/settings/components/tabs/UsageCard.js:65
 msgid "What your plan has used of each allowance. A spent allowance stops the thing it meters - searches stop returning results, and shoppers fall back to WordPress search."
-msgstr "Wie viel dein Tarif von jedem Kontingent verbraucht hat. Ist ein Kontingent aufgebraucht, stoppt die zugehörige Funktion - Suchen liefern keine Ergebnisse mehr, und Kunden landen bei der WordPress-Suche."
+msgstr "Wie viel Ihr Tarif von jedem Kontingent verbraucht hat. Ist ein Kontingent aufgebraucht, stoppt die zugehörige Funktion - Suchen liefern keine Ergebnisse mehr, und Kunden landen bei der WordPress-Suche."
 
 #. translators: 1: amount used. 2: the plan's allowance.
 #: src/admin/settings/components/tabs/UsageCard.js:85
@@ -3594,7 +3594,7 @@ msgstr "%1$s: %2$d %% verbraucht"
 
 #: src/admin/settings/components/tabs/UsageCard.js:109
 msgid "Spent for this month. Upgrade to keep this working."
-msgstr "Für diesen Monat aufgebraucht. Upgrade deinen Tarif, damit es weiter funktioniert."
+msgstr "Für diesen Monat aufgebraucht. Upgraden Sie Ihren Tarif, damit es weiter funktioniert."
 
 #: src/admin/settings/components/tabs/UsageCard.js:114
 msgid "Close to the limit."
@@ -3630,11 +3630,11 @@ msgstr "die aufgerufene Kategorie"
 
 #: src/blocks/products/edit.js:46
 msgid "Products close in meaning to the one being viewed. Needs AI search on your plan; without it the row stays hidden."
-msgstr "Produkte, die dem angezeigten inhaltlich ähneln. Erfordert KI-Suche in deinem Tarif; ohne sie bleibt die Reihe ausgeblendet."
+msgstr "Produkte, die dem angezeigten inhaltlich ähneln. Erfordert KI-Suche in Ihrem Tarif; ohne sie bleibt die Reihe ausgeblendet."
 
 #: src/blocks/products/edit.js:50
 msgid "A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out."
-msgstr "Eine auf eine Kategorie gefilterte Liste, sodass deine Merchandising-Regeln für diese Kategorie gelten - angeheftete Produkte zuerst, ausgeblendete fehlen."
+msgstr "Eine auf eine Kategorie gefilterte Liste, sodass Ihre Merchandising-Regeln für diese Kategorie gelten - angeheftete Produkte zuerst, ausgeblendete fehlen."
 
 #: src/blocks/products/edit.js:66
 msgid "Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
@@ -3953,11 +3953,11 @@ msgstr "Der Assistent ist in diesem Tarif nicht enthalten."
 
 #: src/frontend/search/components/AiAssistant.js:28
 msgid "The assistant has reached its limit for now. Please try again later."
-msgstr "Der Assistent hat sein Limit vorerst erreicht. Bitte versuche es später noch einmal."
+msgstr "Der Assistent hat sein Limit vorerst erreicht. Bitte versuchen Sie es später noch einmal."
 
 #: src/frontend/search/components/AiAssistant.js:31
 msgid "The assistant is unavailable right now. Try searching instead."
-msgstr "Der Assistent ist gerade nicht erreichbar. Nutze so lange die Suche."
+msgstr "Der Assistent ist gerade nicht erreichbar. Nutzen Sie so lange die Suche."
 
 #: src/frontend/search/components/AiAssistant.js:122
 msgid "What's popular?"
@@ -3965,7 +3965,7 @@ msgstr "Was ist beliebt?"
 
 #: src/frontend/search/components/AiAssistant.js:123
 msgid "Help me find a gift"
-msgstr "Hilf mir, ein Geschenk zu finden"
+msgstr "Ich suche ein Geschenk"
 
 #: src/frontend/search/components/AiAssistant.js:124
 msgid "What's on sale?"
@@ -3973,7 +3973,7 @@ msgstr "Was ist im Angebot?"
 
 #: src/frontend/search/components/AiAssistant.js:242
 msgid "Write what you need"
-msgstr "Schreib, was du brauchst"
+msgstr "Schreiben Sie, was Sie brauchen"
 
 #: src/frontend/search/components/AiAssistant.js:243
 msgid "Message the assistant"
@@ -3985,7 +3985,7 @@ msgstr "Senden"
 
 #: src/frontend/search/components/AiAssistant.js:267
 msgid "Describe what you're looking for and I'll find it in this store."
-msgstr "Beschreibe, was du suchst - ich finde es in diesem Shop."
+msgstr "Beschreiben Sie, was Sie suchen - ich finde es in diesem Shop."
 
 #: src/frontend/search/components/AiAssistant.js:306
 msgid "Thinking"
@@ -4153,15 +4153,15 @@ msgstr "Der Produktfinder ist gerade nicht verfügbar."
 
 #: src/frontend/search/components/QuizPane.js:140
 msgid "We could not load your matches. Please try again."
-msgstr "Wir konnten deine Treffer nicht laden. Bitte versuch es erneut."
+msgstr "Wir konnten Ihre Treffer nicht laden. Bitte versuchen Sie es erneut."
 
 #: src/frontend/search/components/QuizPane.js:172
 msgid "We could not load more matches. Please try again."
-msgstr "Wir konnten keine weiteren Treffer laden. Bitte versuch es erneut."
+msgstr "Wir konnten keine weiteren Treffer laden. Bitte versuchen Sie es erneut."
 
 #: src/frontend/search/components/QuizPane.js:274
 msgid "Which one would you like to take?"
-msgstr "Welchen möchtest du starten?"
+msgstr "Welchen möchten Sie starten?"
 
 #: src/frontend/search/components/QuizPane.js:284
 msgid "Start the quiz"
@@ -4180,11 +4180,11 @@ msgstr "Zurück"
 
 #: src/frontend/search/components/QuizPane.js:370
 msgid "Finding your matches…"
-msgstr "Wir suchen deine Treffer …"
+msgstr "Wir suchen Ihre Treffer …"
 
 #: src/frontend/search/components/QuizPane.js:371
 msgid "Your matches"
-msgstr "Deine Treffer"
+msgstr "Ihre Treffer"
 
 #. translators: 1: number of matches loaded so far. 2: total number of matches.
 #: src/frontend/search/components/QuizPane.js:375
@@ -4206,7 +4206,7 @@ msgstr "Neu starten"
 
 #: src/frontend/search/components/QuizPane.js:398
 msgid "Your answers"
-msgstr "Deine Antworten"
+msgstr "Ihre Antworten"
 
 #: src/frontend/search/components/QuizPane.js:441
 #: src/frontend/search/components/SearchModal.js:1556
@@ -4219,7 +4219,7 @@ msgstr "Mehr Treffer laden"
 
 #: src/frontend/search/components/QuizPane.js:449
 msgid "Nothing matched every answer. Go back a step and try a different one."
-msgstr "Nichts passt zu allen Antworten. Geh einen Schritt zurück und probier eine andere."
+msgstr "Nichts passt zu allen Antworten. Gehen Sie einen Schritt zurück und probieren Sie eine andere."
 
 #: src/frontend/search/components/SearchModal.js:866
 msgid "Photo search is not available on this store."
@@ -4227,15 +4227,15 @@ msgstr "Die Fotosuche ist in diesem Shop nicht verfügbar."
 
 #: src/frontend/search/components/SearchModal.js:868
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
-msgstr "Diese Datei können wir nicht als Bild lesen. Versuch ein JPEG oder PNG unter 8 MB."
+msgstr "Diese Datei können wir nicht als Bild lesen. Versuchen Sie ein JPEG oder PNG unter 8 MB."
 
 #: src/frontend/search/components/SearchModal.js:870
 msgid "Photo search has reached its limit for now. Please try again later."
-msgstr "Die Fotosuche hat ihr Limit vorerst erreicht. Bitte versuch es später noch einmal."
+msgstr "Die Fotosuche hat ihr Limit vorerst erreicht. Bitte versuchen Sie es später noch einmal."
 
 #: src/frontend/search/components/SearchModal.js:872
 msgid "That photo search failed. Try another photo."
-msgstr "Diese Fotosuche hat nicht geklappt. Versuch ein anderes Foto."
+msgstr "Diese Fotosuche hat nicht geklappt. Versuchen Sie ein anderes Foto."
 
 #. translators: %d: number of filter values selected.
 #: src/frontend/search/components/SearchModal.js:1100
@@ -4248,11 +4248,11 @@ msgstr[1] "%d ausgewählt"
 
 #: src/frontend/search/components/SearchModal.js:1446
 msgid "Your photo"
-msgstr "Dein Foto"
+msgstr "Ihr Foto"
 
 #: src/frontend/search/components/SearchModal.js:1456
 msgid "From your photo"
-msgstr "Aus deinem Foto"
+msgstr "Aus Ihrem Foto"
 
 #: src/frontend/search/components/SearchModal.js:1473
 #: src/frontend/search/components/SearchModal.js:1488
@@ -4262,7 +4262,7 @@ msgstr "Aktuelle Highlights"
 #: src/frontend/search/components/SearchModal.js:1493
 #: src/frontend/search/components/SearchModal.js:1971
 msgid "Looking at your photo…"
-msgstr "Wir schauen uns dein Foto an …"
+msgstr "Wir schauen uns Ihr Foto an …"
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
 #: src/frontend/search/components/SearchModal.js:1506
@@ -4281,15 +4281,15 @@ msgstr "Mehr Ergebnisse laden"
 
 #: src/frontend/search/components/SearchModal.js:1570
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
-msgstr "Keine Treffer für dieses Foto. Versuch ein schärferes Bild oder ein einzelnes Produkt."
+msgstr "Keine Treffer für dieses Foto. Versuchen Sie ein schärferes Bild oder ein einzelnes Produkt."
 
 #: src/frontend/search/components/SearchModal.js:1576
 msgid "No result matches the filters you chose. Remove one, or reset them all."
-msgstr "Mit den gewählten Filtern passt kein Treffer. Entferne einzelne Filter oder setze alle zurück."
+msgstr "Mit den gewählten Filtern passt kein Treffer. Entfernen Sie einzelne Filter oder setzen Sie alle zurück."
 
 #: src/frontend/search/components/SearchModal.js:1577
 msgid "Check the spelling, or try a more general word."
-msgstr "Prüfe die Schreibweise oder versuche einen allgemeineren Begriff."
+msgstr "Prüfen Sie die Schreibweise oder versuchen Sie einen allgemeineren Begriff."
 
 #: src/frontend/search/components/SearchModal.js:1582
 msgid "Reset filters"
@@ -4425,7 +4425,7 @@ msgstr "für Smartphones"
 
 #: src/admin/settings/components/look/LookControl.js:43
 msgid "The same as on a larger screen, until you change it here."
-msgstr "Wie auf einem grösseren Bildschirm, bis du es hier änderst."
+msgstr "Wie auf einem grösseren Bildschirm, bis Sie es hier ändern."
 
 #: src/admin/settings/components/look/LookControl.js:88
 msgid "Top"
@@ -4548,7 +4548,7 @@ msgstr "Zustand"
 
 #: src/admin/settings/components/look/LookEditor.js:80
 msgid "Nothing here applies to the search as it is shown now. Change \"Shown as\" under Content to see the rest."
-msgstr "Nichts hier gilt für die Suche, wie sie gerade angezeigt wird. Ändere \"Anzeige als\" unter Inhalt, um den Rest zu sehen."
+msgstr "Nichts hier gilt für die Suche, wie sie gerade angezeigt wird. Ändern Sie \"Anzeige als\" unter Inhalt, um den Rest zu sehen."
 
 #: src/admin/settings/components/look/LookEditor.js:108
 msgid "Reset this part"
@@ -4564,7 +4564,7 @@ msgstr "Inhalt"
 
 #: src/admin/settings/components/look/LookEditor.js:225
 msgid "Pick a part of the search. A setting with a screen beside its name is set for the screen chosen above the preview."
-msgstr "Wähle einen Teil der Suche. Eine Einstellung mit einem Bildschirm neben ihrem Namen gilt für den Bildschirm, der über der Vorschau gewählt ist."
+msgstr "Wählen Sie einen Teil der Suche. Eine Einstellung mit einem Bildschirm neben ihrem Namen gilt für den Bildschirm, der über der Vorschau gewählt ist."
 
 #. translators: %d: number of style settings that are set.
 #: src/admin/settings/components/look/LookEditor.js:243
@@ -4604,7 +4604,7 @@ msgstr "Die Vorschau konnte die letzte Änderung nicht zeigen: %s"
 #: src/admin/settings/components/look/LookEditor.js:377
 #, js-format
 msgid "Drawn %dpx wide, in your theme's styles. Type in it to see results and filters."
-msgstr "In %d px Breite gezeichnet, in den Stilen deines Themes. Tippe darin, um Ergebnisse und Filter zu sehen."
+msgstr "In %d px Breite gezeichnet, in den Stilen Ihres Themes. Tippen Sie darin, um Ergebnisse und Filter zu sehen."
 
 #. translators: %d: number of style settings that are set.
 #: src/admin/settings/components/tabs/PlacementTab.js:674
@@ -4644,23 +4644,23 @@ msgstr "Suchstatistik"
 
 #: src/admin/settings/components/tabs/UsageCard.js:123
 msgid "See what visitors searched for"
-msgstr "Sieh dir an, wonach Besucher gesucht haben"
+msgstr "Sehen Sie sich an, wonach Besucher gesucht haben"
 
 #: includes/Enums/Account_Refusal.php:63
 msgid "Your Searcio account has no active plan"
-msgstr "Dein Searcio-Konto hat keinen aktiven Tarif"
+msgstr "Ihr Searcio-Konto hat keinen aktiven Tarif"
 
 #: includes/Enums/Account_Refusal.php:65
 msgid "Your Searcio account is suspended"
-msgstr "Dein Searcio-Konto ist gesperrt"
+msgstr "Ihr Searcio-Konto ist gesperrt"
 
 #: includes/Enums/Account_Refusal.php:75
 msgid "Searcio does not search or index for this site until the account has an active plan. Choose a plan on your Searcio dashboard, then run a sync."
-msgstr "Searcio sucht und indexiert für diese Website erst wieder, wenn das Konto einen aktiven Tarif hat. Wähle im Searcio-Dashboard einen Tarif und starte dann eine Synchronisierung."
+msgstr "Searcio sucht und indexiert für diese Website erst wieder, wenn das Konto einen aktiven Tarif hat. Wählen Sie im Searcio-Dashboard einen Tarif und starten Sie dann eine Synchronisierung."
 
 #: includes/Enums/Account_Refusal.php:77
 msgid "Searcio does not search or index for this site while the account is suspended. Contact Searcio support to have it restored."
-msgstr "Searcio sucht und indexiert für diese Website nicht, solange das Konto gesperrt ist. Wende dich an den Searcio-Support, um es wieder freischalten zu lassen."
+msgstr "Searcio sucht und indexiert für diese Website nicht, solange das Konto gesperrt ist. Wenden Sie sich an den Searcio-Support, um es wieder freischalten zu lassen."
 
 #: includes/Health/Health_Tests.php:177
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:38
@@ -4674,11 +4674,11 @@ msgstr "Searcio-Support kontaktieren"
 
 #: includes/Enums/Account_Refusal.php:64
 msgid "Your Searcio payment is overdue"
-msgstr "Deine Searcio-Zahlung ist überfällig"
+msgstr "Ihre Searcio-Zahlung ist überfällig"
 
 #: includes/Enums/Account_Refusal.php:76
 msgid "Searcio does not search or index for this site until the overdue payment is settled. Pay it on the Billing page of your Searcio dashboard, then run a sync."
-msgstr "Searcio sucht und indexiert für diese Website erst wieder, wenn die überfällige Zahlung beglichen ist. Bezahle sie unter Abrechnung in deinem Searcio-Dashboard und starte dann eine Synchronisierung."
+msgstr "Searcio sucht und indexiert für diese Website erst wieder, wenn die überfällige Zahlung beglichen ist. Bezahlen Sie sie unter Abrechnung in Ihrem Searcio-Dashboard und starten Sie dann eine Synchronisierung."
 
 #: includes/Health/Health_Tests.php:178
 #: src/admin/settings/components/tabs/ConnectionResultNotice.js:40
@@ -4710,7 +4710,7 @@ msgstr "Die Regel greift nur bei Suchen auf Seiten in dieser Sprache."
 
 #: includes/Routing/Quizzes_Endpoint.php:179
 msgid "Connect this site to Searcio on the Connection tab first."
-msgstr "Verbinde diese Website zuerst im Tab Verbindung mit Searcio."
+msgstr "Verbinden Sie diese Website zuerst im Tab Verbindung mit Searcio."
 
 #. translators: %s: number of products.
 #: src/admin/settings/components/quiz/AnswerEditor.js:27
@@ -4824,7 +4824,7 @@ msgstr "Bereich hinzufügen"
 
 #: src/admin/settings/components/quiz/NewQuizModal.js:39
 msgid "Give the quiz a name, such as \"Gift finder\"."
-msgstr "Gib dem Quiz einen Namen, etwa „Geschenkefinder“."
+msgstr "Geben Sie dem Quiz einen Namen, etwa „Geschenkefinder“."
 
 #: src/admin/settings/components/quiz/NewQuizModal.js:67
 #: src/admin/settings/components/quiz/QuizList.js:322
@@ -4907,7 +4907,7 @@ msgstr "Entwurf"
 
 #: src/admin/settings/components/quiz/quizApi.js:48
 msgid "The request to Searcio failed. Try again."
-msgstr "Die Anfrage an Searcio ist fehlgeschlagen. Versuche es noch einmal."
+msgstr "Die Anfrage an Searcio ist fehlgeschlagen. Versuchen Sie es noch einmal."
 
 #: src/admin/settings/components/quiz/QuizEditor.js:165
 #: src/admin/settings/components/quiz/QuizList.js:155
@@ -5090,7 +5090,7 @@ msgstr[1] "%s Produkte"
 
 #: src/admin/settings/components/quiz/QuizEndings.js:55
 msgid "Every way through the quiz and how many products it shows. Before publishing, change the answers of an ending that shows none."
-msgstr "Jeder Weg durch das Quiz und wie viele Produkte er zeigt. Ändere vor dem Veröffentlichen die Antworten eines Endes, das keine zeigt."
+msgstr "Jeder Weg durch das Quiz und wie viele Produkte er zeigt. Ändern Sie vor dem Veröffentlichen die Antworten eines Endes, das keine zeigt."
 
 #: src/admin/settings/components/quiz/QuizEndings.js:61
 msgid "Checking…"
@@ -5156,7 +5156,7 @@ msgstr[1] "%d Quizze werden endgültig gelöscht, auch im Searcio-Panel, und ver
 
 #: src/admin/settings/components/quiz/QuizList.js:283
 msgid "A quiz could not be deleted. Try again."
-msgstr "Ein Quiz konnte nicht gelöscht werden. Versuche es noch einmal."
+msgstr "Ein Quiz konnte nicht gelöscht werden. Versuchen Sie es noch einmal."
 
 #. translators: 1: number of quizzes, 2: the most a site can have.
 #: src/admin/settings/components/quiz/QuizList.js:307
@@ -5200,7 +5200,7 @@ msgstr "Das Bild der Frage"
 
 #: src/admin/settings/components/quiz/QuestionPicture.js:66
 msgid "Searcio shows only pictures served over https, and this one is not. Choose another, or serve the site over https."
-msgstr "Searcio zeigt nur Bilder, die über https ausgeliefert werden, und dieses nicht. Wähle ein anderes oder liefere die Website über https aus."
+msgstr "Searcio zeigt nur Bilder, die über https ausgeliefert werden, und dieses nicht. Wählen Sie ein anderes oder liefern Sie die Website über https aus."
 
 #: src/admin/settings/components/quiz/QuestionPicture.js:67
 msgid "Shown above the question in the product finder."
