@@ -46,6 +46,22 @@ const isTextField = ( el ) =>
 	el instanceof HTMLTextAreaElement ||
 	( el instanceof HTMLInputElement && ! [ 'button', 'submit', 'reset', 'checkbox', 'radio', 'image', 'file', 'hidden' ].includes( el.type ) );
 
+/**
+ * Whether a key press is the K of Ctrl/Cmd+K. By the letter on a layout with
+ * Latin letters, wherever the layout puts it (Dvorak, AZERTY). A layout
+ * without them (Persian, Russian, Arabic, Greek) writes another character for
+ * that key, "ن" or "л", and the browser's own Ctrl+K still answers to it, so
+ * there the key itself decides: it opened the browser's search instead.
+ *
+ * @param {KeyboardEvent} event
+ * @return {boolean} Whether it is K.
+ */
+export const isKeyK = ( event ) => {
+	const key = String( event.key || '' );
+
+	return 'k' === key.toLowerCase() || ( 'KeyK' === event.code && ! /^[a-z]$/i.test( key ) );
+};
+
 /** A field the visitor types in, where "/" is a character and not the shortcut. */
 const isEditable = ( el ) => isTextField( el ) || el instanceof HTMLSelectElement || Boolean( el?.isContentEditable );
 
@@ -115,7 +131,7 @@ export const attachOpeners = ( { selectors = [], shortcut = false, win = window 
 			return;
 		}
 
-		const withModifier = ( event.ctrlKey || event.metaKey ) && ! event.altKey && 'k' === event.key.toLowerCase();
+		const withModifier = ( event.ctrlKey || event.metaKey ) && ! event.altKey && isKeyK( event );
 		const slash = '/' === event.key && ! event.ctrlKey && ! event.metaKey && ! event.altKey && ! isEditable( win.document.activeElement );
 
 		if ( ! withModifier && ! slash ) {
