@@ -142,6 +142,57 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * The assistant writes prices in the shop's currency; without it the model
+	 * guessed dollars on a euro shop. The tab has no field for it.
+	 */
+	public function test_put_sends_the_shops_currency(): void {
+		if ( ! class_exists( \WooCommerce::class ) ) {
+			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+
+		$this->as_admin();
+		update_option( 'woocommerce_currency', 'EUR' );
+		$sent = null;
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$sent ) {
+				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+
+				return $this->http_ok( [ 'languages' => [] ] );
+			}
+		);
+
+		$request = new WP_REST_Request( 'PUT', self::ROUTE );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( [ 'synonyms' => [] ] ) );
+		$this->server->dispatch( $request );
+
+		$this->assertSame( 'EUR', $sent['currency'] );
+	}
+
+	public function test_put_sends_no_currency_without_woocommerce(): void {
+		if ( class_exists( \WooCommerce::class ) ) {
+			$this->markTestSkipped( 'WooCommerce is loaded in this environment.' );
+		}
+
+		$this->as_admin();
+		$sent = null;
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$sent ) {
+				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+
+				return $this->http_ok( [ 'languages' => [] ] );
+			}
+		);
+
+		$request = new WP_REST_Request( 'PUT', self::ROUTE );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( [ 'synonyms' => [] ] ) );
+		$this->server->dispatch( $request );
+
+		$this->assertArrayNotHasKey( 'currency', $sent );
+	}
+
+	/**
 	 * A 422 carries the field-level errors the form marks its inputs with, so it
 	 * has to arrive with its status and envelope intact rather than as a
 	 * flattened "save failed".

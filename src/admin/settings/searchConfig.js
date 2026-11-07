@@ -46,6 +46,9 @@ export const normalizeMerchandising = ( raw ) => ( Array.isArray( raw ) ? raw : 
 	hidden: Array.isArray( rule?.hidden ) ? rule.hidden : [],
 	// The API stores an empty banner as `null`; the input wants a string.
 	banner: 'string' === typeof rule?.banner ? rule.banner : '',
+	// The one language the rule fires in, or `null` for every language. A
+	// service from before rules had a language leaves the key out.
+	lang: 'string' === typeof rule?.lang && '' !== rule.lang ? rule.lang : null,
 } ) );
 
 /**

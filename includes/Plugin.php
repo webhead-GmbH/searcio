@@ -312,7 +312,8 @@ final class Plugin extends Base_Plugin {
 				return new Scheduled_Sync_Job(
 					$container->get( 'sync_service' ),
 					$container->get( 'search_cloud_client' ),
-					$container->get( 'connection_state' )
+					$container->get( 'connection_state' ),
+					$container->get( 'woo' )
 				);
 			}
 		);
@@ -340,7 +341,8 @@ final class Plugin extends Base_Plugin {
 				return new Search_Config_Endpoint(
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'language_config' ),
-					$container->get( 'facet_config' )
+					$container->get( 'facet_config' ),
+					$container->get( 'woo' )
 				);
 			}
 		);

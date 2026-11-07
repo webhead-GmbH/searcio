@@ -61,6 +61,21 @@ final class Woo {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
 	}
 
+	/**
+	 * The shop's currency, ISO 4217 (`EUR`), or null without WooCommerce.
+	 * Searcio's shopping assistant writes prices in it; without it the model
+	 * guessed dollars on a euro shop.
+	 */
+	public function currency(): ?string {
+		if ( ! $this->is_active() || ! function_exists( 'get_woocommerce_currency' ) ) {
+			return null;
+		}
+
+		$code = strtoupper( (string) get_woocommerce_currency() );
+
+		return 1 === preg_match( '/^[A-Z]{3}$/', $code ) ? $code : null;
+	}
+
 	public function version(): string {
 		if ( defined( 'WC_VERSION' ) ) {
 			return (string) WC_VERSION;

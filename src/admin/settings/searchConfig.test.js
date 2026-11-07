@@ -56,7 +56,22 @@ describe( 'normalizeMerchandising', () => {
 			pinned: [ 'p-1', 'p-2' ],
 			hidden: [ 'p-9' ],
 			banner: 'Sale',
+			lang: null,
 		} ] );
+	} );
+
+	it( 'keeps the language a rule fires in, and reads none as every language', () => {
+		const [ german, every, older ] = normalizeMerchandising( [ { query: 'jacke', lang: 'de' }, { query: 'sale', lang: null }, { query: 'old' } ] );
+
+		expect( german.lang ).toBe( 'de' );
+		expect( every.lang ).toBeNull();
+		expect( older.lang ).toBeNull();
+	} );
+
+	it( 'sends the language with the rule', () => {
+		const payload = toPayload( normalizeConfig( { merchandising: [ { query: 'jacke', lang: 'de' }, { query: 'sale' } ] } ) );
+
+		expect( payload.merchandising.map( ( rule ) => rule.lang ) ).toEqual( [ 'de', null ] );
 	} );
 
 	/** The API stores an empty banner as null; a text input cannot take that. */
@@ -72,6 +87,7 @@ describe( 'normalizeMerchandising', () => {
 			pinned: [],
 			hidden: [],
 			banner: '',
+			lang: null,
 		} );
 	} );
 
