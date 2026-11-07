@@ -100,6 +100,30 @@ final class Field_Source_Resolver_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * Stripped as they were, `<li>Wool</li><li>Silk</li>` read "WoolSilk",
+	 * and a heading ran into the paragraph before it: the demo shop's running
+	 * shoe guide was indexed as "a best-of list.Road or trail?Road shoes", and
+	 * "list.Road" is one word to a search. An inline tag still joins what it
+	 * wraps to the text around it.
+	 */
+	public function test_text_on_either_side_of_a_block_stays_apart(): void {
+		$content = '<p>A shoe has to suit you, not a list.</p><h2>Road or trail?</h2><p>Road shoes are <strong>water</strong>proof.<br>Trail shoes have lugs.</p><ul><li>Wool</li><li>Silk</li></ul>';
+		$text    = 'A shoe has to suit you, not a list. Road or trail? Road shoes are waterproof. Trail shoes have lugs. Wool Silk';
+		$post    = get_post(
+			self::factory()->post->create(
+				[
+					'post_content' => $content,
+					'post_excerpt' => '',
+				]
+			)
+		);
+		$source  = new Field_Source_Resolver();
+
+		$this->assertSame( $text, $source->resolve( 'property:content', $post ) );
+		$this->assertSame( $text, $source->resolve( 'property:excerpt', $post ) );
+	}
+
+	/**
 	 * WordPress stores a display name escaped, as it stores a term name.
 	 */
 	public function test_the_author_is_sent_as_typed(): void {

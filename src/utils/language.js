@@ -19,6 +19,31 @@ export const isLanguageSupported = ( enabledLanguages, currentLang ) => {
 };
 
 /**
+ * The hits that belong on a page in `lang`: those in that language, and those
+ * the index holds without one. Photo search, similar products and the
+ * assistant's products take no language filter, so on a multilingual shop they
+ * come back in every language, a product's own translation first among its
+ * similar products.
+ *
+ * @param {Array<Object>} hits
+ * @param {string}        [lang] The page's language, or none to keep every hit.
+ * @return {Array<Object>} A new list; the input is left alone.
+ */
+export const inLanguage = ( hits, lang ) => {
+	const list = Array.isArray( hits ) ? hits : [];
+
+	if ( ! lang ) {
+		return [ ...list ];
+	}
+
+	return list.filter( ( hit ) => {
+		const own = hit?.source?.lang;
+
+		return 'string' !== typeof own || '' === own || own === lang;
+	} );
+};
+
+/**
  * `{lang: '<code>'}` merge-in for `search()`'s `filters` option, or `{}` when
  * there's nothing to scope by.
  *

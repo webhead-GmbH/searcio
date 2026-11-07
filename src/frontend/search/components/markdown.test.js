@@ -68,6 +68,44 @@ describe( 'renderMarkdown', () => {
 		expect( parts.filter( ( p ) => '<li>' === p ) ).toHaveLength( 2 );
 	} );
 
+	/**
+	 * The reply the demo shop got for "a warm jacket for rainy autumn walks":
+	 * a blank line between the numbered products. Each became a list of its
+	 * own, and both read "1.".
+	 */
+	it( 'keeps numbered items apart by blank lines in one list', () => {
+		const nodes = renderMarkdown(
+			'Here are some options:\n\n1. **Rain Jacket**  \n   - **Price:** 129\n\n2. **Bomber Jacket**  \n   - **Price:** 139\n\nWant more details?'
+		);
+		const parts = summarize( nodes );
+
+		expect( parts.filter( ( p ) => '<ol>' === p ) ).toHaveLength( 1 );
+		expect( parts.filter( ( p ) => '<li>' === p ) ).toHaveLength( 2 );
+		expect( parts.filter( ( p ) => '<p>' === p ) ).toHaveLength( 2 );
+		expect( nodes.find( ( node ) => 'ol' === node.type ).props.start ).toBeUndefined();
+	} );
+
+	it( 'keeps bullets apart by blank lines in one list', () => {
+		const parts = summarize( renderMarkdown( '- One\n\n- Two' ) );
+
+		expect( parts.filter( ( p ) => '<ul>' === p ) ).toHaveLength( 1 );
+		expect( parts.filter( ( p ) => '<li>' === p ) ).toHaveLength( 2 );
+	} );
+
+	it( 'goes on counting after a paragraph interrupts a numbered list', () => {
+		const lists = renderMarkdown( '1. Rain Jacket\n\nOr, warmer:\n\n2. Down Jacket' ).filter( ( node ) => 'ol' === node.type );
+
+		expect( lists ).toHaveLength( 2 );
+		expect( lists[ 0 ].props.start ).toBeUndefined();
+		expect( lists[ 1 ].props.start ).toBe( 2 );
+	} );
+
+	it( 'ends a list at the text after it', () => {
+		const parts = summarize( renderMarkdown( '1. One\n2. Two\n\nThat is all.' ) );
+
+		expect( parts ).toEqual( [ '<ol>', '<li>', 'One', '<li>', 'Two', '<p>', 'That is all.' ] );
+	} );
+
 	it( 'separates paragraphs on a blank line', () => {
 		const parts = summarize( renderMarkdown( 'First line.\n\nSecond line.' ) );
 

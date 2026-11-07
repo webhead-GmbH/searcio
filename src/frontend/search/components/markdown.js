@@ -129,7 +129,13 @@ export const renderMarkdown = ( markdown ) => {
 			blocks.push(
 				createElement(
 					list.ordered ? 'ol' : 'ul',
-					{ key: `l-${ blocks.length }`, className: 'whsc-md__list' },
+					{
+						key: `l-${ blocks.length }`,
+						className: 'whsc-md__list',
+						// A list that a paragraph interrupted goes on counting
+						// from the number its first item was written with.
+						...( list.ordered && 1 !== list.start ? { start: list.start } : {} ),
+					},
 					list.items.map( ( item, index ) =>
 						createElement( 'li', { key: index }, renderInline( item, `li-${ index }` ) )
 					)
@@ -143,8 +149,11 @@ export const renderMarkdown = ( markdown ) => {
 		const line = raw.replace( /\s+$/, '' );
 
 		if ( '' === line.trim() ) {
+			// A blank line ends a paragraph, but not a list: models write a
+			// blank line between numbered items, and closing the list there
+			// numbered every item "1.". Whatever comes next and is not an item
+			// of the same list closes it.
 			flushParagraph();
-			flushList();
 
 			return;
 		}
@@ -172,7 +181,7 @@ export const renderMarkdown = ( markdown ) => {
 
 			if ( ! list || ! list.ordered ) {
 				flushList();
-				list = { ordered: true, items: [] };
+				list = { ordered: true, start: Number( ordered[ 1 ] ), items: [] };
 			}
 
 			list.items.push( ordered[ 2 ] );
