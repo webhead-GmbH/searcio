@@ -13,10 +13,13 @@ import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
 import {
+	errorsUnder,
 	idsToText,
 	listError,
 	normalizeConfig,
+	termsToText,
 	textToIds,
+	textToTerms,
 	toPayload,
 } from '../../searchConfig';
 import { indexedFields, unindexedFields } from '../../indexedFields';
@@ -210,12 +213,29 @@ const CategoryFilterCard = () => {
  * (per admin feedback, a page should not show two separate save actions);
  * `SearchConfigTab` calls the settings store's own `saveSettings()`
  * alongside its `/search-config` PUT.
+ *
+ * The terms never offered as popular searches are Searcio's, and go with the
+ * `/search-config` PUT; they are offered only once Searcio reports the list.
+ *
+ * @param {Object}        props
+ * @param {string[]|null} props.excluded The excluded terms, or null.
+ * @param {Object}        props.errors   The API's field errors.
+ * @param {Function}      props.onExcludedChange Called with the terms.
  */
-const PopularSearchesCard = () => {
+const PopularSearchesCard = ( { excluded, errors, onExcludedChange } ) => {
 	const { settings, updateSetting, isLoading } = useContext( SettingsContext );
 
 	const [ popularSearchesText, setPopularSearchesText ] = useState( '' );
 	const popularSearchesInit = useRef( false );
+	const [ excludedText, setExcludedText ] = useState( () => termsToText( excluded ) );
+
+	// The list as Searcio stored it, once a save has trimmed it or dropped a
+	// duplicate; what is being typed is left alone.
+	useEffect( () => {
+		if ( JSON.stringify( textToTerms( excludedText ) ) !== JSON.stringify( excluded || [] ) ) {
+			setExcludedText( termsToText( excluded ) );
+		}
+	}, [ excluded ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect( () => {
 		if ( isLoading || popularSearchesInit.current ) {
@@ -230,22 +250,44 @@ const PopularSearchesCard = () => {
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 			<CardHeading
 				title={ __( 'Popular searches', 'searcio' ) }
-				description={ __(
-					"A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Searcio's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails.",
-					'searcio'
-				) }
+				description={ null === excluded
+					? __(
+						"A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Searcio's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails.",
+						'searcio'
+					)
+					: __(
+						"The searches the search modal suggests before a visitor types anything. Searcio's own live popular searches come first; your fallback list takes over only when that request comes back empty or fails.",
+						'searcio'
+					) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
-				<TextareaControl
-					label={ __( 'Popular searches', 'searcio' ) }
-					hideLabelFromVision
-					description={ __( 'One query per line. Used as a fallback whenever live popular searches from Searcio are unavailable or empty.', 'searcio' ) }
-					value={ popularSearchesText }
-					onValueChange={ ( value ) => {
-						setPopularSearchesText( value );
-						updateSetting( 'popular_searches', fromPopularSearchesText( value ) );
-					} }
-				/>
+				<Stack direction="column" gap="lg">
+					<TextareaControl
+						label={ null === excluded ? __( 'Popular searches', 'searcio' ) : __( 'Fallback list', 'searcio' ) }
+						hideLabelFromVision={ null === excluded }
+						description={ __( 'One query per line. Used as a fallback whenever live popular searches from Searcio are unavailable or empty.', 'searcio' ) }
+						value={ popularSearchesText }
+						onValueChange={ ( value ) => {
+							setPopularSearchesText( value );
+							updateSetting( 'popular_searches', fromPopularSearchesText( value ) );
+						} }
+					/>
+
+					{ null !== excluded && (
+						<TextareaControl
+							label={ __( 'Never show as a popular search', 'searcio' ) }
+							description={ errorsUnder( errors, 'excluded_popular_terms' ) || __(
+								'One term per line, up to 200. Searcio leaves these out of its live popular searches, whatever their capitals. The same list is in the Searcio panel.',
+								'searcio'
+							) }
+							value={ excludedText }
+							onValueChange={ ( value ) => {
+								setExcludedText( value );
+								onExcludedChange( textToTerms( value ) );
+							} }
+						/>
+					) }
+				</Stack>
 			</Card.Content>
 		</Card.Root>
 	);
@@ -1061,7 +1103,11 @@ const SearchConfigTab = () => {
 					</Card.Content>
 				</Card.Root>
 
-				<PopularSearchesCard />
+				<PopularSearchesCard
+					excluded={ config.excluded_popular_terms }
+					errors={ fieldErrors }
+					onExcludedChange={ ( terms ) => set( 'excluded_popular_terms', terms ) }
+				/>
 
 				<MerchandisingCard
 					rules={ config.merchandising }

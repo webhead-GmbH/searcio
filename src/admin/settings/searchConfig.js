@@ -102,6 +102,54 @@ export const normalizeFacetMatch = ( raw ) => {
 	return Object.fromEntries( Object.entries( raw ).filter( ( [ , mode ] ) => FACET_MATCHES.includes( mode ) ) );
 };
 
+/**
+ * The search terms Searcio never offers as popular searches, as it reports
+ * them in `excluded_popular_terms`.
+ *
+ * Null when Searcio leaves the key out, as a service without the list does:
+ * the tab then offers no list the service would not keep.
+ *
+ * @param {*} raw `excluded_popular_terms` from `GET /search-config`.
+ * @return {string[]|null} The terms, or null.
+ */
+export const normalizeExcludedTerms = ( raw ) => ( Array.isArray( raw )
+	? raw.filter( ( term ) => 'string' === typeof term )
+	: null );
+
+/**
+ * The terms as Searcio keeps them: trimmed, without empty lines, and each
+ * once whatever its capitals, in the spelling first typed. Searcio does the
+ * same on save; doing it here as well sends what the tab will read back.
+ *
+ * @param {string[]} terms
+ * @return {string[]}
+ */
+export const cleanTerms = ( terms ) => {
+	const seen = new Set();
+
+	return ( Array.isArray( terms ) ? terms : [] )
+		.map( ( term ) => String( term ).trim() )
+		.filter( ( term ) => {
+			const key = term.toLowerCase();
+
+			if ( '' === term || seen.has( key ) ) {
+				return false;
+			}
+
+			seen.add( key );
+
+			return true;
+		} );
+};
+
+/** One term per line, as the textarea shows them. */
+export const termsToText = ( terms ) => ( Array.isArray( terms ) ? terms.join( '\n' ) : '' );
+
+export const textToTerms = ( text ) => String( text )
+	.split( '\n' )
+	.map( ( line ) => line.trim() )
+	.filter( ( line ) => '' !== line );
+
 export const normalizeConfig = ( raw ) => ( {
 	searchable_fields: Array.isArray( raw?.searchable_fields )
 		? raw.searchable_fields.map( ( row ) => ( {
@@ -118,6 +166,7 @@ export const normalizeConfig = ( raw ) => ( {
 	facet_fields: Array.isArray( raw?.facet_fields ) ? raw.facet_fields : [],
 	facet_match: normalizeFacetMatch( raw?.facet_match ),
 	suggest_fields: Array.isArray( raw?.suggest_fields ) ? raw.suggest_fields : [],
+	excluded_popular_terms: normalizeExcludedTerms( raw?.excluded_popular_terms ),
 	synonyms: Array.isArray( raw?.synonyms ) ? raw.synonyms : [],
 	languages: Array.isArray( raw?.languages ) ? raw.languages : [],
 	merchandising: normalizeMerchandising( raw?.merchandising ),
@@ -153,6 +202,11 @@ export const toPayload = ( config ) => ( {
 	// service that does not report the setting.
 	facet_match: config.facet_match
 		? Object.fromEntries( ( config.facet_fields || [] ).map( ( field ) => [ field, 'all' === config.facet_match[ field ] ? 'all' : 'any' ] ) )
+		: undefined,
+	// Present replaces the list and absent keeps it, so a service without
+	// the list is sent none.
+	excluded_popular_terms: Array.isArray( config.excluded_popular_terms )
+		? cleanTerms( config.excluded_popular_terms )
 		: undefined,
 	/*
 	 * Only switches this plan can actually carry. Enabling a feature the plan
@@ -192,8 +246,17 @@ export const textToIds = ( text ) => text
  * @param {string} column  e.g. `pinned`.
  * @return {string|undefined} Joined messages, or undefined when clean.
  */
-export const listError = ( errors, section, index, column ) => {
-	const prefix = `${ section }.${ index }.${ column }`;
+export const listError = ( errors, section, index, column ) =>
+	errorsUnder( errors, `${ section }.${ index }.${ column }` );
+
+/**
+ * Every message the API gave for a list field or one of its entries.
+ *
+ * @param {Object} errors The API's `errors` envelope.
+ * @param {string} prefix e.g. `excluded_popular_terms`.
+ * @return {string|undefined} Joined messages, or undefined when clean.
+ */
+export const errorsUnder = ( errors, prefix ) => {
 	const messages = Object.entries( errors || {} )
 		.filter( ( [ key ] ) => key === prefix || key.startsWith( `${ prefix }.` ) )
 		.flatMap( ( [ , value ] ) => ( Array.isArray( value ) ? value : [] ) );
