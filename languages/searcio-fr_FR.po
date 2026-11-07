@@ -21,7 +21,7 @@ msgstr "https://wordpress.org/plugins/searcio/"
 
 #. Description of the plugin
 #: searcio.php
-#: includes/Admin/Settings_Page.php:119
+#: includes/Admin/Settings_Page.php:131
 msgid "Connect WordPress and WooCommerce to Searcio."
 msgstr "Connectez WordPress et WooCommerce à Searcio."
 
@@ -38,7 +38,7 @@ msgstr "https://webhead.at"
 #: includes/Admin/Menu_Item.php:35
 #: includes/Admin/Settings_Page.php:36
 #: includes/Admin/Settings_Page.php:40
-#: includes/Admin/Settings_Page.php:118
+#: includes/Admin/Settings_Page.php:130
 #: includes/Plugin.php:491
 #: src/admin/settings/components/SettingsPanel.js:210
 msgid "Searcio"
@@ -4856,43 +4856,44 @@ msgid "The quiz is offered only on pages in this language."
 msgstr "Le quiz n’est proposé que sur les pages dans cette langue."
 
 #. translators: %d: the question's position in the quiz.
-#: src/admin/settings/components/quiz/QuestionEditor.js:33
+#: src/admin/settings/components/quiz/QuestionEditor.js:35
 #: src/admin/settings/components/quiz/quizApi.js:65
 #, js-format
 msgid "Question %d"
 msgstr "Question %d"
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:43
+#: src/admin/settings/components/quiz/QuestionEditor.js:45
 msgid "A quiz has at least one question."
 msgstr "Un quiz a au moins une question."
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:47
+#: src/admin/settings/components/quiz/QuestionEditor.js:49
 msgid "Remove question"
 msgstr "Retirer la question"
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:52
+#: src/admin/settings/components/quiz/QuestionEditor.js:54
 msgid "Question"
 msgstr "Question"
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:53
+#: src/admin/settings/components/quiz/QuestionEditor.js:55
 msgid "e.g. Who is the gift for?"
 msgstr "p. ex. Pour qui est le cadeau ?"
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:59
+#: src/admin/settings/components/quiz/QuestionPicture.js:29
+#: src/admin/settings/components/quiz/QuestionPicture.js:59
 msgid "Picture (optional)"
 msgstr "Image (facultative)"
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:60
+#: src/admin/settings/components/quiz/QuestionPicture.js:30
 msgid "The address of a picture shown above the question, starting with https://."
 msgstr "L’adresse d’une image affichée au-dessus de la question, commençant par https://."
 
 #. translators: %d: the most answers a question can have.
-#: src/admin/settings/components/quiz/QuestionEditor.js:90
+#: src/admin/settings/components/quiz/QuestionEditor.js:86
 #, js-format
 msgid "A question has at most %d answers."
 msgstr "Une question a au plus %d réponses."
 
-#: src/admin/settings/components/quiz/QuestionEditor.js:97
+#: src/admin/settings/components/quiz/QuestionEditor.js:93
 msgid "Add an answer"
 msgstr "Ajouter une réponse"
 
@@ -5184,3 +5185,35 @@ msgstr "Un quiz pose quelques questions aux clients et affiche les produits qui 
 #: src/admin/settings/components/tabs/QuizzesTab.js:61
 msgid "Quizzes ask shoppers a few questions and show the products that fit their answers, in the search window's Product finder tab. They are the same quizzes as in the Searcio panel."
 msgstr "Les quiz posent quelques questions aux clients et affichent les produits qui correspondent à leurs réponses, dans l’onglet Guide d’achat de la fenêtre de recherche. Ce sont les mêmes quiz que dans le panneau Searcio."
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:41
+msgid "Choose the question's picture"
+msgstr "Choisir l’image de la question"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:43
+msgid "Use this picture"
+msgstr "Utiliser cette image"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:62
+msgid "The question's picture"
+msgstr "L’image de la question"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:66
+msgid "Searcio shows only pictures served over https, and this one is not. Choose another, or serve the site over https."
+msgstr "Searcio n’affiche que les images servies en https, ce qui n’est pas le cas de celle-ci. Choisissez-en une autre ou servez le site en https."
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:67
+msgid "Shown above the question in the product finder."
+msgstr "Affichée au-dessus de la question dans le guide d’achat."
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:71
+msgid "Choose a picture"
+msgstr "Choisir une image"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:71
+msgid "Replace"
+msgstr "Remplacer"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:75
+msgid "Remove"
+msgstr "Retirer"

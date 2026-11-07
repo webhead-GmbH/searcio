@@ -8,6 +8,9 @@
     "src/admin/settings/components/quiz/QuestionEditor.js": [
         "public/bundle.settings.js"
     ],
+    "src/admin/settings/components/quiz/QuestionPicture.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/quiz/quizApi.js": [
         "public/bundle.settings.js"
     ],

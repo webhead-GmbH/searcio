@@ -189,7 +189,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.0 =
-- New Product finder tab: make, edit, publish and delete the product finder's quizzes in WordPress instead of the Searcio panel. Answers offer the values your filters really have, and before a quiz is published every way through it is checked for how many products it shows.
+- New Product finder tab: make, edit, publish and delete the product finder's quizzes in WordPress instead of the Searcio panel. A question's picture comes from the Media Library, answers offer the values your filters really have, and before a quiz is published every way through it is checked for how many products it shows.
 - The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
 - The AI shopping assistant shows its reply as it is written, and the products as soon as it has found them, and writes prices in your shop's currency.
 - On a multilingual shop, the product finder offers the quizzes in the language of the page, popular searches are those searched in it, and photo search, similar products and the products the AI shopping assistant shows keep to it. A merchandising rule can be kept to one language.

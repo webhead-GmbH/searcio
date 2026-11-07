@@ -5,10 +5,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Grid } from '../../../../components/Layout';
 import { MAX_OPTIONS, newOption } from '../../quizEditor';
 import AnswerEditor from './AnswerEditor';
+import QuestionPicture from './QuestionPicture';
 
 /**
  * One question of the quiz, the content of its section: the question shoppers
- * read, an optional picture, and its answers, each a card of its own.
+ * read, an optional picture from the Media Library, and its answers, each a
+ * card of its own.
  *
  * @param {Object}        props
  * @param {Object}        props.question
@@ -54,13 +56,7 @@ const QuestionEditor = ( { question, index, questions, facetValues, listPrefix, 
 						value={ question.text }
 						onValueChange={ ( text ) => onChange( { ...question, text } ) }
 					/>
-					<InputControl
-						type="url"
-						label={ __( 'Picture (optional)', 'searcio' ) }
-						description={ __( 'The address of a picture shown above the question, starting with https://.', 'searcio' ) }
-						value={ question.image }
-						onValueChange={ ( image ) => onChange( { ...question, image } ) }
-					/>
+					<QuestionPicture value={ question.image } onChange={ ( image ) => onChange( { ...question, image } ) } />
 				</Grid>
 			</section>
 

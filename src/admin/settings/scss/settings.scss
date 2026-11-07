@@ -408,6 +408,30 @@
   }
 }
 
+.whsc-quiz-picture {
+  .whsc-quiz-picture__label,
+  .whsc-quiz-picture__note {
+    margin: 0;
+  }
+
+  .whsc-quiz-picture__note {
+    color: var(--wpds-color-foreground-content-neutral-weak);
+
+    &.is-warning {
+      color: var(--wpds-color-foreground-content-error);
+    }
+  }
+
+  .whsc-quiz-picture__preview {
+    display: block;
+    max-width: 240px;
+    max-height: 160px;
+    object-fit: cover;
+    border: 1px solid var(--wpds-color-stroke-surface-neutral);
+    border-radius: var(--wpds-border-radius-md);
+  }
+}
+
 .whsc-quiz-conditions__hint {
   margin: 0;
   color: var(--wpds-color-foreground-content-neutral-weak);

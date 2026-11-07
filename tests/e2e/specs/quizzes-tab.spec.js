@@ -191,6 +191,43 @@ test.describe( 'Product finder tab', () => {
 		} );
 	} );
 
+	/**
+	 * A question's picture comes from the Media Library. Its frame is
+	 * WordPress's own; what is pinned is what the editor does with the picture
+	 * picked in it, so the frame here hands one over at once.
+	 */
+	test( 'picks a question's picture in the Media Library and saves its large size', async ( { page } ) => {
+		const sent = await mockQuizzes( page );
+		await page.goto( `${ TAB_URL }&quiz=7&section=question-for` );
+
+		const screen = page.locator( SCREEN );
+		await expect( screen.getByRole( 'button', { name: 'Choose a picture' } ) ).toBeVisible( LOADED );
+		await page.evaluate( () => {
+			window.wp.media = () => {
+				const handlers = {};
+				const attachment = { url: 'https://example.test/full.jpg', sizes: { large: { url: 'https://example.test/large.jpg' } } };
+				const frame = {
+					on: ( event, handler ) => {
+						handlers[ event ] = handler;
+
+						return frame;
+					},
+					open: () => handlers.select?.(),
+					state: () => ( { get: () => ( { first: () => ( { toJSON: () => attachment } ) } ) } ),
+				};
+
+				return frame;
+			};
+		} );
+
+		await screen.getByRole( 'button', { name: 'Choose a picture' } ).click();
+		await expect( screen.getByRole( 'img', { name: 'The question's picture' } ) ).toHaveAttribute( 'src', 'https://example.test/large.jpg' );
+		await expect( screen.getByRole( 'button', { name: 'Replace' } ) ).toBeVisible();
+
+		await screen.getByRole( 'button', { name: 'Save changes' } ).click();
+		await expect.poll( () => sent.find( ( write ) => '/quizzes/7' === write.path )?.body?.quiz?.questions?.[ 0 ]?.image ).toBe( 'https://example.test/large.jpg' );
+	} );
+
 	test( 'asks before publishing a quiz with an ending that shows no products', async ( { page } ) => {
 		const sent = await mockQuizzes( page, { endings: [ { answers: [ { question: 'Who is the gift for?', answer: 'A coffee lover' } ], count: 0, unknown_fields: [] } ] } );
 		await page.goto( `${ TAB_URL }&quiz=7` );

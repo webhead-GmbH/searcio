@@ -5,10 +5,12 @@
 import {
 	endingCounts,
 	graphForSave,
+	isSecurePicture,
 	newOption,
 	newQuestion,
 	nextFreeId,
 	normalizeQuiz,
+	pictureUrl,
 	removeQuestion,
 	savedForm,
 	valueStatus,
@@ -151,5 +153,21 @@ describe( 'valueStatus', () => {
 describe( 'endingCounts', () => {
 	it( 'counts the endings, the dead ends and those on a field that is not a filter', () => {
 		expect( endingCounts( [ { count: 3 }, { count: 0 }, { count: null }, { count: 0 } ] ) ).toEqual( { total: 4, empty: 2, unknown: 1 } );
+	} );
+} );
+
+describe( 'a picture from the Media Library', () => {
+	it( 'takes its large size, else the next size down, else the file', () => {
+		expect( pictureUrl( { url: 'https://shop.test/full.jpg', sizes: { large: { url: 'https://shop.test/large.jpg' }, medium: { url: 'https://shop.test/medium.jpg' } } } ) ).toBe( 'https://shop.test/large.jpg' );
+		expect( pictureUrl( { url: 'https://shop.test/full.jpg', sizes: { medium: { url: 'https://shop.test/medium.jpg' } } } ) ).toBe( 'https://shop.test/medium.jpg' );
+		expect( pictureUrl( { url: 'https://shop.test/small.png' } ) ).toBe( 'https://shop.test/small.png' );
+		expect( pictureUrl( undefined ) ).toBe( '' );
+	} );
+
+	/** Searcio refuses a picture that is not on https. */
+	it( 'is one Searcio takes only from an https address', () => {
+		expect( isSecurePicture( 'https://shop.test/a.jpg' ) ).toBe( true );
+		expect( isSecurePicture( 'http://shop.test/a.jpg' ) ).toBe( false );
+		expect( isSecurePicture( '' ) ).toBe( false );
 	} );
 } );

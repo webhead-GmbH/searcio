@@ -201,3 +201,26 @@ export const endingCounts = ( endings ) => ( {
 	empty: endings.filter( ( ending ) => 0 === ending.count ).length,
 	unknown: endings.filter( ( ending ) => null === ending.count ).length,
 } );
+
+/**
+ * The address of a picture picked in the Media Library: its large size,
+ * which is big enough above a question, or the next size down, or the file
+ * itself when WordPress made no smaller one.
+ *
+ * @param {Object} attachment What the Media Library hands over (`toJSON()`).
+ * @return {string} The address, or '' for none.
+ */
+export const pictureUrl = ( attachment ) => {
+	const sizes = attachment?.sizes || {};
+	const url = sizes.large?.url || sizes.medium_large?.url || sizes.medium?.url || attachment?.url;
+
+	return 'string' === typeof url ? url : '';
+};
+
+/**
+ * Searcio shows a question's picture only from an https address.
+ *
+ * @param {string} url
+ * @return {boolean} Whether the address is one Searcio takes.
+ */
+export const isSecurePicture = ( url ) => /^https:\/\/\S+$/i.test( String( url || '' ).trim() );
