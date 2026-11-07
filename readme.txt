@@ -145,21 +145,20 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 
 == Screenshots ==
 
-1. The search box in your theme's header, on a WooCommerce shop.
-2. Results with product images, prices and sale badges, and filters for type, category, color and price.
-3. Before a search: current highlights, recent searches and popular searches.
-4. One click on a filter narrows the results.
+1. Before a search: recent searches, popular searches and current highlights.
+2. A merchandising rule at work: a banner and two pinned jackets for the search "jacket", with filters for type, category, brand, price, color and material.
+3. The rule behind it, on the Search Config tab: the search it fires on, the language it keeps to, the products it pins and the banner.
+4. The color filter shows your swatches and how many products have each color.
 5. The AI shopping assistant answers in words and shows the products it means.
-6. The product finder asks a few questions...
-7. ...and shows the products that match the answers.
+6. The product finder asks shoppers a few questions, here with a picture, and then shows the products that fit their answers.
+7. The same quiz, made in WordPress: each answer narrows the products by your filters, and the question's picture comes from the Media Library.
 8. Search by photo: upload a picture and find products that look like it.
-9. The Searcio Search block and its settings in the block editor.
-10. Style every part of the search window from the block's Styles panel.
-11. Sync: the progress of the current sync and the history of past ones.
-12. Indexing: choose which content and which WooCommerce details are searchable.
-13. Search Config: AI search, field weights, filters, suggestions and synonyms.
-14. Connection: what your plan has used this month.
-15. General settings, including Support Searcio.
+9. Similar products on a product page, matched by meaning.
+10. On a phone, the search window fills the screen.
+11. The look editor: colors, fonts, sizes and spacing of every part of the search, for desktops, tablets and phones, with a live preview.
+12. Search Config: AI search, visual tagging, search by photo, click ranking and the weight of each field.
+13. Indexing: choose which content and which WooCommerce details are searchable.
+14. Sync: start a sync and see the history of past ones.
 
 == External services ==
 
