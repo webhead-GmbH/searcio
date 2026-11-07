@@ -97,6 +97,7 @@ final class Settings_Page extends Page {
 				'syncBase'            => '/searcio/v1/sync',
 				'cacheClearPath'      => '/searcio/v1/cache/clear',
 				'searchConfigPath'    => '/searcio/v1/search-config',
+				'quizzesPath'         => '/searcio/v1/quizzes',
 				'placementPath'       => '/searcio/v1/placement',
 				'nonce'               => wp_create_nonce( 'wp_rest' ),
 			],

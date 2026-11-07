@@ -155,6 +155,56 @@ final class Search_Cloud_Client {
 	}
 
 	/**
+	 * The site's quizzes, drafts included (`docs/api/quiz.md`, "Managing
+	 * quizzes from a plugin"): `{ quizzes: [{ id, name, status, lang,
+	 * question_count, updated_at }], limit }`.
+	 */
+	public function list_quizzes(): Api_Response {
+		return $this->request( 'GET', '/quiz-templates' );
+	}
+
+	/**
+	 * @param  array<string,mixed>  $quiz  `name`, and optionally `lang`, `status` and `questions`.
+	 */
+	public function create_quiz( array $quiz ): Api_Response {
+		// Asked once: a create that timed out may still have made the quiz,
+		// and asking again would make a second one.
+		return $this->request( 'POST', '/quiz-templates', $quiz, true, false );
+	}
+
+	public function get_quiz( int $id ): Api_Response {
+		return $this->request( 'GET', '/quiz-templates/' . $id );
+	}
+
+	/**
+	 * @param  array<string,mixed>  $changes  Only the keys that change.
+	 */
+	public function update_quiz( int $id, array $changes ): Api_Response {
+		return $this->request( 'PUT', '/quiz-templates/' . $id, $changes );
+	}
+
+	public function delete_quiz( int $id ): Api_Response {
+		return $this->request( 'DELETE', '/quiz-templates/' . $id );
+	}
+
+	/**
+	 * The values of every facet field with how many documents carry each, for
+	 * answers to tag values that exist.
+	 */
+	public function quiz_facet_values(): Api_Response {
+		return $this->request( 'GET', '/quiz-templates/facet-values' );
+	}
+
+	/**
+	 * Every way a question graph can end, saved or not, with its product count.
+	 *
+	 * @param  array<int,array<string,mixed>>  $questions
+	 */
+	public function quiz_endings( array $questions ): Api_Response {
+		return $this->request( 'POST', '/quiz-templates/endings', [ 'questions' => $questions ] );
+	}
+
+	/**
 	 * @return array{0:string,1:string}
 	 */
 	private function credentials(): array {
@@ -178,8 +228,9 @@ final class Search_Cloud_Client {
 
 	/**
 	 * @param  array<string,mixed>|null  $body
+	 * @param  bool                      $retry  Whether a failure that may pass is asked again.
 	 */
-	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true ): Api_Response {
+	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true ): Api_Response {
 		$url = $this->base() . $path;
 
 		$headers = [ 'Accept' => 'application/json' ];
@@ -218,7 +269,7 @@ final class Search_Cloud_Client {
 				$result = Api_Response::from_http( (int) wp_remote_retrieve_response_code( $response ), $response );
 			}
 
-			if ( $result->should_retry() && $attempt < self::MAX_ATTEMPTS ) {
+			if ( $retry && $result->should_retry() && $attempt < self::MAX_ATTEMPTS ) {
 				$this->sleep( $attempt, $result->retry_after() );
 				continue;
 			}

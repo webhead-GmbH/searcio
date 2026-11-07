@@ -1,4 +1,25 @@
 {
+    "src/admin/settings/components/quiz/AnswerEditor.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/quiz/NewQuizModal.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/quiz/QuestionEditor.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/quiz/quizApi.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/quiz/QuizEditor.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/quiz/QuizEndings.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/quiz/QuizList.js": [
+        "public/bundle.settings.js"
+    ],
     "src/admin/settings/components/SettingsPanel.js": [
         "public/bundle.settings.js"
     ],
@@ -39,6 +60,9 @@
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/PlacementTab.js": [
+        "public/bundle.settings.js"
+    ],
+    "src/admin/settings/components/tabs/QuizzesTab.js": [
         "public/bundle.settings.js"
     ],
     "src/admin/settings/components/tabs/SearchConfigTab.js": [
