@@ -106,6 +106,33 @@ describe( 'openers', () => {
 		expect( opened ).toEqual( [ '', '', '' ] );
 	} );
 
+	/**
+	 * With a Persian or Russian layout the K key writes "ن" or "л". The
+	 * browser's own Ctrl+K still answers to it, and it opened the browser's
+	 * search instead of Searcio.
+	 */
+	it( 'opens on Ctrl+K whatever a layout without Latin letters writes for the K key', () => {
+		detach = attachOpeners( { shortcut: true } );
+
+		const persian = new KeyboardEvent( 'keydown', { key: 'ن', code: 'KeyK', ctrlKey: true, bubbles: true, cancelable: true } );
+		document.body.dispatchEvent( persian );
+		document.body.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'л', code: 'KeyK', metaKey: true, bubbles: true, cancelable: true } ) );
+
+		expect( opened ).toEqual( [ '', '' ] );
+		expect( persian.defaultPrevented ).toBe( true );
+	} );
+
+	/** On Dvorak the key where QWERTY has K writes "t": Ctrl+T is not Ctrl+K. */
+	it( 'goes by the letter on a layout with Latin letters', () => {
+		detach = attachOpeners( { shortcut: true } );
+
+		document.body.dispatchEvent( new KeyboardEvent( 'keydown', { key: 't', code: 'KeyK', ctrlKey: true, bubbles: true, cancelable: true } ) );
+		expect( opened ).toEqual( [] );
+
+		document.body.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'k', code: 'KeyV', ctrlKey: true, bubbles: true, cancelable: true } ) );
+		expect( opened ).toEqual( [ '' ] );
+	} );
+
 	it( 'leaves "/" to a field that has the focus', () => {
 		detach = attachOpeners( { shortcut: true } );
 
