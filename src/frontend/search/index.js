@@ -90,8 +90,14 @@ const INTENT_EVENTS = [ 'pointerover', 'focusin', 'touchstart' ];
 const SEARCH_CONTROLS = '[data-whsc-trigger], .searcio-open, a[href="#searcio"]';
 
 const onIntent = ( event ) => {
-	if ( event.target instanceof window.Element && event.target.closest( SEARCH_CONTROLS ) ) {
-		warmUp();
+	const control = event.target instanceof window.Element ? event.target.closest( SEARCH_CONTROLS ) : null;
+
+	if ( control ) {
+		// The highlights the window of this control opens on: its own scope and
+		// source, or the site's trigger's for a link that opens the search.
+		const trigger = control.closest( '[data-whsc-trigger]' ) || document.querySelector( '[data-whsc-trigger][data-whsc-site]' );
+
+		warmUp( { type: trigger?.dataset.type || '', source: trigger?.dataset.highlightsSource || 'newest' } );
 		INTENT_EVENTS.forEach( ( type ) => document.removeEventListener( type, onIntent, true ) );
 	}
 };

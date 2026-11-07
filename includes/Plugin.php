@@ -73,6 +73,7 @@ use Webhead\WP\SearchCloud\Sync\Change_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
 use Webhead\WP\SearchCloud\WP_CLI\Sync_Command;
 use Webhead\WP\SearchCloud\WP_CLI\Command_Registrar;
+use Webhead\WP\SearchCloud\Frontend\Resource_Hints;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
 use Webhead\WP\SearchCloud\Frontend\Placement_Config;
 use Webhead\WP\SearchCloud\Frontend\Placement_Preview;
@@ -434,6 +435,13 @@ final class Plugin extends Base_Plugin {
 		$container->add( 'menu_item', Menu_Item::class );
 		$container->add( 'legacy_names', Legacy_Names::class );
 
+		// The head of a page that will search opens the connection to Searcio.
+		$storefront_handle = $this->get_assets()->handle( Frontend_Config::ENTRY );
+		$container->add(
+			'resource_hints',
+			static fn (): Resource_Hints => new Resource_Hints( $storefront_handle, defined( 'Webhead\\WP\\SearchCloud\\SERVICE_URL' ) ? (string) \Webhead\WP\SearchCloud\SERVICE_URL : '' )
+		);
+
 		// How the storefront entry is registered, said before anything asks for
 		// it. The configuration is a callback: it is built when a block or a
 		// widget on the page enqueues the entry, and on no other request.
@@ -468,6 +476,7 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'widget_registrar' ) );
 		$hooks_manager->register( $container->get( 'menu_item' ) );
 		$hooks_manager->register( $container->get( 'legacy_names' ) );
+		$hooks_manager->register( $container->get( 'resource_hints' ) );
 	}
 
 	/**

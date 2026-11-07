@@ -868,7 +868,7 @@ describe( 'what the window shows before the visitor types', () => {
 } );
 
 describe( 'warmUp', () => {
-	it( 'asks for the storefront config and the popular searches once, and no search', async () => {
+	it( 'asks once for the storefront config, the popular searches and the highlights row', async () => {
 		const api = loadApi();
 
 		api.warmUp();
@@ -877,17 +877,24 @@ describe( 'warmUp', () => {
 
 		const paths = global.fetch.mock.calls.map( ( [ url ] ) => new URL( url ).pathname );
 
-		expect( paths.sort() ).toEqual( [ '/api/v1/search/popular', '/api/v1/storefront-config' ] );
+		expect( paths.sort() ).toEqual( [ '/api/v1/search', '/api/v1/search/popular', '/api/v1/storefront-config' ] );
 	} );
 
-	it( 'hands the window the request it started', async () => {
+	it( 'hands the window the requests it started, the highlights of its control included', async () => {
 		const api = loadApi();
 
-		api.warmUp();
+		api.warmUp( { type: 'product', source: 'featured' } );
 		await api.fetchStorefrontConfig();
 		await api.fetchPopularSearches();
+		await api.fetchHighlights( { type: 'product', source: 'featured' } );
 
-		expect( global.fetch ).toHaveBeenCalledTimes( 2 );
+		expect( global.fetch ).toHaveBeenCalledTimes( 3 );
+
+		const highlights = new URL( global.fetch.mock.calls.find( ( [ url ] ) => '/api/v1/search' === new URL( url ).pathname )[ 0 ] );
+
+		expect( highlights.searchParams.get( 'type' ) ).toBe( 'product' );
+		expect( highlights.searchParams.get( 'filter[featured]' ) ).toBe( 'true' );
+		expect( highlights.searchParams.get( 'surface' ) ).toBe( 'highlights' );
 	} );
 
 	it( 'asks for nothing when search is not set up', () => {
@@ -921,5 +928,13 @@ describe( 'preconnect', () => {
 		loadApi().preconnect();
 
 		expect( document.head.querySelectorAll( 'link[rel="preconnect"]' ) ).toHaveLength( 0 );
+	} );
+} );
+
+describe( 'search', () => {
+	it( 'asks for no highlighted fragments, which the window never shows', async () => {
+		await loadApi().search( 'jacket' );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'highlight' ) ).toBe( '0' );
 	} );
 } );

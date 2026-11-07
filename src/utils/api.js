@@ -22,6 +22,7 @@
  */
 
 import { currentLangFilter as resolveCurrentLangFilter, inLanguage, isLanguageSupported as resolveLanguageSupported } from './language';
+import { buildFilterParams, buildRangeParams } from './facets';
 
 // A page a cache saved before 1.4.0 still prints the config under the
 // plugin's first name, while it loads this script.
@@ -248,12 +249,30 @@ export const preconnect = () => {
 let warmed = false;
 
 /**
+ * The highlights row: the newest products, or the featured ones, in the page's
+ * language, with the filters the visitor has picked. The window asks for it
+ * as it opens and whenever a filter changes with the field empty, and
+ * {@see warmUp} asks for the same address, so the two share one answer.
+ *
+ * @param {{type?: string, source?: string, facets?: Object, ranges?: Object, signal?: AbortSignal}} [options]
+ */
+export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
+	const forced = { ...currentLangFilter(), ...( 'featured' === source ? { featured: 'true' } : {} ) };
+
+	return search( '', { type, filters: buildFilterParams( facets, forced ), ranges: buildRangeParams( ranges ), perPage: 12, surface: 'highlights', signal } );
+};
+
+/**
  * Asks for what the window shows as it opens, a moment before the visitor
  * opens it: as the pointer reaches a search control, it takes focus or a
- * finger touches it. Only what is not metered as a search: the storefront
- * config and the popular searches. Once per page.
+ * finger touches it (search-cloud #164). The storefront config, the popular
+ * searches and the highlights row of the control it reached; the highlights
+ * are kept for the visit, so they are asked for at most every few minutes.
+ * Once per page.
+ *
+ * @param {{type?: string, source?: string}} [instance] The search control's scope and highlights source.
  */
-export const warmUp = () => {
+export const warmUp = ( instance = {} ) => {
 	if ( warmed || ! isConfigured() ) {
 		return;
 	}
@@ -261,6 +280,7 @@ export const warmUp = () => {
 	warmed = true;
 	fetchStorefrontConfig().catch( () => {} );
 	fetchPopularSearches().catch( () => {} );
+	fetchHighlights( { type: instance.type || '', source: instance.source || 'newest' } ).catch( () => {} );
 };
 
 /** How a settled search was started, as the service records it (`origin` on `/search`). */
@@ -332,7 +352,10 @@ export const search = ( q, options = {} ) => {
 	// The hints are part of the address, so a settled search never answers
 	// from the cache a live request for the same words left behind: it goes
 	// out, and the service counts it.
-	const params = { q, type: options.type, page, per_page: options.perPage || 20, ...searchHints( q, page, options ) };
+	// `highlight=0`: the window never shows a hit's highlighted fragments, and
+	// highlighting is the most expensive part of a search for the engine
+	// (search-cloud #164: about 40% of its time on the demo shop's index).
+	const params = { q, type: options.type, page, per_page: options.perPage || 20, highlight: 0, ...searchHints( q, page, options ) };
 
 	// Filterable fields must already be configured as facet fields server-side
 	// (search.md) - an unfiltered chip list never sends a field the API would
