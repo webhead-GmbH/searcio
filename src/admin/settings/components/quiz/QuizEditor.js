@@ -16,6 +16,7 @@ import { MAX_QUESTIONS, endingCounts, graphForSave, newQuestion, normalizeQuiz, 
 import QuestionEditor from './QuestionEditor';
 import QuizEndings from './QuizEndings';
 import { QUIZZES_PATH, languageName, questionTitle, quizErrorMessage, quizErrors, statusLabel } from './quizApi';
+import { forget, readOnce } from '../../remote';
 
 const LIST_PREFIX = 'whsc-quiz-values';
 const NO_ENDINGS = { endings: null, truncated: false, isChecking: false, error: '', checkedForm: '' };
@@ -61,7 +62,7 @@ const QuizEditor = ( { id, languages, onClose } ) => {
 		Promise.all( [
 			apiFetch( { path: `${ QUIZZES_PATH }/${ id }` } ),
 			// The values are a help for typing a filter; the editor works without them.
-			apiFetch( { path: `${ QUIZZES_PATH }/facet-values` } ).catch( () => ( { values: {} } ) ),
+			readOnce( { path: `${ QUIZZES_PATH }/facet-values` } ).catch( () => ( { values: {} } ) ),
 		] )
 			.then( ( [ raw, facets ] ) => {
 				if ( cancelled ) {
@@ -156,6 +157,8 @@ const QuizEditor = ( { id, languages, onClose } ) => {
 				method: 'PUT',
 				data: { quiz: { name: quiz.name.trim(), lang: quiz.lang, questions: graphForSave( quiz.questions ), ...( status ? { status } : {} ) } },
 			} );
+
+			forget( `${ QUIZZES_PATH }?` );
 			const next = normalizeQuiz( response );
 
 			setQuiz( next );

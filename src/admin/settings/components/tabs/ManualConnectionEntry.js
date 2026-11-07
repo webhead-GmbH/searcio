@@ -8,6 +8,7 @@ import SettingsContext from '../../../../settings/store/context';
 import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
 import {useAnnounce} from '../../../../utils/announce';
+import {forgetAll} from '../../remote';
 
 const pluginData = window.searcioData || {};
 const SECRET_PLACEHOLDER = '••••••••••••';
@@ -55,8 +56,12 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 					pluginData?.api?.testConnectionPath ||
 					'/searcio/v1/connection/test',
 				method: 'POST',
+				// "Test connection" asks Searcio now, past what the server keeps,
+				// and the rest of the screen reads anew what new keys may change.
+				data: {fresh: true},
 			});
 
+			forgetAll();
 			setResult(response);
 
 			// A pasted-in credential set that just proved itself healthy

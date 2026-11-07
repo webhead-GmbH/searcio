@@ -49,6 +49,16 @@ final class Api_Response {
 		return new self( $status, $body, $retry_after );
 	}
 
+	/**
+	 * A successful answer read again from where it was kept
+	 * ({@see Search_Cloud_Client}): its status and its body.
+	 *
+	 * @param  array<string,mixed>  $body
+	 */
+	public static function kept( int $status, array $body ): self {
+		return new self( $status, $body );
+	}
+
 	public static function from_transport_error( WP_Error $error ): self {
 		return new self( 0, [], null, true, $error->get_error_message() );
 	}

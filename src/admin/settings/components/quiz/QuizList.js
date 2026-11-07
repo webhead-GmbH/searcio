@@ -10,6 +10,7 @@ import { DataViews } from '../../../../components/DataViews';
 import { showToast } from '../../../../toast';
 import { useAnnounce } from '../../../../utils/announce';
 import { QUIZZES_PATH, languageName, quizErrorMessage, statusLabel } from './quizApi';
+import { forget, readOnce } from '../../remote';
 
 // Scoped to this plugin, screen and table, so the view survives a reload.
 const VIEW_STORAGE_KEY = 'searcio.settings.quizzes.view';
@@ -121,7 +122,7 @@ const QuizList = ( { languages, onOpen, onCreate, reload } ) => {
 
 		setIsLoading( true );
 
-		apiFetch( { path: `${ QUIZZES_PATH }?${ query.toString() }` } )
+		readOnce( { path: `${ QUIZZES_PATH }?${ query.toString() }` } )
 			.then( ( response ) => {
 				if ( ! cancelled ) {
 					setItems( Array.isArray( response?.items ) ? response.items : [] );
@@ -151,6 +152,7 @@ const QuizList = ( { languages, onOpen, onCreate, reload } ) => {
 	const setStatus = async ( item, status ) => {
 		try {
 			await apiFetch( { path: `${ QUIZZES_PATH }/${ item.id }`, method: 'PUT', data: { quiz: { status } } } );
+			forget( `${ QUIZZES_PATH }?` );
 			showToast(
 				'published' === status ? __( 'The quiz is in the product finder.', 'searcio' ) : __( 'The quiz is a draft again.', 'searcio' ),
 				'success'
@@ -278,6 +280,8 @@ const QuizList = ( { languages, onOpen, onCreate, reload } ) => {
 										apiFetch( { path: `${ QUIZZES_PATH }/${ item.id }`, method: 'DELETE' } ).then( () => true, () => false )
 									)
 								);
+
+								forget( `${ QUIZZES_PATH }?` );
 
 								if ( results.includes( false ) ) {
 									showToast( __( 'A quiz could not be deleted. Try again.', 'searcio' ), 'error' );

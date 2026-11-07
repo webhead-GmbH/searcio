@@ -47,7 +47,7 @@ final class Scheduled_Sync_Job implements Job {
 		// logo, and an admin screen is not opened every day: a plan that
 		// changed is noticed here within a day.
 		if ( $this->client->is_configured() ) {
-			$this->connection_state->remember_plan( $this->client->health() );
+			$this->connection_state->remember_plan( $this->client->health( true ) );
 
 			// A shop that changes its currency, or never saves the Search
 			// Config tab, is told within a day.

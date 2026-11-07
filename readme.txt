@@ -197,6 +197,7 @@ Legal notice: https://searcio.com/impressum
 - The AI shopping assistant types its reply out as it arrives, with a blinking cursor while more is coming, instead of showing it a sentence at a time.
 - A filter value with a comma in it, such as a category named "Jackets, Coats & Knitwear", finds its products; it found none.
 - Search as you type answers sooner after a pause in typing.
+- The settings tabs open at once: what they read from Searcio is kept for a few minutes and read again after every change you save, and a tab opened again does not ask the server a second time. "Test connection" always asks Searcio.
 - Ctrl+K and Cmd+K open the search with a keyboard layout that has no Latin letters, such as Persian or Russian, where they opened the browser's own search.
 - The AI shopping assistant numbers the products it suggests 1, 2, 3, where a reply with a blank line between them showed "1." for each.
 - Text in neighbouring paragraphs, headings and list items is indexed as separate words: a list of "Wool" and "Silk" was found only as "WoolSilk". The daily sync updates content that is already indexed.

@@ -15,6 +15,7 @@ import LegalLinks from './LegalLinks';
 import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
 import {useAnnounce} from '../../../../utils/announce';
+import {forgetAll, readOnce} from '../../remote';
 
 const pluginData = window.searcioData || {};
 const CONNECT_PATH = pluginData?.api?.connectPath || '/searcio/v1/connection/connect';
@@ -71,7 +72,7 @@ const ConnectionTab = () => {
 
 		(async () => {
 			try {
-				const response = await apiFetch({path: TEST_CONNECTION_PATH, method: 'POST'});
+				const response = await readOnce({path: TEST_CONNECTION_PATH, method: 'POST'});
 
 				if (!cancelled) {
 					setConnectedResult(response);
@@ -119,7 +120,7 @@ const ConnectionTab = () => {
 
 		(async () => {
 			try {
-				const response = await apiFetch({path: CONNECTION_LEGAL_PATH});
+				const response = await readOnce({path: CONNECTION_LEGAL_PATH});
 
 				if (!cancelled && response) {
 					setLegalLinks({
@@ -177,6 +178,7 @@ const ConnectionTab = () => {
 				},
 			});
 
+			forgetAll();
 			await handleConnectOutcome(response);
 		} catch (error) {
 			await handleConnectOutcome(error);
@@ -190,6 +192,7 @@ const ConnectionTab = () => {
 
 		try {
 			await apiFetch({path: DISCONNECT_PATH, method: 'POST'});
+			forgetAll();
 			await reloadSettings();
 
 			setConnectedResult(null);

@@ -128,7 +128,8 @@ final class Health_Tests {
 			)->to_wordpress_result();
 		}
 
-		$response = $this->client->health();
+		// Site Health reports the connection as it is now, not as it was kept.
+		$response = $this->client->health( true );
 
 		if ( $response->transport_error || ! $response->ok() ) {
 			return Health_Result::critical(
