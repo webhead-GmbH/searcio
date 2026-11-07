@@ -196,7 +196,7 @@ test.describe( 'Product finder tab', () => {
 	 * WordPress's own; what is pinned is what the editor does with the picture
 	 * picked in it, so the frame here hands one over at once.
 	 */
-	test( 'picks a question's picture in the Media Library and saves its large size', async ( { page } ) => {
+	test( "picks a question's picture in the Media Library and saves its large size", async ( { page } ) => {
 		const sent = await mockQuizzes( page );
 		await page.goto( `${ TAB_URL }&quiz=7&section=question-for` );
 
@@ -221,7 +221,7 @@ test.describe( 'Product finder tab', () => {
 		} );
 
 		await screen.getByRole( 'button', { name: 'Choose a picture' } ).click();
-		await expect( screen.getByRole( 'img', { name: 'The question's picture' } ) ).toHaveAttribute( 'src', 'https://example.test/large.jpg' );
+		await expect( screen.getByRole( 'img', { name: "The question's picture" } ) ).toHaveAttribute( 'src', 'https://example.test/large.jpg' );
 		await expect( screen.getByRole( 'button', { name: 'Replace' } ) ).toBeVisible();
 
 		await screen.getByRole( 'button', { name: 'Save changes' } ).click();
