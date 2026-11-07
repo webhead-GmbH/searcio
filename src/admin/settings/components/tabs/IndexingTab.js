@@ -11,6 +11,7 @@ import {selectProps} from '../../../../utils/select';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 import {useAnnounce} from '../../../../utils/announce';
+import {forget, readOnce} from '../../remote';
 
 const pluginData = window.searcioData || {};
 const CONFIG_PATH =
@@ -468,7 +469,7 @@ const IndexingTab = () => {
 
 		const load = async () => {
 			try {
-				const response = await apiFetch({path: CONFIG_PATH});
+				const response = await readOnce({path: CONFIG_PATH});
 
 				if (!isCurrentAttempt) {
 					return;
@@ -516,6 +517,8 @@ const IndexingTab = () => {
 				method: 'POST',
 				data: {config},
 			});
+
+			forget(CONFIG_PATH);
 			const nextConfig = toConfigMap(response);
 
 			setCatalog(response);

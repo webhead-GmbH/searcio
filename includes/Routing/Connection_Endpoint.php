@@ -46,9 +46,13 @@ final class Connection_Endpoint extends Rest_API {
 		return 'searcio/v1';
 	}
 
-	#[Route( '/connection/test', methods: 'POST', permission_callback: 'can_view' )]
+	/**
+	 * The site's status as Searcio reports it, kept a few minutes for the
+	 * settings screen; `fresh` asks Searcio now, as "Test connection" does.
+	 */
+	#[Route( '/connection/test', methods: 'POST', permission_callback: 'can_view', args: [ 'fresh' => [ 'type' => 'boolean', 'default' => false ] ] )]
 	public function test_connection( WP_REST_Request $request ): WP_REST_Response {
-		$response = $this->client->health();
+		$response = $this->client->health( (bool) $request->get_param( 'fresh' ) );
 
 		// The storefront decides on the Searcio logo from the tier, and asks
 		// nobody: it is kept whenever an admin screen checks the connection.

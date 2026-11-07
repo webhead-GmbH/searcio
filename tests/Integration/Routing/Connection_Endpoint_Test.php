@@ -160,7 +160,10 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		remove_all_filters( 'pre_http_request' );
 		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected', 'statistics_url' => 'javascript:alert(1)' ] ] ) );
 
-		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
+		// Asked afresh, as "Test connection" asks: the first answer is kept.
+		$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/test' );
+		$request->set_param( 'fresh', true );
+		$data = $this->server->dispatch( $request )->get_data();
 
 		$this->assertSame( untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/login', $data['statistics_url'] );
 	}

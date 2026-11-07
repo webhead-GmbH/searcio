@@ -1,26 +1,19 @@
 import { useEffect, useState } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { readOnce } from './remote';
 
 const pluginData = window.searcioData || {};
 const TEST_CONNECTION_PATH = pluginData?.api?.testConnectionPath || '/searcio/v1/connection/test';
 
-// One health check per page load, however many places ask what it said.
-let asked = null;
-
 /**
- * The health check's answer (`/connection/test`), or null when it failed.
+ * The health check's answer (`/connection/test`), or null when it failed:
+ * one request for every part of the screen that asks (`remote.js`).
  *
  * @return {Promise<Object|null>} What `Connection_Endpoint::present()` returns.
  */
-const askForHealth = () => {
-	if ( ! asked ) {
-		asked = apiFetch( { path: TEST_CONNECTION_PATH, method: 'POST' } )
-			.then( ( response ) => ( response?.ok ? response : null ) )
-			.catch( () => null );
-	}
-
-	return asked;
-};
+const askForHealth = () =>
+	readOnce( { path: TEST_CONNECTION_PATH, method: 'POST' } )
+		.then( ( response ) => ( response?.ok ? response : null ) )
+		.catch( () => null );
 
 /**
  * One value of the health check, for a connected site: `initial` at once,

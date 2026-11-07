@@ -29,6 +29,7 @@ import { showToast } from '../../../../toast';
 import { useAnnounce } from '../../../../utils/announce';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
+import { forget, readOnce } from '../../remote';
 
 const pluginData = window.searcioData || {};
 // How long a pause in typing has to be before a selector counts as written.
@@ -178,7 +179,7 @@ const PlacementTab = () => {
 		setIsLoading( true );
 		setLoadError( null );
 
-		apiFetch( { path: PLACEMENT_PATH } )
+		readOnce( { path: PLACEMENT_PATH } )
 			.then( ( response ) => mounted.current && accept( response ) )
 			.catch( ( error ) => mounted.current && setLoadError( reasonOf( error ) ) )
 			.finally( () => mounted.current && setIsLoading( false ) );
@@ -216,6 +217,8 @@ const PlacementTab = () => {
 
 		try {
 			const response = await apiFetch( { path: PLACEMENT_PATH, method: 'POST', data: { placement } } );
+
+			forget( PLACEMENT_PATH );
 
 			if ( ! mounted.current ) {
 				return;

@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-import apiFetch from '@wordpress/api-fetch';
 
 import TabIntro from '../TabIntro';
 import QuizList from '../quiz/QuizList';
 import QuizEditor from '../quiz/QuizEditor';
 import NewQuizModal from '../quiz/NewQuizModal';
 import { INDEXING_CONFIG_PATH } from '../quiz/quizApi';
+import { readOnce } from '../../remote';
 
 const QUIZ_PARAMETER = 'quiz';
 
@@ -29,7 +29,7 @@ const QuizzesTab = () => {
 	// The site's languages, as the Search Config tab lists them; none on a
 	// single-language site, which then has no language to choose.
 	useEffect( () => {
-		apiFetch( { path: INDEXING_CONFIG_PATH } )
+		readOnce( { path: INDEXING_CONFIG_PATH } )
 			.then( ( catalog ) => setLanguages( catalog?.languages?.active && Array.isArray( catalog.languages.available ) ? catalog.languages.available : [] ) )
 			.catch( () => setLanguages( [] ) );
 	}, [] );

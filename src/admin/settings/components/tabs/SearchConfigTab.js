@@ -26,6 +26,7 @@ import { showToast } from '../../../../toast';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 import { useAnnounce } from '../../../../utils/announce';
+import { forget, readOnce } from '../../remote';
 
 const pluginData = window.searcioData || {};
 const SEARCH_CONFIG_PATH =
@@ -595,8 +596,8 @@ const SearchConfigTab = () => {
 		const load = async () => {
 			try {
 				const [ configResponse, catalogResponse ] = await Promise.all( [
-					apiFetch( { path: SEARCH_CONFIG_PATH } ),
-					apiFetch( { path: INDEXING_CONFIG_PATH } ),
+					readOnce( { path: SEARCH_CONFIG_PATH } ),
+					readOnce( { path: INDEXING_CONFIG_PATH } ),
 				] );
 
 				if ( ! isCurrentAttempt ) {
@@ -627,7 +628,7 @@ const SearchConfigTab = () => {
 			}
 
 			try {
-				const connection = await apiFetch( { path: TEST_CONNECTION_PATH, method: 'POST' } );
+				const connection = await readOnce( { path: TEST_CONNECTION_PATH, method: 'POST' } );
 
 				if ( isCurrentAttempt && connection?.ok ) {
 					setLanguageLimit( connection.languages?.limit ?? null );
@@ -707,6 +708,8 @@ const SearchConfigTab = () => {
 					method: 'PUT',
 					data: toPayload( config ),
 				} );
+
+				forget( SEARCH_CONFIG_PATH );
 
 				const normalized = normalizeConfig( response );
 				normalized.type_boosts = syncTypeBoosts( normalized.type_boosts, Object.keys( typeLabels ) );

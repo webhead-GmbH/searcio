@@ -15,8 +15,10 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Connection;
 
+use Closure;
 use WP_Error;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Cache\Cache_Key;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Cache\Cache_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 
@@ -30,6 +32,20 @@ final class Search_Cloud_Client {
 	private const TIMEOUT         = 15;
 	private const MAX_BACKOFF     = 8;
 	private const LEGAL_LINKS_TTL = 6 * HOUR_IN_SECONDS;
+
+	/**
+	 * How long a read for the settings screen is kept. What it shows changes
+	 * on Searcio's side only when somebody changes it there, and every change
+	 * the plugin makes forgets what it changed, so a tab opens without a round
+	 * trip to Searcio each time.
+	 */
+	private const READ_TTL = 10 * MINUTE_IN_SECONDS;
+
+	/** The site's status and this month's usage move with every search: kept shorter. */
+	private const HEALTH_TTL = 5 * MINUTE_IN_SECONDS;
+
+	/** The cache group the reads are kept in. */
+	private const READS = 'searcio_reads';
 
 	public function __construct(
 		private Settings_Manager $settings,
@@ -52,8 +68,13 @@ final class Search_Cloud_Client {
 		return $write_key;
 	}
 
-	public function health(): Api_Response {
-		return $this->request( 'GET', '/health' );
+	/**
+	 * `GET /health`: the site, its plan and what it has used. Kept for a few
+	 * minutes for the settings screen; Site Health, the daily sync and "Test
+	 * connection" ask afresh.
+	 */
+	public function health( bool $fresh = false ): Api_Response {
+		return $this->kept( 'health', self::HEALTH_TTL, fn (): Api_Response => $this->request( 'GET', '/health' ), $fresh );
 	}
 
 	/**
@@ -65,7 +86,11 @@ final class Search_Cloud_Client {
 	 * @param  array<string,mixed>  $payload
 	 */
 	public function connect( array $payload ): Api_Response {
-		return $this->request( 'POST', '/connect', $payload, authenticated: false );
+		$response = $this->request( 'POST', '/connect', $payload, authenticated: false );
+
+		$this->forget_reads();
+
+		return $response;
 	}
 
 	/**
@@ -75,7 +100,11 @@ final class Search_Cloud_Client {
 	 * docs/api/building-a-plugin.md "Disconnecting").
 	 */
 	public function disconnect(): Api_Response {
-		return $this->request( 'DELETE', '/disconnect' );
+		$response = $this->request( 'DELETE', '/disconnect' );
+
+		$this->forget_reads();
+
+		return $response;
 	}
 
 	/**
@@ -98,7 +127,7 @@ final class Search_Cloud_Client {
 	public function legal_links(): array {
 		$cache_key = $this->cache_manager->key( 'connect_legal_links' );
 
-		return $this->cache_manager->object_cache()->remember(
+		return $this->cache_manager->transients()->remember(
 			$cache_key,
 			self::LEGAL_LINKS_TTL,
 			function (): array {
@@ -142,8 +171,8 @@ final class Search_Cloud_Client {
 		return $this->request( 'DELETE', '/documents/' . rawurlencode( $id ) );
 	}
 
-	public function get_search_config(): Api_Response {
-		return $this->request( 'GET', '/search-config' );
+	public function get_search_config( bool $fresh = false ): Api_Response {
+		return $this->kept( 'search_config', self::READ_TTL, fn (): Api_Response => $this->request( 'GET', '/search-config' ), $fresh );
 	}
 
 	/**
@@ -151,7 +180,11 @@ final class Search_Cloud_Client {
 	 *                                        keys keep their current server-side value.
 	 */
 	public function update_search_config( array $payload ): Api_Response {
-		return $this->request( 'PUT', '/search-config', $payload );
+		$response = $this->request( 'PUT', '/search-config', $payload );
+
+		$this->forget( 'search_config' );
+
+		return $response;
 	}
 
 	/**
@@ -159,8 +192,8 @@ final class Search_Cloud_Client {
 	 * quizzes from a plugin"): `{ quizzes: [{ id, name, status, lang,
 	 * question_count, updated_at }], limit }`.
 	 */
-	public function list_quizzes(): Api_Response {
-		return $this->request( 'GET', '/quiz-templates' );
+	public function list_quizzes( bool $fresh = false ): Api_Response {
+		return $this->kept( 'quizzes', self::READ_TTL, fn (): Api_Response => $this->request( 'GET', '/quiz-templates' ), $fresh );
 	}
 
 	/**
@@ -169,7 +202,11 @@ final class Search_Cloud_Client {
 	public function create_quiz( array $quiz ): Api_Response {
 		// Asked once: a create that timed out may still have made the quiz,
 		// and asking again would make a second one.
-		return $this->request( 'POST', '/quiz-templates', $quiz, true, false );
+		$response = $this->request( 'POST', '/quiz-templates', $quiz, true, false );
+
+		$this->forget( 'quizzes' );
+
+		return $response;
 	}
 
 	public function get_quiz( int $id ): Api_Response {
@@ -180,19 +217,73 @@ final class Search_Cloud_Client {
 	 * @param  array<string,mixed>  $changes  Only the keys that change.
 	 */
 	public function update_quiz( int $id, array $changes ): Api_Response {
-		return $this->request( 'PUT', '/quiz-templates/' . $id, $changes );
+		$response = $this->request( 'PUT', '/quiz-templates/' . $id, $changes );
+
+		$this->forget( 'quizzes' );
+
+		return $response;
 	}
 
 	public function delete_quiz( int $id ): Api_Response {
-		return $this->request( 'DELETE', '/quiz-templates/' . $id );
+		$response = $this->request( 'DELETE', '/quiz-templates/' . $id );
+
+		$this->forget( 'quizzes' );
+
+		return $response;
 	}
 
 	/**
 	 * The values of every facet field with how many documents carry each, for
 	 * answers to tag values that exist.
 	 */
-	public function quiz_facet_values(): Api_Response {
-		return $this->request( 'GET', '/quiz-templates/facet-values' );
+	public function quiz_facet_values( bool $fresh = false ): Api_Response {
+		return $this->kept( 'quiz_facet_values', self::READ_TTL, fn (): Api_Response => $this->request( 'GET', '/quiz-templates/facet-values' ), $fresh );
+	}
+
+	/**
+	 * Forgets every kept read, as a new connection does.
+	 */
+	public function forget_reads(): void {
+		$this->cache_manager->invalidate_group( self::READS );
+	}
+
+	/**
+	 * A read, from where it was kept unless `$fresh` asks for Searcio's answer
+	 * now. Only a successful answer is kept, so a failure is asked again next
+	 * time.
+	 *
+	 * @param  Closure(): Api_Response  $read
+	 */
+	private function kept( string $name, int $ttl, Closure $read, bool $fresh ): Api_Response {
+		$key   = $this->read_key( $name );
+		$store = $this->cache_manager->transients();
+
+		if ( ! $fresh ) {
+			$kept = $store->get( $key );
+
+			if ( is_array( $kept ) && isset( $kept['status'] ) && is_array( $kept['body'] ?? null ) ) {
+				return Api_Response::kept( (int) $kept['status'], $kept['body'] );
+			}
+		}
+
+		$response = $read();
+
+		if ( $response->ok() ) {
+			$store->set( $key, [ 'status' => $response->status, 'body' => $response->body ], $ttl );
+		}
+
+		return $response;
+	}
+
+	private function forget( string $name ): void {
+		$this->cache_manager->transients()->delete( $this->read_key( $name ) );
+	}
+
+	/**
+	 * Named after the write key as well: keys entered anew read afresh.
+	 */
+	private function read_key( string $name ): Cache_Key {
+		return $this->cache_manager->key( $name . '_' . substr( wp_hash( $this->write_key() ), 0, 12 ), self::READS );
 	}
 
 	/**

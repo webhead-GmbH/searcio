@@ -7,6 +7,7 @@ import Modal from '../../../../components/Modal';
 import { useAnnounce } from '../../../../utils/announce';
 import { selectProps } from '../../../../utils/select';
 import { QUIZZES_PATH, quizErrorMessage } from './quizApi';
+import { forget } from '../../remote';
 
 /**
  * Names a new quiz, and on a multilingual site its language, and makes it in
@@ -46,6 +47,8 @@ const NewQuizModal = ( { isOpen, onClose, onCreated, languages } ) => {
 
 		try {
 			const quiz = await apiFetch( { path: QUIZZES_PATH, method: 'POST', data: { quiz: { name: name.trim(), lang } } } );
+
+			forget( `${ QUIZZES_PATH }?` );
 
 			onCreated( Number( quiz?.id ) );
 		} catch ( reason ) {

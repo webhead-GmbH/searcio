@@ -32,6 +32,100 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertSame( 'https://sc.test/terms', $first['terms'] );
 	}
 
+	/**
+	 * The settings screen's reads are kept, so a tab opens without a round
+	 * trip to Searcio; a change the plugin makes forgets what it changed.
+	 */
+	public function test_the_search_configuration_is_read_once_until_it_is_changed(): void {
+		$this->connect_client();
+		$calls = $this->count_requests( [ 'weights' => [ 'title' => 5 ] ] );
+
+		$this->assertSame( [ 'title' => 5 ], $this->client()->get_search_config()->body()['weights'] );
+		$this->assertSame( [ 'title' => 5 ], $this->client()->get_search_config()->body()['weights'] );
+		$this->assertSame( 1, $calls->get );
+
+		$this->client()->update_search_config( [ 'weights' => [ 'title' => 8 ] ] );
+		$this->client()->get_search_config();
+
+		$this->assertSame( 2, $calls->get );
+	}
+
+	public function test_the_quizzes_are_read_once_until_one_is_made_changed_or_deleted(): void {
+		$this->connect_client();
+		$calls = $this->count_requests( [ 'quizzes' => [] ] );
+
+		$this->client()->list_quizzes();
+		$this->client()->list_quizzes();
+		$this->assertSame( 1, $calls->get );
+
+		foreach ( [ fn () => $this->client()->create_quiz( [ 'name' => 'Gift finder' ] ), fn () => $this->client()->update_quiz( 3, [ 'status' => 'draft' ] ), fn () => $this->client()->delete_quiz( 3 ) ] as $index => $change ) {
+			$change();
+			$this->client()->list_quizzes();
+			$this->assertSame( 2 + $index, $calls->get );
+		}
+	}
+
+	/**
+	 * Site Health, the daily sync and "Test connection" ask Searcio now.
+	 */
+	public function test_the_health_check_is_kept_but_can_be_asked_afresh(): void {
+		$this->connect_client();
+		$calls = $this->count_requests( [ 'site' => [ 'id' => 26 ] ] );
+
+		$this->client()->health();
+		$this->client()->health();
+		$this->assertSame( 1, $calls->get );
+
+		$this->client()->health( true );
+		$this->assertSame( 2, $calls->get );
+	}
+
+	public function test_a_failed_read_is_not_kept(): void {
+		$this->connect_client();
+		$calls = 0;
+		$this->fake_http( function () use ( &$calls ): array {
+			++$calls;
+
+			return $this->http_ok( [ 'message' => 'Unavailable' ], 503 );
+		} );
+
+		$this->client()->quiz_facet_values();
+		$after_first = $calls;
+		$this->client()->quiz_facet_values();
+
+		$this->assertGreaterThan( $after_first, $calls );
+	}
+
+	public function test_keys_entered_anew_read_afresh(): void {
+		$this->connect_client();
+		$calls = $this->count_requests( [ 'weights' => [] ] );
+
+		$this->client()->get_search_config();
+		$this->settings()->set( \Webhead\WP\SearchCloud\Settings\Plugin_Settings::WRITE_KEY, \Webhead\WP\SearchCloud\Settings\Plugin_Settings::encrypt_secret( 'another-write-key' ) );
+		$this->client()->get_search_config();
+
+		$this->assertSame( 2, $calls->get );
+	}
+
+	/**
+	 * Answers every request with `$body` and counts the GETs.
+	 *
+	 * @param  array<string,mixed>  $body
+	 */
+	private function count_requests( array $body ): object {
+		$calls = (object) [ 'get' => 0 ];
+
+		$this->fake_http( function ( string $url, array $args ) use ( $calls, $body ): array {
+			if ( 'GET' === ( $args['method'] ?? 'GET' ) ) {
+				++$calls->get;
+			}
+
+			return $this->http_ok( $body );
+		} );
+
+		return $calls;
+	}
+
 	public function test_disconnect_sends_a_delete_request_with_the_write_credentials(): void {
 		$this->connect_client();
 
