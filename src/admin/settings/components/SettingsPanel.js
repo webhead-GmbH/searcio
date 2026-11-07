@@ -20,6 +20,7 @@ import ConnectionTab from './tabs/ConnectionTab';
 import IndexingTab from './tabs/IndexingTab';
 import SyncTab from './tabs/SyncTab';
 import SearchConfigTab from './tabs/SearchConfigTab';
+import QuizzesTab from './tabs/QuizzesTab';
 import PlacementTab from './tabs/PlacementTab';
 import {useAnnounce} from '../../../utils/announce';
 
@@ -28,9 +29,10 @@ const pluginData = window.searcioData || {};
 const SYNC_TAB = 'sync';
 const INDEXING_TAB = 'indexing';
 const SEARCH_CONFIG_TAB = 'search-config';
+const QUIZZES_TAB = 'quizzes';
 const PLACEMENT_TAB = 'placement';
 const CONNECTION_TAB = 'connection';
-const SELF_MANAGED_TABS = [SYNC_TAB, INDEXING_TAB, SEARCH_CONFIG_TAB, PLACEMENT_TAB, CONNECTION_TAB];
+const SELF_MANAGED_TABS = [SYNC_TAB, INDEXING_TAB, SEARCH_CONFIG_TAB, QUIZZES_TAB, PLACEMENT_TAB, CONNECTION_TAB];
 const CONNECTION_KEYS = pluginData.connectionKeys || [
 	'search_key',
 	'write_key',
@@ -113,6 +115,10 @@ const SettingsPanel = () => {
 			{
 				name: SEARCH_CONFIG_TAB,
 				title: renderAnimatedTabTitle(__('Search Config', 'searcio'), '', 0.16),
+			},
+			{
+				name: QUIZZES_TAB,
+				title: renderAnimatedTabTitle(__('Product finder', 'searcio'), '', 0.17),
 			},
 			{
 				name: PLACEMENT_TAB,
@@ -280,6 +286,14 @@ const SettingsPanel = () => {
 						<Tabs.Panel value={SEARCH_CONFIG_TAB} className="tab-content">
 							<motion.div {...panelMotion}>
 								<SearchConfigTab/>
+							</motion.div>
+						</Tabs.Panel>
+					)}
+
+					{canManageSettings && (
+						<Tabs.Panel value={QUIZZES_TAB} className="tab-content">
+							<motion.div {...panelMotion}>
+								<QuizzesTab/>
 							</motion.div>
 						</Tabs.Panel>
 					)}

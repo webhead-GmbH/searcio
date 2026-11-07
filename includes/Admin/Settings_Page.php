@@ -65,6 +65,18 @@ final class Settings_Page extends Page {
 	}
 
 	/**
+	 * The page's assets, and the Media Library for someone who may upload: the
+	 * quiz editor on the Product finder tab picks a question's picture there.
+	 */
+	public function enqueue_scripts( string $hook ): void {
+		parent::enqueue_scripts( $hook );
+
+		if ( $this->should_enqueue_assets( $hook ) && current_user_can( 'upload_files' ) ) {
+			wp_enqueue_media();
+		}
+	}
+
+	/**
 	 * The Searcio mark in one colour: its green field with the "s" cut out.
 	 * WordPress paints every `fill` of a base64 SVG menu icon in the colour of
 	 * the admin scheme (wp-admin/js/svg-painter.js), so the mark's shape has to
@@ -97,6 +109,7 @@ final class Settings_Page extends Page {
 				'syncBase'            => '/searcio/v1/sync',
 				'cacheClearPath'      => '/searcio/v1/cache/clear',
 				'searchConfigPath'    => '/searcio/v1/search-config',
+				'quizzesPath'         => '/searcio/v1/quizzes',
 				'placementPath'       => '/searcio/v1/placement',
 				'nonce'               => wp_create_nonce( 'wp_rest' ),
 			],

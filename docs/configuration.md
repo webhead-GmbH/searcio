@@ -55,7 +55,7 @@ What the search modal offers is decided by Searcio's `/storefront-config`, not b
 
 - **AI Assistant** - a chat tab that answers in prose and returns the products it is talking about, with a Compare table across their attributes.
 - **Search by photo** - a camera button in the search box. The shopper uploads (or, on a phone, takes) a photo; a vision model describes it as tags and those tags run as an ordinary search. The tags are shown above the results, so an unexpected result set reads as a misread photo rather than as broken search. Turn it on under *AI & ranking* above.
-- **Product finder** - a guided quiz tab: a few questions that narrow the catalogue down for a shopper who knows what they want but not what it is called. The questions are built in the Searcio panel; the tab appears once at least one quiz is published. Answers accumulate into filters, required words (`keywords[]`) and ranges (`range[field]`), and run as a single search at the end.
+- **Product finder** - a guided quiz tab: a few questions that narrow the catalogue down for a shopper who knows what they want but not what it is called. The quizzes are made on the plugin's **Product finder** tab or in the Searcio panel, which hold the same quizzes; the tab appears once at least one quiz is published. Answers accumulate into filters, required words (`keywords[]`) and ranges (`range[field]`), and run as a single search at the end.
 
 Every mode is themeable from the same place as the rest of the widget - the block editor's Styles sidebar, Elementor's Style tab, or, for the shortcode, the classic widget, a form Searcio takes over and the floating button, the Placement tab's look editor.
 

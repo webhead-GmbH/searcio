@@ -375,20 +375,104 @@
 // A section with nothing beside it is no card: its title, its sentence and
 // its controls straight on the panel, on the rhythm a card would give them.
 // wp-admin gives a bare `h3` and `p` margins of their own inside `.wrap`.
-.whsc-placement-section {
+.whsc-placement-section,
+.whsc-quiz-section {
   display: flex;
   flex-direction: column;
   gap: var(--wpds-dimension-gap-lg);
   min-width: 0;
 
-  .whsc-placement-section__title,
-  .whsc-placement-section__description {
+.whsc-placement-section__title,
+  .whsc-placement-section__description,
+  .whsc-quiz-section__title,
+  .whsc-quiz-section__description {
     margin: 0;
   }
 
-  .whsc-placement-section__description {
+  .whsc-placement-section__description,
+  .whsc-quiz-section__description {
     color: var(--wpds-color-foreground-content-neutral-weak);
   }
+}
+
+// The quiz editor (Product finder tab). A condition's fields grow and its
+// remove button stays beside them, level with the inputs under the labels.
+.whsc-quiz-condition {
+  .whsc-quiz-condition__fields {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .whsc-quiz-condition__remove {
+    margin-top: var(--wpds-dimension-gap-xl);
+  }
+}
+
+.whsc-quiz-picture {
+  .whsc-quiz-picture__label,
+  .whsc-quiz-picture__note {
+    margin: 0;
+  }
+
+  .whsc-quiz-picture__note {
+    color: var(--wpds-color-foreground-content-neutral-weak);
+
+    &.is-warning {
+      color: var(--wpds-color-foreground-content-error);
+    }
+  }
+
+  .whsc-quiz-picture__preview {
+    display: block;
+    max-width: 240px;
+    max-height: 160px;
+    object-fit: cover;
+    border: 1px solid var(--wpds-color-stroke-surface-neutral);
+    border-radius: var(--wpds-border-radius-md);
+  }
+}
+
+.whsc-quiz-conditions__hint {
+  margin: 0;
+  color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.whsc-quiz-endings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wpds-dimension-gap-sm);
+  margin: 0;
+  padding-inline-start: var(--wpds-dimension-gap-xl);
+
+  .whsc-quiz-endings__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--wpds-dimension-gap-sm);
+    margin: 0;
+  }
+
+  .whsc-quiz-endings__note {
+    flex-basis: 100%;
+    color: var(--wpds-color-foreground-content-neutral-weak);
+  }
+}
+
+.whsc-quiz-editor__title {
+  margin: 0;
+}
+
+.whsc-quiz-editor__reasons {
+  margin: 0;
+  padding-inline-start: var(--wpds-dimension-gap-lg);
+}
+
+.whsc-quiz-editor__skeleton-bar {
+  height: 40px;
+}
+
+.whsc-quiz-editor__skeleton-body {
+  height: 320px;
 }
 
 // The preview is a page of the site, in the theme's own styles, framed as a

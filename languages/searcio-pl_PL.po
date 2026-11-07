@@ -21,7 +21,7 @@ msgstr "https://wordpress.org/plugins/searcio/"
 
 #. Description of the plugin
 #: searcio.php
-#: includes/Admin/Settings_Page.php:118
+#: includes/Admin/Settings_Page.php:131
 msgid "Connect WordPress and WooCommerce to Searcio."
 msgstr "Łączy WordPress i WooCommerce z Searcio."
 
@@ -38,9 +38,9 @@ msgstr "https://webhead.at"
 #: includes/Admin/Menu_Item.php:35
 #: includes/Admin/Settings_Page.php:36
 #: includes/Admin/Settings_Page.php:40
-#: includes/Admin/Settings_Page.php:117
-#: includes/Plugin.php:483
-#: src/admin/settings/components/SettingsPanel.js:204
+#: includes/Admin/Settings_Page.php:130
+#: includes/Plugin.php:491
+#: src/admin/settings/components/SettingsPanel.js:210
 msgid "Searcio"
 msgstr "Searcio"
 
@@ -1611,6 +1611,7 @@ msgstr "Nie udało się odłączyć od Searcio. Spróbuj ponownie."
 
 #: includes/Routing/Connection_Endpoint.php:191
 #: includes/Routing/Connection_Endpoint.php:298
+#: includes/Routing/Quizzes_Endpoint.php:170
 #: includes/Routing/Search_Config_Endpoint.php:85
 msgid "Could not reach Searcio."
 msgstr "Nie udało się połączyć z Searcio."
@@ -1871,57 +1872,58 @@ msgstr "Synchronizacja anulowana."
 msgid "There is no active sync."
 msgstr "Brak aktywnej synchronizacji."
 
-#: src/admin/settings/components/SettingsPanel.js:106
+#: src/admin/settings/components/SettingsPanel.js:108
 #: src/admin/settings/components/tabs/SyncTab.js:184
 msgid "Sync"
 msgstr "Synchronizacja"
 
-#: src/admin/settings/components/SettingsPanel.js:111
+#: src/admin/settings/components/SettingsPanel.js:113
 msgid "Indexing"
 msgstr "Indeksowanie"
 
-#: src/admin/settings/components/SettingsPanel.js:115
+#: src/admin/settings/components/SettingsPanel.js:117
 msgid "Search Config"
 msgstr "Konfiguracja wyszukiwania"
 
-#: src/admin/settings/components/SettingsPanel.js:119
+#: src/admin/settings/components/SettingsPanel.js:125
 #: src/admin/settings/components/tabs/PlacementTab.js:927
 msgid "Placement"
 msgstr "Osadzanie"
 
-#: src/admin/settings/components/SettingsPanel.js:123
+#: src/admin/settings/components/SettingsPanel.js:129
 msgid "Connection"
 msgstr "Połączenie"
 
 #. translators: %s: reason the settings request failed.
-#: src/admin/settings/components/SettingsPanel.js:168
-#: src/admin/settings/components/SettingsPanel.js:234
+#: src/admin/settings/components/SettingsPanel.js:174
+#: src/admin/settings/components/SettingsPanel.js:240
 #, js-format
 msgid "The settings could not be loaded: %s"
 msgstr "Nie udało się wczytać ustawień: %s"
 
 #. translators: %s: reason the settings could not be saved, as reported by the REST API.
-#: src/admin/settings/components/SettingsPanel.js:173
-#: src/admin/settings/components/SettingsPanel.js:336
+#: src/admin/settings/components/SettingsPanel.js:179
+#: src/admin/settings/components/SettingsPanel.js:350
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:93
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:151
 #, js-format
 msgid "The settings could not be saved: %s"
 msgstr "Nie udało się zapisać ustawień: %s"
 
-#: src/admin/settings/components/SettingsPanel.js:186
+#: src/admin/settings/components/SettingsPanel.js:192
 msgid "Settings saved successfully."
 msgstr "Ustawienia zostały zapisane."
 
-#: src/admin/settings/components/SettingsPanel.js:191
+#: src/admin/settings/components/SettingsPanel.js:197
 msgid "Saving..."
 msgstr "Zapisywanie..."
 
-#: src/admin/settings/components/SettingsPanel.js:192
+#: src/admin/settings/components/SettingsPanel.js:198
 msgid "Save Settings"
 msgstr "Zapisz ustawienia"
 
-#: src/admin/settings/components/SettingsPanel.js:194
+#: src/admin/settings/components/quiz/QuizEditor.js:236
+#: src/admin/settings/components/SettingsPanel.js:200
 #: src/admin/settings/components/tabs/IndexingTab.js:574
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:87
 #: src/admin/settings/components/tabs/PlacementTab.js:333
@@ -1929,11 +1931,13 @@ msgstr "Zapisz ustawienia"
 msgid "No unsaved changes."
 msgstr "Brak niezapisanych zmian."
 
-#: src/admin/settings/components/SettingsPanel.js:205
+#: src/admin/settings/components/SettingsPanel.js:211
 msgid "Configure the plugin settings from one shared admin surface."
 msgstr "Konfiguruj ustawienia wtyczki w jednym wspólnym miejscu panelu administracyjnego."
 
-#: src/admin/settings/components/SettingsPanel.js:240
+#: src/admin/settings/components/quiz/QuizEditor.js:214
+#: src/admin/settings/components/quiz/QuizList.js:332
+#: src/admin/settings/components/SettingsPanel.js:246
 #: src/admin/settings/components/tabs/IndexingTab.js:561
 #: src/admin/settings/components/tabs/PlacementTab.js:278
 #: src/admin/settings/components/tabs/SearchConfigTab.js:776
@@ -2126,6 +2130,8 @@ msgstr "Używana jako nazwa konta Searcio."
 msgid "Disconnect from Searcio?"
 msgstr "Odłączyć od Searcio?"
 
+#: src/admin/settings/components/quiz/NewQuizModal.js:70
+#: src/admin/settings/components/quiz/QuizList.js:267
 #: src/admin/settings/components/tabs/ConnectionTab.js:414
 #: src/admin/settings/components/tabs/SyncHistory.js:289
 #: src/admin/settings/components/tabs/SyncHistory.js:383
@@ -2176,6 +2182,7 @@ msgstr "Taksonomia: %s"
 msgid "- Do not send -"
 msgstr "- Nie wysyłaj -"
 
+#: src/admin/settings/components/quiz/AnswerEditor.js:143
 #: src/admin/settings/components/tabs/IndexingTab.js:100
 msgid "Value"
 msgstr "Wartość"
@@ -2197,6 +2204,7 @@ msgstr "Klucz meta"
 msgid "Send as"
 msgstr "Wyślij jako"
 
+#: src/admin/settings/components/quiz/AnswerEditor.js:193
 #: src/admin/settings/components/tabs/IndexingTab.js:150
 msgid "From"
 msgstr "Źródło"
@@ -2402,6 +2410,7 @@ msgstr "Nie udało się wczytać konfiguracji indeksowania: %s"
 msgid "The indexing configuration could not be saved: %s"
 msgstr "Nie udało się zapisać konfiguracji indeksowania: %s"
 
+#: src/admin/settings/components/quiz/QuizEditor.js:370
 #: src/admin/settings/components/tabs/IndexingTab.js:571
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:84
 #: src/admin/settings/components/tabs/PlacementTab.js:332
@@ -3363,6 +3372,8 @@ msgstr "Przyrostowa"
 msgid "Run"
 msgstr "Przebieg"
 
+#: src/admin/settings/components/quiz/QuizList.js:180
+#: src/admin/settings/components/quiz/QuizList.js:181
 #: src/admin/settings/components/tabs/SyncHistory.js:206
 #: src/admin/settings/components/tabs/SyncHistory.js:207
 msgid "Status"
@@ -3387,6 +3398,7 @@ msgstr "Usunięte"
 msgid "Started"
 msgstr "Rozpoczęcie"
 
+#: src/admin/settings/components/quiz/QuizList.js:243
 #: src/admin/settings/components/tabs/SyncHistory.js:264
 msgid "Delete"
 msgstr "Usuń"
@@ -3407,6 +3419,7 @@ msgstr[0] "%d przebieg zostanie trwale usunięty z historii. To, co wysłał do 
 msgstr[1] "%d przebiegi zostaną trwale usunięte z historii. To, co wysłały do Searcio, pozostaje bez zmian."
 msgstr[2] "%d przebiegów zostanie trwale usuniętych z historii. To, co wysłały do Searcio, pozostaje bez zmian."
 
+#: src/admin/settings/components/quiz/QuizList.js:289
 #: src/admin/settings/components/tabs/SyncHistory.js:308
 msgid "Delete permanently"
 msgstr "Usuń trwale"
@@ -4320,6 +4333,8 @@ msgstr "Wyczyść"
 msgid "Search modes"
 msgstr "Tryby wyszukiwania"
 
+#: src/admin/settings/components/SettingsPanel.js:121
+#: src/admin/settings/components/tabs/QuizzesTab.js:60
 #: src/frontend/search/components/SearchModal.js:1797
 msgid "Product finder"
 msgstr "Dobór produktu"
@@ -4689,10 +4704,17 @@ msgstr "Przejdź do rozliczeń"
 msgid "Loading the preview"
 msgstr "Wczytywanie podglądu"
 
+#: src/admin/settings/components/quiz/NewQuizModal.js:59
+#: src/admin/settings/components/quiz/quizApi.js:25
+#: src/admin/settings/components/quiz/QuizEditor.js:197
+#: src/admin/settings/components/quiz/QuizList.js:198
 #: src/admin/settings/components/tabs/SearchConfigTab.js:383
 msgid "Every language"
 msgstr "Wszystkie języki"
 
+#: src/admin/settings/components/quiz/NewQuizModal.js:95
+#: src/admin/settings/components/quiz/QuizEditor.js:271
+#: src/admin/settings/components/quiz/QuizList.js:194
 #: src/admin/settings/components/tabs/SearchConfigTab.js:434
 msgid "Language"
 msgstr "Język"
@@ -4700,3 +4722,524 @@ msgstr "Język"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:436
 msgid "The rule fires only for searches on pages in this language."
 msgstr "Reguła działa tylko dla wyszukiwań na stronach w tym języku."
+
+#: includes/Routing/Quizzes_Endpoint.php:179
+msgid "Connect this site to Searcio on the Connection tab first."
+msgstr "Najpierw połącz tę witrynę z Searcio na karcie Połączenie."
+
+#. translators: %s: number of products.
+#: src/admin/settings/components/quiz/AnswerEditor.js:27
+#, js-format
+msgid "%s product has this value."
+msgid_plural "%s products have this value."
+msgstr[0] "%s produkt ma tę wartość."
+msgstr[1] "%s produkty mają tę wartość."
+msgstr[2] "%s produktów ma tę wartość."
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:35
+msgid "Filters match the case of a value."
+msgstr "Filtry rozróżniają wielkość liter."
+
+#. translators: %s: a value as the site spells it.
+#: src/admin/settings/components/quiz/AnswerEditor.js:40
+#, js-format
+msgid "Use \"%s\""
+msgstr "Użyj „%s”"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:48
+msgid "No product has this value."
+msgstr "Żaden produkt nie ma tej wartości."
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:76
+msgid "Show the products"
+msgstr "Pokaż produkty"
+
+#. translators: %s: the text of the next question, or its place in the quiz.
+#: src/admin/settings/components/quiz/AnswerEditor.js:84
+#, js-format
+msgid "Ask: %s"
+msgstr "Zapytaj: %s"
+
+#. translators: %d: the answer's position in its question.
+#: src/admin/settings/components/quiz/AnswerEditor.js:98
+#, js-format
+msgid "Answer %d"
+msgstr "Odpowiedź %d"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:107
+msgid "Remove answer"
+msgstr "Usuń odpowiedź"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:116
+msgid "Answer"
+msgstr "Odpowiedź"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:121
+msgid "Then"
+msgstr "Następnie"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:127
+msgid "Products this answer shows"
+msgstr "Produkty, które pokazuje ta odpowiedź"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:131
+msgid "A product has to match every condition of the answer."
+msgstr "Produkt musi spełniać wszystkie warunki odpowiedzi."
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:132
+msgid "Without a condition the answer narrows nothing."
+msgstr "Bez warunku odpowiedź niczego nie zawęża."
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:139
+msgid "Filter"
+msgstr "Filtr"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:154
+msgid "Remove the filter"
+msgstr "Usuń filtr"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:164
+msgid "Name contains"
+msgstr "Nazwa zawiera"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:165
+msgid "e.g. waterproof, rain jacket"
+msgstr "np. wodoodporna, kurtka przeciwdeszczowa"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:166
+msgid "Separate alternatives with commas: the product name needs one of them. A word also finds longer words that start with it."
+msgstr "Oddziel warianty przecinkami: nazwa produktu musi zawierać jeden z nich. Słowo znajduje też dłuższe słowa, które się od niego zaczynają."
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:174
+msgid "Remove the words"
+msgstr "Usuń słowa"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:184
+msgid "Range on"
+msgstr "Zakres dla"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:199
+msgid "To"
+msgstr "Do"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:208
+msgid "Remove the range"
+msgstr "Usuń zakres"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:221
+msgid "Add a filter"
+msgstr "Dodaj filtr"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:225
+msgid "Add name words"
+msgstr "Dodaj słowa z nazwy"
+
+#: src/admin/settings/components/quiz/AnswerEditor.js:234
+msgid "Add a range"
+msgstr "Dodaj zakres"
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:39
+msgid "Give the quiz a name, such as \"Gift finder\"."
+msgstr "Nadaj quizowi nazwę, np. „Wyszukiwarka prezentów”."
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:67
+#: src/admin/settings/components/quiz/QuizList.js:322
+#: src/admin/settings/components/quiz/QuizList.js:361
+msgid "Add a quiz"
+msgstr "Dodaj quiz"
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:72
+msgid "Adding…"
+msgstr "Dodawanie…"
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:72
+msgid "Add the quiz"
+msgstr "Dodaj quiz"
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:88
+#: src/admin/settings/components/quiz/QuizEditor.js:264
+msgid "Name"
+msgstr "Nazwa"
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:89
+#: src/admin/settings/components/quiz/QuizEditor.js:265
+msgid "Shoppers see it when a site has more than one quiz to choose from."
+msgstr "Klienci widzą ją, gdy witryna ma do wyboru więcej niż jeden quiz."
+
+#: src/admin/settings/components/quiz/NewQuizModal.js:96
+#: src/admin/settings/components/quiz/QuizEditor.js:272
+msgid "The quiz is offered only on pages in this language."
+msgstr "Quiz jest oferowany tylko na stronach w tym języku."
+
+#. translators: %d: the question's position in the quiz.
+#: src/admin/settings/components/quiz/QuestionEditor.js:35
+#: src/admin/settings/components/quiz/quizApi.js:65
+#, js-format
+msgid "Question %d"
+msgstr "Pytanie %d"
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:45
+msgid "A quiz has at least one question."
+msgstr "Quiz ma co najmniej jedno pytanie."
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:49
+msgid "Remove question"
+msgstr "Usuń pytanie"
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:54
+msgid "Question"
+msgstr "Pytanie"
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:55
+msgid "e.g. Who is the gift for?"
+msgstr "np. Dla kogo jest prezent?"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:29
+#: src/admin/settings/components/quiz/QuestionPicture.js:59
+msgid "Picture (optional)"
+msgstr "Obraz (opcjonalnie)"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:30
+msgid "The address of a picture shown above the question, starting with https://."
+msgstr "Adres obrazu wyświetlanego nad pytaniem, zaczynający się od https://."
+
+#. translators: %d: the most answers a question can have.
+#: src/admin/settings/components/quiz/QuestionEditor.js:86
+#, js-format
+msgid "A question has at most %d answers."
+msgstr "Pytanie ma co najwyżej %d odpowiedzi."
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:93
+msgid "Add an answer"
+msgstr "Dodaj odpowiedź"
+
+#: src/admin/settings/components/quiz/quizApi.js:16
+msgid "Published"
+msgstr "Opublikowany"
+
+#: src/admin/settings/components/quiz/quizApi.js:16
+msgid "Draft"
+msgstr "Szkic"
+
+#: src/admin/settings/components/quiz/quizApi.js:48
+msgid "The request to Searcio failed. Try again."
+msgstr "Żądanie do Searcio nie powiodło się. Spróbuj ponownie."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:165
+#: src/admin/settings/components/quiz/QuizList.js:155
+msgid "The quiz is in the product finder."
+msgstr "Quiz jest w doborze produktu."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:167
+#: src/admin/settings/components/quiz/QuizList.js:155
+msgid "The quiz is a draft again."
+msgstr "Quiz jest znowu szkicem."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:169
+msgid "Quiz saved."
+msgstr "Quiz zapisany."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:206
+#: src/admin/settings/components/quiz/QuizEditor.js:335
+msgid "All quizzes"
+msgstr "Wszystkie quizy"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:210
+msgid "The quiz could not be loaded."
+msgstr "Nie udało się wczytać quizu."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:224
+msgid "Loading the quiz"
+msgstr "Wczytywanie quizu"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:242
+#: src/admin/settings/components/quiz/QuizEditor.js:255
+#: src/admin/settings/components/quiz/QuizList.js:168
+msgid "Quiz"
+msgstr "Quiz"
+
+#. translators: %d: number of questions.
+#: src/admin/settings/components/quiz/QuizEditor.js:248
+#, js-format
+msgid "%d question"
+msgid_plural "%d questions"
+msgstr[0] "%d pytanie"
+msgstr[1] "%d pytania"
+msgstr[2] "%d pytań"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:258
+msgid "Published: shoppers can take it in the product finder."
+msgstr "Opublikowany: klienci mogą go rozwiązać w doborze produktu."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:259
+msgid "A draft: shoppers do not see it until it is published."
+msgstr "Szkic: klienci nie widzą go, dopóki nie zostanie opublikowany."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:285
+msgid "No answers yet"
+msgstr "Brak odpowiedzi"
+
+#. translators: %d: number of answers.
+#: src/admin/settings/components/quiz/QuizEditor.js:288
+#, js-format
+msgid "%d answer"
+msgid_plural "%d answers"
+msgstr[0] "%d odpowiedź"
+msgstr[1] "%d odpowiedzi"
+msgstr[2] "%d odpowiedzi"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:310
+#: src/admin/settings/components/quiz/QuizEndings.js:52
+msgid "Where the quiz ends"
+msgstr "Gdzie kończy się quiz"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:312
+msgid "Not checked yet"
+msgstr "Jeszcze nie sprawdzono"
+
+#. translators: %d: number of endings.
+#: src/admin/settings/components/quiz/QuizEditor.js:314
+#, js-format
+msgid "%d ending"
+msgid_plural "%d endings"
+msgstr[0] "%d zakończenie"
+msgstr[1] "%d zakończenia"
+msgstr[2] "%d zakończeń"
+
+#. translators: %d: number of endings that show no products.
+#: src/admin/settings/components/quiz/QuizEditor.js:320
+#, js-format
+msgid "%d without products"
+msgid_plural "%d without products"
+msgstr[0] "%d bez produktów"
+msgstr[1] "%d bez produktów"
+msgstr[2] "%d bez produktów"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:324
+msgid "Changed since the check"
+msgstr "Zmieniono od sprawdzenia"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:338
+#: src/admin/settings/components/quiz/QuizList.js:174
+msgid "(no name)"
+msgstr "(bez nazwy)"
+
+#. translators: %d: the most questions a quiz can have.
+#: src/admin/settings/components/quiz/QuizEditor.js:351
+#, js-format
+msgid "A quiz has at most %d questions."
+msgstr "Quiz ma co najwyżej %d pytań."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:358
+msgid "Add a question"
+msgstr "Dodaj pytanie"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:370
+msgid "Save changes"
+msgstr "Zapisz zmiany"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:374
+#: src/admin/settings/components/quiz/QuizList.js:237
+msgid "Make a draft"
+msgstr "Zmień w szkic"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:378
+#: src/admin/settings/components/quiz/QuizList.js:231
+msgid "Publish"
+msgstr "Opublikuj"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:386
+msgid "The quiz could not be saved."
+msgstr "Nie udało się zapisać quizu."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:398
+msgid "Quiz sections"
+msgstr "Sekcje quizu"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:410
+msgid "Publish with endings that show no products?"
+msgstr "Opublikować z zakończeniami bez produktów?"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:414
+msgid "Review the endings"
+msgstr "Przejrzyj zakończenia"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:419
+msgid "Publish anyway"
+msgstr "Opublikuj mimo to"
+
+#. translators: %d: number of endings that show no products.
+#: src/admin/settings/components/quiz/QuizEditor.js:428
+#, js-format
+msgid "%d way through the quiz ends on no products, and a shopper who takes it sees nothing."
+msgid_plural "%d ways through the quiz end on no products, and a shopper who takes one sees nothing."
+msgstr[0] "%d ścieżka quizu kończy się bez produktów i klient, który nią przejdzie, nic nie zobaczy."
+msgstr[1] "%d ścieżki quizu kończą się bez produktów i klient, który przejdzie jedną z nich, nic nie zobaczy."
+msgstr[2] "%d ścieżek quizu kończy się bez produktów i klient, który przejdzie jedną z nich, nic nie zobaczy."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:444
+msgid "Leave without saving?"
+msgstr "Wyjść bez zapisywania?"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:450
+msgid "Keep editing"
+msgstr "Edytuj dalej"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:451
+msgid "Leave without saving"
+msgstr "Wyjdź bez zapisywania"
+
+#: src/admin/settings/components/quiz/QuizEditor.js:454
+msgid "The changes to this quiz since it was last saved are lost."
+msgstr "Zmiany w tym quizie od ostatniego zapisu zostaną utracone."
+
+#: src/admin/settings/components/quiz/QuizEndings.js:18
+msgid "Not a filter"
+msgstr "To nie filtr"
+
+#: src/admin/settings/components/quiz/QuizEndings.js:22
+msgid "No products"
+msgstr "Brak produktów"
+
+#. translators: %s: number of products.
+#: src/admin/settings/components/quiz/QuizEndings.js:29
+#, js-format
+msgid "%s product"
+msgid_plural "%s products"
+msgstr[0] "%s produkt"
+msgstr[1] "%s produkty"
+msgstr[2] "%s produktów"
+
+#: src/admin/settings/components/quiz/QuizEndings.js:55
+msgid "Every way through the quiz and how many products it shows. Before publishing, change the answers of an ending that shows none."
+msgstr "Każda ścieżka przez quiz i liczba produktów, które pokazuje. Przed publikacją zmień odpowiedzi zakończenia, które nie pokazuje żadnego."
+
+#: src/admin/settings/components/quiz/QuizEndings.js:61
+msgid "Checking…"
+msgstr "Sprawdzanie…"
+
+#: src/admin/settings/components/quiz/QuizEndings.js:61
+msgid "Check the endings"
+msgstr "Sprawdź zakończenia"
+
+#: src/admin/settings/components/quiz/QuizEndings.js:73
+msgid "The quiz has changed since this check."
+msgstr "Quiz zmienił się od tego sprawdzenia."
+
+#. translators: 1: number of endings, 2: how many of them show no products.
+#: src/admin/settings/components/quiz/QuizEndings.js:82
+#, js-format
+msgid "%1$d ending, %2$d of them without products."
+msgid_plural "%1$d endings, %2$d of them without products."
+msgstr[0] "%1$d zakończenie, w tym %2$d bez produktów."
+msgstr[1] "%1$d zakończenia, w tym %2$d bez produktów."
+msgstr[2] "%1$d zakończeń, w tym %2$d bez produktów."
+
+#: src/admin/settings/components/quiz/QuizEndings.js:91
+msgid "(no answer)"
+msgstr "(brak odpowiedzi)"
+
+#. translators: %s: names of fields, comma-separated.
+#: src/admin/settings/components/quiz/QuizEndings.js:98
+#, js-format
+msgid "Not a filter of this site: %s"
+msgstr "To nie filtr tej witryny: %s"
+
+#: src/admin/settings/components/quiz/QuizEndings.js:107
+msgid "Only the first endings are listed."
+msgstr "Wymieniono tylko pierwsze zakończenia."
+
+#: src/admin/settings/components/quiz/QuizList.js:206
+#: src/admin/settings/components/quiz/QuizList.js:207
+msgid "Questions"
+msgstr "Pytania"
+
+#: src/admin/settings/components/quiz/QuizList.js:214
+#: src/admin/settings/components/quiz/QuizList.js:215
+msgid "Changed"
+msgstr "Zmieniono"
+
+#: src/admin/settings/components/quiz/QuizList.js:225
+msgid "Edit"
+msgstr "Edytuj"
+
+#: src/admin/settings/components/quiz/QuizList.js:247
+msgid "Delete this quiz?"
+msgid_plural "Delete these quizzes?"
+msgstr[0] "Usunąć ten quiz?"
+msgstr[1] "Usunąć te quizy?"
+msgstr[2] "Usunąć te quizy?"
+
+#. translators: %d: number of quizzes.
+#: src/admin/settings/components/quiz/QuizList.js:256
+#, js-format
+msgid "%d quiz is deleted for good, in the Searcio panel too, and leaves the product finder."
+msgid_plural "%d quizzes are deleted for good, in the Searcio panel too, and leave the product finder."
+msgstr[0] "%d quiz zostanie trwale usunięty, także w panelu Searcio, i zniknie z doboru produktu."
+msgstr[1] "%d quizy zostaną trwale usunięte, także w panelu Searcio, i znikną z doboru produktu."
+msgstr[2] "%d quizów zostanie trwale usuniętych, także w panelu Searcio, i zniknie z doboru produktu."
+
+#: src/admin/settings/components/quiz/QuizList.js:283
+msgid "A quiz could not be deleted. Try again."
+msgstr "Nie udało się usunąć quizu. Spróbuj ponownie."
+
+#. translators: 1: number of quizzes, 2: the most a site can have.
+#: src/admin/settings/components/quiz/QuizList.js:307
+#, js-format
+msgid "%1$d of %2$d quiz"
+msgid_plural "%1$d of %2$d quizzes"
+msgstr[0] "%1$d z %2$d quizu"
+msgstr[1] "%1$d z %2$d quizów"
+msgstr[2] "%1$d z %2$d quizów"
+
+#: src/admin/settings/components/quiz/QuizList.js:319
+msgid "This site has as many quizzes as Searcio holds for one site."
+msgstr "Ta witryna ma tyle quizów, ile Searcio przechowuje dla jednej witryny."
+
+#: src/admin/settings/components/quiz/QuizList.js:328
+msgid "The quizzes could not be loaded."
+msgstr "Nie udało się wczytać quizów."
+
+#: src/admin/settings/components/quiz/QuizList.js:355
+msgid "No quizzes yet"
+msgstr "Brak quizów"
+
+#: src/admin/settings/components/quiz/QuizList.js:357
+msgid "A quiz asks shoppers a few questions and shows the products that fit their answers."
+msgstr "Quiz zadaje klientom kilka pytań i pokazuje produkty pasujące do ich odpowiedzi."
+
+#: src/admin/settings/components/tabs/QuizzesTab.js:61
+msgid "Quizzes ask shoppers a few questions and show the products that fit their answers, in the search window's Product finder tab. They are the same quizzes as in the Searcio panel."
+msgstr "Quizy zadają klientom kilka pytań i pokazują produkty pasujące do ich odpowiedzi na karcie Dobór produktu w oknie wyszukiwania. To te same quizy co w panelu Searcio."
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:41
+msgid "Choose the question's picture"
+msgstr "Wybierz obraz pytania"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:43
+msgid "Use this picture"
+msgstr "Użyj tego obrazu"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:62
+msgid "The question's picture"
+msgstr "Obraz pytania"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:66
+msgid "Searcio shows only pictures served over https, and this one is not. Choose another, or serve the site over https."
+msgstr "Searcio pokazuje tylko obrazy serwowane przez https, a ten nie jest. Wybierz inny albo serwuj witrynę przez https."
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:67
+msgid "Shown above the question in the product finder."
+msgstr "Wyświetlany nad pytaniem w doborze produktu."
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:71
+msgid "Choose a picture"
+msgstr "Wybierz obraz"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:71
+msgid "Replace"
+msgstr "Zamień"
+
+#: src/admin/settings/components/quiz/QuestionPicture.js:75
+msgid "Remove"
+msgstr "Usuń"

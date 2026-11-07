@@ -50,6 +50,7 @@ use Webhead\WP\SearchCloud\Routing\Indexing_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Sync_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Settings_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Cache_Endpoint;
+use Webhead\WP\SearchCloud\Routing\Quizzes_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Search_Config_Endpoint;
 use Webhead\WP\SearchCloud\Routing\Placement_Endpoint;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
@@ -347,6 +348,12 @@ final class Plugin extends Base_Plugin {
 			}
 		);
 		$container->add(
+			'quizzes_endpoint',
+			static function () use ( $container ): Quizzes_Endpoint {
+				return new Quizzes_Endpoint( $container->get( 'search_cloud_client' ) );
+			}
+		);
+		$container->add(
 			'sync_command',
 			static function () use ( $container ): Sync_Command {
 				return new Sync_Command( $container->get( 'sync_service' ), $container->get( 'sync_state' ) );
@@ -452,6 +459,7 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'sync_endpoint' ) );
 		$hooks_manager->register( $container->get( 'cache_endpoint' ) );
 		$hooks_manager->register( $container->get( 'search_config_endpoint' ) );
+		$hooks_manager->register( $container->get( 'quizzes_endpoint' ) );
 		$hooks_manager->register( $container->get( 'command_registrar' ) );
 		$hooks_manager->register( $container->get( 'change_listener' ) );
 		$hooks_manager->register( $container->get( 'placement_endpoint' ) );
