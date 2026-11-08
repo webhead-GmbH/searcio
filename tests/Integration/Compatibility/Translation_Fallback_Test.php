@@ -5,7 +5,9 @@
  *
  * WordPress loads a plugin's translation for the exact locale only, so a site
  * in Canadian French or Mexican Spanish showed the plugin in English, and a
- * site in "Deutsch (Sie)" (de_DE_formal) did too.
+ * site in "Deutsch (Sie)" (de_DE_formal) did too. The stand-in is the
+ * framework's (`Support\Translation_Fallback`, attached as the plugin boots),
+ * which took the place of the plugin's own; this holds the plugin to it.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
