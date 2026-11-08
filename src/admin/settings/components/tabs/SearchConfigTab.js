@@ -748,7 +748,7 @@ const SearchConfigTab = () => {
 				const response = await apiFetch( {
 					path: SEARCH_CONFIG_PATH,
 					method: 'PUT',
-					data: toPayload( config ),
+					data: toPayload( config, persistedConfig ),
 				} );
 
 				forget( SEARCH_CONFIG_PATH );

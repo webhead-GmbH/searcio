@@ -76,6 +76,8 @@ If you would like to support Searcio, you can show a small Searcio logo, linked 
 
 👉 Rate us on [WordPress](https://wordpress.org/support/plugin/searcio/reviews/#new-post)
 
+📖 Read the [documentation](https://searcio.com/en/docs/wordpress/introduction) to set up, configure and place the search.
+
 💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/searcio). The full source code is there, including the JavaScript and CSS before they are built: the files in the plugin's `public/` folder are built from its `src/` folder with `npm install` and `npm run build`.
 
 == Installation ==
@@ -218,6 +220,7 @@ Legal notice: https://searcio.com/impressum
 - The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.
 - Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR).
 - Search Config: list the searches that must never be offered as popular searches, the same list as in the Searcio panel.
+- Saving the Search Config tab sends only what you changed there, so a change made in the Searcio panel in the meantime is kept.
 - On a multilingual site the search suggestions are in the language of the page, as the results are.
 - Names with an "&" (post types, attributes, custom fields, price separators, popular searches) show as typed instead of as "&amp;".
 - New on the Placement tab: a look editor for the shortcode, the classic widgets, a search form Searcio takes over and the floating button, with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.

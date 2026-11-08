@@ -100,6 +100,8 @@ See [`docs/installation.md`](docs/installation.md) for a more detailed walkthrou
 
 ## Documentation
 
+The user documentation is on searcio.com: https://searcio.com/en/docs/wordpress/introduction
+
 - [Installation & setup](docs/installation.md)
 - [Configuration reference](docs/configuration.md) - every setting, tab by tab
 - [Multilingual support](docs/multilingual.md) - WPML / Polylang behavior
