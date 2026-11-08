@@ -27,15 +27,6 @@ describe( 'getRecentSearches', () => {
 
 		expect( getRecentSearches() ).toEqual( [ 'shirt', 'cap' ] );
 	} );
-
-	// Kept under the plugin's first name until 1.4.0.
-	it( 'moves a visitor\'s recent searches from their earlier key', () => {
-		window.localStorage.setItem( 'webheadSearchCloud.recentSearches', JSON.stringify( [ 'jacket' ] ) );
-
-		expect( getRecentSearches() ).toEqual( [ 'jacket' ] );
-		expect( window.localStorage.getItem( 'searcio.recentSearches' ) ).toBe( JSON.stringify( [ 'jacket' ] ) );
-		expect( window.localStorage.getItem( 'webheadSearchCloud.recentSearches' ) ).toBeNull();
-	} );
 } );
 
 describe( 'addRecentSearch', () => {

@@ -8,9 +8,8 @@
  * language pack, and nothing on screen says so until a second locale is
  * tried. These tests read the files the domain is written in.
  *
- * Since 1.4.0 every other name the framework gives after the plugin is the
- * slug too: options, tables, capabilities, hooks, REST routes, blocks. An
- * earlier release's are moved by `Lifecycle\Legacy_Slug`.
+ * Every other name the framework gives after the plugin is the slug too:
+ * options, tables, capabilities, hooks, REST routes, blocks.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -98,7 +97,6 @@ final class Text_Domain_Test extends TestCase {
 	 */
 	public function test_the_main_file_is_named_after_it(): void {
 		$this->assertFileExists( $this->root() . '/' . self::DOMAIN . '.php' );
-		$this->assertFileDoesNotExist( $this->root() . '/webhead-search-cloud.php' );
 		$this->assertSame( 'https://wordpress.org/plugins/' . self::DOMAIN . '/', $this->find( '/^ \* Plugin URI:\s*(\S+)\s*$/m', self::DOMAIN . '.php' ) );
 		$this->assertStringContainsString( "require dirname( __DIR__, 2 ) . '/" . self::DOMAIN . ".php';", (string) file_get_contents( $this->root() . '/tests/Integration/bootstrap.php' ) );
 		$this->assertStringContainsString( '<file>' . self::DOMAIN . '.php</file>', (string) file_get_contents( $this->root() . '/phpcs.xml' ) );
