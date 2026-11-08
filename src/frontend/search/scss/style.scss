@@ -27,7 +27,16 @@
  * would have silently dropped half the stylesheet depending on which chunk
  * `Frontend_Assets` picked.
  */
-@use '../../../components/Default/frontend-reset';
+@use '../../../components/Default/frontend-reset' with (
+	// The families of `@wordpress/components` the window draws, and what they
+	// draw inside them: a Modal draws a Button, a Tooltip a Popover, the
+	// trigger's SearchControl an InputControl. A family left out is a control
+	// the reset no longer holds against the theme.
+	$components: ( modal, button, popover, tooltip, input-control ),
+	// The modal, the sheets and the tooltips are drawn at the end of `body`;
+	// `frontend-overlays.js`, imported by the entry, marks them.
+	$marked-overlays: true,
+);
 
 :root {
 	/* Modal shell */

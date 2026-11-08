@@ -7,7 +7,35 @@
 // unlayered CSS, and unlayered declarations outrank normal declarations inside
 // @layer even when the layered CSS is loaded later.
 
+@use 'sass:list';
+@use 'sass:map';
 @use 'sass:meta';
+
+// What a surface tells this file, from its own stylesheet:
+//
+//     @use '../../components/Default/frontend-reset' with (
+//         $components: ( modal, button, popover, tooltip, input-control ),
+//         $marked-overlays: true,
+//     );
+//
+// `$components` names the families of `@wordpress/components` the surface
+// draws, as the folders of the package name them, and this file writes only
+// their rules under its scope, loaded from the package's source, which says
+// what its built stylesheet says. Name the families of what a component draws
+// inside it as well: a Modal draws a Button, a Tooltip a Popover, a
+// SearchControl an InputControl. `all` writes the whole stylesheet: 388 KB
+// once it is written under the scope, where the five families above are 94.
+//
+// `$marked-overlays` scopes what is drawn at the end of `body` by an attribute
+// on it, `data-webhead-frontend-overlay`, which `frontend-overlays.js` sets:
+// import it from the entry. The scope is then three selectors long, where it
+// is eight under `body:has()`, which the browser matches again whenever the
+// page changes, as a search box does on every keystroke.
+$components: all !default;
+$marked-overlays: false !default;
+// Where the package's source is, from this file: its `exports` let no other
+// path in, and a plugin's `node_modules` is beside `src`, three folders up.
+$components-source: '../../../node_modules/@wordpress/components/src' !default;
 
 // What a rule of this file weighs.
 //
@@ -28,6 +56,80 @@ $page: "body:has(#{$attr})#{$lift}";
 // a tooltip or a menu, which are drawn at the end of `body`, outside it.
 $overlays: ".components-popover__fallback-container, .components-popover, .components-modal__screen-overlay, .components-tooltip, .components-snackbar-list, [data-wp-compat-overlay-slot]";
 $scope: ":is(#{$attr}, body:has(#{$attr}) :is(#{$overlays}), #webhead#webhead)";
+// What the brand and the text are set on for those: `body`, while it holds a
+// surface.
+$overlay-holder: "body:has([data-webhead-frontend-root])";
+$overlay-text: ":where(body:has(#{$attr})) :is(#{$overlays})";
+
+// Or each of them, marked.
+$overlay: "[data-webhead-frontend-overlay]";
+
+@if $marked-overlays {
+	$page: ":is(#{$attr}, #{$overlay})#{$lift}";
+	$scope: ":is(#{$attr}, #{$overlay}, #webhead#webhead)";
+	$overlay-holder: $overlay;
+	$overlay-text: $overlay;
+}
+
+// The families of `@wordpress/components` and their stylesheets, in the order
+// the package's own `src/style.scss` writes them, which is the order they are
+// written in here whatever order a surface names them in. One family loads
+// another: `toggle-control` brings the rules of `form-toggle` with it, and
+// written again ahead of `toggle-control`, which cssnano folds into one copy.
+$families: (
+	'animate': ( 'animate/style' ),
+	'autocomplete': ( 'autocomplete/style' ),
+	'badge': ( 'badge/styles' ),
+	'button-group': ( 'button-group/style' ),
+	'button': ( 'button/style' ),
+	'checkbox-control': ( 'checkbox-control/style' ),
+	'circular-option-picker': ( 'circular-option-picker/style' ),
+	'palette-edit': ( 'palette-edit/style' ),
+	'color-indicator': ( 'color-indicator/style' ),
+	'combobox-control': ( 'combobox-control/style' ),
+	'color-palette': ( 'color-palette/style' ),
+	'custom-gradient-picker': ( 'custom-gradient-picker/style' ),
+	'drop-zone': ( 'drop-zone/style' ),
+	'dropdown': ( 'dropdown/style' ),
+	'dropdown-menu': ( 'dropdown-menu/style' ),
+	'duotone-picker': ( 'duotone-picker/style', 'duotone-picker/color-list-picker/style' ),
+	'external-link': ( 'external-link/style' ),
+	'form-toggle': ( 'form-toggle/style' ),
+	'form-token-field': ( 'form-token-field/style' ),
+	'guide': ( 'guide/style' ),
+	'navigate-regions': ( 'higher-order/navigate-regions/style' ),
+	'input-control': ( 'input-control/style' ),
+	'menu-group': ( 'menu-group/style' ),
+	'menu-item': ( 'menu-item/style' ),
+	'menu-items-choice': ( 'menu-items-choice/style' ),
+	'modal': ( 'modal/style' ),
+	'notice': ( 'notice/style' ),
+	'panel': ( 'panel/style' ),
+	'placeholder': ( 'placeholder/style' ),
+	'popover': ( 'popover/style' ),
+	'radio-control': ( 'radio-control/style' ),
+	'resizable-box': ( 'resizable-box/style' ),
+	'responsive-wrapper': ( 'responsive-wrapper/style' ),
+	'sandbox': ( 'sandbox/style' ),
+	'scroll-lock': ( 'scroll-lock/style' ),
+	'select-control': ( 'select-control/style' ),
+	'snackbar': ( 'snackbar/style' ),
+	'tab-panel': ( 'tab-panel/style' ),
+	'text-control': ( 'text-control/style' ),
+	'tip': ( 'tip/style' ),
+	'toggle-control': ( 'toggle-control/style' ),
+	'toolbar': ( 'toolbar/toolbar/style', 'toolbar/toolbar-button/style', 'toolbar/toolbar-group/style' ),
+	'tooltip': ( 'tooltip/style' ),
+	'validated-form-controls': ( 'validated-form-controls/style' ),
+);
+
+@if $components != all {
+	@each $family in $components {
+		@if not map.has-key($families, $family) {
+			@error "`#{$family}` is not a family of @wordpress/components. The families are: #{map.keys($families)}.";
+		}
+	}
+}
 
 // Black is the brand, here as in the admin: every control, every fill and every
 // button. Green is for focus and for links, and for nothing else.
@@ -40,7 +142,7 @@ $scope: ":is(#{$attr}, body:has(#{$attr}) :is(#{$overlays}), #webhead#webhead)";
 // menus and popovers that are drawn outside the root.
 [data-webhead-frontend-root],
 [data-webhead-frontend-root] [data-wpds-corner-radius] > *,
-body:has([data-webhead-frontend-root]) {
+#{$overlay-holder} {
 	--wh-primary: #101010;
 	--wh-primary-dark: #000000;
 	// What is written on the brand.
@@ -120,9 +222,13 @@ body:has([data-webhead-frontend-root]) {
 }
 
 // The same for a popover, a modal and a tooltip, which have `body` above them
-// and the site's text with it. No weight here either: each of them states its
-// own colour and size, and those stay.
-:where(body:has(#{$attr})) :where(#{$overlays}) {
+// and the site's text with it. The weight of one class: a theme that resets
+// every element, as WoodMart's `div { font: inherit; }` does, outranked this
+// rule when it had none, and a menu of the surface took the page's font and
+// slant through the element that holds it. Each of them states its own colour
+// and size in the package's stylesheet, which this file writes with two ids,
+// and those stay.
+#{$overlay-text} {
 	color: var(--wpds-color-foreground-content-neutral);
 	font-family: var(--wpds-typography-font-family-body);
 	font-size: var(--wpds-typography-font-size-md);
@@ -188,6 +294,23 @@ $taken-off: ":where(:not([class]):not(:is([class*='dataviews-'], [class*='datafo
 #{$scope} :where(#{$tags})#{$taken-off}::before,
 #{$scope} :where(#{$tags})#{$taken-off}::after,
 #{$scope} :where(input, textarea)#{$taken-off}::placeholder {
+	all: revert-layer;
+}
+
+// The same for a `div` or a `span` of `@wordpress/ui`, with the weight of
+// elements and of no class. A theme that resets every element, as WoodMart
+// does with `div, span { border: 0; margin: 0; padding: 0; font: inherit; }`,
+// writes outside a layer and outranks every rule of that package: its fields
+// lost their frame, its notice its border and its checkbox its ring. The rule
+// above does not name these two elements, because `@wordpress/components` 43
+// draws on them with CSS modules too, outside a layer, and two ids took the
+// package's own rules off with the site's. Eight elements are more than a
+// theme writes in a selector of elements alone, and any class is more than
+// eight elements: what the package writes when the page runs stays, and so
+// does a site's rule with a class in it.
+$elements: ":is(*, webhead webhead webhead webhead webhead webhead webhead webhead)";
+
+:where(#{$scope}) :where(div, span):where([class*='__']:not(#{$unlayered}))#{$elements} {
 	all: revert-layer;
 }
 
@@ -257,6 +380,30 @@ $static: ".components-checkbox-control__label, .components-modal__header-heading
 	word-spacing: inherit;
 }
 
+// Its help, the same: a paragraph the package writes when it runs, with one
+// class, under every field, slider and toggle given `help`. Flatsome writes
+// `.dark p { color: #f1f1f1; }` for a dark section, and the help of a slider
+// on a surface there was white on the surface's white. The package says 12px,
+// 8px above and none below, and its grey; the grey here is the design
+// system's weak text, which `@wordpress/ui` writes for a field's description.
+#{$scope} :where(p, span).components-base-control__help {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-family: inherit;
+	font-size: var(--wpds-typography-font-size-sm);
+	font-style: normal;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	line-height: inherit;
+	margin: var(--wpds-dimension-gap-sm) 0 0;
+	max-width: none;
+	padding: 0;
+	text-indent: inherit;
+	text-shadow: inherit;
+	text-transform: inherit;
+	text-wrap: pretty;
+	word-spacing: inherit;
+}
+
 // The stylesheet of `@wordpress/components` again, with the weight of this
 // file. The entrypoint imports it plain, for what is drawn outside the root;
 // here every rule of it is written under the scope, so that what the package
@@ -264,7 +411,17 @@ $static: ".components-checkbox-control__label, .components-modal__header-heading
 // `button`, `input` and `a`. The rules below this one are the house's, and
 // outrank the package's as they did before either was lifted.
 #{$scope} {
-	@include meta.load-css('@wordpress/components/build-style/style.css');
+	@if $components == all {
+		@include meta.load-css('@wordpress/components/build-style/style.css');
+	} @else {
+		@each $family, $stylesheets in $families {
+			@if list.index($components, $family) {
+				@each $stylesheet in $stylesheets {
+					@include meta.load-css('#{$components-source}/#{$stylesheet}');
+				}
+			}
+		}
+	}
 }
 
 // A row or a column of `@wordpress/components` lets what is in it shrink, by a

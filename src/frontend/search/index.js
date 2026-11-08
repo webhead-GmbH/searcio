@@ -1,6 +1,7 @@
 import { createRoot } from '@wordpress/element';
 import domReady from '@wordpress/dom-ready';
 
+import '../../components/Default/frontend-overlays';
 import './scss/style.scss';
 import App from './components/App';
 import { attachOpeners } from './openers';

@@ -28,6 +28,8 @@ Use this before finalizing changes that affect WordPress runtime behavior, relea
 - Keep the text domain `searcio` consistent. To change it, run `wh-plugin rename --slug=<new>`: it moves every translation call and the language files, and leaves what sites have stored where it is.
 - Update `languages/script-translation-map.json` when JavaScript source paths move.
 - Exclude AI skill folders, tests, docs, dependencies, and generated assets from POT generation.
+- **Ship every locale of a language, each in its own form of address.** WordPress loads a plugin's translation for the site's exact locale and no other. German is five locales: `de_DE` says *du*, `de_DE_formal` ("Deutsch (Sie)") *Sie*, `de_AT` *du*, `de_CH` *Sie* and `de_CH_informal` *du*, both Swiss ones with ss for ß. Dutch has `nl_NL` and `nl_NL_formal`, Portuguese `pt_PT` and `pt_PT_ao90`. Address the reader as WordPress does in that locale, compile each PO to MO, generate each one's script JSON (`wp i18n make-json`), and add a string added to `de_DE` to the others in their form.
+- The framework reads a near locale for one this plugin ships no file for (`de_DE` for `de_DE_formal` and `de_AT`, `de_CH` for `de_CH_informal`, `fr_FR` for `fr_CA`), so such a site is not shown English. That is a safety net: a `de_DE_formal` site that reads it is still spoken to with *du*. Check a change in a variant locale as well as the main one.
 
 ## Release Checks
 
