@@ -230,6 +230,59 @@ describe( 'excluded_popular_terms', () => {
 	} );
 } );
 
+describe( 'toPayload against what the tab read', () => {
+	const read = normalizeConfig( {
+		searchable_fields: [ { field: 'title', weight: 5 } ],
+		facet_fields: [ 'brand' ],
+		facet_match: { brand: 'any' },
+		synonyms: [ 'sneaker, trainer' ],
+		excluded_popular_terms: [ 'free' ],
+		redirects: [ { query: 'bf', url: '/bf' } ],
+		features: {
+			ai_search: { available: true, enabled: true, status: 'ready' },
+			visual_search: { available: true, enabled: false },
+		},
+	} );
+
+	/**
+	 * The same settings can be changed in the Searcio panel while the tab shows
+	 * what it read: a key the tab did not change is left out, and Searcio
+	 * keeps what it has for it.
+	 */
+	it( 'sends only the keys the tab changed', () => {
+		const payload = toPayload( { ...read, synonyms: [ 'sneaker, trainer', 'hoodie, sweatshirt' ] }, read );
+
+		expect( payload ).toEqual( { synonyms: [ 'sneaker, trainer', 'hoodie, sweatshirt' ] } );
+	} );
+
+	it( 'sends nothing for an unchanged tab, or a change the API would drop anyway', () => {
+		expect( toPayload( read, read ) ).toEqual( {} );
+		expect( toPayload( { ...read, redirects: [ ...read.redirects, { query: '', url: '' } ] }, read ) ).toEqual( {} );
+	} );
+
+	it( 'sends one feature switch, not every switch', () => {
+		const features = { ...read.features, visual_search: { ...read.features.visual_search, enabled: true } };
+
+		expect( toPayload( { ...read, features }, read ) ).toEqual( { features: { visual_search: { enabled: true } } } );
+	} );
+
+	/** A new filter field needs its mode; the service keeps the old map otherwise. */
+	it( 'sends the modes with changed filter fields', () => {
+		const payload = toPayload( { ...read, facet_fields: [ 'brand', 'color' ] }, read );
+
+		expect( payload ).toEqual( { facet_fields: [ 'brand', 'color' ], facet_match: { brand: 'any', color: 'any' } } );
+	} );
+
+	it( 'sends an emptied list, which clears it', () => {
+		expect( toPayload( { ...read, excluded_popular_terms: [] }, read ) ).toEqual( { excluded_popular_terms: [] } );
+	} );
+
+	it( 'sends everything when it is not told what the tab read', () => {
+		expect( toPayload( read ) ).toHaveProperty( 'synonyms' );
+		expect( toPayload( read ) ).toHaveProperty( 'searchable_fields' );
+	} );
+} );
+
 describe( 'toPayload', () => {
 	/**
 	 * `available` and `status` are reported by the server and ignored on write -

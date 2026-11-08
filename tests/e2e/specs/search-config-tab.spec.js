@@ -356,9 +356,29 @@ test.describe( 'Search Config tab', () => {
 
 		const payload = sent[ sent.length - 1 ].body;
 
-		expect( payload.redirects ).toEqual( [ { query: 'black friday', url: 'https://example.test/bf' } ] );
+		// The empty row changes nothing, so the redirects are not sent at all.
+		expect( payload ).not.toHaveProperty( 'redirects' );
 		expect( payload.merchandising[ 0 ].filter_field ).toBeNull();
 		expect( payload.merchandising[ 0 ].filter_value ).toBeNull();
+	} );
+
+	/**
+	 * The tab may show what it read some minutes ago, and the same settings
+	 * can be changed in the Searcio panel meanwhile. A save sends what was
+	 * changed here and leaves the rest as Searcio has it.
+	 */
+	test( 'saves only what was changed on the tab, and leaves the rest to Searcio', async ( { page } ) => {
+		const sent = [];
+
+		await mockSearchConfig( page, sent );
+		await page.goto( SETTINGS_URL );
+		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+
+		await page.getByRole( 'checkbox', { name: 'Search by photo', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body ).toEqual( { features: { visual_search: { enabled: true } } } );
 	} );
 
 	/**

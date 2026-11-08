@@ -82,11 +82,8 @@ use Webhead\WP\SearchCloud\Frontend\Site_Placement;
 use Webhead\WP\SearchCloud\Shortcodes\Products_Shortcode;
 use Webhead\WP\SearchCloud\Shortcodes\Search_Shortcode;
 use Webhead\WP\SearchCloud\Widgets\Widget_Registrar;
-use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Products_Widget;
-use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Search_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
-use Webhead\WP\SearchCloud\Lifecycle\Legacy_Names;
 use Webhead\WP\SearchCloud\Health\Health_Tests;
 use Webhead\WP\SearchCloud\Health\Runtime_Diagnostics;
 
@@ -433,7 +430,6 @@ final class Plugin extends Base_Plugin {
 		);
 		$container->add( 'widget_registrar', Widget_Registrar::class );
 		$container->add( 'menu_item', Menu_Item::class );
-		$container->add( 'legacy_names', Legacy_Names::class );
 
 		// The head of a page that will search opens the connection to Searcio.
 		$storefront_handle = $this->get_assets()->handle( Frontend_Config::ENTRY );
@@ -475,7 +471,6 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'placement_preview' ) );
 		$hooks_manager->register( $container->get( 'widget_registrar' ) );
 		$hooks_manager->register( $container->get( 'menu_item' ) );
-		$hooks_manager->register( $container->get( 'legacy_names' ) );
 		$hooks_manager->register( $container->get( 'resource_hints' ) );
 	}
 
@@ -499,10 +494,7 @@ final class Plugin extends Base_Plugin {
 		$elementor_manager
 			->set_category( static fn (): string => __( 'Searcio', 'searcio' ), 'eicon-search' )
 			->register_widget( Search_Widget::class )
-			->register_widget( Products_Widget::class )
-			// Their names before 1.4.0, for a page that still saves them so.
-			->register_widget( Legacy_Search_Widget::class )
-			->register_widget( Legacy_Products_Widget::class );
+			->register_widget( Products_Widget::class );
 	}
 
 	protected function register_tables( Database_Manager $database_manager, Container $container ): void {
@@ -561,6 +553,8 @@ final class Plugin extends Base_Plugin {
 			static function (): void {
 				delete_option( 'searcio_site_id' );
 				delete_option( 'searcio_site_id_metadata' );
+				// Left by an earlier build that moved stored data to these names.
+				delete_option( 'searcio_slug_moved' );
 
 				Delete_Legacy_Sync_Options::delete();
 			},

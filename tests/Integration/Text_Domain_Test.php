@@ -4,9 +4,7 @@
  *
  * The framework names the text domain, the hook prefix, the cache group, the
  * REST namespace and the keys it keeps the installed version under after the
- * slug. Until 1.4.0 only the text domain was searcio; a site that ran an
- * earlier release has its stored names moved by `Lifecycle\Legacy_Slug`, which
- * `Legacy_Slug_Test` covers.
+ * slug.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH

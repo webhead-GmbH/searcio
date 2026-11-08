@@ -175,14 +175,15 @@ export const normalizeConfig = ( raw ) => ( {
 } );
 
 /**
- * The payload for `PUT /search-config`. Feature switches are reduced to their
- * `enabled` flag - `available` and `status` are the server's to report, and
- * echoing them back would be describing state we do not own.
+ * The whole configuration as `PUT /search-config` takes it. Feature switches
+ * are reduced to their `enabled` flag - `available` and `status` are the
+ * server's to report, and echoing them back would be describing state we do
+ * not own.
  *
  * @param {Object} config The tab's working copy.
  * @return {Object} Request body.
  */
-export const toPayload = ( config ) => ( {
+const fullPayload = ( config ) => ( {
 	...config,
 	// An unset category trigger is `null` on the wire, not the empty string the
 	// text inputs hold - and both halves only mean anything together, so a row
@@ -225,6 +226,54 @@ export const toPayload = ( config ) => ( {
 		} )
 	),
 } );
+
+/**
+ * The payload for `PUT /search-config`: what the tab changed since it read the
+ * configuration, and nothing else.
+ *
+ * Searcio keeps every key a PUT leaves out and replaces every key it holds.
+ * The tab may show what it read some minutes ago (the read is kept), and the
+ * same settings can be changed in the Searcio panel meanwhile: sending the
+ * whole configuration put back, on any save, what the panel had changed since.
+ * So a key goes only when the tab changed it, a feature switch only when that
+ * switch changed, and `facet_match` when it or the filter fields changed.
+ *
+ * @param {Object} config    The tab's working copy.
+ * @param {Object} [persisted] The configuration as the tab read it. Without it
+ *                             the whole configuration is sent.
+ * @return {Object} Request body.
+ */
+export const toPayload = ( config, persisted ) => {
+	const next = fullPayload( config );
+
+	if ( ! persisted ) {
+		return next;
+	}
+
+	const before = fullPayload( persisted );
+	const same = ( key ) => JSON.stringify( next[ key ] ) === JSON.stringify( before[ key ] );
+	const payload = {};
+
+	Object.keys( next ).forEach( ( key ) => {
+		if ( 'features' !== key && 'facet_match' !== key && ! same( key ) ) {
+			payload[ key ] = next[ key ];
+		}
+	} );
+
+	if ( undefined !== next.facet_match && ( ! same( 'facet_match' ) || ! same( 'facet_fields' ) ) ) {
+		payload.facet_match = next.facet_match;
+	}
+
+	const features = Object.fromEntries(
+		Object.entries( next.features ).filter( ( [ key, value ] ) => JSON.stringify( value ) !== JSON.stringify( before.features[ key ] ) )
+	);
+
+	if ( Object.keys( features ).length > 0 ) {
+		payload.features = features;
+	}
+
+	return payload;
+};
 
 /** Comma-separated document ids, as the merchandising inputs show them. */
 export const idsToText = ( ids ) => ( Array.isArray( ids ) ? ids.join( ', ' ) : '' );

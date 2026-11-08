@@ -2,8 +2,8 @@
 /**
  * The plugin is called Searcio wherever a person reads its name.
  *
- * It was webhead Search Cloud, Search Cloud on screen, and its slug and text
- * domain are written searcio. A name a person reads starts with a capital:
+ * Its slug and text domain are written searcio. A name a person reads starts
+ * with a capital:
  * the menu, the blocks, the widgets, the messages, the translations and the
  * readmes. The slug, the text domain, the folder, the file names, the
  * shortcode `[searcio]` and searcio.com stay as they are, and so does anything
@@ -129,10 +129,11 @@ final class Brand_Test extends TestCase {
 		$this->assertGreaterThan( 100, count( $files ) );
 
 		// The slug where it is a name for code: a text domain, the shortcode's
-		// tag, and the context the framework's snackbars keep their notices in.
+		// tag, the context the framework's snackbars keep their notices in, and
+		// what the encryption key of the saved credentials is derived from.
 		foreach ( $files as $file ) {
 			$code = (string) preg_replace(
-				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TAG = 'searcio'/", "/SNACKBAR_CONTEXT = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
+				[ '/,\s*([\'"])searcio\1/', '/"textdomain": "searcio"/', "/TAG = 'searcio'/", "/SNACKBAR_CONTEXT = 'searcio'/", "/ENCRYPTION_CONTEXT = 'searcio'/", '/^ \* Text Domain: searcio\s*$/m' ],
 				'',
 				(string) file_get_contents( $file )
 			);

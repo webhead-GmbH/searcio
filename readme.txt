@@ -76,6 +76,8 @@ If you would like to support Searcio, you can show a small Searcio logo, linked 
 
 👉 Rate us on [WordPress](https://wordpress.org/support/plugin/searcio/reviews/#new-post)
 
+📖 Read the [documentation](https://searcio.com/en/docs/wordpress/introduction) to set up, configure and place the search.
+
 💻 Contribute or report issues on [GitHub](https://github.com/webhead-GmbH/searcio). The full source code is there, including the JavaScript and CSS before they are built: the files in the plugin's `public/` folder are built from its `src/` folder with `npm install` and `npm run build`.
 
 == Installation ==
@@ -212,12 +214,13 @@ Legal notice: https://searcio.com/impressum
 - Security: when you connect, the address Searcio calls to confirm that the site is yours answers only to the one-time code that connect sent, and only once.
 - The styles of the search block, the shortcode, the widgets, the floating button and the look editor are added through WordPress's stylesheet queue instead of being printed into the page.
 - Updated the webhead plugin framework to 1.8.0.
-- The plugin's settings page, blocks, widgets and everything it stores are named "searcio" now; the settings page is at `admin.php?page=searcio`. Your settings, sync history and connection move by themselves on the first page load after the update, and nothing has to be set up again. A theme or a snippet that uses the plugin's hooks, REST routes or CSS classes under the old name "webhead-search-cloud" should switch to "searcio": the old hooks still work for now, with a notice for developers.
+- The plugin's settings page, blocks, widgets, hooks and everything it stores are named "searcio"; the settings page is at `admin.php?page=searcio`.
 - New: a Search statistics button in the settings header, and a link on the Connection tab, open your search statistics on the Searcio dashboard.
 - New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.
 - The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.
 - Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR).
 - Search Config: list the searches that must never be offered as popular searches, the same list as in the Searcio panel.
+- Saving the Search Config tab sends only what you changed there, so a change made in the Searcio panel in the meantime is kept.
 - On a multilingual site the search suggestions are in the language of the page, as the results are.
 - Names with an "&" (post types, attributes, custom fields, price separators, popular searches) show as typed instead of as "&amp;".
 - New on the Placement tab: a look editor for the shortcode, the classic widgets, a search form Searcio takes over and the floating button, with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
@@ -241,7 +244,7 @@ Legal notice: https://searcio.com/impressum
 - The camera button for search by photo lines up with the icons beside it.
 
 = 1.3.0 =
-- **The plugin is now "searcio - Fast AI Product Search for WooCommerce"**, and its slug and text domain are `searcio`, its name on wordpress.org. The release is `searcio-1.3.0.zip` and installs in a `searcio/` folder. **A site that installed an earlier release** has the plugin in `webhead-search-cloud/`, which WordPress takes for another plugin: check that "Delete plugin data on uninstall" under Search Cloud > General is off, deactivate and delete the old copy, then install and activate this one. The settings, the sync history and the connection stay; nothing has to be synced again.
+- **The plugin is now "searcio - Fast AI Product Search for WooCommerce"**, and its slug and text domain are `searcio`, its name on wordpress.org. The release is `searcio-1.3.0.zip` and installs in a `searcio/` folder. **A site that installed an earlier release** has the plugin in another folder, which WordPress takes for another plugin: check that "Delete plugin data on uninstall" under Search Cloud > General is off, deactivate and delete the old copy, then install and activate this one. The settings, the sync history and the connection stay; nothing has to be synced again.
 - New: Support Searcio. A small searcio logo, linked to searcio.com, ends the search window, faded until it is pointed at. It is always shown on the Free plan; on a paid plan it can be turned off under Search Cloud > General.
 - New: French, Spanish, Italian and Polish translations, and the German one is complete. German also ships for Austria and Switzerland, whose sites WordPress did not give the German of Germany.
 - The General tab of the settings screen is named in the language of the screen.
@@ -269,7 +272,7 @@ Legal notice: https://searcio.com/impressum
 - Fixed a sync that met an error staying paused until somebody resumed it by hand. Until then no scheduled sync ran and no change made in the shop was sent, so a price or a stock level could be wrong in the search for days. A sync that cannot reach Search Cloud now stays running, says when it tries again, and sends the same batch after 1, 2, 5, 10, 15 and 30 minutes. If that fails too it ends as failed, which lets the changes through again.
 - The daily scheduled sync continues a paused sync. A sync an earlier version left paused comes back within a day of updating (or at once with Resume), and a pause made by hand now lasts until the next scheduled sync at the latest. The Sync tab says so while a sync is paused.
 - A batch that is sent again is counted once in a sync's Processed and Failed numbers.
-- `wp webhead-search-cloud sync run` waits and tries again as the background sync does, and exits with an error when the sync did not complete. It used to report a failed sync as completed.
+- The WP-CLI command `sync run` waits and tries again as the background sync does, and exits with an error when the sync did not complete. It used to report a failed sync as completed.
 - Fixed result cards designed in Search Cloud showing an empty search modal, since 1.0.2. They are drawn again, and as the panel draws them: without the plugin's own card frame round them, and without the site's styles for headings, links and images reaching into them.
 - The search looks the same on a site that styles every element. A customized Elementor kit, or a theme's rules for buttons, fields, links and headings, no longer changes the modal's chips, filters, fields and cards. The site's own font, text size and text colour are still followed.
 - Theming through the `--whsc-*` properties is unchanged. A rule of your own that restyles a `.whsc-*` element directly now needs `!important` to win.
@@ -282,7 +285,7 @@ Legal notice: https://searcio.com/impressum
 - The settings screen is redrawn with WordPress's current components: one title, a tab strip that scrolls on a phone, and the same cards, fields and notices throughout.
 - A settings screen that could not load says why and offers to try again, and a save that fails is reported beside its button with the reason.
 - Clearing the sync history, deleting a run from it and disconnecting from Search Cloud ask for confirmation first.
-- The Elementor widgets are listed under "webhead Search Cloud" in the editor panel instead of "General". Widgets already on a page are unaffected.
+- The Elementor widgets are listed under the plugin's own category in the editor panel instead of "General". Widgets already on a page are unaffected.
 - REST routes describe their parameters, so a value of the wrong shape is refused with a 400.
 - Updated the webhead plugin framework to 1.4.0. The package no longer carries the framework's updater or its command runner.
 
@@ -371,7 +374,7 @@ Legal notice: https://searcio.com/impressum
 
 Initial release.
 
-- Connect WordPress/WooCommerce content to webhead Search Cloud, with configurable per-post-type field mapping and a resumable, batched sync engine (full, scheduled, and incremental).
+- Connect WordPress/WooCommerce content to Searcio, with configurable per-post-type field mapping and a resumable, batched sync engine (full, scheduled, and incremental).
 - Full-screen search modal (Gutenberg block + Elementor widget) with search-as-you-type, autocomplete, faceted filtering, multi-type scope, recent/popular searches, and a highlights carousel.
 - Server-designed card templates as an alternative to the plugin's built-in result cards.
 - Search relevance configuration (searchable fields & weights, type boosts, facets, suggestions, synonyms) editable from the plugin's admin screen.

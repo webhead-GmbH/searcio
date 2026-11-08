@@ -34,7 +34,7 @@ Renaming, moving or deleting a category (or any other term) needs no sync of its
 
 ## Search Config
 
-Controls how Searcio itself ranks and filters your content. Most of this data lives on Searcio's side; the plugin is a thin editor for it, so changes apply on the very next search, no sync required.
+Controls how Searcio itself ranks and filters your content. Most of this data lives on Searcio's side; the plugin is a thin editor for it, so changes apply on the very next search, no sync required. The same settings can be changed in the Searcio panel: the tab shows what it read from Searcio up to ten minutes ago, and saving sends only what you changed on the tab, so a change made in the panel meanwhile is kept. Reload the tab after ten minutes to see a change made in the panel.
 
 - **Searchable fields & weights** - which fields full-text search matches, and how much each counts (1-100). A higher weight on `title` makes title matches outrank body-text matches, for example.
 - **Type boosts** - a ranking multiplier (0.1-100) per content type currently enabled in Indexing. Above 1 ranks that type higher overall; below 1 ranks it lower.

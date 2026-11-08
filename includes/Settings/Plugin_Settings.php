@@ -27,6 +27,13 @@ final class Plugin_Settings {
 	private const CIPHER     = 'aes-256-gcm';
 	private const ENC_PREFIX = 'whsc1:';
 
+	/**
+	 * What the encryption key is derived from, with the site's salt. Written
+	 * out rather than taken from the slug: a change to it turns every saved
+	 * write key and secret into nothing.
+	 */
+	private const ENCRYPTION_CONTEXT = 'searcio';
+
 	#[Setting(
 		type: 'string',
 		default: '',
@@ -447,10 +454,8 @@ final class Plugin_Settings {
 	 * Derive a stable 32-byte key from WordPress salts.
 	 */
 	private static function encryption_key(): string {
-		// The plugin's first slug is part of the key, not a name: every saved
-		// key and secret is encrypted with it, so it stays as it was.
-		$salt = function_exists( 'wp_salt' ) ? wp_salt( 'secure_auth' ) : ( defined( 'SECURE_AUTH_SALT' ) ? SECURE_AUTH_SALT : 'webhead-search-cloud' );
+		$salt = function_exists( 'wp_salt' ) ? wp_salt( 'secure_auth' ) : ( defined( 'SECURE_AUTH_SALT' ) ? SECURE_AUTH_SALT : self::ENCRYPTION_CONTEXT );
 
-		return hash( 'sha256', 'webhead-search-cloud|' . $salt, true );
+		return hash( 'sha256', self::ENCRYPTION_CONTEXT . '|' . $salt, true );
 	}
 }

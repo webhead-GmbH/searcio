@@ -24,9 +24,7 @@
 import { currentLangFilter as resolveCurrentLangFilter, inLanguage, isLanguageSupported as resolveLanguageSupported } from './language';
 import { buildFilterParams, buildRangeParams } from './facets';
 
-// A page a cache saved before 1.4.0 still prints the config under the
-// plugin's first name, while it loads this script.
-const config = window.searcioFrontend || window.webheadSearchCloudFrontend || {};
+const config = window.searcioFrontend || {};
 
 const SEARCH_TTL = 60000; // 60s - results/prices stay fresh within a minute.
 // The highlights (newest or featured products) are the same for every visitor

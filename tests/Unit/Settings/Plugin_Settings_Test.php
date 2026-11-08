@@ -23,12 +23,12 @@ final class Plugin_Settings_Test extends TestCase {
 	}
 
 	/**
-	 * A key saved by 1.3.1, before the slug moved, with no WordPress salts.
-	 * The first slug is part of the encryption key; a key built from the new
-	 * one would turn every saved secret into nothing.
+	 * A key saved by 1.4.0, with no WordPress salts. The encryption key is
+	 * derived from the slug and the salt; a change to how it is derived would
+	 * turn every saved secret into nothing, so this holds it.
 	 */
-	public function test_a_secret_saved_under_the_first_slug_still_decrypts(): void {
-		$this->assertSame( 'wk_live_saved_by_1_3_1', Plugin_Settings::decrypt_secret( 'whsc1:BwcHBwcHBwcHBwcHyKxm/wLANkN2cA9bmNipXKLQaUGEoMuRfpkeKKjNzlDDYqkliF0=' ) );
+	public function test_a_secret_saved_by_this_release_still_decrypts(): void {
+		$this->assertSame( 'wk_live_saved_by_1_4_0', Plugin_Settings::decrypt_secret( 'whsc1:BwcHBwcHBwcHBwcH1TC42mgHgR7juLvZcyIoDo9ulOk1B/nkGfQ8XKHvQWxcitCvz74=' ) );
 	}
 
 	public function test_encrypt_secret_is_idempotent_on_an_already_encrypted_value(): void {

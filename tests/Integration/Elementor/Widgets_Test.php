@@ -21,8 +21,6 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Tests\Integration\Elementor;
 
-use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Products_Widget;
-use Webhead\WP\SearchCloud\Elementor\Widgets\Legacy_Search_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
 use Webhead\WP\SearchCloud\Frontend\Frontend_Config;
@@ -39,24 +37,9 @@ final class Widgets_Test extends Integration_Test_Case {
 
 	public function test_both_widgets_are_named_to_the_framework_manager(): void {
 		$this->assertSame(
-			[ Search_Widget::class, Products_Widget::class, Legacy_Search_Widget::class, Legacy_Products_Widget::class ],
+			[ Search_Widget::class, Products_Widget::class ],
 			array_values( $this->plugin()->get_elementor_manager()->widgets() )
 		);
-	}
-
-	/**
-	 * A page saved before 1.4.0 that the move did not reach names the widgets
-	 * by their first names. They draw the same widgets, and only the new ones
-	 * are offered in the panel.
-	 */
-	public function test_a_page_saved_under_the_first_names_still_draws_both_widgets(): void {
-		$widgets = \Elementor\Plugin::$instance->widgets_manager;
-		$search  = $widgets->get_widget_types( 'webhead-search-cloud-search' );
-
-		$this->assertInstanceOf( Search_Widget::class, $search );
-		$this->assertInstanceOf( Products_Widget::class, $widgets->get_widget_types( 'webhead-search-cloud-products' ) );
-		$this->assertFalse( $search->show_in_panel() );
-		$this->assertTrue( $widgets->get_widget_types( 'searcio-search' )->show_in_panel() );
 	}
 
 	/**
