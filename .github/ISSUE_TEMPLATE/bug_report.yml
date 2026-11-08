@@ -1,0 +1,138 @@
+name: Bug report
+description: Something in the Searcio plugin does not work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a problem.
+
+        - **A security issue?** Please do not open an issue. Email support@searcio.com, as the [security policy](https://github.com/webhead-GmbH/searcio/blob/master/.github/SECURITY.md) explains.
+        - **A question about your Searcio account, plan or billing?** Email support@searcio.com.
+        - **Not sure how something works?** The [documentation](https://searcio.com/en/docs/wordpress/introduction) may already answer it.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you saw, and what you expected to see instead.
+      placeholder: When I type "jacket" in the search window, no results appear, although the products are indexed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The shortest way to see the problem, on a site where it happens.
+      placeholder: |
+        1. Open Searcio > Placement and turn on the floating search button
+        2. Open the shop page on a phone
+        3. Tap the button
+        4. See ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where does it happen?
+      multiple: true
+      options:
+        - Search window on the storefront
+        - Search block or Elementor widget
+        - Placement (theme search, floating button, shortcode, menu item, keyboard shortcut)
+        - Product rows
+        - AI shopping assistant
+        - Product finder (quizzes)
+        - Search by photo or by voice
+        - Settings screen in the WordPress admin
+        - Indexing or sync
+        - Connecting to Searcio
+        - Translations, WPML or Polylang
+        - Something else
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: Under Plugins in the WordPress admin.
+      placeholder: "1.4.0"
+    validations:
+      required: true
+
+  - type: input
+    id: wordpress-version
+    attributes:
+      label: WordPress version
+      placeholder: "7.1"
+    validations:
+      required: true
+
+  - type: input
+    id: woocommerce-version
+    attributes:
+      label: WooCommerce version
+      description: Leave empty if WooCommerce is not installed.
+      placeholder: "11.2"
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      description: Under Tools > Site Health > Info > Server.
+      placeholder: "8.3"
+    validations:
+      required: true
+
+  - type: input
+    id: theme
+    attributes:
+      label: Theme and page builder
+      placeholder: Hello Elementor with Elementor Pro 4.3
+
+  - type: input
+    id: multilingual
+    attributes:
+      label: Multilingual plugin and languages
+      description: Leave empty if the site has one language.
+      placeholder: WPML, German (default) and English
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Safari on iPhone 15, Chrome 140 on Windows
+
+  - type: input
+    id: site
+    attributes:
+      label: Address of a page that shows the problem
+      description: Only if the site is public. Never post passwords or keys.
+      placeholder: https://example.com/shop/
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Errors
+      description: PHP errors from `wp-content/debug.log` (with `WP_DEBUG_LOG` on), or errors from the browser's console (F12, then Console). Remove anything private first.
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or a screen recording
+      description: Drag files into this field.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send it
+      options:
+        - label: I searched the existing issues, and this one is not reported yet.
+          required: true
+        - label: It happens with the latest version of the plugin.
+          required: true
+        - label: It still happens with the other plugins deactivated, or I named the plugin that causes it.
