@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://searcio.com/en/docs/wordpress/introduction
+    about: How to set up, configure and place the search.
+  - name: Searcio account, plan or billing
+    url: https://searcio.com/en/contact
+    about: Write to the Searcio team, or email support@searcio.com.
+  - name: Report a security vulnerability
+    url: https://github.com/webhead-GmbH/searcio/blob/master/.github/SECURITY.md
+    about: Please do not open a public issue. Email support@searcio.com instead.

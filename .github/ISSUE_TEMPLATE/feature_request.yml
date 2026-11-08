@@ -1,0 +1,65 @@
+name: Feature request
+description: An idea that would make the Searcio plugin better.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for sharing an idea. Please check the [documentation](https://searcio.com/en/docs/wordpress/introduction) first: the plugin may already do it.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: The problem you have or the goal you want to reach, in your shop's words.
+      placeholder: My shoppers often search for product codes from our printed catalogue, and the search does not find them.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: How could the plugin help?
+      description: What you imagine the plugin doing, and where in the admin or on the storefront.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried instead?
+      description: Workarounds, settings or other plugins you have tried.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the plugin is it about?
+      multiple: true
+      options:
+        - Search window on the storefront
+        - Search block or Elementor widget
+        - Placement
+        - Product rows
+        - AI shopping assistant
+        - Product finder (quizzes)
+        - Search by photo or by voice
+        - Settings screen in the WordPress admin
+        - Indexing or sync
+        - Translations, WPML or Polylang
+        - Something else
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else?
+      description: Screenshots, examples from other sites, or how many shoppers it would help.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you send it
+      options:
+        - label: I searched the existing issues, and this idea is not suggested yet.
+          required: true
+        - label: The latest version of the plugin does not do it already.
+          required: true
