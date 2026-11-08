@@ -5,6 +5,8 @@
  */
 
 import {
+	cleanTerms,
+	errorsUnder,
 	FEATURE_KEYS,
 	idsToText,
 	isBlankRedirect,
@@ -14,7 +16,9 @@ import {
 	normalizeFeatures,
 	normalizeMerchandising,
 	normalizeRedirects,
+	termsToText,
 	textToIds,
+	textToTerms,
 	toPayload,
 } from './searchConfig';
 
@@ -181,6 +185,48 @@ describe( 'facet_match', () => {
 		const payload = toPayload( { facet_fields: [ 'brand', 'features' ], facet_match: { features: 'all', removed: 'all' } } );
 
 		expect( payload.facet_match ).toEqual( { brand: 'any', features: 'all' } );
+	} );
+} );
+
+describe( 'excluded_popular_terms', () => {
+	it( 'is not offered by a service that does not report it', () => {
+		expect( normalizeConfig( {} ).excluded_popular_terms ).toBeNull();
+		// Absent keeps the list Searcio has, so nothing goes over the wire.
+		expect( JSON.parse( JSON.stringify( toPayload( normalizeConfig( {} ) ) ) ) ).not.toHaveProperty( 'excluded_popular_terms' );
+	} );
+
+	it( 'reads the terms Searcio reports, an empty list included', () => {
+		expect( normalizeConfig( { excluded_popular_terms: [ 'free', 7, 'sample' ] } ).excluded_popular_terms ).toEqual( [ 'free', 'sample' ] );
+		expect( normalizeConfig( { excluded_popular_terms: [] } ).excluded_popular_terms ).toEqual( [] );
+	} );
+
+	/** Searcio trims them and drops a duplicate whatever its capitals. */
+	it( 'writes back each term once, trimmed, in the spelling first typed', () => {
+		expect( toPayload( { excluded_popular_terms: [ ' Sale ', 'sale', '', 'FREE', 'free ' ] } ).excluded_popular_terms )
+			.toEqual( [ 'Sale', 'FREE' ] );
+		expect( cleanTerms( undefined ) ).toEqual( [] );
+	} );
+
+	it( 'writes back an emptied list, which clears it', () => {
+		expect( toPayload( { excluded_popular_terms: [] } ).excluded_popular_terms ).toEqual( [] );
+	} );
+
+	it( 'is edited one term per line', () => {
+		expect( termsToText( [ 'free', 'sample' ] ) ).toBe( 'free\nsample' );
+		expect( termsToText( null ) ).toBe( '' );
+		expect( textToTerms( 'free\n\n  sample \n' ) ).toEqual( [ 'free', 'sample' ] );
+	} );
+
+	/** A rejected list names the field, or one of its entries. */
+	it( 'collects what the API said about the list and about each term', () => {
+		const errors = {
+			excluded_popular_terms: [ 'At most 200 terms.' ],
+			'excluded_popular_terms.3': [ 'At most 255 characters.' ],
+			'excluded_popular_terms_other': [ 'Not this one.' ],
+		};
+
+		expect( errorsUnder( errors, 'excluded_popular_terms' ) ).toBe( 'At most 200 terms. At most 255 characters.' );
+		expect( errorsUnder( {}, 'excluded_popular_terms' ) ).toBeUndefined();
 	} );
 } );
 

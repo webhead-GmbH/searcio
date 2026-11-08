@@ -390,6 +390,35 @@ test.describe( 'Search Config tab', () => {
 	} );
 
 	/**
+	 * The terms never offered as popular searches are Searcio's list, kept
+	 * beside the plugin's own fallback, so the field shows only once Searcio
+	 * reports the list. Searcio keeps each term once, whatever its capitals.
+	 */
+	test( 'offers the terms never shown as popular searches once Searcio reports them, and saves each once', async ( { page } ) => {
+		const sent = [];
+
+		await mockSearchConfig( page, sent );
+		await page.goto( SETTINGS_URL );
+		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+		await expect( page.getByRole( 'textbox', { name: 'Never show as a popular search' } ) ).toHaveCount( 0 );
+
+		await page.unrouteAll( { behavior: 'ignoreErrors' } );
+		await mockSearchConfig( page, sent, { ...CONFIG, excluded_popular_terms: [ 'free' ] } );
+		await page.reload();
+
+		const field = page.getByRole( 'textbox', { name: 'Never show as a popular search' } );
+
+		await expect( field ).toHaveValue( 'free', LOADED );
+		await expect( page.getByRole( 'textbox', { name: 'Fallback list' } ) ).toBeVisible();
+
+		await field.fill( 'free\nSample\n\nsample ' );
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.excluded_popular_terms ).toEqual( [ 'free', 'Sample' ] );
+	} );
+
+	/**
 	 * The suggestions used to be a hand-kept list in the tab that offered
 	 * `tags` (never written - the field is `product_tags`) and left out
 	 * `in_stock`, `on_sale`, the price range and every attribute.

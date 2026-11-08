@@ -5217,3 +5217,19 @@ msgstr "Reemplazar"
 #: src/admin/settings/components/quiz/QuestionPicture.js:75
 msgid "Remove"
 msgstr "Quitar"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:258
+msgid "The searches the search modal suggests before a visitor types anything. Searcio's own live popular searches come first; your fallback list takes over only when that request comes back empty or fails."
+msgstr "Las búsquedas que sugiere la ventana de búsqueda antes de que el visitante escriba nada. Primero van las búsquedas populares en directo de Searcio; tu lista de reserva solo entra en juego cuando esa solicitud vuelve vacía o falla."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:266
+msgid "Fallback list"
+msgstr "Lista de reserva"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:278
+msgid "Never show as a popular search"
+msgstr "No mostrar nunca como búsqueda popular"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:279
+msgid "One term per line, up to 200. Searcio leaves these out of its live popular searches, whatever their capitals. The same list is in the Searcio panel."
+msgstr "Un término por línea, hasta 200. Searcio los deja fuera de sus búsquedas populares en directo, sin importar mayúsculas o minúsculas. La misma lista está en el panel de Searcio."
