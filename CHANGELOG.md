@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- **The readme links the live demo.** `readme.txt` and `README.md` point to the demo shop at https://wordpress.demo.searcio.com/en/ and to its admin demo (`?searcio-demo-admin=en`), which opens the plugin's settings and saves nothing.
+
 ## 1.4.0
 
 - **Every locale of the plugin's languages gets them, not English.** WordPress loads a plugin's translation for the site's exact locale and no other, so a site in "Deutsch (Sie)" (`de_DE_formal`), as fisch-gruber.at is, in Swiss German with "du" (`de_CH_informal`), in Canadian or Belgian French or in any Spanish but Spain's showed the search window, the blocks and the settings in English.

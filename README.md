@@ -22,6 +22,10 @@
     <img alt="Required PHP version" src="https://img.shields.io/badge/php-%3E%3D8.3-blue?style=for-the-badge&logo=php&logoColor=white">
 </p>
 
+<p align="center">
+	See it live: the <a href="https://wordpress.demo.searcio.com/en/">demo shop</a>, in English and German, and the <a href="https://wordpress.demo.searcio.com/?searcio-demo-admin=en">admin demo</a> behind it.
+</p>
+
 ## Features
 
 - **Full-screen search modal** - a fast, keyboard-friendly overlay with autocomplete suggestions as you type, results
