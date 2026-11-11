@@ -254,6 +254,9 @@ test.describe( 'Product finder tab', () => {
 		await page.goto( `${ TAB_URL }&quiz=7` );
 
 		const screen = page.locator( SCREEN );
+		// As long as the other tests give the screen to load: the connection
+		// check it starts with can take several seconds.
+		await expect( screen.getByLabel( 'Name' ) ).toBeVisible( LOADED );
 		await screen.getByLabel( 'Name' ).fill( 'Gift finder 2' );
 		await screen.getByRole( 'button', { name: 'Save changes' } ).click();
 

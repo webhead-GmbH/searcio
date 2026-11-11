@@ -206,7 +206,7 @@ Legal notice: https://searcio.com/impressum
 - The category filter tells apart categories of the same name under different parents: each is under its own parent with its own number of products, and picking one filters only that one. After the next sync, add "category_paths" to the facet fields on the Search Config tab, and keep "categories" there for your quizzes and merchandising rules.
 - The category filter lists your categories in the order you sorted them in WooCommerce, or by name or by number of products: see Order of the categories on the Search Config tab.
 - WooCommerce brands can be indexed (Indexing tab, Brands) and offered as a filter of their own by adding "brands" to the facet fields.
-- The highlights, product rows, product finder and photo search show products only, and similar products are of the same kind as the product, where posts and pages came among them.
+- The highlights, product rows (similar products included), product finder and photo search show products only, where posts and pages came among them.
 - Featured highlights: the Placement tab says when the "featured" field still has to be added to the facet fields, and until then the window shows the newest products instead of nothing.
 - On a multilingual site with no language ticked, each page searches its own language. A page in a language you do not index searches WordPress in that language, and the search window no longer shows the other languages' highlights and popular searches there.
 - WooCommerce's cart, checkout, account and shop pages are no longer indexed; the update takes them out of search. A developer filter keeps out any other page.

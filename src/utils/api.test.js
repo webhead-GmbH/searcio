@@ -469,15 +469,27 @@ describe( 'fetchSimilar', () => {
 	} );
 
 	// A jacket's similar products were two articles and a guide.
-	it( "keeps the source's own type, and asks for the most the service answers so the row fills", async () => {
-		const similar = [ 'post-4', 'product-5', 'ratgeber-6', 'product-7' ].map( ( id ) => ( { id, source: {} } ) );
+	it( "keeps a shop's products, and asks for the most the service answers so the row fills", async () => {
+		setConfig( { hasProducts: true, documentTypes: { product: 'product', post: 'artikel' } } );
+		const similar = [ [ 'post-4', 'artikel' ], [ 'product-5', 'product' ], [ 'ratgeber-6', 'ratgeber' ], [ 'product-7', 'product' ] ]
+			.map( ( [ id, type ] ) => ( { id, source: { type } } ) );
 		global.fetch.mockResolvedValue( jsonResponse( { similar } ) );
 		const api = loadApi();
 
-		const result = await api.fetchSimilar( 'product-1', { limit: 4 } );
+		const result = await api.fetchSimilar( 'post-1', { limit: 4 } );
 
 		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'limit' ) ).toBe( '20' );
+		// On an article too: the row shows the products like it.
 		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'product-5', 'product-7' ] );
+	} );
+
+	it( 'keeps every type on a site without products', async () => {
+		const similar = [ 'post-4', 'page-5' ].map( ( id ) => ( { id, source: { type: id.split( '-' )[ 0 ] } } ) );
+		global.fetch.mockResolvedValue( jsonResponse( { similar } ) );
+
+		const result = await loadApi().fetchSimilar( 'post-1' );
+
+		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'post-4', 'page-5' ] );
 	} );
 } );
 

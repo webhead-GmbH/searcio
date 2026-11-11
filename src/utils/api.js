@@ -269,18 +269,6 @@ export const productType = () => {
 };
 
 /**
- * The type part of a document id (`product-12`), '' for an id without one.
- *
- * @param {string} id
- * @return {string} The post type.
- */
-const idType = ( id ) => {
-	const at = String( id ?? '' ).lastIndexOf( '-' );
-
-	return at > 0 ? String( id ).slice( 0, at ) : '';
-};
-
-/**
  * The highlights row: the newest products, or the featured ones, in the page's
  * language, with the filters the visitor has picked. The window asks for it
  * as it opens and whenever a filter changes with the field empty, and
@@ -503,10 +491,11 @@ export const fetchQuizzes = ( options = {} ) =>
  * `search_id` for its clicks (a service without it answers with none, and a
  * click then sends nothing).
  *
- * Only those of the source's own type are kept: the index holds the posts as
- * well, and a jacket's similar products were two articles. On a multilingual
- * site only those in the page's language are kept. The most the service
- * answers is asked for, so the row still fills.
+ * On a shop only the products are kept ({@see productType}): the index holds
+ * the posts as well, and a jacket's similar products were two articles. A row
+ * on an article still shows the products like it. On a multilingual site only
+ * those in the page's language are kept. The most the service answers is
+ * asked for, so the row still fills.
  *
  * @param {string}                            id        The source product's document id.
  * @param {{limit?: number, signal?: AbortSignal}} [options]
@@ -515,14 +504,14 @@ export const fetchQuizzes = ( options = {} ) =>
 export const fetchSimilar = async ( id, options = {} ) => {
 	const limit = options.limit || 6;
 	const { lang } = currentLangFilter();
-	const type = idType( id );
+	const type = productType();
 	const response = await request(
 		'/search/similar',
 		{ id, limit: SIMILAR_MAX, 'filter[lang]': lang, preview: isPreview() ? 1 : undefined },
 		SIMILAR_TTL,
 		options.signal
 	);
-	const similar = inLanguage( response?.similar, lang ).filter( ( hit ) => '' === type || idType( hit?.id ) === type );
+	const similar = inLanguage( response?.similar, lang ).filter( ( hit ) => '' === type || type === hit?.source?.type );
 
 	return { ...response, similar: similar.slice( 0, limit ) };
 };
