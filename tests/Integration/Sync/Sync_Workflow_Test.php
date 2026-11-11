@@ -23,6 +23,7 @@ use Webhead\WP\SearchCloud\Enums\Sync_Control;
 use Webhead\WP\SearchCloud\Enums\Sync_Status;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Password_Protected_Posts;
+use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Shop_Pages;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
@@ -246,6 +247,40 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'post-' . $protected ], $this->delete_requests );
 		$this->assertFalse( $this->dirty_tracker()->was_indexed( $protected ) );
 		$this->assertTrue( $this->dirty_tracker()->was_indexed( $open ) );
+	}
+
+	/**
+	 * A shop updated from 1.4.0 has its cart, checkout, account and shop pages
+	 * in the index. The update queues them, and the drain takes them out; any
+	 * other page stays.
+	 */
+	public function test_the_update_takes_woocommerces_own_pages_out_of_the_index(): void {
+		if ( ! function_exists( 'wc_get_page_id' ) ) {
+			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+
+		$this->connect_client();
+		$this->enable_indexing( 'page' );
+		$this->fake_index();
+
+		$cart  = self::factory()->post->create( [ 'post_type' => 'page', 'post_status' => 'publish' ] );
+		$about = self::factory()->post->create( [ 'post_type' => 'page', 'post_status' => 'publish' ] );
+
+		foreach ( [ 'cart', 'checkout', 'myaccount', 'shop' ] as $page ) {
+			update_option( 'woocommerce_' . $page . '_page_id', 0 );
+		}
+
+		$this->run_full_sync();
+
+		// How 1.4.0 left it: the cart page in the index.
+		update_option( 'woocommerce_cart_page_id', $cart );
+
+		( new Unindex_Shop_Pages( $this->service( 'change_listener' ) ) )->run();
+		$this->service( 'incremental_service' )->drain();
+
+		$this->assertSame( [ 'page-' . $cart ], $this->delete_requests );
+		$this->assertFalse( $this->dirty_tracker()->was_indexed( $cart ) );
+		$this->assertTrue( $this->dirty_tracker()->was_indexed( $about ) );
 	}
 
 	/**
@@ -644,8 +679,8 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	/**
 	 * WooCommerce's "hide out of stock items" is a store option: switching it
 	 * on saves no product, yet takes every out-of-stock product out of the
-	 * catalogue. A product only the drain indexed has to leave the index on the
-	 * next full sync all the same.
+	 * catalogue. Switching it starts a full sync, which takes out a product
+	 * only the drain indexed all the same.
 	 */
 	public function test_a_full_sync_removes_a_drain_indexed_product_a_store_option_hid(): void {
 		if ( ! class_exists( \WC_Product_Simple::class ) ) {
@@ -667,7 +702,9 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 
 		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
 
-		$this->run_full_sync();
+		$this->assertNotNull( $this->sync_state()->active(), 'The change starts the sync itself.' );
+
+		$this->drain_ticks();
 
 		$this->assertSame( [ 'product-' . $product->get_id() ], $this->delete_requests );
 	}

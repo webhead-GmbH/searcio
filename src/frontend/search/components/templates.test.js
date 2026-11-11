@@ -148,3 +148,31 @@ describe( 'the card of any other type', () => {
 		expect( render( { id: 'product-12', source: { type: 'produkt', title: 'Jacke', price: 99 } } ) ).toContain( 'whsc-card--product' );
 	} );
 } );
+
+describe( 'the price of a product card', () => {
+	const render = ( source ) => renderToString( <ResultCard hit={ { id: 'product-3', source: { type: 'product', title: 'Parka', ...source } } } /> );
+
+	// Every variation on sale showed "from 239" with nothing struck through.
+	it( "strikes a variable product's regular price through when it is on sale", () => {
+		const html = render( { product_type: 'variable', price: 239, price_min: 239, price_max: 279, on_sale: true, regular_price: 299, sale_price: 239 } );
+
+		expect( html ).toContain( 'whsc-card__price-from' );
+		expect( html ).toContain( '<del class="whsc-card__price-regular">299.00</del>' );
+		expect( html ).toContain( '<span class="whsc-card__price-current">239.00</span>' );
+	} );
+
+	it( 'strikes nothing through for a variable product that is not on sale', () => {
+		expect( render( { product_type: 'variable', price: 239, price_min: 239, price_max: 279, on_sale: false } ) ).not.toContain( '<del' );
+	} );
+
+	it( 'strikes nothing through when the regular price is not above the "from" price', () => {
+		expect( render( { product_type: 'variable', price: 239, price_min: 239, price_max: 279, on_sale: true, regular_price: 239, sale_price: 239 } ) ).not.toContain( '<del' );
+	} );
+
+	it( "strikes a simple product's regular price through, as it did", () => {
+		const html = render( { product_type: 'simple', price: 99, on_sale: true, regular_price: 149, sale_price: 99 } );
+
+		expect( html ).toContain( '<del class="whsc-card__price-regular">149.00</del>' );
+		expect( html ).toContain( '<ins class="whsc-card__price-current">99.00</ins>' );
+	} );
+} );

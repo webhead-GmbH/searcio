@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { currentLangFilter, fetchSimilar, isConfigured, isLanguageSupported, search, trackClick } from '../../../utils/api';
+import { currentLangFilter, fetchSimilar, isConfigured, isLanguageSupported, productType, search, trackClick } from '../../../utils/api';
 import { buildFilterParams } from '../../../utils/facets';
 import { ResultCard } from './templates';
 import Carousel from './Carousel';
@@ -95,7 +95,10 @@ const ProductList = ( {
 					return;
 				}
 
+				// The posts filed under a category of the same name are not
+				// products.
 				const response = await search( '', {
+					type: productType(),
 					filters: buildFilterParams( { [ filterField ]: [ filterValue ] }, currentLangFilter() ),
 					perPage: limit || 12,
 					surface: 'category',

@@ -835,6 +835,9 @@ const SearchConfigTab = () => {
 
 		const failures = [];
 		let savedSomething = false;
+		// Set when the save changed the languages: the plugin starts a sync,
+		// since they decide what is indexed and in which language.
+		let languageSync = null;
 
 		if ( hasSearchConfigChanges ) {
 			try {
@@ -845,6 +848,8 @@ const SearchConfigTab = () => {
 				} );
 
 				forget( SEARCH_CONFIG_PATH );
+
+				languageSync = response?.sync && 'object' === typeof response.sync ? response.sync : null;
 
 				const normalized = normalizeConfig( response );
 				normalized.type_boosts = syncTypeBoosts( normalized.type_boosts, Object.keys( typeLabels ) );
@@ -873,7 +878,13 @@ const SearchConfigTab = () => {
 		setIsSaving( false );
 
 		if ( 0 === failures.length ) {
-			showToast( __( 'Search configuration saved.', 'searcio' ), 'success' );
+			if ( languageSync && ! languageSync.started ) {
+				showToast( __( 'Search configuration saved. Start a sync on the Sync tab to index the languages.', 'searcio' ), 'warning' );
+			} else if ( languageSync ) {
+				showToast( __( 'Search configuration saved. A sync has started to index the languages.', 'searcio' ), 'success' );
+			} else {
+				showToast( __( 'Search configuration saved.', 'searcio' ), 'success' );
+			}
 
 			return;
 		}

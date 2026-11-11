@@ -122,7 +122,9 @@ final class Quizzes_Endpoint extends Rest_API {
 
 	#[Route( '/quizzes/endings', methods: 'POST', permission_callback: 'can_manage', args: [ 'quiz' => [ 'type' => 'object' ] ] )]
 	public function endings( WP_REST_Request $request ): WP_REST_Response {
-		return $this->respond( $this->client->quiz_endings( $this->payload( $request )['questions'] ?? [] ) );
+		$quiz = $this->payload( $request );
+
+		return $this->respond( $this->client->quiz_endings( $quiz['questions'] ?? [], $quiz['lang'] ?? null ) );
 	}
 
 	#[Route( '/quizzes/(?P<id>\\d+)', methods: 'GET', permission_callback: 'can_manage', args: self::QUIZ_ARGS )]

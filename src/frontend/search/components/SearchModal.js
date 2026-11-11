@@ -105,6 +105,16 @@ const matchAllFacets = () => (Array.isArray(getConfig().facets) ? getConfig().fa
 
 const supportsVoice = () => 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
 
+/**
+ * Whether Searcio searches this page: it is set up, and the page is in a
+ * language the site indexes. A page in another language searches WordPress,
+ * and before that the window shows nothing of Searcio's: its highlights,
+ * popular searches and suggestions were the other languages'.
+ *
+ * @return {boolean} Whether Searcio searches this page.
+ */
+const servesThisPage = () => isConfigured() && isLanguageSupported();
+
 const nativeSearchUrl = (query) => {
 	const config = getConfig();
 	const url = new URL(config.siteHome || '/', window.location.origin);
@@ -256,7 +266,9 @@ const SearchModal = ({
 	// with no code change and nothing here ever offers a control the API would
 	// only answer 403 to. Until the site answers, what this visit saw last
 	// (capabilities.js), so the tabs are where they will be as the window opens.
-	const [remembered] = useState(() => rememberedCapabilities(getConfig().searchKey || ''));
+	// None on a page Searcio does not search, which would otherwise bring back
+	// the tabs the visitor saw on a page in another language.
+	const [remembered] = useState(() => (servesThisPage() ? rememberedCapabilities(getConfig().searchKey || '') : {}));
 	const [assistantEnabled, setAssistantEnabled] = useState(Boolean(remembered.assistant));
 	const [quizEnabled, setQuizEnabled] = useState(Boolean(remembered.quiz));
 	const [visualEnabled, setVisualEnabled] = useState(Boolean(remembered.visual_search));
@@ -355,7 +367,7 @@ const SearchModal = ({
 	// visitors are actually searching for right now. The curated admin list
 	// is only a fallback, used when the live fetch hasn't returned anything
 	// yet, comes back empty, or errors out.
-	const popularSearches = livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches;
+	const popularSearches = !servesThisPage() ? [] : (livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches);
 	const trimmedQuery = query.trim();
 	const queryRef = useRef(query);
 
@@ -458,7 +470,7 @@ const SearchModal = ({
 	// only appears when the account can actually use it; a failure leaves them
 	// all off, which degrades to plain search rather than to a broken control.
 	useEffect(() => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return undefined;
 		}
 
@@ -487,7 +499,7 @@ const SearchModal = ({
 	// fetch returns nothing or fails - `popularSearches` above starts on the
 	// curated list and only stays there if the live list ends up empty.
 	useEffect(() => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return;
 		}
 
@@ -514,7 +526,7 @@ const SearchModal = ({
 	// straight through instead of reading `activeFacets` state, which hasn't
 	// re-rendered yet at the point the click handler fires the request.
 	const loadHighlights = useCallback(async (type, facetsOverride, rangesOverride) => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			setIsLoadingHighlights(false);
 
 			return;
@@ -602,7 +614,7 @@ const SearchModal = ({
 			return;
 		}
 
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return;
 		}
 
@@ -821,7 +833,7 @@ const SearchModal = ({
 	}, [visualPreview]);
 
 	const runVisualSearch = useCallback(async (file) => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return;
 		}
 

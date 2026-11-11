@@ -130,7 +130,8 @@ const QuizEditor = ( { id, languages, onClose } ) => {
 			const response = await apiFetch( {
 				path: `${ QUIZZES_PATH }/endings`,
 				method: 'POST',
-				data: { quiz: { questions: graphForSave( quiz.questions ) } },
+				// A quiz in one language finds that language's products.
+				data: { quiz: { lang: quiz.lang, questions: graphForSave( quiz.questions ) } },
 			} );
 			const list = Array.isArray( response?.endings ) ? response.endings : [];
 

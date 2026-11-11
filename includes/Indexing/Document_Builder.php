@@ -30,6 +30,13 @@ final class Document_Builder {
 	/** The words of its text a post without a title is named by. */
 	private const UNTITLED_WORDS = 8;
 
+	/**
+	 * WooCommerce's own pages and their translations, found once per request.
+	 *
+	 * @var array<int,int>|null
+	 */
+	private ?array $shop_pages = null;
+
 	public function __construct(
 		private Index_Config $config,
 		private Field_Source_Resolver $resolver,
@@ -44,6 +51,11 @@ final class Document_Builder {
 
 	/**
 	 * Used by the sync engine to decide upsert vs. delete.
+	 *
+	 * A post the mapping indexes can still be kept out through
+	 * `searcio_is_indexable`, which is given `true` and the post and
+	 * answers whether to index it. It cannot let in a post the mapping keeps
+	 * out.
 	 */
 	public function is_indexable( WP_Post $post ): bool {
 		$block = $this->config->block_for( $post->post_type );
@@ -75,7 +87,33 @@ final class Document_Builder {
 			}
 		}
 
-		return ! $this->is_language_excluded( $post );
+		if ( $this->is_shop_page( $post ) || $this->is_language_excluded( $post ) ) {
+			return false;
+		}
+
+		return (bool) apply_filters( 'searcio_is_indexable', true, $post );
+	}
+
+	/**
+	 * Whether the post is the cart, the checkout, the account or the shop
+	 * page WooCommerce made, or a translation of one. A search for "cart"
+	 * found the cart page, which holds a block and nothing to read, and the
+	 * shop page is the product list the search window already is.
+	 */
+	public function is_shop_page( WP_Post $post ): bool {
+		if ( 'page' !== $post->post_type ) {
+			return false;
+		}
+
+		if ( null === $this->shop_pages ) {
+			$this->shop_pages = [];
+
+			foreach ( $this->woo->system_page_ids() as $page_id ) {
+				array_push( $this->shop_pages, ...$this->multilingual->post_translations( $page_id ) );
+			}
+		}
+
+		return in_array( $post->ID, $this->shop_pages, true );
 	}
 
 	public function is_password_protected( WP_Post $post ): bool {

@@ -101,7 +101,7 @@ A post is sent again only when the hash of its document changed, or a sync is fo
 
 ### Frontend display
 
-The storefront config (`Frontend_Config::to_array()`) tells the window, besides the search key and the facets: `documentTypes`, post type => the type its documents carry, since the Indexing tab lets an admin rename it ("artikel" for posts) while a block, a shortcode, a widget and a placement name the post type (`documentType()` in `src/utils/documentType.js` turns one into the other); `typeLabels`, keyed by that document type; `hasFeatured`, whether the index has a `featured` field, without which featured highlights fall back to the newest; and `hasProducts`, whether products are indexed, without which the assistant speaks of the site rather than a shop. A facet whose picks must all match (Searcio's `facet_match`, kept by `Facet_Config::set_match()` beside the facet fields) carries `match: 'all'`, and the window then takes its fresh counts after a pick of its own. A result card is chosen by its document type, then by the post type in its id (`product-12`), and is the post card, with the text, for any other.
+The storefront config (`Frontend_Config::to_array()`) tells the window, besides the search key and the facets: `documentTypes`, post type => the type its documents carry, since the Indexing tab lets an admin rename it ("artikel" for posts) while a block, a shortcode, a widget and a placement name the post type (`documentType()` in `src/utils/documentType.js` turns one into the other); `typeLabels`, keyed by that document type; `hasFeatured`, whether `featured` is one of the site's facet fields, without which featured highlights fall back to the newest, since Searcio refuses a filter on any other field (422); `hasProducts`, whether products are indexed, without which the assistant speaks of the site rather than a shop; and `siteHome`, the front page of the page's language (`Multilingual_Support::home_url()`), which a search handed to WordPress goes to. Where products are indexed, what is about them asks for their type (`productType()` in `src/utils/api.js`): the highlights without a type of their own, the product rows, the product finder's matches, and photo search, whose hits are kept to it in the browser because the service takes no type there. Similar products keep to the source's own post type, read from the document ids. On a page in a language the site does not index, the window asks Searcio for nothing before a search. A facet whose picks must all match (Searcio's `facet_match`, kept by `Facet_Config::set_match()` beside the facet fields) carries `match: 'all'`, and the window then takes its fresh counts after a pick of its own. A result card is chosen by its document type, then by the post type in its id (`product-12`), and is the post card, with the text, for any other.
 
 The Gutenberg block (`blocks/search/`) and Elementor widget (`includes/Elementor/Widgets/Search_Widget.php`) share the same rendering, styling, and runtime bundle (`Trigger_Markup`, the `bundle.search` entry) so the two embed points can't drift apart. The search modal is portalled to `document.body` at runtime in both cases, with per-instance CSS custom properties applied to both the trigger and the modal root.
 
@@ -162,6 +162,14 @@ The stock line on product cards reads `--whsc-stock-in-color` and `--whsc-stock-
 ### Filters
 
 The plugin's filters are named `searcio_{area}_{name}`, in WordPress's own form, which Plugin Check reads as carrying the plugin's prefix. The framework's two actions in `searcio.php` keep theirs, `searcio/before_load` and `searcio/after_load`.
+
+- **`searcio_is_indexable`** - `(bool $index, WP_Post $post)`. Asked for each post the mapping would index, after the plugin's own checks (status, catalog visibility, WooCommerce's own pages, language); return `false` to keep it out of the index. It cannot let in a post the mapping keeps out. A post it turns away is taken out of the index the next time it is saved, and by the next full sync:
+
+  ```php
+  add_filter( 'searcio_is_indexable', function ( $index, $post ) {
+      return 'page' === $post->post_type && 'impressum' === $post->post_name ? false : $index;
+  }, 10, 2 );
+  ```
 
 - **`searcio_index_allow_protected_meta`** - `(bool $allow, string $meta_key, ?WP_Post $post)`; `$post` is null when `Index_Config::indexed_fields()` asks whether any document carries the field. A `meta:{key}` field mapping resolves through `Field_Source_Resolver`, which skips WordPress *protected* meta (keys beginning with `_`, e.g. order internals or plugin bookkeeping) by default so an over-broad mapping can't leak internal data into public search. Return `true` for a specific key to index it anyway:
 

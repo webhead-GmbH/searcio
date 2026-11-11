@@ -398,6 +398,14 @@ const PlacementTab = () => {
 				label={ __( 'Before a search, the window shows', 'searcio' ) }
 				{ ...selectProps( highlightItems, search.highlights, ( value ) => setSearch( 'highlights', value || 'newest' ) ) }
 			/>
+			{ /* Searcio finds the featured products through a filter, and refused one that is not among the site's: the row stayed empty and nothing said why. */ }
+			{ 'featured' === search.highlights && false === highlightSources.filterable && (
+				<Notice.Root intent="warning">
+					<Notice.Description>
+						{ __( 'Featured products are found through the featured field, which is not one of the Facet fields on the Search Config tab yet. Until it is added there, the window shows the newest products.', 'searcio' ) }
+					</Notice.Description>
+				</Notice.Root>
+			) }
 			<RangeControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom

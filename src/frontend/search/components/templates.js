@@ -38,9 +38,20 @@ const PriceLine = ( { source } ) => {
 			return null;
 		}
 
+		// On sale, the index carries the cheapest variation's regular price:
+		// "from" alone left the shopper to guess what was taken off.
+		const regular = onSale && Number( source.regular_price ) > Number( source.price_min ?? source.price )
+			? formatPrice( source.regular_price )
+			: '';
+
 		body = (
 			<>
 				<span className="whsc-card__price-from">{ i18n.priceFrom || __( 'from', 'searcio' ) }</span>{ ' ' }
+				{ '' !== regular && (
+					<>
+						<del className="whsc-card__price-regular">{ regular }</del>{ ' ' }
+					</>
+				) }
 				<span className="whsc-card__price-current">{ min }</span>
 			</>
 		);

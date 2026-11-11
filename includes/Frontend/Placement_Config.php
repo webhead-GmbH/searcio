@@ -25,6 +25,7 @@ namespace Webhead\WP\SearchCloud\Frontend;
 use Webhead\WP\SearchCloud\DTO\Placement_Options;
 use Webhead\WP\SearchCloud\DTO\Products_Placement;
 use Webhead\WP\SearchCloud\DTO\Search_Placement;
+use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Term_Names;
 use Webhead\WP\SearchCloud\Indexing\Woo;
@@ -48,7 +49,8 @@ final class Placement_Config {
 	public function __construct(
 		private Settings_Manager $settings,
 		private Compatibility_Manager $compatibility,
-		private Index_Config $index_config
+		private Index_Config $index_config,
+		private Facet_Config $facet_config
 	) {}
 
 	/**
@@ -151,9 +153,12 @@ final class Placement_Config {
 			'types'        => $this->index_config->indexable_post_type_labels(),
 			// What the highlights can be drawn from: products are offered only
 			// where products are indexed, featured ones where they carry it.
+			// Searcio finds the featured ones through a filter, so they show
+			// only once `featured` is one of the filters (`filterable`).
 			'highlights'   => [
-				'products' => in_array( Woo::POST_TYPE, $this->index_config->indexable_post_types(), true ),
-				'featured' => in_array( 'featured', $this->index_config->indexed_fields(), true ),
+				'products'   => in_array( Woo::POST_TYPE, $this->index_config->indexable_post_types(), true ),
+				'featured'   => in_array( 'featured', $this->index_config->indexed_fields(), true ),
+				'filterable' => in_array( 'featured', $this->facet_config->fields(), true ),
 			],
 			// Product rows show WooCommerce's products: a site without it has
 			// none to place.

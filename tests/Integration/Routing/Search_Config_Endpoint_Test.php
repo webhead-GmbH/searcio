@@ -255,6 +255,40 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'brand', 'categories' ], $this->service( 'facet_config' )->fields() );
 	}
 
+	/**
+	 * Which posts are indexed depends on the languages, and so does the
+	 * language each is searched in: a language ticked or unticked stayed out of
+	 * the index until somebody started a sync. A save that leaves them as they
+	 * were starts none.
+	 */
+	public function test_a_save_that_changes_the_languages_starts_a_sync(): void {
+		$this->as_admin();
+		$this->enable_indexing( 'post' );
+		$this->fake_http( fn ( string $url, array $args ) => $this->http_ok( [ 'languages' => json_decode( (string) ( $args['body'] ?? '' ), true )['languages'] ?? [] ] ) );
+
+		$save = function ( array $languages ): array {
+			$request = new WP_REST_Request( 'PUT', self::ROUTE );
+			$request->set_header( 'Content-Type', 'application/json' );
+			$request->set_body( (string) wp_json_encode( [ 'languages' => $languages ] ) );
+
+			return $this->server->dispatch( $request )->get_data();
+		};
+
+		$changed = $save( [ 'de' ] );
+
+		$this->assertSame( [ 'de' ], $changed['languages'] );
+		$this->assertTrue( $changed['sync']['started'], (string) $changed['sync']['message'] );
+		$this->assertNotNull( $this->sync_state()->active() );
+
+		$this->assertArrayNotHasKey( 'sync', $save( [ 'de' ] ), 'The languages did not change.' );
+
+		// A sync that is running already is said so, not started twice.
+		$again = $save( [ 'en', 'de' ] );
+
+		$this->assertFalse( $again['sync']['started'] );
+		$this->assertNotSame( '', $again['sync']['message'] );
+	}
+
 	public function test_a_failed_read_keeps_the_facet_fields_it_had(): void {
 		$this->as_admin();
 		$this->service( 'facet_config' )->set_fields( [ 'brand' ] );

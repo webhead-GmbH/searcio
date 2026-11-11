@@ -16,8 +16,15 @@ describe( 'isLanguageSupported', () => {
 } );
 
 describe( 'currentLangFilter', () => {
-	it( 'is empty when the site has not restricted any language', () => {
-		expect( currentLangFilter( [], 'de' ) ).toEqual( {} );
+	// Every language is indexed then, each document with its own: an English
+	// page listed the German products beside the English ones.
+	it( 'filters on the current language when the site restricts none', () => {
+		expect( currentLangFilter( [], 'de' ) ).toEqual( { lang: 'de' } );
+		expect( currentLangFilter( undefined, 'en' ) ).toEqual( { lang: 'en' } );
+	} );
+
+	it( 'is empty on a site without languages', () => {
+		expect( currentLangFilter( [], '' ) ).toEqual( {} );
 	} );
 
 	it( 'is empty when there is no resolvable current language', () => {

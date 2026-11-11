@@ -17,6 +17,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Frontend;
 
+use Webhead\WP\SearchCloud\Compatibility\Multilingual_Support;
 use Webhead\WP\SearchCloud\DTO\Storefront_Facet;
 use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
@@ -52,6 +53,7 @@ final class Frontend_Config {
 		private Language $language,
 		private Language_Config $language_config,
 		private Facet_Config $facet_config,
+		private Multilingual_Support $multilingual,
 		private ?Placement_Config $placement_config = null
 	) {}
 
@@ -141,7 +143,10 @@ final class Frontend_Config {
 			// needs to be baked into the endpoint URL.
 			'endpoint'        => rtrim( (string) $host, '/' ) . '/api/v1',
 			'searchKey'       => (string) $this->settings->get( Plugin_Settings::SEARCH_KEY ),
-			'siteHome'        => home_url( '/' ),
+			// The front page of the page's language: a search handed over to
+			// WordPress went to the default language's results, with nothing
+			// in it, from an English page.
+			'siteHome'        => $this->multilingual->home_url(),
 			// Read through the setting's own cleaning, for a list saved before it decoded.
 			'popularSearches' => Plugin_Settings::plain_text_list( $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
 			'typeLabels'      => $this->index_config->document_type_labels(),
@@ -150,8 +155,8 @@ final class Frontend_Config {
 			// carry (see Index_Config::document_types()).
 			'documentTypes'   => $this->index_config->document_types(),
 			// Featured highlights ask for `filter[featured]`, which Searcio
-			// refuses on an index without that field: a site without a shop.
-			'hasFeatured'     => in_array( 'featured', $this->index_config->indexed_fields(), true ),
+			// refuses (422) unless `featured` is one of the filters.
+			'hasFeatured'     => in_array( 'featured', $this->facet_config->fields(), true ),
 			// A site that indexes no products is spoken to about what it
 			// publishes, not about a shop it does not have.
 			'hasProducts'     => in_array( Woo::POST_TYPE, $this->index_config->indexable_post_types(), true ),

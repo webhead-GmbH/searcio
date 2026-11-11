@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { currentLangFilter, fetchQuizzes, getConfig, search, trackClick } from '../../../utils/api';
+import { currentLangFilter, fetchQuizzes, getConfig, productType, search, trackClick } from '../../../utils/api';
 import { appendHits, buildFilterParams, hasMorePages, humanizeFieldLabel } from '../../../utils/facets';
 import { answerKeywords, applyOption, applyRanges, firstQuestion, nextQuestion, normalizeQuizzes, quizProgress } from '../../../utils/quiz';
 import { ResultCard } from './templates';
@@ -126,7 +126,10 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		appliedCriteriaRef.current = { keywords: finalKeywords, ranges: finalRanges };
 
 		try {
+			// A product finder finds products: the posts filed under the same
+			// category were among its matches.
 			const response = await search( '', {
+				type: productType(),
 				filters: buildFilterParams( {}, { ...finalTags, ...currentLangFilter() } ),
 				keywords: finalKeywords,
 				ranges: finalRanges,
@@ -155,6 +158,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 
 		try {
 			const response = await search( '', {
+				type: productType(),
 				filters: buildFilterParams( {}, { ...appliedTagsRef.current, ...currentLangFilter() } ),
 				keywords: appliedCriteriaRef.current.keywords,
 				ranges: appliedCriteriaRef.current.ranges,

@@ -288,11 +288,14 @@ final class Search_Cloud_Client {
 
 	/**
 	 * Every way a question graph can end, saved or not, with its product count.
+	 * A quiz in one language is offered on that language's pages alone, so its
+	 * products are counted in that language (`lang`, which a service before it
+	 * ignores).
 	 *
 	 * @param  array<int,array<string,mixed>>  $questions
 	 */
-	public function quiz_endings( array $questions ): Api_Response {
-		return $this->request( 'POST', '/quiz-templates/endings', [ 'questions' => $questions ] );
+	public function quiz_endings( array $questions, ?string $lang = null ): Api_Response {
+		return $this->request( 'POST', '/quiz-templates/endings', [ 'questions' => $questions ] + ( null !== $lang && '' !== $lang ? [ 'lang' => $lang ] : [] ) );
 	}
 
 	/**

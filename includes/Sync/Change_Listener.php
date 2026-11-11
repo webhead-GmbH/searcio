@@ -235,6 +235,32 @@ final class Change_Listener implements Actions {
 		return $queued;
 	}
 
+	/**
+	 * Queue WooCommerce's cart, checkout, account and shop pages and their
+	 * translations, so the drain takes out of the index each one that is in
+	 * it (see {@see Document_Builder::is_shop_page()}).
+	 *
+	 * @return int How many pages were queued.
+	 */
+	public function queue_shop_pages(): int {
+		$queued = 0;
+
+		foreach ( $this->dirty->indexed_document_ids() as $document_id ) {
+			if ( ! str_starts_with( $document_id, 'page-' ) ) {
+				continue;
+			}
+
+			$post = get_post( (int) substr( $document_id, 5 ) );
+
+			if ( $post instanceof WP_Post && $this->builder->is_shop_page( $post ) ) {
+				$this->sync_post( $post );
+				$queued++;
+			}
+		}
+
+		return $queued;
+	}
+
 	private function maybe_delete( int $post_id ): void {
 		$post = get_post( $post_id );
 

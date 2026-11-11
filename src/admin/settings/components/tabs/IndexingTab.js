@@ -289,6 +289,9 @@ const WooSection = ({woo, block, onChange}) => {
 		featured: __('Featured', 'searcio'),
 		rating: __('Average rating', 'searcio'),
 		review_count: __('Review count', 'searcio'),
+		// The attributes a product defines for itself, which the list of the
+		// shop's own attributes below does not have.
+		custom_attributes: __('Product-specific attributes', 'searcio'),
 	};
 
 	const toggleAttribute = (slug, checked) => {
@@ -310,8 +313,8 @@ const WooSection = ({woo, block, onChange}) => {
 			>
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={__('Only index published, visible products', 'searcio')}
-					help={__('Recommended. Hidden or draft products stay out of search.', 'searcio')}
+					label={__('Respect catalog visibility', 'searcio')}
+					help={__('Recommended. Products set to Shop only or Hidden stay out of search, and so do those out of stock when WooCommerce hides them. Whether private products are indexed is up to "Also index private & password-protected items".', 'searcio')}
 					checked={wooConfig.only_visible !== false}
 					onChange={(val) => setWoo('only_visible', val)}
 				/>

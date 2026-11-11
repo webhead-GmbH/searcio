@@ -53,7 +53,16 @@ final class Woo {
 		'featured'     => [ 'featured' ],
 		'rating'       => [ 'rating' ],
 		'review_count' => [ 'review_count' ],
+		'custom_attributes' => [ 'custom_attributes' ],
 	];
+
+	/**
+	 * The pages WooCommerce makes for itself, by the name `wc_get_page_id()`
+	 * knows them by. They hold a shortcode or a block and nothing to search
+	 * for, and the shop page is the product archive the search window already
+	 * is.
+	 */
+	private const SYSTEM_PAGES = [ 'cart', 'checkout', 'myaccount', 'shop' ];
 
 	/**
 	 * "Shop and search results" and "Search results only". "Shop only" and
@@ -63,6 +72,25 @@ final class Woo {
 
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
+	}
+
+	/**
+	 * The ids of the cart, checkout, account and shop pages, as WooCommerce is
+	 * set up; none without WooCommerce.
+	 *
+	 * @return array<int,int>
+	 */
+	public function system_page_ids(): array {
+		if ( ! $this->is_active() || ! function_exists( 'wc_get_page_id' ) ) {
+			return [];
+		}
+
+		return array_values(
+			array_filter(
+				array_map( static fn ( string $page ): int => (int) wc_get_page_id( $page ), self::SYSTEM_PAGES ),
+				static fn ( int $id ): bool => $id > 0
+			)
+		);
 	}
 
 	/**
@@ -287,6 +315,14 @@ final class Woo {
 			$fields['review_count'] = (int) $product->get_review_count();
 		}
 
+		if ( ! empty( $woo['custom_attributes'] ) ) {
+			$custom = $this->custom_attributes( $product );
+
+			if ( [] !== $custom ) {
+				$fields['custom_attributes'] = $custom;
+			}
+		}
+
 		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
 			$values = Term_Names::for_post( $post, $taxonomy );
 
@@ -408,6 +444,42 @@ final class Woo {
 	}
 
 	/**
+	 * The attributes a product defines for itself instead of taking one of the
+	 * shop's, each value as "Name: value": the name is the product's own, so
+	 * there is no field of the shop's to give it. Those the product page shows
+	 * - as a row of its additional information, or as the choice of a
+	 * variation - and no others, which are a merchant's notes.
+	 *
+	 * @return array<int,string>
+	 */
+	private function custom_attributes( $product ): array {
+		$values = [];
+
+		foreach ( $product->get_attributes() as $attribute ) {
+			if ( ! $attribute instanceof \WC_Product_Attribute || $attribute->is_taxonomy() ) {
+				continue;
+			}
+
+			if ( ! $attribute->get_visible() && ! $attribute->get_variation() ) {
+				continue;
+			}
+
+			// Saved through wc_clean(), which writes some characters as entities.
+			$name = trim( Term_Names::decode( (string) $attribute->get_name() ) );
+
+			foreach ( $attribute->get_options() as $option ) {
+				$option = trim( Term_Names::decode( (string) $option ) );
+
+				if ( '' !== $name && '' !== $option ) {
+					$values[] = $name . ': ' . $option;
+				}
+			}
+		}
+
+		return array_values( array_unique( $values ) );
+	}
+
+	/**
 	 * @param  array<string,mixed>  $woo
 	 * @return array<int,string>
 	 */
@@ -424,6 +496,13 @@ final class Woo {
 	 * carries the shop's own display price, and a variable product's range and
 	 * a simple product's price are on the same basis.
 	 *
+	 * `product_type` is WooCommerce's: `simple`, `variable`, `grouped`,
+	 * `external`, or an extension's own.
+	 *
+	 * A variable product on sale carries the regular and the sale price of its
+	 * cheapest variation, the one its "from" price is, so a card can strike
+	 * that variation's regular price through.
+	 *
 	 * @return array<string,mixed>
 	 */
 	private function price_fields( $product, bool $is_variable, bool $with_regular_sale ): array {
@@ -437,7 +516,7 @@ final class Woo {
 				return [];
 			}
 
-			return [
+			$fields = [
 				'price'        => min( $active ),
 				'price_min'    => min( $active ),
 				'price_max'    => max( $active ),
@@ -445,6 +524,18 @@ final class Woo {
 				// A variable product is "on sale" if any variation is.
 				'on_sale'      => $product->is_on_sale(),
 			];
+
+			if ( $with_regular_sale && $fields['on_sale'] ) {
+				$regular  = is_array( $prices['regular_price'] ?? null ) ? array_map( 'floatval', $prices['regular_price'] ) : [];
+				$cheapest = array_search( $fields['price_min'], $active, true );
+
+				if ( false !== $cheapest && isset( $regular[ $cheapest ] ) && $regular[ $cheapest ] > $active[ $cheapest ] ) {
+					$fields['regular_price'] = $regular[ $cheapest ];
+					$fields['sale_price']    = $active[ $cheapest ];
+				}
+			}
+
+			return $fields;
 		}
 
 		if ( $product->is_type( 'grouped' ) ) {
@@ -459,7 +550,7 @@ final class Woo {
 
 		$fields = [
 			'price'        => $this->display_price( $product, $price ),
-			'product_type' => 'simple',
+			'product_type' => (string) $product->get_type(),
 			'on_sale'      => $product->is_on_sale(),
 		];
 
@@ -521,7 +612,7 @@ final class Woo {
 			'price'        => min( $prices ),
 			'price_min'    => min( $prices ),
 			'price_max'    => max( $prices ),
-			'product_type' => 'simple',
+			'product_type' => 'grouped',
 			// A grouped product is "on sale" if a child is.
 			'on_sale'      => (bool) apply_filters( 'woocommerce_product_is_on_sale', $on_sale, $product ),
 		];
