@@ -25,6 +25,7 @@ $whsc_mode = $args[0] ?? 'clear';
 if ( 'clear' === $whsc_mode ) {
 	delete_option( 'searcio_category_filter' );
 	delete_option( 'searcio_category_filter_depth' );
+	delete_option( 'searcio_category_filter_order' );
 
 	foreach ( [ 'Rain jackets', 'Jackets', 'Clothing', 'Shoes' ] as $whsc_name ) {
 		$whsc_term = get_term_by( 'name', $whsc_name, 'category' );
