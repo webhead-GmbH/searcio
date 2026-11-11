@@ -270,11 +270,15 @@ Rules of thumb:
 - `make-pot` takes the plugin's slug from the name of the directory it runs in, and writes it into the template's `Report-Msgid-Bugs-To`. The checkout is not named `searcio`, so always pass `--slug=searcio`.
 - Don't trust `wp i18n update-po` to preserve every existing translation when re-merging a PO file that already has `msgctxt`-scoped entries - verify with `msgfmt --check` after merging, and be ready to refill `msgstr` values from your own translation source of truth if entries came back empty.
 
+## Branches
+
+Work happens on the branch of the major version: `1.x` while the plugin is at 1.*. Every pull request is opened against it and merged into it. `master` holds what was released and takes nothing else: for a release, the version is bumped on `1.x` and `1.x` is merged into `master` with a pull request, and the GitHub release is tagged on that merge commit of `master`. A 2.0 gets its own branch, `2.x`, made from `master` the same way. The tests run on pull requests into `master` and into every `*.x` branch.
+
 ## Releasing
 
 The version is written in the plugin header and the `VERSION` constant of `searcio.php`, in `Stable tag` and the first changelog block of `readme.txt`, in `CHANGELOG.md` (the `Unreleased` heading becomes the version), in `package.json` and twice in `package-lock.json`, in both `blocks/*/block.json`, in the translation template's `Project-Id-Version` (regenerate it) and in the version badge of `README.md`. The README and `docs/installation.md` also repeat what the header asks for - the WordPress and PHP minimums - and the README's *Tested up to* badge the *Tested up to* of `readme.txt`; the README, `docs/installation.md` and `docs/faq.md` also name the WooCommerce the plugin asks for (`Woo::MIN_VERSION`). `tests/Unit/Release/Version_Test.php` compares all of them, so a place that was missed fails the unit suite. None of this changes the build: `public/` comes out the same.
 
-A release is a GitHub release on the merge commit of `master`, tagged with the version (no `v`), with `searcio-<version>.zip` attached. `.github/workflows/deploy.yml` builds that package when a release is published - the release build above, a copy of the tree without what `.distignore` and the workflow name, without `languages/*.po` and `*.pot`, zipped with `searcio/` as its only root folder, the folder wordpress.org installs the plugin in. When the workflow cannot run, build the package the same way by hand and attach it to the release. Before publishing, install the zip on a clean WordPress with `WP_DEBUG` on and run Plugin Check against it as wordpress.org does:
+A release is a GitHub release on the merge commit of `master` that brought the version branch in (see **Branches**), tagged with the version (no `v`), with `searcio-<version>.zip` attached. `.github/workflows/deploy.yml` builds that package when a release is published - the release build above, a copy of the tree without what `.distignore` and the workflow name, without `languages/*.po` and `*.pot`, zipped with `searcio/` as its only root folder, the folder wordpress.org installs the plugin in. When the workflow cannot run, build the package the same way by hand and attach it to the release. Before publishing, install the zip on a clean WordPress with `WP_DEBUG` on and run Plugin Check against it as wordpress.org does:
 
 ```bash
 wp plugin check searcio --error-severity=7 --warning-severity=6 --include-low-severity-errors --exclude-checks=prefixing --categories=plugin_repo
@@ -300,8 +304,9 @@ To update the framework:
 
 ## Contributing
 
-1. Identify the affected public contracts first: settings option keys, REST routes, capability names, table names - these are stable identifiers, not internal details.
-2. Implement inside the existing framework patterns (settings via `Plugin_Settings`, REST via the framework's `Rest_API` base class, tables via `Database_Manager`/`Table`) rather than a parallel system.
-3. Add or update the narrowest useful test in the same change.
-4. Run `php -l` on changed PHP files, `composer test:unit`, `npm run test:js`, and `npm run build`.
-5. Update this documentation (and `CHANGELOG.md`) when the developer-facing contract changes.
+1. Branch from `1.x` and open the pull request against `1.x`, never against `master` (see **Branches**).
+2. Identify the affected public contracts first: settings option keys, REST routes, capability names, table names - these are stable identifiers, not internal details.
+3. Implement inside the existing framework patterns (settings via `Plugin_Settings`, REST via the framework's `Rest_API` base class, tables via `Database_Manager`/`Table`) rather than a parallel system.
+4. Add or update the narrowest useful test in the same change.
+5. Run `php -l` on changed PHP files, `composer test:unit`, `npm run test:js`, and `npm run build`.
+6. Update this documentation (and `CHANGELOG.md`) when the developer-facing contract changes.
