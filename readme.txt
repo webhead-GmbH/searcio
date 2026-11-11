@@ -20,6 +20,8 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 
 **Free to start.** The core search is free forever, with no payment details needed. Add AI when your shop is ready for it.
 
+**See it live.** Search the [demo shop](https://wordpress.demo.searcio.com/en/) in English or German, then look behind it in the [admin demo](https://wordpress.demo.searcio.com/?searcio-demo-admin=en): every setting of the plugin, and nothing you change is saved.
+
 = Lightning-fast, by design =
 
 * **Instant results** - suggestions appear as visitors type, and they can pick one with the arrow keys. Results come when they press Enter, or as they type if you turn that on.
