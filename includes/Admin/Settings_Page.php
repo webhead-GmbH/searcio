@@ -125,7 +125,7 @@ final class Settings_Page extends Page {
 				'connect_pending_claim',
 				'connect_pending_email',
 			],
-			'popularSearchesKeys' => [ 'popular_searches', 'category_filter', 'category_filter_depth' ],
+			'popularSearchesKeys' => [ 'popular_searches', 'category_filter', 'category_filter_depth', 'category_filter_order' ],
 			'plugin' => [
 				'name'        => __( 'Searcio', 'searcio' ),
 				'description' => __( 'Connect WordPress and WooCommerce to Searcio.', 'searcio' ),

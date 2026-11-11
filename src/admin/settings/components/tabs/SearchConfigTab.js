@@ -106,6 +106,21 @@ const unindexedSuggestMessage = ( quoted, count ) => sprintf(
 	quoted
 );
 
+/**
+ * A facet field as the token field shows it. The categories come as two
+ * fields, and the key of the one the filter draws as a tree does not say so.
+ *
+ * @param {string} field
+ * @return {string}
+ */
+const facetFieldText = ( field ) => ( 'category_paths' === field
+	? sprintf(
+		/* translators: %s: the key of a field, "category_paths". */
+		__( '%s (categories as a tree)', 'searcio' ),
+		field
+	)
+	: field );
+
 const enabledTypeLabels = ( catalog ) => {
 	const labels = {};
 
@@ -169,10 +184,16 @@ const CardHeading = ( { title, description } ) => (
 const CategoryFilterCard = () => {
 	const { settings, updateSetting } = useContext( SettingsContext );
 	const mode = settings.category_filter || 'all';
+	const order = settings.category_filter_order || 'shop';
 	const items = [
 		{ value: 'all', label: __( 'All categories, in one list', 'searcio' ) },
 		{ value: 'main', label: __( 'Main categories only', 'searcio' ) },
 		{ value: 'nested', label: __( 'Main categories with their subcategories under them', 'searcio' ) },
+	];
+	const orders = [
+		{ value: 'shop', label: __( 'As sorted in WooCommerce', 'searcio' ) },
+		{ value: 'name', label: __( 'By name', 'searcio' ) },
+		{ value: 'count', label: __( 'By number of products', 'searcio' ) },
 	];
 
 	return (
@@ -198,6 +219,11 @@ const CategoryFilterCard = () => {
 							onValueChange={ ( value ) => updateSetting( 'category_filter_depth', Number( value ) || 2 ) }
 						/>
 					) }
+					<SelectControl
+						label={ __( 'Order of the categories', 'searcio' ) }
+						description={ __( 'Drag them into order under Products > Categories in WooCommerce.', 'searcio' ) }
+						{ ...selectProps( orders, order, ( value ) => updateSetting( 'category_filter_order', value || 'shop' ) ) }
+					/>
 				</Stack>
 			</Card.Content>
 		</Card.Root>
@@ -963,6 +989,7 @@ const SearchConfigTab = () => {
 								hideLabelFromVision
 								value={ config.facet_fields }
 								suggestions={ pool }
+								displayTransform={ facetFieldText }
 								onChange={ ( value ) => set( 'facet_fields', value ) }
 							/>
 							<UnindexedFieldsNotice

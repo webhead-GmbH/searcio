@@ -69,4 +69,33 @@ final class Document_Builder_Test extends Integration_Test_Case {
 
 		$this->assertSame( '#' . $post_id, $document['title'] );
 	}
+
+	/**
+	 * A post's categories share the `categories` field with the products', so
+	 * the category filter's tree needs their paths as it needs the products'.
+	 */
+	public function test_a_post_whose_categories_are_mapped_carries_their_paths(): void {
+		$this->index_posts( [ 'fields' => [ [ 'source' => 'taxonomy:category', 'as' => 'categories' ] ] ] );
+
+		$news    = self::factory()->category->create( [ 'name' => 'News' ] );
+		$local   = self::factory()->category->create( [ 'name' => 'Local', 'parent' => $news ] );
+		$post_id = self::factory()->post->create();
+
+		wp_set_post_categories( $post_id, [ $local ] );
+
+		$document = $this->build( $post_id );
+
+		$this->assertSame( [ 'Local' ], $document['categories'], 'A mapped taxonomy still sends exactly the terms the post carries.' );
+		$this->assertSame( [ 'News', 'News > Local' ], $document['category_paths'] );
+		$this->assertContains( 'category_paths', $this->service( 'index_config' )->indexed_fields() );
+	}
+
+	public function test_a_post_without_its_categories_mapped_carries_no_paths(): void {
+		$this->index_posts( [ 'fields' => [ [ 'source' => 'taxonomy:post_tag', 'as' => 'categories' ] ] ] );
+
+		$post_id = self::factory()->post->create( [ 'tags_input' => [ 'Wetter' ] ] );
+
+		$this->assertArrayNotHasKey( 'category_paths', $this->build( $post_id ), 'Tags have no levels to tell apart.' );
+		$this->assertNotContains( 'category_paths', $this->service( 'index_config' )->indexed_fields() );
+	}
 }

@@ -38,6 +38,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		remove_all_filters( 'product_attributes_type_selector' );
 		delete_option( 'searcio_category_filter' );
 		delete_option( 'searcio_category_filter_depth' );
+		delete_option( 'searcio_category_filter_order' );
 
 		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
 			unregister_taxonomy( self::ATTRIBUTE );
@@ -58,10 +59,11 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 
 	public function test_the_fields_come_in_the_order_search_config_lists_them(): void {
 		$this->facet_config()->set_fields( [ 'categories', 'brand', 'price', 'attr_size' ] );
+		update_option( 'searcio_category_filter_order', 'count' );
 
 		$this->assertSame(
 			[
-				[ 'field' => 'categories', 'order' => 0, 'display' => 'auto' ],
+				[ 'field' => 'categories', 'order' => 0, 'display' => 'auto', 'sort' => 'count' ],
 				[ 'field' => 'brand', 'order' => 1, 'display' => 'auto' ],
 				[ 'field' => 'price', 'order' => 2, 'display' => 'auto' ],
 				[ 'field' => 'attr_size', 'order' => 3, 'display' => 'auto' ],
@@ -323,6 +325,105 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		self::factory()->category->create( [ 'name' => 'Sale', 'slug' => 'sale-kleidung', 'parent' => $main ] );
 
 		$this->assertArrayNotHasKey( 'Sale', $this->facets()[0]['tree']['parents'] );
+	}
+
+	/**
+	 * The paths tell apart what the names cannot, so the tree is drawn from
+	 * them. The names stay a facet field for the quizzes and rules that use
+	 * them, but a second category filter beside the tree is not drawn.
+	 */
+	public function test_the_tree_is_drawn_from_the_paths_when_the_site_has_them(): void {
+		$this->facet_config()->set_fields( [ 'categories', 'category_paths', 'brand' ] );
+		update_option( 'searcio_category_filter', 'nested' );
+		update_option( 'searcio_category_filter_depth', 3 );
+
+		$facets = $this->facets();
+
+		$this->assertTrue( $facets[0]['hidden'] );
+		$this->assertArrayNotHasKey( 'tree', $facets[0] );
+		$this->assertSame( [ 'depth' => 3, 'paths' => true ], $facets[1]['tree'], 'Each path holds its parent.' );
+		$this->assertArrayNotHasKey( 'hidden', $facets[1] );
+		$this->assertArrayNotHasKey( 'sort', $facets[2], 'Only the category filter is sorted.' );
+	}
+
+	public function test_one_list_is_drawn_from_the_names_when_the_site_has_both(): void {
+		$this->facet_config()->set_fields( [ 'categories', 'category_paths' ] );
+
+		$facets = $this->facets();
+
+		$this->assertArrayNotHasKey( 'hidden', $facets[0] );
+		$this->assertArrayNotHasKey( 'tree', $facets[0] );
+		$this->assertTrue( $facets[1]['hidden'] );
+	}
+
+	public function test_the_paths_alone_are_drawn_as_a_list_or_as_a_tree(): void {
+		$this->facet_config()->set_fields( [ 'category_paths' ] );
+
+		$this->assertArrayNotHasKey( 'hidden', $this->facets()[0] );
+		$this->assertArrayNotHasKey( 'tree', $this->facets()[0] );
+
+		update_option( 'searcio_category_filter', 'main' );
+
+		$this->assertSame( [ 'depth' => 1, 'paths' => true ], $this->facets()[0]['tree'] );
+	}
+
+	/**
+	 * WooCommerce numbers siblings from 0 under each parent. The window gets
+	 * each main category followed by what is under it, in that order.
+	 */
+	public function test_the_categories_come_in_the_order_the_shop_sorted_them(): void {
+		if ( ! taxonomy_exists( 'product_cat' ) ) {
+			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+
+		$this->facet_config()->set_fields( [ 'categories', 'category_paths' ] );
+		update_option( 'searcio_category_filter', 'nested' );
+
+		$chassis = $this->product_category( 'Fahrwerke', 0, 1 );
+		$this->product_category( 'Felgen', 0, 0 );
+		$this->product_category( 'Gewindefahrwerke', $chassis, 1 );
+		$this->product_category( 'Luftfahrwerke', $chassis, 0 );
+
+		$facets = $this->facets();
+		$ours   = static fn ( array $values ): array => array_values( array_filter( $values, static fn ( string $value ): bool => 1 === preg_match( '/^(Felgen|Fahrwerke|Gewindefahrwerke|Luftfahrwerke)/', $value ) ) );
+
+		$this->assertSame( 'shop', $facets[1]['sort'], 'The order the shop sorted is the default.' );
+		$this->assertSame(
+			[ 'Felgen', 'Fahrwerke', 'Fahrwerke > Luftfahrwerke', 'Fahrwerke > Gewindefahrwerke' ],
+			$ours( $facets[1]['valuesOrder'] )
+		);
+		$this->assertSame( [ 'Felgen', 'Fahrwerke', 'Luftfahrwerke', 'Gewindefahrwerke' ], $ours( $facets[0]['valuesOrder'] ) );
+	}
+
+	public function test_by_name_or_by_count_the_window_sorts_them_itself(): void {
+		$this->facet_config()->set_fields( [ 'categories' ] );
+		self::factory()->category->create( [ 'name' => 'Kleidung' ] );
+
+		update_option( 'searcio_category_filter_order', 'name' );
+
+		$this->assertSame( 'name', $this->facets()[0]['sort'] );
+		$this->assertArrayNotHasKey( 'valuesOrder', $this->facets()[0] );
+
+		update_option( 'searcio_category_filter_order', 'count' );
+
+		$this->assertSame( 'count', $this->facets()[0]['sort'] );
+
+		update_option( 'searcio_category_filter_order', 'shuffle' );
+
+		$this->assertSame( 'shop', $this->facets()[0]['sort'] );
+		$this->assertContains( 'Kleidung', $this->facets()[0]['valuesOrder'] );
+	}
+
+	/**
+	 * A product category in the place WooCommerce's drag-and-drop gives it.
+	 */
+	private function product_category( string $name, int $parent, int $order ): int {
+		$term = wp_insert_term( $name, 'product_cat', [ 'parent' => $parent ] );
+
+		$this->assertIsArray( $term );
+		update_term_meta( (int) $term['term_id'], 'order', $order );
+
+		return (int) $term['term_id'];
 	}
 
 	private function facets(): array {

@@ -204,6 +204,7 @@ const WooSection = ({woo, block, onChange}) => {
 		stock_status: __('Stock status', 'searcio'),
 		categories: __('Categories', 'searcio'),
 		tags: __('Tags', 'searcio'),
+		brands: __('Brands', 'searcio'),
 		featured: __('Featured', 'searcio'),
 		rating: __('Average rating', 'searcio'),
 		review_count: __('Review count', 'searcio'),

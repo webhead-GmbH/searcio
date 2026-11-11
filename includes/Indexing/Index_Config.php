@@ -164,6 +164,33 @@ final class Index_Config {
 	}
 
 	/**
+	 * The hierarchical taxonomy a block maps to the `categories` field, or ''
+	 * when it maps none. A post's categories share that field with the
+	 * products' (see {@see self::field_labels()}), so a post written with them
+	 * carries their paths for the category filter's tree, as a product does
+	 * (see {@see Term_Paths}).
+	 *
+	 * @param  array<string,mixed>  $block  A normalized block.
+	 */
+	public function category_paths_taxonomy( array $block ): string {
+		foreach ( is_array( $block['fields'] ?? null ) ? $block['fields'] : [] as $field ) {
+			$source = trim( (string) ( $field['source'] ?? '' ) );
+
+			if ( Facet_Config::CATEGORY_FIELD !== (string) ( $field['as'] ?? '' ) || ! str_starts_with( strtolower( $source ), 'taxonomy:' ) ) {
+				continue;
+			}
+
+			$taxonomy = trim( substr( $source, strlen( 'taxonomy:' ) ) );
+
+			if ( '' !== $taxonomy && taxonomy_exists( $taxonomy ) && is_taxonomy_hierarchical( $taxonomy ) ) {
+				return $taxonomy;
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Field => attribute taxonomy, for the WooCommerce attributes the product
 	 * mapping writes (`attr_color` => `pa_color`). Empty when products are not
 	 * indexed.
@@ -271,7 +298,7 @@ final class Index_Config {
 				'version'        => $this->woo->version(),
 				'minimum'        => Woo::MIN_VERSION,
 				'attributes'     => $this->woo->attributes(),
-				'toggles'        => array_keys( Woo::TOGGLE_FIELDS ),
+				'toggles'        => $this->woo->toggles(),
 			],
 			// Which languages WPML/Polylang has configured locally, not the plan
 			// entitlement (that comes from `/health` via Connection_Endpoint).
@@ -558,6 +585,10 @@ final class Index_Config {
 			$fields[] = (string) $field['as'];
 		}
 
+		if ( '' !== $this->category_paths_taxonomy( $block ) ) {
+			$fields[] = Facet_Config::CATEGORY_PATHS_FIELD;
+		}
+
 		if ( Woo::POST_TYPE === $post_type ) {
 			array_push( $fields, ...$this->woo->field_names( $block['woo'] ?? [] ) );
 		}
@@ -572,7 +603,7 @@ final class Index_Config {
 		$woo = [ 'only_visible' => true ];
 
 		foreach ( array_keys( Woo::TOGGLE_FIELDS ) as $toggle ) {
-			$woo[ $toggle ] = in_array( $toggle, [ 'price', 'sku', 'stock_status', 'categories' ], true );
+			$woo[ $toggle ] = in_array( $toggle, [ 'price', 'sku', 'stock_status', 'categories', 'brands' ], true );
 		}
 
 		$woo['attributes'] = [];

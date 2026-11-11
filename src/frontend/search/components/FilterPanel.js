@@ -3,7 +3,7 @@ import { Icon } from '@wordpress/components';
 import { chevronDown, search as searchIcon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { arrangeTree, formatCount, freezeValueOrder, topValues } from '../../../utils/facets';
+import { arrangeTree, formatCount, freezeValueOrder, pathLabel, sortCategoryValues, topValues } from '../../../utils/facets';
 import PriceRange from './PriceRange';
 
 /** Values a list shows before "Show all". */
@@ -111,13 +111,15 @@ const Checkbox = ( { field, entry, onToggle, className } ) => (
  * @param {Object<string,string>} [props.secondColors] For a value of two colours.
  * @param {Object<string,string>} [props.images]
  * @param {Object<string,string>} [props.labels]       The short text a shop shows for a value on a tile.
- * @param {{depth: number, parents: Object<string,string>}} [props.tree] For a list drawn as the shop's tree.
+ * @param {{depth: number, parents?: Object<string,string>, paths?: boolean}} [props.tree] For a list drawn as the shop's tree.
+ * @param {string}   [props.sort]        For the category filter: `shop`, `name` or `count`.
+ * @param {string[]} [props.valuesOrder] For `shop`: the values as the shop sorted them.
  * @param {boolean}  [props.showCount]
  * @param {string}   [props.locale]
  * @param {(field: string, value: string) => void} props.onToggle
  * @param {Object}   [props.range]     For `range`: `span`, `active`, `onApply` and the formatting of {@see PriceRange}.
  */
-const FilterPanel = ( { field, label, display, values = [], selected = [], frozen = [], colors = {}, secondColors = {}, images = {}, labels = {}, tree, showCount = true, locale, onToggle, range = {} } ) => {
+const FilterPanel = ( { field, label, display, values = [], selected = [], frozen = [], colors = {}, secondColors = {}, images = {}, labels = {}, tree, sort, valuesOrder, showCount = true, locale, onToggle, range = {} } ) => {
 	const [ showAll, setShowAll ] = useState( false );
 	const [ term, setTerm ] = useState( '' );
 
@@ -126,7 +128,12 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 	}
 
 	const opened = panelEntries( { values, selected, frozen, natural: 'tiles' === display, keepEmpty: 'tiles' === display, locale } );
-	const entries = 'list' === display ? arrangeTree( opened, tree ) : opened;
+	const sorted = 'list' === display && sort ? sortCategoryValues( opened, { sort, valuesOrder, tree }, locale ) : opened;
+	const entries = 'list' === display ? arrangeTree( sorted, tree ) : opened;
+	// A category drawn from its path is named by its own level; a search
+	// within the list reads as one list, so there it shows the whole path,
+	// which tells two categories of one name apart.
+	const name = ( entry ) => ( tree?.paths ? pathLabel( entry.value ) : entry.value );
 	const count = ( entry ) => showCount && <span className="whsc-facet__count">{ formatCount( entry.count ) }</span>;
 	const legend = <legend className="whsc-visually-hidden">{ label }</legend>;
 
@@ -160,7 +167,7 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 	let shown = entries;
 
 	if ( '' !== wanted ) {
-		shown = entries.filter( ( entry ) => fold( entry.value ).includes( wanted ) );
+		shown = entries.filter( ( entry ) => fold( name( entry ) ).includes( wanted ) );
 	} else if ( long && ! showAll ) {
 		shown = topValues( entries, selected, limit );
 	}
@@ -231,7 +238,7 @@ const FilterPanel = ( { field, label, display, values = [], selected = [], froze
 					>
 						<label className={ `whsc-opt${ entry.disabled ? ' is-empty' : '' }` }>
 							<Checkbox field={ field } entry={ entry } onToggle={ onToggle } className="whsc-box" />
-							<span className="whsc-facet__label"><bdi>{ entry.value }</bdi></span>
+							<span className="whsc-facet__label"><bdi>{ '' === wanted ? name( entry ) : entry.value }</bdi></span>
 							{ count( entry ) }
 						</label>
 					</li>

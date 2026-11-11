@@ -81,7 +81,13 @@ final class Woo_Test extends Integration_Test_Case {
 		$product->set_status( 'publish' );
 		$product->save();
 
-		foreach ( [ 'product_cat' => 'Outerwear', 'product_tag' => 'Winter', self::ATTRIBUTE => 'Matte' ] as $taxonomy => $name ) {
+		$terms = [ 'product_cat' => 'Outerwear', 'product_tag' => 'Winter', self::ATTRIBUTE => 'Matte' ];
+
+		if ( taxonomy_exists( Woo::BRAND_TAXONOMY ) ) {
+			$terms[ Woo::BRAND_TAXONOMY ] = 'Fjellmark';
+		}
+
+		foreach ( $terms as $taxonomy => $name ) {
 			$term = wp_insert_term( $name, $taxonomy );
 			$this->assertIsArray( $term );
 			wp_set_object_terms( $product->get_id(), [ (int) $term['term_id'] ], $taxonomy );
@@ -136,8 +142,50 @@ final class Woo_Test extends Integration_Test_Case {
 	public function test_field_names_follow_the_toggles_that_are_on(): void {
 		$names = $this->woo->field_names( [ 'categories' => true, 'tags' => true, 'stock_status' => true ] );
 
-		$this->assertSame( [ 'stock_status', 'in_stock', 'categories', 'product_tags' ], $names );
+		$this->assertSame( [ 'stock_status', 'in_stock', 'categories', 'category_paths', 'product_tags' ], $names );
 		$this->assertNotContains( 'tags', $names );
+	}
+
+	public function test_brands_are_offered_and_listed_where_woocommerce_has_them(): void {
+		if ( ! taxonomy_exists( Woo::BRAND_TAXONOMY ) ) {
+			$this->markTestSkipped( 'This WooCommerce has no brands.' );
+		}
+
+		$this->assertContains( 'brands', $this->woo->toggles() );
+		$this->assertSame( [ 'brands' ], $this->woo->field_names( [ 'brands' => true ] ) );
+	}
+
+	public function test_brands_are_neither_offered_nor_listed_without_woocommerce_brands(): void {
+		global $wp_taxonomies;
+
+		// Taken out of the registry and put back as it was: a WooCommerce
+		// before 9.6.
+		$taxonomy = $wp_taxonomies[ Woo::BRAND_TAXONOMY ] ?? null;
+
+		unset( $wp_taxonomies[ Woo::BRAND_TAXONOMY ] );
+
+		try {
+			$this->assertNotContains( 'brands', $this->woo->toggles() );
+			$this->assertSame( [], $this->woo->field_names( [ 'brands' => true ] ) );
+		} finally {
+			if ( null !== $taxonomy ) {
+				$wp_taxonomies[ Woo::BRAND_TAXONOMY ] = $taxonomy;
+			}
+		}
+	}
+
+	public function test_brands_are_indexed_by_name_like_tags(): void {
+		if ( ! taxonomy_exists( Woo::BRAND_TAXONOMY ) ) {
+			$this->markTestSkipped( 'This WooCommerce has no brands.' );
+		}
+
+		$brand   = wp_insert_term( 'TA Technix', Woo::BRAND_TAXONOMY );
+		$product = new WC_Product_Simple();
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $brand['term_id'] ], Woo::BRAND_TAXONOMY );
+
+		$this->assertSame( [ 'TA Technix' ], $this->woo->product_fields( get_post( $product->get_id() ), [ 'brands' => true ] )['brands'] );
+		$this->assertArrayNotHasKey( 'brands', $this->woo->product_fields( get_post( $product->get_id() ), [ 'brands' => false ] ) );
 	}
 
 	public function test_regular_and_sale_prices_are_not_listed_without_the_price(): void {
@@ -267,6 +315,46 @@ final class Woo_Test extends Integration_Test_Case {
 		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
 
 		$this->assertContains( 'Outerwear', $fields['categories'] );
+	}
+
+	/**
+	 * lowrider.at has three "MTS Technik", under three parents. By name they
+	 * are one filter value; as paths each is its own, and a product carries
+	 * every level of its own, so a filter on a parent's path finds it.
+	 */
+	public function test_categories_carry_their_paths_from_the_top(): void {
+		$chassis  = wp_insert_term( 'Fahrwerke', 'product_cat' );
+		$coilover = wp_insert_term( 'Gewindefahrwerke', 'product_cat', [ 'parent' => (int) $chassis['term_id'] ] );
+		$springs  = wp_insert_term( 'Gewindefedern', 'product_cat', [ 'parent' => (int) $chassis['term_id'] ] );
+		$mts      = wp_insert_term( 'MTS Technik', 'product_cat', [ 'parent' => (int) $coilover['term_id'] ] );
+
+		wp_insert_term( 'MTS Technik', 'product_cat', [ 'parent' => (int) $springs['term_id'], 'slug' => 'mts-technik-federn' ] );
+
+		$product = new WC_Product_Simple();
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $mts['term_id'] ], 'product_cat' );
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] );
+
+		$this->assertSame( [ 'MTS Technik', 'Gewindefahrwerke', 'Fahrwerke' ], $fields['categories'], 'The names stay as they were.' );
+		$this->assertSame(
+			[ 'Fahrwerke', 'Fahrwerke > Gewindefahrwerke', 'Fahrwerke > Gewindefahrwerke > MTS Technik' ],
+			$fields['category_paths']
+		);
+	}
+
+	public function test_a_greater_than_sign_in_a_name_does_not_make_a_level(): void {
+		$parent = wp_insert_term( 'Größe > 40 & mehr', 'product_cat' );
+		$child  = wp_insert_term( 'Weit >', 'product_cat', [ 'parent' => (int) $parent['term_id'] ] );
+
+		$product = new WC_Product_Simple();
+		$product->save();
+		wp_set_object_terms( $product->get_id(), [ (int) $child['term_id'] ], 'product_cat' );
+
+		$this->assertSame(
+			[ 'Größe › 40 & mehr', 'Größe › 40 & mehr > Weit ›' ],
+			$this->woo->product_fields( get_post( $product->get_id() ), [ 'categories' => true ] )['category_paths']
+		);
 	}
 
 	/**
