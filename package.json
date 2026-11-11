@@ -1,6 +1,6 @@
 {
     "name": "searcio",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Connect WordPress and WooCommerce to Searcio.",
     "main": "src/admin/settings/index.js",
     "scripts": {

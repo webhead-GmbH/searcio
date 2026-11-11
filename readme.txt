@@ -4,7 +4,7 @@ Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -191,6 +191,11 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 Legal notice: https://searcio.com/impressum
 
 == Changelog ==
+
+= 1.4.1 =
+- The category filter tells apart categories of the same name under different parents: each is under its own parent with its own number of products, and picking one filters only that one. After the next sync, add "category_paths" to the facet fields on the Search Config tab, and keep "categories" there for your quizzes and merchandising rules.
+- The category filter lists your categories in the order you sorted them in WooCommerce, or by name or by number of products: see Order of the categories on the Search Config tab.
+- WooCommerce brands can be indexed (Indexing tab, Brands) and offered as a filter of their own by adding "brands" to the facet fields.
 
 = 1.4.0 =
 - Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.
