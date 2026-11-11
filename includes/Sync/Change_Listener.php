@@ -213,30 +213,21 @@ final class Change_Listener implements Actions {
 	 * @return int How many posts were queued.
 	 */
 	public function queue_password_protected_posts(): int {
-		$types = $this->config->indexable_post_types();
-
-		if ( [] === $types ) {
-			return 0;
-		}
-
-		$post_ids = get_posts(
-			[
-				'post_type'        => $types,
-				'post_status'      => 'publish',
-				'has_password'     => true,
-				'fields'           => 'ids',
-				'posts_per_page'   => -1,
-				'no_found_rows'    => true,
-				// Every language of a multilingual site, not the current one.
-				'suppress_filters' => true,
-				'lang'             => '',
-			]
+		// The posts in the index, in every language: a query for posts would
+		// see the current language alone on a multilingual site.
+		$post_ids = array_map(
+			static fn ( string $document_id ): int => (int) substr( $document_id, (int) strrpos( $document_id, '-' ) + 1 ),
+			$this->dirty->indexed_document_ids()
 		);
 		$queued   = 0;
 
-		foreach ( array_map( 'intval', $post_ids ) as $post_id ) {
-			if ( $this->dirty->was_indexed( $post_id ) ) {
-				$this->sync_post( get_post( $post_id ) );
+		_prime_post_caches( $post_ids );
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( $post instanceof WP_Post && 'publish' === $post->post_status && $this->builder->is_password_protected( $post ) ) {
+				$this->sync_post( $post );
 				$queued++;
 			}
 		}
