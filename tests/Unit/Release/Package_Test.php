@@ -57,6 +57,25 @@ final class Package_Test extends TestCase {
 	}
 
 	/**
+	 * Without a build directory the deploy action copies the checkout itself
+	 * to WordPress.org through .distignore: no build, and the translation
+	 * sources with it. The zip attached to the release is the one it makes of
+	 * what it committed.
+	 */
+	public function test_the_release_workflow_deploys_the_package_it_built_and_attaches_that(): void {
+		$workflow = (string) file_get_contents( $this->root() . '/.github/workflows/deploy.yml' );
+
+		$this->assertMatchesRegularExpression( '/^\s*BUILD_DIR:\s*\$\{\{\s*env\.PACKAGE_DIR\s*\}\}\s*$/m', $workflow );
+		$this->assertMatchesRegularExpression( '/^\s*generate-zip:\s*true\s*$/m', $workflow );
+		$this->assertMatchesRegularExpression( '/^\s*run:\s*gh release upload\b/m', $workflow );
+		$this->assertMatchesRegularExpression(
+			'/uses:\s*10up\/action-wordpress-plugin-deploy@[0-9a-f]{40}\s*$/m',
+			$workflow,
+			'The action that is handed the SVN password is pinned to a commit, not to a tag or branch that can move.'
+		);
+	}
+
+	/**
 	 * The PHP of the plugin that a package holds, without the bundle Mozart
 	 * writes: the main file, the uninstall routine, `includes` and the blocks.
 	 *
