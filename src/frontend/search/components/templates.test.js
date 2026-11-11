@@ -129,3 +129,22 @@ describe( 'the post card', () => {
 		expect( render( undefined ) ).not.toContain( 'whsc-card__excerpt' );
 	} );
 } );
+
+/**
+ * A page or a custom type drew a card with its title alone, and a post type
+ * renamed in the Indexing tab ("artikel") lost its card's text too.
+ */
+describe( 'the card of any other type', () => {
+	const render = ( hit ) => renderToString( <ResultCard hit={ hit } /> );
+
+	it( 'shows the text of a page and of a custom type', () => {
+		expect( render( { id: 'page-17', source: { type: 'page', title: 'Black Friday', content: 'All offers of the week.' } } ) )
+			.toContain( '<span class="whsc-card__excerpt">All offers of the week.</span>' );
+		expect( render( { id: 'ratgeber-4', source: { type: 'anleitung', title: 'Milchschaum', content: 'Mit Hafermilch.' } } ) )
+			.toContain( '<span class="whsc-card__excerpt">Mit Hafermilch.</span>' );
+	} );
+
+	it( 'draws a renamed product type as a product, from the post type in its id', () => {
+		expect( render( { id: 'product-12', source: { type: 'produkt', title: 'Jacke', price: 99 } } ) ).toContain( 'whsc-card--product' );
+	} );
+} );

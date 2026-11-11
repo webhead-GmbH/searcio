@@ -11,7 +11,7 @@
 import { act } from 'react';
 import { createRoot, useState } from '@wordpress/element';
 
-import { CustomFieldRow } from './IndexingTab';
+import { CustomFieldRow, ResultSourceField, sourceOptions } from './IndexingTab';
 
 // `@wordpress/components` loads packages that ship as ES modules only, which
 // this suite does not run through Babel. The row takes only its remove button
@@ -150,5 +150,89 @@ describe( 'CustomFieldRow', () => {
 
 		expect( control( 'From' ).textContent ).toBe( 'Custom field' );
 		expect( control( 'Meta key' ) ).not.toBeNull();
+	} );
+
+	/**
+	 * The tester's "lesezeit": picking "Custom field" again from "From" emptied
+	 * the key, and the empty field was saved without anybody noticing.
+	 */
+	it( 'keeps the key when the source it already has is picked again', async () => {
+		await render( { as: 'lesezeit', source: 'meta:lesezeit' } );
+
+		await pick( 'From', 'Custom field' );
+
+		expect( stored.source ).toBe( 'meta:lesezeit' );
+		expect( control( 'Meta key' ).value ).toBe( 'lesezeit' );
+
+		await pick( 'From', 'Taxonomy' );
+
+		expect( stored.source ).toBe( 'taxonomy:' );
+	} );
+} );
+
+const SOURCES = [
+	{ value: 'property:title', label: 'Post title' },
+	{ value: 'property:content', label: 'Post content' },
+	{ value: 'property:excerpt', label: 'Excerpt' },
+	{ value: 'property:permalink', label: 'Permalink (URL)' },
+	{ value: 'property:thumbnail', label: 'Featured image' },
+	{ value: 'property:date', label: 'Published date' },
+	{ value: 'property:author', label: 'Author' },
+];
+
+const Part = ( { role, initial } ) => {
+	const [ value, setValue ] = useState( initial );
+
+	stored = value;
+
+	return (
+		<ResultSourceField
+			role={ role }
+			label="Part"
+			value={ value }
+			sources={ SOURCES }
+			taxonomies={ TAXONOMIES }
+			allowNone={ 'title_source' !== role }
+			onChange={ setValue }
+		/>
+	);
+};
+
+/**
+ * The docs promise a title, a text, a link and an image from a custom field
+ * (an ACF field); the menus had no such choice, and offered an author as the
+ * link and a date as the title.
+ */
+describe( 'ResultSourceField', () => {
+	it( 'offers each part only the sources that suit it, and a custom field', () => {
+		const labels = ( role, stored = '' ) => sourceOptions( role, SOURCES, TAXONOMIES, stored, false ).map( ( option ) => option.label );
+
+		expect( labels( 'title_source' ) ).toEqual( [ 'Post title', 'Excerpt', 'Custom field' ] );
+		expect( labels( 'url_source' ) ).toEqual( [ 'Permalink (URL)', 'Custom field' ] );
+		expect( labels( 'image_source' ) ).toEqual( [ 'Featured image', 'Custom field' ] );
+		expect( labels( 'content_source' ) ).toEqual( [ 'Post content', 'Excerpt', 'Taxonomy: Brands', 'Taxonomy: Product categories', 'Custom field' ] );
+		expect( labels( 'url_source', 'property:author' ) ).toEqual( [ 'Permalink (URL)', 'Author', 'Custom field' ] );
+	} );
+
+	it( 'reads a part from a custom field, and keeps its key when it is picked again', async () => {
+		await act( () => root.render( <Part role="image_source" initial="property:thumbnail" /> ) );
+
+		await pick( 'Part', 'Custom field' );
+
+		expect( stored ).toBe( 'meta:' );
+
+		const key = control( 'Meta key' );
+		const setValue = Object.getOwnPropertyDescriptor( window.HTMLInputElement.prototype, 'value' ).set;
+
+		await act( async () => {
+			setValue.call( key, 'hero_image' );
+			key.dispatchEvent( new window.Event( 'input', { bubbles: true } ) );
+		} );
+
+		expect( stored ).toBe( 'meta:hero_image' );
+
+		await pick( 'Part', 'Custom field' );
+
+		expect( stored ).toBe( 'meta:hero_image' );
 	} );
 } );

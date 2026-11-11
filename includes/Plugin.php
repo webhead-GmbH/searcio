@@ -36,6 +36,7 @@ use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Site_Id_Option;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Sync_Options;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Resync_Capabilities;
+use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Password_Protected_Posts;
 use Webhead\WP\SearchCloud\Jobs\Scheduled_Sync_Job;
 use Webhead\WP\SearchCloud\Jobs\Sync_Tick_Job;
 use Webhead\WP\SearchCloud\Jobs\Change_Drain_Job;
@@ -109,6 +110,7 @@ final class Plugin extends Base_Plugin {
 		$upgrade_runner->register( new Resync_Capabilities( $container->get( 'capability_manager' ) ) );
 		$upgrade_runner->register( new Delete_Legacy_Site_Id_Option() );
 		$upgrade_runner->register( new Delete_Legacy_Sync_Options() );
+		$upgrade_runner->register( new Unindex_Password_Protected_Posts( $container->get( 'change_listener' ) ) );
 	}
 
 	protected function register_jobs( Jobs_Manager $jobs_manager, Container $container ): void {
@@ -236,7 +238,7 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'indexing_endpoint',
 			static function () use ( $container ): Indexing_Endpoint {
-				return new Indexing_Endpoint( $container->get( 'index_config' ) );
+				return new Indexing_Endpoint( $container->get( 'index_config' ), $container->get( 'sync_service' ) );
 			}
 		);
 		$container->add(

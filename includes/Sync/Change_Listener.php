@@ -204,6 +204,46 @@ final class Change_Listener implements Actions {
 		}
 	}
 
+	/**
+	 * Queue every password-protected post of an indexed type, so the drain
+	 * takes out of the index each one that may no longer be in it (see
+	 * {@see Document_Builder::is_indexable()}). Each is queued as an edit
+	 * would queue it, so one whose mapping indexes protected posts stays.
+	 *
+	 * @return int How many posts were queued.
+	 */
+	public function queue_password_protected_posts(): int {
+		$types = $this->config->indexable_post_types();
+
+		if ( [] === $types ) {
+			return 0;
+		}
+
+		$post_ids = get_posts(
+			[
+				'post_type'        => $types,
+				'post_status'      => 'publish',
+				'has_password'     => true,
+				'fields'           => 'ids',
+				'posts_per_page'   => -1,
+				'no_found_rows'    => true,
+				// Every language of a multilingual site, not the current one.
+				'suppress_filters' => true,
+				'lang'             => '',
+			]
+		);
+		$queued   = 0;
+
+		foreach ( array_map( 'intval', $post_ids ) as $post_id ) {
+			if ( $this->dirty->was_indexed( $post_id ) ) {
+				$this->sync_post( get_post( $post_id ) );
+				$queued++;
+			}
+		}
+
+		return $queued;
+	}
+
 	private function maybe_delete( int $post_id ): void {
 		$post = get_post( $post_id );
 

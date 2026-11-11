@@ -97,7 +97,7 @@ final class Incremental_Service {
 
 			$hash = $this->builder->hash( $document );
 
-			if ( $this->dirty->is_fresh( $post, $hash, $cv ) ) {
+			if ( $this->dirty->is_fresh( $post, $hash ) ) {
 				continue;
 			}
 

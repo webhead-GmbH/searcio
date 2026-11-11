@@ -27,6 +27,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Document_Builder {
+	/** The words of its text a post without a title is named by. */
+	private const UNTITLED_WORDS = 8;
+
 	public function __construct(
 		private Index_Config $config,
 		private Field_Source_Resolver $resolver,
@@ -49,9 +52,14 @@ final class Document_Builder {
 			return false;
 		}
 
-		if ( 'publish' === $post->post_status ) {
+		// A password-protected post is published, but only a reader who has its
+		// password may read it, so it is indexed with the private ones, when
+		// the mapping asks for those, and never for being published: indexed
+		// as published, its text was in every visitor's search window and the
+		// shopping assistant read it out.
+		if ( 'publish' === $post->post_status && ! $this->is_password_protected( $post ) ) {
 			$ok = true;
-		} elseif ( in_array( $post->post_status, [ 'private' ], true ) ) {
+		} elseif ( in_array( $post->post_status, [ 'publish', 'private' ], true ) ) {
 			$ok = ! empty( $block['include_private'] );
 		} else {
 			return false;
@@ -68,6 +76,10 @@ final class Document_Builder {
 		}
 
 		return ! $this->is_language_excluded( $post );
+	}
+
+	public function is_password_protected( WP_Post $post ): bool {
+		return '' !== (string) $post->post_password;
 	}
 
 	/**
@@ -181,7 +193,16 @@ final class Document_Builder {
 		// The post's own title, decoded as the default source decodes it.
 		$fallback = $this->resolver->resolve( 'property:title', $post );
 
-		return is_string( $fallback ) ? $fallback : '#' . $post->ID;
+		if ( is_string( $fallback ) && '' !== trim( $fallback ) ) {
+			return $fallback;
+		}
+
+		// A post without a title showed as "#66", which says nothing of what
+		// it holds: the first words of its text say more.
+		$text  = $this->resolver->resolve( 'property:content', $post );
+		$words = is_string( $text ) ? wp_trim_words( $text, self::UNTITLED_WORDS, '…' ) : '';
+
+		return '' !== trim( $words ) ? $words : '#' . $post->ID;
 	}
 
 	/**
@@ -193,6 +214,14 @@ final class Document_Builder {
 		}
 
 		$value = $this->resolver->resolve( $source, $post );
+
+		// An image from a custom field is usually an attachment's id - what ACF
+		// stores - and a card needs its address, at the size the featured
+		// image is sent in.
+		if ( 'image' === $key && ( is_int( $value ) || ( is_string( $value ) && ctype_digit( $value ) ) ) ) {
+			$url   = wp_get_attachment_image_url( (int) $value, 'medium_large' );
+			$value = is_string( $url ) ? $url : null;
+		}
 
 		if ( is_string( $value ) && '' !== $value ) {
 			$document[ $key ] = $value;

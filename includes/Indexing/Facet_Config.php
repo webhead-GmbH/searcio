@@ -63,6 +63,32 @@ final class Facet_Config {
 	}
 
 	/**
+	 * Keep the fields whose picks a result must all have, from Searcio's
+	 * `facet_match` (field => `any` or `all`); a service that does not report
+	 * it has none.
+	 */
+	public function set_match( mixed $match ): void {
+		$all = [];
+
+		foreach ( is_array( $match ) ? $match : [] as $field => $mode ) {
+			if ( is_string( $field ) && '' !== trim( $field ) && 'all' === $mode ) {
+				$all[ trim( $field ) ] = 'all';
+			}
+		}
+
+		$this->settings->set( Plugin_Settings::FACET_MATCH, $all );
+	}
+
+	/**
+	 * Whether a result must have every value picked in this field.
+	 */
+	public function matches_all( string $field ): bool {
+		$stored = $this->settings->get( Plugin_Settings::FACET_MATCH );
+
+		return is_array( $stored ) && 'all' === ( $stored[ $field ] ?? '' );
+	}
+
+	/**
 	 * The filters of the search window, in order, each with how its values are
 	 * drawn and, for an attribute a swatches plugin dresses, the colour, image
 	 * or label of each value in the language of the current request. The
@@ -118,7 +144,8 @@ final class Facet_Config {
 				$category[ $field ]['tree'] ?? null,
 				$category[ $field ]['hidden'] ?? false,
 				$category[ $field ]['sort'] ?? null,
-				$category[ $field ]['order'] ?? []
+				$category[ $field ]['order'] ?? [],
+				$this->matches_all( $field )
 			);
 		}
 
@@ -135,10 +162,11 @@ final class Facet_Config {
 	 * @return array<string,array{tree:array<string,mixed>|null,hidden:bool,sort:Category_Order,order:array<int,string>}>
 	 */
 	private function category_filter( array $fields ): array {
-		$has_names = in_array( self::CATEGORY_FIELD, $fields, true );
-		$has_paths = in_array( self::CATEGORY_PATHS_FIELD, $fields, true );
+		$name_fields = array_intersect_key( $this->index_config->category_fields(), array_flip( $fields ) );
+		$has_names   = isset( $name_fields[ self::CATEGORY_FIELD ] );
+		$has_paths   = in_array( self::CATEGORY_PATHS_FIELD, $fields, true );
 
-		if ( ! $has_names && ! $has_paths ) {
+		if ( [] === $name_fields && ! $has_paths ) {
 			return [];
 		}
 
@@ -150,12 +178,17 @@ final class Facet_Config {
 		$terms = $tree || $shop ? $this->category_terms() : [];
 		$out   = [];
 
-		if ( $has_names ) {
-			$out[ self::CATEGORY_FIELD ] = [
-				'tree'   => $tree && ! $has_paths ? [ 'depth' => $depth, 'parents' => $this->category_parents( $terms ) ] : null,
-				'hidden' => $tree && $has_paths,
+		// The categories by name: the plugin's own field, and any field a
+		// mapping writes from a category taxonomy, each from its own terms.
+		foreach ( $name_fields as $field => $taxonomies ) {
+			$own     = array_intersect_key( $terms, array_flip( $taxonomies ) );
+			$replace = self::CATEGORY_FIELD === $field && $has_paths;
+
+			$out[ $field ] = [
+				'tree'   => $tree && ! $replace ? [ 'depth' => $depth, 'parents' => $this->category_parents( $own ) ] : null,
+				'hidden' => $tree && $replace,
 				'sort'   => $sort,
-				'order'  => $shop ? $this->category_order( $terms, false ) : [],
+				'order'  => $shop ? $this->category_order( $own, false ) : [],
 			];
 		}
 

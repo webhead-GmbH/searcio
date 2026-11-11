@@ -4,6 +4,7 @@ import { OPEN_EVENT } from '../openers';
 import Trigger from './Trigger';
 import ProductList from './ProductList';
 import SearchModal from './SearchModal';
+import { documentType } from '../../../utils/documentType';
 
 /**
  * Portals each server-rendered trigger placeholder to a real
@@ -117,7 +118,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 			{ activeEl && (
 				<SearchModal
 					key={ `${ activeIndex }-${ previewRun }` }
-					scopeType={ activeEl.dataset.type || '' }
+					scopeType={ documentType( activeEl.dataset.type ) }
 					placeholder={ activeEl.dataset.placeholder || '' }
 					enableVoice={ '1' === activeEl.dataset.voice }
 					voiceIconHtml={ activeEl.dataset.voiceIcon || '' }

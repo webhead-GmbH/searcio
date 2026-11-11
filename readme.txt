@@ -193,6 +193,16 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.1 =
+- Security: password-protected posts and pages are no longer indexed, unless "Also index private & password-protected items" is on. Their text could be read in the search window, and the AI shopping assistant answered from it. The update takes the ones already indexed out right away.
+- Saving the Indexing tab starts a sync that sends only what the change altered, instead of waiting for a sync and then sending everything again.
+- A content type you renamed on the Indexing tab is found by blocks, shortcodes, widgets and placements restricted to it, and its type boost works.
+- Result cards of pages and custom content types show their text, not only the title.
+- The category filter's modes work for post categories too, and a post filed under a subcategory is found by a filter on its main category.
+- A filter set to "All (AND)" updates its counts after every pick, so it no longer offers combinations that find nothing.
+- The title, body text, result link and image can come from a custom field, such as an ACF field.
+- The synonyms field takes a new line for each group again.
+- On a site without a shop, the highlights no longer ask for featured products, and the window and the settings no longer speak of a shop.
+- Smaller fixes: clearer error messages on the Search Config tab, a warning for a redirect entered twice and for a field no content carries, the Sync history search works, a negative number of days is refused, Elementor no longer lists the Searcio widgets twice, "Clear cache" no longer clears the opcode cache of other sites on the server, and on a phone the search field has room for what you type.
 - The category filter tells apart categories of the same name under different parents: each is under its own parent with its own number of products, and picking one filters only that one. After the next sync, add "category_paths" to the facet fields on the Search Config tab, and keep "categories" there for your quizzes and merchandising rules.
 - The category filter lists your categories in the order you sorted them in WooCommerce, or by name or by number of products: see Order of the categories on the Search Config tab.
 - WooCommerce brands can be indexed (Indexing tab, Brands) and offered as a filter of their own by adding "brands" to the facet fields.

@@ -2,7 +2,9 @@
 /**
  * Registers the classic widgets. A site with block widget areas lists them
  * too, under the Legacy Widget block, beside the Searcio blocks it should use
- * there instead.
+ * there instead. Elementor lists every classic widget in its panel as well,
+ * where they stood beside the two Searcio widgets of the same name, so they
+ * are kept out of it.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -14,6 +16,7 @@ namespace Webhead\WP\SearchCloud\Widgets;
 
 use WP_Widget;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Action;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,6 +32,19 @@ final class Widget_Registrar {
 		foreach ( self::WIDGETS as $widget ) {
 			register_widget( $widget );
 		}
+	}
+
+	/**
+	 * Elementor's own Searcio widgets do everything the classic ones do, and
+	 * with its controls; two "Searcio Search" in its panel left the choice to
+	 * a guess.
+	 *
+	 * @param  mixed  $black_list  The classic widgets Elementor leaves out.
+	 * @return array<int,mixed>
+	 */
+	#[Filter( 'elementor/widgets/black_list' )]
+	public function keep_out_of_elementor( mixed $black_list ): array {
+		return array_values( array_unique( [ ...( is_array( $black_list ) ? $black_list : [] ), ...self::WIDGETS ] ) );
 	}
 
 	/**

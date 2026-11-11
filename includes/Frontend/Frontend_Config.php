@@ -22,6 +22,7 @@ use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Indexing\Term_Names;
+use Webhead\WP\SearchCloud\Indexing\Woo;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Support\Language;
@@ -143,7 +144,17 @@ final class Frontend_Config {
 			'siteHome'        => home_url( '/' ),
 			// Read through the setting's own cleaning, for a list saved before it decoded.
 			'popularSearches' => Plugin_Settings::plain_text_list( $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
-			'typeLabels'      => $this->index_config->indexable_post_type_labels(),
+			'typeLabels'      => $this->index_config->document_type_labels(),
+			// The block, the shortcode, the widgets and the placements name a
+			// post type; the window asks the index for the type its documents
+			// carry (see Index_Config::document_types()).
+			'documentTypes'   => $this->index_config->document_types(),
+			// Featured highlights ask for `filter[featured]`, which Searcio
+			// refuses on an index without that field: a site without a shop.
+			'hasFeatured'     => in_array( 'featured', $this->index_config->indexed_fields(), true ),
+			// A site that indexes no products is spoken to about what it
+			// publishes, not about a shop it does not have.
+			'hasProducts'     => in_array( Woo::POST_TYPE, $this->index_config->indexable_post_types(), true ),
 			// Facet headings, comparison rows and quiz answers for the fields the
 			// site names itself (WooCommerce attributes, mapped taxonomies), in
 			// the language of the page being built - which is why this is read

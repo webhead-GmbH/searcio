@@ -162,14 +162,24 @@ export const humanizeFieldLabel = ( field, labels ) => {
  * it last showed (frozen from the last response where that field was
  * unfiltered); every other field always takes the fresh list, since it's
  * only being narrowed by *other* filters, which is normal, desired faceting.
+ *
+ * A field whose picks a result must all have (`all`, AND) is the exception:
+ * there each pick narrows what the next one can find, so its own counts are
+ * the fresh ones. Kept, they offered combinations that found nothing.
+ *
+ * @param {Object}   current
+ * @param {Object}   incoming
+ * @param {Object}   activeFacets
+ * @param {string[]} [matchAll] The fields whose picks must all match.
+ * @return {Object}
  */
-export const mergeFieldFacets = ( current, incoming, activeFacets ) => {
+export const mergeFieldFacets = ( current, incoming, activeFacets, matchAll = [] ) => {
 	const merged = { ...incoming };
 
 	Object.keys( current || {} ).forEach( ( field ) => {
 		const hasOwnFilter = ( activeFacets?.[ field ] || [] ).length > 0;
 
-		if ( hasOwnFilter ) {
+		if ( hasOwnFilter && ! ( matchAll.includes( field ) && Array.isArray( incoming?.[ field ] ) ) ) {
 			merged[ field ] = current[ field ];
 		}
 	} );

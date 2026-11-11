@@ -9,6 +9,7 @@ import { getConfig } from '../../../utils/api';
 import { formatPrice } from '../../../utils/currency';
 import { matchTemplate, ServerCard } from './serverCards';
 import { openHandlers } from '../../../utils/clicks';
+import { postTypeOf } from '../../../utils/documentType';
 
 /**
  * The price line for a product card: strikethrough regular + sale price when
@@ -206,19 +207,6 @@ const PostCard = ( { hit, onClick } ) => {
 	);
 };
 
-const GenericCard = ( { hit, onClick } ) => {
-	const source = hit.source || {};
-
-	return (
-		<a className="whsc-card whsc-card--generic" href={ source.url || '#' } { ...openHandlers( onClick ) }>
-			<CardImage src={ source.image } />
-			<span className="whsc-card__body">
-				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
-			</span>
-		</a>
-	);
-};
-
 const templates = {
 	product: ProductCard,
 	post: PostCard,
@@ -250,8 +238,11 @@ export const ResultCard = ( { hit, cardSource, serverTemplates, onClick } ) => {
 		}
 	}
 
-	const type = hit?.source?.type;
-	const Template = ( type && templates[ type ] ) || GenericCard;
+	// By the type the hit was indexed under, then by its post type, so a
+	// renamed type keeps its card; any other hit is drawn as a post, with its
+	// text: a page or a custom type showed its title alone.
+	const own = ( key ) => ( key && Object.prototype.hasOwnProperty.call( templates, key ) ? templates[ key ] : null );
+	const Template = own( hit?.source?.type ) || own( postTypeOf( hit ) ) || PostCard;
 
 	return <Template hit={ hit } onClick={ onClick } />;
 };

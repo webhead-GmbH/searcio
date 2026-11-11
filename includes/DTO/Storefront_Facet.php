@@ -35,6 +35,7 @@ final class Storefront_Facet {
 	 * @param  bool                  $hidden   Not drawn: the category filter is drawn from the other category field.
 	 * @param  Category_Order|null   $sort     The order of the values, for the category filter; by count when null.
 	 * @param  array<int,string>     $values_order  The values in the shop's order, for {@see Category_Order::Shop}.
+	 * @param  bool                  $match_all  A result must have every value picked (AND), so each pick changes the counts of the others.
 	 */
 	public function __construct(
 		public readonly string $field,
@@ -47,7 +48,8 @@ final class Storefront_Facet {
 		public readonly ?array $tree = null,
 		public readonly bool $hidden = false,
 		public readonly ?Category_Order $sort = null,
-		public readonly array $values_order = []
+		public readonly array $values_order = [],
+		public readonly bool $match_all = false
 	) {}
 
 	/**
@@ -90,6 +92,10 @@ final class Storefront_Facet {
 
 		if ( [] !== $this->values_order ) {
 			$out['valuesOrder'] = array_values( $this->values_order );
+		}
+
+		if ( $this->match_all ) {
+			$out['match'] = 'all';
 		}
 
 		return $out;

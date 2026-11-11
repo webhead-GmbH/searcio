@@ -22,6 +22,7 @@ use WP_REST_Response;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
+use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Exceptions\Settings\Invalid_Setting_Value;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
 
@@ -72,7 +73,13 @@ final class Settings_Endpoint extends Rest_API {
 			);
 		}
 
-		$this->settings->partial_update( self::without_unchanged_credentials( $incoming ), rest_only: true );
+		// A value its schema refuses, such as a negative number of days to keep
+		// the history for, is answered as a refusal, not a server error.
+		try {
+			$this->settings->partial_update( self::without_unchanged_credentials( $incoming ), rest_only: true );
+		} catch ( Invalid_Setting_Value $error ) {
+			return new WP_REST_Response( [ 'message' => $error->getMessage() ], 400 );
+		}
 
 		return new WP_REST_Response( $this->prepare_for_rest( $this->settings->export_for_rest() ) );
 	}

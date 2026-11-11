@@ -13,6 +13,8 @@ import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
 import {
+	enabledTypeLabels,
+	repeatsRedirect,
 	errorsUnder,
 	idsToText,
 	listError,
@@ -95,6 +97,17 @@ const unindexedFacetMessage = ( quoted, count ) => sprintf(
 	quoted
 );
 
+const unindexedSearchableMessage = ( quoted, count ) => sprintf(
+	/* translators: %s: one or more quoted field names, e.g. "category". */
+	_n(
+		'No document on this site has a %s field, so searching it finds nothing. Choose a field from the list, or start indexing it in the Indexing tab.',
+		'No document on this site has the fields %s, so searching them finds nothing. Choose fields from the list, or start indexing them in the Indexing tab.',
+		count,
+		'searcio'
+	),
+	quoted
+);
+
 const unindexedSuggestMessage = ( quoted, count ) => sprintf(
 	/* translators: %s: one or more quoted field names, e.g. "category". */
 	_n(
@@ -121,25 +134,40 @@ const facetFieldText = ( field ) => ( 'category_paths' === field
 	)
 	: field );
 
-const enabledTypeLabels = ( catalog ) => {
-	const labels = {};
-
-	( catalog?.post_types || [] ).forEach( ( postType ) => {
-		if ( postType.config?.enabled ) {
-			labels[ postType.slug ] = postType.label;
-		}
-	} );
-
-	return labels;
-};
+/**
+ * The plugin's own words for what a person can get wrong in these fields.
+ * Searcio answers in its own language - German, in an English screen - and
+ * names the field by its key: "Das Format des Feldes redirects.3.url ist
+ * ungültig."
+ *
+ * @return {Object<string,string>} `section.column` => message.
+ */
+const OWN_ERRORS = () => ( {
+	'redirects.url': __( 'Enter a full address that starts with https://, or a path on this site that starts with /.', 'searcio' ),
+	'searchable_fields.weight': __( 'Enter a weight from 1 to 100.', 'searcio' ),
+	'type_boosts.boost': __( 'Enter a boost from 0.1 to 100.', 'searcio' ),
+} );
 
 /** Errors use `searchable_fields.0.field` style keys; map back to a row + column. */
 const rowError = ( errors, section, index, column ) => {
 	const key = `${ section }.${ index }.${ column }`;
 	const messages = errors?.[ key ];
 
-	return Array.isArray( messages ) ? messages.join( ' ' ) : undefined;
+	if ( ! Array.isArray( messages ) ) {
+		return undefined;
+	}
+
+	return OWN_ERRORS()[ `${ section }.${ column }` ] || messages.join( ' ' );
 };
+
+/**
+ * Why a save failed, for the notice beside the button: the fields that need
+ * attention say so under themselves, in the plugin's words, so the notice
+ * does not repeat Searcio's.
+ */
+const saveFailure = ( error ) => ( error?.errors && 'object' === typeof error.errors && Object.keys( error.errors ).length > 0
+	? __( 'Some fields need a change: see the messages under them.', 'searcio' )
+	: reasonOf( error ) );
 
 /** Feature errors come back as `features.ai_search.enabled`. */
 const featureError = ( errors, key ) => {
@@ -227,6 +255,41 @@ const CategoryFilterCard = () => {
 				</Stack>
 			</Card.Content>
 		</Card.Root>
+	);
+};
+
+/**
+ * The synonyms, one group per line. The text is kept as it is typed and only
+ * the list for Searcio is cleaned: rebuilt from that list on every key, the
+ * field dropped a new line as soon as Enter made it, and the space after a
+ * comma with it, so a second group could not be typed.
+ *
+ * @param {Object}        props
+ * @param {Array<string>} props.synonyms The groups, as Searcio keeps them.
+ * @param {Function}      props.onChange Called with the cleaned groups.
+ */
+const SynonymsField = ( { synonyms, onChange } ) => {
+	const [ text, setText ] = useState( () => termsToText( synonyms ) );
+
+	// The list as Searcio stored it, after a load or a save; what is being
+	// typed is left alone.
+	useEffect( () => {
+		if ( JSON.stringify( textToTerms( text ) ) !== JSON.stringify( synonyms || [] ) ) {
+			setText( termsToText( synonyms ) );
+		}
+	}, [ synonyms ] ); // eslint-disable-line react-hooks/exhaustive-deps
+
+	return (
+		<TextareaControl
+			label={ __( 'Synonyms', 'searcio' ) }
+			hideLabelFromVision
+			description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'searcio' ) }
+			value={ text }
+			onValueChange={ ( value ) => {
+				setText( value );
+				onChange( textToTerms( value ) );
+			} }
+		/>
 	);
 };
 
@@ -427,8 +490,10 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 
 /**
  * Per-search curation: pin products to the top, keep products out, and show a
- * banner. An empty trigger applies the rule to every search, which is how a
- * product is hidden site-wide.
+ * banner. Searcio applies the first rule that matches a search and no other,
+ * so an empty trigger, which matches every search, keeps the rules below it
+ * from ever applying, and a product it hides shows wherever a rule above it
+ * matches.
  *
  * On a multilingual site each rule also names the language it fires in:
  * without one, a German rule "jacke" fired on the English search "jacket" too.
@@ -458,7 +523,7 @@ const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
 			<CardHeading
 				title={ __( 'Merchandising rules', 'searcio' ) }
 				description={ __(
-					'Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere.',
+					'Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches.',
 					'searcio'
 				) }
 			/>
@@ -598,7 +663,9 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 						<div className="whsc-redirect-rule" key={ index }>
 							<InputControl
 								label={ __( 'Search term (exact)', 'searcio' ) }
-								description={ rowError( errors, 'redirects', index, 'query' ) }
+								description={ rowError( errors, 'redirects', index, 'query' ) || ( repeatsRedirect( rules, index )
+									? __( 'This term is redirected above already, and only one of the two can be followed.', 'searcio' )
+									: undefined ) }
 								value={ rule.query }
 								onValueChange={ ( query ) => update( index, { ...rule, query } ) }
 							/>
@@ -789,7 +856,7 @@ const SearchConfigTab = () => {
 				failures.push( sprintf(
 					/* translators: %s: reason the save failed, as reported by the REST API. */
 					__( 'The search configuration could not be saved: %s', 'searcio' ),
-					reasonOf( error )
+					saveFailure( error )
 				) );
 				setFieldErrors( error?.errors && 'object' === typeof error.errors ? error.errors : {} );
 			}
@@ -919,6 +986,10 @@ const SearchConfigTab = () => {
 									/>
 								</div>
 							) ) }
+							<UnindexedFieldsNotice
+								fields={ unindexedFields( config.searchable_fields.map( ( row ) => row.field ), indexed ) }
+								message={ unindexedSearchableMessage }
+							/>
 							<Stack direction="row" gap="sm">
 								<Button __next40pxDefaultSize variant="secondary" onClick={ addSearchableField }>
 									{ __( 'Add a field', 'searcio' ) }
@@ -1002,7 +1073,7 @@ const SearchConfigTab = () => {
 									<Fieldset.Legend>{ __( 'When a shopper picks several values of one filter', 'searcio' ) }</Fieldset.Legend>
 									<Stack direction="column" gap="md">
 										<Text render={ <p /> } variant="body-sm" className="whsc-facet-match__description">
-											{ __( 'Any: a product that has one of them is shown. All: only a product that has every one of them, for a field a product holds several values of, such as features or tags.', 'searcio' ) }
+											{ __( 'Any: a result that has one of them is shown. All: only a result that has every one of them, for a field a result holds several values of, such as features or tags.', 'searcio' ) }
 										</Text>
 										{ config.facet_fields.map( ( field ) => (
 											<ToggleGroupControl
@@ -1064,18 +1135,7 @@ const SearchConfigTab = () => {
 						) }
 					/>
 					<Card.Content className="whsc-settings-card-content">
-						<TextareaControl
-							label={ __( 'Synonyms', 'searcio' ) }
-							hideLabelFromVision
-							description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'searcio' ) }
-							value={ config.synonyms.join( '\n' ) }
-							onValueChange={ ( value ) =>
-								set(
-									'synonyms',
-									value.split( '\n' ).map( ( line ) => line.trim() ).filter( ( line ) => '' !== line )
-								)
-							}
-						/>
+						<SynonymsField synonyms={ config.synonyms } onChange={ ( groups ) => set( 'synonyms', groups ) } />
 					</Card.Content>
 				</Card.Root>
 
@@ -1121,9 +1181,14 @@ const SearchConfigTab = () => {
 								/>
 							) }
 
-							{ Array.isArray( fieldErrors?.languages ) && fieldErrors.languages.length > 0 && (
+							{ errorsUnder( fieldErrors, 'languages' ) && (
 								<Notice.Root intent="error">
-									<Notice.Description>{ fieldErrors.languages.join( ' ' ) }</Notice.Description>
+									<Notice.Description>
+										{ /* A code that is not one; what the list as a whole broke, such as the plan's limit, is Searcio's to say. */ }
+										{ Object.keys( fieldErrors ).some( ( key ) => key.startsWith( 'languages.' ) )
+											? __( 'Use the two-letter codes of the site\'s languages, such as de or en, separated by commas.', 'searcio' )
+											: errorsUnder( fieldErrors, 'languages' ) }
+									</Notice.Description>
 								</Notice.Root>
 							) }
 						</Stack>

@@ -263,9 +263,9 @@ test.describe( 'search analytics', () => {
 		await mockSearchCloud( page, {
 			assistant: true,
 			assistantProducts: [
-				{ ...postHit( { title: 'Shell', brand: 'PeakNord' }, 'p-1' ), search_id: 's-a' },
-				{ ...postHit( { title: 'Padded', brand: 'FrostGuard' }, 'p-2' ), search_id: 's-b' },
-				{ ...postHit( { title: 'Parka', brand: 'PeakNord' }, 'p-3' ), search_id: 's-a' },
+				{ ...postHit( { type: 'product', title: 'Shell', brand: 'PeakNord' }, 'p-1' ), search_id: 's-a' },
+				{ ...postHit( { type: 'product', title: 'Padded', brand: 'FrostGuard' }, 'p-2' ), search_id: 's-b' },
+				{ ...postHit( { type: 'product', title: 'Parka', brand: 'PeakNord' }, 'p-3' ), search_id: 's-a' },
 			],
 		} );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );

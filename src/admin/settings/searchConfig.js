@@ -312,3 +312,43 @@ export const errorsUnder = ( errors, prefix ) => {
 
 	return messages.length > 0 ? messages.join( ' ' ) : undefined;
 };
+
+/**
+ * The content types this site indexes, by the type their documents carry -
+ * what a boost is matched against. The Indexing tab lets an admin name it
+ * ("artikel" for posts); keyed by the post type, the boost asked for "post"
+ * and moved nothing.
+ *
+ * @param {?Object} catalog The `/indexing/config` response.
+ * @return {Object<string,string>} Document type => label.
+ */
+export const enabledTypeLabels = ( catalog ) => {
+	const labels = {};
+
+	( catalog?.post_types || [] ).forEach( ( postType ) => {
+		if ( postType.config?.enabled ) {
+			const type = String( postType.config?.type || '' ).trim() || postType.slug;
+
+			labels[ type ] ??= postType.label;
+		}
+	} );
+
+	return labels;
+};
+
+/**
+ * Whether a redirect's term is one an earlier redirect has, as Searcio matches
+ * a term: whatever its capitals and the spaces around it. "versand" and
+ * "VERSAND " were both saved, each with its own target, and nothing said
+ * that one of them would never be followed.
+ *
+ * @param {Array<{query?: string}>} rules
+ * @param {number}                  index
+ * @return {boolean}
+ */
+export const repeatsRedirect = ( rules, index ) => {
+	const term = ( rule ) => String( rule?.query ?? '' ).trim().toLocaleLowerCase();
+	const own = term( rules?.[ index ] );
+
+	return '' !== own && ( rules || [] ).slice( 0, index ).some( ( rule ) => term( rule ) === own );
+};

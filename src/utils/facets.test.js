@@ -135,6 +135,19 @@ describe( 'mergeFieldFacets', () => {
 			brand: [ { value: 'Acme', count: 7 } ],
 		} );
 	} );
+
+	/**
+	 * The tester's "Schlagwort" in AND mode: after "Pflege" and "Anleitung" the
+	 * others still said "Winter (2)" and "Kaufberatung (1)", and picking
+	 * Kaufberatung found nothing. There each pick narrows the next.
+	 */
+	it( 'takes the fresh counts of a field whose picks must all match, its own pick included', () => {
+		const current = { tags: [ { value: 'Pflege', count: 4 }, { value: 'Winter', count: 2 }, { value: 'Kaufberatung', count: 1 } ] };
+		const incoming = { tags: [ { value: 'Pflege', count: 3 }, { value: 'Winter', count: 1 } ] };
+
+		expect( mergeFieldFacets( current, incoming, { tags: [ 'Pflege' ] }, [ 'tags' ] ) ).toEqual( incoming );
+		expect( mergeFieldFacets( current, {}, { tags: [ 'Pflege' ] }, [ 'tags' ] ) ).toEqual( current );
+	} );
 } );
 
 describe( 'humanizeFieldLabel', () => {

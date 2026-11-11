@@ -252,10 +252,14 @@ let warmed = false;
  * as it opens and whenever a filter changes with the field empty, and
  * {@see warmUp} asks for the same address, so the two share one answer.
  *
+ * The featured ones only where the index has a `featured` field: on a site
+ * without a shop the filter was refused (422) and the row stayed empty.
+ *
  * @param {{type?: string, source?: string, facets?: Object, ranges?: Object, signal?: AbortSignal}} [options]
  */
 export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
-	const forced = { ...currentLangFilter(), ...( 'featured' === source ? { featured: 'true' } : {} ) };
+	const featured = 'featured' === source && false !== config.hasFeatured;
+	const forced = { ...currentLangFilter(), ...( featured ? { featured: 'true' } : {} ) };
 
 	return search( '', { type, filters: buildFilterParams( facets, forced ), ranges: buildRangeParams( ranges ), perPage: 12, surface: 'highlights', signal } );
 };
@@ -390,17 +394,18 @@ export const search = ( q, options = {} ) => {
 
 /**
  * Titles that start with what was typed, in the language of the page on a
- * multilingual site, as a search is (`filter[lang]`).
+ * multilingual site, as a search is (`filter[lang]`), and of the type a window
+ * restricted to one asks for (`type`, which a service before it ignores).
  *
  * @param {string} q
- * @param {{limit?: number, signal?: AbortSignal}} [options]
+ * @param {{limit?: number, type?: string, signal?: AbortSignal}} [options]
  */
 export const suggest = ( q, options = {} ) => {
 	const { lang } = currentLangFilter();
 
 	return request(
 		'/search/suggest',
-		{ q, limit: options.limit || 5, 'filter[lang]': lang },
+		{ q, limit: options.limit || 5, type: options.type || undefined, 'filter[lang]': lang },
 		SUGGEST_TTL,
 		options.signal
 	);

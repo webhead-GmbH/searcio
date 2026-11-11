@@ -116,6 +116,8 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 				type="number"
 				label={ definition.label || key }
 				hideLabelFromVision
+				min={ definition.minimum }
+				max={ definition.maximum }
 				value={ value ?? '' }
 				onValueChange={ ( nextValue ) => {
 					if ( nextValue === '' ) {
@@ -128,9 +130,16 @@ const renderFieldControl = ( field, settings, updateSetting ) => {
 						? parseInt( nextValue, 10 )
 						: parseFloat( nextValue );
 
+					// Within what the setting takes: -5 days to keep the
+					// history for was saved, and meant nothing.
+					const bounded = Math.min(
+						Number.isFinite( definition.maximum ) ? definition.maximum : Infinity,
+						Math.max( Number.isFinite( definition.minimum ) ? definition.minimum : -Infinity, parsedValue )
+					);
+
 					updateSetting(
 						key,
-						Number.isNaN( parsedValue ) ? definition.default : parsedValue
+						Number.isNaN( parsedValue ) ? definition.default : bounded
 					);
 				} }
 			/>

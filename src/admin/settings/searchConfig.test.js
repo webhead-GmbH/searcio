@@ -6,6 +6,8 @@
 
 import {
 	cleanTerms,
+	enabledTypeLabels,
+	repeatsRedirect,
 	errorsUnder,
 	FEATURE_KEYS,
 	idsToText,
@@ -450,5 +452,37 @@ describe( 'document id lists', () => {
 
 	it( 'reads an empty field as no ids', () => {
 		expect( textToIds( '' ) ).toEqual( [] );
+	} );
+} );
+
+/**
+ * A boost is matched against the type the documents carry. Keyed by the post
+ * type, the tester's boost of 100 for posts asked for "post" while posts were
+ * "artikel", and moved nothing.
+ */
+describe( 'enabledTypeLabels', () => {
+	it( 'names each indexed content type by the type its documents carry', () => {
+		const catalog = {
+			post_types: [
+				{ slug: 'post', label: 'Beiträge', config: { enabled: true, type: 'artikel' } },
+				{ slug: 'page', label: 'Seiten', config: { enabled: true, type: 'page' } },
+				{ slug: 'ratgeber', label: 'Ratgeber', config: { enabled: true } },
+				{ slug: 'faq', label: 'FAQ', config: { enabled: false, type: 'faq' } },
+			],
+		};
+
+		expect( enabledTypeLabels( catalog ) ).toEqual( { artikel: 'Beiträge', page: 'Seiten', ratgeber: 'Ratgeber' } );
+		expect( enabledTypeLabels( null ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'repeatsRedirect', () => {
+	it( 'flags a later redirect whose term an earlier one has, whatever its capitals and spaces', () => {
+		const rules = [ { query: 'versand' }, { query: 'Retoure' }, { query: 'VERSAND ' }, { query: '' }, { query: '' } ];
+
+		expect( repeatsRedirect( rules, 0 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 4 ) ).toBe( false );
 	} );
 } );

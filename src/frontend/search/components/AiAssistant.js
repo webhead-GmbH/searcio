@@ -2,10 +2,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from '@word
 import { __, _n, sprintf } from '@wordpress/i18n';
 import Button from './Button';
 
-import { streamAssistant, trackClick } from '../../../utils/api';
+import { getConfig, streamAssistant, trackClick } from '../../../utils/api';
 import { positionInSearch } from '../../../utils/clicks';
 import { NARROW, useMediaQuery } from '../../../utils/mediaQuery';
 import CompareTable, { comparisonRows } from './CompareTable';
+import { postTypeOf } from '../../../utils/documentType';
 import Markdown from './markdown';
 import { useTypewriter } from '../../../utils/typewriter';
 import { compareIcon, gridIcon, sendIcon, sparkleIcon } from './icons';
@@ -138,17 +139,20 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 		trackClick( products[ index ]?.search_id, products[ index ]?.id, positionInSearch( products, index ) );
 	// Offered only when the table would have a row: products that carry just a
 	// title, link, image and price opened a table with a header and no body.
-	const canCompare = products.length >= 2 && comparisonRows( products ).length > 0;
+	// And only for products: two posts or pages side by side compare nothing
+	// a reader chooses between.
+	const allProducts = products.every( ( product ) => 'product' === postTypeOf( product ) || 'product' === product?.source?.type || 'number' === typeof product?.source?.price );
+	const canCompare = products.length >= 2 && allProducts && comparisonRows( products ).length > 0;
 	// A new product set can have nothing to compare while the toggle was on.
 	const comparing = compare && canCompare;
 
-	// Store-agnostic openers for the empty state. Kept short so all three sit on
-	// one row rather than wrapping into a lopsided 2 + 1.
-	const STARTERS = [
-		__( "What's popular?", 'searcio' ),
-		__( 'Help me find a gift', 'searcio' ),
-		__( "What's on sale?", 'searcio' ),
-	];
+	// Openers for the empty state. Kept short so all three sit on one row
+	// rather than wrapping into a lopsided 2 + 1. A site without a shop has no
+	// gift and no sale to find: there they are about what it publishes.
+	const shop = false !== getConfig().hasProducts;
+	const STARTERS = shop
+		? [ __( "What's popular?", 'searcio' ), __( 'Help me find a gift', 'searcio' ), __( "What's on sale?", 'searcio' ) ]
+		: [ __( "What's popular?", 'searcio' ), __( "What's new?", 'searcio' ), __( 'Where should I start?', 'searcio' ) ];
 
 	/**
 	 * Ask for one reply and draw it as it comes: the turn joins the thread
@@ -301,10 +305,9 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 								{ sparkleIcon }
 							</span>
 							<p className="whsc-assistant__intro-text">
-								{ __(
-									"Describe what you're looking for and I'll find it in this store.",
-									'searcio'
-								) }
+								{ shop
+									? __( "Describe what you're looking for and I'll find it in this store.", 'searcio' )
+									: __( "Describe what you're looking for and I'll find it on this site.", 'searcio' ) }
 							</p>
 							{ /* A blank chat box gives no clue what it can do, so offer
 							     store-agnostic openers that fill and send the message. */ }

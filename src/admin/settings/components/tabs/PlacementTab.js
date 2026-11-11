@@ -307,9 +307,14 @@ const PlacementTab = () => {
 		{ value: 'submit', label: __( 'When Enter is pressed', 'searcio' ) },
 		{ value: 'type', label: __( 'As the visitor types', 'searcio' ) },
 	];
+	// A site without a shop has no products to name, and no featured ones:
+	// "Featured products" left the highlights empty there.
+	const highlightSources = catalog?.highlights || { products: true, featured: true };
 	const highlightItems = [
-		{ value: 'newest', label: __( 'The newest products', 'searcio' ) },
-		{ value: 'featured', label: __( 'Featured products', 'searcio' ) },
+		{ value: 'newest', label: highlightSources.products ? __( 'The newest products', 'searcio' ) : __( 'The newest content', 'searcio' ) },
+		...( highlightSources.featured || 'featured' === search?.highlights
+			? [ { value: 'featured', label: __( 'Featured products', 'searcio' ) } ]
+			: [] ),
 	];
 	const animationItems = [
 		{ value: 'fade', label: __( 'Fade', 'searcio' ) },
@@ -934,7 +939,11 @@ const PlacementTab = () => {
 				) }
 			/>
 
-			<SectionList label={ __( 'Placement settings', 'searcio' ) } sections={ sections } />
+			{ /* Product rows show WooCommerce's products, which a site without it has none of. */ }
+			<SectionList
+				label={ __( 'Placement settings', 'searcio' ) }
+				sections={ sections.filter( ( section ) => 'products' !== section.id || false !== catalog?.shop ) }
+			/>
 
 			<LookEditor
 				isOpen={ isEditingLook }

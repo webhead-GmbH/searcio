@@ -22,6 +22,7 @@ use Webhead\WP\SearchCloud\Enums\Change_Action;
 use Webhead\WP\SearchCloud\Enums\Sync_Control;
 use Webhead\WP\SearchCloud\Enums\Sync_Status;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
+use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Password_Protected_Posts;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
@@ -200,6 +201,113 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertFalse( $this->dirty_tracker()->was_indexed( $private ), 'A pruned post must lose its sync meta.' );
 		$this->assertTrue( $this->dirty_tracker()->was_indexed( $kept ) );
 		$this->assertTrue( $this->dirty_tracker()->was_indexed( $later ) );
+	}
+
+	/**
+	 * The tester's post-59 and page-17: published with a password, indexed with
+	 * their text although "Also index private & password-protected items" was
+	 * off. A protected post goes with the private ones.
+	 */
+	public function test_a_password_protected_post_is_indexed_only_with_the_private_ones(): void {
+		$this->enable_indexing( 'post', [ 'include_private' => false ] );
+
+		$protected = get_post( self::factory()->post->create( [ 'post_status' => 'publish', 'post_password' => 'secret' ] ) );
+		$open      = get_post( self::factory()->post->create( [ 'post_status' => 'publish' ] ) );
+
+		$this->assertFalse( $this->service( 'document_builder' )->is_indexable( $protected ) );
+		$this->assertTrue( $this->service( 'document_builder' )->is_indexable( $open ) );
+
+		$this->enable_indexing( 'post', [ 'include_private' => true ] );
+
+		$this->assertTrue( $this->service( 'document_builder' )->is_indexable( $protected ) );
+	}
+
+	/**
+	 * A site updated from 1.4.0 has its protected posts in the index. The update
+	 * queues each one, and the drain takes it out at once rather than at the
+	 * next full sync; a post without a password is not touched.
+	 */
+	public function test_the_update_takes_the_protected_posts_out_of_the_index(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post', [ 'include_private' => false ] );
+		$this->fake_index();
+
+		$protected = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$open      = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->run_full_sync();
+
+		// How 1.4.0 left it: protected, and still in the index.
+		$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->posts, [ 'post_password' => 'secret' ], [ 'ID' => $protected ] );
+		clean_post_cache( $protected );
+
+		( new Unindex_Password_Protected_Posts( $this->service( 'change_listener' ) ) )->run();
+		$this->service( 'incremental_service' )->drain();
+
+		$this->assertSame( [ 'post-' . $protected ], $this->delete_requests );
+		$this->assertFalse( $this->dirty_tracker()->was_indexed( $protected ) );
+		$this->assertTrue( $this->dirty_tracker()->was_indexed( $open ) );
+	}
+
+	/**
+	 * Saving the Indexing tab bumps the mapping's version. The documents a
+	 * change does not alter are the same, so the sync after it sends only the
+	 * one that changed: the tester's site sent all 58 to take one out.
+	 */
+	public function test_a_mapping_change_sends_only_the_documents_it_changed(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+
+		$upserted = [];
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$upserted ): array {
+				if ( str_contains( $url, '/documents' ) && 'DELETE' !== ( $args['method'] ?? '' ) ) {
+					$body     = json_decode( (string) ( $args['body'] ?? '{}' ), true );
+					$upserted = array_merge( $upserted, array_column( (array) ( $body['documents'] ?? [] ), 'id' ) );
+				}
+
+				return $this->http_ok( [ 'ok' => true ] );
+			}
+		);
+
+		self::factory()->post->create_many( 3, [ 'post_status' => 'publish' ] );
+		$with_subtitle = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		update_post_meta( $with_subtitle, 'subtitle', 'For the winter' );
+		$this->run_full_sync();
+		$upserted = [];
+
+		// Only the post that has a subtitle is written differently with it.
+		$this->enable_indexing( 'post', [ 'fields' => [ [ 'as' => 'subtitle', 'source' => 'meta:subtitle' ] ] ] );
+		$this->run_full_sync();
+
+		$this->assertSame( [ 'post-' . $with_subtitle ], $upserted );
+	}
+
+	/**
+	 * A post the new mapping leaves out stayed findable until somebody started
+	 * a sync, or the next day's ran. A save that changes the mapping starts
+	 * one; a save that changes nothing does not.
+	 */
+	public function test_saving_a_changed_mapping_starts_a_sync(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post', [ 'include_private' => true ] );
+		$this->fake_index();
+
+		$save = function ( bool $private ): array {
+			$request = new \WP_REST_Request( 'POST', '/searcio/v1/indexing/config' );
+			$request->set_param( 'config', [ 'post' => [ 'enabled' => true, 'include_private' => $private ] ] );
+
+			return $this->service( 'indexing_endpoint' )->save_config( $request )->get_data();
+		};
+
+		$payload = $save( false );
+
+		$this->assertTrue( $payload['sync']['started'], (string) $payload['sync']['message'] );
+		$this->assertNotNull( $this->sync_state()->active() );
+
+		$this->drain_ticks();
+
+		$this->assertArrayNotHasKey( 'sync', $save( false ), 'Nothing changed, so nothing is synced.' );
+		$this->assertNull( $this->sync_state()->active() );
 	}
 
 	/**

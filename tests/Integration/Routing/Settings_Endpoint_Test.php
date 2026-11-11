@@ -175,6 +175,24 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * -5 days was saved with "Settings saved successfully", and nobody could
+	 * tell whether it kept the history forever or deleted all of it.
+	 */
+	public function test_a_negative_number_of_days_to_keep_the_history_is_refused(): void {
+		$this->as_admin();
+		$this->settings()->set( Plugin_Settings::SYNC_RETENTION_DAYS, 30 );
+
+		$response = $this->save( [ Plugin_Settings::SYNC_RETENTION_DAYS => -5 ] );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+		$this->assertSame( 30, (int) $this->settings()->get( Plugin_Settings::SYNC_RETENTION_DAYS ) );
+
+		$this->save( [ Plugin_Settings::SYNC_RETENTION_DAYS => 0 ] );
+
+		$this->assertSame( 0, (int) $this->settings()->get( Plugin_Settings::SYNC_RETENTION_DAYS ), '0 keeps the history forever.' );
+	}
+
+	/**
 	 * The settings of the default section name their tab, and the framework
 	 * names it in English. The screen showed "General" in every language.
 	 */

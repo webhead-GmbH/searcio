@@ -61,13 +61,39 @@ final class Document_Builder_Test extends Integration_Test_Case {
 		$this->assertSame( self::TITLE, $document['title'] );
 	}
 
-	public function test_a_post_without_a_title_is_indexed_under_its_id(): void {
+	public function test_a_post_without_a_title_or_text_is_indexed_under_its_id(): void {
 		$this->index_posts();
 
-		$post_id  = self::factory()->post->create( [ 'post_title' => '&nbsp;' ] );
+		$post_id  = self::factory()->post->create( [ 'post_title' => '&nbsp;', 'post_content' => '' ] );
 		$document = $this->build( $post_id );
 
 		$this->assertSame( '#' . $post_id, $document['title'] );
+	}
+
+	/** "#66" in the results said nothing of what the post was about. */
+	public function test_a_post_without_a_title_is_named_by_the_first_words_of_its_text(): void {
+		$this->index_posts();
+
+		$post_id = self::factory()->post->create(
+			[
+				'post_title'   => '',
+				'post_content' => '<p>Wolle richtig waschen: lauwarm, mit wenig Waschmittel und nie im Trockner.</p>',
+			]
+		);
+
+		$this->assertSame( 'Wolle richtig waschen: lauwarm, mit wenig Waschmittel und…', $this->build( $post_id )['title'] );
+	}
+
+	/** ACF keeps an image field as the attachment's id; a card needs its address. */
+	public function test_an_image_from_a_custom_field_holding_an_attachment_id_is_sent_as_its_address(): void {
+		$attachment = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg' );
+
+		$this->index_posts( [ 'image_source' => 'meta:hero_image' ] );
+
+		$post_id = self::factory()->post->create();
+		update_post_meta( $post_id, 'hero_image', (string) $attachment );
+
+		$this->assertSame( wp_get_attachment_image_url( $attachment, 'medium_large' ), $this->build( $post_id )['image'] );
 	}
 
 	/**
@@ -85,9 +111,29 @@ final class Document_Builder_Test extends Integration_Test_Case {
 
 		$document = $this->build( $post_id );
 
-		$this->assertSame( [ 'Local' ], $document['categories'], 'A mapped taxonomy still sends exactly the terms the post carries.' );
+		$this->assertSame( [ 'Local', 'News' ], $document['categories'], 'A hierarchical taxonomy sends the parents too, as a product\'s categories do.' );
 		$this->assertSame( [ 'News', 'News > Local' ], $document['category_paths'] );
 		$this->assertContains( 'category_paths', $this->service( 'index_config' )->indexed_fields() );
+	}
+
+	/**
+	 * The tester's "Ratgeber › Pflege › Wolle" went as "Wolle" alone, so a
+	 * filter on "Ratgeber" did not find the post. Tags have no parents.
+	 */
+	public function test_a_mapped_hierarchical_taxonomy_sends_the_parents_too(): void {
+		$this->index_posts( [ 'fields' => [ [ 'source' => 'taxonomy:category', 'as' => 'kategorien' ], [ 'source' => 'taxonomy:post_tag', 'as' => 'schlagworte' ] ] ] );
+
+		$guide   = self::factory()->category->create( [ 'name' => 'Ratgeber' ] );
+		$care    = self::factory()->category->create( [ 'name' => 'Pflege', 'parent' => $guide ] );
+		$wool    = self::factory()->category->create( [ 'name' => 'Wolle', 'parent' => $care ] );
+		$post_id = self::factory()->post->create( [ 'tags_input' => [ 'Winter' ] ] );
+
+		wp_set_post_categories( $post_id, [ $wool ] );
+
+		$document = $this->build( $post_id );
+
+		$this->assertSame( [ 'Wolle', 'Pflege', 'Ratgeber' ], $document['kategorien'] );
+		$this->assertSame( [ 'Winter' ], $document['schlagworte'] );
 	}
 
 	public function test_a_post_without_its_categories_mapped_carries_no_paths(): void {

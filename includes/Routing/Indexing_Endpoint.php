@@ -7,7 +7,10 @@
  * read/written through Index_Config (which wraps the framework Settings_Manager).
  * GET returns the mapping plus the catalog the UI needs (post types, taxonomies,
  * WooCommerce availability and store attributes); POST validates and persists,
- * bumping the config version.
+ * bumping the config version. A save that changed the mapping starts a sync,
+ * which sends the documents the change altered and takes out the ones it left
+ * out: until the next scheduled one, a post the mapping no longer indexes,
+ * such as a private one, was still found by every visitor.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -20,7 +23,9 @@ namespace Webhead\WP\SearchCloud\Routing;
 use WP_REST_Request;
 use WP_REST_Response;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
+use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
+use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
 
@@ -31,7 +36,8 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Indexing_Endpoint extends Rest_API {
 	public function __construct(
-		private Index_Config $config
+		private Index_Config $config,
+		private Sync_Service $sync
 	) {}
 
 	protected function get_rest_namespace(): string {
@@ -54,11 +60,25 @@ final class Indexing_Endpoint extends Rest_API {
 			);
 		}
 
-		$version = $this->config->save( $incoming );
+		$previous = $this->config->config_version();
+		$version  = $this->config->save( $incoming );
 
 		$payload                   = $this->config->catalog();
 		$payload['saved']          = true;
 		$payload['config_version'] = $version;
+
+		if ( $version !== $previous ) {
+			$user_id = get_current_user_id();
+			$started = $this->sync->start( Sync_Trigger::Manual, $user_id > 0 ? $user_id : null, false );
+
+			// Not started: no credentials yet, nothing indexed, or a sync
+			// already running, which does not see the change for the posts it
+			// has passed.
+			$payload['sync'] = [
+				'started' => ! empty( $started['ok'] ),
+				'message' => (string) ( $started['message'] ?? '' ),
+			];
+		}
 
 		return new WP_REST_Response( $payload );
 	}

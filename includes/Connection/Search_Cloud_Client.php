@@ -324,7 +324,13 @@ final class Search_Cloud_Client {
 	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true ): Api_Response {
 		$url = $this->base() . $path;
 
-		$headers = [ 'Accept' => 'application/json' ];
+		// The language of the screen, or of the site, so that what Searcio says
+		// back - a field it refuses, for one - can be in it: it answered an
+		// English screen in German.
+		$headers = [
+			'Accept'          => 'application/json',
+			'Accept-Language' => str_replace( '_', '-', determine_locale() ),
+		];
 
 		if ( $authenticated ) {
 			[ $write_key, $write_secret ] = $this->credentials();

@@ -757,6 +757,17 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	}
 }
 
+/* On a phone the field shared its row with three buttons and kept about 120px
+ * for what was typed. While it holds text, the mic and the camera, which start
+ * a query, step aside for the clear button and the text, and come back when
+ * the field is empty; the mic stays while it listens, so it can be stopped. */
+@media screen and (max-width: 480px) {
+	.whsc-input-row.has-query .whsc-voice-btn:not(.is-pressed),
+	.whsc-input-row.has-query .whsc-visual-btn {
+		display: none;
+	}
+}
+
 /* -------------------------------------------------------------------------
  * Search field
  * ---------------------------------------------------------------------- */
