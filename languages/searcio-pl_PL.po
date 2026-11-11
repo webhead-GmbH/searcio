@@ -2264,14 +2264,6 @@ msgstr "Szczegóły produktu"
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr "Wybierz, które dane WooCommerce mają być wysyłane. Produkty z wariantami są indeksowane jeden raz (jako produkt nadrzędny) z zakresem cen."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:230
-msgid "Only index published, visible products"
-msgstr "Indeksuj tylko opublikowane, widoczne produkty"
-
-#: src/admin/settings/components/tabs/IndexingTab.js:231
-msgid "Recommended. Hidden or draft products stay out of search."
-msgstr "Zalecane. Ukryte produkty i szkice nie trafiają do wyszukiwania."
-
 #: src/admin/settings/components/tabs/IndexingTab.js:250
 msgid "Product attributes"
 msgstr "Atrybuty produktu"
@@ -5360,3 +5352,27 @@ msgstr "Co nowego?"
 #: src/frontend/search/components/AiAssistant.js:155
 msgid "Where should I start?"
 msgstr "Od czego zacząć?"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:294
+msgid "Product-specific attributes"
+msgstr "Atrybuty własne produktu"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:316
+msgid "Respect catalog visibility"
+msgstr "Uwzględniaj widoczność w katalogu"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:317
+msgid "Recommended. Products set to Shop only or Hidden stay out of search, and so do those out of stock when WooCommerce hides them. Whether private products are indexed is up to \"Also index private & password-protected items\"."
+msgstr "Zalecane. Produkty ustawione na „Tylko sklep” lub „Ukryty” nie trafiają do wyszukiwania, podobnie jak niedostępne, gdy WooCommerce je ukrywa. Czy produkty prywatne są indeksowane, zależy od opcji „Indeksuj także elementy prywatne i chronione hasłem”."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:405
+msgid "Featured products are found through the featured field, which is not one of the Facet fields on the Search Config tab yet. Until it is added there, the window shows the newest products."
+msgstr "Polecane produkty są wyszukiwane przez pole featured, którego nie ma jeszcze wśród pól fasetowych na karcie Konfiguracja wyszukiwania. Dopóki nie zostanie tam dodane, okno pokazuje najnowsze produkty."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:882
+msgid "Search configuration saved. Start a sync on the Sync tab to index the languages."
+msgstr "Konfiguracja wyszukiwania zapisana. Uruchom synchronizację na karcie Sync, aby zindeksować języki."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:884
+msgid "Search configuration saved. A sync has started to index the languages."
+msgstr "Konfiguracja wyszukiwania zapisana. Synchronizacja indeksuje teraz języki."

@@ -2264,14 +2264,6 @@ msgstr "Detalles del producto"
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr "Elige qué datos de WooCommerce enviar. Los productos variables se indexan una sola vez (como el producto principal) con un rango de precios."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:230
-msgid "Only index published, visible products"
-msgstr "Indexar solo productos publicados y visibles"
-
-#: src/admin/settings/components/tabs/IndexingTab.js:231
-msgid "Recommended. Hidden or draft products stay out of search."
-msgstr "Recomendado. Los productos ocultos o en borrador quedan fuera de la búsqueda."
-
 #: src/admin/settings/components/tabs/IndexingTab.js:250
 msgid "Product attributes"
 msgstr "Atributos del producto"
@@ -5333,3 +5325,27 @@ msgstr "¿Qué hay de nuevo?"
 #: src/frontend/search/components/AiAssistant.js:155
 msgid "Where should I start?"
 msgstr "¿Por dónde empiezo?"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:294
+msgid "Product-specific attributes"
+msgstr "Atributos propios del producto"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:316
+msgid "Respect catalog visibility"
+msgstr "Respetar la visibilidad en el catálogo"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:317
+msgid "Recommended. Products set to Shop only or Hidden stay out of search, and so do those out of stock when WooCommerce hides them. Whether private products are indexed is up to \"Also index private & password-protected items\"."
+msgstr "Recomendado. Los productos con «Solo en la tienda» u «Oculto» quedan fuera de la búsqueda, igual que los agotados cuando WooCommerce los oculta. Que se indexen los productos privados depende de «Indexar también los elementos privados y protegidos con contraseña»."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:405
+msgid "Featured products are found through the featured field, which is not one of the Facet fields on the Search Config tab yet. Until it is added there, the window shows the newest products."
+msgstr "Los productos destacados se encuentran mediante el campo featured, que aún no es uno de los campos de faceta de la pestaña Configuración de búsqueda. Hasta que se añada allí, la ventana muestra los productos más recientes."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:882
+msgid "Search configuration saved. Start a sync on the Sync tab to index the languages."
+msgstr "Configuración de búsqueda guardada. Inicia una sincronización en la pestaña Sync para indexar los idiomas."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:884
+msgid "Search configuration saved. A sync has started to index the languages."
+msgstr "Configuración de búsqueda guardada. Una sincronización está indexando los idiomas."

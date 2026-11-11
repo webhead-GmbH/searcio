@@ -2264,14 +2264,6 @@ msgstr "Produktdetails"
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr "Wählen Sie aus, welche WooCommerce-Daten gesendet werden. Variable Produkte werden einmal (als übergeordnetes Produkt) mit einer Preisspanne indexiert."
 
-#: src/admin/settings/components/tabs/IndexingTab.js:230
-msgid "Only index published, visible products"
-msgstr "Nur veröffentlichte, sichtbare Produkte indexieren"
-
-#: src/admin/settings/components/tabs/IndexingTab.js:231
-msgid "Recommended. Hidden or draft products stay out of search."
-msgstr "Empfohlen. Versteckte Produkte und Entwürfe bleiben aus der Suche heraus."
-
 #: src/admin/settings/components/tabs/IndexingTab.js:250
 msgid "Product attributes"
 msgstr "Produkteigenschaften"
@@ -5333,3 +5325,27 @@ msgstr "Was ist neu?"
 #: src/frontend/search/components/AiAssistant.js:155
 msgid "Where should I start?"
 msgstr "Womit fange ich an?"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:294
+msgid "Product-specific attributes"
+msgstr "Produktspezifische Attribute"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:316
+msgid "Respect catalog visibility"
+msgstr "Katalogsichtbarkeit beachten"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:317
+msgid "Recommended. Products set to Shop only or Hidden stay out of search, and so do those out of stock when WooCommerce hides them. Whether private products are indexed is up to \"Also index private & password-protected items\"."
+msgstr "Empfohlen. Produkte mit \"Nur Shop\" oder \"Versteckt\" bleiben aus der Suche, ebenso nicht vorrätige, wenn WooCommerce sie ausblendet. Ob private Produkte indexiert werden, entscheidet \"Auch private & passwortgeschützte Inhalte indexieren\"."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:405
+msgid "Featured products are found through the featured field, which is not one of the Facet fields on the Search Config tab yet. Until it is added there, the window shows the newest products."
+msgstr "Hervorgehobene Produkte werden über das Feld featured gefunden, das noch nicht zu den Facettenfeldern im Tab \"Sucheinstellungen\" gehört. Bis es dort hinzugefügt ist, zeigt das Fenster die neuesten Produkte."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:882
+msgid "Search configuration saved. Start a sync on the Sync tab to index the languages."
+msgstr "Sucheinstellungen gespeichert. Starten Sie eine Synchronisierung im Tab \"Sync\", um die Sprachen zu indexieren."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:884
+msgid "Search configuration saved. A sync has started to index the languages."
+msgstr "Sucheinstellungen gespeichert. Eine Synchronisierung indexiert jetzt die Sprachen."
