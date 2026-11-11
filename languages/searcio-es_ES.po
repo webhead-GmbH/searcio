@@ -1961,10 +1961,6 @@ msgstr "No se ha podido vaciar la caché."
 msgid "Cache"
 msgstr "Caché"
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:42
-msgid "Clears this plugin's own cached data and PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own."
-msgstr "Vacía los datos en caché propios de este plugin y la caché de opcode de PHP, para que un ajuste recién cambiado o una plantilla de tarjeta o un resultado de búsquedas populares actualizados hace poco aparezcan al instante, en lugar de esperar a que caduquen solos."
-
 #: src/admin/settings/components/tabs/CacheClearCard.js:58
 msgid "Clearing…"
 msgstr "Vaciando…"
@@ -3112,10 +3108,6 @@ msgstr "Los resultados en los que más se hace clic para una búsqueda suben par
 #: src/admin/settings/components/tabs/SearchConfigTab.js:390
 msgid "Merchandising rules"
 msgstr "Reglas de merchandising"
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:391
-msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
-msgstr "Selecciona a mano los resultados de búsquedas concretas. Deja el activador vacío para aplicar una regla a todas las búsquedas: así es como se excluye un producto de la búsqueda en todas partes."
 
 #. translators: %d: the rule's position in the list.
 #: src/admin/settings/components/tabs/SearchConfigTab.js:407
@@ -4626,10 +4618,6 @@ msgstr "Colores, fuentes, tamaños y espaciados de cada parte, para ordenadores,
 msgid "When a shopper picks several values of one filter"
 msgstr "Cuando un cliente elige varios valores de un mismo filtro"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:933
-msgid "Any: a product that has one of them is shown. All: only a product that has every one of them, for a field a product holds several values of, such as features or tags."
-msgstr "Cualquiera: se muestra un producto que tenga uno de ellos. Todos: solo un producto que los tenga todos, para un campo del que un producto puede tener varios valores, como características o etiquetas."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:945
 msgid "Any (OR)"
 msgstr "Cualquiera (O)"
@@ -5264,3 +5252,84 @@ msgstr "Orden de las categorías"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:224
 msgid "Drag them into order under Products > Categories in WooCommerce."
 msgstr "Arrástralas al orden que quieras en Productos > Categorías de WooCommerce."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:152
+#: src/admin/settings/components/tabs/IndexingTab.js:215
+msgid "A key that starts with \"_\" belongs to WordPress or a plugin, and is not sent."
+msgstr "Una clave que empieza por \"_\" pertenece a WordPress o a un plugin, y no se envía."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1076
+msgid "Any: a result that has one of them is shown. All: only a result that has every one of them, for a field a result holds several values of, such as features or tags."
+msgstr "Cualquiera: se muestra un resultado que tenga uno de ellos. Todos: solo un resultado que los tenga todos, para un campo del que un resultado puede tener varios valores, como características o etiquetas."
+
+#: src/admin/settings/components/tabs/CacheClearCard.js:42
+msgid "Clears this plugin's own cached data and its files in PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own. Other sites on the same server are not touched."
+msgstr "Vacía los datos en caché propios de este plugin y sus archivos en la caché de opcode de PHP, para que un ajuste recién cambiado o una plantilla de tarjeta o un resultado de búsquedas populares actualizados hace poco aparezcan al instante, en lugar de esperar a que caduquen solos. Los demás sitios del mismo servidor no se ven afectados."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:525
+msgid "Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches."
+msgstr "Selecciona a mano los resultados de búsquedas concretas. Una búsqueda toma la primera regla, empezando por arriba, que coincide con ella, y ninguna otra: una regla con el activador vacío coincide con todas las búsquedas, así que las reglas de debajo nunca se aplican, y un producto que oculta sigue apareciendo donde coincide una regla de arriba."
+
+#: src/frontend/search/components/AiAssistant.js:310
+msgid "Describe what you're looking for and I'll find it on this site."
+msgstr "Describe lo que buscas y lo encontraré en este sitio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:148
+msgid "Enter a boost from 0.1 to 100."
+msgstr "Introduce un impulso de 0,1 a 100."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:146
+msgid "Enter a full address that starts with https://, or a path on this site that starts with /."
+msgstr "Introduce una dirección completa que empiece por https://, o una ruta de este sitio que empiece por /."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:147
+msgid "Enter a weight from 1 to 100."
+msgstr "Introduce un peso de 1 a 100."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:618
+msgid "Indexing configuration saved. A sync has started to apply it."
+msgstr "Configuración de indexación guardada. Una sincronización la está aplicando."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:616
+msgid "Indexing configuration saved. Start a sync on the Sync tab to apply it."
+msgstr "Configuración de indexación guardada. Inicia una sincronización en la pestaña Sync para aplicarla."
+
+#. translators: %s: one or more quoted field names, e.g. "category".
+#: src/admin/settings/components/tabs/SearchConfigTab.js:102
+#, js-format
+msgid "No document on this site has a %s field, so searching it finds nothing. Choose a field from the list, or start indexing it in the Indexing tab."
+msgid_plural "No document on this site has the fields %s, so searching them finds nothing. Choose fields from the list, or start indexing them in the Indexing tab."
+msgstr[0] "Ningún documento de este sitio tiene un campo %s, así que buscar en él no encuentra nada. Elige un campo de la lista o empieza a indexarlo en la pestaña Indexación."
+msgstr[1] "Ningún documento de este sitio tiene los campos %s, así que buscar en ellos no encuentra nada. Elige campos de la lista o empieza a indexarlos en la pestaña Indexación."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:380
+msgid "No sync has run yet."
+msgstr "Todavía no se ha hecho ninguna sincronización."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:379
+msgid "No sync matches the search or the filters."
+msgstr "Ninguna sincronización coincide con la búsqueda o los filtros."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:169
+msgid "Some fields need a change: see the messages under them."
+msgstr "Hay campos que cambiar: mira los mensajes debajo de ellos."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:314
+msgid "The newest content"
+msgstr "Los contenidos más recientes"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:667
+msgid "This term is redirected above already, and only one of the two can be followed."
+msgstr "Este término ya se redirige más arriba, y solo se puede seguir una de las dos redirecciones."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1189
+msgid "Use the two-letter codes of the site's languages, such as de or en, separated by commas."
+msgstr "Usa los códigos de dos letras de los idiomas del sitio, como de o en, separados por comas."
+
+#: src/frontend/search/components/AiAssistant.js:155
+msgid "What's new?"
+msgstr "¿Qué hay de nuevo?"
+
+#: src/frontend/search/components/AiAssistant.js:155
+msgid "Where should I start?"
+msgstr "¿Por dónde empiezo?"

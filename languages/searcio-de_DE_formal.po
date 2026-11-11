@@ -1961,10 +1961,6 @@ msgstr "Der Cache konnte nicht geleert werden."
 msgid "Cache"
 msgstr "Cache"
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:42
-msgid "Clears this plugin's own cached data and PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own."
-msgstr "Leert die zwischengespeicherten Daten dieses Plugins und den Opcode-Cache von PHP, damit eine gerade geänderte Einstellung, eine kürzlich aktualisierte Kartenvorlage oder neue beliebte Suchanfragen sofort erscheinen, statt erst, wenn der Cache von selbst abläuft."
-
 #: src/admin/settings/components/tabs/CacheClearCard.js:58
 msgid "Clearing…"
 msgstr "Wird geleert …"
@@ -3112,10 +3108,6 @@ msgstr "Ergebnisse, die bei einer Suche am häufigsten angeklickt werden, steige
 #: src/admin/settings/components/tabs/SearchConfigTab.js:390
 msgid "Merchandising rules"
 msgstr "Merchandising-Regeln"
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:391
-msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
-msgstr "Kuratieren Sie die Ergebnisse ausgewählter Suchen. Lassen Sie den Trigger leer, um eine Regel auf jede Suche anzuwenden - so halten Sie ein Produkt überall aus der Suche heraus."
 
 #. translators: %d: the rule's position in the list.
 #: src/admin/settings/components/tabs/SearchConfigTab.js:407
@@ -4626,10 +4618,6 @@ msgstr "Farben, Schriften, Größen und Abstände jedes Teils, für Desktops, Ta
 msgid "When a shopper picks several values of one filter"
 msgstr "Wenn jemand mehrere Werte eines Filters wählt"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:933
-msgid "Any: a product that has one of them is shown. All: only a product that has every one of them, for a field a product holds several values of, such as features or tags."
-msgstr "Beliebige: Ein Produkt mit einem davon wird gezeigt. Alle: nur ein Produkt, das jeden davon hat, für ein Feld, von dem ein Produkt mehrere Werte haben kann, etwa Merkmale oder Schlagwörter."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:945
 msgid "Any (OR)"
 msgstr "Beliebige (ODER)"
@@ -5264,3 +5252,84 @@ msgstr "Reihenfolge der Kategorien"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:224
 msgid "Drag them into order under Products > Categories in WooCommerce."
 msgstr "Ziehen Sie sie in WooCommerce unter Produkte > Kategorien in die gewünschte Reihenfolge."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:152
+#: src/admin/settings/components/tabs/IndexingTab.js:215
+msgid "A key that starts with \"_\" belongs to WordPress or a plugin, and is not sent."
+msgstr "Ein Schlüssel, der mit \"_\" beginnt, gehört zu WordPress oder einem Plugin und wird nicht gesendet."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1076
+msgid "Any: a result that has one of them is shown. All: only a result that has every one of them, for a field a result holds several values of, such as features or tags."
+msgstr "Beliebige: Ein Ergebnis mit einem davon wird gezeigt. Alle: nur ein Ergebnis, das jeden davon hat, für ein Feld, von dem ein Ergebnis mehrere Werte haben kann, etwa Merkmale oder Schlagwörter."
+
+#: src/admin/settings/components/tabs/CacheClearCard.js:42
+msgid "Clears this plugin's own cached data and its files in PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own. Other sites on the same server are not touched."
+msgstr "Leert die zwischengespeicherten Daten dieses Plugins und seine Dateien im Opcode-Cache von PHP, damit eine gerade geänderte Einstellung, eine kürzlich aktualisierte Kartenvorlage oder neue beliebte Suchanfragen sofort erscheinen, statt erst, wenn der Cache von selbst abläuft. Andere Websites auf demselben Server bleiben unberührt."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:525
+msgid "Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches."
+msgstr "Kuratieren Sie die Ergebnisse ausgewählter Suchen. Eine Suche nimmt die erste Regel von oben, die zu ihr passt, und keine andere: Eine Regel mit leerem Trigger passt zu jeder Suche, daher gelten die Regeln darunter nie, und ein Produkt, das sie ausblendet, erscheint trotzdem, wo eine Regel darüber passt."
+
+#: src/frontend/search/components/AiAssistant.js:310
+msgid "Describe what you're looking for and I'll find it on this site."
+msgstr "Beschreiben Sie, was Sie suchen - ich finde es auf dieser Website."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:148
+msgid "Enter a boost from 0.1 to 100."
+msgstr "Geben Sie einen Boost von 0,1 bis 100 ein."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:146
+msgid "Enter a full address that starts with https://, or a path on this site that starts with /."
+msgstr "Geben Sie eine vollständige Adresse ein, die mit https:// beginnt, oder einen Pfad auf dieser Website, der mit / beginnt."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:147
+msgid "Enter a weight from 1 to 100."
+msgstr "Geben Sie eine Gewichtung von 1 bis 100 ein."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:618
+msgid "Indexing configuration saved. A sync has started to apply it."
+msgstr "Indexierungskonfiguration gespeichert. Eine Synchronisierung wendet sie jetzt an."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:616
+msgid "Indexing configuration saved. Start a sync on the Sync tab to apply it."
+msgstr "Indexierungskonfiguration gespeichert. Starten Sie eine Synchronisierung im Tab \"Sync\", um sie anzuwenden."
+
+#. translators: %s: one or more quoted field names, e.g. "category".
+#: src/admin/settings/components/tabs/SearchConfigTab.js:102
+#, js-format
+msgid "No document on this site has a %s field, so searching it finds nothing. Choose a field from the list, or start indexing it in the Indexing tab."
+msgid_plural "No document on this site has the fields %s, so searching them finds nothing. Choose fields from the list, or start indexing them in the Indexing tab."
+msgstr[0] "Kein Dokument dieser Website hat ein Feld %s, daher findet eine Suche darin nichts. Wählen Sie ein Feld aus der Liste oder indexieren Sie es künftig im Tab \"Indexierung\"."
+msgstr[1] "Kein Dokument dieser Website hat die Felder %s, daher findet eine Suche darin nichts. Wählen Sie Felder aus der Liste oder indexieren Sie sie künftig im Tab \"Indexierung\"."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:380
+msgid "No sync has run yet."
+msgstr "Es wurde noch keine Synchronisierung ausgeführt."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:379
+msgid "No sync matches the search or the filters."
+msgstr "Keine Synchronisierung passt zur Suche oder zu den Filtern."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:169
+msgid "Some fields need a change: see the messages under them."
+msgstr "Einige Felder müssen geändert werden: Sehen Sie sich die Hinweise darunter an."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:314
+msgid "The newest content"
+msgstr "Die neuesten Inhalte"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:667
+msgid "This term is redirected above already, and only one of the two can be followed."
+msgstr "Dieser Begriff wird weiter oben schon weitergeleitet, und nur eine der beiden Weiterleitungen kann gelten."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1189
+msgid "Use the two-letter codes of the site's languages, such as de or en, separated by commas."
+msgstr "Verwenden Sie die zweistelligen Codes der Sprachen der Website, etwa de oder en, durch Kommas getrennt."
+
+#: src/frontend/search/components/AiAssistant.js:155
+msgid "What's new?"
+msgstr "Was ist neu?"
+
+#: src/frontend/search/components/AiAssistant.js:155
+msgid "Where should I start?"
+msgstr "Womit fange ich an?"
