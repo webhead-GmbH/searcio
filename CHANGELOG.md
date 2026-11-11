@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **Work goes to the `1.x` branch, `master` only takes releases.** Pull requests are opened against `1.x` and merged there; a release merges `1.x` into `master` and is tagged on that merge. `run-tests.yml` runs on pull requests into `master` and into every `*.x` branch, which it did only for `master`. `docs/developers.md` (**Branches**, **Releasing**, **Contributing**), the pull request template and the README say so.
 - **The readme links the live demo.** `readme.txt` and `README.md` point to the demo shop at https://wordpress.demo.searcio.com/en/ and to its admin demo (`?searcio-demo-admin=en`), which opens the plugin's settings and saves nothing.
 
 ## 1.4.0

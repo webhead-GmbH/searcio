@@ -12,6 +12,7 @@
 
 ## Checklist
 
+- [ ] The pull request is opened against `1.x`, not `master`: `master` only takes releases.
 - [ ] Tests are added or updated for the change.
 - [ ] `readme.txt` and `CHANGELOG.md` say what a shop owner notices.
 - [ ] Every new string is translatable with the `searcio` text domain.

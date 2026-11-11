@@ -116,6 +116,7 @@ The user documentation is on searcio.com: https://searcio.com/en/docs/wordpress/
 
 ## Contributing and security
 
+- Open pull requests against the `1.x` branch, where the next 1.* release is made; `master` only takes releases. The [developer guide](docs/developers.md#branches) has the details.
 - Report a bug or suggest a feature with the [issue forms](https://github.com/webhead-GmbH/searcio/issues/new/choose).
 - Report a security vulnerability privately, as the [security policy](.github/SECURITY.md) explains: email support@searcio.com, never a public issue.
 - Everyone taking part follows the [code of conduct](.github/CODE_OF_CONDUCT.md).
