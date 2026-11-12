@@ -131,10 +131,6 @@ msgstr "Opcjonalne. Jeśli pozostanie puste, rząd nie będzie miał tytułu."
 msgid "Product"
 msgstr "Produkt"
 
-#: includes/Elementor/Widgets/Products_Widget.php:88
-msgid "Leave empty to use whichever product the visitor is viewing."
-msgstr "Pozostaw puste, aby użyć produktu, który ogląda odwiedzający."
-
 #: includes/Elementor/Widgets/Products_Widget.php:96
 #: src/blocks/products/edit.js:78
 msgid "Filter field"
@@ -3626,10 +3622,6 @@ msgstr "Produkty o znaczeniu zbliżonym do oglądanego. Wymaga wyszukiwania AI w
 msgid "A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out."
 msgstr "Lista zawężona do jednej kategorii, więc obowiązują Twoje reguły merchandisingu dla tej kategorii - najpierw przypięte produkty, bez ukrytych."
 
-#: src/blocks/products/edit.js:66
-msgid "Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
-msgstr "Pozostaw puste, aby użyć produktu, który ogląda odwiedzający - dzięki temu blok działa w szablonie produktu."
-
 #: src/blocks/products/edit.js:95
 msgid "Shown only when a rule for this category actually carries one."
 msgstr "Wyświetlany tylko wtedy, gdy reguła dla tej kategorii faktycznie go zawiera."
@@ -5376,3 +5368,71 @@ msgstr "Konfiguracja wyszukiwania zapisana. Uruchom synchronizację na karcie Sy
 #: src/admin/settings/components/tabs/SearchConfigTab.js:884
 msgid "Search configuration saved. A sync has started to index the languages."
 msgstr "Konfiguracja wyszukiwania zapisana. Synchronizacja indeksuje teraz języki."
+
+#: includes/Elementor/Widgets/Products_Widget.php:88
+msgid "The ID WordPress shows for the product, such as 119. Leave empty to use whichever product the visitor is viewing."
+msgstr "ID, które WordPress pokazuje dla produktu, np. 119. Pozostaw puste, aby użyć produktu, który odwiedzający właśnie ogląda."
+
+#: includes/Frontend/Product_List_Markup.php:191
+msgid "This row shows the products of the category being viewed, and this page is not a category. Enter a filter value, or place the row on a category template."
+msgstr "Ten wiersz pokazuje produkty oglądanej kategorii, a ta strona nie jest kategorią. Wpisz wartość filtra albo umieść wiersz w szablonie kategorii."
+
+#: includes/Frontend/Product_List_Markup.php:195
+msgid "No product has this ID. Enter the ID WordPress shows for the product, such as 119."
+msgstr "Żaden produkt nie ma tego ID. Wpisz ID, które WordPress pokazuje dla produktu, np. 119."
+
+#: includes/Frontend/Product_List_Markup.php:198
+msgid "This row shows the products like the product being viewed, and this page is not a product. Enter a product ID, or place the row on a product template."
+msgstr "Ten wiersz pokazuje produkty podobne do oglądanego produktu, a ta strona nie jest produktem. Wpisz ID produktu albo umieść wiersz w szablonie produktu."
+
+#: includes/Routing/Connection_Endpoint.php:84
+msgid "No search key is saved, so the site searches with WordPress instead of Searcio. Connect again, or paste the search key under the manual key entry."
+msgstr "Nie zapisano klucza wyszukiwania, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Połącz się ponownie albo wklej klucz wyszukiwania w sekcji „Zaawansowane: ręczne wprowadzanie kluczy”."
+
+#: includes/Routing/Connection_Endpoint.php:93
+msgid "Searcio does not know the search key, so the site searches with WordPress instead of Searcio. Copy it again from the Searcio dashboard, or connect again."
+msgstr "Searcio nie zna klucza wyszukiwania, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Skopiuj go ponownie z panelu Searcio albo połącz się ponownie."
+
+#: includes/Routing/Connection_Endpoint.php:100
+msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. Add the address to the domains of the key in the Searcio dashboard."
+msgstr "Searcio odrzuca klucz wyszukiwania z adresu tej witryny, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Dodaj adres do domen klucza w panelu Searcio."
+
+#: includes/Routing/Settings_Endpoint.php:82
+msgid "That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard."
+msgstr "To nie jest klucz wyszukiwania: klucz zaczyna się od sk_ i nie zawiera spacji. Skopiuj go ponownie z panelu Searcio."
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:67
+msgid "No answer leads to this question, so shoppers never see it. Choose it under \"Then\" for an answer of an earlier question."
+msgstr "Żadna odpowiedź nie prowadzi do tego pytania, więc klienci nigdy go nie widzą. Wybierz je w polu „Następnie” przy odpowiedzi na wcześniejsze pytanie."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:296
+msgid "No answer leads here"
+msgstr "Żadna odpowiedź tu nie prowadzi"
+
+#: src/admin/settings/components/quiz/QuizList.js:334
+msgid "A quiz set to \"Every language\" is offered on the pages of every language. Open it and choose its language if its questions are written in one."
+msgstr "Quiz ustawiony na „Wszystkie języki” jest oferowany na stronach we wszystkich językach. Otwórz go i wybierz jego język, jeśli pytania są napisane w jednym języku."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:859
+msgid "These settings were changed in the Searcio dashboard, or in another window, since this tab read them, and saving would undo that. Nothing was saved. Read them again, then make your change once more."
+msgstr "Te ustawienia zostały zmienione w panelu Searcio lub w innym oknie od czasu, gdy ta karta je odczytała, a zapisanie cofnęłoby tę zmianę. Nic nie zapisano. Odczytaj je ponownie, a następnie wprowadź zmianę jeszcze raz."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1266
+msgid "Read them again"
+msgstr "Odczytaj ponownie"
+
+#: src/blocks/products/edit.js:66
+msgid "The ID WordPress shows for the product, such as 119. Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
+msgstr "ID, które WordPress pokazuje dla produktu, np. 119. Pozostaw puste, aby użyć produktu, który odwiedzający właśnie ogląda - dzięki temu działa to też w szablonie produktu."
+
+#: src/utils/facets.js:96
+msgid "Rating"
+msgstr "Ocena"
+
+#: src/utils/facets.js:97
+msgid "Reviews"
+msgstr "Opinie"
+
+#: src/utils/facets.js:99
+msgid "Attributes"
+msgstr "Atrybuty"
