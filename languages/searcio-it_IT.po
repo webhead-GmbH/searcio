@@ -3107,10 +3107,6 @@ msgstr "Regola %d"
 msgid "Remove rule"
 msgstr "Rimuovi regola"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:424
-msgid "Trigger (search term contains)"
-msgstr "Trigger (il termine di ricerca contiene)"
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:427
 msgid "Empty: this rule applies to every search on the site."
 msgstr "Vuoto: questa regola si applica a ogni ricerca sul sito."
@@ -5409,3 +5405,31 @@ msgstr "Recensioni"
 #: src/utils/facets.js:99
 msgid "Attributes"
 msgstr "Attributi"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:297
+msgid "Purchase price, for profit ranking"
+msgstr "Prezzo d'acquisto, per il ranking per margine"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:337
+msgid "Purchase price from field"
+msgstr "Prezzo d'acquisto dal campo"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:338
+msgid "The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Searcio lifts products with a good margin once profit ranking is on in the Searcio dashboard, and never shows the price or sends it back."
+msgstr "Il prezzo d'acquisto viene letto prima dal costo dei beni di WooCommerce (Cost of goods). Per un negozio che lo tiene nel campo di un plugin per il costo dei beni, inserisci la meta key di quel campo, ad esempio _wc_cog_cost. Searcio mette in evidenza i prodotti con un buon margine quando il ranking per margine è attivo nella dashboard di Searcio, e non mostra né restituisce mai il prezzo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:522
+msgid "Contains the trigger"
+msgstr "Contiene il trigger"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:523
+msgid "Is the trigger itself"
+msgstr "È il trigger stesso"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:573
+msgid "Fires when the search term"
+msgstr "Si attiva quando il termine di ricerca"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:575
+msgid "\"Contains\" fires on \"rain jacket\" for the trigger \"jacket\"; \"is the trigger itself\" only on \"jacket\"."
+msgstr "\"Contiene\" si attiva su \"giacca da pioggia\" per il trigger \"giacca\"; \"è il trigger stesso\" solo su \"giacca\"."
