@@ -46,7 +46,7 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 * **Search by photo** - shoppers upload a photo instead of typing and find products that look like it.
 * **Similar products** - a "you may also like" row on product pages, matched by meaning rather than by shared tags.
 
-AI search and similar products come with every paid plan, and the AI shopping assistant and photo search with the Pro and Business plans. [Compare the plans](https://searcio.com/preise).
+AI search and similar products come with every paid plan, and the AI shopping assistant and photo search with the Pro and Business plans. [Compare the plans](https://searcio.com/en/plans-pricing).
 
 = Fits your site =
 
@@ -97,7 +97,7 @@ If you would like to support Searcio, you can show a small Searcio logo, linked 
 
 Yes. The core search is free forever on Searcio's Free plan, and no payment details are needed: instant results, typo tolerance, autocomplete, filters, merchandising, search redirects, the product finder and search statistics, with a monthly allowance of searches and indexed documents made for small shops and blogs.
 
-When you want AI search, the AI shopping assistant, photo search, more languages or higher limits, upgrade to a paid plan whenever you like. [See the plans and pricing](https://searcio.com/preise).
+When you want AI search, the AI shopping assistant, photo search, more languages or higher limits, upgrade to a paid plan whenever you like. [See the plans and pricing](https://searcio.com/en/plans-pricing).
 
 = Do I have to sign up somewhere? =
 
@@ -170,7 +170,7 @@ This plugin sends data to Searcio, the hosted service that powers the search. Se
 
 * **Before you connect:** opening the Connection tab asks Searcio for the current addresses of its terms of use, privacy policy and data processing agreement, to link them beside the consent boxes. Nothing about your site is sent.
 * **When you connect:** the site's name and address, whether it runs WooCommerce, the site's admin email address (or the one you enter under "Not this email?"), the name of the admin who connects, which agreements you accepted, and an address on your site with a one-time code. Searcio uses them to create your account, or to find the one you have, and calls that address once to confirm that the site is yours.
-* **When you sync:** the content you chose to index - for example a post's title, text and link.
+* **When you sync:** the content you chose to index - for example a post's title, text and link - and, if you turn on the purchase price on the Indexing tab, what each product costs your shop, which Searcio uses to rank and never shows or returns.
 * **When you make or change a quiz on the Product finder tab:** the quiz - its name, language, questions, answers and the conditions each answer filters by - which Searcio stores and shows in the product finder. Opening the tab asks Searcio for the site's quizzes and for the values of its filters, and checking a quiz's endings sends its questions to count the products at the end of each way through it. These requests carry the site's keys.
 * **When you save the Search Config tab:** the search configuration you set there - weights, filters, synonyms, the searches never offered as popular searches, merchandising rules and redirects - and the shop's currency, which Searcio stores and applies.
 * **While you are connected:** the Connection and Search Config tabs, Site Health and the daily sync ask Searcio for the site's status, its search configuration and what your plan has used this month. These requests carry the site's keys and nothing else, except that the daily sync also sends the shop's currency, which the AI shopping assistant writes prices in.
@@ -221,6 +221,8 @@ Legal notice: https://searcio.com/impressum
 - A product row accepts the product's ID as WordPress shows it, and the Elementor editor says why a row is empty.
 - The product finder names each answer by its question, and its editor marks a question no answer leads to.
 - On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.
+- The purchase price of your products can be sent for Searcio's profit ranking (Indexing tab, Purchase price): from WooCommerce's Cost of goods, or from the field of a cost of goods plugin. It is never shown to shoppers.
+- A merchandising rule can fire only on a search for its trigger itself, not on every search that contains it, and a rule set that way in the Searcio dashboard keeps it when the Search Config tab saves.
 
 = 1.4.0 =
 - Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.

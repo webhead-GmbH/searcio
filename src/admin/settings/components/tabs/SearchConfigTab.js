@@ -512,11 +512,15 @@ const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
 	// inputs are uncontrolled and show whatever the row at this index held.
 	const add = () => onChange( [
 		...rules,
-		{ query: '', filter_field: '', filter_value: '', pinned: [], hidden: [], banner: '', lang: null },
+		{ query: '', filter_field: '', filter_value: '', pinned: [], hidden: [], banner: '', lang: null, match: null },
 	] );
 	const languageItems = [
 		{ value: null, label: __( 'Every language', 'searcio' ) },
 		...languages.map( ( language ) => ( { value: language.code, label: `${ language.name } (${ language.code })` } ) ),
+	];
+	const matchItems = [
+		{ value: null, label: __( 'Contains the trigger', 'searcio' ) },
+		{ value: 'exact', label: __( 'Is the trigger itself', 'searcio' ) },
 	];
 
 	return (
@@ -555,15 +559,23 @@ const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
 							</Card.Header>
 							<Card.Content className="whsc-card__content">
 								<Stack direction="column" gap="md">
-									<InputControl
-										label={ __( 'Trigger (search term contains)', 'searcio' ) }
-										description={ rowError( errors, 'merchandising', index, 'query' )
-											|| ( '' === rule.query
-												? __( 'Empty: this rule applies to every search on the site.', 'searcio' )
-												: undefined ) }
-										value={ rule.query }
-										onValueChange={ ( query ) => update( index, { ...rule, query } ) }
-									/>
+									<Grid auto={ 220 } gap="var(--wpds-dimension-gap-md)" align="start">
+										<InputControl
+											label={ __( 'Trigger', 'searcio' ) }
+											description={ rowError( errors, 'merchandising', index, 'query' )
+												|| ( '' === rule.query
+													? __( 'Empty: this rule applies to every search on the site.', 'searcio' )
+													: undefined ) }
+											value={ rule.query }
+											onValueChange={ ( query ) => update( index, { ...rule, query } ) }
+										/>
+										<SelectControl
+											label={ __( 'Fires when the search term', 'searcio' ) }
+											description={ rowError( errors, 'merchandising', index, 'match' )
+												|| __( '"Contains" fires on "rain jacket" for the trigger "jacket"; "is the trigger itself" only on "jacket".', 'searcio' ) }
+											{ ...selectProps( matchItems, rule.match ?? null, ( match ) => update( index, { ...rule, match } ) ) }
+										/>
+									</Grid>
 									{ languages.length > 1 && (
 										<SelectControl
 											label={ __( 'Language', 'searcio' ) }

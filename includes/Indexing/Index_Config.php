@@ -715,6 +715,7 @@ final class Index_Config {
 		}
 
 		$woo['attributes'] = [];
+		$woo['cost_meta']  = '';
 
 		return $woo;
 	}
@@ -730,6 +731,10 @@ final class Index_Config {
 		foreach ( array_keys( Woo::TOGGLE_FIELDS ) as $toggle ) {
 			$normalized[ $toggle ] = ! empty( $woo[ $toggle ] );
 		}
+
+		// The meta key a cost of goods plugin keeps the purchase price in, read
+		// where WooCommerce's own "Cost of goods" has none (Woo::cost_price()).
+		$normalized['cost_meta'] = is_string( $woo['cost_meta'] ?? null ) ? (string) preg_replace( '/[^A-Za-z0-9_\-]/', '', $woo['cost_meta'] ) : '';
 
 		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
 		$normalized['attributes'] = array_values(

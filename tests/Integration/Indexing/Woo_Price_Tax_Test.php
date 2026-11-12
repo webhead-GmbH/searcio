@@ -314,6 +314,37 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * A purchase price is entered without tax. Profit ranking works the
+	 * margin out between it and the price sent, so where that price carries
+	 * tax the purchase price is taxed as it is: 50 net beside 119 gross read
+	 * as a margin of 58% where it is 50%.
+	 */
+	public function test_the_purchase_price_is_sent_on_the_basis_of_the_price(): void {
+		update_option( 'woocommerce_feature_cost_of_goods_sold_enabled', 'no' );
+
+		$woo = [ 'price' => true, 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ];
+
+		$this->tax_shop( false, 'incl' );
+
+		$taxed  = $this->simple( '100' );
+		$exempt = $this->simple( '100', '', 'none' );
+		update_post_meta( $taxed, '_wc_cog_cost', '50' );
+		update_post_meta( $exempt, '_wc_cog_cost', '50' );
+
+		$this->assertSame( 59.5, $this->woo->product_fields( get_post( $taxed ), $woo )['cost_price'] );
+		$this->assertSame( 50.0, $this->woo->product_fields( get_post( $exempt ), $woo )['cost_price'], 'A product that is not taxable.' );
+
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+
+		$this->assertSame( 50.0, $this->woo->product_fields( get_post( $taxed ), $woo )['cost_price'], 'Prices shown without tax.' );
+
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		update_option( 'woocommerce_calc_taxes', 'no' );
+
+		$this->assertSame( 50.0, $this->woo->product_fields( get_post( $taxed ), $woo )['cost_price'], 'Taxes switched off.' );
+	}
+
+	/**
 	 * A shop in Germany with one 19% standard rate. Tax is worked out for the
 	 * shop base whoever runs the sync, so the guest customer WooCommerce made
 	 * at `init` for the test process (located at the install default, US:CA)

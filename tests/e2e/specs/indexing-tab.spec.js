@@ -43,10 +43,11 @@ const PRODUCT = {
 /**
  * The catalogue `Index_Config::catalog()` answers with, for one post type.
  *
- * @param {Object} config The product's mapping.
+ * @param {Object}   config  The product's mapping.
+ * @param {string[]} toggles The product details offered.
  * @return {Object} The `/indexing/config` response.
  */
-const catalog = ( config ) => ( {
+const catalog = ( config, toggles = [] ) => ( {
 	post_types: [ { ...PRODUCT, config } ],
 	sources: [
 		{ value: 'property:title', label: 'Post title' },
@@ -55,7 +56,7 @@ const catalog = ( config ) => ( {
 		{ value: 'property:permalink', label: 'Permalink (URL)' },
 		{ value: 'property:thumbnail', label: 'Featured image' },
 	],
-	woo: { active: true, meets_minimum: true, version: '11.2.0', minimum: '8.0', attributes: [], toggles: [] },
+	woo: { active: true, meets_minimum: true, version: '11.2.0', minimum: '8.0', attributes: [], toggles },
 	languages: { active: false, available: [] },
 	indexed_fields: [ 'title', 'content', 'type', 'url' ],
 	config_version: 1,
@@ -66,20 +67,21 @@ const catalog = ( config ) => ( {
  * sent, capturing each save's body.
  *
  * @param {import('@playwright/test').Page} page
- * @param {Array}                           sent Receives each save's body.
+ * @param {Array}                           sent    Receives each save's body.
+ * @param {string[]}                        toggles The product details offered.
  */
-async function mockCatalog( page, sent ) {
+async function mockCatalog( page, sent, toggles = [] ) {
 	await page.route(
 		// Decode first: with plain permalinks apiFetch hits `?rest_route=…`.
 		( url ) => decodeURIComponent( url.href ).includes( '/indexing/config' ),
 		( route ) => {
-			let body = catalog( PRODUCT.config );
+			let body = catalog( PRODUCT.config, toggles );
 
 			if ( 'GET' !== route.request().method() ) {
 				const data = route.request().postDataJSON();
 
 				sent.push( data );
-				body = catalog( data.config.product );
+				body = catalog( data.config.product, toggles );
 			}
 
 			return route.fulfill( {
@@ -161,5 +163,29 @@ test.describe( 'Indexing tab', () => {
 		// Drawn again from what the save answered, the row still names its taxonomy.
 		await expect( from ).toHaveText( 'Taxonomy' );
 		await expect( taxonomy ).toHaveText( 'Brands' );
+	} );
+
+	/**
+	 * Searcio's profit ranking needs what a product costs the shop, which a
+	 * cost of goods plugin keeps under a meta key of its own.
+	 */
+	test( 'asks where the purchase price is kept once it is sent, and saves both', async ( { page } ) => {
+		const sent = [];
+
+		await mockCatalog( page, sent, [ 'price', 'cost_price' ] );
+		await page.goto( SETTINGS_URL );
+
+		const card = page.locator( '.whsc-post-type-card' ).filter( { has: page.getByRole( 'heading', { name: 'Products' } ) } );
+		const field = card.getByRole( 'textbox', { name: 'Purchase price from field' } );
+
+		await card.getByRole( 'checkbox', { name: 'Purchase price, for profit ranking' } ).check( LOADED );
+		await field.fill( '_wc_cog_cost' );
+		await page.getByRole( 'button', { name: 'Save indexing configuration' } ).click();
+
+		await expect.poll( () => sent.length ).toBe( 1 );
+		expect( sent[ 0 ].config.product.woo ).toMatchObject( { cost_price: true, cost_meta: '_wc_cog_cost' } );
+
+		await card.getByRole( 'checkbox', { name: 'Purchase price, for profit ranking' } ).uncheck();
+		await expect( field ).toHaveCount( 0 );
 	} );
 } );

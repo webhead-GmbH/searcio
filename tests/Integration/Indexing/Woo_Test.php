@@ -60,13 +60,15 @@ final class Woo_Test extends Integration_Test_Case {
 		$woo = array_fill_keys( array_keys( Woo::TOGGLE_FIELDS ), true );
 
 		$woo['attributes'] = [ self::ATTRIBUTE ];
+		$woo['cost_meta']  = '_wc_cog_cost';
 
 		return $woo;
 	}
 
 	/**
 	 * A simple product carrying a value for every field a simple product can
-	 * have: a sale, a SKU, a category, a tag and an attribute term.
+	 * have: a sale, a SKU, a purchase price, a category, a tag and an
+	 * attribute term.
 	 */
 	private function make_complete_simple_product(): int {
 		register_taxonomy( self::ATTRIBUTE, 'product' );
@@ -81,6 +83,7 @@ final class Woo_Test extends Integration_Test_Case {
 		$product->set_status( 'publish' );
 		$product->set_attributes( [ $this->local_attribute( 'Weight', [ '250 g' ] ) ] );
 		$product->save();
+		update_post_meta( $product->get_id(), '_wc_cog_cost', '20' );
 
 		$terms = [ 'product_cat' => 'Outerwear', 'product_tag' => 'Winter', self::ATTRIBUTE => 'Matte' ];
 
@@ -126,6 +129,7 @@ final class Woo_Test extends Integration_Test_Case {
 	 * The drift guard for the Search Config tab's suggestions: `field_names()`
 	 * must name exactly what `product_fields()` writes across both product
 	 * kinds - nothing missing, and nothing (like `tags`) that no product has.
+	 * The fields written for Searcio alone are the one exception.
 	 */
 	public function test_field_names_are_exactly_the_fields_products_are_written_with(): void {
 		$woo = $this->every_toggle();
@@ -134,7 +138,8 @@ final class Woo_Test extends Integration_Test_Case {
 		$variable = $this->woo->product_fields( get_post( $this->make_variable_product() ), $woo );
 		$written  = array_values( array_unique( array_merge( array_keys( $simple ), array_keys( $variable ) ) ) );
 
-		$this->assertEqualsCanonicalizing( $written, $this->woo->field_names( $woo ) );
+		$this->assertContains( 'cost_price', $written );
+		$this->assertEqualsCanonicalizing( array_values( array_diff( $written, Woo::PRIVATE_FIELDS ) ), $this->woo->field_names( $woo ) );
 	}
 
 	/**
@@ -229,7 +234,8 @@ final class Woo_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * A built product document carries nothing the indexed-field list omits.
+	 * A built product document carries nothing the indexed-field list omits,
+	 * but for the fields written for Searcio alone.
 	 */
 	public function test_every_field_a_built_product_document_carries_is_listed(): void {
 		$woo                 = $this->every_toggle();
@@ -255,7 +261,7 @@ final class Woo_Test extends Integration_Test_Case {
 
 		$unlisted = array_diff( array_keys( $document ), [ 'id' ], $this->service( 'index_config' )->indexed_fields() );
 
-		$this->assertSame( [], array_values( $unlisted ) );
+		$this->assertSame( Woo::PRIVATE_FIELDS, array_values( $unlisted ) );
 	}
 
 	public function test_is_active_and_meets_minimum(): void {
@@ -683,6 +689,109 @@ final class Woo_Test extends Integration_Test_Case {
 
 		$this->assertSame( [ 'Gewicht: 250g', 'Gewicht: 1kg', 'Röstung: Wiener' ], $fields['custom_attributes'] );
 		$this->assertArrayNotHasKey( 'custom_attributes', $this->woo->product_fields( get_post( $product->get_id() ), [] ) );
+	}
+
+	/**
+	 * Searcio's profit ranking works a product's margin out from what it costs
+	 * the shop. A cost of goods plugin keeps that in a meta key of its own,
+	 * often with a decimal comma.
+	 */
+	public function test_the_purchase_price_is_read_from_the_meta_key_the_mapping_names(): void {
+		$this->cost_of_goods( false );
+
+		$product = $this->product( 'visible' )->get_id();
+		update_post_meta( $product, '_wc_cog_cost', '12,50' );
+
+		$this->assertSame( 12.5, $this->cost( $product, [ 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ] ) );
+		$this->assertNull( $this->cost( $product, [ 'cost_meta' => '_wc_cog_cost' ] ), 'Not asked for.' );
+		$this->assertNull( $this->cost( $product, [ 'cost_price' => true, 'cost_meta' => '' ] ), 'No field named and Cost of goods off.' );
+	}
+
+	public function test_a_product_without_a_purchase_price_is_sent_none(): void {
+		$this->cost_of_goods( false );
+
+		$woo = [ 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ];
+
+		foreach ( [ '', '0', '-4', 'n/a' ] as $value ) {
+			$product = $this->product( 'visible' )->get_id();
+			update_post_meta( $product, '_wc_cog_cost', $value );
+
+			$this->assertNull( $this->cost( $product, $woo ), 'A purchase price of "' . $value . '".' );
+		}
+
+		$this->assertNull( $this->cost( $this->product( 'visible' )->get_id(), $woo ), 'No meta value at all.' );
+	}
+
+	/**
+	 * A variable product is sent its cheapest variation's price, so its margin
+	 * is that variation's. A variation with no purchase price of its own has
+	 * the product's.
+	 */
+	public function test_a_variable_products_purchase_price_is_its_cheapest_variations(): void {
+		$this->cost_of_goods( false );
+
+		$woo      = [ 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ];
+		$variable = $this->make_variable_product();
+		$children = wc_get_product( $variable )->get_children();
+		$prices   = array_map( static fn ( int $id ): float => (float) wc_get_product( $id )->get_price(), $children );
+		$cheapest = $children[ array_search( min( $prices ), $prices, true ) ];
+		$dearest  = $children[ array_search( max( $prices ), $prices, true ) ];
+
+		update_post_meta( $cheapest, '_wc_cog_cost', '4' );
+		update_post_meta( $dearest, '_wc_cog_cost', '9' );
+
+		$this->assertSame( 4.0, $this->cost( $variable, $woo ) );
+
+		delete_post_meta( $cheapest, '_wc_cog_cost' );
+		update_post_meta( $variable, '_wc_cog_cost', '6' );
+
+		$this->assertSame( 6.0, $this->cost( $variable, $woo ), 'The product\'s, for a variation with none.' );
+	}
+
+	/**
+	 * WooCommerce's own "Cost of goods" comes first; the meta key is for a
+	 * shop that keeps the price elsewhere.
+	 */
+	public function test_woocommerces_cost_of_goods_comes_before_the_meta_key(): void {
+		$product = $this->product( 'visible' );
+
+		if ( ! method_exists( $product, 'set_cogs_value' ) ) {
+			$this->markTestSkipped( 'This WooCommerce has no Cost of goods.' );
+		}
+
+		$this->cost_of_goods( true );
+
+		$product = wc_get_product( $product->get_id() );
+		$product->set_cogs_value( 18.0 );
+		$product->save();
+		update_post_meta( $product->get_id(), '_wc_cog_cost', '30' );
+
+		$this->assertSame( 18.0, $this->cost( $product->get_id(), [ 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ] ) );
+		$this->assertSame( 18.0, $this->cost( $product->get_id(), [ 'cost_price' => true, 'cost_meta' => '' ] ) );
+
+		$this->cost_of_goods( false );
+
+		$this->assertSame( 30.0, $this->cost( $product->get_id(), [ 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ] ), 'The meta key once Cost of goods is off.' );
+	}
+
+	/**
+	 * Searcio never returns the purchase price and refuses it as a field to
+	 * search, filter or suggest, so Search Config is not offered it.
+	 */
+	public function test_the_purchase_price_is_written_but_never_offered_as_a_field(): void {
+		$this->assertNotContains( 'cost_price', $this->woo->field_names( [ 'cost_price' => true, 'price' => true ] ) );
+		$this->assertSame( [ 'cost_price' ], Woo::PRIVATE_FIELDS );
+	}
+
+	private function cost_of_goods( bool $on ): void {
+		update_option( 'woocommerce_feature_cost_of_goods_sold_enabled', $on ? 'yes' : 'no' );
+	}
+
+	/**
+	 * @param array<string,mixed> $woo
+	 */
+	private function cost( int $product_id, array $woo ): ?float {
+		return $this->woo->product_fields( get_post( $product_id ), $woo )['cost_price'] ?? null;
 	}
 
 	/**

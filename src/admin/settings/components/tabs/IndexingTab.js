@@ -245,7 +245,7 @@ export const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 	);
 };
 
-const WooSection = ({woo, block, onChange}) => {
+export const WooSection = ({woo, block, onChange}) => {
 	if (!woo.active) {
 		return (
 			<Notice.Root intent="info">
@@ -292,6 +292,9 @@ const WooSection = ({woo, block, onChange}) => {
 		// The attributes a product defines for itself, which the list of the
 		// shop's own attributes below does not have.
 		custom_attributes: __('Product-specific attributes', 'searcio'),
+		// What a product costs the shop, for Searcio's profit ranking. Searcio
+		// never shows it or sends it back.
+		cost_price: __('Purchase price, for profit ranking', 'searcio'),
 	};
 
 	const toggleAttribute = (slug, checked) => {
@@ -329,6 +332,15 @@ const WooSection = ({woo, block, onChange}) => {
 						/>
 					))}
 				</Grid>
+				{wooConfig.cost_price && (
+					<InputControl
+						label={__('Purchase price from field', 'searcio')}
+						description={__('The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Searcio lifts products with a good margin once profit ranking is on in the Searcio dashboard, and never shows the price or sends it back.', 'searcio')}
+						placeholder="_wc_cog_cost"
+						value={wooConfig.cost_meta || ''}
+						onValueChange={(value) => setWoo('cost_meta', value)}
+					/>
+				)}
 			</Section>
 
 			{woo.attributes.length > 0 && (

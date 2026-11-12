@@ -400,6 +400,36 @@ test.describe( 'Search Config tab', () => {
 	} );
 
 	/**
+	 * A rule set to fire on its trigger alone in the Searcio dashboard came
+	 * back as "contains" from any save of the rules: the tab dropped `match`.
+	 */
+	test( 'keeps a rule that fires on its trigger alone, and saves "contains" unsaid', async ( { page } ) => {
+		const sent = [];
+		const config = { ...CONFIG, merchandising: [ { ...CONFIG.merchandising[ 0 ], match: 'exact' } ] };
+
+		await mockSearchConfig( page, sent, config );
+		await page.goto( SETTINGS_URL );
+
+		const rule = page.locator( '.whsc-merchandising-rule' ).first();
+		const match = rule.getByRole( 'combobox', { name: 'Fires when the search term' } );
+
+		await expect( match ).toHaveText( 'Is the trigger itself', LOADED );
+
+		await rule.getByLabel( 'Promotional banner' ).fill( 'Winter shoe sale' );
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.merchandising[ 0 ] ).toMatchObject( { banner: 'Winter shoe sale', match: 'exact' } );
+
+		await match.click();
+		await page.getByRole( 'option', { name: 'Contains the trigger' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 1 );
+
+		expect( sent[ sent.length - 1 ].body.merchandising[ 0 ] ).not.toHaveProperty( 'match' );
+	} );
+
+	/**
 	 * The tab may show what it read some minutes ago, and the same settings
 	 * can be changed in the Searcio panel meanwhile. A save sends what was
 	 * changed here and leaves the rest as Searcio has it.

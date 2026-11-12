@@ -119,6 +119,33 @@ final class Index_Config_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * The field the purchase price is read from is a meta key and is kept as
+	 * one; a mapping saved before the field existed has none.
+	 */
+	public function test_the_purchase_price_field_is_kept_as_a_meta_key(): void {
+		if ( ! post_type_exists( 'product' ) ) {
+			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+
+		$this->assertFalse( $this->config()->defaults_for( 'product' )['woo']['cost_price'], 'Off until the shop turns it on.' );
+		$this->assertSame( '', $this->config()->defaults_for( 'product' )['woo']['cost_meta'] );
+
+		$block = $this->block( 'product' );
+
+		$block['woo']['cost_price'] = true;
+		$block['woo']['cost_meta']  = " _wc_cog_cost' OR 1";
+		$this->config()->save( [ 'product' => $block ] );
+
+		$this->assertTrue( $this->config()->all()['product']['woo']['cost_price'] );
+		$this->assertSame( '_wc_cog_costOR1', $this->config()->all()['product']['woo']['cost_meta'] );
+
+		unset( $block['woo']['cost_meta'] );
+		$this->config()->save( [ 'product' => $block ] );
+
+		$this->assertSame( '', $this->config()->all()['product']['woo']['cost_meta'] );
+	}
+
+	/**
 	 * The Search Config tab reads the list from `GET /indexing/config`, which
 	 * returns the catalog verbatim.
 	 */
