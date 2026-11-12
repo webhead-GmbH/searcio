@@ -108,6 +108,22 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * A secret corrected under the same write key read what the right pair
+	 * had answered before, as a wrong one did: the kept answers are named
+	 * after the pair.
+	 */
+	public function test_a_secret_entered_anew_reads_afresh(): void {
+		$this->connect_client();
+		$calls = $this->count_requests( [ 'site' => [ 'id' => 7 ] ] );
+
+		$this->client()->health();
+		$this->settings()->set( \Webhead\WP\SearchCloud\Settings\Plugin_Settings::WRITE_SECRET, \Webhead\WP\SearchCloud\Settings\Plugin_Settings::encrypt_secret( 'another-write-secret' ) );
+		$this->client()->health();
+
+		$this->assertSame( 2, $calls->get );
+	}
+
+	/**
 	 * Answers every request with `$body` and counts the GETs.
 	 *
 	 * @param  array<string,mixed>  $body

@@ -20,7 +20,7 @@ const SECRET_PLACEHOLDER = '••••••••••••';
  * copies the resulting keys back here) and for key rotation. Collapsed by
  * default; the parent expands it automatically on `pending_claim` or a `409`.
  */
-const ManualConnectionEntry = ({pendingClaim}) => {
+const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 	const {settings, updateSetting, saveSettings, saveError, clearSaveError, isSaving, isLoading, hasUnsavedChanges} =
 		useContext(SettingsContext);
 
@@ -42,8 +42,19 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 
 		setWriteKey('');
 		setWriteSecret('');
+		// The answer of a test before the save is of the keys it replaced:
+		// "The keys are wrong" stayed under the right ones until a reload.
+		setResult(null);
+		forgetAll();
+		onSaved?.();
 
 		showToast(__('Connection settings saved.', 'searcio'), 'success');
+	};
+
+	// A key being typed is not the one the last test was of.
+	const changeKey = (key, value) => {
+		setResult(null);
+		updateSetting(key, value);
 	};
 
 	const onTest = async () => {
@@ -111,7 +122,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				label={__('Search key', 'searcio')}
 				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'searcio')}
 				value={settings.search_key ?? ''}
-				onValueChange={(value) => updateSetting('search_key', value)}
+				onValueChange={(value) => changeKey('search_key', value)}
 			/>
 			<InputControl
 				type="password"
@@ -126,7 +137,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				value={writeKey}
 				onValueChange={(value) => {
 					setWriteKey(value);
-					updateSetting('write_key', value);
+					changeKey('write_key', value);
 				}}
 			/>
 			<InputControl
@@ -142,7 +153,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				value={writeSecret}
 				onValueChange={(value) => {
 					setWriteSecret(value);
-					updateSetting('write_secret', value);
+					changeKey('write_secret', value);
 				}}
 			/>
 

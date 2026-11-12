@@ -330,10 +330,14 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * Named after the write key as well: keys entered anew read afresh.
+	 * Named after the write key and the secret as well: keys entered anew read
+	 * afresh. After the write key alone, a secret corrected under the same key
+	 * read what the right pair had answered earlier, and a wrong one too.
 	 */
 	private function read_key( string $name ): Cache_Key {
-		return $this->cache_manager->key( $name . '_' . substr( wp_hash( $this->write_key() ), 0, 12 ), self::READS );
+		[ $write_key, $write_secret ] = $this->credentials();
+
+		return $this->cache_manager->key( $name . '_' . substr( wp_hash( $write_key . '|' . $write_secret ), 0, 12 ), self::READS );
 	}
 
 	/**

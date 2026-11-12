@@ -217,6 +217,7 @@ Legal notice: https://searcio.com/impressum
 - A quiz published in the Product finder tab shows on the shop's next page, not some minutes later.
 - Product rows set to Searcio templates draw them, and a card designed in Searcio looks on the site as it does in the Searcio panel.
 - The comparison table leaves out internal fields, a product on backorder says so, and a wrong search key is refused and reported by Test connection.
+- Keys entered by hand on the Connection tab are checked again as soon as they are saved, where an earlier "wrong keys" stayed until the page was reloaded.
 - A product row accepts the product's ID as WordPress shows it, and the Elementor editor says why a row is empty.
 - The product finder names each answer by its question, and its editor marks a question no answer leads to.
 - On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.

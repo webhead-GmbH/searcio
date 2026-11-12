@@ -199,6 +199,36 @@ test.describe( 'Connection tab allowances', () => {
 	} );
 
 	/**
+	 * Wrong keys saved by hand were answered "wrong" once, and that answer
+	 * stayed: the right keys saved after them still read "wrong" until the
+	 * page was loaded again. A save checks the connection anew.
+	 */
+	test( 'checks the connection again once keys are saved by hand', async ( { page } ) => {
+		let answer = { ok: false, status: 401, message: 'Searcio does not know these keys.' };
+		let checks = 0;
+
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/connection/test' ),
+			( route ) => {
+				checks++;
+
+				return route.fulfill( { status: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify( answer ) } );
+			}
+		);
+		await page.goto( CONNECTION_URL );
+		await expect( page.getByText( 'Searcio does not know these keys.' ).first() ).toBeVisible( LOADED );
+
+		answer = HEALTH;
+		await page.getByRole( 'button', { name: /manual key entry/i } ).click();
+		await page.getByLabel( 'Search key' ).fill( 'sk_e2erecheck' );
+		await page.getByRole( 'button', { name: 'Save connection' } ).click();
+
+		await expect( page.getByText( 'Connected - 96 / 300,000 documents indexed.', { exact: false } ).first() ).toBeVisible( LOADED );
+		await expect( page.getByText( 'Searcio does not know these keys.' ) ).toHaveCount( 0 );
+		expect( checks ).toBeGreaterThan( 1 );
+	} );
+
+	/**
 	 * wp-admin is written in the language of the user's profile, and a browser
 	 * is often set to another one. A number then has to follow the screen: a
 	 * Persian browser used to put "۲۷۰٬۰۰۰ of ۳۰۰٬۰۰۰" into the English sentence.
