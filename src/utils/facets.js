@@ -17,8 +17,16 @@ export const toggleSelection = ( list, value ) =>
 export const buildTypeParam = ( scopeType, activeTypes ) =>
 	scopeType || ( ( activeTypes || [] ).length > 0 ? activeTypes.join( ',' ) : '' );
 
-/** Every facet key in a `/search` response other than the built-in `types`, which type-filter chips already render separately. */
-export const extractFieldFacets = ( facets ) => {
+/**
+ * Every facet key in a `/search` response other than the built-in `types`,
+ * which type-filter chips already render separately, and the fields the
+ * storefront config marks `hidden`.
+ *
+ * @param {Object}   facets
+ * @param {string[]} [hidden] Fields not to draw: the category field the category filter is not drawn from.
+ * @return {Object<string,Array<Object>>}
+ */
+export const extractFieldFacets = ( facets, hidden = [] ) => {
 	const out = {};
 
 	Object.entries( facets || {} ).forEach( ( [ field, values ] ) => {
@@ -26,7 +34,7 @@ export const extractFieldFacets = ( facets ) => {
 		// numeric field, which has no `.keyword` to bucket on. Keeping it here
 		// would render a group heading with no chips beneath it; those fields
 		// are picked up as range controls instead.
-		if ( 'types' !== field && Array.isArray( values ) && values.length > 0 ) {
+		if ( 'types' !== field && ! hidden.includes( field ) && Array.isArray( values ) && values.length > 0 ) {
 			out[ field ] = values;
 		}
 	} );
@@ -77,7 +85,10 @@ export const buildFilterParams = ( activeFacets, extra = {} ) => {
  */
 const KNOWN_FIELD_LABELS = () => ( {
 	categories: __( 'Categories', 'searcio' ),
+	// The same categories as a tree: on the storefront it is the category filter.
+	category_paths: __( 'Categories', 'searcio' ),
 	product_tags: __( 'Tags', 'searcio' ),
+	brands: __( 'Brands', 'searcio' ),
 	stock_status: __( 'Stock status', 'searcio' ),
 	in_stock: __( 'In stock', 'searcio' ),
 	on_sale: __( 'On sale', 'searcio' ),
@@ -626,6 +637,81 @@ export const detectFacetDisplay = ( field, values, config = {} ) => {
 	return 'list';
 };
 
+/** What joins two levels of a category path: "Fahrwerke > Gewindefahrwerke". */
+export const PATH_SEPARATOR = ' > ';
+
+/**
+ * The last level of a category path, the category's own name.
+ *
+ * @param {string} value "Fahrwerke > Gewindefahrwerke > MTS Technik"
+ * @return {string} "MTS Technik"
+ */
+export const pathLabel = ( value ) => {
+	const text = String( value ?? '' );
+	const at = text.lastIndexOf( PATH_SEPARATOR );
+
+	return at < 0 ? text : text.slice( at + PATH_SEPARATOR.length );
+};
+
+/**
+ * The path one level up, or undefined for a main category.
+ *
+ * @param {string} value
+ * @return {string|undefined}
+ */
+const pathParent = ( value ) => {
+	const text = String( value ?? '' );
+	const at = text.lastIndexOf( PATH_SEPARATOR );
+
+	return at < 0 ? undefined : text.slice( 0, at );
+};
+
+/**
+ * How a value of a filter reads where it is shown: a category drawn from its
+ * path by its own name, any other value as it is.
+ *
+ * @param {string} value
+ * @param {{tree?: {paths?: boolean}}} [facet] The field's entry in the storefront config's `facets`.
+ * @return {string}
+ */
+export const facetValueLabel = ( value, facet ) => ( facet?.tree?.paths ? pathLabel( value ) : String( value ?? '' ) );
+
+/**
+ * The values of the category filter in the order the shop asked for: as it
+ * sorted them in WooCommerce (`valuesOrder`, with a value missing from it after
+ * the ones it lists, in the order given), by name, or in the order given,
+ * which is by count. In a tree, siblings keep this order.
+ *
+ * @param {Array<{value: string}>} entries
+ * @param {{sort?: string, valuesOrder?: string[], tree?: Object}} [facet]
+ * @param {string} [locale]
+ * @return {Array<{value: string}>}
+ */
+export const sortCategoryValues = ( entries, facet, locale ) => {
+	const list = [ ...( entries || [] ) ];
+
+	if ( 'name' === facet?.sort ) {
+		return list.sort( ( a, b ) => facetValueLabel( a.value, facet ).localeCompare(
+			facetValueLabel( b.value, facet ),
+			locale || undefined,
+			{ numeric: true, sensitivity: 'base' }
+		) );
+	}
+
+	if ( 'shop' === facet?.sort && Array.isArray( facet.valuesOrder ) && facet.valuesOrder.length > 0 ) {
+		const rank = new Map( facet.valuesOrder.map( ( value, index ) => [ value, index ] ) );
+		const at = ( entry ) => ( rank.has( entry.value ) ? rank.get( entry.value ) : Infinity );
+
+		// Two values the order does not list stay as they came.
+		return list
+			.map( ( entry, index ) => [ entry, index ] )
+			.sort( ( [ a, i ], [ b, j ] ) => ( at( a ) - at( b ) ) || i - j )
+			.map( ( [ entry ] ) => entry );
+	}
+
+	return list;
+};
+
 /**
  * The entries of a filter as the shop's tree: each under its parent, the
  * levels past `depth` left out. An entry that is selected stays whatever its
@@ -633,8 +719,11 @@ export const detectFacetDisplay = ( field, values, config = {} ) => {
  * is not among the entries goes under its nearest ancestor that is, or starts
  * the list: a search answers with the values it has, not with the shop's tree.
  *
+ * The parents are `tree.parents`, value => parent, or, with `tree.paths`, the
+ * values themselves: each is a path that holds its parent.
+ *
  * @param {Array<{value: string, selected?: boolean}>} entries In the order siblings are to keep.
- * @param {{depth: number, parents: Object<string,string>}} [tree]
+ * @param {{depth: number, parents?: Object<string,string>, paths?: boolean}} [tree]
  * @return {Array<Object>} The entries, each with its `level`, 0 for a main one.
  */
 export const arrangeTree = ( entries, tree ) => {
@@ -645,7 +734,9 @@ export const arrangeTree = ( entries, tree ) => {
 	}
 
 	const parents = tree.parents || {};
-	const parentOf = ( value ) => ( Object.prototype.hasOwnProperty.call( parents, value ) ? parents[ value ] : undefined );
+	const parentOf = tree.paths
+		? pathParent
+		: ( value ) => ( Object.prototype.hasOwnProperty.call( parents, value ) ? parents[ value ] : undefined );
 
 	// Every ancestor of a value, nearest first. A loop ends the walk.
 	const ancestors = ( value ) => {

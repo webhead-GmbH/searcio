@@ -16,10 +16,10 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/webhead-GmbH/searcio/releases/latest"><img alt="Plugin version" src="https://img.shields.io/badge/plugin-v1.4.0-blue?style=for-the-badge"></a>
-    <img alt="Required WordPress version" src="https://img.shields.io/badge/wordpress-%3E%3D6.8-blue?style=for-the-badge&logo=wordpress&logoColor=white">
-    <img alt="Tested up to WordPress version" src="https://img.shields.io/badge/tested_up_to-wordpress_7.1-green?style=for-the-badge&logo=wordpress&logoColor=white">
-    <img alt="Required PHP version" src="https://img.shields.io/badge/php-%3E%3D8.3-blue?style=for-the-badge&logo=php&logoColor=white">
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/v/searcio" alt="WordPress Plugin Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/required-php/searcio" alt="WordPress Plugin Required PHP Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/tested/searcio" alt="WordPress Plugin: Tested WP Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/stars/searcio" alt="WordPress Plugin Rating"></a>
 </p>
 
 <p align="center">

@@ -14,6 +14,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\DTO;
 
+use Webhead\WP\SearchCloud\Enums\Category_Order;
 use Webhead\WP\SearchCloud\Enums\Facet_Display;
 
 defined( 'ABSPATH' ) || exit;
@@ -30,7 +31,10 @@ final class Storefront_Facet {
 	 * @param  array<string,string>  $second_colors  Value => second hex colour, for a value of two colours.
 	 * @param  array<string,string>  $images   Value => image URL.
 	 * @param  array<string,string>  $labels   Value => the short text a shop shows for it.
-	 * @param  array{depth:int,parents:array<string,string>}|null  $tree  The levels to show and each value's parent, for a filter drawn as a tree.
+	 * @param  array{depth:int,parents?:array<string,string>,paths?:bool}|null  $tree  The levels to show and each value's parent, for a filter drawn as a tree; `paths` for values that are paths, which hold their parent.
+	 * @param  bool                  $hidden   Not drawn: the category filter is drawn from the other category field.
+	 * @param  Category_Order|null   $sort     The order of the values, for the category filter; by count when null.
+	 * @param  array<int,string>     $values_order  The values in the shop's order, for {@see Category_Order::Shop}.
 	 */
 	public function __construct(
 		public readonly string $field,
@@ -40,14 +44,17 @@ final class Storefront_Facet {
 		public readonly array $second_colors = [],
 		public readonly array $images = [],
 		public readonly array $labels = [],
-		public readonly ?array $tree = null
+		public readonly ?array $tree = null,
+		public readonly bool $hidden = false,
+		public readonly ?Category_Order $sort = null,
+		public readonly array $values_order = []
 	) {}
 
 	/**
 	 * What the storefront reads. A map is left out when it has nothing in it,
 	 * and is an object, never a list, when it has.
 	 *
-	 * @return array{field:string,order:int,display:string,colors?:array<string,string>,secondColors?:array<string,string>,images?:array<string,string>,labels?:array<string,string>,tree?:array{depth:int,parents:array<string,string>}}
+	 * @return array{field:string,order:int,display:string,colors?:array<string,string>,secondColors?:array<string,string>,images?:array<string,string>,labels?:array<string,string>,tree?:array<string,mixed>,hidden?:true,sort?:string,valuesOrder?:array<int,string>}
 	 */
 	public function to_array(): array {
 		$out = [
@@ -71,6 +78,18 @@ final class Storefront_Facet {
 
 		if ( null !== $this->tree ) {
 			$out['tree'] = $this->tree;
+		}
+
+		if ( $this->hidden ) {
+			$out['hidden'] = true;
+		}
+
+		if ( null !== $this->sort ) {
+			$out['sort'] = $this->sort->value;
+		}
+
+		if ( [] !== $this->values_order ) {
+			$out['valuesOrder'] = array_values( $this->values_order );
 		}
 
 		return $out;

@@ -5233,3 +5233,34 @@ msgstr "No mostrar nunca como búsqueda popular"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:279
 msgid "One term per line, up to 200. Searcio leaves these out of its live popular searches, whatever their capitals. The same list is in the Searcio panel."
 msgstr "Un término por línea, hasta 200. Searcio los deja fuera de sus búsquedas populares en directo, sin importar mayúsculas o minúsculas. La misma lista está en el panel de Searcio."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:207
+#: src/utils/facets.js:91
+msgid "Brands"
+msgstr "Marcas"
+
+#. translators: %s: the key of a field, "category_paths".
+#: src/admin/settings/components/tabs/SearchConfigTab.js:119
+#, js-format
+msgid "%s (categories as a tree)"
+msgstr "%s (categorías en árbol)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:194
+msgid "As sorted in WooCommerce"
+msgstr "Como están ordenadas en WooCommerce"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:195
+msgid "By name"
+msgstr "Por nombre"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:196
+msgid "By number of products"
+msgstr "Por número de productos"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:223
+msgid "Order of the categories"
+msgstr "Orden de las categorías"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:224
+msgid "Drag them into order under Products > Categories in WooCommerce."
+msgstr "Arrástralas al orden que quieras en Productos > Categorías de WooCommerce."

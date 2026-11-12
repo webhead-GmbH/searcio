@@ -29,6 +29,9 @@ final class Woo {
 	public const POST_TYPE         = 'product';
 	public const CATEGORY_TAXONOMY = 'product_cat';
 
+	/** WooCommerce's own brands, since WooCommerce 9.6. */
+	public const BRAND_TAXONOMY = 'product_brand';
+
 	/**
 	 * Each product-mapping toggle and the document fields `product_fields()`
 	 * writes when it is on. The toggle list itself is derived from these keys,
@@ -44,8 +47,9 @@ final class Woo {
 		'sku'          => [ 'sku' ],
 		'skus'         => [ 'skus' ],
 		'stock_status' => [ 'stock_status', 'in_stock' ],
-		'categories'   => [ 'categories' ],
+		'categories'   => [ 'categories', 'category_paths' ],
 		'tags'         => [ 'product_tags' ],
+		'brands'       => [ 'brands' ],
 		'featured'     => [ 'featured' ],
 		'rating'       => [ 'rating' ],
 		'review_count' => [ 'review_count' ],
@@ -59,6 +63,21 @@ final class Woo {
 
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
+	}
+
+	/**
+	 * The product-mapping toggles the Indexing tab offers: brands only where
+	 * WooCommerce has them.
+	 *
+	 * @return array<int,string>
+	 */
+	public function toggles(): array {
+		return array_values(
+			array_filter(
+				array_keys( self::TOGGLE_FIELDS ),
+				static fn ( string $toggle ): bool => 'brands' !== $toggle || taxonomy_exists( self::BRAND_TAXONOMY )
+			)
+		);
 	}
 
 	/**
@@ -224,12 +243,19 @@ final class Woo {
 		// A product is usually filed under the most specific category only, so
 		// its ancestors are sent with it: without them a filter, a quiz answer
 		// or a merchandising rule naming "Shoes" matches nothing filed under
-		// "Sneakers", while WooCommerce's own "Shoes" archive lists it.
+		// "Sneakers", while WooCommerce's own "Shoes" archive lists it. The
+		// paths are the same categories told apart where two share a name,
+		// for the category filter's tree.
 		if ( ! empty( $woo['categories'] ) ) {
 			$categories = Term_Names::for_post( $post, self::CATEGORY_TAXONOMY, true );
+			$paths      = Term_Paths::for_post( $post, self::CATEGORY_TAXONOMY );
 
 			if ( [] !== $categories ) {
 				$fields['categories'] = $categories;
+			}
+
+			if ( [] !== $paths ) {
+				$fields['category_paths'] = $paths;
 			}
 		}
 
@@ -238,6 +264,14 @@ final class Woo {
 
 			if ( [] !== $tags ) {
 				$fields['product_tags'] = $tags;
+			}
+		}
+
+		if ( ! empty( $woo['brands'] ) ) {
+			$brands = Term_Names::for_post( $post, self::BRAND_TAXONOMY );
+
+			if ( [] !== $brands ) {
+				$fields['brands'] = $brands;
 			}
 		}
 
@@ -288,6 +322,11 @@ final class Woo {
 			// The regular and sale prices are written beside the price, never
 			// on their own.
 			if ( 'regular_sale' === $toggle && empty( $woo['price'] ) ) {
+				continue;
+			}
+
+			// A shop on a WooCommerce without brands has none to write.
+			if ( 'brands' === $toggle && ! taxonomy_exists( self::BRAND_TAXONOMY ) ) {
 				continue;
 			}
 

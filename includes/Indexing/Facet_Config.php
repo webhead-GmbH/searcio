@@ -19,9 +19,11 @@ namespace Webhead\WP\SearchCloud\Indexing;
 use Webhead\WP\SearchCloud\DTO\Attribute_Swatches;
 use Webhead\WP\SearchCloud\DTO\Storefront_Facet;
 use Webhead\WP\SearchCloud\Enums\Category_Filter;
+use Webhead\WP\SearchCloud\Enums\Category_Order;
 use Webhead\WP\SearchCloud\Enums\Facet_Display;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Settings\Settings_Manager;
+use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,8 +31,11 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Facet_Config {
-	/** The field the plugin writes a post's categories to. */
-	private const CATEGORY_FIELD = 'categories';
+	/** The field the plugin writes a post's categories to, by name. */
+	public const CATEGORY_FIELD = 'categories';
+
+	/** The same categories as paths from the top (see {@see Term_Paths}). */
+	public const CATEGORY_PATHS_FIELD = 'category_paths';
 
 	/** The taxonomies that field is read from. */
 	private const CATEGORY_TAXONOMIES = [ Woo::CATEGORY_TAXONOMY, 'category' ];
@@ -62,7 +67,13 @@ final class Facet_Config {
 	 * drawn and, for an attribute a swatches plugin dresses, the colour, image
 	 * or label of each value in the language of the current request. The
 	 * category filter comes with the shop's tree when the Search Config tab
-	 * asks for one.
+	 * asks for one, and with the order to list the categories in.
+	 *
+	 * The category filter is one filter. It is drawn as a tree from
+	 * `category_paths` when the site has that facet, since a tree of names has
+	 * one "MTS Technik" for three categories of that name, and from
+	 * `categories` otherwise. The field it is not drawn from is `hidden`, and
+	 * stays a facet field for the quizzes and rules that use it.
 	 *
 	 * How a field is drawn is the storefront's to decide (`auto`) unless the
 	 * attribute's type says or a shop does, through
@@ -84,6 +95,7 @@ final class Facet_Config {
 		}
 
 		$taxonomies = $this->index_config->attribute_taxonomies();
+		$category   = $this->category_filter( $fields );
 		$facets     = [];
 
 		foreach ( $fields as $order => $field ) {
@@ -103,7 +115,10 @@ final class Facet_Config {
 				$this->colors( $swatches->second_colors ),
 				$this->images( $images ),
 				$swatches->labels,
-				self::CATEGORY_FIELD === $field ? $this->category_tree() : null
+				$category[ $field ]['tree'] ?? null,
+				$category[ $field ]['hidden'] ?? false,
+				$category[ $field ]['sort'] ?? null,
+				$category[ $field ]['order'] ?? []
 			);
 		}
 
@@ -111,44 +126,140 @@ final class Facet_Config {
 	}
 
 	/**
-	 * The levels the category filter shows and each category's parent, or null
-	 * for the list a search answers with. The main categories alone are a tree
-	 * of one level.
+	 * For each category field among the facet fields: the tree it is drawn as,
+	 * or null for one list; whether the filter is drawn from the other one;
+	 * and the order of its values. The main categories alone are a tree of
+	 * one level.
 	 *
-	 * @return array{depth:int,parents:array<string,string>}|null
+	 * @param  array<int,string>  $fields
+	 * @return array<string,array{tree:array<string,mixed>|null,hidden:bool,sort:Category_Order,order:array<int,string>}>
 	 */
-	private function category_tree(): ?array {
-		$mode = Category_Filter::from_storage( $this->settings->get( Plugin_Settings::CATEGORY_FILTER ) );
+	private function category_filter( array $fields ): array {
+		$has_names = in_array( self::CATEGORY_FIELD, $fields, true );
+		$has_paths = in_array( self::CATEGORY_PATHS_FIELD, $fields, true );
 
-		if ( Category_Filter::All === $mode ) {
-			return null;
+		if ( ! $has_names && ! $has_paths ) {
+			return [];
 		}
 
-		return [
-			'depth'   => Category_Filter::Main === $mode ? 1 : max( 1, (int) $this->settings->get( Plugin_Settings::CATEGORY_FILTER_DEPTH ) ),
-			'parents' => $this->category_parents(),
-		];
+		$mode  = Category_Filter::from_storage( $this->settings->get( Plugin_Settings::CATEGORY_FILTER ) );
+		$sort  = Category_Order::from_storage( $this->settings->get( Plugin_Settings::CATEGORY_FILTER_ORDER ) );
+		$depth = Category_Filter::Main === $mode ? 1 : max( 1, (int) $this->settings->get( Plugin_Settings::CATEGORY_FILTER_DEPTH ) );
+		$tree  = Category_Filter::All !== $mode;
+		$shop  = Category_Order::Shop === $sort;
+		$terms = $tree || $shop ? $this->category_terms() : [];
+		$out   = [];
+
+		if ( $has_names ) {
+			$out[ self::CATEGORY_FIELD ] = [
+				'tree'   => $tree && ! $has_paths ? [ 'depth' => $depth, 'parents' => $this->category_parents( $terms ) ] : null,
+				'hidden' => $tree && $has_paths,
+				'sort'   => $sort,
+				'order'  => $shop ? $this->category_order( $terms, false ) : [],
+			];
+		}
+
+		if ( $has_paths ) {
+			$out[ self::CATEGORY_PATHS_FIELD ] = [
+				// Each path holds its parent, so this tree needs no map.
+				'tree'   => $tree ? [ 'depth' => $depth, 'paths' => true ] : null,
+				'hidden' => ! $tree && $has_names,
+				'sort'   => $sort,
+				'order'  => $shop ? $this->category_order( $terms, true ) : [],
+			];
+		}
+
+		return $out;
 	}
 
 	/**
-	 * Category name => the name of its parent, in the language of the current
-	 * request. A search answers with names, so two categories of one name are
-	 * one value: it is a main category if either is, and under the first
-	 * parent otherwise.
+	 * Each category taxonomy's terms in the language of the current request,
+	 * in the order the shop sorted them: WooCommerce keeps the order its
+	 * categories were dragged into as term meta, and reads it for
+	 * `menu_order`. A taxonomy WooCommerce does not sort comes by name.
 	 *
+	 * @return array<string,array<int,WP_Term>>
+	 */
+	private function category_terms(): array {
+		$out = [];
+
+		foreach ( self::CATEGORY_TAXONOMIES as $taxonomy ) {
+			$terms = taxonomy_exists( $taxonomy ) ? get_terms( [ 'taxonomy' => $taxonomy, 'orderby' => 'menu_order', 'hide_empty' => false, 'update_term_meta_cache' => false ] ) : [];
+
+			if ( is_array( $terms ) ) {
+				$out[ $taxonomy ] = array_values( array_filter( $terms, static fn ( mixed $term ): bool => $term instanceof WP_Term ) );
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * The categories as the shop lists them: a main category, then the
+	 * categories under it in their order, then the next main one, so a list
+	 * and a tree read alike. WooCommerce numbers siblings from 0 under each
+	 * parent, which a list of every level sorted by that number alone would
+	 * interleave. A name is listed where it first appears.
+	 *
+	 * @param  array<string,array<int,WP_Term>>  $taxonomies  From {@see self::category_terms()}.
+	 * @return array<int,string> Paths, or names.
+	 */
+	private function category_order( array $taxonomies, bool $paths ): array {
+		$order = [];
+
+		foreach ( $taxonomies as $terms ) {
+			$values   = $paths ? Term_Paths::of_terms( $terms ) : [];
+			$children = [];
+			$roots    = [];
+			$seen     = [];
+
+			foreach ( $terms as $term ) {
+				$values[ $term->term_id ] ??= Term_Names::decode( $term->name );
+			}
+
+			foreach ( $terms as $term ) {
+				if ( isset( $values[ $term->parent ] ) && $term->parent !== $term->term_id ) {
+					$children[ $term->parent ][] = $term;
+				} else {
+					$roots[] = $term;
+				}
+			}
+
+			$walk = static function ( WP_Term $term ) use ( &$walk, &$order, &$seen, $children, $values ): void {
+				// A parent loop, which only a broken database has, ends the walk.
+				if ( isset( $seen[ $term->term_id ] ) ) {
+					return;
+				}
+
+				$seen[ $term->term_id ] = true;
+				$order[]                = $values[ $term->term_id ];
+
+				foreach ( $children[ $term->term_id ] ?? [] as $child ) {
+					$walk( $child );
+				}
+			};
+
+			foreach ( $roots as $root ) {
+				$walk( $root );
+			}
+		}
+
+		return array_values( array_unique( array_filter( $order, static fn ( string $value ): bool => '' !== $value ) ) );
+	}
+
+	/**
+	 * Category name => the name of its parent. A search answers with names, so
+	 * two categories of one name are one value: it is a main category if
+	 * either is, and under the first parent otherwise.
+	 *
+	 * @param  array<string,array<int,WP_Term>>  $taxonomies  From {@see self::category_terms()}.
 	 * @return array<string,string>
 	 */
-	private function category_parents(): array {
+	private function category_parents( array $taxonomies ): array {
 		$parents = [];
 		$roots   = [];
 
-		foreach ( self::CATEGORY_TAXONOMIES as $taxonomy ) {
-			$terms = taxonomy_exists( $taxonomy ) ? get_terms( [ 'taxonomy' => $taxonomy, 'hide_empty' => false, 'update_term_meta_cache' => false ] ) : [];
-
-			if ( ! is_array( $terms ) ) {
-				continue;
-			}
-
+		foreach ( $taxonomies as $terms ) {
 			$names = [];
 
 			foreach ( $terms as $term ) {

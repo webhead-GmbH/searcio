@@ -9,7 +9,7 @@
  * renders is indistinguishable from a feature that does not exist.
  */
 
-import { test, expect, setConnected, touchingInShell } from '../utils';
+import { test, expect, setCategoryFilter, setConnected, touchingInShell } from '../utils';
 
 const SETTINGS_URL = '/wp-admin/admin.php?page=searcio&tab=search-config';
 
@@ -162,6 +162,43 @@ test.describe( 'Search Config tab', () => {
 
 	test.afterAll( () => {
 		setConnected( false );
+		setCategoryFilter( 'clear' );
+	} );
+
+	/**
+	 * The service answers the categories by count, so the filter showed them
+	 * in an order the shop never chose. It is kept in WordPress and saved by
+	 * the tab's one Save button.
+	 */
+	test( 'saves the order of the categories with the tab, the shop\'s own by default', async ( { page } ) => {
+		const saved = [];
+
+		await mockSearchConfig( page );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/searcio/v1/settings' ),
+			async ( route ) => {
+				if ( 'GET' !== route.request().method() ) {
+					saved.push( route.request().postDataJSON() );
+				}
+
+				await route.continue();
+			}
+		);
+		await page.goto( SETTINGS_URL );
+
+		const order = card( page, 'Category filter' ).getByRole( 'combobox', { name: 'Order of the categories' } );
+
+		await expect( order ).toHaveText( /As sorted in WooCommerce/, LOADED );
+
+		await order.click();
+		await page.getByRole( 'option', { name: 'By name' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => saved.length ).toBeGreaterThan( 0 );
+
+		expect( saved.at( -1 ).settings.category_filter_order ).toBe( 'name' );
+
+		await page.reload();
+		await expect( order ).toHaveText( /By name/, LOADED );
 	} );
 
 	test( 'leaves a gap between everything it stacks', async ( { page } ) => {

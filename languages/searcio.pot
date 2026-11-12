@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Searcio - Fast AI Product Search for WooCommerce 1.4.0\n"
+"Project-Id-Version: Searcio - Fast AI Product Search for WooCommerce 1.4.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/searcio\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-07T18:40:12+00:00\n"
+"POT-Creation-Date: 2026-11-11T07:38:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: searcio\n"
@@ -44,8 +44,8 @@ msgstr ""
 #: includes/Admin/Settings_Page.php:36
 #: includes/Admin/Settings_Page.php:40
 #: includes/Admin/Settings_Page.php:130
-#: includes/Plugin.php:497
-#: src/admin/settings/components/SettingsPanel.js:210
+#: includes/Plugin.php:495
+#: src/admin/settings/components/SettingsPanel.js:211
 msgid "Searcio"
 msgstr ""
 
@@ -54,8 +54,8 @@ msgstr ""
 #: includes/Frontend/Frontend_Config.php:183
 #: src/admin/settings/components/tabs/PlacementTab.js:913
 #: src/frontend/search/components/SearchInput.js:33
-#: src/frontend/search/components/SearchModal.js:1756
-#: src/frontend/search/components/SearchModal.js:1788
+#: src/frontend/search/components/SearchModal.js:1763
+#: src/frontend/search/components/SearchModal.js:1795
 #: src/frontend/search/components/Trigger.js:27
 #: src/frontend/search/components/Trigger.js:44
 msgid "Search"
@@ -151,7 +151,7 @@ msgid "A facet field. Defaults to \"categories\", which is how product categorie
 msgstr ""
 
 #: includes/Elementor/Widgets/Products_Widget.php:107
-#: src/admin/settings/components/tabs/SearchConfigTab.js:495
+#: src/admin/settings/components/tabs/SearchConfigTab.js:521
 #: src/blocks/products/edit.js:84
 msgid "Filter value"
 msgstr ""
@@ -346,8 +346,8 @@ msgid "How many filters get a button of their own under the search field, as far
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:240
-#: src/frontend/search/components/SearchModal.js:1514
-#: src/frontend/search/components/SearchModal.js:1535
+#: src/frontend/search/components/SearchModal.js:1519
+#: src/frontend/search/components/SearchModal.js:1540
 msgid "Results"
 msgstr ""
 
@@ -367,9 +367,9 @@ msgid "Newest"
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:265
-#: src/admin/settings/components/tabs/IndexingTab.js:207
+#: src/admin/settings/components/tabs/IndexingTab.js:208
 #: src/blocks/search/edit.js:118
-#: src/utils/facets.js:84
+#: src/utils/facets.js:95
 msgid "Featured"
 msgstr ""
 
@@ -1000,7 +1000,7 @@ msgstr ""
 #: src/blocks/search/edit.js:316
 #: src/frontend/search/components/FilterBar.js:204
 #: src/frontend/search/components/FilterBar.js:228
-#: src/frontend/search/components/SearchModal.js:2045
+#: src/frontend/search/components/SearchModal.js:2052
 msgid "Filters"
 msgstr ""
 
@@ -1099,7 +1099,7 @@ msgstr ""
 #: includes/Elementor/Widgets/Search_Widget.php:1121
 #: includes/Frontend/Look_Schema.php:397
 #: src/blocks/search/edit.js:353
-#: src/frontend/search/components/SearchModal.js:1802
+#: src/frontend/search/components/SearchModal.js:1809
 msgid "AI Assistant"
 msgstr ""
 
@@ -1141,7 +1141,7 @@ msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:1146
 #: includes/Frontend/Look_Schema.php:409
-#: src/admin/settings/components/tabs/SearchConfigTab.js:522
+#: src/admin/settings/components/tabs/SearchConfigTab.js:548
 #: src/blocks/search/edit.js:367
 msgid "Promotional banner"
 msgstr ""
@@ -1286,7 +1286,7 @@ msgstr ""
 #: includes/Elementor/Widgets/Search_Widget.php:1320
 #: includes/Frontend/Look_Schema.php:348
 #: src/admin/settings/components/tabs/IndexingTab.js:204
-#: src/utils/facets.js:81
+#: src/utils/facets.js:92
 msgid "Stock status"
 msgstr ""
 
@@ -1300,7 +1300,7 @@ msgstr ""
 #: src/blocks/search/edit.js:400
 #: src/frontend/search/components/CompareTable.js:57
 #: src/frontend/search/components/templates.js:102
-#: src/utils/facets.js:82
+#: src/utils/facets.js:93
 msgid "In stock"
 msgstr ""
 
@@ -1399,13 +1399,13 @@ msgid "Searcio does not search or index for this site while the account is suspe
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:169
-#: src/frontend/search/components/SearchModal.js:1591
-#: src/frontend/search/components/SearchModal.js:2007
+#: src/frontend/search/components/SearchModal.js:1596
+#: src/frontend/search/components/SearchModal.js:2014
 msgid "No results found."
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:170
-#: src/frontend/search/components/SearchModal.js:1992
+#: src/frontend/search/components/SearchModal.js:1999
 msgid "Searching…"
 msgstr ""
 
@@ -1421,8 +1421,8 @@ msgid "Sale"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:174
-#: src/frontend/search/components/SearchModal.js:776
-#: src/frontend/search/components/SearchModal.js:1324
+#: src/frontend/search/components/SearchModal.js:780
+#: src/frontend/search/components/SearchModal.js:1329
 msgid "Search is unavailable right now."
 msgstr ""
 
@@ -1432,8 +1432,8 @@ msgid "Recent searches"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:176
-#: src/admin/settings/components/tabs/SearchConfigTab.js:252
-#: src/admin/settings/components/tabs/SearchConfigTab.js:266
+#: src/admin/settings/components/tabs/SearchConfigTab.js:278
+#: src/admin/settings/components/tabs/SearchConfigTab.js:292
 #: src/frontend/search/components/Browse.js:118
 msgid "Popular searches"
 msgstr ""
@@ -1444,13 +1444,13 @@ msgid "Clear"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:178
-#: src/frontend/search/components/SearchModal.js:1831
-#: src/frontend/search/components/SearchModal.js:1885
+#: src/frontend/search/components/SearchModal.js:1838
+#: src/frontend/search/components/SearchModal.js:1892
 msgid "Close search"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:179
-#: src/frontend/search/components/SearchModal.js:1872
+#: src/frontend/search/components/SearchModal.js:1879
 msgid "Search by voice"
 msgstr ""
 
@@ -1616,33 +1616,33 @@ msgstr ""
 msgid "Connection, indexing, and sync state for support and debugging. Credentials are never included."
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:403
+#: includes/Indexing/Index_Config.php:430
 msgid "Post title"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:407
+#: includes/Indexing/Index_Config.php:434
 msgid "Post content"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:411
+#: includes/Indexing/Index_Config.php:438
 #: src/admin/settings/components/tabs/IndexingTab.js:32
 msgid "Excerpt"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:415
+#: includes/Indexing/Index_Config.php:442
 msgid "Permalink (URL)"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:419
+#: includes/Indexing/Index_Config.php:446
 msgid "Featured image"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:423
+#: includes/Indexing/Index_Config.php:450
 #: src/admin/settings/components/tabs/IndexingTab.js:30
 msgid "Published date"
 msgstr ""
 
-#: includes/Indexing/Index_Config.php:427
+#: includes/Indexing/Index_Config.php:454
 #: src/admin/settings/components/tabs/IndexingTab.js:29
 msgid "Author"
 msgstr ""
@@ -1739,19 +1739,19 @@ msgstr ""
 msgid "No verification is in progress."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:361
+#: includes/Settings/Plugin_Settings.php:384
 msgid "Keep history for (days)"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:362
+#: includes/Settings/Plugin_Settings.php:385
 msgid "How long finished sync runs are kept. Use 0 to keep them forever."
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:365
+#: includes/Settings/Plugin_Settings.php:388
 msgid "Delete plugin data on uninstall"
 msgstr ""
 
-#: includes/Settings/Plugin_Settings.php:366
+#: includes/Settings/Plugin_Settings.php:389
 msgid "When enabled, deleting this plugin also removes its settings, sync tables, and per-post sync metadata from this site. It never deletes documents already sent to Searcio."
 msgstr ""
 
@@ -1843,7 +1843,7 @@ msgstr ""
 
 #: includes/Widgets/Classic_Products_Widget.php:107
 #: includes/Widgets/Classic_Search_Widget.php:106
-#: src/admin/settings/components/tabs/IndexingTab.js:324
+#: src/admin/settings/components/tabs/IndexingTab.js:325
 #: src/blocks/search/edit.js:398
 msgid "Title"
 msgstr ""
@@ -1965,7 +1965,7 @@ msgid "Bottom"
 msgstr ""
 
 #: src/admin/settings/components/look/LookControl.js:129
-#: src/frontend/search/components/SearchModal.js:1700
+#: src/frontend/search/components/SearchModal.js:1707
 msgid "Reset"
 msgstr ""
 
@@ -2056,7 +2056,7 @@ msgid "Size"
 msgstr ""
 
 #: src/admin/settings/components/look/LookControl.js:286
-#: src/admin/settings/components/tabs/SearchConfigTab.js:880
+#: src/admin/settings/components/tabs/SearchConfigTab.js:906
 msgid "Weight"
 msgstr ""
 
@@ -2118,7 +2118,7 @@ msgid "All parts"
 msgstr ""
 
 #: src/admin/settings/components/look/LookEditor.js:306
-#: src/frontend/search/components/SearchModal.js:1671
+#: src/frontend/search/components/SearchModal.js:1678
 msgid "Done"
 msgstr ""
 
@@ -2297,7 +2297,7 @@ msgstr ""
 #: src/admin/settings/components/quiz/quizApi.js:25
 #: src/admin/settings/components/quiz/QuizEditor.js:200
 #: src/admin/settings/components/quiz/QuizList.js:200
-#: src/admin/settings/components/tabs/SearchConfigTab.js:426
+#: src/admin/settings/components/tabs/SearchConfigTab.js:452
 msgid "Every language"
 msgstr ""
 
@@ -2337,7 +2337,7 @@ msgstr ""
 #: src/admin/settings/components/quiz/NewQuizModal.js:98
 #: src/admin/settings/components/quiz/QuizEditor.js:274
 #: src/admin/settings/components/quiz/QuizList.js:196
-#: src/admin/settings/components/tabs/SearchConfigTab.js:477
+#: src/admin/settings/components/tabs/SearchConfigTab.js:503
 msgid "Language"
 msgstr ""
 
@@ -2457,10 +2457,10 @@ msgstr ""
 
 #: src/admin/settings/components/quiz/QuizEditor.js:217
 #: src/admin/settings/components/quiz/QuizList.js:336
-#: src/admin/settings/components/SettingsPanel.js:246
-#: src/admin/settings/components/tabs/IndexingTab.js:564
+#: src/admin/settings/components/SettingsPanel.js:247
+#: src/admin/settings/components/tabs/IndexingTab.js:565
 #: src/admin/settings/components/tabs/PlacementTab.js:281
-#: src/admin/settings/components/tabs/SearchConfigTab.js:821
+#: src/admin/settings/components/tabs/SearchConfigTab.js:847
 #: src/frontend/search/components/AiAssistant.js:374
 msgid "Try again"
 msgstr ""
@@ -2470,11 +2470,11 @@ msgid "Loading the quiz"
 msgstr ""
 
 #: src/admin/settings/components/quiz/QuizEditor.js:239
-#: src/admin/settings/components/SettingsPanel.js:200
-#: src/admin/settings/components/tabs/IndexingTab.js:577
+#: src/admin/settings/components/SettingsPanel.js:201
+#: src/admin/settings/components/tabs/IndexingTab.js:578
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:92
 #: src/admin/settings/components/tabs/PlacementTab.js:336
-#: src/admin/settings/components/tabs/SearchConfigTab.js:833
+#: src/admin/settings/components/tabs/SearchConfigTab.js:859
 msgid "No unsaved changes."
 msgstr ""
 
@@ -2557,10 +2557,10 @@ msgid "Add a question"
 msgstr ""
 
 #: src/admin/settings/components/quiz/QuizEditor.js:373
-#: src/admin/settings/components/tabs/IndexingTab.js:574
+#: src/admin/settings/components/tabs/IndexingTab.js:575
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:89
 #: src/admin/settings/components/tabs/PlacementTab.js:335
-#: src/admin/settings/components/tabs/SearchConfigTab.js:830
+#: src/admin/settings/components/tabs/SearchConfigTab.js:856
 msgid "Saving…"
 msgstr ""
 
@@ -2749,63 +2749,63 @@ msgstr ""
 msgid "A quiz asks shoppers a few questions and shows the products that fit their answers."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:108
+#: src/admin/settings/components/SettingsPanel.js:109
 #: src/admin/settings/components/tabs/SyncTab.js:184
 msgid "Sync"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:113
+#: src/admin/settings/components/SettingsPanel.js:114
 msgid "Indexing"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:117
+#: src/admin/settings/components/SettingsPanel.js:118
 msgid "Search Config"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:121
+#: src/admin/settings/components/SettingsPanel.js:122
 #: src/admin/settings/components/tabs/QuizzesTab.js:60
-#: src/frontend/search/components/SearchModal.js:1817
+#: src/frontend/search/components/SearchModal.js:1824
 msgid "Product finder"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:125
+#: src/admin/settings/components/SettingsPanel.js:126
 #: src/admin/settings/components/tabs/PlacementTab.js:930
 msgid "Placement"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:129
+#: src/admin/settings/components/SettingsPanel.js:130
 msgid "Connection"
 msgstr ""
 
 #. translators: %s: reason the settings request failed.
-#: src/admin/settings/components/SettingsPanel.js:174
-#: src/admin/settings/components/SettingsPanel.js:240
+#: src/admin/settings/components/SettingsPanel.js:175
+#: src/admin/settings/components/SettingsPanel.js:241
 #, js-format
 msgid "The settings could not be loaded: %s"
 msgstr ""
 
 #. translators: %s: reason the settings could not be saved, as reported by the REST API.
-#: src/admin/settings/components/SettingsPanel.js:179
-#: src/admin/settings/components/SettingsPanel.js:350
+#: src/admin/settings/components/SettingsPanel.js:180
+#: src/admin/settings/components/SettingsPanel.js:351
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:98
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:156
 #, js-format
 msgid "The settings could not be saved: %s"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:192
+#: src/admin/settings/components/SettingsPanel.js:193
 msgid "Settings saved successfully."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:197
+#: src/admin/settings/components/SettingsPanel.js:198
 msgid "Saving..."
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:198
+#: src/admin/settings/components/SettingsPanel.js:199
 msgid "Save Settings"
 msgstr ""
 
-#: src/admin/settings/components/SettingsPanel.js:211
+#: src/admin/settings/components/SettingsPanel.js:212
 msgid "Configure the plugin settings from one shared admin surface."
 msgstr ""
 
@@ -3055,7 +3055,7 @@ msgid "Send as"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:160
-#: src/admin/settings/components/tabs/SearchConfigTab.js:891
+#: src/admin/settings/components/tabs/SearchConfigTab.js:917
 msgid "Remove field"
 msgstr ""
 
@@ -3070,7 +3070,7 @@ msgid "WooCommerce %1$s is below the supported minimum %2$s. Product fields are 
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:200
-#: src/utils/facets.js:87
+#: src/utils/facets.js:98
 msgid "Price"
 msgstr ""
 
@@ -3079,7 +3079,7 @@ msgid "Regular & sale price"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:202
-#: src/utils/facets.js:85
+#: src/utils/facets.js:96
 msgid "SKU"
 msgstr ""
 
@@ -3088,191 +3088,197 @@ msgid "Variation SKUs"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:205
-#: src/utils/facets.js:79
+#: src/utils/facets.js:87
+#: src/utils/facets.js:89
 msgid "Categories"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:206
-#: src/utils/facets.js:80
+#: src/utils/facets.js:90
 msgid "Tags"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:208
-msgid "Average rating"
+#: src/admin/settings/components/tabs/IndexingTab.js:207
+#: src/utils/facets.js:91
+msgid "Brands"
 msgstr ""
 
 #: src/admin/settings/components/tabs/IndexingTab.js:209
+msgid "Average rating"
+msgstr ""
+
+#: src/admin/settings/components/tabs/IndexingTab.js:210
 msgid "Review count"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:223
+#: src/admin/settings/components/tabs/IndexingTab.js:224
 msgid "Product details"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:224
+#: src/admin/settings/components/tabs/IndexingTab.js:225
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:231
+#: src/admin/settings/components/tabs/IndexingTab.js:232
 msgid "Only index published, visible products"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:232
+#: src/admin/settings/components/tabs/IndexingTab.js:233
 msgid "Recommended. Hidden or draft products stay out of search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:251
+#: src/admin/settings/components/tabs/IndexingTab.js:252
 msgid "Product attributes"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:252
+#: src/admin/settings/components/tabs/IndexingTab.js:253
 msgid "Each selected attribute is sent as its own field (attr_{name}) so it can be made searchable."
 msgstr ""
 
 #. translators: %s: post type label.
-#: src/admin/settings/components/tabs/IndexingTab.js:301
+#: src/admin/settings/components/tabs/IndexingTab.js:302
 #, js-format
 msgid "Add %s to search"
 msgstr ""
 
 #. translators: %s: post type label.
-#: src/admin/settings/components/tabs/IndexingTab.js:306
+#: src/admin/settings/components/tabs/IndexingTab.js:307
 #, js-format
 msgid "When on, your %s are sent to Searcio and appear in search results."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:316
+#: src/admin/settings/components/tabs/IndexingTab.js:317
 msgid "What appears in results"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:317
+#: src/admin/settings/components/tabs/IndexingTab.js:318
 msgid "Choose where each part of a search result comes from. The defaults work for most sites."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:325
+#: src/admin/settings/components/tabs/IndexingTab.js:326
 msgid "The main heading of each result. Required."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:333
+#: src/admin/settings/components/tabs/IndexingTab.js:334
 msgid "Body text"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:334
+#: src/admin/settings/components/tabs/IndexingTab.js:335
 msgid "The text Searcio looks through for matches."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:342
+#: src/admin/settings/components/tabs/IndexingTab.js:343
 msgid "Result link"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:343
+#: src/admin/settings/components/tabs/IndexingTab.js:344
 msgid "Where clicking a result takes the visitor."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:351
+#: src/admin/settings/components/tabs/IndexingTab.js:352
 msgid "Thumbnail image"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:352
+#: src/admin/settings/components/tabs/IndexingTab.js:353
 msgid "Image shown next to each result."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:362
+#: src/admin/settings/components/tabs/IndexingTab.js:363
 msgid "Options"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:366
+#: src/admin/settings/components/tabs/IndexingTab.js:367
 msgid "Include a short summary (excerpt)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:372
+#: src/admin/settings/components/tabs/IndexingTab.js:373
 msgid "Also index private & password-protected items"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:373
+#: src/admin/settings/components/tabs/IndexingTab.js:374
 msgid "Off by default."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:391
+#: src/admin/settings/components/tabs/IndexingTab.js:392
 msgid "Hide advanced options"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:392
+#: src/admin/settings/components/tabs/IndexingTab.js:393
 msgid "Show advanced options"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:399
+#: src/admin/settings/components/tabs/IndexingTab.js:400
 msgid "Type label"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:400
+#: src/admin/settings/components/tabs/IndexingTab.js:401
 msgid "How this content is grouped and filtered in search. Most sites can leave this as the default."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:406
+#: src/admin/settings/components/tabs/IndexingTab.js:407
 msgid "Type"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:413
+#: src/admin/settings/components/tabs/IndexingTab.js:414
 msgid "Extra fields"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:414
+#: src/admin/settings/components/tabs/IndexingTab.js:415
 msgid "Send additional data (a custom field, a taxonomy, or a built-in field) under a name you choose."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:434
-#: src/admin/settings/components/tabs/SearchConfigTab.js:898
+#: src/admin/settings/components/tabs/IndexingTab.js:435
+#: src/admin/settings/components/tabs/SearchConfigTab.js:924
 msgid "Add a field"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:488
-#: src/admin/settings/components/tabs/IndexingTab.js:530
-#: src/admin/settings/components/tabs/IndexingTab.js:559
+#: src/admin/settings/components/tabs/IndexingTab.js:489
+#: src/admin/settings/components/tabs/IndexingTab.js:531
+#: src/admin/settings/components/tabs/IndexingTab.js:560
 #: src/admin/settings/components/tabs/PlacementTab.js:47
 #: src/admin/settings/components/tabs/PlacementTab.js:247
-#: src/admin/settings/components/tabs/SearchConfigTab.js:610
-#: src/admin/settings/components/tabs/SearchConfigTab.js:816
+#: src/admin/settings/components/tabs/SearchConfigTab.js:636
+#: src/admin/settings/components/tabs/SearchConfigTab.js:842
 #: src/settings/store/provider.js:95
 msgid "the request to the REST API failed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:527
+#: src/admin/settings/components/tabs/IndexingTab.js:528
 msgid "Indexing configuration saved."
 msgstr ""
 
 #. translators: %s: reason the request failed.
-#: src/admin/settings/components/tabs/IndexingTab.js:539
-#: src/admin/settings/components/tabs/IndexingTab.js:558
+#: src/admin/settings/components/tabs/IndexingTab.js:540
+#: src/admin/settings/components/tabs/IndexingTab.js:559
 #, js-format
 msgid "The indexing configuration could not be loaded: %s"
 msgstr ""
 
 #. translators: %s: reason the save failed, as reported by the REST API.
-#: src/admin/settings/components/tabs/IndexingTab.js:544
-#: src/admin/settings/components/tabs/IndexingTab.js:617
+#: src/admin/settings/components/tabs/IndexingTab.js:545
+#: src/admin/settings/components/tabs/IndexingTab.js:618
 #, js-format
 msgid "The indexing configuration could not be saved: %s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:575
+#: src/admin/settings/components/tabs/IndexingTab.js:576
 msgid "Save indexing configuration"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:583
+#: src/admin/settings/components/tabs/IndexingTab.js:584
 msgid "What to index"
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:584
+#: src/admin/settings/components/tabs/IndexingTab.js:585
 msgid "Turn on the content you want to be searchable and choose which information is sent for each. Changes take effect after the next sync."
 msgstr ""
 
-#: src/admin/settings/components/tabs/IndexingTab.js:592
+#: src/admin/settings/components/tabs/IndexingTab.js:593
 msgid "Sending a field here makes the data available. To let visitors search by it, also enable that field (with a weight) in the Search Config tab."
 msgstr ""
 
 #. translators: %d: number of enabled content types.
-#: src/admin/settings/components/tabs/IndexingTab.js:642
+#: src/admin/settings/components/tabs/IndexingTab.js:643
 #, js-format
 msgid "%d content type will be indexed."
 msgid_plural "%d content types will be indexed."
@@ -3818,357 +3824,383 @@ msgid_plural "No document on this site has the fields %s, so they will never add
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:137
+#. translators: %s: the key of a field, "category_paths".
+#: src/admin/settings/components/tabs/SearchConfigTab.js:119
+#, js-format
+msgid "%s (categories as a tree)"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:152
 msgid "Preparing…"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:138
+#: src/admin/settings/components/tabs/SearchConfigTab.js:153
 msgid "Indexing…"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:139
+#: src/admin/settings/components/tabs/SearchConfigTab.js:154
 msgid "Ready"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:140
+#: src/admin/settings/components/tabs/SearchConfigTab.js:155
 #: src/admin/settings/components/tabs/SyncTab.js:257
 #: src/admin/settings/syncStatus.js:12
 msgid "Failed"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:173
+#: src/admin/settings/components/tabs/SearchConfigTab.js:189
 msgid "All categories, in one list"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:174
+#: src/admin/settings/components/tabs/SearchConfigTab.js:190
 msgid "Main categories only"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:175
+#: src/admin/settings/components/tabs/SearchConfigTab.js:191
 msgid "Main categories with their subcategories under them"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:181
-msgid "Category filter"
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:182
-msgid "How the search window lists your categories in its filter. Picking a main category finds what is in its subcategories too."
-msgstr ""
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:187
-msgid "Categories to show"
+#: src/admin/settings/components/tabs/SearchConfigTab.js:194
+msgid "As sorted in WooCommerce"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:195
-msgid "Levels to show"
+msgid "By name"
 msgstr ""
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:196
+msgid "By number of products"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:202
+msgid "Category filter"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:203
+msgid "How the search window lists your categories in its filter. Picking a main category finds what is in its subcategories too."
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:208
+msgid "Categories to show"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:216
+msgid "Levels to show"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:217
 msgid "Counts the main categories as the first level, so 2 shows them and their direct subcategories."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:254
+#: src/admin/settings/components/tabs/SearchConfigTab.js:223
+msgid "Order of the categories"
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:224
+msgid "Drag them into order under Products > Categories in WooCommerce."
+msgstr ""
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:280
 msgid "A fallback list of queries shown as suggestions in the search modal before a visitor types anything. Searcio's own live popular searches are used whenever available; this list only takes over when that request comes back empty or fails."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:258
+#: src/admin/settings/components/tabs/SearchConfigTab.js:284
 msgid "The searches the search modal suggests before a visitor types anything. Searcio's own live popular searches come first; your fallback list takes over only when that request comes back empty or fails."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:266
+#: src/admin/settings/components/tabs/SearchConfigTab.js:292
 msgid "Fallback list"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:268
+#: src/admin/settings/components/tabs/SearchConfigTab.js:294
 msgid "One query per line. Used as a fallback whenever live popular searches from Searcio are unavailable or empty."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:278
+#: src/admin/settings/components/tabs/SearchConfigTab.js:304
 msgid "Never show as a popular search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:279
+#: src/admin/settings/components/tabs/SearchConfigTab.js:305
 msgid "One term per line, up to 200. Searcio leaves these out of its live popular searches, whatever their capitals. The same list is in the Searcio panel."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:310
+#: src/admin/settings/components/tabs/SearchConfigTab.js:336
 msgid "Your plan does not include this."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:315
+#: src/admin/settings/components/tabs/SearchConfigTab.js:341
 msgid "AI & ranking"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:316
+#: src/admin/settings/components/tabs/SearchConfigTab.js:342
 msgid "Site-level switches that change how results are found and ordered. These are the same switches as in the Searcio panel."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:327
+#: src/admin/settings/components/tabs/SearchConfigTab.js:353
 msgid "AI search"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:331
+#: src/admin/settings/components/tabs/SearchConfigTab.js:357
 msgid "Searches return hybrid keyword + semantic results. Turning this on starts a background re-index of your catalogue; turning it off is instant and keeps keyword search working."
 msgstr ""
 
 #. translators: %s: index status, e.g. "Ready".
-#: src/admin/settings/components/tabs/SearchConfigTab.js:341
+#: src/admin/settings/components/tabs/SearchConfigTab.js:367
 #, js-format
 msgid "Index status: %s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:352
+#: src/admin/settings/components/tabs/SearchConfigTab.js:378
 msgid "AI visual tagging"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:356
+#: src/admin/settings/components/tabs/SearchConfigTab.js:382
 msgid "A vision model describes each product image and adds the tags to the document, so sparsely-described products still turn up. Applied as you sync - re-sync to tag products already indexed."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:368
+#: src/admin/settings/components/tabs/SearchConfigTab.js:394
 #: src/frontend/search/components/VisualSearchButton.js:43
 msgid "Search by photo"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:372
+#: src/admin/settings/components/tabs/SearchConfigTab.js:398
 msgid "Shoppers can upload a photo instead of typing: a vision model describes what it sees and searches for that. A camera button appears in the search box once this is on."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:384
+#: src/admin/settings/components/tabs/SearchConfigTab.js:410
 msgid "Rank results by what visitors click"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:387
+#: src/admin/settings/components/tabs/SearchConfigTab.js:413
 msgid "Results people click most for a search rise for everyone searching it. Relevance still leads - popular results are only nudged up."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:433
+#: src/admin/settings/components/tabs/SearchConfigTab.js:459
 msgid "Merchandising rules"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:434
+#: src/admin/settings/components/tabs/SearchConfigTab.js:460
 msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
 msgstr ""
 
 #. translators: %d: the rule's position in the list.
-#: src/admin/settings/components/tabs/SearchConfigTab.js:450
+#: src/admin/settings/components/tabs/SearchConfigTab.js:476
 #, js-format
 msgid "Rule %d"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:459
+#: src/admin/settings/components/tabs/SearchConfigTab.js:485
 msgid "Remove rule"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:467
+#: src/admin/settings/components/tabs/SearchConfigTab.js:493
 msgid "Trigger (search term contains)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:470
+#: src/admin/settings/components/tabs/SearchConfigTab.js:496
 msgid "Empty: this rule applies to every search on the site."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:479
+#: src/admin/settings/components/tabs/SearchConfigTab.js:505
 msgid "The rule fires only for searches on pages in this language."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:487
+#: src/admin/settings/components/tabs/SearchConfigTab.js:513
 msgid "Also require filter (field)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:490
+#: src/admin/settings/components/tabs/SearchConfigTab.js:516
 msgid "Optional. A facet field, e.g. \"categories\"."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:497
+#: src/admin/settings/components/tabs/SearchConfigTab.js:523
 msgid "With a field, the rule fires on that listing page - leave the trigger empty to curate the page itself."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:507
+#: src/admin/settings/components/tabs/SearchConfigTab.js:533
 msgid "Pin to top (document ids)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:509
+#: src/admin/settings/components/tabs/SearchConfigTab.js:535
 msgid "Comma-separated, in the order they should appear."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:514
+#: src/admin/settings/components/tabs/SearchConfigTab.js:540
 msgid "Hide (document ids)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:516
+#: src/admin/settings/components/tabs/SearchConfigTab.js:542
 msgid "Comma-separated. Kept out of the results entirely."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:524
+#: src/admin/settings/components/tabs/SearchConfigTab.js:550
 msgid "Optional message returned with the results for this search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:534
+#: src/admin/settings/components/tabs/SearchConfigTab.js:560
 msgid "Add a rule"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:561
+#: src/admin/settings/components/tabs/SearchConfigTab.js:587
 msgid "Search redirects"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:562
+#: src/admin/settings/components/tabs/SearchConfigTab.js:588
 msgid "Send a search straight to a page instead of showing results. The term has to match exactly - capitalisation and surrounding spaces are ignored, but \"black friday\" will not fire on \"black friday deals\"."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:574
+#: src/admin/settings/components/tabs/SearchConfigTab.js:600
 msgid "Search term (exact)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:580
+#: src/admin/settings/components/tabs/SearchConfigTab.js:606
 msgid "Send them to"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:582
+#: src/admin/settings/components/tabs/SearchConfigTab.js:608
 msgid "A full URL, or a path on this site starting with /."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:592
+#: src/admin/settings/components/tabs/SearchConfigTab.js:618
 msgid "Remove redirect"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:600
+#: src/admin/settings/components/tabs/SearchConfigTab.js:626
 msgid "Add a redirect"
 msgstr ""
 
 #. translators: %s: reason the save failed, as reported by the REST API.
-#: src/admin/settings/components/tabs/SearchConfigTab.js:765
+#: src/admin/settings/components/tabs/SearchConfigTab.js:791
 #, js-format
 msgid "The search configuration could not be saved: %s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:776
+#: src/admin/settings/components/tabs/SearchConfigTab.js:802
 msgid "The popular searches and the category filter could not be saved."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:783
+#: src/admin/settings/components/tabs/SearchConfigTab.js:809
 msgid "Search configuration saved."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:792
+#: src/admin/settings/components/tabs/SearchConfigTab.js:818
 msgid "Everything else was saved."
 msgstr ""
 
 #. translators: %s: reason the request failed.
-#: src/admin/settings/components/tabs/SearchConfigTab.js:800
-#: src/admin/settings/components/tabs/SearchConfigTab.js:815
+#: src/admin/settings/components/tabs/SearchConfigTab.js:826
+#: src/admin/settings/components/tabs/SearchConfigTab.js:841
 #, js-format
 msgid "The search configuration could not be loaded: %s"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:806
+#: src/admin/settings/components/tabs/SearchConfigTab.js:832
 msgid "Loading the search configuration"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:831
+#: src/admin/settings/components/tabs/SearchConfigTab.js:857
 msgid "Save search configuration"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:839
+#: src/admin/settings/components/tabs/SearchConfigTab.js:865
 msgid "Search configuration"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:840
+#: src/admin/settings/components/tabs/SearchConfigTab.js:866
 msgid "Controls how Searcio itself ranks and filters your content - which fields it searches and how heavily, per-type ranking boosts, which fields power facets and suggestions, and synonyms. Most of this lives on Searcio's side, not in this plugin's own settings, so changes take effect on the very next search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:860
+#: src/admin/settings/components/tabs/SearchConfigTab.js:886
 msgid "Searchable fields & weights"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:861
+#: src/admin/settings/components/tabs/SearchConfigTab.js:887
 msgid "Which fields full-text search matches, and how much each one counts (1-100). A higher weight on \"title\" makes title matches outrank body-text matches, for example."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:871
+#: src/admin/settings/components/tabs/SearchConfigTab.js:897
 msgid "Field"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:907
+#: src/admin/settings/components/tabs/SearchConfigTab.js:933
 msgid "Type boosts"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:908
+#: src/admin/settings/components/tabs/SearchConfigTab.js:934
 msgid "Ranking boost per content type (0.1-100). Above 1 ranks that type higher overall; below 1 ranks it lower. One row per content type currently enabled in Indexing."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:938
+#: src/admin/settings/components/tabs/SearchConfigTab.js:964
 msgid "Enable at least one content type in the Indexing tab to set a type boost."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:950
-#: src/admin/settings/components/tabs/SearchConfigTab.js:962
+#: src/admin/settings/components/tabs/SearchConfigTab.js:976
+#: src/admin/settings/components/tabs/SearchConfigTab.js:988
 msgid "Facet fields"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:951
+#: src/admin/settings/components/tabs/SearchConfigTab.js:977
 msgid "Fields returned as facets on search results and allowed as filters. Click the field to browse every available field, or type to search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:975
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1002
 msgid "When a shopper picks several values of one filter"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:978
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1005
 msgid "Any: a product that has one of them is shown. All: only a product that has every one of them, for a field a product holds several values of, such as features or tags."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:990
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1017
 msgid "Any (OR)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:991
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1018
 msgid "All (AND)"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1005
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1017
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1032
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1044
 msgid "Suggest fields"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1006
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1033
 msgid "Fields queried for search-as-you-type suggestions. Defaults to \"title\" when left empty. Click to browse, or type to search."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1033
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1041
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1060
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1068
 msgid "Synonyms"
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1034
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1061
 msgid "Treats words as interchangeable during search, even when the exact word a visitor types never appears in a result. For example, a line with \"sneaker, trainer\" means searching \"sneaker\" also matches results that only mention \"trainer\", and vice versa - useful for regional spelling or naming differences."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1043
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1070
 msgid "One comma-separated group of interchangeable words per line, e.g. \"sneaker, trainer\"."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1057
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1084
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1111
 msgid "Languages"
 msgstr ""
 
 #. translators: %d: number of languages the plan allows.
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1062
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1089
 #, js-format
 msgid "Which of this site's languages to index and search. Your plan allows up to %d."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1065
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1092
 msgid "Which of this site's languages to index and search. Leave every language unchecked for unrestricted."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1066
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1093
 msgid "No WPML/Polylang installation was detected, so languages can only be entered manually here. Leave empty for unrestricted."
 msgstr ""
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1086
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1113
 msgid "Comma-separated ISO language codes, e.g. \"de, en\"."
 msgstr ""
 
@@ -4782,7 +4814,7 @@ msgstr ""
 
 #. translators: 1: filter name, e.g. "Colour". 2: what is selected in it, e.g. "Olive".
 #: src/frontend/search/components/ActiveFilters.js:58
-#: src/utils/facets.js:776
+#: src/utils/facets.js:867
 #, js-format
 msgid "%1$s: %2$s"
 msgstr ""
@@ -4846,7 +4878,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:397
-#: src/frontend/search/components/SearchModal.js:1532
+#: src/frontend/search/components/SearchModal.js:1537
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -4914,7 +4946,7 @@ msgid "%s:"
 msgstr ""
 
 #: src/frontend/search/components/FilterBar.js:204
-#: src/frontend/search/components/SearchModal.js:2045
+#: src/frontend/search/components/SearchModal.js:2052
 msgid "All filters"
 msgstr ""
 
@@ -4942,19 +4974,19 @@ msgstr ""
 msgid "Show all %d"
 msgstr ""
 
-#: src/frontend/search/components/FilterPanel.js:134
+#: src/frontend/search/components/FilterPanel.js:141
 msgid "No values match the other filters."
 msgstr ""
 
 #. translators: %s: filter name, e.g. "Category".
-#: src/frontend/search/components/FilterPanel.js:211
-#: src/frontend/search/components/FilterPanel.js:216
+#: src/frontend/search/components/FilterPanel.js:218
+#: src/frontend/search/components/FilterPanel.js:223
 #, js-format
 msgid "Search %s"
 msgstr ""
 
 #. translators: %s: what was typed into a filter's search field.
-#: src/frontend/search/components/FilterPanel.js:244
+#: src/frontend/search/components/FilterPanel.js:251
 #, js-format
 msgid "Nothing matches “%s”."
 msgstr ""
@@ -5053,7 +5085,7 @@ msgid "Your answers"
 msgstr ""
 
 #: src/frontend/search/components/QuizPane.js:441
-#: src/frontend/search/components/SearchModal.js:1576
+#: src/frontend/search/components/SearchModal.js:1581
 msgid "Loading…"
 msgstr ""
 
@@ -5065,104 +5097,104 @@ msgstr ""
 msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:886
+#: src/frontend/search/components/SearchModal.js:890
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:888
+#: src/frontend/search/components/SearchModal.js:892
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:890
+#: src/frontend/search/components/SearchModal.js:894
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:892
+#: src/frontend/search/components/SearchModal.js:896
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
 #. translators: %d: number of filter values selected.
-#: src/frontend/search/components/SearchModal.js:1120
-#: src/frontend/search/components/SearchModal.js:1738
+#: src/frontend/search/components/SearchModal.js:1125
+#: src/frontend/search/components/SearchModal.js:1745
 #, js-format
 msgid "%d selected"
 msgid_plural "%d selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/SearchModal.js:1466
+#: src/frontend/search/components/SearchModal.js:1471
 msgid "Your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1476
+#: src/frontend/search/components/SearchModal.js:1481
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1493
-#: src/frontend/search/components/SearchModal.js:1508
+#: src/frontend/search/components/SearchModal.js:1498
+#: src/frontend/search/components/SearchModal.js:1513
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1513
-#: src/frontend/search/components/SearchModal.js:1991
+#: src/frontend/search/components/SearchModal.js:1518
+#: src/frontend/search/components/SearchModal.js:1998
 msgid "Looking at your photo…"
 msgstr ""
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:1526
+#: src/frontend/search/components/SearchModal.js:1531
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1540
-#: src/frontend/search/components/SearchModal.js:1564
+#: src/frontend/search/components/SearchModal.js:1545
+#: src/frontend/search/components/SearchModal.js:1569
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1577
+#: src/frontend/search/components/SearchModal.js:1582
 msgid "Load more results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1590
+#: src/frontend/search/components/SearchModal.js:1595
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1596
+#: src/frontend/search/components/SearchModal.js:1601
 msgid "No result matches the filters you chose. Remove one, or reset them all."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1597
+#: src/frontend/search/components/SearchModal.js:1602
 msgid "Check the spelling, or try a more general word."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1602
+#: src/frontend/search/components/SearchModal.js:1607
 msgid "Reset filters"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1675
+#: src/frontend/search/components/SearchModal.js:1682
 msgid "No results"
 msgstr ""
 
 #. translators: %d: number of results the filters leave.
-#: src/frontend/search/components/SearchModal.js:1678
+#: src/frontend/search/components/SearchModal.js:1685
 #, js-format
 msgid "Show %d result"
 msgid_plural "Show %d results"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/SearchModal.js:1775
+#: src/frontend/search/components/SearchModal.js:1782
 msgid "Search modes"
 msgstr ""
 
 #. translators: 1: number of results shown. 2: total number of results found.
-#: src/frontend/search/components/SearchModal.js:1998
+#: src/frontend/search/components/SearchModal.js:2005
 #, js-format
 msgid "Showing %1$d of %2$d results."
 msgstr ""
 
 #. translators: %d: number of results found.
-#: src/frontend/search/components/SearchModal.js:2004
+#: src/frontend/search/components/SearchModal.js:2011
 #, js-format
 msgid "%d result found."
 msgid_plural "%d results found."
@@ -5181,40 +5213,40 @@ msgstr ""
 msgid "from"
 msgstr ""
 
-#: src/utils/facets.js:83
+#: src/utils/facets.js:94
 msgid "On sale"
 msgstr ""
 
-#: src/utils/facets.js:86
+#: src/utils/facets.js:97
 msgid "SKUs"
 msgstr ""
 
-#: src/utils/facets.js:88
+#: src/utils/facets.js:99
 msgid "Lowest price"
 msgstr ""
 
-#: src/utils/facets.js:89
+#: src/utils/facets.js:100
 msgid "Highest price"
 msgstr ""
 
-#: src/utils/facets.js:90
+#: src/utils/facets.js:101
 msgid "Product type"
 msgstr ""
 
 #. translators: 1: lower bound, e.g. "50 €". 2: upper bound, e.g. "200 €".
-#: src/utils/facets.js:735
+#: src/utils/facets.js:826
 #, js-format
 msgid "%1$s - %2$s"
 msgstr ""
 
 #. translators: %s: lower bound of a filter, e.g. "50 €".
-#: src/utils/facets.js:740
+#: src/utils/facets.js:831
 #, js-format
 msgid "from %s"
 msgstr ""
 
 #. translators: %s: upper bound of a filter, e.g. "200 €".
-#: src/utils/facets.js:745
+#: src/utils/facets.js:836
 #, js-format
 msgid "up to %s"
 msgstr ""

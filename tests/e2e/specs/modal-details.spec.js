@@ -256,3 +256,55 @@ test.describe( 'the details of the search window', () => {
 		await expect( panel.locator( '.whsc-opts__item' ) ).toHaveText( [ /Clothing/, /Shoes/ ] );
 	} );
 } );
+
+/**
+ * lowrider.at has a "MTS Technik" under several parents. By name they were
+ * one value, which filtered all of them and sat under whichever parent came
+ * first. Searcio answers a `_paths` field with one value per category.
+ */
+test.describe( 'the category filter drawn from category paths', () => {
+	const PATHS = {
+		types: [ { value: 'post', count: 8 } ],
+		categories: [ { value: 'Fahrwerke', count: 8 }, { value: 'MTS Technik', count: 7 } ],
+		category_paths: [
+			{ value: 'Fahrwerke', label: 'Fahrwerke', parent: null, count: 8 },
+			{ value: 'Fahrwerke > Gewindefahrwerke', label: 'Gewindefahrwerke', parent: 'Fahrwerke', count: 5 },
+			{ value: 'Fahrwerke > Gewindefahrwerke > MTS Technik', label: 'MTS Technik', parent: 'Fahrwerke > Gewindefahrwerke', count: 5 },
+			{ value: 'Fahrwerke > Sturzdomlager', label: 'Sturzdomlager', parent: 'Fahrwerke', count: 3 },
+			{ value: 'Fahrwerke > Sturzdomlager > MTS Technik', label: 'MTS Technik', parent: 'Fahrwerke > Sturzdomlager', count: 2 },
+		],
+	};
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await configureSearchKey( requestUtils );
+		setFacetFields( [ 'categories', 'category_paths' ] );
+		setCategoryFilter( 'nested', 3 );
+	} );
+
+	test.afterAll( () => {
+		setFacetFields();
+		setCategoryFilter( 'clear' );
+	} );
+
+	test( 'is one filter, with each category of one name under its own parent', async ( { page, requestUtils } ) => {
+		const searches = [];
+		const widget = await open( page, requestUtils, {}, { facets: PATHS, onSearch: ( url ) => searches.push( url ) } );
+
+		await widget.search( 'mts' );
+
+		// The names stay a facet field, but the window draws one category filter.
+		await expect( widget.groupButton( 'Categories' ) ).toBeVisible();
+		await expect( widget.modal.locator( '.whsc-filter-btn[data-field="categories"]' ) ).toHaveCount( 0 );
+
+		const panel = await widget.openGroup( 'Categories' );
+		const items = panel.locator( '.whsc-opts__item' );
+
+		await expect( items ).toHaveText( [ /Fahrwerke/, /Gewindefahrwerke/, /MTS Technik/, /Sturzdomlager/, /MTS Technik/ ] );
+		expect( await items.nth( 4 ).evaluate( ( item ) => item.style.getPropertyValue( '--whsc-level' ) ) ).toBe( '2' );
+
+		await items.nth( 4 ).locator( 'input' ).check();
+
+		await expect.poll( () => searches.at( -1 )?.searchParams.get( 'filter[category_paths]' ) ).toBe( 'Fahrwerke > Sturzdomlager > MTS Technik' );
+		await expect( widget.groupButton( 'Categories' ) ).toContainText( 'Categories: MTS Technik' );
+	} );
+} );

@@ -10,6 +10,7 @@ import {
 	extractFieldFacets,
 	extractRangeFields,
 	facetCoverage,
+	facetValueLabel,
 	filterButtonLabel,
 	filterValue,
 	fitFilterButtons,
@@ -21,7 +22,9 @@ import {
 	mergeRangeFields,
 	orderFacetGroups,
 	parseAmount,
+	pathLabel,
 	rangeLabel,
+	sortCategoryValues,
 	summarizeSelection,
 	toggleSelection,
 	topValues,
@@ -83,6 +86,15 @@ describe( 'extractFieldFacets', () => {
 		expect( extractFieldFacets( { brand: [ { value: 'Acme', count: 7 } ], price: [] } ) ).toEqual( {
 			brand: [ { value: 'Acme', count: 7 } ],
 		} );
+	} );
+
+	it( 'drops the fields the storefront config hides: one category filter, not two', () => {
+		const facets = {
+			categories: [ { value: 'MTS Technik', count: 4103 } ],
+			category_paths: [ { value: 'Fahrwerke', count: 4103 } ],
+		};
+
+		expect( Object.keys( extractFieldFacets( facets, [ 'categories' ] ) ) ).toEqual( [ 'category_paths' ] );
 	} );
 } );
 
@@ -681,6 +693,75 @@ describe( 'arrangeTree', () => {
 
 	it( 'does not take a name from an object\'s prototype for a parent', () => {
 		expect( rows( arrangeTree( [ entry( 'constructor' ) ], { depth: 1, parents } ) ) ).toEqual( [ [ 'constructor', 0 ] ] );
+	} );
+
+	/**
+	 * lowrider.at has three "MTS Technik" under three parents. As names they
+	 * were one value, placed under whichever parent came first.
+	 */
+	it( 'reads the parent of a path from the path itself', () => {
+		const entries = [
+			'Fahrwerke > Gewindefahrwerke > MTS Technik',
+			'Fahrwerke',
+			'Fahrwerke > Sturzdomlager > MTS Technik',
+			'Fahrwerke > Gewindefahrwerke',
+			'Fahrwerke > Sturzdomlager',
+		].map( ( value ) => entry( value ) );
+
+		expect( rows( arrangeTree( entries, { depth: 3, paths: true } ) ) ).toEqual( [
+			[ 'Fahrwerke', 0 ],
+			[ 'Fahrwerke > Gewindefahrwerke', 1 ],
+			[ 'Fahrwerke > Gewindefahrwerke > MTS Technik', 2 ],
+			[ 'Fahrwerke > Sturzdomlager', 1 ],
+			[ 'Fahrwerke > Sturzdomlager > MTS Technik', 2 ],
+		] );
+	} );
+
+	it( 'counts the levels of a path whose parents the search did not answer with', () => {
+		const entries = [ entry( 'Fahrwerke' ), entry( 'Fahrwerke > Gewindefahrwerke > MTS Technik' ) ];
+
+		expect( rows( arrangeTree( entries, { depth: 2, paths: true } ) ) ).toEqual( [ [ 'Fahrwerke', 0 ] ] );
+		expect( rows( arrangeTree( entries, { depth: 3, paths: true } ) ) ).toEqual( [
+			[ 'Fahrwerke', 0 ],
+			[ 'Fahrwerke > Gewindefahrwerke > MTS Technik', 1 ],
+		] );
+	} );
+} );
+
+describe( 'pathLabel and facetValueLabel', () => {
+	it( 'names a category by its own level', () => {
+		expect( pathLabel( 'Fahrwerke > Gewindefahrwerke > MTS Technik' ) ).toBe( 'MTS Technik' );
+		expect( pathLabel( 'Fahrwerke' ) ).toBe( 'Fahrwerke' );
+	} );
+
+	it( 'names a value by its last level only in a tree of paths', () => {
+		expect( facetValueLabel( 'A > B', { tree: { depth: 2, paths: true } } ) ).toBe( 'B' );
+		expect( facetValueLabel( 'A > B', { tree: { depth: 2, parents: {} } } ) ).toBe( 'A > B' );
+		expect( facetValueLabel( 'A > B' ) ).toBe( 'A > B' );
+	} );
+} );
+
+describe( 'sortCategoryValues', () => {
+	const byCount = [ 'Gewindefahrwerke', 'Luftfahrwerke', 'Sturzdomlager', 'Gewindefedern' ].map( ( value ) => ( { value } ) );
+	const values = ( list ) => list.map( ( { value } ) => value );
+
+	it( 'lists them as the shop sorted them, with what it does not list after, as they came', () => {
+		const facet = { sort: 'shop', valuesOrder: [ 'Luftfahrwerke', 'Gewindefahrwerke', 'Gewindefedern' ] };
+
+		expect( values( sortCategoryValues( byCount, facet ) ) ).toEqual( [ 'Luftfahrwerke', 'Gewindefahrwerke', 'Gewindefedern', 'Sturzdomlager' ] );
+	} );
+
+	it( 'lists them by name, a path by its own level', () => {
+		const paths = [ 'Z > Beta', 'A > Gamma', 'M > Alpha' ].map( ( value ) => ( { value } ) );
+
+		expect( values( sortCategoryValues( byCount, { sort: 'name' }, 'de' ) ) ).toEqual( [ 'Gewindefahrwerke', 'Gewindefedern', 'Luftfahrwerke', 'Sturzdomlager' ] );
+		expect( values( sortCategoryValues( paths, { sort: 'name', tree: { depth: 2, paths: true } }, 'de' ) ) ).toEqual( [ 'M > Alpha', 'Z > Beta', 'A > Gamma' ] );
+	} );
+
+	it( 'leaves them by count, and without an order to follow', () => {
+		expect( values( sortCategoryValues( byCount, { sort: 'count' } ) ) ).toEqual( values( byCount ) );
+		expect( values( sortCategoryValues( byCount, { sort: 'shop', valuesOrder: [] } ) ) ).toEqual( values( byCount ) );
+		expect( values( sortCategoryValues( byCount ) ) ).toEqual( values( byCount ) );
 	} );
 } );
 

@@ -281,6 +281,22 @@ final class Plugin_Settings {
 	public const CATEGORY_FILTER_DEPTH = 'category_filter_depth';
 
 	/**
+	 * The order the category filter lists the categories in, one of
+	 * {@see \Webhead\WP\SearchCloud\Enums\Category_Order}. Drawn on the Search
+	 * Config tab with the other two.
+	 */
+	#[Setting(
+		type: 'string',
+		default: 'shop',
+		option_key: 'searcio_category_filter_order',
+		show_in_rest: true,
+		label: 'Category order',
+		description: 'The order of the categories in the filter: as sorted in WooCommerce, by name, or by number of products.',
+		schema: [ 'enum' => [ 'shop', 'name', 'count' ] ]
+	)]
+	public const CATEGORY_FILTER_ORDER = 'category_filter_order';
+
+	/**
 	 * Where the search is placed without a block or a widget, and how a
 	 * shortcode, a classic widget and a site-wide placement look by default
 	 * (see {@see \Webhead\WP\SearchCloud\DTO\Placement_Options}). Read and

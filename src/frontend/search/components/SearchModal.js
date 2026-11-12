@@ -6,7 +6,7 @@ import Button from './Button';
 
 import {currentLangFilter, fetchCardTemplates, fetchHighlights, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
-import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, facetValueLabel, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
 import {redirectTarget} from '../../../utils/redirect';
 import {trackScrollEnd} from '../../../utils/scrollEnd';
@@ -92,6 +92,11 @@ const useModalWidth = (ref) => {
 
 	return width;
 };
+
+/** The fields the storefront config says not to draw (see `hidden` of its `facets`). */
+const hiddenFacets = () => (Array.isArray(getConfig().facets) ? getConfig().facets : [])
+	.filter((facet) => facet?.hidden)
+	.map((facet) => facet.field);
 
 const supportsVoice = () => 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
 
@@ -553,7 +558,7 @@ const SearchModal = ({
 			if ('' === type) {
 				setFacets(response.facets?.types || []);
 			}
-			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), appliedFacets));
 			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 			groupsSource.current = {key: `|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
 			setGroupsVersion((version) => version + 1);
@@ -758,7 +763,7 @@ const SearchModal = ({
 				setFacets(response.facets?.types || []);
 			}
 
-			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), appliedFacets));
 			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
 			groupsSource.current = {key: `${trimmed}|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
 			setGroupsVersion((version) => version + 1);
@@ -862,7 +867,7 @@ const SearchModal = ({
 
 			setVisualTags(Array.isArray(response?.tags) ? response.tags : []);
 			setResults(response);
-			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), {}));
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), {}));
 		} catch (e) {
 			if ('AbortError' === e.name || !isLatest()) {
 				return;
@@ -1090,6 +1095,7 @@ const SearchModal = ({
 	}, []);
 
 	const labelOf = (field) => humanizeFieldLabel(field, fieldLabels);
+	const valuesOf = (field) => (activeFacets[field] || []).map((value) => facetValueLabel(value, facetSettings[field]));
 	const displayOf = (field) => bar.displays[field]
 		|| (rangeFields[field] && !facetGroups[field] ? 'range' : detectFacetDisplay(field, (facetGroups[field] || []).map((entry) => entry.value), facetSettings[field]));
 	const isGroupActive = (field) => (activeFacets[field] || []).length > 0 || hasBound(activeRanges[field]);
@@ -1619,7 +1625,7 @@ const SearchModal = ({
 		}
 
 		(activeFacets[field] || []).forEach((value) => {
-			chips.push({key: `${field}:${value}`, field, value, name: labelOf(field), label: value});
+			chips.push({key: `${field}:${value}`, field, value, name: labelOf(field), label: facetValueLabel(value, facetSettings[field])});
 		});
 	});
 
@@ -1648,6 +1654,8 @@ const SearchModal = ({
 			images={facetSettings[field]?.images || {}}
 			labels={facetSettings[field]?.labels || {}}
 			tree={facetSettings[field]?.tree}
+			sort={facetSettings[field]?.sort}
+			valuesOrder={facetSettings[field]?.valuesOrder}
 			showCount={showCount}
 			locale={locale}
 			onToggle={onFieldFacetClick}
@@ -1707,7 +1715,7 @@ const SearchModal = ({
 
 	const sections = bar.order.map((field, index) => {
 		const open = Boolean(expanded[field]);
-		const summary = summarizeSelection(activeFacets[field], activeRanges[field], formatBound(field));
+		const summary = summarizeSelection(valuesOf(field), activeRanges[field], formatBound(field));
 		const sectionId = `${popoverId}-section-${index}`;
 
 		return (
@@ -1914,7 +1922,7 @@ const SearchModal = ({
 							// numbers that disagree ("20 results", "Products 21") help no one.
 							showCount={showCount && exactTotal}
 							groups={bar.order}
-							buttonLabel={(field) => filterButtonLabel(labelOf(field), activeFacets[field], activeRanges[field], formatBound(field))}
+							buttonLabel={(field) => filterButtonLabel(labelOf(field), valuesOf(field), activeRanges[field], formatBound(field))}
 							isActive={isGroupActive}
 							openField={openFilter?.field || ''}
 							allOpen={'all' === openFilter?.kind}

@@ -144,6 +144,13 @@ final class Document_Builder {
 			}
 		}
 
+		$paths_taxonomy = $this->config->category_paths_taxonomy( $block );
+		$paths          = '' === $paths_taxonomy ? [] : Term_Paths::for_post( $post, $paths_taxonomy );
+
+		if ( [] !== $paths ) {
+			$document[ Facet_Config::CATEGORY_PATHS_FIELD ] = $paths;
+		}
+
 		if ( Woo::POST_TYPE === $post->post_type ) {
 			$woo = isset( $block['woo'] ) && is_array( $block['woo'] ) ? $block['woo'] : [];
 
