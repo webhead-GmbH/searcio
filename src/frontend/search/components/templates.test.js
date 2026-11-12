@@ -176,3 +176,21 @@ describe( 'the price of a product card', () => {
 		expect( html ).toContain( '<ins class="whsc-card__price-current">99.00</ins>' );
 	} );
 } );
+
+describe( 'the stock line of a product card', () => {
+	const render = ( source ) => renderToString( <ResultCard hit={ { id: 'product-4', source: { type: 'product', title: 'Sandal', price: 40, ...source } } } /> );
+
+	// A product on backorder read "In stock" in green.
+	it( 'says a product on backorder is on backorder, not in stock', () => {
+		const html = render( { in_stock: true, stock_status: 'onbackorder' } );
+
+		expect( html ).toContain( 'is-on-backorder' );
+		expect( html ).toContain( 'On backorder' );
+		expect( html ).not.toContain( 'In stock' );
+	} );
+
+	it( 'says in stock and out of stock as it did', () => {
+		expect( render( { in_stock: true, stock_status: 'instock' } ) ).toContain( 'In stock' );
+		expect( render( { in_stock: false, stock_status: 'outofstock' } ) ).toContain( 'Out of stock' );
+	} );
+} );

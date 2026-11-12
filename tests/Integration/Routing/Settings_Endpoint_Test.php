@@ -78,6 +78,24 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'Kabel <2m', 'Fisch & Chips' ], $this->read()->get_data()['settings'][ Plugin_Settings::POPULAR_SEARCHES ] );
 	}
 
+	/**
+	 * "falscher-key 123" was saved without a word, and the site's search fell
+	 * back to WordPress's own.
+	 */
+	public function test_a_search_key_that_is_not_one_is_refused(): void {
+		$this->as_admin();
+		$this->settings()->set( Plugin_Settings::SEARCH_KEY, 'sk_before' );
+
+		$refused = $this->save( [ Plugin_Settings::SEARCH_KEY => 'falscher-key 123' ] );
+
+		$this->assertSame( 400, $refused->get_status() );
+		$this->assertStringContainsString( 'sk_', $refused->get_data()['message'] );
+		$this->assertSame( 'sk_before', $this->settings()->get( Plugin_Settings::SEARCH_KEY ) );
+
+		$this->assertSame( 200, $this->save( [ Plugin_Settings::SEARCH_KEY => 'sk_I4zYlezgsjA8CjXpnlPK5Pu6' ] )->get_status() );
+		$this->assertSame( 200, $this->save( [ Plugin_Settings::SEARCH_KEY => '' ] )->get_status() );
+	}
+
 	/** An unconnected site reads as empty, so the screen can still tell the two apart. */
 	public function test_reading_reports_an_empty_credential_as_empty(): void {
 		$this->settings()->set( Plugin_Settings::WRITE_KEY, '' );

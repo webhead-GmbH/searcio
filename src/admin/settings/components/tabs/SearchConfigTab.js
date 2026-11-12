@@ -13,6 +13,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 import SettingsContext from '../../../../settings/store/context';
 import {
+	changedSince,
 	enabledTypeLabels,
 	repeatsRedirect,
 	errorsUnder,
@@ -719,6 +720,9 @@ const SearchConfigTab = () => {
 	const [ persistedConfig, setPersistedConfig ] = useState( null );
 	const [ loadError, setLoadError ] = useState( null );
 	const [ saveError, setSaveError ] = useState( null );
+	// Set when a save found its sections changed elsewhere since the tab read
+	// them, and stopped: the notice then offers to read them again.
+	const [ isConflict, setIsConflict ] = useState( false );
 	const [ loadAttempt, setLoadAttempt ] = useState( 0 );
 	const [ fieldErrors, setFieldErrors ] = useState( {} );
 	// `null` limit means unlimited. A failed connection test (e.g. credentials
@@ -831,6 +835,7 @@ const SearchConfigTab = () => {
 	const onSave = async () => {
 		setIsSaving( true );
 		setSaveError( null );
+		setIsConflict( false );
 		setFieldErrors( {} );
 
 		const failures = [];
@@ -840,11 +845,30 @@ const SearchConfigTab = () => {
 		let languageSync = null;
 
 		if ( hasSearchConfigChanges ) {
+			const payload = toPayload( config, persistedConfig );
+
+			// What Searcio has now, against what the tab read: a section changed
+			// in the Searcio dashboard meanwhile would be written back as it was.
+			try {
+				const live = normalizeConfig( await apiFetch( { path: SEARCH_CONFIG_PATH } ) );
+				live.type_boosts = syncTypeBoosts( live.type_boosts, Object.keys( typeLabels ) );
+
+				if ( changedSince( payload, live, persistedConfig ).length > 0 ) {
+					setIsSaving( false );
+					setIsConflict( true );
+					setSaveError( __( 'These settings were changed in the Searcio dashboard, or in another window, since this tab read them, and saving would undo that. Nothing was saved. Read them again, then make your change once more.', 'searcio' ) );
+
+					return;
+				}
+			} catch ( error ) {
+				// Unreadable now: the save itself says what is wrong.
+			}
+
 			try {
 				const response = await apiFetch( {
 					path: SEARCH_CONFIG_PATH,
 					method: 'PUT',
-					data: toPayload( config, persistedConfig ),
+					data: payload,
 				} );
 
 				forget( SEARCH_CONFIG_PATH );
@@ -1229,6 +1253,20 @@ const SearchConfigTab = () => {
 			{ saveError && (
 				<Notice.Root intent="error">
 					<Notice.Description>{ saveError }</Notice.Description>
+					{ isConflict && (
+						<Notice.Actions>
+							<Notice.ActionButton
+								onClick={ () => {
+									forget( SEARCH_CONFIG_PATH );
+									setSaveError( null );
+									setIsConflict( false );
+									setLoadAttempt( ( attempt ) => attempt + 1 );
+								} }
+							>
+								{ __( 'Read them again', 'searcio' ) }
+							</Notice.ActionButton>
+						</Notice.Actions>
+					) }
 					<Notice.CloseIconButton onClick={ () => setSaveError( null ) } />
 				</Notice.Root>
 			) }

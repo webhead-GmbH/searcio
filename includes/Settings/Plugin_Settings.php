@@ -181,6 +181,22 @@ final class Plugin_Settings {
 	public const CONFIG_VERSION = 'config_version';
 
 	/**
+	 * When the plugin last changed something the storefront keeps for a visit
+	 * (`sessionStorage` in `src/utils/api.js`): the search settings, or a quiz.
+	 * The storefront keys what it keeps by it, so a quiz published in the
+	 * Product finder tab shows on the next page, not ten minutes later.
+	 */
+	#[Setting(
+		type: 'integer',
+		default: 0,
+		option_key: 'searcio_storefront_version',
+		show_in_rest: false,
+		label: 'Storefront version',
+		description: 'When the plugin last changed what the storefront keeps for a visit.'
+	)]
+	public const STOREFRONT_VERSION = 'storefront_version';
+
+	/**
 	 * Sync-history retention in days. `0` keeps history forever. REST-exposed
 	 * so it renders on the generic schema-driven "General" settings tab;
 	 * applied by {@see \Webhead\WP\SearchCloud\Sync\Sync_Service::run_scheduled()}

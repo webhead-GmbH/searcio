@@ -44,6 +44,18 @@ const refusalAction = (result, refusal) => {
 };
 
 /**
+ * Why the storefront's search key does not work from this site, or '' when
+ * it does: the write key can be connected while the search key is wrong, and
+ * then every visitor's search is WordPress's own.
+ *
+ * @param {?Object} result
+ * @return {string} The reason, or ''.
+ */
+export const searchKeyProblem = (result) => (
+	result?.ok && false === result?.search_key?.ok ? String(result.search_key.message || '') : ''
+);
+
+/**
  * What a result says, in the words its notice prints.
  *
  * @param {?Object} result
@@ -84,7 +96,9 @@ const resultMessage = (result) => {
 		)
 		: '';
 
-	return detail + siteIdSuffix;
+	const keyProblem = searchKeyProblem(result);
+
+	return keyProblem ? `${detail + siteIdSuffix} ${keyProblem}` : detail + siteIdSuffix;
 };
 
 const ConnectionResultNotice = ({result}) => {
@@ -93,7 +107,9 @@ const ConnectionResultNotice = ({result}) => {
 
 	// The answer of a test or a connect is read out as it arrives: a failure
 	// at once, a success when the screen reader is free.
-	useAnnounce(message, result?.ok && !refusal ? 'polite' : 'assertive');
+	const keyProblem = searchKeyProblem(result);
+
+	useAnnounce(message, result?.ok && !refusal && !keyProblem ? 'polite' : 'assertive');
 
 	if (!result) {
 		return null;
@@ -120,7 +136,7 @@ const ConnectionResultNotice = ({result}) => {
 	}
 
 	return (
-		<Notice.Root intent={result.ok ? 'success' : 'error'}>
+		<Notice.Root intent={result.ok && !keyProblem ? 'success' : 'error'}>
 			<Notice.Description>{message}</Notice.Description>
 		</Notice.Root>
 	);

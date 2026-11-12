@@ -28,6 +28,7 @@ declare( strict_types=1 );
 
 namespace Webhead\WP\SearchCloud\Frontend;
 
+use WP_Post;
 use WP_Term;
 use Webhead\WP\SearchCloud\Indexing\Term_Names;
 
@@ -65,7 +66,7 @@ final class Product_List_Markup {
 			? (string) $attributes['source']
 			: 'similar';
 
-		$document_id  = self::text( $attributes['documentId'] ?? '' );
+		$document_id  = self::document_id( self::text( $attributes['documentId'] ?? '' ) );
 		$filter_field = self::text( $attributes['filterField'] ?? '' );
 		$filter_value = self::text( $attributes['filterValue'] ?? '' );
 
@@ -169,6 +170,47 @@ final class Product_List_Markup {
 		$term = get_queried_object();
 
 		return $term instanceof WP_Term ? Term_Names::decode( (string) $term->name ) : '';
+	}
+
+	/**
+	 * Why a row draws nothing, for whoever is placing it in an editor; '' when
+	 * it draws. A row asked for an id no post has, or one that takes the
+	 * product or the category being viewed from a page without one, was an
+	 * empty box with nothing to say why.
+	 *
+	 * @param  array<string,mixed>  $attributes  As {@see self::render()} takes them.
+	 */
+	public static function why_empty( array $attributes ): string {
+		if ( '' !== self::render( $attributes ) ) {
+			return '';
+		}
+
+		$source = in_array( $attributes['source'] ?? '', self::SOURCES, true ) ? (string) $attributes['source'] : 'similar';
+
+		if ( 'category' === $source ) {
+			return __( 'This row shows the products of the category being viewed, and this page is not a category. Enter a filter value, or place the row on a category template.', 'searcio' );
+		}
+
+		if ( '' !== self::text( $attributes['documentId'] ?? '' ) ) {
+			return __( 'No product has this ID. Enter the ID WordPress shows for the product, such as 119.', 'searcio' );
+		}
+
+		return __( 'This row shows the products like the product being viewed, and this page is not a product. Enter a product ID, or place the row on a product template.', 'searcio' );
+	}
+
+	/**
+	 * The document id of the product a row is given: as Searcio knows it
+	 * (`product-119`), or as WordPress shows it (`119`), which is the one an
+	 * admin has; an id no post has is none. `119` alone found nothing.
+	 */
+	private static function document_id( string $given ): string {
+		if ( ! ctype_digit( $given ) ) {
+			return $given;
+		}
+
+		$post = get_post( (int) $given );
+
+		return $post instanceof WP_Post ? $post->post_type . '-' . $post->ID : '';
 	}
 
 	private static function text( mixed $value ): string {

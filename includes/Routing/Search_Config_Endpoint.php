@@ -53,9 +53,14 @@ final class Search_Config_Endpoint extends Rest_API {
 		return 'searcio/v1';
 	}
 
+	/**
+	 * Read from Searcio each time, not from the copy kept for ten minutes: the
+	 * same settings are edited in the Searcio dashboard, and the tab showed a
+	 * boost changed there as it had been, then wrote that back over it.
+	 */
 	#[Route( '/search-config', methods: 'GET', permission_callback: 'can_view' )]
 	public function get_config(): WP_REST_Response {
-		return $this->respond( $this->client->get_search_config() );
+		return $this->respond( $this->client->get_search_config( true ) );
 	}
 
 	#[Route( '/search-config', methods: 'PUT', permission_callback: 'can_manage_settings' )]

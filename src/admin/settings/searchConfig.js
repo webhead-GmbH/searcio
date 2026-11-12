@@ -243,6 +243,27 @@ const fullPayload = ( config ) => ( {
  *                             the whole configuration is sent.
  * @return {Object} Request body.
  */
+/**
+ * The sections a save would write that were changed elsewhere since the tab
+ * read them: in the Searcio dashboard, which edits the same settings, or in
+ * another tab. A section is written whole, so saving it then put its old rows
+ * back over that change, and nothing said so.
+ *
+ * @param {Object} payload   What the save would send ({@see toPayload}).
+ * @param {Object} live      The configuration as Searcio has it now, normalized as the tab's.
+ * @param {Object} persisted The configuration as the tab read it.
+ * @return {Array<string>} The sections, by key.
+ */
+export const changedSince = ( payload, live, persisted ) => Object.keys( payload ).filter( ( key ) => {
+	if ( 'features' === key ) {
+		return Object.keys( payload.features || {} ).some(
+			( feature ) => JSON.stringify( live?.features?.[ feature ] ) !== JSON.stringify( persisted?.features?.[ feature ] )
+		);
+	}
+
+	return JSON.stringify( live?.[ key ] ) !== JSON.stringify( persisted?.[ key ] );
+} );
+
 export const toPayload = ( config, persisted ) => {
 	const next = fullPayload( config );
 

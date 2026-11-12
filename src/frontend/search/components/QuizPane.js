@@ -32,9 +32,10 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 	// "Back" restores the previous step exactly rather than restarting.
 	const [ history, setHistory ] = useState( [] );
 	const [ tags, setTags ] = useState( {} );
-	// The wording the visitor picked, per field. The tag value is a catalogue
-	// value ("m"); showing that back reads as an internal code, not as the
-	// answer they gave ("Medium").
+	// The answer the visitor picked for each field, with the question it
+	// answered: `{ label, question }`. The tag value is a catalogue value
+	// ("m"); showing that back reads as an internal code, not as the answer
+	// they gave ("Medium").
 	const [ answerLabels, setAnswerLabels ] = useState( {} );
 	// What the answers asked for besides filters (`quiz.md`, "Widget flow
 	// contract"): one entry per answer that wanted words, kept with its wording
@@ -197,7 +198,7 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 			const next = { ...current };
 
 			[ ...( option.tags_matched || [] ), ...( option.ranges_matched || [] ) ].forEach( ( criterion ) => {
-				next[ criterion.field ] = option.label;
+				next[ criterion.field ] = { label: option.label, question: question.text };
 			} );
 
 			return next;
@@ -294,20 +295,28 @@ const QuizPane = ( { cardSource, serverTemplates, onEmpty } ) => {
 		);
 	}
 
-	// A range shows like a filter, under its field. An answer that asked for
-	// words has no field, so it is listed under the question it answered.
-	const answers = [
-		...Object.entries( { ...tags, ...ranges } ).map( ( [ field, value ] ) => ( {
-			key: field,
-			name: humanizeFieldLabel( field, getConfig().fieldLabels ),
-			value: answerLabels[ field ] || ( Array.isArray( value ) ? value.join( ', ' ) : value ),
-		} ) ),
-		...keywordAnswers.map( ( entry, index ) => ( {
-			key: `keywords-${ index }`,
-			name: entry.question,
-			value: entry.label,
-		} ) ),
-	];
+	// Each answer under the question it answered, once. Under the field it
+	// filters on, a budget answer that also set a category read "Kategorien:
+	// Mehr als 60 Euro", the catalogue's word for a question nobody asked.
+	const answers = [];
+	const answered = new Set();
+	const addAnswer = ( key, name, value ) => {
+		if ( ! answered.has( name ) ) {
+			answered.add( name );
+			answers.push( { key, name, value } );
+		}
+	};
+
+	Object.entries( { ...tags, ...ranges } ).forEach( ( [ field, value ] ) => {
+		const given = answerLabels[ field ];
+
+		addAnswer(
+			field,
+			given?.question || humanizeFieldLabel( field, getConfig().fieldLabels ),
+			given?.label || ( Array.isArray( value ) ? value.join( ', ' ) : value )
+		);
+	} );
+	keywordAnswers.forEach( ( entry, index ) => addAnswer( `keywords-${ index }`, entry.question, entry.label ) );
 	const progress = quizProgress( quiz, history.length, question );
 	const hits = results?.hits || [];
 	// The quiz always searches with an empty term, which the service answers on

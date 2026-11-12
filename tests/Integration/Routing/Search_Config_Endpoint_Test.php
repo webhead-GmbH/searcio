@@ -289,6 +289,25 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$this->assertNotSame( '', $again['sync']['message'] );
 	}
 
+	/**
+	 * The same settings are edited in the Searcio dashboard. Kept ten minutes,
+	 * the tab showed a boost changed there as it had been, and wrote that back
+	 * over it: the tab reads them from Searcio each time.
+	 */
+	public function test_the_tab_reads_the_configuration_from_searcio_each_time(): void {
+		$this->as_admin();
+		$boost = 1;
+		$this->fake_http( function () use ( &$boost ) {
+			return $this->http_ok( [ 'type_boosts' => [ [ 'type' => 'ratgeber', 'boost' => $boost ] ] ] );
+		} );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+		$boost = 3;
+		$data  = $this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) )->get_data();
+
+		$this->assertSame( 3, $data['type_boosts'][0]['boost'] );
+	}
+
 	public function test_a_failed_read_keeps_the_facet_fields_it_had(): void {
 		$this->as_admin();
 		$this->service( 'facet_config' )->set_fields( [ 'brand' ] );

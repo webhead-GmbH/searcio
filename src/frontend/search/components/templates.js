@@ -104,9 +104,20 @@ const CardImage = ( { src } ) => {
 	);
 };
 
-const StockStatus = ( { inStock } ) => {
+/**
+ * @param {Object}  props
+ * @param {boolean} [props.inStock] Whether WooCommerce counts the product in stock.
+ * @param {string}  [props.status]  WooCommerce's stock status.
+ */
+const StockStatus = ( { inStock, status } ) => {
 	if ( undefined === inStock ) {
 		return null;
+	}
+
+	// WooCommerce counts a product on backorder in stock, since it can be
+	// bought: "In stock" told the shopper it was ready to ship.
+	if ( 'onbackorder' === status ) {
+		return <span className="whsc-card__stock is-on-backorder">{ __( 'On backorder', 'searcio' ) }</span>;
 	}
 
 	return (
@@ -131,7 +142,7 @@ const ProductCard = ( { hit, onClick } ) => {
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
 				<PriceLine source={ source } />
-				<StockStatus inStock={ source.in_stock } />
+				<StockStatus inStock={ source.in_stock } status={ source.stock_status } />
 			</span>
 		</a>
 	);

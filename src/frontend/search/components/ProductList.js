@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { currentLangFilter, fetchSimilar, isConfigured, isLanguageSupported, productType, search, trackClick } from '../../../utils/api';
+import { currentLangFilter, fetchCardTemplates, fetchSimilar, isConfigured, isLanguageSupported, productType, search, trackClick } from '../../../utils/api';
 import { buildFilterParams } from '../../../utils/facets';
 import { ResultCard } from './templates';
 import Carousel from './Carousel';
@@ -34,8 +34,9 @@ import SearchResultsSkeleton from './SearchResultsSkeleton';
  * @param {number}  [props.limit]           How many products to ask for.
  * @param {string}  [props.layout]          'carousel' (default) or 'grid'.
  * @param {boolean} [props.showBanner]      Render the merchandising banner ('category').
- * @param {string}  [props.cardSource]      Passed through to ResultCard.
- * @param {Array}   [props.serverTemplates] Passed through to ResultCard.
+ * @param {string}  [props.cardSource]      Passed through to ResultCard. With
+ *                                          `server`, the row asks for the card
+ *                                          templates designed in Searcio itself.
  */
 const ProductList = ( {
 	source,
@@ -47,15 +48,39 @@ const ProductList = ( {
 	layout,
 	showBanner,
 	cardSource,
-	serverTemplates,
 } ) => {
 	const [ products, setProducts ] = useState( null );
+	// The templates designed in Searcio, for a row set to draw them: it was
+	// never given any, so "Searcio templates" drew the plugin's cards.
+	const [ serverTemplates, setServerTemplates ] = useState( [] );
 	const [ banner, setBanner ] = useState( '' );
 	// The `search_id` the row's clicks are attributed to: the category row's
 	// `/search`, or the `/search/similar` list (a service that does not record
 	// those answers with none, and a click then sends nothing).
 	const [ searchId, setSearchId ] = useState( '' );
 	const abortRef = useRef( null );
+
+	// Asked once, and kept for the page as the search window keeps them; a
+	// failure leaves the plugin's cards, never an empty row.
+	useEffect( () => {
+		if ( 'server' !== cardSource || ! isConfigured() ) {
+			return undefined;
+		}
+
+		let cancelled = false;
+
+		fetchCardTemplates()
+			.then( ( response ) => {
+				if ( ! cancelled ) {
+					setServerTemplates( Array.isArray( response?.templates ) ? response.templates : [] );
+				}
+			} )
+			.catch( () => {} );
+
+		return () => {
+			cancelled = true;
+		};
+	}, [ cardSource ] );
 
 	useEffect( () => {
 		// An unsupported visitor language would otherwise be served products

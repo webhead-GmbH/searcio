@@ -147,6 +147,9 @@ final class Frontend_Config {
 			// WordPress went to the default language's results, with nothing
 			// in it, from an English page.
 			'siteHome'        => $this->multilingual->home_url(),
+			// What the storefront keeps for a visit is keyed by it, so what the
+			// plugin changed on Searcio is asked for again on the next page.
+			'cacheVersion'    => (int) $this->settings->get( Plugin_Settings::STOREFRONT_VERSION ),
 			// Read through the setting's own cleaning, for a list saved before it decoded.
 			'popularSearches' => Plugin_Settings::plain_text_list( $this->settings->get( Plugin_Settings::POPULAR_SEARCHES ) ),
 			'typeLabels'      => $this->index_config->document_type_labels(),

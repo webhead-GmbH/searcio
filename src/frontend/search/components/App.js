@@ -5,6 +5,7 @@ import Trigger from './Trigger';
 import ProductList from './ProductList';
 import SearchModal from './SearchModal';
 import { documentType } from '../../../utils/documentType';
+import { liftAboveBottomBars } from '../../../utils/bottomBars';
 
 /**
  * Portals each server-rendered trigger placeholder to a real
@@ -50,6 +51,16 @@ const App = ( { triggerElements, listElements = [] } ) => {
 		window.addEventListener( OPEN_EVENT, onOpenRequest );
 
 		return () => window.removeEventListener( OPEN_EVENT, onOpenRequest );
+	}, [ triggerElements ] );
+
+	// The floating button stands on a bar the site fixes to the bottom of the
+	// screen, a store notice or a cookie banner, not over it.
+	useEffect( () => {
+		const stops = triggerElements
+			.filter( ( el ) => el.classList.contains( 'whsc-trigger--floating' ) )
+			.map( ( el ) => liftAboveBottomBars( el ) );
+
+		return () => stops.forEach( ( stop ) => stop() );
 	}, [ triggerElements ] );
 
 	const closeModal = () => {

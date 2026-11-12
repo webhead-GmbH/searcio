@@ -18,6 +18,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Routing;
 
 use WP_REST_Request;
 use WP_REST_Server;
+use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Quizzes_Endpoint_Test extends Integration_Test_Case {
@@ -204,6 +205,37 @@ final class Quizzes_Endpoint_Test extends Integration_Test_Case {
 		$endings = $this->send( 'POST', self::ROUTE . '/endings', [ 'questions' => [ [ 'id' => 'q', 'text' => 'Who?', 'options' => [] ] ] ] );
 		$this->assertSame( 0, $endings->get_data()['endings'][0]['count'] );
 		$this->assertSame( [ 'questions' => [ [ 'id' => 'q', 'text' => 'Who?', 'options' => [] ] ] ], end( $this->sent )['body'] );
+	}
+
+	/**
+	 * A German quiz counted 4 products for an ending that found none on the
+	 * English pages it was also offered on: the endings are asked for in the
+	 * quiz's language, which a service before it ignores.
+	 */
+	public function test_the_endings_of_a_quiz_in_one_language_are_counted_in_it(): void {
+		$this->as_admin();
+		$this->fake_service( fn (): array => $this->http_ok( [ 'endings' => [], 'truncated' => false ] ) );
+
+		$this->send( 'POST', self::ROUTE . '/endings', [ 'lang' => 'de', 'questions' => [] ] );
+		$this->assertSame( 'de', end( $this->sent )['body']['lang'] ?? null );
+
+		$this->send( 'POST', self::ROUTE . '/endings', [ 'lang' => null, 'questions' => [] ] );
+		$this->assertArrayNotHasKey( 'lang', end( $this->sent )['body'] );
+	}
+
+	/**
+	 * A quiz published in the Product finder tab stayed out of a visit's
+	 * search window for ten minutes: the storefront keeps the list for the
+	 * visit, keyed by when the plugin last changed it.
+	 */
+	public function test_a_change_to_a_quiz_makes_the_storefront_ask_for_the_quizzes_again(): void {
+		$this->as_admin();
+		$this->settings()->set( Plugin_Settings::STOREFRONT_VERSION, 0 );
+		$this->fake_service( fn (): array => $this->http_ok( [ 'id' => 3, 'name' => 'Gift finder', 'status' => 'published' ] ) );
+
+		$this->send( 'PUT', self::ROUTE . '/3', [ 'status' => 'published' ] );
+
+		$this->assertGreaterThan( 0, (int) $this->settings()->get( Plugin_Settings::STOREFRONT_VERSION ) );
 	}
 
 	/** Searcio's own answer would only say "Unauthenticated"; the editor says what to do. */

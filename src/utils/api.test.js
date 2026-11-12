@@ -1012,3 +1012,37 @@ describe( 'search', () => {
 		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'highlight' ) ).toBe( '0' );
 	} );
 } );
+
+describe( 'what is kept for a visit', () => {
+	// A quiz published in the Product finder tab stayed out of a visitor's
+	// window for ten minutes: the list was kept for the visit.
+	it( 'is asked for again once the plugin changed it on Searcio', async () => {
+		const asked = [];
+
+		global.fetch = ( url ) => {
+			asked.push( url );
+
+			return Promise.resolve( jsonResponse( { quizzes: [] } ) );
+		};
+
+		const page = ( cacheVersion ) => {
+			let api;
+
+			setConfig( { cacheVersion } );
+			jest.isolateModules( () => {
+				api = require( './api' );
+			} );
+
+			return api;
+		};
+
+		await page( 100 ).fetchQuizzes();
+		await page( 100 ).fetchQuizzes();
+
+		expect( asked ).toHaveLength( 1 );
+
+		await page( 200 ).fetchQuizzes();
+
+		expect( asked ).toHaveLength( 2 );
+	} );
+} );

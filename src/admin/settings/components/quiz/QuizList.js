@@ -327,6 +327,15 @@ const QuizList = ( { languages, onOpen, onCreate, reload } ) => {
 				</Button>
 			</Stack>
 
+			{ /* A quiz made before the site had a second language is for every language, and a German one then showed on the English pages, where it found nothing. */ }
+			{ languages.length > 1 && items.some( ( quiz ) => ! quiz.lang ) && (
+				<Notice.Root intent="info">
+					<Notice.Description>
+						{ __( 'A quiz set to "Every language" is offered on the pages of every language. Open it and choose its language if its questions are written in one.', 'searcio' ) }
+					</Notice.Description>
+				</Notice.Root>
+			) }
+
 			{ '' !== loadError ? (
 				<Notice.Root intent="error">
 					<Notice.Title>{ __( 'The quizzes could not be loaded.', 'searcio' ) }</Notice.Title>

@@ -93,6 +93,10 @@ const KNOWN_FIELD_LABELS = () => ( {
 	in_stock: __( 'In stock', 'searcio' ),
 	on_sale: __( 'On sale', 'searcio' ),
 	featured: __( 'Featured', 'searcio' ),
+	rating: __( 'Rating', 'searcio' ),
+	review_count: __( 'Reviews', 'searcio' ),
+	// The attributes a product defines for itself, each "Name: value".
+	custom_attributes: __( 'Attributes', 'searcio' ),
 	sku: __( 'SKU', 'searcio' ),
 	skus: __( 'SKUs', 'searcio' ),
 	price: __( 'Price', 'searcio' ),

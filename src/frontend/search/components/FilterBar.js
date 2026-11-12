@@ -147,8 +147,8 @@ const FilterBar = ( {
 		// A group of independent toggle buttons, not a tablist: more than one
 		// type can be pressed at once.
 		<div className="whsc-types" role="group" aria-label={ __( 'Filter by type', 'searcio' ) }>
-			{ /* On a phone "All" is the state with no type pressed. */ }
-			{ ! narrow && typeButton( '', allTypesLabel || __( 'All', 'searcio' ) ) }
+			{ /* On a phone too: without it, the way back to every result was to press the pressed type again, which nothing said. */ }
+			{ typeButton( '', allTypesLabel || __( 'All', 'searcio' ) ) }
 			{ types.map( ( facet ) => typeButton( facet.value, typeLabels[ facet.value ] || facet.value, facet.count ) ) }
 		</div>
 	);

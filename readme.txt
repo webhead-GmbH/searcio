@@ -213,6 +213,13 @@ Legal notice: https://searcio.com/impressum
 - Changing "Hide out of stock items" in WooCommerce, or the languages on the Search Config tab, starts a sync.
 - A variable product on sale shows its regular price struck through, and grouped and external products are sent with their own product type.
 - Attributes a product defines for itself can be indexed (Indexing tab, Product-specific attributes).
+- The Search Config tab always shows the settings as Searcio has them, and no longer undoes a change made in the Searcio dashboard.
+- A quiz published in the Product finder tab shows on the shop's next page, not some minutes later.
+- Product rows set to Searcio templates draw them, and a card designed in Searcio looks on the site as it does in the Searcio panel.
+- The comparison table leaves out internal fields, a product on backorder says so, and a wrong search key is refused and reported by Test connection.
+- A product row accepts the product's ID as WordPress shows it, and the Elementor editor says why a row is empty.
+- The product finder names each answer by its question, and its editor marks a question no answer leads to.
+- On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.
 
 = 1.4.0 =
 - Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.

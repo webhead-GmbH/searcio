@@ -152,7 +152,8 @@ describe( 'mergeFieldFacets', () => {
 
 describe( 'humanizeFieldLabel', () => {
 	it( 'replaces underscores/hyphens with spaces and capitalizes the first letter', () => {
-		expect( humanizeFieldLabel( 'review_count' ) ).toBe( 'Review count' );
+		expect( humanizeFieldLabel( 'shipping_class' ) ).toBe( 'Shipping class' );
+		expect( humanizeFieldLabel( 'review_count' ) ).toBe( 'Reviews' );
 		expect( humanizeFieldLabel( 'stock-status' ) ).toBe( 'Stock status' );
 	} );
 

@@ -14,6 +14,11 @@ const HEADER_OR_INTERNAL = new Set( [
 	// Every variation's SKU, next to the product's own `sku` row: the same
 	// thing again, as a list only a warehouse reads.
 	'skus',
+	// The categories again, as paths for the filter's tree; the tags Searcio's
+	// photo tagging writes, in English on a German shop; and the flag that
+	// picks the "featured" highlights. None says anything to a shopper
+	// choosing between two products.
+	'category_paths', 'ai_tags', 'featured',
 	// Bookkeeping the indexer writes. `indexed_at` in particular was showing up
 	// as a comparison row, which tells a shopper nothing about the product.
 	'indexed_at', 'synced_at', 'updated_at', 'created_at', 'modified', 'date',

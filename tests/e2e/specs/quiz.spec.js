@@ -110,10 +110,11 @@ test.describe( 'guided quiz', () => {
 		await widget.answerQuiz( 'Large' );
 
 		await expect( widget.quizAnswers ).toHaveCount( 2 );
-		// The chip names the field and echoes the answer as it was written on
-		// the button - "Formal", not the `formal` tag value that goes to the
-		// API. A raw value here is what a shopper cannot make sense of.
-		await expect( widget.quizAnswers.first() ).toContainText( 'Style' );
+		// The chip names the question and echoes the answer as it was written
+		// on the button - "Formal", not the `formal` tag value that goes to the
+		// API. A raw value here is what a shopper cannot make sense of, and so
+		// is the field: a budget answer read "Categories: More than 60 Euro".
+		await expect( widget.quizAnswers.first() ).toContainText( "What's your style?" );
 		await expect( widget.quizAnswers.first() ).toContainText( 'Formal' );
 	} );
 

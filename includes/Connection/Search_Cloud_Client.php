@@ -58,6 +58,11 @@ final class Search_Cloud_Client {
 		return '' !== $write_key && '' !== $write_secret;
 	}
 
+	/** The public search key the storefront sends, as saved. */
+	public function search_key(): string {
+		return trim( (string) $this->settings->get( Plugin_Settings::SEARCH_KEY ) );
+	}
+
 	/**
 	 * The write key alone, decrypted, for contexts that must never see the
 	 * secret half (e.g. the public domain-ownership {@see \Webhead\WP\SearchCloud\Routing\Verify_Endpoint}).
@@ -75,6 +80,35 @@ final class Search_Cloud_Client {
 	 */
 	public function health( bool $fresh = false ): Api_Response {
 		return $this->kept( 'health', self::HEALTH_TTL, fn (): Api_Response => $this->request( 'GET', '/health' ), $fresh );
+	}
+
+	/**
+	 * Whether Searcio takes the search key the storefront sends, from this
+	 * site's address: `GET /storefront-config` with it, as a visitor's browser
+	 * asks, with the site's own origin, since a key restricted to its domains
+	 * refuses any other. The health check asks with the write key, which said
+	 * "Connected" while a wrong search key kept every visitor's search on
+	 * WordPress's own. Kept as long as the health check.
+	 */
+	public function search_key_check( string $key, bool $fresh = false ): Api_Response {
+		return $this->kept(
+			'search_key_' . substr( wp_hash( $key ), 0, 12 ),
+			self::HEALTH_TTL,
+			fn (): Api_Response => $this->request( 'GET', '/storefront-config?' . http_build_query( [ 'key' => $key ] ), authenticated: false, headers: [ 'Origin' => $this->site_origin() ] ),
+			$fresh
+		);
+	}
+
+	/** The site's own origin, `https://shop.example` (with a port when it has one). */
+	private function site_origin(): string {
+		$parts = wp_parse_url( home_url() );
+		$host  = is_array( $parts ) ? (string) ( $parts['host'] ?? '' ) : '';
+
+		if ( '' === $host ) {
+			return '';
+		}
+
+		return ( $parts['scheme'] ?? 'https' ) . '://' . $host . ( isset( $parts['port'] ) ? ':' . (int) $parts['port'] : '' );
 	}
 
 	/**
@@ -183,6 +217,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'PUT', '/search-config', $payload );
 
 		$this->forget( 'search_config' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -205,6 +240,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'POST', '/quiz-templates', $quiz, true, false );
 
 		$this->forget( 'quizzes' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -220,6 +256,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'PUT', '/quiz-templates/' . $id, $changes );
 
 		$this->forget( 'quizzes' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -228,6 +265,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'DELETE', '/quiz-templates/' . $id );
 
 		$this->forget( 'quizzes' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -273,6 +311,18 @@ final class Search_Cloud_Client {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * A change the storefront keeps a copy of for a visit: the search
+	 * settings decide its tabs and the quizzes fill one. The copies are keyed
+	 * by {@see Plugin_Settings::STOREFRONT_VERSION}, so a new one makes them
+	 * stale on the next page.
+	 */
+	private function storefront_changed( Api_Response $response ): void {
+		if ( $response->ok() ) {
+			$this->settings->set( Plugin_Settings::STOREFRONT_VERSION, time() );
+		}
 	}
 
 	private function forget( string $name ): void {
@@ -322,9 +372,10 @@ final class Search_Cloud_Client {
 
 	/**
 	 * @param  array<string,mixed>|null  $body
-	 * @param  bool                      $retry  Whether a failure that may pass is asked again.
+	 * @param  bool                      $retry    Whether a failure that may pass is asked again.
+	 * @param  array<string,string>      $headers  Sent besides the plugin's own.
 	 */
-	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true ): Api_Response {
+	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true, array $headers = [] ): Api_Response {
 		$url = $this->base() . $path;
 
 		// The language of the screen, or of the site, so that what Searcio says
@@ -333,7 +384,7 @@ final class Search_Cloud_Client {
 		$headers = [
 			'Accept'          => 'application/json',
 			'Accept-Language' => str_replace( '_', '-', determine_locale() ),
-		];
+		] + array_filter( $headers, static fn ( string $value ): bool => '' !== $value );
 
 		if ( $authenticated ) {
 			[ $write_key, $write_secret ] = $this->credentials();

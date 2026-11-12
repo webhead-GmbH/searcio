@@ -861,6 +861,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 .whsc-modal .whsc-search-input__clear {
+	position: relative;
 	flex-shrink: 0;
 	min-width: 30px;
 	min-height: 30px;
@@ -876,6 +877,16 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		color: var(--whsc-clearbtn-color-hover, var(--whsc-clearbtn-color, var(--whsc-icon-color)));
 		background: var(--whsc-clearbtn-bg-hover, var(--whsc-icon-bg-hover));
 		box-shadow: none;
+	}
+
+	// A finger needs 44px, and the field has no room for a button that big:
+	// the button stays as it looks and takes a touch 7px round it.
+	@media (pointer: coarse) {
+		&::after {
+			content: "";
+			position: absolute;
+			inset: -7px;
+		}
 	}
 }
 
@@ -1815,6 +1826,24 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		flex: 1 1 auto;
 	}
 
+	// The panel's canvas stacks what a card or a box holds, each part as wide
+	// as the box, unless the template says otherwise ("containers stack
+	// children vertically unless styled otherwise", the service's
+	// `canvas-node.tsx`), and the stylesheet it sends says nothing of it. Left
+	// to the browser, a card drawn as a link put the title, the price, the
+	// stars and the badge on one line.
+	> *,
+	:is(a, div):has(> [class*="sct-"]) {
+		display: flex;
+		flex-direction: column;
+	}
+
+	// The canvas writes a space between the parts of a price, the markup
+	// none: "from249,90".
+	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"]) {
+		margin-inline-end: 0.25em;
+	}
+
 	:is(h1, h2, h3, h4, h5, h6) {
 		font-size: inherit;
 		font-weight: inherit;
@@ -1990,6 +2019,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	&.is-out-of-stock {
 		color: var(--whsc-stock-out-color);
 	}
+
+	// It can be bought, and is not ready to ship: the colour of the price, not
+	// the green of a product in stock.
+	&.is-on-backorder {
+		color: var(--whsc-stock-backorder-color, var(--whsc-price-color));
+	}
 }
 
 /* The text is cut in `templates.js`, at a word and with an ellipsis; a line
@@ -2109,13 +2144,15 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 /*
  * The floating button, fixed to a bottom corner. Its distance from the
- * bottom edge is the Placement tab's, so it can stand above a cart bar or a
- * cookie notice, and a phone's home indicator is added to it.
+ * bottom edge is the Placement tab's, a phone's home indicator is added to
+ * it, and so is the height of a bar the site fixes to the bottom of the
+ * screen under the button (`--whsc-floating-lift`, `bottomBars.js`): it stood
+ * over a store notice's text and its close button.
  */
 .searcio-trigger#{$lift}.whsc-trigger--floating {
 	position: fixed;
 	z-index: 99990;
-	inset-block-end: calc(var(--whsc-floating-offset, 24px) + env(safe-area-inset-bottom, 0px));
+	inset-block-end: calc(var(--whsc-floating-offset, 24px) + var(--whsc-floating-lift, 0px) + env(safe-area-inset-bottom, 0px));
 	inset-inline-end: 16px;
 
 	&.whsc-floating--start {
@@ -2930,7 +2967,10 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	box-shadow: 1px 0 0 var(--whsc-assistant-divider, #e8e9eb);
 }
 
-.whsc-compare__corner {
+/* Above the product headers that scroll under it. Written as `thead th`, as
+ * the rule that gives every header cell its layer is: one class alone lost to
+ * it, and the product scrolled sideways showed through the corner on a phone. */
+.whsc-compare__table thead th.whsc-compare__corner {
 	z-index: 2;
 }
 

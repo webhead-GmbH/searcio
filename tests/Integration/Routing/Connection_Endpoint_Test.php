@@ -109,6 +109,45 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/** A service from before the refusal says nothing about the account, and serves it. */
+	/**
+	 * "falscher-key 123" was saved and the test said "Connected": it asks with
+	 * the write key, while every visitor's search went to WordPress.
+	 */
+	public function test_test_connection_says_when_searcio_does_not_take_the_search_key(): void {
+		$this->login_admin();
+		$this->settings()->set( Plugin_Settings::SEARCH_KEY, 'sk_wrong' );
+		$asked = [];
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$asked ): array {
+				if ( str_contains( $url, '/storefront-config' ) ) {
+					$asked[] = $args['headers']['Origin'] ?? '';
+
+					return $this->http_ok( [ 'message' => 'Unauthenticated.' ], 401 );
+				}
+
+				return $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected' ] ] );
+			}
+		);
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
+
+		$this->assertTrue( $data['ok'] );
+		$this->assertFalse( $data['search_key']['ok'] );
+		$this->assertStringContainsString( 'does not know the search key', $data['search_key']['message'] );
+		// Asked as the site's own pages ask, from its address.
+		$this->assertSame( [ untrailingslashit( home_url() ) ], $asked );
+	}
+
+	public function test_test_connection_says_nothing_against_a_search_key_that_works(): void {
+		$this->login_admin();
+		$this->settings()->set( Plugin_Settings::SEARCH_KEY, 'sk_right' );
+		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected' ] ] ) );
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
+
+		$this->assertTrue( $data['search_key']['ok'] );
+	}
+
 	public function test_test_connection_reads_an_answer_without_account_as_served(): void {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected' ] ] ) );

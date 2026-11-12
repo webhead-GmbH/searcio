@@ -73,6 +73,17 @@ final class Settings_Endpoint extends Rest_API {
 			);
 		}
 
+		// A search key is `sk_` and letters and digits. Anything else was saved
+		// without a word, and the site's search fell back to WordPress's own.
+		$search_key = $incoming[ Plugin_Settings::SEARCH_KEY ] ?? null;
+
+		if ( is_string( $search_key ) && '' !== trim( $search_key ) && 1 !== preg_match( '/^sk_\w+$/', trim( $search_key ) ) ) {
+			return new WP_REST_Response(
+				[ 'message' => __( 'That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard.', 'searcio' ) ],
+				400
+			);
+		}
+
 		// A value its schema refuses, such as a negative number of days to keep
 		// the history for, is answered as a refusal, not a server error.
 		try {

@@ -53,9 +53,11 @@ const SIMILAR_MAX = 20;
 const CACHE_MAX = 60;
 
 // The answers kept across the pages of a visit: what the window shows before
-// the visitor types, the same on every page.
+// the visitor types, the same on every page. Keyed by when the plugin last
+// changed one of them on Searcio (`cacheVersion`): a quiz published in the
+// Product finder tab stayed out of a visit's window for ten minutes.
 const KEPT_PATHS = [ '/storefront-config', '/card-templates', '/search/popular', '/quizzes' ];
-const STORE_PREFIX = 'searcio.cache:';
+const STORE_PREFIX = `searcio.cache:${ Number( config.cacheVersion ) || 0 }:`;
 
 const cache = new Map();
 // Requests of kept answers on their way, shared by every caller that asks.

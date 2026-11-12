@@ -92,7 +92,7 @@ The other ways, which the tab also lists:
   | `[searcio_products]` attribute | Values |
   | --- | --- |
   | `source` | `similar` (to the product on the page) or `category` (the category on the page) |
-  | `id`, `field`, `value` | a product's document id, or a category's field and value, for a row placed elsewhere |
+  | `id`, `field`, `value` | a product's ID (`119`) or document id (`product-119`), or a category's field and value, for a row placed elsewhere |
   | `layout`, `limit` | `carousel` or `grid`, and 1 to 24 products |
   | `heading`, `banner` | the row's title, and `yes` or `no` for a merchandising banner |
   | `cards`, `class` | as above |

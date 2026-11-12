@@ -5,6 +5,7 @@
  */
 
 import {
+	changedSince,
 	cleanTerms,
 	enabledTypeLabels,
 	repeatsRedirect,
@@ -484,5 +485,35 @@ describe( 'repeatsRedirect', () => {
 		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
 		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
 		expect( repeatsRedirect( rules, 4 ) ).toBe( false );
+	} );
+} );
+
+describe( 'changedSince', () => {
+	const persisted = {
+		type_boosts: [ { type: 'product', boost: 1 }, { type: 'ratgeber', boost: 1 } ],
+		searchable_fields: [ { field: 'title', weight: 5 }, { field: 'content', weight: 1 } ],
+		synonyms: [],
+		features: { visual_search: { enabled: false }, assistant: { enabled: true } },
+	};
+
+	// A boost changed in the Searcio dashboard went back to 1 when the tab
+	// saved its boosts, read ten minutes before.
+	it( 'names a section the save would write that changed since the tab read it', () => {
+		const live = { ...persisted, type_boosts: [ { type: 'product', boost: 1 }, { type: 'ratgeber', boost: 3 } ] };
+
+		expect( changedSince( { type_boosts: persisted.type_boosts }, live, persisted ) ).toEqual( [ 'type_boosts' ] );
+	} );
+
+	it( 'lets through a save of sections nobody changed meanwhile', () => {
+		const live = { ...persisted, searchable_fields: [ { field: 'title', weight: 5 }, { field: 'content', weight: 2 } ] };
+
+		expect( changedSince( { synonyms: [ [ 'hoodie', 'sweater' ] ] }, live, persisted ) ).toEqual( [] );
+	} );
+
+	it( 'looks only at the feature switches the save sends', () => {
+		const live = { ...persisted, features: { visual_search: { enabled: false }, assistant: { enabled: false } } };
+
+		expect( changedSince( { features: { visual_search: { enabled: true } } }, live, persisted ) ).toEqual( [] );
+		expect( changedSince( { features: { assistant: { enabled: true } } }, live, persisted ) ).toEqual( [ 'features' ] );
 	} );
 } );

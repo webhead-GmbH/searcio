@@ -12,7 +12,7 @@ import { Grid } from '../../../../components/Layout';
 import { showToast } from '../../../../toast';
 import { useAnnounce } from '../../../../utils/announce';
 import { selectProps } from '../../../../utils/select';
-import { MAX_QUESTIONS, endingCounts, graphForSave, newQuestion, normalizeQuiz, removeQuestion, savedForm } from '../../quizEditor';
+import { MAX_QUESTIONS, endingCounts, graphForSave, newQuestion, normalizeQuiz, removeQuestion, savedForm, unreachableQuestions } from '../../quizEditor';
 import QuestionEditor from './QuestionEditor';
 import QuizEndings from './QuizEndings';
 import { QUIZZES_PATH, languageName, questionTitle, quizErrorMessage, quizErrors, statusLabel } from './quizApi';
@@ -239,6 +239,7 @@ const QuizEditor = ( { id, languages, onClose } ) => {
 	const stale = null !== counts && endings.checkedForm !== current;
 	const saveDescription = ! isSaving && ! isDirty ? __( 'No unsaved changes.', 'searcio' ) : undefined;
 	const isPublished = 'published' === quiz.status;
+	const unreachable = unreachableQuestions( quiz.questions );
 
 	const sections = [
 		{
@@ -292,11 +293,13 @@ const QuizEditor = ( { id, languages, onClose } ) => {
 						_n( '%d answer', '%d answers', question.options.length, 'searcio' ),
 						question.options.length
 					),
+				unreachable.has( String( question.id ) ) ? __( 'No answer leads here', 'searcio' ) : '',
 			],
 			content: (
 				<QuestionEditor
 					question={ question }
 					index={ index }
+					unreachable={ unreachable.has( String( question.id ) ) }
 					questions={ quiz.questions }
 					facetValues={ facetValues }
 					listPrefix={ LIST_PREFIX }

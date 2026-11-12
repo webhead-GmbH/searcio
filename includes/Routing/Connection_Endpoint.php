@@ -52,13 +52,59 @@ final class Connection_Endpoint extends Rest_API {
 	 */
 	#[Route( '/connection/test', methods: 'POST', permission_callback: 'can_view', args: [ 'fresh' => [ 'type' => 'boolean', 'default' => false ] ] )]
 	public function test_connection( WP_REST_Request $request ): WP_REST_Response {
-		$response = $this->client->health( (bool) $request->get_param( 'fresh' ) );
+		$fresh    = (bool) $request->get_param( 'fresh' );
+		$response = $this->client->health( $fresh );
 
 		// The storefront decides on the Searcio logo from the tier, and asks
 		// nobody: it is kept whenever an admin screen checks the connection.
 		$this->connection_state->remember_plan( $response );
 
-		return new WP_REST_Response( $this->present( $response ) );
+		$presented = $this->present( $response );
+
+		if ( ! empty( $presented['ok'] ) ) {
+			$presented['search_key'] = $this->search_key_status( $fresh );
+		}
+
+		return new WP_REST_Response( $presented );
+	}
+
+	/**
+	 * Whether the storefront's search key works from this site, besides the
+	 * write key the health check asks with: `{ ok, message }`. A check that
+	 * cannot reach Searcio says nothing against the key.
+	 *
+	 * @return array{ok:bool,message:string}
+	 */
+	private function search_key_status( bool $fresh ): array {
+		$key = $this->client->search_key();
+
+		if ( '' === $key ) {
+			return [
+				'ok'      => false,
+				'message' => __( 'No search key is saved, so the site searches with WordPress instead of Searcio. Connect again, or paste the search key under the manual key entry.', 'searcio' ),
+			];
+		}
+
+		$check = $this->client->search_key_check( $key, $fresh );
+
+		if ( 401 === $check->status ) {
+			return [
+				'ok'      => false,
+				'message' => __( 'Searcio does not know the search key, so the site searches with WordPress instead of Searcio. Copy it again from the Searcio dashboard, or connect again.', 'searcio' ),
+			];
+		}
+
+		if ( 403 === $check->status ) {
+			return [
+				'ok'      => false,
+				'message' => __( 'Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. Add the address to the domains of the key in the Searcio dashboard.', 'searcio' ),
+			];
+		}
+
+		return [
+			'ok'      => true,
+			'message' => '',
+		];
 	}
 
 	/**
