@@ -82,7 +82,7 @@ The other ways, which the tab also lists:
   | `width`, `align` | the field's width in px (0 fills), and `start`, `center` or `end` |
   | `voice`, `count` | `yes` or `no`: voice input, and the number of results on each filter |
   | `trigger` | `submit` (search on Enter) or `type` (search as the visitor types) |
-  | `highlights` | `newest` or `featured`: what the window shows before a search |
+  | `highlights` | `newest` (by date) or `featured`: what the window shows before a search |
   | `filters` | 0 to 8 filter buttons in the bar |
   | `animation` | `none`, `fade`, `slide-down`, `slide-up` or `zoom` |
   | `cards` | `plugin` or `server` (a template designed in Searcio) |

@@ -188,10 +188,21 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * @param  array<int,array<string,mixed>>  $documents  1-1000 documents.
+	 * `sync_type` names the run in Searcio's sync history: `incremental` for
+	 * the drain's few changed documents, which it called a "Full sync".
+	 *
+	 * @param  array<int,array<string,mixed>>  $documents    1-1000 documents.
+	 * @param  bool                            $incremental  Sent by the incremental drain.
 	 */
-	public function bulk_upsert( array $documents ): Api_Response {
-		return $this->request( 'POST', '/documents', [ 'documents' => array_values( $documents ) ] );
+	public function bulk_upsert( array $documents, bool $incremental = false ): Api_Response {
+		return $this->request(
+			'POST',
+			'/documents',
+			[
+				'documents' => array_values( $documents ),
+				'sync_type' => $incremental ? 'incremental' : 'full',
+			]
+		);
 	}
 
 	/**

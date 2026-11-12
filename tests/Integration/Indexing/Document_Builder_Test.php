@@ -144,4 +144,26 @@ final class Document_Builder_Test extends Integration_Test_Case {
 		$this->assertArrayNotHasKey( 'category_paths', $this->build( $post_id ), 'Tags have no levels to tell apart.' );
 		$this->assertNotContains( 'category_paths', $this->service( 'index_config' )->indexed_fields() );
 	}
+
+	/**
+	 * "The newest products" listed the site's oldest pages: Searcio had no
+	 * date to sort by. It reads `published_at` as an ISO 8601 date, in UTC
+	 * whatever the site's timezone.
+	 */
+	public function test_every_document_carries_when_it_was_published_in_utc(): void {
+		update_option( 'timezone_string', 'Europe/Vienna' );
+		$this->index_posts();
+
+		$post_id = self::factory()->post->create(
+			[
+				'post_status'   => 'publish',
+				'post_date'     => '2026-11-01 09:00:00',
+				'post_date_gmt' => '2026-11-01 08:00:00',
+			]
+		);
+
+		$this->assertSame( '2026-11-01T08:00:00Z', $this->build( $post_id )['published_at'] );
+		$this->assertNotContains( 'published_at', $this->service( 'index_config' )->indexed_fields(), 'A date to sort by, not a field to search or filter on.' );
+		$this->assertSame( [ 'published_at' ], Document_Builder::SORT_FIELDS );
+	}
 }

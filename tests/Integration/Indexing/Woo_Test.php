@@ -235,7 +235,7 @@ final class Woo_Test extends Integration_Test_Case {
 
 	/**
 	 * A built product document carries nothing the indexed-field list omits,
-	 * but for the fields written for Searcio alone.
+	 * but for the fields written for Searcio alone and the date it sorts by.
 	 */
 	public function test_every_field_a_built_product_document_carries_is_listed(): void {
 		$woo                 = $this->every_toggle();
@@ -261,7 +261,7 @@ final class Woo_Test extends Integration_Test_Case {
 
 		$unlisted = array_diff( array_keys( $document ), [ 'id' ], $this->service( 'index_config' )->indexed_fields() );
 
-		$this->assertSame( Woo::PRIVATE_FIELDS, array_values( $unlisted ) );
+		$this->assertEqualsCanonicalizing( array_merge( Document_Builder::SORT_FIELDS, Woo::PRIVATE_FIELDS ), array_values( $unlisted ) );
 	}
 
 	public function test_is_active_and_meets_minimum(): void {

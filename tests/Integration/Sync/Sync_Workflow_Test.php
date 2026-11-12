@@ -79,12 +79,14 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$post_ids = self::factory()->post->create_many( 3, [ 'post_status' => 'publish' ] );
 
 		$upserted = [];
+		$types    = [];
 		$this->fake_http(
-			function ( string $url, array $args ) use ( &$upserted ): array {
+			function ( string $url, array $args ) use ( &$upserted, &$types ): array {
 				if ( str_contains( $url, '/documents' ) ) {
 					$body = json_decode( (string) ( $args['body'] ?? '{}' ), true );
 					$docs = is_array( $body ) && isset( $body['documents'] ) ? $body['documents'] : [];
 					$upserted = array_merge( $upserted, is_array( $docs ) ? $docs : [] );
+					$types[]  = $body['sync_type'] ?? null;
 				}
 
 				return $this->http_ok( [ 'ok' => true ] );
@@ -103,6 +105,7 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertSame( count( $post_ids ), (int) $run['pushed'] );
 		$this->assertNull( $this->sync_state()->active() );
 		$this->assertCount( count( $post_ids ), $upserted );
+		$this->assertSame( [ 'full' ], array_values( array_unique( $types ) ) );
 	}
 
 	public function test_a_second_unforced_run_skips_unchanged_posts(): void {

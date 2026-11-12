@@ -51,6 +51,28 @@ final class Incremental_Reporting_Test extends Integration_Test_Case {
 		$this->assertStringContainsString( '503', (string) $run['last_error'] );
 	}
 
+	/** Searcio's sync history names the drain's batch an incremental one. */
+	public function test_the_drain_sends_its_batch_as_an_incremental_one(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->service( 'change_queue_table' )->enqueue( $post_id, 'post', Change_Action::Upsert );
+
+		$types = [];
+		$this->fake_http( function ( string $url, array $args ) use ( &$types ): array {
+			if ( str_ends_with( (string) wp_parse_url( $url, PHP_URL_PATH ), '/documents' ) ) {
+				$types[] = json_decode( (string) ( $args['body'] ?? '' ), true )['sync_type'] ?? null;
+			}
+
+			return $this->http_ok( [ 'status' => 'queued' ], 202 );
+		} );
+
+		$this->drain();
+
+		$this->assertSame( [ 'incremental' ], $types );
+	}
+
 	/** A transport failure names the connection problem rather than a status. */
 	public function test_an_unreachable_api_is_reported_as_such(): void {
 		$this->connect_client();

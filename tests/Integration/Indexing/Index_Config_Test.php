@@ -160,7 +160,8 @@ final class Index_Config_Test extends Integration_Test_Case {
 
 	/**
 	 * The drift guard: a field the builder starts writing without being listed
-	 * here fails this test instead of going unsuggested.
+	 * here fails this test instead of going unsuggested. The fields written to
+	 * sort by are the one exception.
 	 */
 	public function test_every_field_a_built_post_document_carries_is_listed(): void {
 		$this->config()->save(
@@ -198,7 +199,8 @@ final class Index_Config_Test extends Integration_Test_Case {
 
 		$written = array_diff( array_keys( $document ), [ 'id' ] );
 
-		$this->assertEqualsCanonicalizing( $written, $this->config()->indexed_fields() );
+		$this->assertContains( 'published_at', $written );
+		$this->assertEqualsCanonicalizing( array_values( array_diff( $written, Document_Builder::SORT_FIELDS ) ), $this->config()->indexed_fields() );
 	}
 
 	/**

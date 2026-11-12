@@ -280,13 +280,25 @@ export const productType = () => {
  * The featured ones only where `featured` is one of the site's filters:
  * Searcio refused the filter otherwise (422), and the row stayed empty.
  *
+ * The newest are asked for with `sort=newest`, by the date each document
+ * carries (`published_at`): without it they came in the index's order, the
+ * oldest first. A service from before the parameter ignores it.
+ *
  * @param {{type?: string, source?: string, facets?: Object, ranges?: Object, signal?: AbortSignal}} [options]
  */
 export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
 	const featured = 'featured' === source && false !== config.hasFeatured;
 	const forced = { ...currentLangFilter(), ...( featured ? { featured: 'true' } : {} ) };
 
-	return search( '', { type: type || productType(), filters: buildFilterParams( facets, forced ), ranges: buildRangeParams( ranges ), perPage: 12, surface: 'highlights', signal } );
+	return search( '', {
+		type: type || productType(),
+		filters: buildFilterParams( facets, forced ),
+		ranges: buildRangeParams( ranges ),
+		perPage: 12,
+		surface: 'highlights',
+		sort: featured ? undefined : 'newest',
+		signal,
+	} );
 };
 
 /**
@@ -371,8 +383,11 @@ export const searchHints = ( q, page, options ) => {
  * A filter's value is the comma-joined values or, when one of them holds a
  * comma, the list of them ({@see filterValue}), sent as `filter[field][]`.
  *
+ * `sort` is `newest`, `price_asc` or `price_desc`; without it the results
+ * come by relevance.
+ *
  * @param {string} q
- * @param {{type?: string, filters?: Object<string,(string|Array<string>)>, ranges?: Object<string,string>, keywords?: Array<string>, page?: number, perPage?: number, live?: boolean, origin?: string, surface?: string, signal?: AbortSignal}} [options]
+ * @param {{type?: string, filters?: Object<string,(string|Array<string>)>, ranges?: Object<string,string>, keywords?: Array<string>, page?: number, perPage?: number, live?: boolean, origin?: string, surface?: string, sort?: string, signal?: AbortSignal}} [options]
  */
 export const search = ( q, options = {} ) => {
 	const page = options.page || 1;
@@ -382,7 +397,7 @@ export const search = ( q, options = {} ) => {
 	// `highlight=0`: the window never shows a hit's highlighted fragments, and
 	// highlighting is the most expensive part of a search for the engine
 	// (search-cloud #164: about 40% of its time on the demo shop's index).
-	const params = { q, type: options.type, page, per_page: options.perPage || 20, highlight: 0, ...searchHints( q, page, options ) };
+	const params = { q, type: options.type, page, per_page: options.perPage || 20, highlight: 0, sort: options.sort || undefined, ...searchHints( q, page, options ) };
 
 	// Filterable fields must already be configured as facet fields server-side
 	// (search.md) - an unfiltered chip list never sends a field the API would
@@ -493,11 +508,13 @@ export const fetchQuizzes = ( options = {} ) =>
  * `search_id` for its clicks (a service without it answers with none, and a
  * click then sends nothing).
  *
- * On a shop only the products are kept ({@see productType}): the index holds
- * the posts as well, and a jacket's similar products were two articles. A row
- * on an article still shows the products like it. On a multilingual site only
- * those in the page's language are kept. The most the service answers is
- * asked for, so the row still fills.
+ * On a shop only the products are asked for ({@see productType}): the index
+ * holds the posts as well, and a jacket's similar products were two articles.
+ * A row on an article still shows the products like it. Searcio filters by
+ * the type inside its search, and the hits are kept to it here as well, for
+ * a service from before it took the type. On a multilingual site only those
+ * in the page's language are kept. The most the service answers is asked
+ * for, so the row still fills where the service filters nothing.
  *
  * @param {string}                            id        The source product's document id.
  * @param {{limit?: number, signal?: AbortSignal}} [options]
@@ -509,7 +526,7 @@ export const fetchSimilar = async ( id, options = {} ) => {
 	const type = productType();
 	const response = await request(
 		'/search/similar',
-		{ id, limit: SIMILAR_MAX, 'filter[lang]': lang, preview: isPreview() ? 1 : undefined },
+		{ id, limit: SIMILAR_MAX, type: type || undefined, 'filter[lang]': lang, preview: isPreview() ? 1 : undefined },
 		SIMILAR_TTL,
 		options.signal
 	);
@@ -531,8 +548,9 @@ export const fetchSimilar = async ( id, options = {} ) => {
  * Not cached - the same photo picked twice is a new upload either way, and the
  * cache is keyed by URL, which a multipart body never varies.
  *
- * On a shop only the products are kept ({@see productType}): the service
- * takes no type here, and a photo of a bag also found the pages.
+ * On a shop only the products are asked for ({@see productType}): a photo of
+ * a bag also found the pages. The hits are kept to the type here as well, for
+ * a service from before it took the type.
  *
  * @param {File}                   file      The image to search with (≤ 8 MB).
  * @param {{signal?: AbortSignal}} [options]
@@ -543,7 +561,8 @@ export const visualSearch = async ( file, options = {} ) => {
 
 	body.append( 'photo', file );
 
-	const response = await fetch( buildUrl( '/search/visual', { 'filter[lang]': currentLangFilter().lang } ), {
+	const type = productType();
+	const response = await fetch( buildUrl( '/search/visual', { type: type || undefined, 'filter[lang]': currentLangFilter().lang } ), {
 		method: 'POST',
 		credentials: 'omit',
 		body,
@@ -561,7 +580,6 @@ export const visualSearch = async ( file, options = {} ) => {
 	}
 
 	const result = await response.json();
-	const type = productType();
 	const hits = inLanguage( result?.hits, currentLangFilter().lang ).filter( ( hit ) => '' === type || type === hit?.source?.type );
 
 	return { ...result, hits };

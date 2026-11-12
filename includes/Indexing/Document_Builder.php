@@ -31,6 +31,13 @@ final class Document_Builder {
 	private const UNTITLED_WORDS = 8;
 
 	/**
+	 * Fields every document carries for Searcio to sort by, not to search or
+	 * filter on: the Search Config tab does not offer them. `published_at` is
+	 * what `sort=newest` orders by, so "the newest" highlights are the newest.
+	 */
+	public const SORT_FIELDS = [ 'published_at' ];
+
+	/**
 	 * WooCommerce's own pages and their translations, found once per request.
 	 *
 	 * @var array<int,int>|null
@@ -157,6 +164,12 @@ final class Document_Builder {
 			'type' => (string) $block['type'],
 		];
 
+		$published = $this->published_at( $post );
+
+		if ( null !== $published ) {
+			$document['published_at'] = $published;
+		}
+
 		// Tagged whenever resolvable, independent of whether the site currently
 		// restricts languages at all, so the front-end can scope results to a
 		// visitor's language. Costs nothing extra since `is_indexable()` above
@@ -215,6 +228,16 @@ final class Document_Builder {
 	/**
 	 * @param  array<string,mixed>  $document
 	 */
+	/**
+	 * When the post was published, in UTC and ISO 8601 (`2026-11-01T08:00:00Z`),
+	 * as Searcio reads a date. Null for a post without a date of its own.
+	 */
+	private function published_at( WP_Post $post ): ?string {
+		$timestamp = get_post_timestamp( $post );
+
+		return false === $timestamp ? null : gmdate( 'Y-m-d\TH:i:s\Z', $timestamp );
+	}
+
 	public function hash( array $document ): string {
 		$sorted = $this->deep_sort( $document );
 

@@ -106,7 +106,7 @@ final class Incremental_Service {
 		}
 
 		if ( [] !== $documents ) {
-			$response = $this->client->bulk_upsert( array_values( $documents ) );
+			$response = $this->client->bulk_upsert( array_values( $documents ), true );
 
 			if ( $response->ok() ) {
 				foreach ( $targets as $target ) {

@@ -652,12 +652,18 @@ const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
  * @param {Object}   props
  * @param {Array}    props.rules
  * @param {Object}   props.errors
- * @param {Function} props.onChange Called with the full replacement list.
+ * @param {Array}    props.languages The site's languages, `{ code, name }`.
+ * @param {Function} props.onChange  Called with the full replacement list.
  */
-const RedirectsCard = ( { rules, errors, onChange } ) => {
+const RedirectsCard = ( { rules, errors, languages, onChange } ) => {
 	const update = ( index, next ) => onChange( rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
 	const remove = ( index ) => onChange( rules.filter( ( _, i ) => i !== index ) );
-	const add = () => onChange( [ ...rules, { query: '', url: '' } ] );
+	const add = () => onChange( [ ...rules, { query: '', url: '', lang: null } ] );
+	const multilingual = languages.length > 1;
+	const languageItems = [
+		{ value: null, label: __( 'Every language', 'searcio' ) },
+		...languages.map( ( language ) => ( { value: language.code, label: `${ language.name } (${ language.code })` } ) ),
+	];
 
 	return (
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide">
@@ -673,7 +679,7 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 					{ /* A redirect is two fields and a delete, so it stays on one row
 					     rather than borrowing the merchandising rule's card. */ }
 					{ rules.map( ( rule, index ) => (
-						<div className="whsc-redirect-rule" key={ index }>
+						<div className={ multilingual ? 'whsc-redirect-rule whsc-redirect-rule--lang' : 'whsc-redirect-rule' } key={ index }>
 							<InputControl
 								label={ __( 'Search term (exact)', 'searcio' ) }
 								description={ rowError( errors, 'redirects', index, 'query' ) || ( repeatsRedirect( rules, index )
@@ -689,6 +695,14 @@ const RedirectsCard = ( { rules, errors, onChange } ) => {
 								value={ rule.url }
 								onValueChange={ ( url ) => update( index, { ...rule, url } ) }
 							/>
+							{ multilingual && (
+								<SelectControl
+									label={ __( 'Language', 'searcio' ) }
+									description={ rowError( errors, 'redirects', index, 'lang' )
+										|| __( 'Followed only for searches on pages in this language.', 'searcio' ) }
+									{ ...selectProps( languageItems, rule.lang ?? null, ( lang ) => update( index, { ...rule, lang } ) ) }
+								/>
+							) }
 							<div className="whsc-row-remove">
 								<Button
 									__next40pxDefaultSize
@@ -1258,6 +1272,7 @@ const SearchConfigTab = () => {
 				<RedirectsCard
 					rules={ config.redirects }
 					errors={ fieldErrors }
+					languages={ catalog?.languages?.active ? catalog.languages.available || [] : [] }
 					onChange={ ( rules ) => set( 'redirects', rules ) }
 				/>
 			</Grid>
