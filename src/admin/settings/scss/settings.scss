@@ -275,6 +275,11 @@
   grid-template-columns: 1fr 1fr auto;
   align-items: start;
 
+  // The language a redirect is followed in, on a multilingual site.
+  &--lang {
+    grid-template-columns: 1fr 1fr minmax(10rem, 0.7fr) auto;
+  }
+
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
 

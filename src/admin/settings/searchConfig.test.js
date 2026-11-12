@@ -140,7 +140,7 @@ describe( 'normalizeMerchandising', () => {
 describe( 'normalizeRedirects', () => {
 	it( 'keeps a rule whole', () => {
 		expect( normalizeRedirects( [ { query: 'black friday', url: 'https://example.com/bf' } ] ) ).toEqual( [
-			{ query: 'black friday', url: 'https://example.com/bf' },
+			{ query: 'black friday', url: 'https://example.com/bf', lang: null },
 		] );
 	} );
 
@@ -149,7 +149,7 @@ describe( 'normalizeRedirects', () => {
 	} );
 
 	it( 'fills in a half-written rule so both inputs stay editable', () => {
-		expect( normalizeRedirects( [ { query: 'bf' } ] ) ).toEqual( [ { query: 'bf', url: '' } ] );
+		expect( normalizeRedirects( [ { query: 'bf' } ] ) ).toEqual( [ { query: 'bf', url: '', lang: null } ] );
 	} );
 
 	/**
@@ -182,7 +182,7 @@ describe( 'normalizeConfig', () => {
 
 		expect( config.searchable_fields ).toEqual( [ { field: 'title', weight: 5 } ] );
 		expect( config.merchandising ).toHaveLength( 1 );
-		expect( config.redirects ).toEqual( [ { query: 'black friday', url: '/bf' } ] );
+		expect( config.redirects ).toEqual( [ { query: 'black friday', url: '/bf', lang: null } ] );
 		expect( config.features.ai_search.status ).toBe( 'indexing' );
 		expect( config.features.visual_tagging.available ).toBe( false );
 		expect( config.features.visual_search.available ).toBe( false );
@@ -502,6 +502,45 @@ describe( 'repeatsRedirect', () => {
 		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
 		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
 		expect( repeatsRedirect( rules, 4 ) ).toBe( false );
+	} );
+
+	// Searcio follows the first redirect that matches the term and the page's language.
+	it( 'flags it only where an earlier one is followed in its language too', () => {
+		const rules = [
+			{ query: 'versand', lang: 'de' },
+			{ query: 'versand', lang: 'en' },
+			{ query: 'versand', lang: 'de' },
+			{ query: 'retoure', lang: null },
+			{ query: 'retoure', lang: 'en' },
+			{ query: 'agb', lang: 'de' },
+			{ query: 'agb', lang: null },
+		];
+
+		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 4 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 6 ) ).toBe( false );
+	} );
+} );
+
+describe( 'a redirect\'s language', () => {
+	// A save from the tab took the language off every redirect given one in the dashboard.
+	it( 'keeps the language Searcio returns, and sends it only for one language', () => {
+		const read = normalizeConfig( {
+			redirects: [
+				{ query: 'versand', url: '/de/versand', lang: 'de' },
+				{ query: 'shipping', url: '/en/shipping', lang: null },
+				{ query: 'agb', url: '/agb' },
+			],
+		} );
+
+		expect( read.redirects.map( ( rule ) => rule.lang ) ).toEqual( [ 'de', null, null ] );
+		expect( toPayload( { ...read, redirects: [ ...read.redirects, { query: 'faq', url: '/faq', lang: 'en' } ] }, read ).redirects ).toEqual( [
+			{ query: 'versand', url: '/de/versand', lang: 'de' },
+			{ query: 'shipping', url: '/en/shipping' },
+			{ query: 'agb', url: '/agb' },
+			{ query: 'faq', url: '/faq', lang: 'en' },
+		] );
 	} );
 } );
 

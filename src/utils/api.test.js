@@ -478,7 +478,12 @@ describe( 'fetchSimilar', () => {
 
 		const result = await api.fetchSimilar( 'post-1', { limit: 4 } );
 
-		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'limit' ) ).toBe( '20' );
+		const params = new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams;
+
+		expect( params.get( 'limit' ) ).toBe( '20' );
+		// Searcio filters by type inside its search; the hits are kept to it
+		// here as well, for a service from before it took the type.
+		expect( params.get( 'type' ) ).toBe( 'product' );
 		// On an article too: the row shows the products like it.
 		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'product-5', 'product-7' ] );
 	} );
@@ -968,6 +973,32 @@ describe( 'what is about products', () => {
 		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'filter[featured]' ) ).toBe( false );
 	} );
 
+	// The newest came in the index's order, the oldest first.
+	it( 'asks for the newest by their date, and for the featured ones as Searcio ranks them', async () => {
+		shop( { hasFeatured: true } );
+		const api = loadApi();
+
+		await api.fetchHighlights();
+		await api.fetchHighlights( { source: 'featured' } );
+
+		const newest = new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams;
+		const featured = new URL( global.fetch.mock.calls[ 1 ][ 0 ] ).searchParams;
+
+		expect( newest.get( 'sort' ) ).toBe( 'newest' );
+		expect( featured.get( 'filter[featured]' ) ).toBe( 'true' );
+		expect( featured.has( 'sort' ) ).toBe( false );
+	} );
+
+	it( 'sorts a search only when asked to', async () => {
+		const api = loadApi();
+
+		await api.search( 'jacket' );
+		await api.search( 'jacket', { sort: 'price_asc' } );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'sort' ) ).toBe( false );
+		expect( new URL( global.fetch.mock.calls[ 1 ][ 0 ] ).searchParams.get( 'sort' ) ).toBe( 'price_asc' );
+	} );
+
 	// A photo of a bag found the shop's pages too.
 	it( "keeps a photo search's products on a shop", async () => {
 		shop();
@@ -975,7 +1006,16 @@ describe( 'what is about products', () => {
 
 		const result = await loadApi().visualSearch( new File( [ 'x' ], 'bag.jpg', { type: 'image/jpeg' } ) );
 
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'type' ) ).toBe( 'product' );
 		expect( result.hits.map( ( hit ) => hit.id ) ).toEqual( [ 'product-3' ] );
+	} );
+
+	it( 'asks a photo search of a site without products for every type', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { tags: [ 'bag' ], hits: [] } ) );
+
+		await loadApi().visualSearch( new File( [ 'x' ], 'bag.jpg', { type: 'image/jpeg' } ) );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'type' ) ).toBe( false );
 	} );
 } );
 

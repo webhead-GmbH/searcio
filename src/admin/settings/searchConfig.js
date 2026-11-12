@@ -66,6 +66,10 @@ export const normalizeMerchandising = ( raw ) => ( Array.isArray( raw ) ? raw : 
 export const normalizeRedirects = ( raw ) => ( Array.isArray( raw ) ? raw : [] ).map( ( rule ) => ( {
 	query: 'string' === typeof rule?.query ? rule.query : '',
 	url: 'string' === typeof rule?.url ? rule.url : '',
+	// The one language the redirect is followed in, or `null` for every
+	// language, as on a merchandising rule. Dropped here, a save from the tab
+	// took the language off every redirect given one in the Searcio dashboard.
+	lang: 'string' === typeof rule?.lang && '' !== rule.lang ? rule.lang : null,
 } ) );
 
 /**
@@ -205,7 +209,11 @@ const fullPayload = ( config ) => ( {
 	// A half-filled row is dropped by the API rather than rejected, which would
 	// silently lose it on the next read; drop it here so the form shows what was
 	// actually stored.
-	redirects: ( config.redirects || [] ).filter( ( rule ) => ! isBlankRedirect( rule ) ),
+	// Every language, the default, goes unsaid, so a service from before
+	// redirects had a language is never sent a key it does not know.
+	redirects: ( config.redirects || [] )
+		.filter( ( rule ) => ! isBlankRedirect( rule ) )
+		.map( ( { lang, ...rule } ) => ( lang ? { ...rule, lang } : rule ) ),
 	// Every filter field once, and none that is no longer one; left out for a
 	// service that does not report the setting.
 	facet_match: config.facet_match
@@ -370,13 +378,19 @@ export const enabledTypeLabels = ( catalog ) => {
  * "VERSAND " were both saved, each with its own target, and nothing said
  * that one of them would never be followed.
  *
- * @param {Array<{query?: string}>} rules
- * @param {number}                  index
+ * Searcio follows the first redirect that matches, so an earlier one for
+ * every language, or for the same language, keeps this one from being
+ * followed; one for another language does not.
+ *
+ * @param {Array<{query?: string, lang?: ?string}>} rules
+ * @param {number}                                  index
  * @return {boolean}
  */
 export const repeatsRedirect = ( rules, index ) => {
 	const term = ( rule ) => String( rule?.query ?? '' ).trim().toLocaleLowerCase();
-	const own = term( rules?.[ index ] );
+	const own = rules?.[ index ];
 
-	return '' !== own && ( rules || [] ).slice( 0, index ).some( ( rule ) => term( rule ) === own );
+	return '' !== term( own ) && ( rules || [] ).slice( 0, index ).some(
+		( rule ) => term( rule ) === term( own ) && ( ! rule?.lang || rule.lang === ( own?.lang || null ) )
+	);
 };

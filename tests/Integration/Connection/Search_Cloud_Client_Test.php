@@ -142,6 +142,28 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		return $calls;
 	}
 
+	/**
+	 * Searcio's sync history called every batch a "Full sync", the drain's
+	 * three changed documents too.
+	 */
+	public function test_a_batch_says_whether_it_is_part_of_a_full_or_an_incremental_sync(): void {
+		$this->connect_client();
+
+		$sent = [];
+		$this->fake_http( function ( string $url, array $args ) use ( &$sent ): array {
+			$sent[] = json_decode( (string) ( $args['body'] ?? '' ), true );
+
+			return $this->http_ok( [ 'status' => 'queued' ], 202 );
+		} );
+
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-1', 'title' => 'A' ] ] );
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-2', 'title' => 'B' ] ], true );
+
+		$this->assertSame( 'full', $sent[0]['sync_type'] );
+		$this->assertSame( [ [ 'id' => 'post-1', 'title' => 'A' ] ], $sent[0]['documents'] );
+		$this->assertSame( 'incremental', $sent[1]['sync_type'] );
+	}
+
 	public function test_disconnect_sends_a_delete_request_with_the_write_credentials(): void {
 		$this->connect_client();
 

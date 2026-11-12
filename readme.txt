@@ -223,6 +223,8 @@ Legal notice: https://searcio.com/impressum
 - On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.
 - The purchase price of your products can be sent for Searcio's profit ranking (Indexing tab, Purchase price): from WooCommerce's Cost of goods, or from the field of a cost of goods plugin. It is never shown to shoppers.
 - A merchandising rule can fire only on a search for its trigger itself, not on every search that contains it, and a rule set that way in the Searcio dashboard keeps it when the Search Config tab saves.
+- The newest highlights are really the newest, once the next sync has sent each item's date.
+- On a multilingual site a search redirect can be kept to one language, and keeps the language set in the Searcio dashboard when the Search Config tab saves.
 
 = 1.4.0 =
 - Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.

@@ -79,8 +79,9 @@ const INDEXED_FIELDS = [
  *
  * @param {import('@playwright/test').Page} page
  * @param {Array<string>}                   indexedFields The catalogue's `indexed_fields`.
+ * @param {Array<Object>}                   languages     The site's languages, `{ code, name }`; none by default.
  */
-async function mockCatalog( page, indexedFields = INDEXED_FIELDS ) {
+async function mockCatalog( page, indexedFields = INDEXED_FIELDS, languages = [] ) {
 	await page.route(
 		( url ) => decodeURIComponent( url.href ).includes( '/indexing/config' ),
 		( route ) =>
@@ -99,7 +100,7 @@ async function mockCatalog( page, indexedFields = INDEXED_FIELDS ) {
 					],
 					sources: [],
 					woo: { active: true, attributes: [ { slug: 'pa_color', label: 'Color' } ] },
-					languages: { active: false, available: [] },
+					languages: { active: languages.length > 0, available: languages },
 					indexed_fields: indexedFields,
 					config_version: 1,
 				} ),
@@ -397,6 +398,48 @@ test.describe( 'Search Config tab', () => {
 		expect( payload ).not.toHaveProperty( 'redirects' );
 		expect( payload.merchandising[ 0 ].filter_field ).toBeNull();
 		expect( payload.merchandising[ 0 ].filter_value ).toBeNull();
+	} );
+
+	/**
+	 * Searcio gave redirects a language, and the tab dropped it: a save took
+	 * the language off every redirect given one in the dashboard.
+	 */
+	test( 'keeps the language a redirect is followed in, and saves every language unsaid', async ( { page } ) => {
+		const sent = [];
+		const config = { ...CONFIG, redirects: [ { query: 'versand', url: '/de/versand', lang: 'de' } ] };
+
+		await mockCatalog( page, INDEXED_FIELDS, [ { code: 'de', name: 'Deutsch' }, { code: 'en', name: 'English' } ] );
+		await mockSearchConfig( page, sent, config );
+		await page.goto( SETTINGS_URL );
+
+		const rule = page.locator( '.whsc-redirect-rule' ).first();
+		const language = rule.getByRole( 'combobox', { name: 'Language' } );
+
+		await expect( language ).toHaveText( 'Deutsch (de)', LOADED );
+
+		await rule.getByLabel( 'Send them to' ).fill( '/de/lieferung' );
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.redirects ).toEqual( [ { query: 'versand', url: '/de/lieferung', lang: 'de' } ] );
+
+		await language.click();
+		await page.getByRole( 'option', { name: 'Every language' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 1 );
+
+		expect( sent[ sent.length - 1 ].body.redirects ).toEqual( [ { query: 'versand', url: '/de/versand' } ] );
+	} );
+
+	test( 'offers no language for a redirect on a site with one language', async ( { page } ) => {
+		await mockCatalog( page );
+		await mockSearchConfig( page );
+		await page.goto( SETTINGS_URL );
+
+		const rule = page.locator( '.whsc-redirect-rule' ).first();
+
+		await expect( rule ).toBeVisible( LOADED );
+		await expect( rule.getByRole( 'combobox', { name: 'Language' } ) ).toHaveCount( 0 );
 	} );
 
 	/**
