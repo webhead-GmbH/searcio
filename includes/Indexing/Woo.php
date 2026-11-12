@@ -54,7 +54,15 @@ final class Woo {
 		'rating'       => [ 'rating' ],
 		'review_count' => [ 'review_count' ],
 		'custom_attributes' => [ 'custom_attributes' ],
+		'cost_price'   => [ 'cost_price' ],
 	];
+
+	/**
+	 * Fields written for Searcio alone: it never returns them and refuses them
+	 * as searchable, facet or suggest fields, so they are not offered as one.
+	 * The purchase price is what its profit ranking works the margin out from.
+	 */
+	public const PRIVATE_FIELDS = [ 'cost_price' ];
 
 	/**
 	 * The pages WooCommerce makes for itself, by the name `wc_get_page_id()`
@@ -323,6 +331,15 @@ final class Woo {
 			}
 		}
 
+		if ( ! empty( $woo['cost_price'] ) ) {
+			$meta_key = is_string( $woo['cost_meta'] ?? null ) ? $woo['cost_meta'] : '';
+			$cost     = $this->without_customer( fn () => $this->cost_price( $product, $is_variable, $meta_key ) );
+
+			if ( null !== $cost ) {
+				$fields['cost_price'] = $cost;
+			}
+		}
+
 		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
 			$values = Term_Names::for_post( $post, $taxonomy );
 
@@ -338,7 +355,9 @@ final class Woo {
 	 * Every field `product_fields()` can write for this mapping - the union
 	 * across product kinds, so `price_min` is listed even though only a
 	 * variable product carries it. Empty when WooCommerce is inactive, because
-	 * then no product field is written at all.
+	 * then no product field is written at all. The {@see self::PRIVATE_FIELDS}
+	 * are left out: they are for Searcio alone, which refuses them as fields to
+	 * search or filter.
 	 *
 	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
 	 * @return array<int,string>
@@ -376,7 +395,7 @@ final class Woo {
 			}
 		}
 
-		return array_values( array_unique( $names ) );
+		return array_values( array_diff( array_unique( $names ), self::PRIVATE_FIELDS ) );
 	}
 
 	/**
@@ -477,6 +496,80 @@ final class Woo {
 		}
 
 		return array_values( array_unique( $values ) );
+	}
+
+	/**
+	 * What the product costs the shop, for Searcio's profit ranking: from
+	 * WooCommerce's own "Cost of goods" (9.5 and later, with the feature on),
+	 * else from the meta key the mapping names, which a cost of goods plugin
+	 * keeps it in (`_wc_cog_cost`, `_alg_wc_cog_cost`). A variable product's is
+	 * its cheapest variation's, whose price is the one sent; a variation
+	 * without a meta value of its own takes the product's.
+	 *
+	 * A purchase price is entered without tax. Where the shop shows prices
+	 * with tax, it is taxed as the price is, so the margin is worked out
+	 * between two amounts on one basis. Null for a product with none.
+	 */
+	private function cost_price( $product, bool $is_variable, string $meta_key ): ?float {
+		$source = $product;
+
+		if ( $is_variable && method_exists( $product, 'get_variation_prices' ) ) {
+			$active = array_map( 'floatval', (array) ( $product->get_variation_prices( true )['price'] ?? [] ) );
+
+			if ( [] === $active ) {
+				return null;
+			}
+
+			$variation = wc_get_product( (int) array_search( min( $active ), $active, true ) );
+
+			if ( ! $variation instanceof \WC_Product ) {
+				return null;
+			}
+
+			$source = $variation;
+		}
+
+		$cost = $this->cogs_value( $source );
+
+		if ( null === $cost && '' !== $meta_key ) {
+			$cost = $this->number( get_post_meta( $source->get_id(), $meta_key, true ) );
+
+			if ( null === $cost && $source !== $product ) {
+				$cost = $this->number( get_post_meta( $product->get_id(), $meta_key, true ) );
+			}
+		}
+
+		if ( null === $cost || $cost <= 0 ) {
+			return null;
+		}
+
+		if ( wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' ) && $source->is_taxable() ) {
+			$cost += array_sum( \WC_Tax::calc_tax( $cost, \WC_Tax::get_rates( $source->get_tax_class() ), false ) );
+		}
+
+		return (float) wc_format_decimal( $cost, wc_get_price_decimals() );
+	}
+
+	/** WooCommerce's "Cost of goods" of a product or variation, null where the feature is off or the value is not set. */
+	private function cogs_value( $product ): ?float {
+		if ( ! method_exists( $product, 'get_cogs_total_value' ) || ! class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			return null;
+		}
+
+		if ( ! \Automattic\WooCommerce\Utilities\FeaturesUtil::feature_is_enabled( 'cost_of_goods_sold' ) ) {
+			return null;
+		}
+
+		$value = (float) $product->get_cogs_total_value();
+
+		return $value > 0 ? $value : null;
+	}
+
+	/** A number kept as text, with a comma or a point; null for anything else. */
+	private function number( mixed $value ): ?float {
+		$text = is_scalar( $value ) ? str_replace( ',', '.', trim( (string) $value ) ) : '';
+
+		return is_numeric( $text ) ? (float) $text : null;
 	}
 
 	/**

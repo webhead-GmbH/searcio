@@ -64,7 +64,23 @@ describe( 'normalizeMerchandising', () => {
 			hidden: [ 'p-9' ],
 			banner: 'Sale',
 			lang: null,
+			match: null,
 		} ] );
+	} );
+
+	// A rule set to "exact" in the Searcio dashboard came back as "contains"
+	// once the tab saved its rules: the tab did not keep the option.
+	it( 'keeps whether a rule fires on the exact term, and sends it back', () => {
+		const config = normalizeConfig( { merchandising: [ { query: 'kopfhörer', match: 'exact' }, { query: 'jacke', match: 'contains' }, { query: 'sale' } ] } );
+
+		expect( config.merchandising.map( ( rule ) => rule.match ) ).toEqual( [ 'exact', null, null ] );
+
+		const payload = toPayload( config );
+
+		expect( payload.merchandising[ 0 ].match ).toBe( 'exact' );
+		// "Contains" is the default and goes unsaid, for a service from before the option.
+		expect( payload.merchandising[ 1 ] ).not.toHaveProperty( 'match' );
+		expect( payload.merchandising[ 2 ] ).not.toHaveProperty( 'match' );
 	} );
 
 	it( 'keeps the language a rule fires in, and reads none as every language', () => {
@@ -95,6 +111,7 @@ describe( 'normalizeMerchandising', () => {
 			hidden: [],
 			banner: '',
 			lang: null,
+			match: null,
 		} );
 	} );
 

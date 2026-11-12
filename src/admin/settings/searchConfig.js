@@ -49,6 +49,11 @@ export const normalizeMerchandising = ( raw ) => ( Array.isArray( raw ) ? raw : 
 	// The one language the rule fires in, or `null` for every language. A
 	// service from before rules had a language leaves the key out.
 	lang: 'string' === typeof rule?.lang && '' !== rule.lang ? rule.lang : null,
+	// `exact`: the rule fires only on a search term that is the trigger
+	// itself. `null` is "contains", the default, which a service from before
+	// the option leaves out. Dropped here, a save from the tab turned every
+	// rule set to "exact" in the Searcio dashboard back into "contains".
+	match: 'exact' === rule?.match ? 'exact' : null,
 } ) );
 
 /**
@@ -188,12 +193,14 @@ const fullPayload = ( config ) => ( {
 	// An unset category trigger is `null` on the wire, not the empty string the
 	// text inputs hold - and both halves only mean anything together, so a row
 	// with just one filled in sends neither.
-	merchandising: ( config.merchandising || [] ).map( ( rule ) => {
+	merchandising: ( config.merchandising || [] ).map( ( { match, ...rule } ) => {
 		const field = ( rule.filter_field || '' ).trim();
 		const value = ( rule.filter_value || '' ).trim();
 		const paired = '' !== field && '' !== value;
 
-		return { ...rule, filter_field: paired ? field : null, filter_value: paired ? value : null };
+		// "Contains" is the default and goes unsaid, so a service from before
+		// the option is never sent a key it does not know.
+		return { ...rule, filter_field: paired ? field : null, filter_value: paired ? value : null, ...( 'exact' === match ? { match } : {} ) };
 	} ),
 	// A half-filled row is dropped by the API rather than rejected, which would
 	// silently lose it on the next read; drop it here so the form shows what was

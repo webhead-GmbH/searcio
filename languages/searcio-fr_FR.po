@@ -3107,10 +3107,6 @@ msgstr "Règle %d"
 msgid "Remove rule"
 msgstr "Retirer la règle"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:424
-msgid "Trigger (search term contains)"
-msgstr "Déclencheur (le terme de recherche contient)"
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:427
 msgid "Empty: this rule applies to every search on the site."
 msgstr "Vide : cette règle s’applique à toutes les recherches du site."
@@ -5409,3 +5405,31 @@ msgstr "Avis"
 #: src/utils/facets.js:99
 msgid "Attributes"
 msgstr "Attributs"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:297
+msgid "Purchase price, for profit ranking"
+msgstr "Prix d’achat, pour le classement par marge"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:337
+msgid "Purchase price from field"
+msgstr "Prix d’achat depuis le champ"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:338
+msgid "The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Searcio lifts products with a good margin once profit ranking is on in the Searcio dashboard, and never shows the price or sends it back."
+msgstr "Le prix d’achat est lu d’abord dans le coût des marchandises de WooCommerce (Cost of goods). Pour une boutique qui le garde dans le champ d’une extension de coût des marchandises, saisissez la clé méta de ce champ, par exemple _wc_cog_cost. Searcio met en avant les produits à bonne marge une fois le classement par marge activé dans le tableau de bord Searcio, et n’affiche jamais ce prix ni ne le renvoie."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:522
+msgid "Contains the trigger"
+msgstr "Contient le déclencheur"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:523
+msgid "Is the trigger itself"
+msgstr "Est le déclencheur lui-même"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:573
+msgid "Fires when the search term"
+msgstr "Se déclenche quand le terme de recherche"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:575
+msgid "\"Contains\" fires on \"rain jacket\" for the trigger \"jacket\"; \"is the trigger itself\" only on \"jacket\"."
+msgstr "« Contient » se déclenche sur « veste de pluie » pour le déclencheur « veste » ; « est le déclencheur lui-même » seulement sur « veste »."

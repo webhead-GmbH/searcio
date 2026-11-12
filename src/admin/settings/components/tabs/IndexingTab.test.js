@@ -11,7 +11,7 @@
 import { act } from 'react';
 import { createRoot, useState } from '@wordpress/element';
 
-import { CustomFieldRow, ResultSourceField, sourceOptions } from './IndexingTab';
+import { CustomFieldRow, ResultSourceField, sourceOptions, WooSection } from './IndexingTab';
 
 // `@wordpress/components` loads packages that ship as ES modules only, which
 // this suite does not run through Babel. The row takes only its remove button
@@ -234,5 +234,37 @@ describe( 'ResultSourceField', () => {
 		await pick( 'Part', 'Custom field' );
 
 		expect( stored ).toBe( 'meta:hero_image' );
+	} );
+} );
+
+describe( 'WooSection', () => {
+	const WOO = { active: true, meets_minimum: true, toggles: [ 'price', 'cost_price' ], attributes: [] };
+
+	const Products = ( { initial } ) => {
+		const [ block, setBlock ] = useState( initial );
+
+		stored = block;
+
+		return <WooSection woo={ WOO } block={ block } onChange={ setBlock } />;
+	};
+
+	it( 'asks where the purchase price is kept once it is sent, and keeps the key', async () => {
+		await act( () => root.render( <Products initial={ { woo: { price: true, cost_price: false, cost_meta: '' } } } /> ) );
+
+		expect( control( 'Purchase price from field' ) ).toBeNull();
+
+		await act( () => root.render( <Products initial={ { woo: { price: true, cost_price: true, cost_meta: '' } } } key="on" /> ) );
+
+		const key = control( 'Purchase price from field' );
+		const setValue = Object.getOwnPropertyDescriptor( window.HTMLInputElement.prototype, 'value' ).set;
+
+		expect( key ).not.toBeNull();
+
+		await act( async () => {
+			setValue.call( key, '_wc_cog_cost' );
+			key.dispatchEvent( new window.Event( 'input', { bubbles: true } ) );
+		} );
+
+		expect( stored.woo ).toEqual( { price: true, cost_price: true, cost_meta: '_wc_cog_cost' } );
 	} );
 } );
