@@ -72,6 +72,23 @@ describe( 'ConnectionResultNotice', () => {
 		expect( links() ).toEqual( [] );
 	} );
 
+	// "falscher-key 123" was saved and the test said "Connected": it asks with
+	// the write key, and every visitor's search was WordPress's own.
+	it( 'says, as an error, that the search key does not work, after the connection', async () => {
+		await render( null );
+		await render( { ...SERVED, search_key: { ok: false, message: 'Searcio does not know the search key.' } } );
+
+		expect( container.textContent ).toContain( 'Connected - 96 / 300,000 documents indexed. (site #21) Searcio does not know the search key.' );
+		expect( speak ).toHaveBeenCalledWith( expect.stringContaining( 'does not know the search key' ), 'assertive' );
+	} );
+
+	it( 'says nothing of a search key that works', async () => {
+		await render( { ...SERVED, search_key: { ok: true, message: '' } } );
+
+		expect( container.textContent ).toContain( 'Connected - 96 / 300,000 documents indexed. (site #21)' );
+		expect( container.textContent ).not.toContain( 'search key' );
+	} );
+
 	it( 'says why an account without a plan is refused, and links to choosing one', async () => {
 		await render( refused( 'no_active_plan' ) );
 

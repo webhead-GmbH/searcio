@@ -243,6 +243,27 @@ const fullPayload = ( config ) => ( {
  *                             the whole configuration is sent.
  * @return {Object} Request body.
  */
+/**
+ * The sections a save would write that were changed elsewhere since the tab
+ * read them: in the Searcio dashboard, which edits the same settings, or in
+ * another tab. A section is written whole, so saving it then put its old rows
+ * back over that change, and nothing said so.
+ *
+ * @param {Object} payload   What the save would send ({@see toPayload}).
+ * @param {Object} live      The configuration as Searcio has it now, normalized as the tab's.
+ * @param {Object} persisted The configuration as the tab read it.
+ * @return {Array<string>} The sections, by key.
+ */
+export const changedSince = ( payload, live, persisted ) => Object.keys( payload ).filter( ( key ) => {
+	if ( 'features' === key ) {
+		return Object.keys( payload.features || {} ).some(
+			( feature ) => JSON.stringify( live?.features?.[ feature ] ) !== JSON.stringify( persisted?.features?.[ feature ] )
+		);
+	}
+
+	return JSON.stringify( live?.[ key ] ) !== JSON.stringify( persisted?.[ key ] );
+} );
+
 export const toPayload = ( config, persisted ) => {
 	const next = fullPayload( config );
 
@@ -311,4 +332,44 @@ export const errorsUnder = ( errors, prefix ) => {
 		.flatMap( ( [ , value ] ) => ( Array.isArray( value ) ? value : [] ) );
 
 	return messages.length > 0 ? messages.join( ' ' ) : undefined;
+};
+
+/**
+ * The content types this site indexes, by the type their documents carry -
+ * what a boost is matched against. The Indexing tab lets an admin name it
+ * ("artikel" for posts); keyed by the post type, the boost asked for "post"
+ * and moved nothing.
+ *
+ * @param {?Object} catalog The `/indexing/config` response.
+ * @return {Object<string,string>} Document type => label.
+ */
+export const enabledTypeLabels = ( catalog ) => {
+	const labels = {};
+
+	( catalog?.post_types || [] ).forEach( ( postType ) => {
+		if ( postType.config?.enabled ) {
+			const type = String( postType.config?.type || '' ).trim() || postType.slug;
+
+			labels[ type ] ??= postType.label;
+		}
+	} );
+
+	return labels;
+};
+
+/**
+ * Whether a redirect's term is one an earlier redirect has, as Searcio matches
+ * a term: whatever its capitals and the spaces around it. "versand" and
+ * "VERSAND " were both saved, each with its own target, and nothing said
+ * that one of them would never be followed.
+ *
+ * @param {Array<{query?: string}>} rules
+ * @param {number}                  index
+ * @return {boolean}
+ */
+export const repeatsRedirect = ( rules, index ) => {
+	const term = ( rule ) => String( rule?.query ?? '' ).trim().toLocaleLowerCase();
+	const own = term( rules?.[ index ] );
+
+	return '' !== own && ( rules || [] ).slice( 0, index ).some( ( rule ) => term( rule ) === own );
 };

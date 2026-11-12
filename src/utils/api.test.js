@@ -409,7 +409,7 @@ describe( 'fetchQuizzes', () => {
 
 describe( 'fetchSimilar', () => {
 	it( 'asks for more like a given product, with the search key', async () => {
-		global.fetch.mockResolvedValue( jsonResponse( { similar: [ { id: 'p-2' } ] } ) );
+		global.fetch.mockResolvedValue( jsonResponse( { similar: [ { id: 'product-2' } ] } ) );
 		const api = loadApi();
 
 		const result = await api.fetchSimilar( 'product-1', { limit: 4 } );
@@ -417,18 +417,16 @@ describe( 'fetchSimilar', () => {
 		const [ url ] = global.fetch.mock.calls[ 0 ];
 		expect( url ).toContain( '/search/similar?' );
 		expect( url ).toContain( 'id=product-1' );
-		expect( url ).toContain( 'limit=4' );
 		expect( url ).toContain( 'key=sk_test' );
 		expect( result.similar ).toHaveLength( 1 );
 	} );
 
-	it( 'defaults to six', async () => {
-		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+	it( 'shows six by default, and as many as asked for', async () => {
+		global.fetch.mockResolvedValue( jsonResponse( { similar: Array.from( { length: 9 }, ( _, index ) => ( { id: `product-${ index + 2 }` } ) ) } ) );
 		const api = loadApi();
 
-		await api.fetchSimilar( 'product-1' );
-
-		expect( global.fetch.mock.calls[ 0 ][ 0 ] ).toContain( 'limit=6' );
+		expect( ( await api.fetchSimilar( 'product-1' ) ).similar ).toHaveLength( 6 );
+		expect( ( await api.fetchSimilar( 'product-1', { limit: 4 } ) ).similar ).toHaveLength( 4 );
 	} );
 
 	/**
@@ -456,27 +454,42 @@ describe( 'fetchSimilar', () => {
 	 * A product's nearest neighbour is its own translation: on the English page
 	 * of a rain jacket the row opened with the same jacket in German.
 	 */
-	it( "asks for one row per language and keeps the page's language on a multilingual site", async () => {
+	it( "asks for the page's language and keeps it on a multilingual site", async () => {
 		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'en' } );
-		const similar = [ 'de', 'en', 'de', 'en', 'en', 'de', 'en', 'en' ].map( ( lang, index ) => ( { id: `p-${ index }`, source: { lang } } ) );
+		const similar = [ 'de', 'en', 'de', 'en', 'en', 'de', 'en', 'en' ].map( ( lang, index ) => ( { id: `product-${ index + 10 }`, source: { lang } } ) );
 		global.fetch.mockResolvedValue( jsonResponse( { search_id: 's-1', similar } ) );
 		const api = loadApi();
 
 		const result = await api.fetchSimilar( 'product-1', { limit: 4 } );
+		const params = new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams;
 
-		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'limit' ) ).toBe( '8' );
-		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'p-1', 'p-3', 'p-4', 'p-6' ] );
+		expect( params.get( 'filter[lang]' ) ).toBe( 'en' );
+		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'product-11', 'product-13', 'product-14', 'product-16' ] );
 		expect( result.search_id ).toBe( 's-1' );
 	} );
 
-	it( 'never asks for more than the service answers', async () => {
-		setConfig( { enabledLanguages: [ 'de', 'en', 'fr' ], currentLang: 'fr' } );
-		global.fetch.mockResolvedValue( jsonResponse( { similar: [] } ) );
+	// A jacket's similar products were two articles and a guide.
+	it( "keeps a shop's products, and asks for the most the service answers so the row fills", async () => {
+		setConfig( { hasProducts: true, documentTypes: { product: 'product', post: 'artikel' } } );
+		const similar = [ [ 'post-4', 'artikel' ], [ 'product-5', 'product' ], [ 'ratgeber-6', 'ratgeber' ], [ 'product-7', 'product' ] ]
+			.map( ( [ id, type ] ) => ( { id, source: { type } } ) );
+		global.fetch.mockResolvedValue( jsonResponse( { similar } ) );
 		const api = loadApi();
 
-		await api.fetchSimilar( 'product-1', { limit: 8 } );
+		const result = await api.fetchSimilar( 'post-1', { limit: 4 } );
 
 		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'limit' ) ).toBe( '20' );
+		// On an article too: the row shows the products like it.
+		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'product-5', 'product-7' ] );
+	} );
+
+	it( 'keeps every type on a site without products', async () => {
+		const similar = [ 'post-4', 'page-5' ].map( ( id ) => ( { id, source: { type: id.split( '-' )[ 0 ] } } ) );
+		global.fetch.mockResolvedValue( jsonResponse( { similar } ) );
+
+		const result = await loadApi().fetchSimilar( 'post-1' );
+
+		expect( result.similar.map( ( hit ) => hit.id ) ).toEqual( [ 'post-4', 'page-5' ] );
 	} );
 } );
 
@@ -903,6 +916,67 @@ describe( 'warmUp', () => {
 
 		expect( global.fetch ).not.toHaveBeenCalled();
 	} );
+
+	// A page in a language the site does not index searches WordPress.
+	it( 'asks for nothing on a page in a language the site does not index', () => {
+		setConfig( { enabledLanguages: [ 'de' ], currentLang: 'en' } );
+		loadApi().warmUp();
+
+		expect( global.fetch ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'what is about products', () => {
+	const shop = ( overrides = {} ) => setConfig( { hasProducts: true, documentTypes: { product: 'product', post: 'artikel' }, ...overrides } );
+
+	it( 'is the type the products carry, or none on a site without them', () => {
+		shop();
+		expect( loadApi().productType() ).toBe( 'product' );
+
+		shop( { documentTypes: { product: 'produkt' } } );
+		expect( loadApi().productType() ).toBe( 'produkt' );
+
+		setConfig( { hasProducts: false } );
+		expect( loadApi().productType() ).toBe( '' );
+	} );
+
+	// "The newest products" listed the site's oldest pages.
+	it( 'asks the highlights for products on a shop, unless the control has a type of its own', async () => {
+		shop();
+		const api = loadApi();
+
+		await api.fetchHighlights();
+		await api.fetchHighlights( { type: 'artikel' } );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'type' ) ).toBe( 'product' );
+		expect( new URL( global.fetch.mock.calls[ 1 ][ 0 ] ).searchParams.get( 'type' ) ).toBe( 'artikel' );
+	} );
+
+	it( 'asks the highlights of a site without products for everything', async () => {
+		await loadApi().fetchHighlights();
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'type' ) ).toBe( false );
+	} );
+
+	// Searcio refuses `filter[featured]` (422) unless it is one of the filters.
+	it( 'asks for the featured products only where featured is a filter of the site', async () => {
+		shop( { hasFeatured: false } );
+		const api = loadApi();
+
+		await api.fetchHighlights( { source: 'featured' } );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'filter[featured]' ) ).toBe( false );
+	} );
+
+	// A photo of a bag found the shop's pages too.
+	it( "keeps a photo search's products on a shop", async () => {
+		shop();
+		global.fetch.mockResolvedValue( jsonResponse( { tags: [ 'bag' ], hits: [ { id: 'page-2', source: { type: 'page' } }, { id: 'product-3', source: { type: 'product' } } ] } ) );
+
+		const result = await loadApi().visualSearch( new File( [ 'x' ], 'bag.jpg', { type: 'image/jpeg' } ) );
+
+		expect( result.hits.map( ( hit ) => hit.id ) ).toEqual( [ 'product-3' ] );
+	} );
 } );
 
 describe( 'preconnect', () => {
@@ -936,5 +1010,39 @@ describe( 'search', () => {
 		await loadApi().search( 'jacket' );
 
 		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.get( 'highlight' ) ).toBe( '0' );
+	} );
+} );
+
+describe( 'what is kept for a visit', () => {
+	// A quiz published in the Product finder tab stayed out of a visitor's
+	// window for ten minutes: the list was kept for the visit.
+	it( 'is asked for again once the plugin changed it on Searcio', async () => {
+		const asked = [];
+
+		global.fetch = ( url ) => {
+			asked.push( url );
+
+			return Promise.resolve( jsonResponse( { quizzes: [] } ) );
+		};
+
+		const page = ( cacheVersion ) => {
+			let api;
+
+			setConfig( { cacheVersion } );
+			jest.isolateModules( () => {
+				api = require( './api' );
+			} );
+
+			return api;
+		};
+
+		await page( 100 ).fetchQuizzes();
+		await page( 100 ).fetchQuizzes();
+
+		expect( asked ).toHaveLength( 1 );
+
+		await page( 200 ).fetchQuizzes();
+
+		expect( asked ).toHaveLength( 2 );
 	} );
 } );

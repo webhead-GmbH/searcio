@@ -64,7 +64,7 @@ const Edit = ( { attributes, setAttributes } ) => {
 							<InputControl
 								label={ __( 'Product', 'searcio' ) }
 								description={ __(
-									'Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template.',
+									'The ID WordPress shows for the product, such as 119. Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template.',
 									'searcio'
 								) }
 								value={ documentId }

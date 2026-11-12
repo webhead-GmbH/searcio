@@ -32,6 +32,10 @@ final class Sync_State {
 	) {}
 
 	/**
+	 * Every time of a run is written in UTC, `created_at` too: left to the
+	 * column's `CURRENT_TIMESTAMP`, it was the database server's local time,
+	 * an hour ahead of `started_at` in Vienna and presented as UTC all the same.
+	 *
 	 * @param  array<string,mixed>  $cursor
 	 */
 	public function create( Sync_Trigger $trigger, ?int $user_id, bool $force, int $total_estimated, array $cursor ): int {
@@ -53,6 +57,7 @@ final class Sync_State {
 				'deleted'         => 0,
 				'failed_count'    => 0,
 				'started_at'      => $now,
+				'created_at'      => $now,
 			]
 		);
 	}
@@ -81,6 +86,7 @@ final class Sync_State {
 				'failed_count'    => $failed,
 				'started_at'      => $now,
 				'finished_at'     => $now,
+				'created_at'      => $now,
 				'last_error'      => $error,
 			]
 		);

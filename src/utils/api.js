@@ -53,9 +53,11 @@ const SIMILAR_MAX = 20;
 const CACHE_MAX = 60;
 
 // The answers kept across the pages of a visit: what the window shows before
-// the visitor types, the same on every page.
+// the visitor types, the same on every page. Keyed by when the plugin last
+// changed one of them on Searcio (`cacheVersion`): a quiz published in the
+// Product finder tab stayed out of a visit's window for ten minutes.
 const KEPT_PATHS = [ '/storefront-config', '/card-templates', '/search/popular', '/quizzes' ];
-const STORE_PREFIX = 'searcio.cache:';
+const STORE_PREFIX = `searcio.cache:${ Number( config.cacheVersion ) || 0 }:`;
 
 const cache = new Map();
 // Requests of kept answers on their way, shared by every caller that asks.
@@ -247,17 +249,44 @@ export const preconnect = () => {
 let warmed = false;
 
 /**
+ * The type the shop's products carry in the index (the Indexing tab can name
+ * it), or '' on a site that indexes none. What is about products - the
+ * highlights, the product rows, the product finder and photo search - asks
+ * for this type where there is one: the index holds the posts and pages too,
+ * and the newest products listed the site's oldest pages, and the similar
+ * products of a jacket two articles.
+ *
+ * @return {string} The type, or ''.
+ */
+export const productType = () => {
+	if ( ! config.hasProducts ) {
+		return '';
+	}
+
+	const types = config.documentTypes && 'object' === typeof config.documentTypes ? config.documentTypes : {};
+
+	return Object.prototype.hasOwnProperty.call( types, 'product' ) && 'string' === typeof types.product && '' !== types.product
+		? types.product
+		: 'product';
+};
+
+/**
  * The highlights row: the newest products, or the featured ones, in the page's
  * language, with the filters the visitor has picked. The window asks for it
  * as it opens and whenever a filter changes with the field empty, and
  * {@see warmUp} asks for the same address, so the two share one answer.
+ * Without a type of its own it shows the shop's products ({@see productType}).
+ *
+ * The featured ones only where `featured` is one of the site's filters:
+ * Searcio refused the filter otherwise (422), and the row stayed empty.
  *
  * @param {{type?: string, source?: string, facets?: Object, ranges?: Object, signal?: AbortSignal}} [options]
  */
 export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
-	const forced = { ...currentLangFilter(), ...( 'featured' === source ? { featured: 'true' } : {} ) };
+	const featured = 'featured' === source && false !== config.hasFeatured;
+	const forced = { ...currentLangFilter(), ...( featured ? { featured: 'true' } : {} ) };
 
-	return search( '', { type, filters: buildFilterParams( facets, forced ), ranges: buildRangeParams( ranges ), perPage: 12, surface: 'highlights', signal } );
+	return search( '', { type: type || productType(), filters: buildFilterParams( facets, forced ), ranges: buildRangeParams( ranges ), perPage: 12, surface: 'highlights', signal } );
 };
 
 /**
@@ -271,7 +300,7 @@ export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ra
  * @param {{type?: string, source?: string}} [instance] The search control's scope and highlights source.
  */
 export const warmUp = ( instance = {} ) => {
-	if ( warmed || ! isConfigured() ) {
+	if ( warmed || ! isConfigured() || ! isLanguageSupported() ) {
 		return;
 	}
 
@@ -390,17 +419,18 @@ export const search = ( q, options = {} ) => {
 
 /**
  * Titles that start with what was typed, in the language of the page on a
- * multilingual site, as a search is (`filter[lang]`).
+ * multilingual site, as a search is (`filter[lang]`), and of the type a window
+ * restricted to one asks for (`type`, which a service before it ignores).
  *
  * @param {string} q
- * @param {{limit?: number, signal?: AbortSignal}} [options]
+ * @param {{limit?: number, type?: string, signal?: AbortSignal}} [options]
  */
 export const suggest = ( q, options = {} ) => {
 	const { lang } = currentLangFilter();
 
 	return request(
 		'/search/suggest',
-		{ q, limit: options.limit || 5, 'filter[lang]': lang },
+		{ q, limit: options.limit || 5, type: options.type || undefined, 'filter[lang]': lang },
 		SUGGEST_TTL,
 		options.signal
 	);
@@ -463,9 +493,11 @@ export const fetchQuizzes = ( options = {} ) =>
  * `search_id` for its clicks (a service without it answers with none, and a
  * click then sends nothing).
  *
- * On a multilingual site only the products in the page's language are kept,
- * and as many more are asked for as the site has languages, so the row still
- * fills.
+ * On a shop only the products are kept ({@see productType}): the index holds
+ * the posts as well, and a jacket's similar products were two articles. A row
+ * on an article still shows the products like it. On a multilingual site only
+ * those in the page's language are kept. The most the service answers is
+ * asked for, so the row still fills.
  *
  * @param {string}                            id        The source product's document id.
  * @param {{limit?: number, signal?: AbortSignal}} [options]
@@ -474,15 +506,16 @@ export const fetchQuizzes = ( options = {} ) =>
 export const fetchSimilar = async ( id, options = {} ) => {
 	const limit = options.limit || 6;
 	const { lang } = currentLangFilter();
-	const asked = lang ? Math.min( SIMILAR_MAX, limit * Math.max( 1, ( config.enabledLanguages || [] ).length ) ) : limit;
+	const type = productType();
 	const response = await request(
 		'/search/similar',
-		{ id, limit: asked, preview: isPreview() ? 1 : undefined },
+		{ id, limit: SIMILAR_MAX, 'filter[lang]': lang, preview: isPreview() ? 1 : undefined },
 		SIMILAR_TTL,
 		options.signal
 	);
+	const similar = inLanguage( response?.similar, lang ).filter( ( hit ) => '' === type || type === hit?.source?.type );
 
-	return { ...response, similar: inLanguage( response?.similar, lang ).slice( 0, limit ) };
+	return { ...response, similar: similar.slice( 0, limit ) };
 };
 
 /**
@@ -497,6 +530,9 @@ export const fetchSimilar = async ( id, options = {} ) => {
  *
  * Not cached - the same photo picked twice is a new upload either way, and the
  * cache is keyed by URL, which a multipart body never varies.
+ *
+ * On a shop only the products are kept ({@see productType}): the service
+ * takes no type here, and a photo of a bag also found the pages.
  *
  * @param {File}                   file      The image to search with (≤ 8 MB).
  * @param {{signal?: AbortSignal}} [options]
@@ -525,8 +561,10 @@ export const visualSearch = async ( file, options = {} ) => {
 	}
 
 	const result = await response.json();
+	const type = productType();
+	const hits = inLanguage( result?.hits, currentLangFilter().lang ).filter( ( hit ) => '' === type || type === hit?.source?.type );
 
-	return { ...result, hits: inLanguage( result?.hits, currentLangFilter().lang ) };
+	return { ...result, hits };
 };
 
 /**

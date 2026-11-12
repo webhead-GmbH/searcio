@@ -555,7 +555,7 @@ final class Sync_Service {
 			$seen[]        = $doc_id;
 			$hash          = $this->builder->hash( $document );
 
-			if ( ! $force && $this->dirty->is_fresh( $post, $hash, $cv ) ) {
+			if ( ! $force && $this->dirty->is_fresh( $post, $hash ) ) {
 				$counters['skipped']++;
 
 				continue;

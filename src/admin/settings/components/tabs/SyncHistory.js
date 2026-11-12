@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from '@wordpress/element';
 import {Button} from '@wordpress/components';
-import {Badge, Icon, Stack, Text} from '@wordpress/ui';
+import {Badge, EmptyState, Icon, Stack, Text} from '@wordpress/ui';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import {calendar, tag, trash} from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -156,6 +156,11 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 
 			if (filterValue('trigger')) {
 				query.set('trigger', filterValue('trigger'));
+			}
+
+			// A run by its number, or by what went wrong in it.
+			if ('' !== (view.search || '').trim()) {
+				query.set('search', view.search.trim());
 			}
 
 			try {
@@ -365,6 +370,17 @@ const SyncHistory = ({apiBase, refreshSignal, onChanged}) => {
 						activity: {showMedia: false},
 					}}
 					getItemId={(item) => String(item.id)}
+					// Said "No results" with nothing searched for, after the
+					// finished runs were cleared.
+					empty={
+						<EmptyState.Root>
+							<EmptyState.Title>
+								{'' !== (view.search || '').trim() || view.filters.length > 0
+									? __('No sync matches the search or the filters.', 'searcio')
+									: __('No sync has run yet.', 'searcio')}
+							</EmptyState.Title>
+						</EmptyState.Root>
+					}
 				/>
 			</div>
 

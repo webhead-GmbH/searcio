@@ -85,6 +85,32 @@ test.describe( 'the details of the search window', () => {
 		expect( y ).toBeLessThanOrEqual( 0.5 );
 	} );
 
+	/**
+	 * At 390px the field shared its row with the mic, the camera and close,
+	 * and kept about 120px for what was typed. Typing, the mic steps aside,
+	 * and comes back when the field is empty.
+	 */
+	test( 'on a phone the mic makes room for what is typed', async ( { page, requestUtils }, testInfo ) => {
+		test.skip( 'mobile-chrome' !== testInfo.project.name, 'The phone layout.' );
+
+		const widget = await open( page, requestUtils );
+		const voice = widget.modal.locator( '.whsc-voice-btn' );
+
+		await expect( voice ).toBeVisible();
+
+		const before = await widget.input.evaluate( ( input ) => input.getBoundingClientRect().width );
+
+		await widget.input.fill( 'merino' );
+
+		await expect( voice ).toBeHidden();
+		// Wider though the clear button now shares the field with the text.
+		expect( await widget.input.evaluate( ( input ) => input.getBoundingClientRect().width ) ).toBeGreaterThan( before );
+
+		await widget.input.fill( '' );
+
+		await expect( voice ).toBeVisible();
+	} );
+
 	test( 'the sparkle stands in the middle of its circle', async ( { page, requestUtils } ) => {
 		const widget = await open( page, requestUtils, {}, { assistant: true } );
 

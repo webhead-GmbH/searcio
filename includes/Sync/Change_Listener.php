@@ -204,6 +204,63 @@ final class Change_Listener implements Actions {
 		}
 	}
 
+	/**
+	 * Queue every password-protected post of an indexed type, so the drain
+	 * takes out of the index each one that may no longer be in it (see
+	 * {@see Document_Builder::is_indexable()}). Each is queued as an edit
+	 * would queue it, so one whose mapping indexes protected posts stays.
+	 *
+	 * @return int How many posts were queued.
+	 */
+	public function queue_password_protected_posts(): int {
+		// The posts in the index, in every language: a query for posts would
+		// see the current language alone on a multilingual site.
+		$post_ids = array_map(
+			static fn ( string $document_id ): int => (int) substr( $document_id, (int) strrpos( $document_id, '-' ) + 1 ),
+			$this->dirty->indexed_document_ids()
+		);
+		$queued   = 0;
+
+		_prime_post_caches( $post_ids );
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( $post instanceof WP_Post && 'publish' === $post->post_status && $this->builder->is_password_protected( $post ) ) {
+				$this->sync_post( $post );
+				$queued++;
+			}
+		}
+
+		return $queued;
+	}
+
+	/**
+	 * Queue WooCommerce's cart, checkout, account and shop pages and their
+	 * translations, so the drain takes out of the index each one that is in
+	 * it (see {@see Document_Builder::is_shop_page()}).
+	 *
+	 * @return int How many pages were queued.
+	 */
+	public function queue_shop_pages(): int {
+		$queued = 0;
+
+		foreach ( $this->dirty->indexed_document_ids() as $document_id ) {
+			if ( ! str_starts_with( $document_id, 'page-' ) ) {
+				continue;
+			}
+
+			$post = get_post( (int) substr( $document_id, 5 ) );
+
+			if ( $post instanceof WP_Post && $this->builder->is_shop_page( $post ) ) {
+				$this->sync_post( $post );
+				$queued++;
+			}
+		}
+
+		return $queued;
+	}
+
 	private function maybe_delete( int $post_id ): void {
 		$post = get_post( $post_id );
 

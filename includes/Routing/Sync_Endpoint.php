@@ -54,6 +54,7 @@ final class Sync_Endpoint extends Rest_API {
 		'trigger'     => [ 'type' => 'string' ],
 		'date_after'  => [ 'type' => 'string' ],
 		'date_before' => [ 'type' => 'string' ],
+		'search'      => [ 'type' => 'string' ],
 	];
 
 	public function __construct(
@@ -105,6 +106,7 @@ final class Sync_Endpoint extends Rest_API {
 				'trigger'     => (string) ( $request->get_param( 'trigger' ) ?? '' ),
 				'date_after'  => (string) ( $request->get_param( 'date_after' ) ?? '' ),
 				'date_before' => (string) ( $request->get_param( 'date_before' ) ?? '' ),
+				'search'      => (string) ( $request->get_param( 'search' ) ?? '' ),
 			]
 		);
 

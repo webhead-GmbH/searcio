@@ -27,6 +27,16 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Document_Builder {
+	/** The words of its text a post without a title is named by. */
+	private const UNTITLED_WORDS = 8;
+
+	/**
+	 * WooCommerce's own pages and their translations, found once per request.
+	 *
+	 * @var array<int,int>|null
+	 */
+	private ?array $shop_pages = null;
+
 	public function __construct(
 		private Index_Config $config,
 		private Field_Source_Resolver $resolver,
@@ -41,6 +51,11 @@ final class Document_Builder {
 
 	/**
 	 * Used by the sync engine to decide upsert vs. delete.
+	 *
+	 * A post the mapping indexes can still be kept out through
+	 * `searcio_is_indexable`, which is given `true` and the post and
+	 * answers whether to index it. It cannot let in a post the mapping keeps
+	 * out.
 	 */
 	public function is_indexable( WP_Post $post ): bool {
 		$block = $this->config->block_for( $post->post_type );
@@ -49,9 +64,14 @@ final class Document_Builder {
 			return false;
 		}
 
-		if ( 'publish' === $post->post_status ) {
+		// A password-protected post is published, but only a reader who has its
+		// password may read it, so it is indexed with the private ones, when
+		// the mapping asks for those, and never for being published: indexed
+		// as published, its text was in every visitor's search window and the
+		// shopping assistant read it out.
+		if ( 'publish' === $post->post_status && ! $this->is_password_protected( $post ) ) {
 			$ok = true;
-		} elseif ( in_array( $post->post_status, [ 'private' ], true ) ) {
+		} elseif ( in_array( $post->post_status, [ 'publish', 'private' ], true ) ) {
 			$ok = ! empty( $block['include_private'] );
 		} else {
 			return false;
@@ -67,7 +87,37 @@ final class Document_Builder {
 			}
 		}
 
-		return ! $this->is_language_excluded( $post );
+		if ( $this->is_shop_page( $post ) || $this->is_language_excluded( $post ) ) {
+			return false;
+		}
+
+		return (bool) apply_filters( 'searcio_is_indexable', true, $post );
+	}
+
+	/**
+	 * Whether the post is the cart, the checkout, the account or the shop
+	 * page WooCommerce made, or a translation of one. A search for "cart"
+	 * found the cart page, which holds a block and nothing to read, and the
+	 * shop page is the product list the search window already is.
+	 */
+	public function is_shop_page( WP_Post $post ): bool {
+		if ( 'page' !== $post->post_type ) {
+			return false;
+		}
+
+		if ( null === $this->shop_pages ) {
+			$this->shop_pages = [];
+
+			foreach ( $this->woo->system_page_ids() as $page_id ) {
+				array_push( $this->shop_pages, ...$this->multilingual->post_translations( $page_id ) );
+			}
+		}
+
+		return in_array( $post->ID, $this->shop_pages, true );
+	}
+
+	public function is_password_protected( WP_Post $post ): bool {
+		return '' !== (string) $post->post_password;
 	}
 
 	/**
@@ -181,7 +231,16 @@ final class Document_Builder {
 		// The post's own title, decoded as the default source decodes it.
 		$fallback = $this->resolver->resolve( 'property:title', $post );
 
-		return is_string( $fallback ) ? $fallback : '#' . $post->ID;
+		if ( is_string( $fallback ) && '' !== trim( $fallback ) ) {
+			return $fallback;
+		}
+
+		// A post without a title showed as "#66", which says nothing of what
+		// it holds: the first words of its text say more.
+		$text  = $this->resolver->resolve( 'property:content', $post );
+		$words = is_string( $text ) ? wp_trim_words( $text, self::UNTITLED_WORDS, '…' ) : '';
+
+		return '' !== trim( $words ) ? $words : '#' . $post->ID;
 	}
 
 	/**
@@ -193,6 +252,14 @@ final class Document_Builder {
 		}
 
 		$value = $this->resolver->resolve( $source, $post );
+
+		// An image from a custom field is usually an attachment's id - what ACF
+		// stores - and a card needs its address, at the size the featured
+		// image is sent in.
+		if ( 'image' === $key && ( is_int( $value ) || ( is_string( $value ) && ctype_digit( $value ) ) ) ) {
+			$url   = wp_get_attachment_image_url( (int) $value, 'medium_large' );
+			$value = is_string( $url ) ? $url : null;
+		}
 
 		if ( is_string( $value ) && '' !== $value ) {
 			$document[ $key ] = $value;

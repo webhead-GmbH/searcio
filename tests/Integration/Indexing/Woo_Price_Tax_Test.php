@@ -192,7 +192,7 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		$this->assertSame( 10.7, $grouped['price'] );
 		$this->assertSame( 10.7, $grouped['price_min'] );
 		$this->assertSame( 178.5, $grouped['price_max'] );
-		$this->assertSame( 'simple', $grouped['product_type'] );
+		$this->assertSame( 'grouped', $grouped['product_type'] );
 		$this->assertFalse( $grouped['on_sale'] );
 	}
 

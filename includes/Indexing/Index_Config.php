@@ -26,6 +26,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Index_Config {
+	/** Where Elementor keeps its templates, floating elements, code snippets, fonts and icon sets. */
+	private const BUILDER_POST_TYPES = [ 'elementor_library', 'e-floating-buttons', 'elementor_snippet', 'elementor_font', 'elementor_icons' ];
+
 	public function __construct(
 		private Settings_Manager $settings,
 		private Woo $woo,
@@ -82,9 +85,8 @@ final class Index_Config {
 	}
 
 	/**
-	 * Slug => plural label, so front-ends (the search modal's type filters) can
-	 * show a human-readable name instead of the raw slug the Searcio API's
-	 * facets return.
+	 * Slug => plural label, for the places an admin picks a post type: the
+	 * Placement tab's "Content to search".
 	 *
 	 * @return array<string,string>
 	 */
@@ -96,6 +98,46 @@ final class Index_Config {
 			if ( in_array( $object->name, $enabled, true ) ) {
 				$labels[ $object->name ] = $this->post_type_label( $object );
 			}
+		}
+
+		return $labels;
+	}
+
+	/**
+	 * Post type => the type its documents carry, which the Indexing tab lets an
+	 * admin name: "artikel" for posts. A block, a shortcode, a widget and a
+	 * placement name a post type, and the index knows only this, so a search
+	 * restricted to posts asked for `type=post` and found nothing once posts
+	 * were "artikel".
+	 *
+	 * @return array<string,string>
+	 */
+	public function document_types(): array {
+		$types = [];
+
+		foreach ( $this->all() as $post_type => $block ) {
+			if ( ! empty( $block['enabled'] ) ) {
+				$type                         = trim( (string) ( $block['type'] ?? '' ) );
+				$types[ (string) $post_type ] = '' !== $type ? $type : (string) $post_type;
+			}
+		}
+
+		return $types;
+	}
+
+	/**
+	 * Document type => the plural label of its post type, so the search
+	 * window's type buttons name what the Searcio API's facets return: a
+	 * renamed type showed as "artikel" beside "Seiten".
+	 *
+	 * @return array<string,string>
+	 */
+	public function document_type_labels(): array {
+		$types  = $this->document_types();
+		$labels = [];
+
+		foreach ( $this->indexable_post_type_labels() as $post_type => $label ) {
+			$labels[ $types[ $post_type ] ?? $post_type ] ??= $label;
 		}
 
 		return $labels;
@@ -163,6 +205,18 @@ final class Index_Config {
 		return null === $woo ? $labels : array_merge( $labels, $this->woo->attribute_labels( $woo ) );
 	}
 
+	private function is_protected_meta_source( string $source ): bool {
+		$source = trim( $source );
+
+		if ( ! str_starts_with( strtolower( $source ), 'meta:' ) ) {
+			return false;
+		}
+
+		$key = trim( substr( $source, strlen( 'meta:' ) ) );
+
+		return '' !== $key && Field_Source_Resolver::is_protected_meta_key( $key );
+	}
+
 	/**
 	 * The hierarchical taxonomy a block maps to the `categories` field, or ''
 	 * when it maps none. A post's categories share that field with the
@@ -188,6 +242,42 @@ final class Index_Config {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Field => category taxonomies, for the fields the category filter is: the
+	 * plugin's own `categories` and any field an enabled mapping writes from
+	 * the product or the post categories. A site that maps its post
+	 * categories as "kategorien" set "Main categories only" and still saw
+	 * every subcategory: only the field named `categories` got a tree.
+	 *
+	 * @return array<string,array<int,string>>
+	 */
+	public function category_fields(): array {
+		$fields = [ Facet_Config::CATEGORY_FIELD => [ Woo::CATEGORY_TAXONOMY, 'category' ] ];
+
+		foreach ( $this->all() as $block ) {
+			if ( empty( $block['enabled'] ) ) {
+				continue;
+			}
+
+			foreach ( $block['fields'] as $field ) {
+				$source = trim( (string) $field['source'] );
+				$as     = (string) $field['as'];
+
+				if ( ! str_starts_with( strtolower( $source ), 'taxonomy:' ) || isset( $fields[ $as ] ) ) {
+					continue;
+				}
+
+				$taxonomy = trim( substr( $source, strlen( 'taxonomy:' ) ) );
+
+				if ( in_array( $taxonomy, [ Woo::CATEGORY_TAXONOMY, 'category' ], true ) ) {
+					$fields[ $as ] = [ $taxonomy ];
+				}
+			}
+		}
+
+		return $fields;
 	}
 
 	/**
@@ -316,8 +406,21 @@ final class Index_Config {
 	 */
 	private function candidate_post_types(): array {
 		$objects = get_post_types( [ 'public' => true ], 'objects' );
+		$config  = $this->all();
 
 		unset( $objects['attachment'] );
+
+		// A page builder's parts are public, so WordPress lists them, but no
+		// visitor reads one: Elementor's templates and floating elements were
+		// offered as content to search. So is a type the site keeps out of its
+		// own search. One that is indexed already stays.
+		foreach ( $objects as $name => $object ) {
+			$builder = in_array( $name, self::BUILDER_POST_TYPES, true );
+
+			if ( ( $builder || ! empty( $object->exclude_from_search ) ) && empty( $config[ $name ]['enabled'] ) ) {
+				unset( $objects[ $name ] );
+			}
+		}
 
 		// Products are public only when WooCommerce is active; surface the section
 		// regardless so the UI can explain the soft dependency.
@@ -582,7 +685,12 @@ final class Index_Config {
 		}
 
 		foreach ( $block['fields'] as $field ) {
-			$fields[] = (string) $field['as'];
+			// A protected key is never sent, so no document has the field: the
+			// tester's "interne_notiz" was offered as a filter and flagged as
+			// nothing.
+			if ( ! $this->is_protected_meta_source( (string) $field['source'] ) ) {
+				$fields[] = (string) $field['as'];
+			}
 		}
 
 		if ( '' !== $this->category_paths_taxonomy( $block ) ) {

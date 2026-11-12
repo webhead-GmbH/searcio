@@ -307,9 +307,14 @@ const PlacementTab = () => {
 		{ value: 'submit', label: __( 'When Enter is pressed', 'searcio' ) },
 		{ value: 'type', label: __( 'As the visitor types', 'searcio' ) },
 	];
+	// A site without a shop has no products to name, and no featured ones:
+	// "Featured products" left the highlights empty there.
+	const highlightSources = catalog?.highlights || { products: true, featured: true };
 	const highlightItems = [
-		{ value: 'newest', label: __( 'The newest products', 'searcio' ) },
-		{ value: 'featured', label: __( 'Featured products', 'searcio' ) },
+		{ value: 'newest', label: highlightSources.products ? __( 'The newest products', 'searcio' ) : __( 'The newest content', 'searcio' ) },
+		...( highlightSources.featured || 'featured' === search?.highlights
+			? [ { value: 'featured', label: __( 'Featured products', 'searcio' ) } ]
+			: [] ),
 	];
 	const animationItems = [
 		{ value: 'fade', label: __( 'Fade', 'searcio' ) },
@@ -393,6 +398,14 @@ const PlacementTab = () => {
 				label={ __( 'Before a search, the window shows', 'searcio' ) }
 				{ ...selectProps( highlightItems, search.highlights, ( value ) => setSearch( 'highlights', value || 'newest' ) ) }
 			/>
+			{ /* Searcio finds the featured products through a filter, and refused one that is not among the site's: the row stayed empty and nothing said why. */ }
+			{ 'featured' === search.highlights && false === highlightSources.filterable && (
+				<Notice.Root intent="warning">
+					<Notice.Description>
+						{ __( 'Featured products are found through the featured field, which is not one of the Facet fields on the Search Config tab yet. Until it is added there, the window shows the newest products.', 'searcio' ) }
+					</Notice.Description>
+				</Notice.Root>
+			) }
 			<RangeControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
@@ -934,7 +947,11 @@ const PlacementTab = () => {
 				) }
 			/>
 
-			<SectionList label={ __( 'Placement settings', 'searcio' ) } sections={ sections } />
+			{ /* Product rows show WooCommerce's products, which a site without it has none of. */ }
+			<SectionList
+				label={ __( 'Placement settings', 'searcio' ) }
+				sections={ sections.filter( ( section ) => 'products' !== section.id || false !== catalog?.shop ) }
+			/>
 
 			<LookEditor
 				isOpen={ isEditingLook }

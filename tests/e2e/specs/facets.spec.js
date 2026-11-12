@@ -37,8 +37,9 @@ test.describe( 'Type facets', () => {
 
 		const pills = widget.typeSwitch.getByRole( 'button' );
 
-		// "All" plus one pill per returned type; on a phone no pressed type is all.
-		await expect( pills ).toHaveCount( 'mobile-chrome' === test.info().project.name ? 2 : 3 );
+		// "All" plus one pill per returned type, on a phone too: without it, the
+		// way back to every result was to press the pressed type again.
+		await expect( pills ).toHaveCount( 3 );
 
 		const post = widget.typeSwitch.getByRole( 'button', { name: /^post/ } );
 

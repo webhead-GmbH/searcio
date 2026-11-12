@@ -39,6 +39,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		delete_option( 'searcio_category_filter' );
 		delete_option( 'searcio_category_filter_depth' );
 		delete_option( 'searcio_category_filter_order' );
+		delete_option( 'searcio_facet_match' );
 
 		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
 			unregister_taxonomy( self::ATTRIBUTE );
@@ -412,6 +413,61 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 
 		$this->assertSame( 'shop', $this->facets()[0]['sort'] );
 		$this->assertContains( 'Kleidung', $this->facets()[0]['valuesOrder'] );
+	}
+
+	/**
+	 * The tester's "Schlagwort" in AND mode kept the counts of its first pick,
+	 * since the window did not know the mode; the plugin keeps a copy of it
+	 * with the facet fields.
+	 */
+	public function test_a_filter_whose_picks_must_all_match_says_so(): void {
+		$this->facet_config()->set_fields( [ 'schlagworte', 'brand' ] );
+		$this->facet_config()->set_match( [ 'schlagworte' => 'all', 'brand' => 'any', 7 => 'all' ] );
+
+		$facets = $this->facets();
+
+		$this->assertSame( 'all', $facets[0]['match'] );
+		$this->assertArrayNotHasKey( 'match', $facets[1] );
+
+		$this->facet_config()->set_match( null );
+
+		$this->assertArrayNotHasKey( 'match', $this->facets()[0], 'A service that does not report the mode has none.' );
+	}
+
+	/**
+	 * Posts mapped as "kategorien" kept every subcategory under "Main
+	 * categories only": only the field named `categories` got a tree.
+	 */
+	public function test_a_field_mapped_from_the_post_categories_is_drawn_as_the_category_filter(): void {
+		$config = $this->service( 'index_config' );
+
+		$config->save( [ 'post' => array_merge( $config->defaults_for( 'post' ), [ 'enabled' => true, 'fields' => [ [ 'as' => 'kategorien', 'source' => 'taxonomy:category' ] ] ] ) ] );
+		$this->facet_config()->set_fields( [ 'kategorien' ] );
+		update_option( 'searcio_category_filter', 'main' );
+
+		$main = self::factory()->category->create( [ 'name' => 'Pflege' ] );
+		self::factory()->category->create( [ 'name' => 'Wolle', 'parent' => $main ] );
+
+		$tree = $this->facets()[0]['tree'];
+
+		$this->assertSame( 1, $tree['depth'] );
+		$this->assertSame( 'Pflege', $tree['parents']['Wolle'] );
+	}
+
+	/**
+	 * A post type renamed in the Indexing tab, and an index without a
+	 * `featured` field, as the window reads them.
+	 */
+	public function test_the_window_is_told_the_document_types_and_whether_there_are_featured_items(): void {
+		$config = $this->service( 'index_config' );
+
+		$config->save( [ 'post' => array_merge( $config->defaults_for( 'post' ), [ 'enabled' => true, 'type' => 'artikel' ] ) ] );
+
+		$frontend = $this->service( 'frontend_config' )->to_array();
+
+		$this->assertSame( [ 'post' => 'artikel' ], $frontend['documentTypes'] );
+		$this->assertArrayHasKey( 'artikel', $frontend['typeLabels'] );
+		$this->assertFalse( $frontend['hasFeatured'], 'Posts have no featured field: asking for them was refused.' );
 	}
 
 	/**

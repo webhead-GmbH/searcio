@@ -4,9 +4,12 @@
  *
  * Owns the sync meta written on every successful push so the full sync and the
  * incremental drain agree on one contract: a post is only re-pushed when its
- * rendered document hash changes, the mapping `config_version` moved, or a
- * re-sync is forced. The same meta is the record of which posts this site has
- * in the index, which the full sync's prune phase reads.
+ * rendered document hash changes, or a re-sync is forced. A change to the
+ * mapping is not a reason of its own: a document it leaves as it was is the
+ * same document, and re-pushing every one of them for a change to a few (or
+ * to none) cost a large site its quota and an hour. The same meta is the
+ * record of which posts this site has in the index, which the full sync's
+ * prune phase reads.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -24,15 +27,10 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Dirty_Tracker {
-	public function is_fresh( WP_Post $post, string $hash, int $config_version ): bool {
-		$stored_cv   = (int) get_post_meta( $post->ID, Sync_Keys::META_CONFIG_VER, true );
+	public function is_fresh( WP_Post $post, string $hash ): bool {
 		$stored_hash = (string) get_post_meta( $post->ID, Sync_Keys::META_DOC_HASH, true );
 
-		if ( '' === $stored_hash || $stored_cv !== $config_version ) {
-			return false;
-		}
-
-		return $stored_hash === $hash;
+		return '' !== $stored_hash && $stored_hash === $hash;
 	}
 
 	public function was_indexed( int $post_id ): bool {

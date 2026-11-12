@@ -18,6 +18,18 @@ use Webhead\WP\SearchCloud\Widgets\Classic_Products_Widget;
 use Webhead\WP\SearchCloud\Widgets\Classic_Search_Widget;
 
 final class Classic_Widgets_Test extends Integration_Test_Case {
+	/**
+	 * Elementor lists every classic widget in its panel, so "Searcio Search"
+	 * and "Searcio Products" stood there twice, beside its own two.
+	 */
+	public function test_the_classic_widgets_are_kept_out_of_elementors_panel(): void {
+		$black_list = apply_filters( 'elementor/widgets/black_list', [ 'Some_Other_Widget' ] );
+
+		$this->assertContains( Classic_Search_Widget::class, $black_list );
+		$this->assertContains( Classic_Products_Widget::class, $black_list );
+		$this->assertContains( 'Some_Other_Widget', $black_list, 'The entries of another plugin stay.' );
+	}
+
 	public function test_both_widgets_are_registered(): void {
 		global $wp_widget_factory;
 

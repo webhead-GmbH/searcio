@@ -131,10 +131,6 @@ msgstr "Opcjonalne. Jeśli pozostanie puste, rząd nie będzie miał tytułu."
 msgid "Product"
 msgstr "Produkt"
 
-#: includes/Elementor/Widgets/Products_Widget.php:88
-msgid "Leave empty to use whichever product the visitor is viewing."
-msgstr "Pozostaw puste, aby użyć produktu, który ogląda odwiedzający."
-
 #: includes/Elementor/Widgets/Products_Widget.php:96
 #: src/blocks/products/edit.js:78
 msgid "Filter field"
@@ -1961,10 +1957,6 @@ msgstr "Nie udało się wyczyścić pamięci podręcznej."
 msgid "Cache"
 msgstr "Pamięć podręczna"
 
-#: src/admin/settings/components/tabs/CacheClearCard.js:42
-msgid "Clears this plugin's own cached data and PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own."
-msgstr "Czyści dane tej wtyczki zapisane w pamięci podręcznej oraz pamięć podręczną opcode PHP, aby właśnie zmienione ustawienie albo niedawno zaktualizowany szablon karty lub wynik popularnych wyszukiwań pojawiły się od razu, zamiast czekać, aż same wygasną."
-
 #: src/admin/settings/components/tabs/CacheClearCard.js:58
 msgid "Clearing…"
 msgstr "Czyszczenie…"
@@ -2267,14 +2259,6 @@ msgstr "Szczegóły produktu"
 #: src/admin/settings/components/tabs/IndexingTab.js:223
 msgid "Pick which WooCommerce data to send. Variable products are indexed once (as the parent) with a price range."
 msgstr "Wybierz, które dane WooCommerce mają być wysyłane. Produkty z wariantami są indeksowane jeden raz (jako produkt nadrzędny) z zakresem cen."
-
-#: src/admin/settings/components/tabs/IndexingTab.js:230
-msgid "Only index published, visible products"
-msgstr "Indeksuj tylko opublikowane, widoczne produkty"
-
-#: src/admin/settings/components/tabs/IndexingTab.js:231
-msgid "Recommended. Hidden or draft products stay out of search."
-msgstr "Zalecane. Ukryte produkty i szkice nie trafiają do wyszukiwania."
 
 #: src/admin/settings/components/tabs/IndexingTab.js:250
 msgid "Product attributes"
@@ -3117,10 +3101,6 @@ msgstr "Wyniki najczęściej klikane dla danego wyszukiwania przesuwają się wy
 msgid "Merchandising rules"
 msgstr "Reguły merchandisingu"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:391
-msgid "Curate the results of chosen searches. Leave the trigger empty to apply a rule to every search - that is how you keep a product out of search everywhere."
-msgstr "Dobieraj wyniki wybranych wyszukiwań. Pozostaw wyzwalacz pusty, aby zastosować regułę do każdego wyszukiwania - w ten sposób wykluczysz produkt z wyszukiwania wszędzie."
-
 #. translators: %d: the rule's position in the list.
 #: src/admin/settings/components/tabs/SearchConfigTab.js:407
 #, js-format
@@ -3641,10 +3621,6 @@ msgstr "Produkty o znaczeniu zbliżonym do oglądanego. Wymaga wyszukiwania AI w
 #: src/blocks/products/edit.js:50
 msgid "A listing filtered to one category, so your merchandising rules for that category apply - pinned products first, hidden ones left out."
 msgstr "Lista zawężona do jednej kategorii, więc obowiązują Twoje reguły merchandisingu dla tej kategorii - najpierw przypięte produkty, bez ukrytych."
-
-#: src/blocks/products/edit.js:66
-msgid "Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
-msgstr "Pozostaw puste, aby użyć produktu, który ogląda odwiedzający - dzięki temu blok działa w szablonie produktu."
 
 #: src/blocks/products/edit.js:95
 msgid "Shown only when a rule for this category actually carries one."
@@ -4641,10 +4617,6 @@ msgstr "Kolory, czcionki, rozmiary i odstępy każdej części, dla komputerów,
 msgid "When a shopper picks several values of one filter"
 msgstr "Gdy klient wybierze kilka wartości jednego filtra"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:933
-msgid "Any: a product that has one of them is shown. All: only a product that has every one of them, for a field a product holds several values of, such as features or tags."
-msgstr "Dowolna: pokazywany jest produkt, który ma jedną z nich. Wszystkie: tylko produkt, który ma każdą z nich, dla pola, którego produkt może mieć kilka wartości, np. cechy lub tagi."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:945
 msgid "Any (OR)"
 msgstr "Dowolna (LUB)"
@@ -5290,3 +5262,177 @@ msgstr "Kolejność kategorii"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:224
 msgid "Drag them into order under Products > Categories in WooCommerce."
 msgstr "Przeciągnij je w odpowiedniej kolejności w WooCommerce, w Produkty > Kategorie."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:152
+#: src/admin/settings/components/tabs/IndexingTab.js:215
+msgid "A key that starts with \"_\" belongs to WordPress or a plugin, and is not sent."
+msgstr "Klucz zaczynający się od „_” należy do WordPressa lub wtyczki i nie jest wysyłany."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1076
+msgid "Any: a result that has one of them is shown. All: only a result that has every one of them, for a field a result holds several values of, such as features or tags."
+msgstr "Dowolna: pokazywany jest wynik, który ma jedną z nich. Wszystkie: tylko wynik, który ma każdą z nich, dla pola, którego wynik może mieć kilka wartości, np. cechy lub tagi."
+
+#: src/admin/settings/components/tabs/CacheClearCard.js:42
+msgid "Clears this plugin's own cached data and its files in PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own. Other sites on the same server are not touched."
+msgstr "Czyści dane tej wtyczki zapisane w pamięci podręcznej oraz jej pliki w pamięci podręcznej opcode PHP, aby właśnie zmienione ustawienie albo niedawno zaktualizowany szablon karty lub wynik popularnych wyszukiwań pojawiły się od razu, zamiast czekać, aż same wygasną. Inne witryny na tym samym serwerze pozostają nietknięte."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:525
+msgid "Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches."
+msgstr "Dobieraj wyniki wybranych wyszukiwań. Wyszukiwanie bierze pierwszą od góry regułę, która do niego pasuje, i żadnej innej: reguła z pustym wyzwalaczem pasuje do każdego wyszukiwania, więc reguły pod nią nigdy nie działają, a produkt, który ukrywa, nadal się pojawia tam, gdzie pasuje reguła nad nią."
+
+#: src/frontend/search/components/AiAssistant.js:310
+msgid "Describe what you're looking for and I'll find it on this site."
+msgstr "Opisz, czego szukasz, a znajdę to na tej stronie."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:148
+msgid "Enter a boost from 0.1 to 100."
+msgstr "Wpisz wzmocnienie od 0,1 do 100."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:146
+msgid "Enter a full address that starts with https://, or a path on this site that starts with /."
+msgstr "Wpisz pełny adres zaczynający się od https:// albo ścieżkę w tej witrynie zaczynającą się od /."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:147
+msgid "Enter a weight from 1 to 100."
+msgstr "Wpisz wagę od 1 do 100."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:618
+msgid "Indexing configuration saved. A sync has started to apply it."
+msgstr "Konfiguracja indeksowania została zapisana. Synchronizacja właśnie ją stosuje."
+
+#: src/admin/settings/components/tabs/IndexingTab.js:616
+msgid "Indexing configuration saved. Start a sync on the Sync tab to apply it."
+msgstr "Konfiguracja indeksowania została zapisana. Uruchom synchronizację na karcie Sync, aby ją zastosować."
+
+#. translators: %s: one or more quoted field names, e.g. "category".
+#: src/admin/settings/components/tabs/SearchConfigTab.js:102
+#, js-format
+msgid "No document on this site has a %s field, so searching it finds nothing. Choose a field from the list, or start indexing it in the Indexing tab."
+msgid_plural "No document on this site has the fields %s, so searching them finds nothing. Choose fields from the list, or start indexing them in the Indexing tab."
+msgstr[0] "Żaden dokument w tej witrynie nie ma pola %s, więc wyszukiwanie w nim niczego nie znajdzie. Wybierz pole z listy lub zacznij je indeksować w zakładce Indeksowanie."
+msgstr[1] "Żaden dokument w tej witrynie nie ma pól %s, więc wyszukiwanie w nich niczego nie znajdzie. Wybierz pola z listy lub zacznij je indeksować w zakładce Indeksowanie."
+msgstr[2] "Żaden dokument w tej witrynie nie ma pól %s, więc wyszukiwanie w nich niczego nie znajdzie. Wybierz pola z listy lub zacznij je indeksować w zakładce Indeksowanie."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:380
+msgid "No sync has run yet."
+msgstr "Nie uruchomiono jeszcze żadnej synchronizacji."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:379
+msgid "No sync matches the search or the filters."
+msgstr "Żadna synchronizacja nie pasuje do wyszukiwania ani filtrów."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:169
+msgid "Some fields need a change: see the messages under them."
+msgstr "Niektóre pola trzeba zmienić: zobacz komunikaty pod nimi."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:314
+msgid "The newest content"
+msgstr "Najnowsze treści"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:667
+msgid "This term is redirected above already, and only one of the two can be followed."
+msgstr "Ten termin jest już przekierowany wyżej i tylko jedno z dwóch przekierowań może zadziałać."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1189
+msgid "Use the two-letter codes of the site's languages, such as de or en, separated by commas."
+msgstr "Użyj dwuliterowych kodów języków witryny, np. de lub en, oddzielonych przecinkami."
+
+#: src/frontend/search/components/AiAssistant.js:155
+msgid "What's new?"
+msgstr "Co nowego?"
+
+#: src/frontend/search/components/AiAssistant.js:155
+msgid "Where should I start?"
+msgstr "Od czego zacząć?"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:294
+msgid "Product-specific attributes"
+msgstr "Atrybuty własne produktu"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:316
+msgid "Respect catalog visibility"
+msgstr "Uwzględniaj widoczność w katalogu"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:317
+msgid "Recommended. Products set to Shop only or Hidden stay out of search, and so do those out of stock when WooCommerce hides them. Whether private products are indexed is up to \"Also index private & password-protected items\"."
+msgstr "Zalecane. Produkty ustawione na „Tylko sklep” lub „Ukryty” nie trafiają do wyszukiwania, podobnie jak niedostępne, gdy WooCommerce je ukrywa. Czy produkty prywatne są indeksowane, zależy od opcji „Indeksuj także elementy prywatne i chronione hasłem”."
+
+#: src/admin/settings/components/tabs/PlacementTab.js:405
+msgid "Featured products are found through the featured field, which is not one of the Facet fields on the Search Config tab yet. Until it is added there, the window shows the newest products."
+msgstr "Polecane produkty są wyszukiwane przez pole featured, którego nie ma jeszcze wśród pól fasetowych na karcie Konfiguracja wyszukiwania. Dopóki nie zostanie tam dodane, okno pokazuje najnowsze produkty."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:882
+msgid "Search configuration saved. Start a sync on the Sync tab to index the languages."
+msgstr "Konfiguracja wyszukiwania zapisana. Uruchom synchronizację na karcie Sync, aby zindeksować języki."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:884
+msgid "Search configuration saved. A sync has started to index the languages."
+msgstr "Konfiguracja wyszukiwania zapisana. Synchronizacja indeksuje teraz języki."
+
+#: includes/Elementor/Widgets/Products_Widget.php:88
+msgid "The ID WordPress shows for the product, such as 119. Leave empty to use whichever product the visitor is viewing."
+msgstr "ID, które WordPress pokazuje dla produktu, np. 119. Pozostaw puste, aby użyć produktu, który odwiedzający właśnie ogląda."
+
+#: includes/Frontend/Product_List_Markup.php:191
+msgid "This row shows the products of the category being viewed, and this page is not a category. Enter a filter value, or place the row on a category template."
+msgstr "Ten wiersz pokazuje produkty oglądanej kategorii, a ta strona nie jest kategorią. Wpisz wartość filtra albo umieść wiersz w szablonie kategorii."
+
+#: includes/Frontend/Product_List_Markup.php:195
+msgid "No product has this ID. Enter the ID WordPress shows for the product, such as 119."
+msgstr "Żaden produkt nie ma tego ID. Wpisz ID, które WordPress pokazuje dla produktu, np. 119."
+
+#: includes/Frontend/Product_List_Markup.php:198
+msgid "This row shows the products like the product being viewed, and this page is not a product. Enter a product ID, or place the row on a product template."
+msgstr "Ten wiersz pokazuje produkty podobne do oglądanego produktu, a ta strona nie jest produktem. Wpisz ID produktu albo umieść wiersz w szablonie produktu."
+
+#: includes/Routing/Connection_Endpoint.php:84
+msgid "No search key is saved, so the site searches with WordPress instead of Searcio. Connect again, or paste the search key under the manual key entry."
+msgstr "Nie zapisano klucza wyszukiwania, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Połącz się ponownie albo wklej klucz wyszukiwania w sekcji „Zaawansowane: ręczne wprowadzanie kluczy”."
+
+#: includes/Routing/Connection_Endpoint.php:93
+msgid "Searcio does not know the search key, so the site searches with WordPress instead of Searcio. Copy it again from the Searcio dashboard, or connect again."
+msgstr "Searcio nie zna klucza wyszukiwania, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Skopiuj go ponownie z panelu Searcio albo połącz się ponownie."
+
+#: includes/Routing/Connection_Endpoint.php:100
+msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. Add the address to the domains of the key in the Searcio dashboard."
+msgstr "Searcio odrzuca klucz wyszukiwania z adresu tej witryny, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Dodaj adres do domen klucza w panelu Searcio."
+
+#: includes/Routing/Settings_Endpoint.php:82
+msgid "That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard."
+msgstr "To nie jest klucz wyszukiwania: klucz zaczyna się od sk_ i nie zawiera spacji. Skopiuj go ponownie z panelu Searcio."
+
+#: src/admin/settings/components/quiz/QuestionEditor.js:67
+msgid "No answer leads to this question, so shoppers never see it. Choose it under \"Then\" for an answer of an earlier question."
+msgstr "Żadna odpowiedź nie prowadzi do tego pytania, więc klienci nigdy go nie widzą. Wybierz je w polu „Następnie” przy odpowiedzi na wcześniejsze pytanie."
+
+#: src/admin/settings/components/quiz/QuizEditor.js:296
+msgid "No answer leads here"
+msgstr "Żadna odpowiedź tu nie prowadzi"
+
+#: src/admin/settings/components/quiz/QuizList.js:334
+msgid "A quiz set to \"Every language\" is offered on the pages of every language. Open it and choose its language if its questions are written in one."
+msgstr "Quiz ustawiony na „Wszystkie języki” jest oferowany na stronach we wszystkich językach. Otwórz go i wybierz jego język, jeśli pytania są napisane w jednym języku."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:859
+msgid "These settings were changed in the Searcio dashboard, or in another window, since this tab read them, and saving would undo that. Nothing was saved. Read them again, then make your change once more."
+msgstr "Te ustawienia zostały zmienione w panelu Searcio lub w innym oknie od czasu, gdy ta karta je odczytała, a zapisanie cofnęłoby tę zmianę. Nic nie zapisano. Odczytaj je ponownie, a następnie wprowadź zmianę jeszcze raz."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1266
+msgid "Read them again"
+msgstr "Odczytaj ponownie"
+
+#: src/blocks/products/edit.js:66
+msgid "The ID WordPress shows for the product, such as 119. Leave empty to use whichever product the visitor is viewing - that is what makes this work from a product template."
+msgstr "ID, które WordPress pokazuje dla produktu, np. 119. Pozostaw puste, aby użyć produktu, który odwiedzający właśnie ogląda - dzięki temu działa to też w szablonie produktu."
+
+#: src/utils/facets.js:96
+msgid "Rating"
+msgstr "Ocena"
+
+#: src/utils/facets.js:97
+msgid "Reviews"
+msgstr "Opinie"
+
+#: src/utils/facets.js:99
+msgid "Attributes"
+msgstr "Atrybuty"

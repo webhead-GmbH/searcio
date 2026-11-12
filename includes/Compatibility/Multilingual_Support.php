@@ -56,6 +56,39 @@ final class Multilingual_Support {
 		};
 	}
 
+	/**
+	 * The post and each of its translations; the post alone without a
+	 * multilingual plugin, or when it has none.
+	 *
+	 * @return array<int,int>
+	 */
+	public function post_translations( int $post_id ): array {
+		$ids = match ( $this->provider() ) {
+			'wpml'     => $this->wpml_post_translations( $post_id ),
+			'polylang' => function_exists( 'pll_get_post_translations' ) ? (array) pll_get_post_translations( $post_id ) : [],
+			default    => [],
+		};
+
+		return array_values( array_unique( array_filter( array_map( 'intval', [ $post_id, ...array_values( $ids ) ] ), static fn ( int $id ): bool => $id > 0 ) ) );
+	}
+
+	/**
+	 * The front page of the language the request is in, as the multilingual
+	 * plugin links it (`/en/`, or `?lang=en`), so a search handed to WordPress
+	 * stays in that language; the site's own without a multilingual plugin.
+	 */
+	public function home_url(): string {
+		$home = home_url( '/' );
+		$url  = match ( $this->provider() ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filter, asked as WPML documents it.
+			'wpml'     => apply_filters( 'wpml_home_url', $home ),
+			'polylang' => function_exists( 'pll_home_url' ) ? pll_home_url() : $home,
+			default    => $home,
+		};
+
+		return is_string( $url ) && '' !== $url ? $url : $home;
+	}
+
 	/** Polylang first - see the class docblock for why this can't be `Compatibility_Manager::get_multilingual_provider()`. */
 	private function provider(): ?string {
 		if ( $this->compatibility->get_polylang()->is_active() ) {
@@ -89,6 +122,29 @@ final class Multilingual_Support {
 				array_filter( $languages, 'is_array' )
 			)
 		);
+	}
+
+	/**
+	 * @return array<int,int>
+	 */
+	private function wpml_post_translations( int $post_id ): array {
+		$post_type = get_post_type( $post_id );
+		$ids       = [];
+
+		if ( false === $post_type ) {
+			return [];
+		}
+
+		foreach ( $this->wpml_active_languages() as $language ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filter, asked as WPML documents it.
+			$id = apply_filters( 'wpml_object_id', $post_id, $post_type, false, $language['code'] );
+
+			if ( is_numeric( $id ) ) {
+				$ids[] = (int) $id;
+			}
+		}
+
+		return $ids;
 	}
 
 	private function wpml_post_language( int $post_id ): ?string {

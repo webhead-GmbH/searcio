@@ -36,6 +36,8 @@ use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Site_Id_Option;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Delete_Legacy_Sync_Options;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Resync_Capabilities;
+use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Password_Protected_Posts;
+use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Shop_Pages;
 use Webhead\WP\SearchCloud\Jobs\Scheduled_Sync_Job;
 use Webhead\WP\SearchCloud\Jobs\Sync_Tick_Job;
 use Webhead\WP\SearchCloud\Jobs\Change_Drain_Job;
@@ -70,6 +72,7 @@ use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
 use Webhead\WP\SearchCloud\Sync\Change_Listener;
+use Webhead\WP\SearchCloud\Sync\Shop_Settings_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
 use Webhead\WP\SearchCloud\WP_CLI\Sync_Command;
 use Webhead\WP\SearchCloud\WP_CLI\Command_Registrar;
@@ -109,6 +112,8 @@ final class Plugin extends Base_Plugin {
 		$upgrade_runner->register( new Resync_Capabilities( $container->get( 'capability_manager' ) ) );
 		$upgrade_runner->register( new Delete_Legacy_Site_Id_Option() );
 		$upgrade_runner->register( new Delete_Legacy_Sync_Options() );
+		$upgrade_runner->register( new Unindex_Password_Protected_Posts( $container->get( 'change_listener' ) ) );
+		$upgrade_runner->register( new Unindex_Shop_Pages( $container->get( 'change_listener' ) ) );
 	}
 
 	protected function register_jobs( Jobs_Manager $jobs_manager, Container $container ): void {
@@ -236,7 +241,7 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'indexing_endpoint',
 			static function () use ( $container ): Indexing_Endpoint {
-				return new Indexing_Endpoint( $container->get( 'index_config' ) );
+				return new Indexing_Endpoint( $container->get( 'index_config' ), $container->get( 'sync_service' ) );
 			}
 		);
 		$container->add(
@@ -300,6 +305,12 @@ final class Plugin extends Base_Plugin {
 			}
 		);
 		$container->add(
+			'shop_settings_listener',
+			static function () use ( $container ): Shop_Settings_Listener {
+				return new Shop_Settings_Listener( $container->get( 'index_config' ), $container->get( 'sync_service' ) );
+			}
+		);
+		$container->add(
 			'change_drain_job',
 			static function () use ( $container ): Change_Drain_Job {
 				return new Change_Drain_Job( $container->get( 'incremental_service' ) );
@@ -341,7 +352,8 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'language_config' ),
 					$container->get( 'facet_config' ),
-					$container->get( 'woo' )
+					$container->get( 'woo' ),
+					$container->get( 'sync_service' )
 				);
 			}
 		);
@@ -371,7 +383,8 @@ final class Plugin extends Base_Plugin {
 				return new Placement_Config(
 					$container->get( Settings_Manager::class ),
 					$container->get( 'compatibility_manager' ),
-					$container->get( 'index_config' )
+					$container->get( 'index_config' ),
+					$container->get( 'facet_config' )
 				);
 			}
 		);
@@ -390,6 +403,7 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'language' ),
 					$container->get( 'language_config' ),
 					$container->get( 'facet_config' ),
+					$container->get( 'multilingual_support' ),
 					$container->get( 'placement_config' )
 				);
 			}
@@ -466,6 +480,7 @@ final class Plugin extends Base_Plugin {
 		$hooks_manager->register( $container->get( 'quizzes_endpoint' ) );
 		$hooks_manager->register( $container->get( 'command_registrar' ) );
 		$hooks_manager->register( $container->get( 'change_listener' ) );
+		$hooks_manager->register( $container->get( 'shop_settings_listener' ) );
 		$hooks_manager->register( $container->get( 'placement_endpoint' ) );
 		$hooks_manager->register( $container->get( 'site_placement' ) );
 		$hooks_manager->register( $container->get( 'placement_preview' ) );

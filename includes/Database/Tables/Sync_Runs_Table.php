@@ -250,6 +250,20 @@ final class Sync_Runs_Table extends Table {
 			$query->where( 'created_at', '<=', (string) $args['date_before'] );
 		}
 
+		// The table's search: a number is a run, anything else is looked for
+		// in what went wrong. The box searched nothing at all.
+		$search = trim( (string) ( $args['search'] ?? '' ) );
+
+		if ( '' !== $search ) {
+			if ( ctype_digit( ltrim( $search, '#' ) ) ) {
+				$query->where( 'id', (int) ltrim( $search, '#' ) );
+			} else {
+				global $wpdb;
+
+				$query->where( 'last_error', 'like', '%' . $wpdb->esc_like( $search ) . '%' );
+			}
+		}
+
 		return $query;
 	}
 

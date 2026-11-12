@@ -78,6 +78,24 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'Kabel <2m', 'Fisch & Chips' ], $this->read()->get_data()['settings'][ Plugin_Settings::POPULAR_SEARCHES ] );
 	}
 
+	/**
+	 * "falscher-key 123" was saved without a word, and the site's search fell
+	 * back to WordPress's own.
+	 */
+	public function test_a_search_key_that_is_not_one_is_refused(): void {
+		$this->as_admin();
+		$this->settings()->set( Plugin_Settings::SEARCH_KEY, 'sk_before' );
+
+		$refused = $this->save( [ Plugin_Settings::SEARCH_KEY => 'falscher-key 123' ] );
+
+		$this->assertSame( 400, $refused->get_status() );
+		$this->assertStringContainsString( 'sk_', $refused->get_data()['message'] );
+		$this->assertSame( 'sk_before', $this->settings()->get( Plugin_Settings::SEARCH_KEY ) );
+
+		$this->assertSame( 200, $this->save( [ Plugin_Settings::SEARCH_KEY => 'sk_I4zYlezgsjA8CjXpnlPK5Pu6' ] )->get_status() );
+		$this->assertSame( 200, $this->save( [ Plugin_Settings::SEARCH_KEY => '' ] )->get_status() );
+	}
+
 	/** An unconnected site reads as empty, so the screen can still tell the two apart. */
 	public function test_reading_reports_an_empty_credential_as_empty(): void {
 		$this->settings()->set( Plugin_Settings::WRITE_KEY, '' );
@@ -172,6 +190,24 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 
 		$this->assertSame( 'sk_public_key', $this->settings()->get( Plugin_Settings::SEARCH_KEY ) );
 		$this->assertSame( 'test-write-key', Plugin_Settings::decrypt_secret( $this->stored()[0] ) );
+	}
+
+	/**
+	 * -5 days was saved with "Settings saved successfully", and nobody could
+	 * tell whether it kept the history forever or deleted all of it.
+	 */
+	public function test_a_negative_number_of_days_to_keep_the_history_is_refused(): void {
+		$this->as_admin();
+		$this->settings()->set( Plugin_Settings::SYNC_RETENTION_DAYS, 30 );
+
+		$response = $this->save( [ Plugin_Settings::SYNC_RETENTION_DAYS => -5 ] );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+		$this->assertSame( 30, (int) $this->settings()->get( Plugin_Settings::SYNC_RETENTION_DAYS ) );
+
+		$this->save( [ Plugin_Settings::SYNC_RETENTION_DAYS => 0 ] );
+
+		$this->assertSame( 0, (int) $this->settings()->get( Plugin_Settings::SYNC_RETENTION_DAYS ), '0 keeps the history forever.' );
 	}
 
 	/**

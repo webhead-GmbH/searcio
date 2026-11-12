@@ -5,7 +5,10 @@
  */
 
 import {
+	changedSince,
 	cleanTerms,
+	enabledTypeLabels,
+	repeatsRedirect,
 	errorsUnder,
 	FEATURE_KEYS,
 	idsToText,
@@ -450,5 +453,67 @@ describe( 'document id lists', () => {
 
 	it( 'reads an empty field as no ids', () => {
 		expect( textToIds( '' ) ).toEqual( [] );
+	} );
+} );
+
+/**
+ * A boost is matched against the type the documents carry. Keyed by the post
+ * type, the tester's boost of 100 for posts asked for "post" while posts were
+ * "artikel", and moved nothing.
+ */
+describe( 'enabledTypeLabels', () => {
+	it( 'names each indexed content type by the type its documents carry', () => {
+		const catalog = {
+			post_types: [
+				{ slug: 'post', label: 'Beiträge', config: { enabled: true, type: 'artikel' } },
+				{ slug: 'page', label: 'Seiten', config: { enabled: true, type: 'page' } },
+				{ slug: 'ratgeber', label: 'Ratgeber', config: { enabled: true } },
+				{ slug: 'faq', label: 'FAQ', config: { enabled: false, type: 'faq' } },
+			],
+		};
+
+		expect( enabledTypeLabels( catalog ) ).toEqual( { artikel: 'Beiträge', page: 'Seiten', ratgeber: 'Ratgeber' } );
+		expect( enabledTypeLabels( null ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'repeatsRedirect', () => {
+	it( 'flags a later redirect whose term an earlier one has, whatever its capitals and spaces', () => {
+		const rules = [ { query: 'versand' }, { query: 'Retoure' }, { query: 'VERSAND ' }, { query: '' }, { query: '' } ];
+
+		expect( repeatsRedirect( rules, 0 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 4 ) ).toBe( false );
+	} );
+} );
+
+describe( 'changedSince', () => {
+	const persisted = {
+		type_boosts: [ { type: 'product', boost: 1 }, { type: 'ratgeber', boost: 1 } ],
+		searchable_fields: [ { field: 'title', weight: 5 }, { field: 'content', weight: 1 } ],
+		synonyms: [],
+		features: { visual_search: { enabled: false }, assistant: { enabled: true } },
+	};
+
+	// A boost changed in the Searcio dashboard went back to 1 when the tab
+	// saved its boosts, read ten minutes before.
+	it( 'names a section the save would write that changed since the tab read it', () => {
+		const live = { ...persisted, type_boosts: [ { type: 'product', boost: 1 }, { type: 'ratgeber', boost: 3 } ] };
+
+		expect( changedSince( { type_boosts: persisted.type_boosts }, live, persisted ) ).toEqual( [ 'type_boosts' ] );
+	} );
+
+	it( 'lets through a save of sections nobody changed meanwhile', () => {
+		const live = { ...persisted, searchable_fields: [ { field: 'title', weight: 5 }, { field: 'content', weight: 2 } ] };
+
+		expect( changedSince( { synonyms: [ [ 'hoodie', 'sweater' ] ] }, live, persisted ) ).toEqual( [] );
+	} );
+
+	it( 'looks only at the feature switches the save sends', () => {
+		const live = { ...persisted, features: { visual_search: { enabled: false }, assistant: { enabled: false } } };
+
+		expect( changedSince( { features: { visual_search: { enabled: true } } }, live, persisted ) ).toEqual( [] );
+		expect( changedSince( { features: { assistant: { enabled: true } } }, live, persisted ) ).toEqual( [ 'features' ] );
 	} );
 } );

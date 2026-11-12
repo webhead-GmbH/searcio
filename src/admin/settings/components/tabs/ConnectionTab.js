@@ -92,6 +92,22 @@ const ConnectionTab = () => {
 		};
 	}, [isLoading, isConnected, connectedResult]);
 
+	// Keys saved by hand are checked at once, from Searcio and not from what
+	// the page or the server kept: the first check's answer stayed, and wrong
+	// keys saved before the right ones kept saying "wrong" until a reload.
+	const recheck = async () => {
+		forgetAll();
+
+		try {
+			setConnectedResult(await apiFetch({path: TEST_CONNECTION_PATH, method: 'POST', data: {fresh: true}}));
+		} catch (error) {
+			setConnectedResult({
+				ok: false,
+				message: error?.message || __('The test request failed.', 'searcio'),
+			});
+		}
+	};
+
 	// A connect that failed, and one that found an account for the email,
 	// are read out as their notices appear.
 	useAnnounce(connectError ? String(connectError) : '', 'assertive');
@@ -230,7 +246,7 @@ const ConnectionTab = () => {
 					: __('Advanced: manual key entry', 'searcio')}
 			</CollapsibleCard.Header>
 			<CollapsibleCard.Content className="whsc-card__content">
-				<ManualConnectionEntry pendingClaim={!isConnected && pendingClaim}/>
+				<ManualConnectionEntry pendingClaim={!isConnected && pendingClaim} onSaved={recheck}/>
 			</CollapsibleCard.Content>
 		</CollapsibleCard.Root>
 	);

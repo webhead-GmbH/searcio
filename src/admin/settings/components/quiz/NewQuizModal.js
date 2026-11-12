@@ -85,13 +85,29 @@ const NewQuizModal = ( { isOpen, onClose, onCreated, languages } ) => {
 					event.preventDefault();
 					void create();
 				} }
+				// The form has no button of its own (the modal's are outside it),
+				// so with the language select beside the name, Enter in the name
+				// submitted nothing.
+				onKeyDown={ ( event ) => {
+					if ( 'Enter' === event.key && 'INPUT' === event.target?.tagName && ! event.nativeEvent?.isComposing && ! isCreating ) {
+						event.preventDefault();
+						void create();
+					}
+				} }
 			>
 				<Stack direction="column" gap="lg">
 					<InputControl
 						label={ __( 'Name', 'searcio' ) }
 						description={ __( 'Shoppers see it when a site has more than one quiz to choose from.', 'searcio' ) }
 						value={ name }
-						onValueChange={ setName }
+						onValueChange={ ( value ) => {
+							setName( value );
+
+							// "Give the quiz a name" stayed under the name typed since.
+							if ( '' !== value.trim() ) {
+								setError( '' );
+							}
+						} }
 					/>
 					{ languages.length > 1 && (
 						<SelectControl

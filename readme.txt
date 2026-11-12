@@ -193,9 +193,34 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.1 =
+- Security: password-protected posts and pages are no longer indexed, unless "Also index private & password-protected items" is on. Their text could be read in the search window, and the AI shopping assistant answered from it. The update takes the ones already indexed out right away.
+- Saving the Indexing tab starts a sync that sends only what the change altered, instead of waiting for a sync and then sending everything again.
+- A content type you renamed on the Indexing tab is found by blocks, shortcodes, widgets and placements restricted to it, and its type boost works.
+- Result cards of pages and custom content types show their text, not only the title.
+- The category filter's modes work for post categories too, and a post filed under a subcategory is found by a filter on its main category.
+- A filter set to "All (AND)" updates its counts after every pick, so it no longer offers combinations that find nothing.
+- The title, body text, result link and image can come from a custom field, such as an ACF field.
+- The synonyms field takes a new line for each group again.
+- On a site without a shop, the highlights no longer ask for featured products, and the window and the settings no longer speak of a shop.
+- Smaller fixes: clearer error messages on the Search Config tab, a warning for a redirect entered twice and for a field no content carries, the Sync history search works, a negative number of days is refused, Elementor no longer lists the Searcio widgets twice, "Clear cache" no longer clears the opcode cache of other sites on the server, and on a phone the search field has room for what you type.
 - The category filter tells apart categories of the same name under different parents: each is under its own parent with its own number of products, and picking one filters only that one. After the next sync, add "category_paths" to the facet fields on the Search Config tab, and keep "categories" there for your quizzes and merchandising rules.
 - The category filter lists your categories in the order you sorted them in WooCommerce, or by name or by number of products: see Order of the categories on the Search Config tab.
 - WooCommerce brands can be indexed (Indexing tab, Brands) and offered as a filter of their own by adding "brands" to the facet fields.
+- The highlights, product rows (similar products included), product finder and photo search show products only, where posts and pages came among them.
+- Featured highlights: the Placement tab says when the "featured" field still has to be added to the facet fields, and until then the window shows the newest products instead of nothing.
+- On a multilingual site with no language ticked, each page searches its own language. A page in a language you do not index searches WordPress in that language, and the search window no longer shows the other languages' highlights and popular searches there.
+- WooCommerce's cart, checkout, account and shop pages are no longer indexed; the update takes them out of search. A developer filter keeps out any other page.
+- Changing "Hide out of stock items" in WooCommerce, or the languages on the Search Config tab, starts a sync.
+- A variable product on sale shows its regular price struck through, and grouped and external products are sent with their own product type.
+- Attributes a product defines for itself can be indexed (Indexing tab, Product-specific attributes).
+- The Search Config tab always shows the settings as Searcio has them, and no longer undoes a change made in the Searcio dashboard.
+- A quiz published in the Product finder tab shows on the shop's next page, not some minutes later.
+- Product rows set to Searcio templates draw them, and a card designed in Searcio looks on the site as it does in the Searcio panel.
+- The comparison table leaves out internal fields, a product on backorder says so, and a wrong search key is refused and reported by Test connection.
+- Keys entered by hand on the Connection tab are checked again as soon as they are saved, where an earlier "wrong keys" stayed until the page was reloaded.
+- A product row accepts the product's ID as WordPress shows it, and the Elementor editor says why a row is empty.
+- The product finder names each answer by its question, and its editor marks a question no answer leads to.
+- On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.
 
 = 1.4.0 =
 - Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.

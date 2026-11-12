@@ -66,7 +66,7 @@ final class Field_Source_Resolver {
 	}
 
 	private function resolve_meta( string $key, WP_Post $post ): mixed {
-		if ( '' === $key || $this->is_protected_meta_key( $key, $post ) ) {
+		if ( '' === $key || self::is_protected_meta_key( $key, $post ) ) {
 			return null;
 		}
 
@@ -104,9 +104,11 @@ final class Field_Source_Resolver {
 	 * transient handshakes). They are never pushed to Searcio by default so
 	 * an over-broad mapping cannot silently leak internal data into public
 	 * search. A site that deliberately needs one indexed can allow it per key
-	 * through the `searcio_index_allow_protected_meta` filter.
+	 * through the `searcio_index_allow_protected_meta` filter, which is given
+	 * the key and the post, or null when the question is whether any post's
+	 * document carries the field (see {@see Index_Config::indexed_fields()}).
 	 */
-	private function is_protected_meta_key( string $key, WP_Post $post ): bool {
+	public static function is_protected_meta_key( string $key, ?WP_Post $post = null ): bool {
 		$protected = function_exists( 'is_protected_meta' )
 			? is_protected_meta( $key, 'post' )
 			: str_starts_with( $key, '_' );
@@ -120,13 +122,16 @@ final class Field_Source_Resolver {
 
 	/**
 	 * The names of the terms the post is assigned, decoded like every other
-	 * indexed term name (see {@see Term_Names}). Ancestors are not added here:
-	 * a mapped taxonomy sends exactly the terms the post carries.
+	 * indexed term name (see {@see Term_Names}), with every parent of each in
+	 * a hierarchical taxonomy, as a product's categories are sent: a post
+	 * filed under "Ratgeber › Pflege › Wolle" went as "Wolle" alone, so a
+	 * filter on "Ratgeber" did not find it, and the category filter had no
+	 * main categories to show.
 	 *
 	 * @return array<int,string>|null
 	 */
 	private function resolve_taxonomy( string $taxonomy, WP_Post $post ): ?array {
-		$names = Term_Names::for_post( $post, $taxonomy );
+		$names = Term_Names::for_post( $post, $taxonomy, true );
 
 		return [] === $names ? null : $names;
 	}

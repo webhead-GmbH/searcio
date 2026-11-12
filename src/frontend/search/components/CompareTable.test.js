@@ -27,6 +27,17 @@ describe( 'comparisonRows', () => {
 		).toEqual( [] );
 	} );
 
+	// "Ai tags" in English on a German shop, a second category row of paths,
+	// and "Featured: Yes" were rows a shopper could make nothing of.
+	it( 'leaves out the photo tags, the category paths and the featured flag', () => {
+		expect(
+			comparisonRows( [
+				product( 'a', { ai_tags: [ 'handbag' ], category_paths: [ 'Bags' ], featured: true, material: 'Leather' } ),
+				product( 'b', { ai_tags: [ 'purse' ], category_paths: [ 'Bags > Totes' ], featured: false, material: 'Canvas' } ),
+			] )
+		).toEqual( [ 'material' ] );
+	} );
+
 	it( 'leads with the rows that differ, then sorts by label', () => {
 		expect(
 			comparisonRows( [
@@ -48,10 +59,10 @@ describe( 'comparisonRows', () => {
 	it( 'does not count two spellings of the same flag as a difference', () => {
 		expect(
 			comparisonRows( [
-				product( 'a', { featured: '1', brand: 'Acme' } ),
-				product( 'b', { featured: true, brand: 'Other' } ),
+				product( 'a', { virtual: '1', brand: 'Acme' } ),
+				product( 'b', { virtual: true, brand: 'Other' } ),
 			] )
-		).toEqual( [ 'brand', 'featured' ] );
+		).toEqual( [ 'brand', 'virtual' ] );
 	} );
 
 	it( 'includes a field only some of the products have', () => {

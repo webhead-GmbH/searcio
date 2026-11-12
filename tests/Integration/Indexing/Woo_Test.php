@@ -79,6 +79,7 @@ final class Woo_Test extends Integration_Test_Case {
 		$product->set_sku( 'COAT-1' );
 		$product->set_featured( true );
 		$product->set_status( 'publish' );
+		$product->set_attributes( [ $this->local_attribute( 'Weight', [ '250 g' ] ) ] );
 		$product->save();
 
 		$terms = [ 'product_cat' => 'Outerwear', 'product_tag' => 'Winter', self::ATTRIBUTE => 'Matte' ];
@@ -605,6 +606,148 @@ final class Woo_Test extends Integration_Test_Case {
 		$this->assertSame( 'Indexed Product', $document['title'] );
 		$this->assertSame( 42.0, $document['price'] );
 		$this->assertSame( 'IDX-42', $document['sku'] );
+	}
+
+	/**
+	 * WooCommerce's own type, not "simple" for every product that is not
+	 * variable: a grouped and an external product were sent as simple ones.
+	 */
+	public function test_the_product_type_is_woocommerces(): void {
+		$child = $this->product( 'visible' );
+
+		$grouped = new \WC_Product_Grouped();
+		$grouped->set_name( 'Coffee starter set' );
+		$grouped->set_children( [ $child->get_id() ] );
+		$grouped->set_status( 'publish' );
+		$grouped->save();
+
+		$external = new \WC_Product_External();
+		$external->set_name( 'Gift card at a partner' );
+		$external->set_regular_price( '25' );
+		$external->set_product_url( 'https://partner.example/gift' );
+		$external->save();
+
+		$this->assertSame( 'grouped', $this->woo->product_fields( get_post( $grouped->get_id() ), [ 'price' => true ] )['product_type'] );
+		$this->assertSame( 'external', $this->woo->product_fields( get_post( $external->get_id() ), [ 'price' => true ] )['product_type'] );
+		$this->assertSame( 'simple', $this->woo->product_fields( get_post( $child->get_id() ), [ 'price' => true ] )['product_type'] );
+	}
+
+	/**
+	 * A card showed "from 239" for a parka whose every variation was on sale,
+	 * with nothing struck through: the index had no regular price for it.
+	 */
+	public function test_a_variable_product_on_sale_carries_its_cheapest_variations_regular_price(): void {
+		$variable = new WC_Product_Variable();
+		$variable->set_name( 'Parka' );
+		$variable->save();
+
+		foreach ( [ [ '299', '239' ], [ '349', '279' ] ] as [ $regular, $sale ] ) {
+			$variation = new WC_Product_Variation();
+			$variation->set_parent_id( $variable->get_id() );
+			$variation->set_regular_price( $regular );
+			$variation->set_sale_price( $sale );
+			$variation->save();
+		}
+
+		wc_get_product( $variable->get_id() )->save();
+
+		$fields = $this->woo->product_fields( get_post( $variable->get_id() ), [ 'price' => true, 'regular_sale' => true ] );
+
+		$this->assertSame( 239.0, $fields['price_min'] );
+		$this->assertTrue( $fields['on_sale'] );
+		$this->assertSame( 299.0, $fields['regular_price'] );
+		$this->assertSame( 239.0, $fields['sale_price'] );
+
+		$this->assertArrayNotHasKey( 'regular_price', $this->woo->product_fields( get_post( $this->make_variable_product() ), [ 'price' => true, 'regular_sale' => true ] ), 'Not on sale.' );
+		$this->assertArrayNotHasKey( 'regular_price', $this->woo->product_fields( get_post( $variable->get_id() ), [ 'price' => true ] ), 'Not asked for.' );
+	}
+
+	/**
+	 * Many shops give a product an attribute of its own rather than one of the
+	 * shop's, and those were not indexed at all.
+	 */
+	public function test_the_attributes_a_product_defines_for_itself_are_indexed_as_name_and_value(): void {
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Espresso beans' );
+		$product->set_regular_price( '9' );
+		$product->set_attributes(
+			[
+				$this->local_attribute( 'Gewicht', [ '250g', '1kg' ], false, true ),
+				$this->local_attribute( 'R&ouml;stung', [ 'Wiener' ] ),
+				$this->local_attribute( 'Lieferant intern', [ 'Nr. 7' ], false ),
+			]
+		);
+		$product->save();
+
+		$fields = $this->woo->product_fields( get_post( $product->get_id() ), [ 'custom_attributes' => true ] );
+
+		$this->assertSame( [ 'Gewicht: 250g', 'Gewicht: 1kg', 'Röstung: Wiener' ], $fields['custom_attributes'] );
+		$this->assertArrayNotHasKey( 'custom_attributes', $this->woo->product_fields( get_post( $product->get_id() ), [] ) );
+	}
+
+	/**
+	 * A search for "cart" or "checkout" put WooCommerce's own pages first:
+	 * pages with a block and nothing to read. The shop page is the product
+	 * list the search window already is.
+	 */
+	public function test_woocommerces_own_pages_are_not_indexed(): void {
+		$this->enable_indexing( 'page' );
+
+		$pages = [];
+
+		foreach ( [ 'cart', 'checkout', 'myaccount', 'shop' ] as $page ) {
+			$pages[ $page ] = self::factory()->post->create( [ 'post_type' => 'page', 'post_status' => 'publish' ] );
+			update_option( 'woocommerce_' . $page . '_page_id', $pages[ $page ] );
+		}
+
+		$other = self::factory()->post->create( [ 'post_type' => 'page', 'post_status' => 'publish' ] );
+
+		/** @var Document_Builder $builder */
+		$builder = $this->service( 'document_builder' );
+
+		foreach ( $pages as $page => $page_id ) {
+			$this->assertFalse( $builder->is_indexable( get_post( $page_id ) ), $page );
+		}
+
+		$this->assertTrue( $builder->is_indexable( get_post( $other ) ) );
+	}
+
+	/**
+	 * Changing "Hide out of stock items" saves no product, so the products it
+	 * hid stayed in search until somebody started a sync.
+	 */
+	public function test_hiding_out_of_stock_items_starts_a_sync(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'product' );
+		update_option( 'woocommerce_hide_out_of_stock_items', 'no' );
+
+		$this->assertNull( $this->sync_state()->active() );
+
+		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
+
+		$this->assertNotNull( $this->sync_state()->active() );
+	}
+
+	public function test_hiding_out_of_stock_items_starts_no_sync_where_the_mapping_indexes_hidden_products(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'product', [ 'woo' => [ 'only_visible' => false ] ] );
+		update_option( 'woocommerce_hide_out_of_stock_items', 'no' );
+		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
+
+		$this->assertNull( $this->sync_state()->active() );
+	}
+
+	/**
+	 * @param  array<int,string>  $options
+	 */
+	private function local_attribute( string $name, array $options, bool $visible = true, bool $variation = false ): \WC_Product_Attribute {
+		$attribute = new \WC_Product_Attribute();
+		$attribute->set_name( $name );
+		$attribute->set_options( $options );
+		$attribute->set_visible( $visible );
+		$attribute->set_variation( $variation );
+
+		return $attribute;
 	}
 
 	private function product( string $visibility, string $stock_status = 'instock', string $status = 'publish' ): WC_Product_Simple {

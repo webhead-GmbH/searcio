@@ -129,3 +129,68 @@ describe( 'the post card', () => {
 		expect( render( undefined ) ).not.toContain( 'whsc-card__excerpt' );
 	} );
 } );
+
+/**
+ * A page or a custom type drew a card with its title alone, and a post type
+ * renamed in the Indexing tab ("artikel") lost its card's text too.
+ */
+describe( 'the card of any other type', () => {
+	const render = ( hit ) => renderToString( <ResultCard hit={ hit } /> );
+
+	it( 'shows the text of a page and of a custom type', () => {
+		expect( render( { id: 'page-17', source: { type: 'page', title: 'Black Friday', content: 'All offers of the week.' } } ) )
+			.toContain( '<span class="whsc-card__excerpt">All offers of the week.</span>' );
+		expect( render( { id: 'ratgeber-4', source: { type: 'anleitung', title: 'Milchschaum', content: 'Mit Hafermilch.' } } ) )
+			.toContain( '<span class="whsc-card__excerpt">Mit Hafermilch.</span>' );
+	} );
+
+	it( 'draws a renamed product type as a product, from the post type in its id', () => {
+		expect( render( { id: 'product-12', source: { type: 'produkt', title: 'Jacke', price: 99 } } ) ).toContain( 'whsc-card--product' );
+	} );
+} );
+
+describe( 'the price of a product card', () => {
+	const render = ( source ) => renderToString( <ResultCard hit={ { id: 'product-3', source: { type: 'product', title: 'Parka', ...source } } } /> );
+
+	// Every variation on sale showed "from 239" with nothing struck through.
+	it( "strikes a variable product's regular price through when it is on sale", () => {
+		const html = render( { product_type: 'variable', price: 239, price_min: 239, price_max: 279, on_sale: true, regular_price: 299, sale_price: 239 } );
+
+		expect( html ).toContain( 'whsc-card__price-from' );
+		expect( html ).toContain( '<del class="whsc-card__price-regular">299.00</del>' );
+		expect( html ).toContain( '<span class="whsc-card__price-current">239.00</span>' );
+	} );
+
+	it( 'strikes nothing through for a variable product that is not on sale', () => {
+		expect( render( { product_type: 'variable', price: 239, price_min: 239, price_max: 279, on_sale: false } ) ).not.toContain( '<del' );
+	} );
+
+	it( 'strikes nothing through when the regular price is not above the "from" price', () => {
+		expect( render( { product_type: 'variable', price: 239, price_min: 239, price_max: 279, on_sale: true, regular_price: 239, sale_price: 239 } ) ).not.toContain( '<del' );
+	} );
+
+	it( "strikes a simple product's regular price through, as it did", () => {
+		const html = render( { product_type: 'simple', price: 99, on_sale: true, regular_price: 149, sale_price: 99 } );
+
+		expect( html ).toContain( '<del class="whsc-card__price-regular">149.00</del>' );
+		expect( html ).toContain( '<ins class="whsc-card__price-current">99.00</ins>' );
+	} );
+} );
+
+describe( 'the stock line of a product card', () => {
+	const render = ( source ) => renderToString( <ResultCard hit={ { id: 'product-4', source: { type: 'product', title: 'Sandal', price: 40, ...source } } } /> );
+
+	// A product on backorder read "In stock" in green.
+	it( 'says a product on backorder is on backorder, not in stock', () => {
+		const html = render( { in_stock: true, stock_status: 'onbackorder' } );
+
+		expect( html ).toContain( 'is-on-backorder' );
+		expect( html ).toContain( 'On backorder' );
+		expect( html ).not.toContain( 'In stock' );
+	} );
+
+	it( 'says in stock and out of stock as it did', () => {
+		expect( render( { in_stock: true, stock_status: 'instock' } ) ).toContain( 'In stock' );
+		expect( render( { in_stock: false, stock_status: 'outofstock' } ) ).toContain( 'Out of stock' );
+	} );
+} );

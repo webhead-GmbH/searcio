@@ -33,23 +33,53 @@ const PROPERTY_OPTIONS = [
 	{value: 'slug', label: __('Slug', 'searcio')},
 ];
 
-/** Options for the recognised-field selects: properties + the type's taxonomies. */
-const sourceOptions = (sources, taxonomies, allowNone) => {
-	const options = sources.map((source) => ({
-		value: source.value,
-		label: source.label,
-	}));
+/**
+ * The built-in properties each part of a result can come from. Every menu
+ * offered every source, so an author could be the link and a date the title.
+ */
+const ROLE_PROPERTIES = {
+	title_source: ['property:title', 'property:excerpt'],
+	content_source: ['property:content', 'property:excerpt'],
+	url_source: ['property:permalink'],
+	image_source: ['property:thumbnail'],
+};
 
-	taxonomies.forEach((taxonomy) => {
-		options.push({
-			value: `taxonomy:${taxonomy.slug}`,
-			label: sprintf(
-				/* translators: %s: taxonomy label. */
-				__('Taxonomy: %s', 'searcio'),
-				taxonomy.label
-			),
+/** What the menu holds for a source read from a custom field. */
+const CUSTOM_SOURCE = 'meta:';
+
+/**
+ * Options for the recognised-field selects: the properties that suit the part,
+ * the type's taxonomies for the body text, and a custom field. A source saved
+ * before that the part's list leaves out is still offered, so it shows as
+ * what it is.
+ *
+ * @param {string}        role       `title_source`, `content_source`, `url_source` or `image_source`.
+ * @param {Array<Object>} sources    The properties of the catalog.
+ * @param {Array<Object>} taxonomies The post type's taxonomies.
+ * @param {string}        stored     The saved source.
+ * @param {boolean}       allowNone
+ * @return {Array<{value: ?string, label: string}>}
+ */
+export const sourceOptions = (role, sources, taxonomies, stored, allowNone) => {
+	const wanted = ROLE_PROPERTIES[role] || [];
+	const options = sources
+		.filter((source) => wanted.includes(source.value) || source.value === stored)
+		.map((source) => ({value: source.value, label: source.label}));
+
+	taxonomies
+		.filter((taxonomy) => 'content_source' === role || `taxonomy:${taxonomy.slug}` === stored)
+		.forEach((taxonomy) => {
+			options.push({
+				value: `taxonomy:${taxonomy.slug}`,
+				label: sprintf(
+					/* translators: %s: taxonomy label. */
+					__('Taxonomy: %s', 'searcio'),
+					taxonomy.label
+				),
+			});
 		});
-	});
+
+	options.push({value: CUSTOM_SOURCE, label: __('Custom field', 'searcio')});
 
 	if (allowNone) {
 		return [{value: null, label: __('- Do not send -', 'searcio')}, ...options];
@@ -88,10 +118,57 @@ const Section = ({title, description, children}) => (
 	</Stack>
 );
 
+/**
+ * One part of a result - the title, the body text, the link or the image -
+ * and where it comes from, with the key of a custom field when it comes from
+ * one: an ACF field, for example.
+ */
+export const ResultSourceField = ({role, label, description, value, sources, taxonomies, allowNone, onChange}) => {
+	const stored = 'string' === typeof value ? value : '';
+	const custom = stored.startsWith(CUSTOM_SOURCE);
+	const key = custom ? stored.slice(CUSTOM_SOURCE.length) : '';
+
+	return (
+		<Stack direction="column" gap="sm">
+			<SelectControl
+				label={label}
+				description={description}
+				{...selectProps(
+					sourceOptions(role, sources, taxonomies, stored, allowNone),
+					custom ? CUSTOM_SOURCE : stored,
+					(next) => {
+						// Picking "Custom field" again keeps the key typed.
+						if (next !== CUSTOM_SOURCE || !custom) {
+							onChange(next ?? NONE);
+						}
+					}
+				)}
+			/>
+			{custom && (
+				<InputControl
+					label={__('Meta key', 'searcio')}
+					placeholder="my_field"
+					description={key.trim().startsWith('_')
+						? __('A key that starts with "_" belongs to WordPress or a plugin, and is not sent.', 'searcio')
+						: undefined}
+					value={key}
+					onValueChange={(next) => onChange(`${CUSTOM_SOURCE}${next ?? ''}`)}
+				/>
+			)}
+		</Stack>
+	);
+};
+
 export const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 	const {kind, value} = parseSource(field.source);
 
-	const setKind = (nextKind) => onChange({...field, source: `${nextKind}:`});
+	// Picking the source it already has again keeps what was typed: the key was
+	// emptied, and an unnoticed empty field saved.
+	const setKind = (nextKind) => {
+		if (nextKind !== kind) {
+			onChange({...field, source: `${nextKind}:`});
+		}
+	};
 	const setValue = (nextValue) => onChange({...field, source: `${kind}:${nextValue ?? ''}`});
 
 	const renderValue = () => {
@@ -132,7 +209,11 @@ export const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 				label={kind === 'taxonomy'
 					? __('Taxonomy slug', 'searcio')
 					: __('Meta key', 'searcio')}
-				placeholder={kind === 'taxonomy' ? 'product_brand' : '_my_field'}
+				// A key that starts with "_" is protected and never sent.
+				placeholder={kind === 'taxonomy' ? 'product_brand' : 'my_field'}
+				description={'meta' === kind && value.trim().startsWith('_')
+					? __('A key that starts with "_" belongs to WordPress or a plugin, and is not sent.', 'searcio')
+					: undefined}
 				value={value}
 				onValueChange={setValue}
 			/>
@@ -208,6 +289,9 @@ const WooSection = ({woo, block, onChange}) => {
 		featured: __('Featured', 'searcio'),
 		rating: __('Average rating', 'searcio'),
 		review_count: __('Review count', 'searcio'),
+		// The attributes a product defines for itself, which the list of the
+		// shop's own attributes below does not have.
+		custom_attributes: __('Product-specific attributes', 'searcio'),
 	};
 
 	const toggleAttribute = (slug, checked) => {
@@ -229,8 +313,8 @@ const WooSection = ({woo, block, onChange}) => {
 			>
 				<ToggleControl
 					__nextHasNoMarginBottom
-					label={__('Only index published, visible products', 'searcio')}
-					help={__('Recommended. Hidden or draft products stay out of search.', 'searcio')}
+					label={__('Respect catalog visibility', 'searcio')}
+					help={__('Recommended. Products set to Shop only or Hidden stay out of search, and so do those out of stock when WooCommerce hides them. Whether private products are indexed is up to "Also index private & password-protected items".', 'searcio')}
 					checked={wooConfig.only_visible !== false}
 					onChange={(val) => setWoo('only_visible', val)}
 				/>
@@ -321,41 +405,45 @@ const PostTypeCard = ({postType, sources, woo, block, onChange}) => {
 								)}
 							>
 								<Grid auto={260} rowGap="var(--wpds-dimension-gap-lg)" columnGap="var(--wpds-dimension-gap-xl)" align="start">
-									<SelectControl
+									<ResultSourceField
+										role="title_source"
 										label={__('Title', 'searcio')}
 										description={__('The main heading of each result. Required.', 'searcio')}
-										{...selectProps(
-											sourceOptions(sources, postType.taxonomies, false),
-											block.title_source,
-											(val) => set('title_source', val)
-										)}
+										value={block.title_source}
+										sources={sources}
+										taxonomies={postType.taxonomies}
+										allowNone={false}
+										onChange={(val) => set('title_source', val)}
 									/>
-									<SelectControl
+									<ResultSourceField
+										role="content_source"
 										label={__('Body text', 'searcio')}
 										description={__('The text Searcio looks through for matches.', 'searcio')}
-										{...selectProps(
-											sourceOptions(sources, postType.taxonomies, true),
-											block.content_source,
-											(val) => set('content_source', val ?? NONE)
-										)}
+										value={block.content_source}
+										sources={sources}
+										taxonomies={postType.taxonomies}
+										allowNone
+										onChange={(val) => set('content_source', val)}
 									/>
-									<SelectControl
+									<ResultSourceField
+										role="url_source"
 										label={__('Result link', 'searcio')}
 										description={__('Where clicking a result takes the visitor.', 'searcio')}
-										{...selectProps(
-											sourceOptions(sources, postType.taxonomies, true),
-											block.url_source,
-											(val) => set('url_source', val ?? NONE)
-										)}
+										value={block.url_source}
+										sources={sources}
+										taxonomies={postType.taxonomies}
+										allowNone
+										onChange={(val) => set('url_source', val)}
 									/>
-									<SelectControl
+									<ResultSourceField
+										role="image_source"
 										label={__('Thumbnail image', 'searcio')}
 										description={__('Image shown next to each result.', 'searcio')}
-										{...selectProps(
-											sourceOptions(sources, postType.taxonomies, true),
-											block.image_source,
-											(val) => set('image_source', val ?? NONE)
-										)}
+										value={block.image_source}
+										sources={sources}
+										taxonomies={postType.taxonomies}
+										allowNone
+										onChange={(val) => set('image_source', val)}
 									/>
 								</Grid>
 							</Section>
@@ -525,7 +613,15 @@ const IndexingTab = () => {
 			setCatalog(response);
 			setConfig(nextConfig);
 			setPersistedConfig(nextConfig);
-			showToast(__('Indexing configuration saved.', 'searcio'), 'success');
+
+			// A change to the mapping starts a sync that sends what it changed.
+			if (response?.sync && !response.sync.started) {
+				showToast(__('Indexing configuration saved. Start a sync on the Sync tab to apply it.', 'searcio'), 'warning');
+			} else if (response?.sync?.started) {
+				showToast(__('Indexing configuration saved. A sync has started to apply it.', 'searcio'), 'success');
+			} else {
+				showToast(__('Indexing configuration saved.', 'searcio'), 'success');
+			}
 		} catch (error) {
 			// Beside the button that failed, with the reason the REST API gave.
 			setSaveError(error?.message || __('the request to the REST API failed.', 'searcio'));
