@@ -5433,3 +5433,7 @@ msgstr "Se activa cuando el término de búsqueda"
 #: src/admin/settings/components/tabs/SearchConfigTab.js:575
 msgid "\"Contains\" fires on \"rain jacket\" for the trigger \"jacket\"; \"is the trigger itself\" only on \"jacket\"."
 msgstr "«Contiene» se activa con «chaqueta de lluvia» para el activador «chaqueta»; «es el propio activador» solo con «chaqueta»."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:702
+msgid "Followed only for searches on pages in this language."
+msgstr "La redirección solo se aplica a las búsquedas en páginas en este idioma."
