@@ -2176,7 +2176,8 @@ msgid "- Do not send -"
 msgstr "- No enviar -"
 
 #: src/admin/settings/components/quiz/AnswerEditor.js:143
-#: src/admin/settings/components/tabs/IndexingTab.js:100
+#: src/admin/settings/components/tabs/IndexingTab.js:178
+#: src/admin/settings/components/tabs/SearchConfigTab.js:606
 msgid "Value"
 msgstr "Valor"
 
@@ -5455,3 +5456,83 @@ msgstr "Los atributos en los que se diferencian las variantes de un producto, co
 #: src/admin/settings/searchKeyCheck.js:53
 msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. A search key works only on the domain it was connected with and its subdomains: on a copy of the site under another address this is expected; otherwise connect this site again."
 msgstr "Searcio rechaza la clave de búsqueda desde la dirección de este sitio, así que el sitio busca con WordPress en lugar de Searcio. Una clave de búsqueda solo funciona en el dominio con el que se conectó y sus subdominios: en una copia del sitio con otra dirección es lo esperado; si no, vuelve a conectar este sitio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:538
+msgid "Profitable products first"
+msgstr "Productos rentables primero"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:539
+msgid "Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
+msgstr "Destaca los productos con buen margen entre los resultados que coinciden con una búsqueda más o menos igual de bien. Una coincidencia mucho mejor conserva su puesto, los productos fijados siguen arriba y los productos agotados siguen al final. Los mismos ajustes que en el panel de Searcio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:544
+msgid "Lift profitable products"
+msgstr "Destacar los productos rentables"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:545
+msgid "The margin of each product is worked out from the purchase price it is indexed with, and is never shown."
+msgstr "El margen de cada producto se calcula a partir del precio de compra con el que está indexado, y nunca se muestra."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:553
+msgid "Nothing is lifted yet: the products are indexed without a purchase price. Turn on \"Purchase price, for profit ranking\" under Product details on the Indexing tab, save it, and let the sync it starts finish."
+msgstr "Aún no se destaca nada: los productos están indexados sin precio de compra. Activa «Precio de compra, para el ranking por margen» en Detalles del producto de la pestaña Indexación, guárdalo y deja que termine la sincronización que inicia."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:564
+msgid "Strength (%)"
+msgstr "Intensidad (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:565
+msgid "How far a product with a good margin may rise, from 1 to 50: at 15 it overtakes only results that match at most 15 percent better."
+msgstr "Cuánto puede subir un producto con buen margen, de 1 a 50: con 15 solo adelanta a resultados que coinciden como mucho un 15 por ciento mejor."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:574
+msgid "Target margin (%)"
+msgstr "Margen objetivo (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:575
+msgid "The margin from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift."
+msgstr "El margen a partir del cual un producto cuenta como rentable. En el objetivo recibe la mitad del impulso; al doble del objetivo, el impulso completo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:583
+msgid "Least profit per sale"
+msgstr "Beneficio mínimo por venta"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:584
+msgid "Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin."
+msgstr "Opcional, en los precios que muestra la tienda. Un producto que gana menos por venta no se destaca, por alto que sea su margen."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:591
+msgid "Targets of their own"
+msgstr "Objetivos propios"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:594
+msgid "A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies."
+msgstr "Un margen objetivo para los productos de una categoría, una marca u otro campo, o ninguno para productos que nunca se destacan, como una categoría de liquidación. Si varios coinciden con un producto, se aplica el que comparten menos productos."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:616
+msgid "Target (%)"
+msgstr "Objetivo (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:624
+msgid "Never lift"
+msgstr "No destacar nunca"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:635
+msgid "Remove target"
+msgstr "Quitar objetivo"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:648
+msgid "Add a target"
+msgstr "Añadir un objetivo"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:655
+msgid "Search terms ranked by relevance alone"
+msgstr "Términos de búsqueda solo por relevancia"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:656
+msgid "One per line, up to 200, matched whole and whatever their capitals: brand names or service terms, for example."
+msgstr "Uno por línea, hasta 200, comparados enteros y sin importar mayúsculas: nombres de marca o términos de servicio, por ejemplo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:667
+msgid "See what profit ranking changes, and import targets, in the Searcio dashboard"
+msgstr "Mira en el panel de Searcio qué cambia el ranking por margen, e importa objetivos"

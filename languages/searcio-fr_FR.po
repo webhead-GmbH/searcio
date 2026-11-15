@@ -2176,7 +2176,8 @@ msgid "- Do not send -"
 msgstr "- Ne pas envoyer -"
 
 #: src/admin/settings/components/quiz/AnswerEditor.js:143
-#: src/admin/settings/components/tabs/IndexingTab.js:100
+#: src/admin/settings/components/tabs/IndexingTab.js:178
+#: src/admin/settings/components/tabs/SearchConfigTab.js:606
 msgid "Value"
 msgstr "Valeur"
 
@@ -5455,3 +5456,83 @@ msgstr "Les attributs dans lesquels les variantes d’un produit diffèrent, com
 #: src/admin/settings/searchKeyCheck.js:53
 msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. A search key works only on the domain it was connected with and its subdomains: on a copy of the site under another address this is expected; otherwise connect this site again."
 msgstr "Searcio refuse la clé de recherche depuis l’adresse de ce site, le site recherche donc avec WordPress au lieu de Searcio. Une clé de recherche ne fonctionne que sur le domaine avec lequel le site a été connecté et ses sous-domaines : sur une copie du site à une autre adresse, c’est voulu ; sinon, connectez à nouveau ce site."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:538
+msgid "Profitable products first"
+msgstr "Produits rentables en premier"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:539
+msgid "Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
+msgstr "Met en avant les produits à bonne marge parmi les résultats qui correspondent à peu près aussi bien à une recherche. Un résultat bien meilleur garde sa place, les produits épinglés restent en haut et les produits en rupture restent à la fin. Les mêmes réglages que dans le tableau de bord Searcio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:544
+msgid "Lift profitable products"
+msgstr "Mettre en avant les produits rentables"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:545
+msgid "The margin of each product is worked out from the purchase price it is indexed with, and is never shown."
+msgstr "La marge de chaque produit est calculée à partir du prix d’achat avec lequel il est indexé, et n’est jamais affichée."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:553
+msgid "Nothing is lifted yet: the products are indexed without a purchase price. Turn on \"Purchase price, for profit ranking\" under Product details on the Indexing tab, save it, and let the sync it starts finish."
+msgstr "Rien n’est encore mis en avant : les produits sont indexés sans prix d’achat. Activez « Prix d’achat, pour le classement par marge » sous Détails du produit dans l’onglet Indexation, enregistrez, et laissez se terminer la synchronisation que cela lance."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:564
+msgid "Strength (%)"
+msgstr "Intensité (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:565
+msgid "How far a product with a good margin may rise, from 1 to 50: at 15 it overtakes only results that match at most 15 percent better."
+msgstr "Jusqu’où un produit à bonne marge peut monter, de 1 à 50 : à 15, il ne dépasse que les résultats qui correspondent au plus 15 pour cent mieux."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:574
+msgid "Target margin (%)"
+msgstr "Marge cible (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:575
+msgid "The margin from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift."
+msgstr "La marge à partir de laquelle un produit est jugé rentable. À la cible, il reçoit la moitié de la mise en avant, au double de la cible la totalité."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:583
+msgid "Least profit per sale"
+msgstr "Bénéfice minimum par vente"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:584
+msgid "Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin."
+msgstr "Facultatif, dans les prix affichés par la boutique. Un produit qui rapporte moins par vente n’est pas mis en avant, quelle que soit sa marge."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:591
+msgid "Targets of their own"
+msgstr "Cibles propres"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:594
+msgid "A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies."
+msgstr "Une marge cible pour les produits d’une catégorie, d’une marque ou d’un autre champ, ou aucune pour les produits à ne jamais mettre en avant, comme une catégorie de déstockage. Si plusieurs correspondent à un produit, celle que partagent le moins de produits s’applique."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:616
+msgid "Target (%)"
+msgstr "Cible (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:624
+msgid "Never lift"
+msgstr "Ne jamais mettre en avant"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:635
+msgid "Remove target"
+msgstr "Retirer la cible"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:648
+msgid "Add a target"
+msgstr "Ajouter une cible"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:655
+msgid "Search terms ranked by relevance alone"
+msgstr "Termes de recherche classés par pertinence seule"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:656
+msgid "One per line, up to 200, matched whole and whatever their capitals: brand names or service terms, for example."
+msgstr "Un par ligne, jusqu’à 200, comparés en entier et quelle que soit la casse : des noms de marque ou des termes de service, par exemple."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:667
+msgid "See what profit ranking changes, and import targets, in the Searcio dashboard"
+msgstr "Voir ce que change le classement par marge, et importer des cibles, dans le tableau de bord Searcio"
