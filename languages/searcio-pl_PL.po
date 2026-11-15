@@ -220,7 +220,8 @@ msgstr "Wyszukiwarka Searcio"
 #: includes/Elementor/Widgets/Search_Widget.php:122
 #: includes/Elementor/Widgets/Search_Widget.php:376
 #: includes/Frontend/Look_Schema.php:103
-#: src/admin/settings/components/tabs/SyncHistory.js:219
+#: src/admin/settings/components/tabs/SearchConfigTab.js:567
+#: src/admin/settings/components/tabs/SyncHistory.js:224
 #: src/blocks/search/edit.js:198
 msgid "Trigger"
 msgstr "Wyzwalacz"
@@ -4025,7 +4026,8 @@ msgstr "Strony"
 msgid "Go to page %d"
 msgstr "Przejdź do strony %d"
 
-#: src/frontend/search/components/CompareTable.js:59
+#: src/frontend/search/components/CompareTable.js:64
+#: src/frontend/search/components/templates.js:120
 msgid "On backorder"
 msgstr "Na zamówienie"
 
@@ -5272,10 +5274,6 @@ msgstr "Dowolna: pokazywany jest wynik, który ma jedną z nich. Wszystkie: tylk
 msgid "Clears this plugin's own cached data and its files in PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own. Other sites on the same server are not touched."
 msgstr "Czyści dane tej wtyczki zapisane w pamięci podręcznej oraz jej pliki w pamięci podręcznej opcode PHP, aby właśnie zmienione ustawienie albo niedawno zaktualizowany szablon karty lub wynik popularnych wyszukiwań pojawiły się od razu, zamiast czekać, aż same wygasną. Inne witryny na tym samym serwerze pozostają nietknięte."
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:525
-msgid "Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches."
-msgstr "Dobieraj wyniki wybranych wyszukiwań. Wyszukiwanie bierze pierwszą od góry regułę, która do niego pasuje, i żadnej innej: reguła z pustym wyzwalaczem pasuje do każdego wyszukiwania, więc reguły pod nią nigdy nie działają, a produkt, który ukrywa, nadal się pojawia tam, gdzie pasuje reguła nad nią."
-
 #: src/frontend/search/components/AiAssistant.js:310
 msgid "Describe what you're looking for and I'll find it on this site."
 msgstr "Opisz, czego szukasz, a znajdę to na tej stronie."
@@ -5381,17 +5379,13 @@ msgstr "Żaden produkt nie ma tego ID. Wpisz ID, które WordPress pokazuje dla p
 msgid "This row shows the products like the product being viewed, and this page is not a product. Enter a product ID, or place the row on a product template."
 msgstr "Ten wiersz pokazuje produkty podobne do oglądanego produktu, a ta strona nie jest produktem. Wpisz ID produktu albo umieść wiersz w szablonie produktu."
 
-#: includes/Routing/Connection_Endpoint.php:84
+#: src/admin/settings/searchKeyCheck.js:33
 msgid "No search key is saved, so the site searches with WordPress instead of Searcio. Connect again, or paste the search key under the manual key entry."
 msgstr "Nie zapisano klucza wyszukiwania, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Połącz się ponownie albo wklej klucz wyszukiwania w sekcji „Zaawansowane: ręczne wprowadzanie kluczy”."
 
-#: includes/Routing/Connection_Endpoint.php:93
+#: src/admin/settings/searchKeyCheck.js:49
 msgid "Searcio does not know the search key, so the site searches with WordPress instead of Searcio. Copy it again from the Searcio dashboard, or connect again."
 msgstr "Searcio nie zna klucza wyszukiwania, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Skopiuj go ponownie z panelu Searcio albo połącz się ponownie."
-
-#: includes/Routing/Connection_Endpoint.php:100
-msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. Add the address to the domains of the key in the Searcio dashboard."
-msgstr "Searcio odrzuca klucz wyszukiwania z adresu tej witryny, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Dodaj adres do domen klucza w panelu Searcio."
 
 #: includes/Routing/Settings_Endpoint.php:82
 msgid "That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard."
@@ -5464,3 +5458,27 @@ msgstr "„Zawiera” działa przy „kurtka przeciwdeszczowa” dla wyzwalacza 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:702
 msgid "Followed only for searches on pages in this language."
 msgstr "Przekierowanie działa tylko dla wyszukiwań na stronach w tym języku."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:533
+msgid "Curate the results of chosen searches. Every rule that matches a search applies, in order from the top: what any of them hides is hidden, the products an earlier rule pins come first, and the banner is the first one a matching rule has. A rule with an empty trigger matches every search."
+msgstr "Dobieraj wyniki wybranych wyszukiwań. Każda reguła, która pasuje do wyszukiwania, działa, w kolejności od góry: to, co ukrywa którakolwiek z nich, jest ukryte, produkty przypięte przez wcześniejszą regułę są pierwsze, a baner to pierwszy, który ma pasująca reguła. Reguła z pustym wyzwalaczem pasuje do każdego wyszukiwania."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1167
+msgid "Fields that hold numbers"
+msgstr "Pola z liczbami"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1174
+msgid "Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background; search keeps working meanwhile."
+msgstr "Twoje własne pola, których wartości są liczbami, np. waga lub długość, do 20: ich filtr staje się zakresem od i do, a porównuje się je jak liczby. Wartość, która nie jest liczbą, jest pomijana. Zmiana listy przebudowuje indeks wyszukiwania w tle; wyszukiwanie w tym czasie działa dalej."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1184
+msgid "Attributes one variation must match"
+msgstr "Atrybuty, które musi spełnić jeden wariant"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1191
+msgid "Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background."
+msgstr "Atrybuty, którymi różnią się warianty produktu, np. kolor i rozmiar. Filtry na nich znajdują produkt tylko wtedy, gdy jeden dostępny wariant ma każdą wybraną wartość: czerwony i XL nie znajdują już kurtki, której czerwona XL jest wyprzedana. Ustawienie pierwszego przebudowuje indeks wyszukiwania w tle."
+
+#: src/admin/settings/searchKeyCheck.js:53
+msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. A search key works only on the domain it was connected with and its subdomains: on a copy of the site under another address this is expected; otherwise connect this site again."
+msgstr "Searcio odrzuca klucz wyszukiwania z adresu tej witryny, więc witryna wyszukuje za pomocą WordPressa zamiast Searcio. Klucz wyszukiwania działa tylko w domenie, z którą witryna została połączona, i jej subdomenach: na kopii witryny pod innym adresem tak ma być; w przeciwnym razie połącz tę witrynę ponownie."
