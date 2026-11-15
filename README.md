@@ -16,10 +16,11 @@
 </p>
 
 <p align="center">
-    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/v/searcio" alt="WordPress Plugin Version"></a>
-    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/required-php/searcio" alt="WordPress Plugin Required PHP Version"></a>
-    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/tested/searcio" alt="WordPress Plugin: Tested WP Version"></a>
-    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/stars/searcio" alt="WordPress Plugin Rating"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/v/searcio?style=for-the-badge" alt="WordPress Plugin Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/required-php/searcio?style=for-the-badge" alt="WordPress Plugin Required PHP Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/tested/searcio?style=for-the-badge" alt="WordPress Plugin: Tested WP Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/badge/woocommerce-v11.3.0_tested-brightgreen?style=for-the-badge" alt="WordPress Plugin: Tested WC Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/stars/searcio?style=for-the-badge" alt="WordPress Plugin Rating"></a>
 </p>
 
 <p align="center">
@@ -75,7 +76,7 @@ The AI Assistant, search by photo and the quiz appear when your Searcio plan and
 - PHP 8.3 or later
 - A [Searcio](https://searcio.com) account - one is created for you when you connect, if your email does
   not have one yet
-- WooCommerce 8.0+ (optional - only needed to index and search products)
+- WooCommerce 8.0+ (optional - only needed to index and search products), tested up to 11.3
 - WPML or Polylang (optional - only needed for multilingual search scoping)
 
 ## Works with

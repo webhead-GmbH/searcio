@@ -600,6 +600,20 @@ final class Plugin extends Base_Plugin {
 	}
 
 	/**
+	 * The WooCommerce features the plugin works with. The header's `WC tested
+	 * up to` makes WooCommerce check them: a feature left undeclared is one it
+	 * is "uncertain" about, and the Cart and Checkout blocks name such a plugin
+	 * as a possibly incompatible extension. The plugin indexes products only:
+	 * it reads no order, adds nothing to the cart or the checkout, and reads a
+	 * product's Cost of goods through WooCommerce's own API.
+	 *
+	 * @return array<int|string, string|bool>
+	 */
+	protected function get_woocommerce_feature_compatibility(): array {
+		return [ 'custom_order_tables', 'cart_checkout_blocks', 'cost_of_goods_sold' ];
+	}
+
+	/**
 	 * What the current site asked to have done with its data on uninstall.
 	 */
 	public function uninstall_policy(): string {

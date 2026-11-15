@@ -27,6 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Tested up to WooCommerce 11.3. The plugin header declares the supported WooCommerce versions (`WC requires at least: 8.0`, `WC tested up to: 11.3`), and the plugin declares its compatibility with WooCommerce's order storage (HPOS), the Cart and Checkout blocks and Cost of goods, so WooCommerce reports it as compatible.
 - Saving the Indexing tab starts a sync that sends only the content the change affects.
 - Changing WooCommerce's "Hide out of stock items" or the indexed languages starts a sync.
 - Every merchandising rule that matches a search now applies, in list order, instead of only the first one.

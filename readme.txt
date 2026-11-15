@@ -193,6 +193,7 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.1 =
+- Tested up to WooCommerce 11.3.
 - Security: password-protected posts and pages are no longer indexed, unless "Also index private & password-protected items" is on. Their text could be read in the search window, and the AI shopping assistant answered from it. The update takes the ones already indexed out right away.
 - Saving the Indexing tab starts a sync that sends only what the change altered, instead of waiting for a sync and then sending everything again.
 - A content type you renamed on the Indexing tab is found by blocks, shortcodes, widgets and placements restricted to it, and its type boost works.

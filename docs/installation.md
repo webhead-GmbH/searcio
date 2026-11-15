@@ -5,7 +5,7 @@
 - WordPress 6.8 or later
 - PHP 8.3 or later
 - A [Searcio](https://searcio.com) account - one is created for you when you connect, if your email does not have one yet
-- WooCommerce 8.0 or later (optional, only needed to index and search products)
+- WooCommerce 8.0 or later (optional, only needed to index and search products), tested up to WooCommerce 11.3
 - WPML or Polylang (optional, only needed for multilingual search scoping - see [`multilingual.md`](multilingual.md))
 
 ## 1. Install the plugin

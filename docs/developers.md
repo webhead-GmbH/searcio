@@ -95,6 +95,10 @@ A post is sent again only when the hash of its document changed, or a sync is fo
 
 `includes/Capabilities/Plugin_Capabilities.php` defines three capabilities, all granted to Administrators by default: `VIEW` (`searcio_view`, read-only: it opens the screen and the routes that only read), `RUN_SYNC` (`searcio_run_sync`, operate the sync engine, no credential/mapping changes), and `MANAGE_SETTINGS` (`searcio_manage_settings`, connection, indexing mapping and search configuration). Each is checked by itself and none implies another, so a role that is to change settings needs `VIEW` as well, or it cannot open the screen. A fourth, `MANAGE_NETWORK_SETTINGS`, is the network-admin guard: it maps to `manage_network_options` on a multisite network and to `MANAGE_SETTINGS` on a single site. Grant them to other roles/users through the framework's capability manager rather than checking `manage_options` directly.
 
+### WooCommerce compatibility
+
+WooCommerce is optional. The plugin header names the WooCommerce versions the plugin supports and was tested with (`WC requires at least`, `WC tested up to`), and `Plugin::get_woocommerce_feature_compatibility()` declares the WooCommerce features it works with: `custom_order_tables` (HPOS), `cart_checkout_blocks` and `cost_of_goods_sold`. WooCommerce checks every feature of a plugin whose header carries `WC tested up to`, so a feature the plugin relies on must be declared there. When a WooCommerce release has been tested, update `WC tested up to` and the WooCommerce badge in `README.md` together; `Version_Test` fails while they differ.
+
 ### Multilingual support
 
 `includes/Compatibility/Multilingual_Support.php` deliberately checks **Polylang before WPML** - Polylang registers WPML's own compatibility filters, so WPML-first detection would misidentify a Polylang-only site as running WPML. See the class docblock for the specific live bug this avoided, and [`multilingual.md`](multilingual.md) for user-facing behavior.
