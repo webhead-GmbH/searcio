@@ -685,9 +685,8 @@ final class Index_Config {
 		}
 
 		foreach ( $block['fields'] as $field ) {
-			// A protected key is never sent, so no document has the field: the
-			// tester's "interne_notiz" was offered as a filter and flagged as
-			// nothing.
+			// A protected key is never sent, so no document has the field;
+			// listed, it was offered as a filter that could never match.
 			if ( ! $this->is_protected_meta_source( (string) $field['source'] ) ) {
 				$fields[] = (string) $field['as'];
 			}

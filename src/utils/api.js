@@ -304,7 +304,7 @@ export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ra
 /**
  * Asks for what the window shows as it opens, a moment before the visitor
  * opens it: as the pointer reaches a search control, it takes focus or a
- * finger touches it (search-cloud #164). The storefront config, the popular
+ * finger touches it. The storefront config, the popular
  * searches and the highlights row of the control it reached; the highlights
  * are kept for the visit, so they are asked for at most every few minutes.
  * Once per page.
@@ -396,7 +396,7 @@ export const search = ( q, options = {} ) => {
 	// out, and the service counts it.
 	// `highlight=0`: the window never shows a hit's highlighted fragments, and
 	// highlighting is the most expensive part of a search for the engine
-	// (search-cloud #164: about 40% of its time on the demo shop's index).
+	// (about 40% of its time on a typical shop's index).
 	const params = { q, type: options.type, page, per_page: options.perPage || 20, highlight: 0, sort: options.sort || undefined, ...searchHints( q, page, options ) };
 
 	// Filterable fields must already be configured as facet fields server-side

@@ -417,7 +417,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * A number field could not be a range (the tester's bug 5): Searcio maps
+	 * A number field could not be filtered as a range. Searcio maps
 	 * the fields in `numeric_fields` as numbers, and answers their values as
 	 * text, so the window is told to draw them as a range. A shop's own choice
 	 * still comes last.
@@ -442,9 +442,9 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The tester's "Schlagwort" in AND mode kept the counts of its first pick,
-	 * since the window did not know the mode; the plugin keeps a copy of it
-	 * with the facet fields.
+	 * A filter in AND mode kept the counts of its first pick, since the window
+	 * did not know the mode; the plugin keeps a copy of it with the facet
+	 * fields.
 	 */
 	public function test_a_filter_whose_picks_must_all_match_says_so(): void {
 		$this->facet_config()->set_fields( [ 'schlagworte', 'brand' ] );

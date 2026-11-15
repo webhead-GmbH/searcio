@@ -117,8 +117,8 @@ final class Document_Builder_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The tester's "Ratgeber › Pflege › Wolle" went as "Wolle" alone, so a
-	 * filter on "Ratgeber" did not find the post. Tags have no parents.
+	 * A post under "Ratgeber › Pflege › Wolle" went as "Wolle" alone, so a
+	 * filter on "Ratgeber" did not find it. Tags have no parents.
 	 */
 	public function test_a_mapped_hierarchical_taxonomy_sends_the_parents_too(): void {
 		$this->index_posts( [ 'fields' => [ [ 'source' => 'taxonomy:category', 'as' => 'kategorien' ], [ 'source' => 'taxonomy:post_tag', 'as' => 'schlagworte' ] ] ] );

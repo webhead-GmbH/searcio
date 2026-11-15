@@ -137,9 +137,9 @@ describe( 'mergeFieldFacets', () => {
 	} );
 
 	/**
-	 * The tester's "Schlagwort" in AND mode: after "Pflege" and "Anleitung" the
-	 * others still said "Winter (2)" and "Kaufberatung (1)", and picking
-	 * Kaufberatung found nothing. There each pick narrows the next.
+	 * A tag filter in AND mode: after two picks the other values kept the
+	 * counts they had before, and picking one of them found nothing. There
+	 * each pick narrows the next.
 	 */
 	it( 'takes the fresh counts of a field whose picks must all match, its own pick included', () => {
 		const current = { tags: [ { value: 'Pflege', count: 4 }, { value: 'Winter', count: 2 }, { value: 'Kaufberatung', count: 1 } ] };
@@ -720,8 +720,8 @@ describe( 'arrangeTree', () => {
 	} );
 
 	/**
-	 * lowrider.at has three "MTS Technik" under three parents. As names they
-	 * were one value, placed under whichever parent came first.
+	 * A shop with three categories of one name under three parents: as names
+	 * they were one value, placed under whichever parent came first.
 	 */
 	it( 'reads the parent of a path from the path itself', () => {
 		const entries = [

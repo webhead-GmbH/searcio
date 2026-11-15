@@ -43,14 +43,16 @@ final class Version_Test extends TestCase {
 	}
 
 	/**
-	 * Between two releases the changelog opens with an Unreleased section and
-	 * the version stays that of the last release, so the first numbered
-	 * heading is the version either way.
+	 * CHANGELOG.md follows Keep a Changelog: `## [1.4.1] - 2026-11-20`, or
+	 * `- Unreleased` until the release. Between two releases an
+	 * `## [Unreleased]` section may come first and the version stays that of
+	 * the last release, so the first numbered heading is the version either
+	 * way.
 	 */
 	public function test_both_changelogs_have_the_version_as_their_newest_entry(): void {
 		$version = $this->header( 'Version' );
 
-		$this->assertSame( $version, $this->find( '/^## (\d+\.\d+\.\d+)\s*$/m', 'CHANGELOG.md' ) );
+		$this->assertSame( $version, $this->find( '/^## \[(\d+\.\d+\.\d+)\] - (?:\d{4}-\d{2}-\d{2}|Unreleased)\s*$/m', 'CHANGELOG.md' ) );
 		$this->assertSame( $version, $this->find( '/^= (\d+\.\d+\.\d+) =\s*$/m', 'readme.txt' ) );
 	}
 

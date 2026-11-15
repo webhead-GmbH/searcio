@@ -284,7 +284,7 @@ test.describe( 'the details of the search window', () => {
 } );
 
 /**
- * lowrider.at has a "MTS Technik" under several parents. By name they were
+ * A shop may have one category name under several parents. By name they were
  * one value, which filtered all of them and sat under whichever parent came
  * first. Searcio answers a `_paths` field with one value per category.
  */

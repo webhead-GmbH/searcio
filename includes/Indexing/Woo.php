@@ -66,7 +66,7 @@ final class Woo {
 
 	/**
 	 * A variable product's variations, one object each with the attributes it
-	 * differs in and whether it is in stock (search-cloud #211). Searcio
+	 * differs in and whether it is in stock. Searcio
 	 * filters on them so that red and XL find a jacket only when one of its
 	 * variations is both and in stock. Not a field to search or filter on by
 	 * itself, so not offered as one.

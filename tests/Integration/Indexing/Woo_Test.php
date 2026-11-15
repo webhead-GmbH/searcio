@@ -340,9 +340,9 @@ final class Woo_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * lowrider.at has three "MTS Technik", under three parents. By name they
-	 * are one filter value; as paths each is its own, and a product carries
-	 * every level of its own, so a filter on a parent's path finds it.
+	 * Three categories of one name under three parents are one filter value
+	 * by name; as paths each is its own, and a product carries every level of
+	 * its own, so a filter on a parent's path finds it.
 	 */
 	public function test_categories_carry_their_paths_from_the_top(): void {
 		$chassis  = wp_insert_term( 'Fahrwerke', 'product_cat' );
@@ -790,8 +790,8 @@ final class Woo_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * Colour and size matched the product, not one variation (the tester's bug
-	 * 46): red and XL found a jacket whose only red was M. Searcio filters on
+	 * Colour and size matched the product, not one variation: red and XL
+	 * found a jacket whose only red was M. Searcio filters on
 	 * the variations when they are sent as `variants`, each with the
 	 * attributes it is made of and whether it is in stock.
 	 */

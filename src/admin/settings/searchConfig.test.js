@@ -480,8 +480,8 @@ describe( 'document id lists', () => {
 
 /**
  * A boost is matched against the type the documents carry. Keyed by the post
- * type, the tester's boost of 100 for posts asked for "post" while posts were
- * "artikel", and moved nothing.
+ * type, a boost for posts renamed "artikel" asked for "post" and had no
+ * effect.
  */
 describe( 'enabledTypeLabels', () => {
 	it( 'names each indexed content type by the type its documents carry', () => {

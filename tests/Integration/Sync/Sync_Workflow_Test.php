@@ -208,9 +208,9 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The tester's post-59 and page-17: published with a password, indexed with
-	 * their text although "Also index private & password-protected items" was
-	 * off. A protected post goes with the private ones.
+	 * A post and a page published with a password were indexed with their
+	 * text although "Also index private & password-protected items" was off.
+	 * A protected post goes with the private ones.
 	 */
 	public function test_a_password_protected_post_is_indexed_only_with_the_private_ones(): void {
 		$this->enable_indexing( 'post', [ 'include_private' => false ] );
@@ -289,7 +289,7 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	/**
 	 * Saving the Indexing tab bumps the mapping's version. The documents a
 	 * change does not alter are the same, so the sync after it sends only the
-	 * one that changed: the tester's site sent all 58 to take one out.
+	 * one that changed, where a site sent all its documents to take one out.
 	 */
 	public function test_a_mapping_change_sends_only_the_documents_it_changed(): void {
 		$this->connect_client();

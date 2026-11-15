@@ -153,8 +153,8 @@ describe( 'CustomFieldRow', () => {
 	} );
 
 	/**
-	 * The tester's "lesezeit": picking "Custom field" again from "From" emptied
-	 * the key, and the empty field was saved without anybody noticing.
+	 * Picking "Custom field" again from "From" emptied the key, and the empty
+	 * field was saved without any warning.
 	 */
 	it( 'keeps the key when the source it already has is picked again', async () => {
 		await render( { as: 'lesezeit', source: 'meta:lesezeit' } );

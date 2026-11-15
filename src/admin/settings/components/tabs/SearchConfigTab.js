@@ -677,7 +677,7 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 /**
  * Per-search curation: pin products to the top, keep products out, and show a
  * banner. Searcio applies every rule that matches a search, in the order of
- * the list (search-cloud #206): what any of them hides is hidden, an earlier
+ * the list: what any of them hides is hidden, an earlier
  * rule's pins come first, and the banner is the first one a matching rule
  * has. A rule with an empty trigger matches every search.
  *
