@@ -9,6 +9,7 @@ import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
 import {useAnnounce} from '../../../../utils/announce';
 import {forgetAll} from '../../remote';
+import {checkSearchKey} from '../../searchKeyCheck';
 
 const pluginData = window.searcioData || {};
 const SECRET_PLACEHOLDER = '••••••••••••';
@@ -62,7 +63,7 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 		setResult(null);
 
 		try {
-			const response = await apiFetch({
+			const response = await checkSearchKey(await apiFetch({
 				path:
 					pluginData?.api?.testConnectionPath ||
 					'/searcio/v1/connection/test',
@@ -70,7 +71,7 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 				// "Test connection" asks Searcio now, past what the server keeps,
 				// and the rest of the screen reads anew what new keys may change.
 				data: {fresh: true},
-			});
+			}));
 
 			forgetAll();
 			setResult(response);

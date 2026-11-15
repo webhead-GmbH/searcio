@@ -210,15 +210,38 @@ export const mergeFieldFacets = ( current, incoming, activeFacets, matchAll = []
  * min/max, which the API does not expose. It is offered as a hint, never as a
  * limit on what can be typed.
  *
+ * A field of the site's own that Searcio maps as a number (`numeric_fields`)
+ * is drawn as a range by the site's settings (`ranged`). Its facet values do
+ * come back, as text ("5", "12.5"), and so may its values in the hits: its
+ * span is taken from both, read as numbers.
+ *
  * @param {Object} facets
  * @param {Array<{source?: Object}>} hits
+ * @param {Array<string>} [ranged] The fields the site draws as a range.
  * @return {Object<string,{min: number, max: number}>}
  */
-export const extractRangeFields = ( facets, hits ) => {
+export const extractRangeFields = ( facets, hits, ranged = [] ) => {
 	const out = {};
 
 	Object.keys( facets || {} ).forEach( ( field ) => {
 		if ( 'types' === field ) {
+			return;
+		}
+
+		if ( ranged.includes( field ) ) {
+			const numbers = [
+				...( Array.isArray( facets[ field ] ) ? facets[ field ] : [] ).map( ( entry ) => entry?.value ),
+				...( hits || [] ).map( ( hit ) => hit?.source?.[ field ] ),
+			]
+				.filter( ( value ) => ( 'number' === typeof value || 'string' === typeof value ) && '' !== String( value ).trim() )
+				.map( Number )
+				.filter( Number.isFinite );
+			const distinct = new Set( numbers );
+
+			if ( distinct.size > 1 ) {
+				out[ field ] = { min: Math.floor( Math.min( ...distinct ) ), max: Math.ceil( Math.max( ...distinct ) ) };
+			}
+
 			return;
 		}
 

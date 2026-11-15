@@ -65,6 +65,15 @@ final class Woo {
 	public const PRIVATE_FIELDS = [ 'cost_price' ];
 
 	/**
+	 * A variable product's variations, one object each with the attributes it
+	 * differs in and whether it is in stock (search-cloud #211). Searcio
+	 * filters on them so that red and XL find a jacket only when one of its
+	 * variations is both and in stock. Not a field to search or filter on by
+	 * itself, so not offered as one.
+	 */
+	public const VARIANTS_FIELD = 'variants';
+
+	/**
 	 * The pages WooCommerce makes for itself, by the name `wc_get_page_id()`
 	 * knows them by. They hold a shortcode or a block and nothing to search
 	 * for, and the shop page is the product archive the search window already
@@ -348,7 +357,77 @@ final class Woo {
 			}
 		}
 
+		if ( $is_variable ) {
+			$variants = $this->variants( $product, $post, $woo );
+
+			if ( [] !== $variants ) {
+				$fields[ self::VARIANTS_FIELD ] = $variants;
+			}
+		}
+
 		return $fields;
+	}
+
+	/**
+	 * One object per variation a shopper can buy (a disabled one is private),
+	 * with the selected attributes it is made of, under the names the product
+	 * sends them (`attr_color`: "Red"), and `in_stock`. A variation set to
+	 * "any" value of an attribute is every value the product has of it. Only
+	 * the attributes the shop's variations are made of, and none when the
+	 * mapping sends none of those.
+	 *
+	 * @param  array<string,mixed>  $woo
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function variants( $product, WP_Post $post, array $woo ): array {
+		if ( ! method_exists( $product, 'get_variation_attributes' ) ) {
+			return [];
+		}
+
+		$taxonomies = array_values(
+			array_filter(
+				array_intersect( $this->selected_attributes( $woo ), array_keys( $product->get_variation_attributes() ) ),
+				'taxonomy_exists'
+			)
+		);
+
+		if ( [] === $taxonomies ) {
+			return [];
+		}
+
+		$own      = [];
+		$variants = [];
+
+		foreach ( $taxonomies as $taxonomy ) {
+			$own[ $taxonomy ] = Term_Names::for_post( $post, $taxonomy );
+		}
+
+		foreach ( $product->get_children() as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+
+			if ( ! $variation instanceof \WC_Product_Variation || 'publish' !== $variation->get_status() ) {
+				continue;
+			}
+
+			$chosen  = $variation->get_attributes();
+			$variant = [];
+
+			foreach ( $taxonomies as $taxonomy ) {
+				$slug  = is_string( $chosen[ $taxonomy ] ?? null ) ? $chosen[ $taxonomy ] : '';
+				$term  = '' === $slug ? null : get_term_by( 'slug', $slug, $taxonomy );
+				$value = $term instanceof \WP_Term ? Term_Names::decode( $term->name ) : $own[ $taxonomy ];
+
+				if ( '' !== $value && [] !== $value ) {
+					$variant[ $this->attribute_field( $taxonomy ) ] = $value;
+				}
+			}
+
+			if ( [] !== $variant ) {
+				$variants[] = $variant + [ 'in_stock' => $variation->is_in_stock() ];
+			}
+		}
+
+		return $variants;
 	}
 
 	/**
@@ -357,7 +436,8 @@ final class Woo {
 	 * variable product carries it. Empty when WooCommerce is inactive, because
 	 * then no product field is written at all. The {@see self::PRIVATE_FIELDS}
 	 * are left out: they are for Searcio alone, which refuses them as fields to
-	 * search or filter.
+	 * search or filter. So are the {@see self::VARIANTS_FIELD}, which are the
+	 * attributes again, one variation at a time.
 	 *
 	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
 	 * @return array<int,string>

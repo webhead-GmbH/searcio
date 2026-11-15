@@ -140,6 +140,7 @@ final class Search_Config_Endpoint extends Rest_API {
 			$this->language_config->set_enabled_languages( $response->body()['languages'] ?? [] );
 			$this->facet_config->set_fields( $response->body()['facet_fields'] ?? [] );
 			$this->facet_config->set_match( $response->body()['facet_match'] ?? [] );
+			$this->facet_config->set_numeric( $response->body()['numeric_fields'] ?? [] );
 		}
 
 		return new WP_REST_Response( $response->body(), $response->status );

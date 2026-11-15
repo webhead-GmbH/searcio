@@ -126,6 +126,49 @@ export const normalizeExcludedTerms = ( raw ) => ( Array.isArray( raw )
 	: null );
 
 /**
+ * The most fields Searcio takes in `numeric_fields` and in `variant_fields`.
+ */
+export const FIELD_LIST_MAX = 20;
+
+/**
+ * Fields Searcio maps itself, which it refuses as number or variant fields,
+ * and those it maps as numbers already.
+ */
+const MAPPED_FIELDS = [ 'type', 'title', 'content', 'url', 'image', 'indexed_at', 'published_at', 'lang', 'ai_tags', 'variants' ];
+const NUMBER_FIELDS = [ 'price', 'price_min', 'price_max', 'regular_price', 'sale_price', 'rating' ];
+
+/**
+ * A list of field names Searcio keeps (`numeric_fields`, `variant_fields`),
+ * or null when it leaves the key out, as a service without the setting does:
+ * the tab then offers no list the service would not keep.
+ *
+ * @param {*} raw The list from `GET /search-config`.
+ * @return {string[]|null} The fields, or null.
+ */
+export const normalizeFieldList = ( raw ) => ( Array.isArray( raw )
+	? raw.filter( ( field ) => 'string' === typeof field && '' !== field.trim() )
+	: null );
+
+/**
+ * The indexed fields that can be number fields: the site's own, not one
+ * Searcio maps or reads as a number already.
+ *
+ * @param {string[]} fields The indexed fields.
+ * @return {string[]}
+ */
+export const numberFieldChoices = ( fields ) => ( fields || [] ).filter(
+	( field ) => ! MAPPED_FIELDS.includes( field ) && ! NUMBER_FIELDS.includes( field )
+);
+
+/**
+ * The indexed fields a variation can differ in: the shop's attributes.
+ *
+ * @param {string[]} fields The indexed fields.
+ * @return {string[]}
+ */
+export const variantFieldChoices = ( fields ) => ( fields || [] ).filter( ( field ) => field.startsWith( 'attr_' ) );
+
+/**
  * The terms as Searcio keeps them: trimmed, without empty lines, and each
  * once whatever its capitals, in the spelling first typed. Searcio does the
  * same on save; doing it here as well sends what the tab will read back.
@@ -176,6 +219,8 @@ export const normalizeConfig = ( raw ) => ( {
 	facet_match: normalizeFacetMatch( raw?.facet_match ),
 	suggest_fields: Array.isArray( raw?.suggest_fields ) ? raw.suggest_fields : [],
 	excluded_popular_terms: normalizeExcludedTerms( raw?.excluded_popular_terms ),
+	numeric_fields: normalizeFieldList( raw?.numeric_fields ),
+	variant_fields: normalizeFieldList( raw?.variant_fields ),
 	synonyms: Array.isArray( raw?.synonyms ) ? raw.synonyms : [],
 	languages: Array.isArray( raw?.languages ) ? raw.languages : [],
 	merchandising: normalizeMerchandising( raw?.merchandising ),
@@ -224,6 +269,10 @@ const fullPayload = ( config ) => ( {
 	excluded_popular_terms: Array.isArray( config.excluded_popular_terms )
 		? cleanTerms( config.excluded_popular_terms )
 		: undefined,
+	// Each change of these rebuilds the site's index on Searcio, so they are
+	// sent only by a service that reports them, and only when changed.
+	numeric_fields: Array.isArray( config.numeric_fields ) ? [ ...new Set( config.numeric_fields ) ].slice( 0, FIELD_LIST_MAX ) : undefined,
+	variant_fields: Array.isArray( config.variant_fields ) ? [ ...new Set( config.variant_fields ) ].slice( 0, FIELD_LIST_MAX ) : undefined,
 	/*
 	 * Only switches this plan can actually carry. Enabling a feature the plan
 	 * does not include is a 422 on `features.<name>.enabled` - and because the

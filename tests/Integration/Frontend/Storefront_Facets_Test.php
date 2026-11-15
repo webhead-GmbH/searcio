@@ -40,6 +40,7 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 		delete_option( 'searcio_category_filter_depth' );
 		delete_option( 'searcio_category_filter_order' );
 		delete_option( 'searcio_facet_match' );
+		delete_option( 'searcio_numeric_fields' );
 
 		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
 			unregister_taxonomy( self::ATTRIBUTE );
@@ -413,6 +414,31 @@ final class Storefront_Facets_Test extends Integration_Test_Case {
 
 		$this->assertSame( 'shop', $this->facets()[0]['sort'] );
 		$this->assertContains( 'Kleidung', $this->facets()[0]['valuesOrder'] );
+	}
+
+	/**
+	 * A number field could not be a range (the tester's bug 5): Searcio maps
+	 * the fields in `numeric_fields` as numbers, and answers their values as
+	 * text, so the window is told to draw them as a range. A shop's own choice
+	 * still comes last.
+	 */
+	public function test_a_field_searcio_maps_as_a_number_is_drawn_as_a_range(): void {
+		$this->facet_config()->set_fields( [ 'gewicht', 'brand' ] );
+		$this->facet_config()->set_numeric( [ 'gewicht', 7, ' ' ] );
+
+		$facets = $this->facets();
+
+		$this->assertSame( 'range', $facets[0]['display'] );
+		$this->assertSame( 'auto', $facets[1]['display'] );
+
+		add_filter( 'searcio_storefront_facet_display', static fn ( string $display, string $field ): string => 'gewicht' === $field ? 'list' : $display, 10, 2 );
+
+		$this->assertSame( 'list', $this->facets()[0]['display'] );
+
+		remove_all_filters( 'searcio_storefront_facet_display' );
+		$this->facet_config()->set_numeric( null );
+
+		$this->assertSame( 'auto', $this->facets()[0]['display'], 'A service that does not report number fields has none.' );
 	}
 
 	/**

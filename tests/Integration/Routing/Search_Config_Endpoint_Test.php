@@ -256,6 +256,24 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * And the fields Searcio maps as numbers, which the window draws as a
+	 * range; a service that does not report them has none.
+	 */
+	public function test_a_successful_read_mirrors_the_number_fields(): void {
+		$this->as_admin();
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'gewicht' ], 'numeric_fields' => [ 'gewicht' ] ] ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertTrue( $this->service( 'facet_config' )->is_numeric( 'gewicht' ) );
+
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'gewicht' ] ] ) );
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertFalse( $this->service( 'facet_config' )->is_numeric( 'gewicht' ) );
+	}
+
+	/**
 	 * Which posts are indexed depends on the languages, and so does the
 	 * language each is searched in: a language ticked or unticked stayed out of
 	 * the index until somebody started a sync. A save that leaves them as they

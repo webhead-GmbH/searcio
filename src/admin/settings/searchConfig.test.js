@@ -19,10 +19,12 @@ import {
 	normalizeFeatures,
 	normalizeMerchandising,
 	normalizeRedirects,
+	numberFieldChoices,
 	termsToText,
 	textToIds,
 	textToTerms,
 	toPayload,
+	variantFieldChoices,
 } from './searchConfig';
 
 describe( 'normalizeFeatures', () => {
@@ -491,6 +493,30 @@ describe( 'enabledTypeLabels', () => {
 
 		expect( enabledTypeLabels( catalog ) ).toEqual( { artikel: 'Beiträge', page: 'Seiten', ratgeber: 'Ratgeber' } );
 		expect( enabledTypeLabels( null ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'number and variant fields', () => {
+	// Each change rebuilds the site's index on Searcio.
+	it( 'offers them only once Searcio reports them, and sends them only when changed', () => {
+		expect( normalizeConfig( {} ).numeric_fields ).toBeNull();
+		expect( normalizeConfig( {} ).variant_fields ).toBeNull();
+
+		const read = normalizeConfig( { numeric_fields: [ 'gewicht', 7 ], variant_fields: [ 'attr_farbe' ], synonyms: [] } );
+
+		expect( read.numeric_fields ).toEqual( [ 'gewicht' ] );
+		expect( toPayload( { ...read, synonyms: [ 'a, b' ] }, read ) ).toEqual( { synonyms: [ 'a, b' ] } );
+		expect( toPayload( { ...read, numeric_fields: [ 'gewicht', 'laenge', 'gewicht' ] }, read ) ).toEqual( { numeric_fields: [ 'gewicht', 'laenge' ] } );
+		expect( toPayload( { ...read, variant_fields: [ 'attr_farbe', 'attr_groesse' ] }, read ) ).toEqual( { variant_fields: [ 'attr_farbe', 'attr_groesse' ] } );
+		expect( toPayload( normalizeConfig( {} ), normalizeConfig( {} ) ) ).toEqual( {} );
+	} );
+
+	// Searcio refuses the fields it maps itself (422), and maps the prices and the rating as numbers already.
+	it( 'offers as number fields only the site\'s own, and as variant fields the attributes', () => {
+		const indexed = [ 'title', 'type', 'price', 'rating', 'gewicht', 'attr_farbe', 'categories', 'published_at' ];
+
+		expect( numberFieldChoices( indexed ) ).toEqual( [ 'gewicht', 'attr_farbe', 'categories' ] );
+		expect( variantFieldChoices( indexed ) ).toEqual( [ 'attr_farbe' ] );
 	} );
 } );
 

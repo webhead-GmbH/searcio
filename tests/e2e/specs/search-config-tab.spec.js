@@ -431,6 +431,45 @@ test.describe( 'Search Config tab', () => {
 		expect( sent[ sent.length - 1 ].body.redirects ).toEqual( [ { query: 'versand', url: '/de/versand' } ] );
 	} );
 
+	/**
+	 * A number field could not be a range, and colour and size matched the
+	 * product rather than one variation: Searcio keeps `numeric_fields` and
+	 * `variant_fields`, and the tab offers them once it reports them.
+	 */
+	test( 'offers the number and variant fields once Searcio reports them, and saves each change', async ( { page } ) => {
+		const sent = [];
+		const config = { ...CONFIG, numeric_fields: [], variant_fields: [] };
+
+		await mockCatalog( page );
+		await mockSearchConfig( page, sent, config );
+		await page.goto( SETTINGS_URL );
+
+		const numbers = page.getByRole( 'combobox', { name: 'Fields that hold numbers' } );
+		const variants = page.getByRole( 'combobox', { name: 'Attributes one variation must match' } );
+
+		await expect( numbers ).toBeVisible( LOADED );
+
+		await variants.click();
+		await expect( page.getByRole( 'option', { name: 'attr_color' } ) ).toBeVisible();
+		await expect( page.getByRole( 'option', { name: 'title' } ) ).toHaveCount( 0 );
+		await page.getByRole( 'option', { name: 'attr_color' } ).click();
+
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body ).toEqual( { variant_fields: [ 'attr_color' ] } );
+	} );
+
+	test( 'offers no number or variant fields to a service that does not report them', async ( { page } ) => {
+		await mockCatalog( page );
+		await mockSearchConfig( page );
+		await page.goto( SETTINGS_URL );
+
+		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
+		await expect( page.getByRole( 'combobox', { name: 'Fields that hold numbers' } ) ).toHaveCount( 0 );
+		await expect( page.getByRole( 'combobox', { name: 'Attributes one variation must match' } ) ).toHaveCount( 0 );
+	} );
+
 	test( 'offers no language for a redirect on a site with one language', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page );

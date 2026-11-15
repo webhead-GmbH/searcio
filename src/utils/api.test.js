@@ -178,6 +178,27 @@ describe( 'suggest / fetchCardTemplates / fetchPopularSearches', () => {
 		expect( urls[ 2 ] ).toContain( '/search/popular?' );
 	} );
 
+	// A template has a language: "Ansehen" showed on the English pages.
+	it( 'asks for the card templates of the page\'s language on a multilingual site', async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'en' } );
+		const api = loadApi();
+
+		await api.fetchCardTemplates( 'product' );
+
+		const params = new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams;
+
+		expect( params.get( 'type' ) ).toBe( 'product' );
+		expect( params.get( 'filter[lang]' ) ).toBe( 'en' );
+	} );
+
+	it( 'asks for every card template on a site with one language', async () => {
+		const api = loadApi();
+
+		await api.fetchCardTemplates( 'product' );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'filter[lang]' ) ).toBe( false );
+	} );
+
 	// A German page suggested the English titles too: suggestions are filtered
 	// by the page's language, as a search is.
 	it( 'suggests in the language of the page on a multilingual site', async () => {

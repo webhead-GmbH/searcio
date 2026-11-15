@@ -457,7 +457,9 @@ export const suggest = ( q, options = {} ) => {
  */
 export const fetchCardTemplates = ( type, options = {} ) => request(
 	'/card-templates',
-	{ type },
+	// A template has a language: the page's own, and those for every
+	// language, on a multilingual site. A service before it ignores the filter.
+	{ type, 'filter[lang]': currentLangFilter().lang },
 	CARD_TEMPLATES_TTL,
 	options.signal
 );

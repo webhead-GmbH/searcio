@@ -17,13 +17,16 @@ import {
 	enabledTypeLabels,
 	repeatsRedirect,
 	errorsUnder,
+	FIELD_LIST_MAX,
 	idsToText,
 	listError,
 	normalizeConfig,
+	numberFieldChoices,
 	termsToText,
 	textToIds,
 	textToTerms,
 	toPayload,
+	variantFieldChoices,
 } from '../../searchConfig';
 import { indexedFields, unindexedFields } from '../../indexedFields';
 import { selectProps } from '../../../../utils/select';
@@ -491,10 +494,10 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 
 /**
  * Per-search curation: pin products to the top, keep products out, and show a
- * banner. Searcio applies the first rule that matches a search and no other,
- * so an empty trigger, which matches every search, keeps the rules below it
- * from ever applying, and a product it hides shows wherever a rule above it
- * matches.
+ * banner. Searcio applies every rule that matches a search, in the order of
+ * the list (search-cloud #206): what any of them hides is hidden, an earlier
+ * rule's pins come first, and the banner is the first one a matching rule
+ * has. A rule with an empty trigger matches every search.
  *
  * On a multilingual site each rule also names the language it fires in:
  * without one, a German rule "jacke" fired on the English search "jacket" too.
@@ -528,7 +531,7 @@ const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
 			<CardHeading
 				title={ __( 'Merchandising rules', 'searcio' ) }
 				description={ __(
-					'Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches.',
+					'Curate the results of chosen searches. Every rule that matches a search applies, in order from the top: what any of them hides is hidden, the products an earlier rule pins come first, and the banner is the first one a matching rule has. A rule with an empty trigger matches every search.',
 					'searcio'
 				) }
 			/>
@@ -1152,6 +1155,42 @@ const SearchConfigTab = () => {
 										) ) }
 									</Stack>
 								</Fieldset.Root>
+							) }
+							{ /* Offered once Searcio reports them. Each change rebuilds
+							     the site's index there, which the descriptions say. */ }
+							{ Array.isArray( config.numeric_fields ) && (
+								<Stack direction="column" gap="xs">
+									<FormTokenField
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										__experimentalExpandOnFocus
+										label={ __( 'Fields that hold numbers', 'searcio' ) }
+										value={ config.numeric_fields }
+										suggestions={ numberFieldChoices( pool ) }
+										maxLength={ FIELD_LIST_MAX }
+										onChange={ ( value ) => set( 'numeric_fields', value ) }
+									/>
+									<Text render={ <p /> } variant="body-sm" className="whsc-field-list__description">
+										{ errorsUnder( fieldErrors, 'numeric_fields' ) || __( 'Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background; search keeps working meanwhile.', 'searcio' ) }
+									</Text>
+								</Stack>
+							) }
+							{ Array.isArray( config.variant_fields ) && (
+								<Stack direction="column" gap="xs">
+									<FormTokenField
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										__experimentalExpandOnFocus
+										label={ __( 'Attributes one variation must match', 'searcio' ) }
+										value={ config.variant_fields }
+										suggestions={ variantFieldChoices( pool ) }
+										maxLength={ FIELD_LIST_MAX }
+										onChange={ ( value ) => set( 'variant_fields', value ) }
+									/>
+									<Text render={ <p /> } variant="body-sm" className="whsc-field-list__description">
+										{ errorsUnder( fieldErrors, 'variant_fields' ) || __( 'Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background.', 'searcio' ) }
+									</Text>
+								</Stack>
 							) }
 						</Stack>
 					</Card.Content>

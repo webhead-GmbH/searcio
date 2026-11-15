@@ -98,6 +98,11 @@ const hiddenFacets = () => (Array.isArray(getConfig().facets) ? getConfig().face
 	.filter((facet) => facet?.hidden)
 	.map((facet) => facet.field);
 
+/** The fields the site draws as a range: Searcio's number fields among them. */
+const rangedFacets = () => (Array.isArray(getConfig().facets) ? getConfig().facets : [])
+	.filter((facet) => 'range' === facet?.display)
+	.map((facet) => facet.field);
+
 /** The fields whose picks a result must all have (`match: 'all'`). */
 const matchAllFacets = () => (Array.isArray(getConfig().facets) ? getConfig().facets : [])
 	.filter((facet) => 'all' === facet?.match)
@@ -576,7 +581,7 @@ const SearchModal = ({
 				setFacets(response.facets?.types || []);
 			}
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), appliedFacets, matchAllFacets()));
-			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits, rangedFacets()), appliedRanges));
 			groupsSource.current = {key: `|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
 			setGroupsVersion((version) => version + 1);
 		} catch (e) {
@@ -781,7 +786,7 @@ const SearchModal = ({
 			}
 
 			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), appliedFacets, matchAllFacets()));
-			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits, rangedFacets()), appliedRanges));
 			groupsSource.current = {key: `${trimmed}|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
 			setGroupsVersion((version) => version + 1);
 

@@ -1838,10 +1838,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		flex-direction: column;
 	}
 
-	// The canvas writes a space between the parts of a price, the markup
-	// none: "from249,90".
-	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"]) {
-		margin-inline-end: 0.25em;
+	// The canvas writes a space between the parts of a price: "from249,90"
+	// without it. Written on the part's `::after`, as the stylesheet Searcio
+	// compiles writes it (search-cloud #210), so a template that has it still
+	// shows one space, and a hidden part takes its space along.
+	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"])::after {
+		content: "\a0";
 	}
 
 	:is(h1, h2, h3, h4, h5, h6) {

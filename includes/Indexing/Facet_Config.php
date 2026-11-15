@@ -80,6 +80,23 @@ final class Facet_Config {
 	}
 
 	/**
+	 * Keep the site's own fields Searcio maps as numbers, from its
+	 * `numeric_fields`; a service that does not report them has none.
+	 */
+	public function set_numeric( mixed $fields ): void {
+		$this->settings->set( Plugin_Settings::NUMERIC_FIELDS, is_array( $fields ) ? $this->clean( $fields ) : [] );
+	}
+
+	/**
+	 * Whether Searcio maps the field as a number.
+	 */
+	public function is_numeric( string $field ): bool {
+		$stored = $this->settings->get( Plugin_Settings::NUMERIC_FIELDS );
+
+		return is_array( $stored ) && in_array( $field, $stored, true );
+	}
+
+	/**
 	 * Whether a result must have every value picked in this field.
 	 */
 	public function matches_all( string $field ): bool {
@@ -102,7 +119,9 @@ final class Facet_Config {
 	 * stays a facet field for the quizzes and rules that use it.
 	 *
 	 * How a field is drawn is the storefront's to decide (`auto`) unless the
-	 * attribute's type says or a shop does, through
+	 * attribute's type says, the field is one Searcio maps as a number, which
+	 * is drawn as a range (its values come back as text, "5" and "12.5", so
+	 * the window could not tell), or a shop says, through
 	 * `searcio_storefront_facet_display`, which is given that and
 	 * the field and answers `list`, `tiles`, `color`, `image` or `range`.
 	 * Colours and images can be given or corrected through
@@ -127,8 +146,9 @@ final class Facet_Config {
 		foreach ( $fields as $order => $field ) {
 			$taxonomy = $taxonomies[ $field ] ?? '';
 			$swatches = '' === $taxonomy ? new Attribute_Swatches() : $this->swatches->read( $taxonomy );
+			$drawn    = Facet_Display::Auto === $swatches->display && $this->is_numeric( $field ) ? Facet_Display::Range : $swatches->display;
 			$display  = Facet_Display::from_storage(
-				apply_filters( 'searcio_storefront_facet_display', $swatches->display->value, $field )
+				apply_filters( 'searcio_storefront_facet_display', $drawn->value, $field )
 			);
 			$colors   = apply_filters( 'searcio_storefront_facet_colors', $swatches->colors, $field, $taxonomy );
 			$images   = apply_filters( 'searcio_storefront_facet_images', $swatches->images, $field, $taxonomy );

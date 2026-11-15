@@ -225,6 +225,10 @@ Legal notice: https://searcio.com/impressum
 - A merchandising rule can fire only on a search for its trigger itself, not on every search that contains it, and a rule set that way in the Searcio dashboard keeps it when the Search Config tab saves.
 - The newest highlights are really the newest, once the next sync has sent each item's date.
 - On a multilingual site a search redirect can be kept to one language, and keeps the language set in the Searcio dashboard when the Search Config tab saves.
+- Every merchandising rule that matches a search applies, not only the first.
+- Your own number fields, such as a weight, can be filtered as a range from and to (Search Config, Fields that hold numbers).
+- Colour and size filters can match one variation in stock, so a sold-out red XL no longer finds the jacket (Search Config, Attributes one variation must match).
+- Card templates designed in Searcio can be made per language.
 
 = 1.4.0 =
 - Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.

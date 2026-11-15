@@ -257,6 +257,16 @@ describe( 'humanizeFieldLabel prefixes', () => {
 describe( 'extractRangeFields', () => {
 	const facets = { types: [ { value: 'product', count: 3 } ], price: [], brand: [ { value: 'Acme', count: 2 } ] };
 
+	// A numeric custom field could not be a range: Searcio answers its facet
+	// values as text once it maps the field as a number (`numeric_fields`).
+	it( 'reads a number field the site draws as a range from its facet values and hits, as numbers', () => {
+		const numeric = { weight: [ { value: '5', count: 3 }, { value: '12.5', count: 1 } ], size: [ { value: '38', count: 2 }, { value: '42', count: 2 } ] };
+		const hits = [ { source: { weight: '20', size: '38' } }, { source: { weight: 'n/a' } } ];
+
+		expect( extractRangeFields( numeric, hits, [ 'weight' ] ) ).toEqual( { weight: { min: 5, max: 20 } } );
+		expect( extractRangeFields( { weight: [ { value: '5', count: 3 } ] }, [], [ 'weight' ] ) ).toEqual( {} );
+	} );
+
 	it( 'reads the span from the hits, since a numeric field aggregates to nothing', () => {
 		const hits = [
 			{ source: { price: 19.5, brand: 'Acme' } },
