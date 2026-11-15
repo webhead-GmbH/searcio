@@ -18,8 +18,11 @@ import {
 	normalizeFacetMatch,
 	normalizeFeatures,
 	normalizeMerchandising,
+	normalizeProfitRanking,
 	normalizeRedirects,
 	numberFieldChoices,
+	profitRankingPayload,
+	sendsPurchasePrice,
 	termsToText,
 	textToIds,
 	textToTerms,
@@ -493,6 +496,73 @@ describe( 'enabledTypeLabels', () => {
 
 		expect( enabledTypeLabels( catalog ) ).toEqual( { artikel: 'Beiträge', page: 'Seiten', ratgeber: 'Ratgeber' } );
 		expect( enabledTypeLabels( null ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'profit ranking', () => {
+	const RANKING = {
+		enabled: true,
+		strength: 15,
+		target: 25,
+		min_profit: null,
+		rules: [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ],
+		excluded_terms: [ 'acme' ],
+	};
+
+	it( 'is offered only once Searcio reports it, and read as it reports it', () => {
+		expect( normalizeConfig( {} ).profit_ranking ).toBeNull();
+		expect( normalizeProfitRanking( RANKING ) ).toEqual( RANKING );
+		expect( normalizeProfitRanking( { enabled: 1, strength: 'x' } ) ).toEqual( { enabled: true, strength: 15, target: 25, min_profit: null, rules: [], excluded_terms: [] } );
+	} );
+
+	// Searcio takes it whole; a save that changes something else leaves it out.
+	it( 'is sent whole when it changed, and not at all otherwise', () => {
+		const read = normalizeConfig( { profit_ranking: RANKING, synonyms: [] } );
+
+		expect( toPayload( { ...read, synonyms: [ 'a, b' ] }, read ) ).toEqual( { synonyms: [ 'a, b' ] } );
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, target: 30 } }, read ) ).toEqual( {
+			profit_ranking: { ...RANKING, target: 30 },
+		} );
+		// A value typed as it was read is no change.
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, strength: '15' } }, read ) ).toEqual( {} );
+	} );
+
+	it( 'sends numbers for what the fields hold, no target for a rule that never lifts, and no untouched row', () => {
+		expect( profitRankingPayload( {
+			enabled: true,
+			strength: '20',
+			target: '12,5',
+			min_profit: '',
+			rules: [
+				{ field: ' brands ', value: 'Our own', target: '45', exclude: false },
+				{ field: 'categories', value: 'Clearance', target: 30, exclude: true },
+				{ field: '', value: '', target: null, exclude: false },
+				{ field: 'categories', value: '', target: '10', exclude: false },
+			],
+			excluded_terms: [ ' Acme ', 'acme', '' ],
+		} ) ).toEqual( {
+			enabled: true,
+			strength: 20,
+			target: 12.5,
+			min_profit: null,
+			rules: [
+				{ field: 'brands', value: 'Our own', target: 45, exclude: false },
+				{ field: 'categories', value: 'Clearance', target: null, exclude: true },
+				// Half a rule goes, for Searcio to say what is missing under it.
+				{ field: 'categories', value: '', target: 10, exclude: false },
+			],
+			excluded_terms: [ 'Acme' ],
+		} );
+	} );
+
+	// Turned on in the dashboard without purchase prices, it lifted nothing and nothing said why.
+	it( 'knows whether the products are indexed with a purchase price', () => {
+		const catalog = ( config ) => ( { post_types: [ { slug: 'post', is_product: false, config: { enabled: true } }, { slug: 'product', is_product: true, config } ] } );
+
+		expect( sendsPurchasePrice( catalog( { enabled: true, woo: { cost_price: true } } ) ) ).toBe( true );
+		expect( sendsPurchasePrice( catalog( { enabled: true, woo: { cost_price: false } } ) ) ).toBe( false );
+		expect( sendsPurchasePrice( catalog( { enabled: false, woo: { cost_price: true } } ) ) ).toBe( false );
+		expect( sendsPurchasePrice( null ) ).toBe( false );
 	} );
 } );
 

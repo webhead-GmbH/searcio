@@ -460,6 +460,48 @@ test.describe( 'Search Config tab', () => {
 		expect( sent[ sent.length - 1 ].body ).toEqual( { variant_fields: [ 'attr_color' ] } );
 	} );
 
+	/**
+	 * "Profitable products first" was the Searcio dashboard's alone, and
+	 * turned on there without purchase prices it lifted nothing, with nothing
+	 * to say why. The tab offers it once Searcio reports it, says when the
+	 * products are indexed without a purchase price, and saves it whole.
+	 */
+	test( 'offers profit ranking, says when no purchase price is sent, and saves it whole', async ( { page } ) => {
+		const sent = [];
+		const ranking = { enabled: true, strength: 15, target: 25, min_profit: null, rules: [], excluded_terms: [] };
+
+		await mockCatalog( page );
+		await mockSearchConfig( page, sent, { ...CONFIG, profit_ranking: ranking } );
+		await page.goto( SETTINGS_URL );
+
+		const profit = page.locator( '.whsc-profit-ranking' );
+
+		await expect( profit ).toBeVisible( LOADED );
+		await expect( profit.getByText( 'Nothing is lifted yet' ) ).toBeVisible();
+
+		await profit.getByRole( 'spinbutton', { name: 'Target margin (%)' } ).fill( '30' );
+		await profit.getByRole( 'button', { name: 'Add a target' } ).click();
+		// A field with suggestions is a combobox.
+		await profit.getByRole( 'combobox', { name: 'Field', exact: true } ).fill( 'categories' );
+		await profit.getByRole( 'textbox', { name: 'Value', exact: true } ).fill( 'Clearance' );
+		await profit.getByRole( 'checkbox', { name: 'Never lift' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body ).toEqual( {
+			profit_ranking: { ...ranking, target: 30, rules: [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ] },
+		} );
+	} );
+
+	test( 'offers no profit ranking to a service that does not report it', async ( { page } ) => {
+		await mockCatalog( page );
+		await mockSearchConfig( page );
+		await page.goto( SETTINGS_URL );
+
+		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
+		await expect( page.locator( '.whsc-profit-ranking' ) ).toHaveCount( 0 );
+	} );
+
 	test( 'offers no number or variant fields to a service that does not report them', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page );

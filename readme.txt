@@ -222,6 +222,7 @@ Legal notice: https://searcio.com/impressum
 - The product finder names each answer by its question, and its editor marks a question no answer leads to.
 - On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.
 - The purchase price of your products can be sent for Searcio's profit ranking (Indexing tab, Purchase price): from WooCommerce's Cost of goods, or from the field of a cost of goods plugin. It is never shown to shoppers.
+- "Profitable products first" can be set on the Search Config tab too, which says when the products are still indexed without a purchase price.
 - A merchandising rule can fire only on a search for its trigger itself, not on every search that contains it, and a rule set that way in the Searcio dashboard keeps it when the Search Config tab saves.
 - The newest highlights are really the newest, once the next sync has sent each item's date.
 - On a multilingual site a search redirect can be kept to one language, and keeps the language set in the Searcio dashboard when the Search Config tab saves.

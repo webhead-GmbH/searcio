@@ -6,7 +6,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { Card, CheckboxControl, Fieldset, InputControl, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
+import { Card, CheckboxControl, Fieldset, InputControl, Link, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
@@ -22,12 +22,18 @@ import {
 	listError,
 	normalizeConfig,
 	numberFieldChoices,
+	PROFIT_RULES_MAX,
+	PROFIT_STRENGTH_MAX,
+	PROFIT_TERMS_MAX,
+	sendsPurchasePrice,
 	termsToText,
 	textToIds,
 	textToTerms,
 	toPayload,
+	typedNumber,
 	variantFieldChoices,
 } from '../../searchConfig';
+import { useStatisticsUrl } from '../../plan';
 import { indexedFields, unindexedFields } from '../../indexedFields';
 import { selectProps } from '../../../../utils/select';
 import { Grid } from '../../../../components/Layout';
@@ -486,6 +492,182 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 						disabled={ ! features.personalization.available && ! features.personalization.enabled }
 						onCheckedChange={ ( enabled ) => onChange( 'personalization', Boolean( enabled ) ) }
 					/>
+				</Stack>
+			</Card.Content>
+		</Card.Root>
+	);
+};
+
+/**
+ * "Profitable products first": Searcio lifts products with a good margin
+ * among the results that match a search about equally well. The same
+ * settings as in the Searcio dashboard, which also shows their effect and
+ * imports rules. It works the margin out from the purchase price each
+ * product is indexed with, which the Indexing tab sends once its "Purchase
+ * price, for profit ranking" is on: without it the ranking lifts nothing, and
+ * the card says so.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.ranking            `profit_ranking`, normalized.
+ * @param {Object}   props.errors
+ * @param {boolean}  props.sendsPurchasePrice Whether the products are indexed with a purchase price.
+ * @param {Function} props.onChange           Called with the whole replacement.
+ */
+const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) => {
+	const statisticsUrl = useStatisticsUrl();
+	const [ termsText, setTermsText ] = useState( () => termsToText( ranking.excluded_terms ) );
+	const set = ( key, value ) => onChange( { ...ranking, [ key ]: value } );
+	// A number while the field holds one, so that a value typed as it was
+	// read is no change; what is being typed otherwise, for Searcio to judge.
+	const typed = ( value ) => typedNumber( value ) ?? value;
+	const rules = ranking.rules || [];
+	const update = ( index, next ) => set( 'rules', rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
+	const error = ( key ) => errorsUnder( errors, `profit_ranking.${ key }` );
+
+	// The terms as Searcio stored them, once a save has trimmed them; what is
+	// being typed is left alone.
+	useEffect( () => {
+		if ( JSON.stringify( textToTerms( termsText ) ) !== JSON.stringify( ranking.excluded_terms || [] ) ) {
+			setTermsText( termsToText( ranking.excluded_terms ) );
+		}
+	}, [ ranking.excluded_terms ] ); // eslint-disable-line react-hooks/exhaustive-deps
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide whsc-profit-ranking">
+			<CardHeading
+				title={ __( 'Profitable products first', 'searcio' ) }
+				description={ __( 'Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
+			/>
+			<Card.Content className="whsc-settings-card-content">
+				<Stack direction="column" gap="lg">
+					<CheckboxControl
+						label={ __( 'Lift profitable products', 'searcio' ) }
+						description={ error( 'enabled' ) || __( 'The margin of each product is worked out from the purchase price it is indexed with, and is never shown.', 'searcio' ) }
+						checked={ Boolean( ranking.enabled ) }
+						onCheckedChange={ ( enabled ) => set( 'enabled', Boolean( enabled ) ) }
+					/>
+
+					{ ranking.enabled && ! sendsPurchasePrice && (
+						<Notice.Root intent="warning">
+							<Notice.Description>
+								{ __( 'Nothing is lifted yet: the products are indexed without a purchase price. Turn on "Purchase price, for profit ranking" under Product details on the Indexing tab, save it, and let the sync it starts finish.', 'searcio' ) }
+							</Notice.Description>
+						</Notice.Root>
+					) }
+
+					<Grid auto={ 220 } gap="var(--wpds-dimension-gap-md)" align="start">
+						<InputControl
+							type="number"
+							min={ 1 }
+							max={ PROFIT_STRENGTH_MAX }
+							step={ 1 }
+							label={ __( 'Strength (%)', 'searcio' ) }
+							description={ error( 'strength' ) || __( 'How far a product with a good margin may rise, from 1 to 50: at 15 it overtakes only results that match at most 15 percent better.', 'searcio' ) }
+							value={ String( ranking.strength ?? '' ) }
+							onValueChange={ ( value ) => set( 'strength', typed( value ) ) }
+						/>
+						<InputControl
+							type="number"
+							min={ 0.1 }
+							max={ 100 }
+							step={ 0.1 }
+							label={ __( 'Target margin (%)', 'searcio' ) }
+							description={ error( 'target' ) || __( 'The margin from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift.', 'searcio' ) }
+							value={ String( ranking.target ?? '' ) }
+							onValueChange={ ( value ) => set( 'target', typed( value ) ) }
+						/>
+						<InputControl
+							type="number"
+							min={ 0 }
+							step={ 0.01 }
+							label={ __( 'Least profit per sale', 'searcio' ) }
+							description={ error( 'min_profit' ) || __( 'Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin.', 'searcio' ) }
+							value={ String( ranking.min_profit ?? '' ) }
+							onValueChange={ ( value ) => set( 'min_profit', typed( value ) ) }
+						/>
+					</Grid>
+
+					<Fieldset.Root className="whsc-profit-rules">
+						<Fieldset.Legend>{ __( 'Targets of their own', 'searcio' ) }</Fieldset.Legend>
+						<Stack direction="column" gap="md">
+							<Text render={ <p /> } variant="body-sm">
+								{ __( 'A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies.', 'searcio' ) }
+							</Text>
+							{ rules.map( ( rule, index ) => (
+								<div className="whsc-profit-rule" key={ index }>
+									<InputControl
+										label={ __( 'Field', 'searcio' ) }
+										list="whsc-field-suggestions"
+										description={ rowError( errors, 'profit_ranking.rules', index, 'field' ) }
+										value={ rule.field }
+										onValueChange={ ( field ) => update( index, { ...rule, field } ) }
+									/>
+									<InputControl
+										label={ __( 'Value', 'searcio' ) }
+										description={ rowError( errors, 'profit_ranking.rules', index, 'value' ) }
+										value={ rule.value }
+										onValueChange={ ( value ) => update( index, { ...rule, value } ) }
+									/>
+									<InputControl
+										type="number"
+										min={ 0.1 }
+										max={ 100 }
+										step={ 0.1 }
+										label={ __( 'Target (%)', 'searcio' ) }
+										description={ rowError( errors, 'profit_ranking.rules', index, 'target' ) }
+										value={ rule.exclude ? '' : String( rule.target ?? '' ) }
+										disabled={ rule.exclude }
+										onValueChange={ ( target ) => update( index, { ...rule, target: typed( target ) } ) }
+									/>
+									<div className="whsc-profit-rule__exclude">
+										<CheckboxControl
+											label={ __( 'Never lift', 'searcio' ) }
+											checked={ Boolean( rule.exclude ) }
+											onCheckedChange={ ( exclude ) => update( index, { ...rule, exclude: Boolean( exclude ) } ) }
+										/>
+									</div>
+									<div className="whsc-row-remove">
+										<Button
+											__next40pxDefaultSize
+											icon={ trash }
+											isDestructive
+											variant="tertiary"
+											label={ __( 'Remove target', 'searcio' ) }
+											onClick={ () => set( 'rules', rules.filter( ( _, i ) => i !== index ) ) }
+										/>
+									</div>
+								</div>
+							) ) }
+							<Stack direction="row" gap="sm">
+								<Button
+									__next40pxDefaultSize
+									variant="secondary"
+									disabled={ rules.length >= PROFIT_RULES_MAX }
+									onClick={ () => set( 'rules', [ ...rules, { field: '', value: '', target: null, exclude: false } ] ) }
+								>
+									{ __( 'Add a target', 'searcio' ) }
+								</Button>
+							</Stack>
+						</Stack>
+					</Fieldset.Root>
+
+					<TextareaControl
+						label={ __( 'Search terms ranked by relevance alone', 'searcio' ) }
+						description={ error( 'excluded_terms' ) || __( 'One per line, up to 200, matched whole and whatever their capitals: brand names or service terms, for example.', 'searcio' ) }
+						value={ termsText }
+						onValueChange={ ( value ) => {
+							setTermsText( value );
+							set( 'excluded_terms', textToTerms( value ).slice( 0, PROFIT_TERMS_MAX ) );
+						} }
+					/>
+
+					{ statisticsUrl && (
+						<Text render={ <p /> } variant="body-sm">
+							<Link href={ statisticsUrl } openInNewTab>
+								{ __( 'See what profit ranking changes, and import targets, in the Searcio dashboard', 'searcio' ) }
+							</Link>
+						</Text>
+					) }
 				</Stack>
 			</Card.Content>
 		</Card.Root>
@@ -1011,6 +1193,16 @@ const SearchConfigTab = () => {
 						} )
 					}
 				/>
+
+				{ /* Offered once Searcio reports it, on a site with products. */ }
+				{ config.profit_ranking && catalog?.woo?.active && (
+					<ProfitRankingCard
+						ranking={ config.profit_ranking }
+						errors={ fieldErrors }
+						sendsPurchasePrice={ sendsPurchasePrice( catalog ) }
+						onChange={ ( ranking ) => set( 'profit_ranking', ranking ) }
+					/>
+				) }
 
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
