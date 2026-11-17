@@ -49,6 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The placeholder image of a card made from a Searcio template is smaller and lighter, like the plugin's own.
 - The German word for a product on backorder is WooCommerce's own, "Lieferrückstand".
 - A setting of the Placement tab that takes one of a few values, such as the animation, refuses another with a message instead of saving the value it already had.
+- A page with a search button loads 10 scripts and about 1.2 MB less JavaScript. The search window no longer loads WordPress's component library with the date library, the rich-text editor and the data layer behind it: what Searcio adds to a page fell from 27 scripts (1.5 MB, 488 KB compressed) to 17 (0.35 MB, 122 KB). On a phone with the processor slowed fourfold the script time Searcio adds fell from about 1.9 s to 0.3 s, and the window opens in about half the time. It looks and works as before.
 - The batches of a full sync name their run, so that Searcio's sync history shows one row for the run, not one for each post type and batch.
 - The Sync history's search also finds a run by its status or by what started it, and a run started by a settings change is named so.
 - The Search Config tab asks to wait a few minutes before changing the fields that hold numbers, or the attributes one variation must match, again, because each change rebuilds the search index.

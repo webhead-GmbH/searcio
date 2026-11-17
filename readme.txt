@@ -200,6 +200,7 @@ Legal notice: https://searcio.com/impressum
 - In the search window: "20 of about 173 results" and counts on the type buttons for a search by meaning, highlights that show the newest products when the featured ones cannot be asked for, and a comparison of up to four products.
 - On a multilingual site each page searches its own language, card templates can be made per language, and a new quiz starts in the language you work in.
 - Saving the Indexing tab sends only what the change altered. The Sync tab says when WP-Cron does not run a sync and offers to run its next step, Site Health lists overdue tasks, and the Connection tab warns when the index is empty.
+- Pages with a search button load about 1.2 MB less JavaScript, so they are ready sooner on phones.
 - WooCommerce's cart, checkout, account and shop pages are no longer indexed. Tested up to WooCommerce 11.3.
 - Many smaller fixes to phones and tablets, error messages, the product finder, product rows and the German texts: see CHANGELOG.md.
 
