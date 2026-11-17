@@ -1,5 +1,5 @@
 import { forwardRef } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import Icon from '../ui/Icon';
 import { search, closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import Button from './Button';

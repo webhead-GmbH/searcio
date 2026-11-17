@@ -46,13 +46,14 @@ msgstr "Searcio"
 
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:162
-#: includes/Frontend/Frontend_Config.php:183
-#: src/admin/settings/components/tabs/PlacementTab.js:910
+#: includes/Frontend/Frontend_Config.php:202
+#: src/admin/settings/components/tabs/PlacementTab.js:926
 #: src/frontend/search/components/SearchInput.js:33
-#: src/frontend/search/components/SearchModal.js:1736
-#: src/frontend/search/components/SearchModal.js:1768
+#: src/frontend/search/components/SearchModal.js:1800
+#: src/frontend/search/components/SearchModal.js:1832
 #: src/frontend/search/components/Trigger.js:27
 #: src/frontend/search/components/Trigger.js:44
+#: src/frontend/search/ui/SearchBox.js:47
 msgid "Search"
 msgstr "Rechercher"
 
@@ -5673,3 +5674,7 @@ msgstr "Les %1$d premiers des %2$d produits sont comparés."
 #, js-format
 msgid "%1$d of about %2$d results"
 msgstr "%1$d résultats sur environ %2$d"
+
+#: src/frontend/search/ui/Modal.js:310
+msgid "Scrollable section"
+msgstr "Section défilante"

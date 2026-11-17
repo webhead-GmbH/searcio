@@ -1,11 +1,11 @@
-import { SearchControl } from '@wordpress/components';
+import SearchBox from '../ui/SearchBox';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import Button from './Button';
 
 /**
  * Hydrates a server-rendered `[data-whsc-trigger]` placeholder with a real
- * `@wordpress/components` control.
+ * control.
  *
  * Icon mode only ever opens the shared modal. Box mode is a real, working
  * input: typing in it (`onBoxChange`) updates the shared query and opens the
@@ -48,7 +48,7 @@ const Trigger = ( { mode, placeholder, iconHtml, value, onOpen, onBoxChange, flo
 
 	if ( 'box' === mode ) {
 		return (
-			<SearchControl
+			<SearchBox
 				className="whsc-trigger-box"
 				value={ value }
 				placeholder={ placeholder }

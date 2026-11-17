@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from '@wordpress/element';
-import {Icon, Modal} from '@wordpress/components';
+import Icon from '../ui/Icon';
+import Modal from '../ui/Modal';
 import {chevronDown, closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import Button from './Button';
@@ -399,7 +400,7 @@ const SearchModal = ({
 		}
 	}, [editorPreview]);
 
-	// `Modal` (`@wordpress/components`) always portals its frame straight to
+	// `Modal` (`../ui/Modal`) always portals its frame straight to
 	// `document.body` and doesn't forward unrecognized props to it, so
 	// `data-webhead-frontend-root` can't be passed in as a prop like
 	// `className` above - it has to be set on the real DOM node once it
@@ -1789,7 +1790,6 @@ const SearchModal = ({
 
 	return (
 		<Modal
-			__experimentalHideHeader
 			focusOnMount={editorPreview ? false : undefined}
 			onRequestClose={onRequestClose}
 			className={`whsc-modal whsc-anim-${animation || 'fade'}${instanceClass ? ` ${instanceClass}` : ''}`}

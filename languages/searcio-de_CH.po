@@ -46,13 +46,14 @@ msgstr "Searcio"
 
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:162
-#: includes/Frontend/Frontend_Config.php:183
-#: src/admin/settings/components/tabs/PlacementTab.js:910
+#: includes/Frontend/Frontend_Config.php:202
+#: src/admin/settings/components/tabs/PlacementTab.js:926
 #: src/frontend/search/components/SearchInput.js:33
-#: src/frontend/search/components/SearchModal.js:1736
-#: src/frontend/search/components/SearchModal.js:1768
+#: src/frontend/search/components/SearchModal.js:1800
+#: src/frontend/search/components/SearchModal.js:1832
 #: src/frontend/search/components/Trigger.js:27
 #: src/frontend/search/components/Trigger.js:44
+#: src/frontend/search/ui/SearchBox.js:47
 msgid "Search"
 msgstr "Suche"
 
@@ -5673,3 +5674,7 @@ msgstr "Die ersten %1$d der %2$d Produkte werden verglichen."
 #, js-format
 msgid "%1$d of about %2$d results"
 msgstr "%1$d von etwa %2$d Ergebnissen"
+
+#: src/frontend/search/ui/Modal.js:310
+msgid "Scrollable section"
+msgstr "Scrollbarer Abschnitt"

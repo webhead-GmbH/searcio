@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import Icon from '../ui/Icon';
 import { chevronDown, funnel } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
 

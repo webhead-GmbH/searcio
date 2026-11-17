@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-17T10:58:02+00:00\n"
+"POT-Creation-Date: 2026-11-17T13:55:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: searcio\n"
@@ -44,7 +44,7 @@ msgstr ""
 #: includes/Admin/Settings_Page.php:36
 #: includes/Admin/Settings_Page.php:40
 #: includes/Admin/Settings_Page.php:130
-#: includes/Plugin.php:510
+#: includes/Plugin.php:519
 #: src/admin/settings/components/SettingsPanel.js:211
 msgid "Searcio"
 msgstr ""
@@ -58,6 +58,7 @@ msgstr ""
 #: src/frontend/search/components/SearchModal.js:1832
 #: src/frontend/search/components/Trigger.js:27
 #: src/frontend/search/components/Trigger.js:44
+#: src/frontend/search/ui/SearchBox.js:47
 msgid "Search"
 msgstr ""
 
@@ -347,8 +348,8 @@ msgid "How many filters get a button of their own under the search field, as far
 msgstr ""
 
 #: includes/Elementor/Widgets/Search_Widget.php:240
-#: src/frontend/search/components/SearchModal.js:1549
-#: src/frontend/search/components/SearchModal.js:1577
+#: src/frontend/search/components/SearchModal.js:1550
+#: src/frontend/search/components/SearchModal.js:1578
 msgid "Results"
 msgstr ""
 
@@ -1400,7 +1401,7 @@ msgid "Searcio does not search or index for this site while the account is suspe
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:188
-#: src/frontend/search/components/SearchModal.js:1633
+#: src/frontend/search/components/SearchModal.js:1634
 #: src/frontend/search/components/SearchModal.js:2052
 msgid "No results found."
 msgstr ""
@@ -1422,8 +1423,8 @@ msgid "Sale"
 msgstr ""
 
 #: includes/Frontend/Frontend_Config.php:193
-#: src/frontend/search/components/SearchModal.js:802
-#: src/frontend/search/components/SearchModal.js:1351
+#: src/frontend/search/components/SearchModal.js:803
+#: src/frontend/search/components/SearchModal.js:1352
 msgid "Search is unavailable right now."
 msgstr ""
 
@@ -1701,7 +1702,7 @@ msgstr ""
 #: includes/Routing/Connection_Endpoint.php:209
 #: includes/Routing/Connection_Endpoint.php:320
 #: includes/Routing/Quizzes_Endpoint.php:172
-#: includes/Routing/Search_Config_Endpoint.php:131
+#: includes/Routing/Search_Config_Endpoint.php:139
 msgid "Could not reach Searcio."
 msgstr ""
 
@@ -1735,7 +1736,7 @@ msgstr ""
 msgid "No site found for these credentials."
 msgstr ""
 
-#: includes/Routing/Indexing_Endpoint.php:58
+#: includes/Routing/Indexing_Endpoint.php:60
 msgid "Invalid indexing configuration payload."
 msgstr ""
 
@@ -1753,7 +1754,7 @@ msgstr ""
 msgid "Connect this site to Searcio on the Connection tab first."
 msgstr ""
 
-#: includes/Routing/Search_Config_Endpoint.php:72
+#: includes/Routing/Search_Config_Endpoint.php:74
 msgid "Invalid search configuration payload."
 msgstr ""
 
@@ -1833,7 +1834,7 @@ msgstr ""
 
 #. translators: 1: document id, 2: HTTP status code.
 #: includes/Sync/Incremental_Service.php:253
-#: includes/Sync/Sync_Service.php:791
+#: includes/Sync/Sync_Service.php:799
 #, php-format
 msgid "Could not remove %1$s from the index (HTTP %2$d)."
 msgstr ""
@@ -1844,53 +1845,53 @@ msgstr ""
 msgid "Searcio rejected the update (HTTP %d)."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:118
+#: includes/Sync/Sync_Service.php:121
 msgid "Add and save your Searcio credentials before syncing."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:127
+#: includes/Sync/Sync_Service.php:130
 #: src/admin/settings/components/tabs/SyncTab.js:207
 msgid "No content types are enabled for indexing yet."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:134
+#: includes/Sync/Sync_Service.php:137
 msgid "A sync is already in progress."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:153
+#: includes/Sync/Sync_Service.php:159
 msgid "Could not start the sync run."
 msgstr ""
 
 #. translators: 1: plan metric name, 2: plan limit.
-#: includes/Sync/Sync_Service.php:966
+#: includes/Sync/Sync_Service.php:975
 #, php-format
 msgid "Plan limit reached for %1$s (limit %2$s). Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr ""
 
-#: includes/Sync/Sync_Service.php:972
+#: includes/Sync/Sync_Service.php:981
 msgid "Your Searcio plan limit was reached. Upgrade your plan or reduce what you index, then re-run the sync."
 msgstr ""
 
 #. translators: %s: a length of time, such as "5 mins".
-#: includes/Sync/Sync_Service.php:986
+#: includes/Sync/Sync_Service.php:995
 #, php-format
 msgid "Could not reach Searcio. The sync tries again in %s."
 msgstr ""
 
 #. translators: 1: HTTP status code, 2: a length of time, such as "5 mins".
-#: includes/Sync/Sync_Service.php:993
+#: includes/Sync/Sync_Service.php:1002
 #, php-format
 msgid "Searcio returned an error (HTTP %1$d). The sync tries again in %2$s."
 msgstr ""
 
 #. translators: %d: number of tries.
-#: includes/Sync/Sync_Service.php:1008
+#: includes/Sync/Sync_Service.php:1017
 #, php-format
 msgid "Could not reach Searcio in %d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Searcio answers."
 msgstr ""
 
 #. translators: 1: HTTP status code, 2: number of tries.
-#: includes/Sync/Sync_Service.php:1015
+#: includes/Sync/Sync_Service.php:1024
 #, php-format
 msgid "Searcio returned an error (HTTP %1$d) in %2$d tries, so this sync was stopped. The next scheduled sync starts again; changes made meanwhile are sent as soon as Searcio answers."
 msgstr ""
@@ -2023,7 +2024,7 @@ msgid "Bottom"
 msgstr ""
 
 #: src/admin/settings/components/look/LookControl.js:129
-#: src/frontend/search/components/SearchModal.js:1744
+#: src/frontend/search/components/SearchModal.js:1745
 msgid "Reset"
 msgstr ""
 
@@ -2176,7 +2177,7 @@ msgid "All parts"
 msgstr ""
 
 #: src/admin/settings/components/look/LookEditor.js:306
-#: src/frontend/search/components/SearchModal.js:1715
+#: src/frontend/search/components/SearchModal.js:1716
 msgid "Done"
 msgstr ""
 
@@ -5270,7 +5271,7 @@ msgstr[1] ""
 #. translators: %d: number of products.
 #. translators: %d: number of results.
 #: src/frontend/search/components/AiAssistant.js:400
-#: src/frontend/search/components/SearchModal.js:1574
+#: src/frontend/search/components/SearchModal.js:1575
 #, js-format
 msgid "%d result"
 msgid_plural "%d results"
@@ -5390,7 +5391,7 @@ msgstr ""
 msgid "Nothing matches “%s”."
 msgstr ""
 
-#: src/frontend/search/components/FilterSheet.js:64
+#: src/frontend/search/components/FilterSheet.js:63
 msgid "Close filters"
 msgstr ""
 
@@ -5484,7 +5485,7 @@ msgid "Your answers"
 msgstr ""
 
 #: src/frontend/search/components/QuizPane.js:454
-#: src/frontend/search/components/SearchModal.js:1618
+#: src/frontend/search/components/SearchModal.js:1619
 msgid "Loading…"
 msgstr ""
 
@@ -5496,92 +5497,92 @@ msgstr ""
 msgid "Nothing matched every answer. Go back a step and try a different one."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:912
+#: src/frontend/search/components/SearchModal.js:913
 msgid "Photo search is not available on this store."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:914
+#: src/frontend/search/components/SearchModal.js:915
 msgid "That file is not an image we can read. Try a JPEG or PNG under 8 MB."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:916
+#: src/frontend/search/components/SearchModal.js:917
 msgid "Photo search has reached its limit for now. Please try again later."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:918
+#: src/frontend/search/components/SearchModal.js:919
 msgid "That photo search failed. Try another photo."
 msgstr ""
 
 #. translators: %d: number of filter values selected.
-#: src/frontend/search/components/SearchModal.js:1147
-#: src/frontend/search/components/SearchModal.js:1782
+#: src/frontend/search/components/SearchModal.js:1148
+#: src/frontend/search/components/SearchModal.js:1783
 #, js-format
 msgid "%d selected"
 msgid_plural "%d selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/frontend/search/components/SearchModal.js:1498
+#: src/frontend/search/components/SearchModal.js:1499
 msgid "Your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1508
+#: src/frontend/search/components/SearchModal.js:1509
 msgid "From your photo"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1528
-#: src/frontend/search/components/SearchModal.js:1543
+#: src/frontend/search/components/SearchModal.js:1529
+#: src/frontend/search/components/SearchModal.js:1544
 msgid "Current highlights"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1548
+#: src/frontend/search/components/SearchModal.js:1549
 #: src/frontend/search/components/SearchModal.js:2036
 msgid "Looking at your photo…"
 msgstr ""
 
 #. translators: 1: number of results loaded so far. 2: total number of results.
-#: src/frontend/search/components/SearchModal.js:1561
+#: src/frontend/search/components/SearchModal.js:1562
 #, js-format
 msgid "%1$d of %2$d results"
 msgstr ""
 
 #. translators: 1: number of results loaded so far. 2: about how many results there are; Searcio counts the best matches of a search by meaning, not every one.
-#: src/frontend/search/components/SearchModal.js:1568
+#: src/frontend/search/components/SearchModal.js:1569
 #, js-format
 msgid "%1$d of about %2$d results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1582
-#: src/frontend/search/components/SearchModal.js:1606
+#: src/frontend/search/components/SearchModal.js:1583
+#: src/frontend/search/components/SearchModal.js:1607
 msgid "Search results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1619
+#: src/frontend/search/components/SearchModal.js:1620
 msgid "Load more results"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1632
+#: src/frontend/search/components/SearchModal.js:1633
 msgid "No matches for that photo. Try a clearer shot, or one item on its own."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1638
+#: src/frontend/search/components/SearchModal.js:1639
 msgid "No result matches the filters you chose. Remove one, or reset them all."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1639
+#: src/frontend/search/components/SearchModal.js:1640
 msgid "Check the spelling, or try a more general word."
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1644
+#: src/frontend/search/components/SearchModal.js:1645
 msgid "Reset filters"
 msgstr ""
 
-#: src/frontend/search/components/SearchModal.js:1719
+#: src/frontend/search/components/SearchModal.js:1720
 msgid "No results"
 msgstr ""
 
 #. translators: %d: number of results the filters leave.
-#: src/frontend/search/components/SearchModal.js:1722
+#: src/frontend/search/components/SearchModal.js:1723
 #, js-format
 msgid "Show %d result"
 msgid_plural "Show %d results"
@@ -5616,6 +5617,10 @@ msgstr ""
 
 #: src/frontend/search/components/templates.js:49
 msgid "from"
+msgstr ""
+
+#: src/frontend/search/ui/Modal.js:310
+msgid "Scrollable section"
 msgstr ""
 
 #: src/utils/facets.js:94
