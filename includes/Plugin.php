@@ -85,6 +85,8 @@ use Webhead\WP\SearchCloud\Frontend\Search_Surface;
 use Webhead\WP\SearchCloud\Frontend\Site_Placement;
 use Webhead\WP\SearchCloud\Shortcodes\Products_Shortcode;
 use Webhead\WP\SearchCloud\Shortcodes\Search_Shortcode;
+use Webhead\WP\SearchCloud\Widgets\Classic_Products_Widget;
+use Webhead\WP\SearchCloud\Widgets\Classic_Search_Widget;
 use Webhead\WP\SearchCloud\Widgets\Widget_Registrar;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
@@ -557,6 +559,7 @@ final class Plugin extends Base_Plugin {
 			'searcio_sync_options',
 			static function (): void {
 				delete_option( Sync_Keys::OPTION_SNAPSHOT );
+				delete_option( Sync_Keys::OPTION_INDEX_OWNER );
 				delete_option( Sync_Keys::OPTION_SEEN );
 				delete_option( Sync_Keys::OPTION_PRUNE );
 				delete_option( Sync_Keys::OPTION_FAILED_DELETES );
@@ -581,6 +584,17 @@ final class Plugin extends Base_Plugin {
 				delete_option( 'searcio_slug_moved' );
 
 				Delete_Legacy_Sync_Options::delete();
+			},
+			Uninstall_Manager::GROUP_DATA
+		);
+
+		// WordPress keeps the settings of a widget's instances in an option of
+		// its own, which the plugin's two classic widgets leave behind.
+		$uninstall_manager->register_cleanup(
+			'searcio_widget_options',
+			static function (): void {
+				delete_option( 'widget_' . Classic_Search_Widget::ID_BASE );
+				delete_option( 'widget_' . Classic_Products_Widget::ID_BASE );
 			},
 			Uninstall_Manager::GROUP_DATA
 		);

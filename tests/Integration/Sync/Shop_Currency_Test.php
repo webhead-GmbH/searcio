@@ -51,7 +51,10 @@ final class Shop_Currency_Test extends Integration_Test_Case {
 				$path = (string) wp_parse_url( $url, PHP_URL_PATH );
 
 				if ( str_ends_with( $path, '/search-config' ) ) {
-					$sent[] = json_decode( (string) ( $args['body'] ?? '' ), true );
+					// What the shop writes, not what it reads before it does.
+					if ( 'PUT' === ( $args['method'] ?? '' ) ) {
+						$sent[] = json_decode( (string) ( $args['body'] ?? '' ), true );
+					}
 
 					return $this->http_ok( [ 'currency' => 'CHF' ] );
 				}

@@ -371,10 +371,11 @@ final class Search_Cloud_Client {
 	 * visitor's browser on the site, so the storefront's are the browser's.
 	 *
 	 * @param  array<string,mixed>|null  $body
-	 * @param  bool                      $retry  Whether a failure that may pass is asked again.
+	 * @param  bool                      $retry  Whether a failure that may pass is asked again. Not in a request somebody waits for, see {@see self::is_waited_for()}.
 	 */
 	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true ): Api_Response {
-		$url = $this->endpoint() . $path;
+		$url   = $this->endpoint() . $path;
+		$retry = $retry && ! $this->is_waited_for();
 
 		// The language of the screen, or of the site, so that what Searcio says
 		// back - a field it refuses, for one - can be in it: it answered an
@@ -427,6 +428,19 @@ final class Search_Cloud_Client {
 		} while ( $attempt < self::MAX_ATTEMPTS );
 
 		return $result;
+	}
+
+	/**
+	 * Whether somebody is waiting for the answer, in wp-admin: a screen of the
+	 * plugin asks through the REST API, and Searcio that does not answer would
+	 * hold the request for three tries of fifteen seconds and the waits between
+	 * them, longer than the time limit many hosts give a request. The screen
+	 * then shows a server error where it could say that Searcio did not answer.
+	 * Such a request asks once. What runs in the background asks again, and the
+	 * sync and the drain have their own way of sending a batch later.
+	 */
+	private function is_waited_for(): bool {
+		return wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
 	}
 
 	private function sleep( int $attempt, ?int $retry_after = null ): void {

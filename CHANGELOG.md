@@ -76,6 +76,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Product finder answers are labelled with their question, and the quiz editor marks questions that no answer leads to.
 - "Clear cache" only clears the plugin's own files from the PHP opcode cache.
 - Elementor no longer lists the Searcio widgets twice.
+- After a shop disconnects and connects again, or enters the keys of another Searcio account, the next sync sends every document. Before, it skipped them as unchanged and ended "completed" over an empty index.
+- With Polylang, a language given to a post without saving it (a bulk change, the wizard for content from before Polylang, linking translations) reaches the search index with the next incremental sync, where it waited for the daily one.
+- A screen of the plugin no longer waits through three tries for a Searcio that does not answer: the Connection and Search Config tabs say so after 15 seconds, where the request was held for 51, longer than the time limit of many hosts, which showed a server error.
+- Deleting the plugin's data on uninstall also removes the options WordPress keeps for its two classic widgets.
 - Smaller fixes: error messages on the Search Config tab in the language of the screen, a warning for a redirect term entered twice, a working search in the sync history, retention days that cannot be negative, a wider search field on phones, and sync times stored in UTC.
 
 ## [1.4.0] - 2026-11-09

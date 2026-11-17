@@ -24,8 +24,10 @@ use Webhead\WP\SearchCloud\Enums\Sync_Status;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Password_Protected_Posts;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Shop_Pages;
+use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
+use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Sync_Workflow_Test extends Integration_Test_Case {
@@ -172,6 +174,51 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertSame( Sync_Status::Completed->value, $second_run['status'] );
 		$this->assertSame( 0, (int) $second_run['pushed'], 'Unchanged posts must be skipped via the dirty tracker.' );
 		$this->assertSame( 2, (int) $second_run['skipped'] );
+	}
+
+	/**
+	 * Disconnecting deletes the site and its index at Searcio, and a new
+	 * connection starts an empty one. The documents the shop holds as sent are
+	 * not in it, so skipping them as unchanged would end a "completed" run
+	 * over an empty index.
+	 */
+	public function test_a_run_after_keys_of_another_account_sends_every_document_again(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish' ] );
+		$this->fake_http( fn(): array => $this->http_ok( [ 'ok' => true ] ) );
+
+		$first = $this->run_full_sync();
+		$this->assertSame( 2, (int) $first['pushed'] );
+
+		$same = $this->run_full_sync();
+		$this->assertSame( 0, (int) $same['pushed'], 'The same keys: nothing has changed, nothing is sent.' );
+
+		$this->settings()->set( Plugin_Settings::WRITE_KEY, Plugin_Settings::encrypt_secret( 'the-next-accounts-write-key' ) );
+
+		$next = $this->run_full_sync();
+
+		$this->assertSame( 2, (int) $next['pushed'], 'Keys of another account: its index has none of the documents.' );
+		$this->assertSame( 0, (int) $next['skipped'] );
+
+		$after = $this->run_full_sync();
+		$this->assertSame( 0, (int) $after['pushed'], 'Once the run has completed under the new keys, unchanged documents are skipped again.' );
+	}
+
+	public function test_a_site_that_has_not_completed_a_run_yet_keeps_skipping_what_has_not_changed(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish' ] );
+		$this->fake_http( fn(): array => $this->http_ok( [ 'ok' => true ] ) );
+
+		$this->run_full_sync();
+		// What a site that updated from a release before this one holds.
+		delete_option( Sync_Keys::OPTION_INDEX_OWNER );
+		$this->settings()->set( Plugin_Settings::WRITE_KEY, Plugin_Settings::encrypt_secret( 'another-write-key' ) );
+
+		$run = $this->run_full_sync();
+
+		$this->assertSame( 0, (int) $run['pushed'], 'Nothing says whose index the documents were sent to, so a run does not resend them all.' );
 	}
 
 	public function test_a_running_tick_honours_a_cancel_signal(): void {

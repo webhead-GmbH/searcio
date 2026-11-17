@@ -149,6 +149,34 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertGreaterThan( $after_first, $calls );
 	}
 
+	/**
+	 * Searcio that does not answer used to hold a screen of the plugin for three
+	 * tries and the waits between them, longer than the time limit of many
+	 * hosts, so the screen showed a server error. Somebody waiting asks once;
+	 * a task in the background asks again.
+	 */
+	public function test_a_request_somebody_waits_for_asks_once_and_a_background_task_asks_again(): void {
+		$this->connect_client();
+		$calls = 0;
+		$this->fake_http( function () use ( &$calls ): array {
+			++$calls;
+
+			// An answer that says to ask again at once, so that the tries do not wait.
+			return array_merge( $this->http_ok( [ 'message' => 'Unavailable' ], 503 ), [ 'headers' => [ 'retry-after' => '0' ] ] );
+		} );
+
+		$this->client()->get_search_config( true );
+		$background = $calls;
+
+		$calls = 0;
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$this->client()->get_search_config( true );
+		remove_filter( 'wp_doing_ajax', '__return_true' );
+
+		$this->assertGreaterThan( 1, $background, 'A task in the background asks again.' );
+		$this->assertSame( 1, $calls, 'A request somebody waits for asks once.' );
+	}
+
 	public function test_keys_entered_anew_read_afresh(): void {
 		$this->connect_client();
 		$calls = $this->count_requests( [ 'weights' => [] ] );

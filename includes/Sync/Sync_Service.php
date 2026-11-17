@@ -141,6 +141,12 @@ final class Sync_Service {
 		update_option( Sync_Keys::OPTION_SEEN, [], false );
 		update_option( Sync_Keys::OPTION_PRUNE, [], false );
 
+		// A document that has not changed is skipped because the index has it,
+		// which holds for the account it was sent to. After a disconnect and a
+		// new connection, or keys of another account, the new index has none
+		// of them, and a run that skipped them all would end "completed".
+		$force = $force || $this->index_is_another_accounts();
+
 		$cursor = [
 			'phase'      => 'index',
 			'type_index' => 0,
@@ -819,8 +825,24 @@ final class Sync_Service {
 		return [] === $remaining;
 	}
 
+	/**
+	 * Whether the documents were last sent under keys of another account. A
+	 * site that has not finished a run since this was recorded is not told so:
+	 * its first run sends what has changed, as before.
+	 */
+	private function index_is_another_accounts(): bool {
+		$owner = (string) get_option( Sync_Keys::OPTION_INDEX_OWNER, '' );
+
+		return '' !== $owner && ! hash_equals( $owner, $this->index_owner() );
+	}
+
+	private function index_owner(): string {
+		return wp_hash( $this->client->write_key() );
+	}
+
 	private function complete( int $id ): void {
 		update_option( Sync_Keys::OPTION_SNAPSHOT, $this->read_ids( Sync_Keys::OPTION_SEEN ), false );
+		update_option( Sync_Keys::OPTION_INDEX_OWNER, $this->index_owner(), false );
 		$this->cleanup_options();
 
 		// `finish()` writes `last_error` unconditionally, so carry forward what

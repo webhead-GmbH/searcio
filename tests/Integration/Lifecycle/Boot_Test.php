@@ -16,6 +16,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Lifecycle;
 
 use Webhead\WP\SearchCloud\Plugin;
 use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
+use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Lifecycle\Uninstall_Manager;
 
@@ -43,6 +44,28 @@ final class Boot_Test extends Integration_Test_Case {
 	public function test_data_is_kept_on_uninstall_until_the_site_says_otherwise(): void {
 		$this->assertSame( Uninstall_Manager::POLICY_KEEP_DATA, $this->plugin()->get_uninstall_manager()->get_policy() );
 		$this->assertSame( Uninstall_Manager::POLICY_KEEP_DATA, $this->plugin()->uninstall_policy() );
+	}
+
+	/**
+	 * Deleting a site's data left the options WordPress keeps for the classic
+	 * widgets, and the daily sync's fingerprint of the index.
+	 */
+	public function test_the_data_cleanup_removes_what_the_widgets_and_the_sync_keep(): void {
+		update_option( 'widget_searcio_search', [ '_multiwidget' => 1 ] );
+		update_option( 'widget_searcio_products', [ '_multiwidget' => 1 ] );
+		update_option( Sync_Keys::OPTION_INDEX_OWNER, 'a-fingerprint' );
+
+		$cleanups = $this->plugin()->get_uninstall_manager()->all();
+
+		$this->assertArrayHasKey( 'searcio_widget_options', $cleanups );
+		$this->assertArrayHasKey( 'searcio_sync_options', $cleanups );
+
+		( $cleanups['searcio_widget_options']['callback'] )();
+		( $cleanups['searcio_sync_options']['callback'] )();
+
+		$this->assertFalse( get_option( 'widget_searcio_search' ) );
+		$this->assertFalse( get_option( 'widget_searcio_products' ) );
+		$this->assertFalse( get_option( Sync_Keys::OPTION_INDEX_OWNER ) );
 	}
 
 	public function test_the_uninstall_policy_follows_the_setting_when_it_is_asked_for(): void {

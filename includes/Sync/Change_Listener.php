@@ -77,6 +77,7 @@ final class Change_Listener implements Actions {
 			'added_post_meta'         => [ 'on_meta', 20, 3 ],
 			'updated_post_meta'       => [ 'on_meta', 20, 3 ],
 			'deleted_post_meta'       => [ 'on_meta', 20, 3 ],
+			'set_object_terms'        => [ 'on_object_terms', 20, 4 ],
 			'edit_terms'              => [ 'before_term_edit', 20, 2 ],
 			'edited_term'             => [ 'on_term_edited', 20, 3 ],
 			'pre_delete_term'         => [ 'on_term_delete', 20, 2 ],
@@ -105,6 +106,31 @@ final class Change_Listener implements Actions {
 
 	public function on_product( int $product_id ): void {
 		$this->sync_post( get_post( $product_id ) );
+	}
+
+	/**
+	 * Polylang keeps a post's language, and the group of its translations, as
+	 * terms of two taxonomies of their own, and assigns them without saving the
+	 * post: a bulk change of language, the wizard that gives the content a
+	 * site had before Polylang its first language, linking two posts as
+	 * translations. A document carries its language, so the post is refreshed.
+	 * WPML keeps its own tables and is heard through the save of the post.
+	 *
+	 * @param  int     $object_id  The post.
+	 * @param  mixed   $terms      Unused.
+	 * @param  mixed   $tt_ids     Unused.
+	 * @param  string  $taxonomy
+	 */
+	public function on_object_terms( int $object_id, mixed $terms, mixed $tt_ids, string $taxonomy ): void {
+		if ( ! in_array( $taxonomy, [ 'language', 'post_translations' ], true ) ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( $post instanceof WP_Post && ! wp_is_post_revision( $post ) && ! wp_is_post_autosave( $post ) ) {
+			$this->sync_post( $post );
+		}
 	}
 
 	/**
