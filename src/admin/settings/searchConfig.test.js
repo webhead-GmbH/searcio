@@ -22,6 +22,8 @@ import {
 	normalizeRedirects,
 	numberFieldChoices,
 	profitRankingPayload,
+	profitRankingProblems,
+	profitRulesSent,
 	sendsPurchasePrice,
 	termsToText,
 	textToIds,
@@ -552,6 +554,49 @@ describe( 'profit ranking', () => {
 				{ field: 'categories', value: '', target: 10, exclude: false },
 			],
 			excluded_terms: [ 'Acme' ],
+		} );
+	} );
+
+	// Searcio counts an error by the position in the list it was sent: a blank
+	// row above a target would have put its message under the wrong row.
+	it( 'knows which targets are sent, so an error is shown under its own row', () => {
+		const rules = [
+			{ field: 'categories', value: 'Shoes', target: 20, exclude: false },
+			{ field: '', value: '', target: null, exclude: false },
+			{ field: ' ', value: 'Navy', target: null, exclude: false },
+		];
+
+		expect( profitRulesSent( rules ) ).toEqual( [ 0, 2 ] );
+		expect( profitRulesSent( undefined ) ).toEqual( [] );
+	} );
+
+	// Searcio's messages name a field by its key ("profit_ranking.rules.2.target") and come in its own language.
+	it( 'finds what Searcio would refuse, under the keys it would use', () => {
+		const valid = { ...RANKING, strength: '20', target: '12,5', min_profit: '' };
+
+		expect( profitRankingProblems( valid ) ).toEqual( {} );
+		expect( profitRankingProblems( { ...valid, strength: 60, target: 0, min_profit: -1 } ) ).toEqual( {
+			'profit_ranking.strength': [ 'invalid' ],
+			'profit_ranking.target': [ 'invalid' ],
+			'profit_ranking.min_profit': [ 'invalid' ],
+		} );
+		expect( profitRankingProblems( { ...valid, strength: '', target: 'abc' } ) ).toHaveProperty( [ 'profit_ranking.strength' ] );
+		expect( profitRankingProblems( { ...valid, min_profit: 'abc' } ) ).toHaveProperty( [ 'profit_ranking.min_profit' ] );
+	} );
+
+	it( 'names a target by its position in what is sent, and lets a target that never lifts have none', () => {
+		const rules = [
+			{ field: 'categories', value: 'Shoes', target: 20, exclude: false },
+			{ field: '', value: '', target: null, exclude: false },
+			{ field: 'categories', value: 'Clearance', target: null, exclude: false },
+			{ field: 'brands', value: 'Own', target: null, exclude: true },
+			{ field: '', value: 'Navy', target: 30, exclude: false },
+		];
+
+		expect( profitRankingProblems( { ...RANKING, rules } ) ).toEqual( {
+			// The blank row is not counted: "Clearance" is the second target sent.
+			'profit_ranking.rules.1.target': [ 'invalid' ],
+			'profit_ranking.rules.3.field': [ 'invalid' ],
 		} );
 	} );
 

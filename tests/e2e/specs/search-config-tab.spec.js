@@ -43,6 +43,9 @@ const CONFIG = {
 	},
 };
 
+/** The profit ranking as Searcio reports it, switched on, with nothing of its own set. */
+const PROFIT_RANKING = { enabled: true, strength: 15, target: 25, min_profit: null, rules: [], excluded_terms: [] };
+
 // The tab loads its configuration, the indexing catalogue and a connection test
 // before it renders anything, and the connection test is a real round trip to
 // Searcio - slow to fail against dummy credentials. Give the first
@@ -80,8 +83,9 @@ const INDEXED_FIELDS = [
  * @param {import('@playwright/test').Page} page
  * @param {Array<string>}                   indexedFields The catalogue's `indexed_fields`.
  * @param {Array<Object>}                   languages     The site's languages, `{ code, name }`; none by default.
+ * @param {Object}                          woo           More of the catalogue's `woo` block, such as `prices_with_tax`.
  */
-async function mockCatalog( page, indexedFields = INDEXED_FIELDS, languages = [] ) {
+async function mockCatalog( page, indexedFields = INDEXED_FIELDS, languages = [], woo = {} ) {
 	await page.route(
 		( url ) => decodeURIComponent( url.href ).includes( '/indexing/config' ),
 		( route ) =>
@@ -99,7 +103,7 @@ async function mockCatalog( page, indexedFields = INDEXED_FIELDS, languages = []
 						},
 					],
 					sources: [],
-					woo: { active: true, attributes: [ { slug: 'pa_color', label: 'Color' } ] },
+					woo: { active: true, attributes: [ { slug: 'pa_color', label: 'Color' } ], ...woo },
 					languages: { active: languages.length > 0, available: languages },
 					indexed_fields: indexedFields,
 					config_version: 1,
@@ -491,6 +495,78 @@ test.describe( 'Search Config tab', () => {
 		expect( sent[ sent.length - 1 ].body ).toEqual( {
 			profit_ranking: { ...ranking, target: 30, rules: [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ] },
 		} );
+	} );
+
+	/**
+	 * The profit ranking card's own checks: Searcio's messages name a field by
+	 * its key and come in the service's language, a blank row above a target
+	 * would move its message to another row, and a target for a field no
+	 * product has (`farbe` for `attr_farbe`) would be saved without a word.
+	 */
+	test( 'words what is out of range itself, under the right row, and sends nothing', async ( { page } ) => {
+		const sent = [];
+
+		await mockCatalog( page );
+		await mockSearchConfig( page, sent, { ...CONFIG, profit_ranking: PROFIT_RANKING } );
+		await page.goto( SETTINGS_URL );
+
+		const profit = page.locator( '.whsc-profit-ranking' );
+		const rows = profit.locator( '.whsc-profit-rule' );
+
+		await expect( profit ).toBeVisible( LOADED );
+		await profit.getByRole( 'spinbutton', { name: 'Strength (%)' } ).fill( '60' );
+
+		// An untouched row, then a target with a field and a value and no margin.
+		await profit.getByRole( 'button', { name: 'Add a target' } ).click();
+		await profit.getByRole( 'button', { name: 'Add a target' } ).click();
+		await rows.nth( 1 ).getByRole( 'combobox', { name: 'Field', exact: true } ).fill( 'categories' );
+		await rows.nth( 1 ).getByRole( 'textbox', { name: 'Value', exact: true } ).fill( 'Clearance' );
+
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+
+		await expect( profit.getByText( 'Enter a strength from 1 to 50.' ) ).toBeVisible();
+		await expect( rows.nth( 1 ).getByText( 'Enter a target margin from 0.1 to 100, or tick Never lift.' ) ).toBeVisible();
+		await expect( rows.nth( 0 ).getByText( /Enter a target margin/ ) ).toHaveCount( 0 );
+		expect( sent ).toEqual( [] );
+
+		// Mended, it goes.
+		await profit.getByRole( 'spinbutton', { name: 'Strength (%)' } ).fill( '20' );
+		await rows.nth( 1 ).getByRole( 'checkbox', { name: 'Never lift' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.profit_ranking.rules ).toEqual( [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ] );
+	} );
+
+	test( 'warns about a target for a field no product has, until it is mended', async ( { page } ) => {
+		await mockCatalog( page );
+		await mockSearchConfig( page, [], { ...CONFIG, profit_ranking: PROFIT_RANKING } );
+		await page.goto( SETTINGS_URL );
+
+		const profit = page.locator( '.whsc-profit-ranking' );
+
+		await expect( profit ).toBeVisible( LOADED );
+		await profit.getByRole( 'button', { name: 'Add a target' } ).click();
+
+		const field = profit.getByRole( 'combobox', { name: 'Field', exact: true } );
+
+		await field.fill( 'color' );
+		await expect( profit.getByText( 'No product on this site has this field' ) ).toBeVisible();
+
+		await field.fill( 'attr_color' );
+		await expect( profit.getByText( 'No product on this site has this field' ) ).toHaveCount( 0 );
+	} );
+
+	test( 'sends the shop owner to the Indexing tab, and words the least profit by the shop\'s tax display', async ( { page } ) => {
+		await mockCatalog( page, INDEXED_FIELDS, [], { prices_with_tax: true } );
+		await mockSearchConfig( page, [], { ...CONFIG, profit_ranking: PROFIT_RANKING } );
+		await page.goto( SETTINGS_URL );
+
+		const profit = page.locator( '.whsc-profit-ranking' );
+
+		await expect( profit ).toBeVisible( LOADED );
+		await expect( profit.getByRole( 'link', { name: 'Open the Indexing tab' } ) ).toHaveAttribute( 'href', /tab=indexing/ );
+		await expect( profit.getByText( 'which include tax' ) ).toBeVisible();
 	} );
 
 	test( 'offers no profit ranking to a service that does not report it', async ( { page } ) => {

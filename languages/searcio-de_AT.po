@@ -2444,10 +2444,6 @@ msgstr "Gib die Zugangsdaten von der Seite deiner Website in der Searcio-App ein
 msgid "Search key"
 msgstr "Search Key"
 
-#: src/admin/settings/components/tabs/ManualConnectionEntry.js:107
-msgid "Public key (sk_...) used by the browser, restricted by your domain allowlist."
-msgstr "Öffentlicher Schlüssel (sk_...), den der Browser verwendet, beschränkt durch die Domain-Allowlist."
-
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:114
 msgid "Write key"
 msgstr "Write Key"
@@ -5409,10 +5405,6 @@ msgstr "Einkaufspreis, für das Gewinn-Ranking"
 msgid "Purchase price from field"
 msgstr "Einkaufspreis aus Feld"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:338
-msgid "The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Searcio lifts products with a good margin once profit ranking is on in the Searcio dashboard, and never shows the price or sends it back."
-msgstr "Der Einkaufspreis wird zuerst aus \"Cost of goods\" von WooCommerce gelesen. Hält dein Shop ihn im Feld eines Plugins für Wareneinstandskosten, gib den Meta-Key dieses Feldes ein, etwa _wc_cog_cost. Searcio hebt Produkte mit guter Marge hervor, sobald \"Gewinnstarke Produkte zuerst\" im Searcio-Dashboard aktiviert ist, und zeigt den Preis nie an und gibt ihn nie zurück."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:522
 msgid "Contains the trigger"
 msgstr "Den Trigger enthält"
@@ -5441,17 +5433,9 @@ msgstr "Kuratiere die Ergebnisse ausgewählter Suchen. Jede Regel, die zu einer 
 msgid "Fields that hold numbers"
 msgstr "Felder mit Zahlen"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1174
-msgid "Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background; search keeps working meanwhile."
-msgstr "Deine eigenen Felder, deren Werte Zahlen sind, etwa ein Gewicht oder eine Länge, bis zu 20: Ihr Filter wird zu einem Bereich von und bis, und sie werden als Zahlen verglichen. Ein Wert, der keine Zahl ist, wird weggelassen. Eine Änderung der Liste baut den Suchindex im Hintergrund neu auf; die Suche funktioniert dabei weiter."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1184
 msgid "Attributes one variation must match"
 msgstr "Attribute, die eine Variante erfüllen muss"
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:1191
-msgid "Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background."
-msgstr "Attribute, in denen sich die Varianten eines Produkts unterscheiden, etwa Farbe und Größe. Filter darauf finden ein Produkt nur, wenn eine vorrätige Variante jeden gewählten Wert hat: Rot und XL finden keine Jacke mehr, deren rote XL ausverkauft ist. Das erste Attribut baut den Suchindex im Hintergrund neu auf."
 
 #: src/admin/settings/searchKeyCheck.js:53
 msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. A search key works only on the domain it was connected with and its subdomains: on a copy of the site under another address this is expected; otherwise connect this site again."
@@ -5461,17 +5445,9 @@ msgstr "Searcio lehnt den Search Key von der Adresse dieser Website ab, daher su
 msgid "Profitable products first"
 msgstr "Gewinnstarke Produkte zuerst"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:539
-msgid "Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
-msgstr "Hebt Produkte mit guter Marge unter den Ergebnissen hervor, die etwa gleich gut zu einer Suche passen. Ein deutlich besserer Treffer behält seinen Platz, angeheftete Produkte bleiben oben, und nicht vorrätige Produkte bleiben hinten. Dieselben Einstellungen wie im Searcio-Dashboard."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:544
 msgid "Lift profitable products"
 msgstr "Gewinnstarke Produkte hervorheben"
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:545
-msgid "The margin of each product is worked out from the purchase price it is indexed with, and is never shown."
-msgstr "Die Marge jedes Produkts wird aus dem Einkaufspreis berechnet, mit dem es indexiert ist, und nie angezeigt."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:553
 msgid "Nothing is lifted yet: the products are indexed without a purchase price. Turn on \"Purchase price, for profit ranking\" under Product details on the Indexing tab, save it, and let the sync it starts finish."
@@ -5489,10 +5465,6 @@ msgstr "Wie weit ein Produkt mit guter Marge aufsteigen darf, von 1 bis 50: Bei 
 msgid "Target margin (%)"
 msgstr "Zielmarge (%)"
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:575
-msgid "The margin from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift."
-msgstr "Die Marge, ab der ein Produkt als gewinnstark gilt. Beim Ziel bekommt es die halbe Hervorhebung, beim doppelten Ziel die volle."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:583
 msgid "Least profit per sale"
 msgstr "Mindestgewinn pro Verkauf"
@@ -5504,10 +5476,6 @@ msgstr "Optional, in den Preisen, die der Shop anzeigt. Ein Produkt, das pro Ver
 #: src/admin/settings/components/tabs/SearchConfigTab.js:591
 msgid "Targets of their own"
 msgstr "Eigene Ziele"
-
-#: src/admin/settings/components/tabs/SearchConfigTab.js:594
-msgid "A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies."
-msgstr "Ein Margenziel für die Produkte einer Kategorie, einer Marke oder eines anderen Feldes, oder gar keins für Produkte, die nie hervorgehoben werden, etwa eine Restposten-Kategorie. Passen mehrere zu einem Produkt, gilt das, das weniger Produkte teilen."
 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:616
 msgid "Target (%)"
@@ -5536,3 +5504,79 @@ msgstr "Einer pro Zeile, bis zu 200, als ganzes Wort und unabhängig von Groß- 
 #: src/admin/settings/components/tabs/SearchConfigTab.js:667
 msgid "See what profit ranking changes, and import targets, in the Searcio dashboard"
 msgstr "Sieh im Searcio-Dashboard, was das Gewinn-Ranking verändert, und importiere Ziele"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:338
+msgid "The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Enter purchase prices without tax: where the shop shows prices with tax, Searcio adds it, so the margin comes out the same. A variable product uses the purchase price of its cheapest variation. Searcio lifts products with a good margin once profit ranking is on (Search Config tab), and never shows the price or sends it back."
+msgstr "Der Einkaufspreis wird zuerst aus \"Cost of goods\" von WooCommerce gelesen. Hält dein Shop ihn im Feld eines Plugins für Wareneinstandskosten, gib den Meta-Key dieses Feldes ein, etwa _wc_cog_cost. Gib Einkaufspreise ohne Steuer ein: Zeigt der Shop Preise mit Steuer an, addiert Searcio sie, sodass die Marge gleich ausfällt. Ein variables Produkt nutzt den Einkaufspreis seiner günstigsten Variante. Searcio hebt Produkte mit guter Marge hervor, sobald das Gewinn-Ranking aktiviert ist (Tab Sucheinstellungen), und zeigt den Preis nie an und gibt ihn nie zurück."
+
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:124
+msgid "Public key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains."
+msgstr "Öffentlicher Schlüssel (sk_...), den der Browser verwendet. Er gilt für die Domain, mit der die Website verbunden wurde, und ihre Subdomains."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:162
+msgid "Enter a strength from 1 to 50."
+msgstr "Gib eine Stärke von 1 bis 50 ein."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:163
+msgid "Enter a target margin from 0.1 to 100."
+msgstr "Gib eine Zielmarge von 0,1 bis 100 ein."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:164
+msgid "Enter an amount of 0 or more, or leave it empty."
+msgstr "Gib einen Betrag ab 0 ein oder lass das Feld leer."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:165
+msgid "Enter up to 200 terms, one per line."
+msgstr "Gib bis zu 200 Begriffe ein, einen pro Zeile."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:166
+msgid "Enter the field the products have, such as categories."
+msgstr "Gib das Feld ein, das die Produkte haben, etwa categories."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:167
+msgid "Enter the value the products have in that field."
+msgstr "Gib den Wert ein, den die Produkte in diesem Feld haben."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:168
+msgid "Enter a target margin from 0.1 to 100, or tick Never lift."
+msgstr "Gib eine Zielmarge von 0,1 bis 100 ein oder setze den Haken bei Nie hervorheben."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:563
+msgid "Lifts products with a good margin among the results that match a search about equally well, and orders listings without a search term, such as a category page, the same way. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
+msgstr "Hebt Produkte mit guter Marge unter den Ergebnissen hervor, die etwa gleich gut zu einer Suche passen, und ordnet Listen ohne Suchbegriff, etwa eine Kategorieseite, genauso. Ein deutlich besserer Treffer behält seinen Platz, angeheftete Produkte bleiben oben, und nicht vorrätige Produkte bleiben hinten. Dieselben Einstellungen wie im Searcio-Dashboard."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:569
+msgid "Margins are worked out without tax: enter purchase prices without tax, and where the shop shows prices with tax it is added to them, so the margin comes out the same either way. Purchase prices are never shown."
+msgstr "Margen werden ohne Steuer berechnet: Gib Einkaufspreise ohne Steuer ein, und zeigt der Shop Preise mit Steuer an, wird sie hinzugerechnet, sodass die Marge in beiden Fällen gleich ausfällt. Einkaufspreise werden nie angezeigt."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:581
+msgid "Open the Indexing tab"
+msgstr "Tab Indexierung öffnen"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:604
+msgid "The margin, without tax, from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift: with a target of 25, a margin of 25 gets half of it and 50 or more all of it."
+msgstr "Die Marge ohne Steuer, ab der ein Produkt als gewinnstark gilt. Beim Ziel bekommt es die halbe Hervorhebung, beim doppelten Ziel die volle: Bei einem Ziel von 25 bekommt eine Marge von 25 die Hälfte und eine Marge von 50 oder mehr alles."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:614
+msgid "Optional. A product that earns less per sale is not lifted, however high its margin. Counted in the prices the shop displays, which include tax, so the tax on the profit counts too."
+msgstr "Optional. Ein Produkt, das pro Verkauf weniger verdient, wird nicht hervorgehoben, wie hoch seine Marge auch ist. Gerechnet wird in den Preisen, die der Shop anzeigt und die Steuer enthalten, die Steuer auf den Gewinn zählt also mit."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:625
+msgid "A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies, and saved targets are listed in that order."
+msgstr "Ein Margenziel für die Produkte einer Kategorie, einer Marke oder eines anderen Feldes, oder gar keins für Produkte, die nie hervorgehoben werden, etwa eine Restposten-Kategorie. Passen mehrere zu einem Produkt, gilt das, das weniger Produkte teilen, und gespeicherte Ziele werden in dieser Reihenfolge aufgelistet."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:633
+msgid "No product on this site has this field, so the target never applies. Choose a field from the list, or start indexing it in the Indexing tab."
+msgstr "Kein Produkt dieser Website hat dieses Feld, also greift das Ziel nie. Wähle ein Feld aus der Liste oder indexiere es im Tab Indexierung."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:640
+msgid "Write it as it is in your products, for example Navy."
+msgstr "Schreib es so, wie es in deinen Produkten steht, zum Beispiel Navy."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1413
+msgid "Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background: give it a few minutes before changing it again."
+msgstr "Deine eigenen Felder, deren Werte Zahlen sind, etwa ein Gewicht oder eine Länge, bis zu 20: ihr Filter wird zu einem Bereich von und bis, und sie werden als Zahlen verglichen. Ein Wert, der keine Zahl ist, wird weggelassen. Eine Änderung der Liste baut den Suchindex im Hintergrund neu auf: Gib ihm ein paar Minuten, bevor du sie erneut änderst."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1430
+msgid "Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background: give it a few minutes before changing it again."
+msgstr "Attribute, in denen sich die Varianten eines Produkts unterscheiden, etwa Farbe und Größe. Filter darauf finden ein Produkt nur, wenn eine vorrätige Variante jeden gewählten Wert hat: Rot und XL finden keine Jacke mehr, deren rote XL ausverkauft ist. Das erste Attribut baut den Suchindex im Hintergrund neu auf: Gib ihm ein paar Minuten, bevor du es erneut änderst."

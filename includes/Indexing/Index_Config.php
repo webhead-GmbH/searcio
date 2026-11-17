@@ -57,6 +57,23 @@ final class Index_Config {
 	}
 
 	/**
+	 * The meta key the product mapping reads the purchase price from, or ''
+	 * when no purchase price is sent from a field. Read from what is stored,
+	 * without normalizing every block as {@see self::all()} does: the change
+	 * listener asks it on every meta write of the site.
+	 */
+	public function cost_meta_key(): string {
+		$stored = $this->settings->get( Plugin_Settings::INDEX_CONFIG );
+		$block  = is_array( $stored ) ? ( $stored[ Woo::POST_TYPE ] ?? null ) : null;
+
+		if ( ! is_array( $block ) || empty( $block['enabled'] ) || ! is_array( $block['woo'] ?? null ) || empty( $block['woo']['cost_price'] ) ) {
+			return '';
+		}
+
+		return is_string( $block['woo']['cost_meta'] ?? null ) ? $block['woo']['cost_meta'] : '';
+	}
+
+	/**
 	 * @return array<string,mixed>|null
 	 */
 	public function block_for( string $post_type ): ?array {
@@ -389,6 +406,7 @@ final class Index_Config {
 				'minimum'        => Woo::MIN_VERSION,
 				'attributes'     => $this->woo->attributes(),
 				'toggles'        => $this->woo->toggles(),
+				'prices_with_tax' => $this->woo->shows_prices_with_tax(),
 			],
 			// Which languages WPML/Polylang has configured locally, not the plan
 			// entitlement (that comes from `/health` via Connection_Endpoint).

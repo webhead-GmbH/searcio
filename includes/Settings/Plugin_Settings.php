@@ -40,7 +40,7 @@ final class Plugin_Settings {
 		option_key: 'searcio_search_key',
 		show_in_rest: true,
 		label: 'Search key',
-		description: 'Public search key (sk_...) used by the browser. Restricted by your domain allowlist.',
+		description: 'Public search key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains.',
 		schema: [ 'format' => 'text-field' ]
 	)]
 	public const SEARCH_KEY = 'search_key';

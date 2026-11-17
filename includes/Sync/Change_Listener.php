@@ -70,6 +70,13 @@ final class Change_Listener implements Actions {
 			'wp_trash_post'           => [ 'on_trash', 20, 1 ],
 			'before_delete_post'      => [ 'on_delete', 20, 1 ],
 			'woocommerce_update_product' => [ 'on_product', 20, 1 ],
+			// A variation whose price, stock or custom field changed is written
+			// without its post row, so `save_post` does not fire for it.
+			'woocommerce_update_product_variation' => [ 'on_product', 20, 1 ],
+			'woocommerce_new_product_variation'    => [ 'on_product', 20, 1 ],
+			'added_post_meta'         => [ 'on_meta', 20, 3 ],
+			'updated_post_meta'       => [ 'on_meta', 20, 3 ],
+			'deleted_post_meta'       => [ 'on_meta', 20, 3 ],
 			'edit_terms'              => [ 'before_term_edit', 20, 2 ],
 			'edited_term'             => [ 'on_term_edited', 20, 3 ],
 			'pre_delete_term'         => [ 'on_term_delete', 20, 2 ],
@@ -98,6 +105,31 @@ final class Change_Listener implements Actions {
 
 	public function on_product( int $product_id ): void {
 		$this->sync_post( get_post( $product_id ) );
+	}
+
+	/**
+	 * The purchase price kept in a field of its own (`_wc_cog_cost` of a cost of
+	 * goods plugin, or the key the mapping names) can be written by an import
+	 * or a script without a save of the product, and a document carries it.
+	 * Only that key of a product or a variation counts; a product's own
+	 * save, which writes every other field, is heard through its hooks.
+	 *
+	 * @param  mixed  $meta_id    The meta row, or the rows of a deletion.
+	 * @param  int    $object_id  The post.
+	 * @param  mixed  $meta_key   The key written.
+	 */
+	public function on_meta( mixed $meta_id, int $object_id, mixed $meta_key ): void {
+		$key = $this->config->cost_meta_key();
+
+		if ( '' === $key || $meta_key !== $key ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( $post instanceof WP_Post && in_array( $post->post_type, [ 'product', 'product_variation' ], true ) && ! wp_is_post_revision( $post ) ) {
+			$this->sync_post( $post );
+		}
 	}
 
 	/**

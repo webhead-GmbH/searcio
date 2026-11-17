@@ -140,6 +140,17 @@ final class Woo {
 		return 1 === preg_match( '/^[A-Z]{3}$/', $code ) ? $code : null;
 	}
 
+	/**
+	 * Whether the shop shows its prices with tax, which is the price Searcio is
+	 * sent: with tax when WooCommerce says so under Tax > Display prices in the
+	 * shop, whichever way they were entered. A purchase price is entered
+	 * without tax and is taxed to match, so a margin is the same on either
+	 * basis, and a profit in the shop's prices counts the tax on it.
+	 */
+	public function shows_prices_with_tax(): bool {
+		return $this->is_active() && wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' );
+	}
+
 	public function version(): string {
 		if ( defined( 'WC_VERSION' ) ) {
 			return (string) WC_VERSION;
@@ -623,7 +634,7 @@ final class Woo {
 			return null;
 		}
 
-		if ( wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' ) && $source->is_taxable() ) {
+		if ( $this->shows_prices_with_tax() && $source->is_taxable() ) {
 			$cost += array_sum( \WC_Tax::calc_tax( $cost, \WC_Tax::get_rates( $source->get_tax_class() ), false ) );
 		}
 

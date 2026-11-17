@@ -10,6 +10,7 @@ import { Card, CheckboxControl, Fieldset, InputControl, Link, Notice, SelectCont
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 import SettingsContext from '../../../../settings/store/context';
 import {
@@ -25,6 +26,8 @@ import {
 	PROFIT_RULES_MAX,
 	PROFIT_STRENGTH_MAX,
 	PROFIT_TERMS_MAX,
+	profitRankingProblems,
+	profitRulesSent,
 	sendsPurchasePrice,
 	termsToText,
 	textToIds,
@@ -156,6 +159,13 @@ const OWN_ERRORS = () => ( {
 	'redirects.url': __( 'Enter a full address that starts with https://, or a path on this site that starts with /.', 'searcio' ),
 	'searchable_fields.weight': __( 'Enter a weight from 1 to 100.', 'searcio' ),
 	'type_boosts.boost': __( 'Enter a boost from 0.1 to 100.', 'searcio' ),
+	'profit_ranking.strength': __( 'Enter a strength from 1 to 50.', 'searcio' ),
+	'profit_ranking.target': __( 'Enter a target margin from 0.1 to 100.', 'searcio' ),
+	'profit_ranking.min_profit': __( 'Enter an amount of 0 or more, or leave it empty.', 'searcio' ),
+	'profit_ranking.excluded_terms': __( 'Enter up to 200 terms, one per line.', 'searcio' ),
+	'profit_ranking.rules.field': __( 'Enter the field the products have, such as categories.', 'searcio' ),
+	'profit_ranking.rules.value': __( 'Enter the value the products have in that field.', 'searcio' ),
+	'profit_ranking.rules.target': __( 'Enter a target margin from 0.1 to 100, or tick Never lift.', 'searcio' ),
 } );
 
 /** Errors use `searchable_fields.0.field` style keys; map back to a row + column. */
@@ -168,6 +178,13 @@ const rowError = ( errors, section, index, column ) => {
 	}
 
 	return OWN_ERRORS()[ `${ section }.${ column }` ] || messages.join( ' ' );
+};
+
+/** The plugin's words for what Searcio reported under one key, or Searcio's own where it has none. */
+const fieldError = ( errors, key ) => {
+	const messages = errors?.[ key ];
+
+	return Array.isArray( messages ) ? OWN_ERRORS()[ key ] || messages.join( ' ' ) : undefined;
 };
 
 /**
@@ -511,9 +528,11 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
  * @param {Object}   props.ranking            `profit_ranking`, normalized.
  * @param {Object}   props.errors
  * @param {boolean}  props.sendsPurchasePrice Whether the products are indexed with a purchase price.
+ * @param {?Array}   props.indexed            The fields the documents carry, or null when unknown.
+ * @param {boolean}  props.pricesWithTax      Whether the shop shows its prices with tax.
  * @param {Function} props.onChange           Called with the whole replacement.
  */
-const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) => {
+const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pricesWithTax, onChange } ) => {
 	const statisticsUrl = useStatisticsUrl();
 	const [ termsText, setTermsText ] = useState( () => termsToText( ranking.excluded_terms ) );
 	const set = ( key, value ) => onChange( { ...ranking, [ key ]: value } );
@@ -522,7 +541,12 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 	const typed = ( value ) => typedNumber( value ) ?? value;
 	const rules = ranking.rules || [];
 	const update = ( index, next ) => set( 'rules', rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
-	const error = ( key ) => errorsUnder( errors, `profit_ranking.${ key }` );
+	const error = ( key ) => fieldError( errors, `profit_ranking.${ key }` );
+	// Searcio counts a target's errors in the list it was sent, which has no
+	// untouched row in it.
+	const sent = profitRulesSent( rules );
+	const rowMessage = ( index, column ) => ( -1 === sent.indexOf( index ) ? undefined : rowError( errors, 'profit_ranking.rules', sent.indexOf( index ), column ) );
+	const unindexed = unindexedFields( rules.map( ( rule ) => rule.field ), indexed );
 
 	// The terms as Searcio stored them, once a save has trimmed them; what is
 	// being typed is left alone.
@@ -536,13 +560,13 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide whsc-profit-ranking">
 			<CardHeading
 				title={ __( 'Profitable products first', 'searcio' ) }
-				description={ __( 'Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
+				description={ __( 'Lifts products with a good margin among the results that match a search about equally well, and orders listings without a search term, such as a category page, the same way. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
 				<Stack direction="column" gap="lg">
 					<CheckboxControl
 						label={ __( 'Lift profitable products', 'searcio' ) }
-						description={ error( 'enabled' ) || __( 'The margin of each product is worked out from the purchase price it is indexed with, and is never shown.', 'searcio' ) }
+						description={ error( 'enabled' ) || __( 'Margins are worked out without tax: enter purchase prices without tax, and where the shop shows prices with tax it is added to them, so the margin comes out the same either way. Purchase prices are never shown.', 'searcio' ) }
 						checked={ Boolean( ranking.enabled ) }
 						onCheckedChange={ ( enabled ) => set( 'enabled', Boolean( enabled ) ) }
 					/>
@@ -552,6 +576,11 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 							<Notice.Description>
 								{ __( 'Nothing is lifted yet: the products are indexed without a purchase price. Turn on "Purchase price, for profit ranking" under Product details on the Indexing tab, save it, and let the sync it starts finish.', 'searcio' ) }
 							</Notice.Description>
+							<Notice.Actions>
+								<Notice.ActionLink href={ addQueryArgs( window.location.href, { tab: 'indexing' } ) } openInNewTab>
+									{ __( 'Open the Indexing tab', 'searcio' ) }
+								</Notice.ActionLink>
+							</Notice.Actions>
 						</Notice.Root>
 					) }
 
@@ -572,7 +601,7 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 							max={ 100 }
 							step={ 0.1 }
 							label={ __( 'Target margin (%)', 'searcio' ) }
-							description={ error( 'target' ) || __( 'The margin from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift.', 'searcio' ) }
+							description={ error( 'target' ) || __( 'The margin, without tax, from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift: with a target of 25, a margin of 25 gets half of it and 50 or more all of it.', 'searcio' ) }
 							value={ String( ranking.target ?? '' ) }
 							onValueChange={ ( value ) => set( 'target', typed( value ) ) }
 						/>
@@ -581,7 +610,9 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 							min={ 0 }
 							step={ 0.01 }
 							label={ __( 'Least profit per sale', 'searcio' ) }
-							description={ error( 'min_profit' ) || __( 'Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin.', 'searcio' ) }
+							description={ error( 'min_profit' ) || ( pricesWithTax
+								? __( 'Optional. A product that earns less per sale is not lifted, however high its margin. Counted in the prices the shop displays, which include tax, so the tax on the profit counts too.', 'searcio' )
+								: __( 'Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin.', 'searcio' ) ) }
 							value={ String( ranking.min_profit ?? '' ) }
 							onValueChange={ ( value ) => set( 'min_profit', typed( value ) ) }
 						/>
@@ -591,20 +622,22 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 						<Fieldset.Legend>{ __( 'Targets of their own', 'searcio' ) }</Fieldset.Legend>
 						<Stack direction="column" gap="md">
 							<Text render={ <p /> } variant="body-sm">
-								{ __( 'A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies.', 'searcio' ) }
+								{ __( 'A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies, and saved targets are listed in that order.', 'searcio' ) }
 							</Text>
 							{ rules.map( ( rule, index ) => (
 								<div className="whsc-profit-rule" key={ index }>
 									<InputControl
 										label={ __( 'Field', 'searcio' ) }
 										list="whsc-field-suggestions"
-										description={ rowError( errors, 'profit_ranking.rules', index, 'field' ) }
+										description={ rowMessage( index, 'field' ) || ( unindexed.includes( String( rule.field ).trim() )
+											? __( 'No product on this site has this field, so the target never applies. Choose a field from the list, or start indexing it in the Indexing tab.', 'searcio' )
+											: undefined ) }
 										value={ rule.field }
 										onValueChange={ ( field ) => update( index, { ...rule, field } ) }
 									/>
 									<InputControl
 										label={ __( 'Value', 'searcio' ) }
-										description={ rowError( errors, 'profit_ranking.rules', index, 'value' ) }
+										description={ rowMessage( index, 'value' ) || __( 'Write it as it is in your products, for example Navy.', 'searcio' ) }
 										value={ rule.value }
 										onValueChange={ ( value ) => update( index, { ...rule, value } ) }
 									/>
@@ -614,7 +647,7 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, onChange } ) 
 										max={ 100 }
 										step={ 0.1 }
 										label={ __( 'Target (%)', 'searcio' ) }
-										description={ rowError( errors, 'profit_ranking.rules', index, 'target' ) }
+										description={ rowMessage( index, 'target' ) }
 										value={ rule.exclude ? '' : String( rule.target ?? '' ) }
 										disabled={ rule.exclude }
 										onValueChange={ ( target ) => update( index, { ...rule, target: typed( target ) } ) }
@@ -1058,6 +1091,18 @@ const SearchConfigTab = () => {
 		if ( hasSearchConfigChanges ) {
 			const payload = toPayload( config, persistedConfig );
 
+			// Searcio names a field by its key and answers in its own language,
+			// so what is plainly out of range is said here, under the field.
+			const problems = payload.profit_ranking ? profitRankingProblems( config.profit_ranking ) : {};
+
+			if ( Object.keys( problems ).length > 0 ) {
+				setIsSaving( false );
+				setFieldErrors( problems );
+				setSaveError( __( 'Some fields need a change: see the messages under them.', 'searcio' ) );
+
+				return;
+			}
+
 			// What Searcio has now, against what the tab read: a section changed
 			// in the Searcio dashboard meanwhile would be written back as it was.
 			try {
@@ -1200,6 +1245,8 @@ const SearchConfigTab = () => {
 						ranking={ config.profit_ranking }
 						errors={ fieldErrors }
 						sendsPurchasePrice={ sendsPurchasePrice( catalog ) }
+						indexed={ indexed }
+						pricesWithTax={ Boolean( catalog?.woo?.prices_with_tax ) }
 						onChange={ ( ranking ) => set( 'profit_ranking', ranking ) }
 					/>
 				) }
@@ -1363,7 +1410,7 @@ const SearchConfigTab = () => {
 										onChange={ ( value ) => set( 'numeric_fields', value ) }
 									/>
 									<Text render={ <p /> } variant="body-sm" className="whsc-field-list__description">
-										{ errorsUnder( fieldErrors, 'numeric_fields' ) || __( 'Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background; search keeps working meanwhile.', 'searcio' ) }
+										{ errorsUnder( fieldErrors, 'numeric_fields' ) || __( 'Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background: give it a few minutes before changing it again.', 'searcio' ) }
 									</Text>
 								</Stack>
 							) }
@@ -1380,7 +1427,7 @@ const SearchConfigTab = () => {
 										onChange={ ( value ) => set( 'variant_fields', value ) }
 									/>
 									<Text render={ <p /> } variant="body-sm" className="whsc-field-list__description">
-										{ errorsUnder( fieldErrors, 'variant_fields' ) || __( 'Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background.', 'searcio' ) }
+										{ errorsUnder( fieldErrors, 'variant_fields' ) || __( 'Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background: give it a few minutes before changing it again.', 'searcio' ) }
 									</Text>
 								</Stack>
 							) }

@@ -45,7 +45,7 @@ Sending a field here makes its data available to Searcio. To let visitors actual
 
 Go to **Searcio → Sync** and click **Start sync**. This sends your currently-enabled content to Searcio. The sync runs in the background in resumable batches; you can pause, resume, or cancel it, and watch live progress on the same screen.
 
-After the first sync, a scheduled sync runs daily and an incremental sync pushes edits shortly after you save, trash, or delete content - you don't need to manually re-sync for day-to-day edits. See [`developers.md`](developers.md#wp-cli) if you're running WordPress on a real system cron and want to trigger syncs directly.
+After the first sync, a scheduled sync runs daily and an incremental sync pushes edits shortly after you save, trash, or delete content - you don't need to manually re-sync for day-to-day edits. "Shortly" is the next run of WordPress's own scheduler (WP-Cron), which a visit to the site starts: on a quiet site, or one that has WP-Cron turned off, run a real system cron every minute (`wp cron event run --due-now`) and the edit is sent within moments. See [`developers.md`](developers.md#wp-cli) if you're running WordPress on a real system cron and want to trigger syncs directly.
 
 ## 5. Add the search experience to your site
 

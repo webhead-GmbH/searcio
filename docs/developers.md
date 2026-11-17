@@ -81,7 +81,7 @@ Framework-managed runtime commands are also exposed under the plugin slug (`wp s
 Both tables are managed through `Database_Manager` and registered `Table` classes (`includes/Database/Tables/`) - never query them with raw `$wpdb` SQL.
 
 - **`sync_runs`** - one row per sync run (the single active row is live state; finished rows are history). Tracks status, trigger, progress counters, a resumable cursor, and between-batch pause/cancel signals.
-- **`change_queue`** - incremental-sync queue. Editorial hooks (save/trash/delete/status-transition, a WooCommerce product update, and a term renamed, moved or deleted, which queues the posts filed under it and under its descendants) enqueue a coalesced row per post (edit-then-delete collapses to a single delete); the drain job processes and clears them in batches.
+- **`change_queue`** - incremental-sync queue. Editorial hooks (save/trash/delete/status-transition, a WooCommerce product update, a variation's own update or creation, which queue its product because a variation's price, stock and purchase price are saved without saving the post, a write to the purchase price meta key chosen on the Indexing tab, and a term renamed, moved or deleted, which queues the posts filed under it and under its descendants) enqueue a coalesced row per post (edit-then-delete collapses to a single delete); the drain job processes and clears them in batches.
 
 ### Jobs
 

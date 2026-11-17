@@ -121,7 +121,7 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 			</Text>
 			<InputControl
 				label={__('Search key', 'searcio')}
-				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'searcio')}
+				description={__('Public key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains.', 'searcio')}
 				value={settings.search_key ?? ''}
 				onValueChange={(value) => changeKey('search_key', value)}
 			/>

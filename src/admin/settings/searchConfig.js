@@ -269,16 +269,80 @@ export const profitRankingPayload = ( ranking ) => ( {
 	strength: typedNumber( ranking.strength ),
 	target: typedNumber( ranking.target ),
 	min_profit: typedNumber( ranking.min_profit ),
-	rules: ( ranking.rules || [] )
-		.filter( ( rule ) => '' !== String( rule?.field ?? '' ).trim() || '' !== String( rule?.value ?? '' ).trim() )
-		.map( ( rule ) => ( {
+	rules: profitRulesSent( ranking.rules ).map( ( index ) => {
+		const rule = ranking.rules[ index ];
+
+		return {
 			field: String( rule.field ?? '' ).trim(),
 			value: String( rule.value ?? '' ).trim(),
 			target: rule.exclude ? null : typedNumber( rule.target ),
 			exclude: Boolean( rule.exclude ),
-		} ) ),
+		};
+	} ),
 	excluded_terms: cleanTerms( ranking.excluded_terms || [] ),
 } );
+
+/**
+ * Where, in the list of targets the tab shows, each one that is sent stands:
+ * an untouched row (neither a field nor a value) is not sent. Searcio names
+ * an error by the position in the list it was sent (`rules.2.target`), so a
+ * blank row above would put its message under the wrong row.
+ *
+ * @param {Array} rules The tab's targets.
+ * @return {number[]} The index in `rules` of each target that is sent, in order.
+ */
+export const profitRulesSent = ( rules ) => ( Array.isArray( rules ) ? rules : [] ).flatMap( ( rule, index ) => (
+	'' === String( rule?.field ?? '' ).trim() && '' === String( rule?.value ?? '' ).trim() ? [] : [ index ]
+) );
+
+/**
+ * What Searcio would refuse in the profit ranking, found before it is asked:
+ * the same keys as its `errors` (`profit_ranking.strength`,
+ * `profit_ranking.rules.0.target`, counted in the list that is sent), so the
+ * card words them the same way. Searcio's own messages name fields by their
+ * keys and come in its language.
+ *
+ * @param {Object} ranking The tab's working copy.
+ * @return {Object<string,string[]>} Empty when nothing is wrong.
+ */
+export const profitRankingProblems = ( ranking ) => {
+	const problems = {};
+	const flag = ( key ) => {
+		problems[ `profit_ranking.${ key }` ] = [ 'invalid' ];
+	};
+	const inRange = ( value, min, max ) => 'number' === typeof value && value >= min && value <= max;
+	const filled = ( value ) => '' !== String( value ?? '' ).trim();
+
+	if ( ! inRange( typedNumber( ranking.strength ), 1, PROFIT_STRENGTH_MAX ) ) {
+		flag( 'strength' );
+	}
+
+	if ( ! inRange( typedNumber( ranking.target ), 0.1, 100 ) ) {
+		flag( 'target' );
+	}
+
+	if ( filled( ranking.min_profit ) && ! inRange( typedNumber( ranking.min_profit ), 0, 1000000 ) ) {
+		flag( 'min_profit' );
+	}
+
+	profitRulesSent( ranking.rules ).forEach( ( index, position ) => {
+		const rule = ranking.rules[ index ];
+
+		if ( ! filled( rule.field ) ) {
+			flag( `rules.${ position }.field` );
+		}
+
+		if ( ! filled( rule.value ) ) {
+			flag( `rules.${ position }.value` );
+		}
+
+		if ( ! rule.exclude && ! inRange( typedNumber( rule.target ), 0.1, 100 ) ) {
+			flag( `rules.${ position }.target` );
+		}
+	} );
+
+	return problems;
+};
 
 /**
  * Whether the site sends its products' purchase prices, which profit ranking

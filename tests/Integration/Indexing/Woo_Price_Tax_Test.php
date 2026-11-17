@@ -314,6 +314,25 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * The settings screen words the profit ranking's "least profit per sale"
+	 * by it: a profit in the shop's own prices includes the tax on it where
+	 * they include tax.
+	 */
+	public function test_the_catalog_says_whether_the_shop_shows_prices_with_tax(): void {
+		$catalog = fn (): bool => $this->service( 'index_config' )->catalog()['woo']['prices_with_tax'];
+
+		$this->tax_shop( false, 'incl' );
+		$this->assertTrue( $catalog() );
+
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+		$this->assertFalse( $catalog() );
+
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		update_option( 'woocommerce_calc_taxes', 'no' );
+		$this->assertFalse( $catalog(), 'Taxes switched off: no price carries tax.' );
+	}
+
+	/**
 	 * A purchase price is entered without tax. Profit ranking works the
 	 * margin out between it and the price sent, so where that price carries
 	 * tax the purchase price is taxed as it is: 50 net beside 119 gross read

@@ -13,7 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- **Profitable products first.** The purchase price of each product can be sent for Searcio's profit ranking (Indexing tab, Product details, "Purchase price, for profit ranking"). It is read from WooCommerce's Cost of goods, or from the meta field of a cost of goods plugin, is taxed like the displayed price, and is never shown to shoppers. The ranking itself (strength, target margin, minimum profit per sale, per-category or per-brand targets, excluded search terms) can be set on the Search Config tab, which warns when the ranking is on while products are indexed without a purchase price.
+- **Profitable products first.** The purchase price of each product can be sent for Searcio's profit ranking (Indexing tab, Product details, "Purchase price, for profit ranking"). It is read from WooCommerce's Cost of goods, or from the meta field of a cost of goods plugin, is entered without tax (where the shop shows prices with tax, Searcio adds it, so the margin comes out the same), is the cheapest variation's for a variable product, and is never shown to shoppers. The ranking itself (strength, target margin, minimum profit per sale, per-category or per-brand targets, excluded search terms) can be set on the Search Config tab. It warns when the ranking is on while products are indexed without a purchase price, and when a target names a field that no product has.
 - Filters on product attributes can match a single variation that is in stock, so "red" and "XL" no longer find a jacket whose red XL is sold out (Search Config, "Attributes one variation must match"). Variable products now send their variations with their attributes and stock status.
 - Custom fields that hold numbers can be filtered as a range from and to (Search Config, "Fields that hold numbers").
 - The category filter tells apart categories that share a name under different parents, and lists categories in the order set in WooCommerce, by name, or by number of products.
@@ -39,10 +39,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Products are sent with WooCommerce's own product type, so grouped and external products are no longer reported as simple products.
 - Searcio's sync history now tells incremental updates apart from full syncs.
 - The "Only index published, visible products" setting is now called "Respect catalog visibility", which describes what it does.
+- The Search Config tab asks to wait a few minutes before changing the fields that hold numbers, or the attributes one variation must match, again, because each change rebuilds the search index.
 - On tablets in portrait orientation, results are shown as a grid. The floating search button stays clear of bars fixed to the bottom of the screen, and the "All" filter is available on phones again.
 
 ### Fixed
 
+- A change to a variation's price, stock or purchase price, to the purchase price field of a cost of goods plugin, or a variation that is added or removed, reaches the search index with the next incremental sync. Before, only a change to the product itself did, so a variable product kept its old purchase price and price.
+- The profit ranking card words its own errors, in the language of the screen, instead of repeating the key names and messages Searcio returns. A message appears under the target it belongs to even when an empty row sits above it, and values outside their range are caught before the card is saved.
 - A content type renamed on the Indexing tab works in blocks, shortcodes, widgets, placements and type boosts, and its result cards show their text.
 - The category filter modes work for post categories, and a post filed under a subcategory is found when filtering by its parent category.
 - Filters set to "All (AND)" update their counts after every selection.
