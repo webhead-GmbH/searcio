@@ -538,8 +538,9 @@ final class Sync_Service {
 
 	/**
 	 * Runs the next step of the running sync now, in the request of the person
-	 * who asked, where WP-Cron does not fire it. Through the job's own hook, so
-	 * the lock a worker holds is still honoured.
+	 * who asked, where WP-Cron does not fire it. Through the job manager, so
+	 * the lock a worker holds is still honoured: a step another worker is on is
+	 * not run twice, and the run is moving then all the same.
 	 */
 	public function nudge(): bool {
 		$run = $this->state->active();
@@ -548,7 +549,7 @@ final class Sync_Service {
 			return false;
 		}
 
-		do_action( Sync_Keys::HOOK_TICK ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- The plugin's own hook, in its own prefix.
+		$this->jobs->run_now( Sync_Keys::HOOK_TICK );
 
 		return true;
 	}
