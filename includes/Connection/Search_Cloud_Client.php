@@ -162,18 +162,26 @@ final class Search_Cloud_Client {
 	 * `sync_type` names the run in Searcio's sync history: `incremental` for
 	 * the drain's few changed documents, which it called a "Full sync".
 	 *
-	 * @param  array<int,array<string,mixed>>  $documents    1-1000 documents.
-	 * @param  bool                            $incremental  Sent by the incremental drain.
+	 * `run_reference` joins the requests of one run into one row of that
+	 * history, instead of a row for each batch (a post type at a time, 200 at
+	 * most): the same reference, within a day, is the same run. Without one the
+	 * request is a run of its own.
+	 *
+	 * @param  array<int,array<string,mixed>>  $documents      1-1000 documents.
+	 * @param  bool                            $incremental    Sent by the incremental drain.
+	 * @param  string                          $run_reference  Up to 64 letters, digits and `.`, `_`, `:`, `-`; none for a request that is a run of its own.
 	 */
-	public function bulk_upsert( array $documents, bool $incremental = false ): Api_Response {
-		return $this->request(
-			'POST',
-			'/documents',
-			[
-				'documents' => array_values( $documents ),
-				'sync_type' => $incremental ? 'incremental' : 'full',
-			]
-		);
+	public function bulk_upsert( array $documents, bool $incremental = false, string $run_reference = '' ): Api_Response {
+		$body = [
+			'documents' => array_values( $documents ),
+			'sync_type' => $incremental ? 'incremental' : 'full',
+		];
+
+		if ( 1 === preg_match( '/^[A-Za-z0-9._:-]{1,64}$/', $run_reference ) ) {
+			$body['run_reference'] = $run_reference;
+		}
+
+		return $this->request( 'POST', '/documents', $body );
 	}
 
 	/**

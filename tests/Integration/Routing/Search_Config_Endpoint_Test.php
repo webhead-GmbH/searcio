@@ -118,7 +118,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -155,7 +156,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$sent = null;
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -178,7 +180,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$sent = null;
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}

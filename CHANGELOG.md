@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Card templates designed in Searcio are requested in the language of the page.
 - The Search Config tab offers the profit ranking's switch for listings without a search term (a category page, the highlights) once Searcio reports it, and Searcio then counts the least profit per sale without tax: where the shop shows prices with tax, the price without tax is sent beside the purchase price.
 - The Connection tab warns when Searcio says the search index of the site is empty although documents were sent.
+- The names the shop gives its fields (an attribute's, a taxonomy's) are sent to Searcio, so that its dashboard lists the fields as the shop does. They go beside the settings, when they differ, and on the daily sync.
 - The Sync tab says when a running sync has not moved for ten minutes because WP-Cron does not run it, and runs its next step on a click. Site Health lists a task of the plugin that is overdue.
 - A new quiz starts in the language the admin works in, where it started in "Every language".
 - Developers: the `searcio_is_indexable` filter keeps individual posts out of the index.
@@ -48,6 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The placeholder image of a card made from a Searcio template is smaller and lighter, like the plugin's own.
 - The German word for a product on backorder is WooCommerce's own, "Lieferrückstand".
 - A setting of the Placement tab that takes one of a few values, such as the animation, refuses another with a message instead of saving the value it already had.
+- The batches of a full sync name their run, so that Searcio's sync history shows one row for the run, not one for each post type and batch.
 - The Sync history's search also finds a run by its status or by what started it, and a run started by a settings change is named so.
 - The Search Config tab asks to wait a few minutes before changing the fields that hold numbers, or the attributes one variation must match, again, because each change rebuilds the search index.
 - On tablets in portrait orientation, results are shown as a grid. The floating search button stays clear of bars fixed to the bottom of the screen, and the "All" filter is available on phones again.

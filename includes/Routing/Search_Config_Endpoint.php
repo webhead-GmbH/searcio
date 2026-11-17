@@ -31,6 +31,7 @@ use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Indexing\Woo;
+use Webhead\WP\SearchCloud\Sync\Field_Label_Sync;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -46,7 +47,8 @@ final class Search_Config_Endpoint extends Rest_API {
 		private Language_Config $language_config,
 		private Facet_Config $facet_config,
 		private Woo $woo,
-		private Sync_Service $sync
+		private Sync_Service $sync,
+		private Field_Label_Sync $field_labels
 	) {}
 
 	protected function get_rest_namespace(): string {
@@ -84,6 +86,12 @@ final class Search_Config_Endpoint extends Rest_API {
 		$before   = $this->language_config->enabled_languages();
 		$response = $this->client->update_search_config( $payload );
 		$answer   = $this->respond( $response );
+
+		// Beside the save, not in it: a label Searcio refuses is no reason to
+		// refuse the settings the person changed.
+		if ( $response->ok() ) {
+			$this->field_labels->push();
+		}
 
 		if ( $response->ok() && ! $this->same_languages( $before, $this->language_config->enabled_languages() ) ) {
 			$user_id = get_current_user_id();

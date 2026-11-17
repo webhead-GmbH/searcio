@@ -108,6 +108,53 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'full' ], array_values( array_unique( $types ) ) );
 	}
 
+	/**
+	 * A full run sends a batch for each post type, and Searcio's sync history
+	 * showed each as a run. They name the run: one reference, made as it
+	 * starts and kept in its cursor, on every batch, and a new one for the
+	 * next run.
+	 */
+	public function test_every_batch_of_a_run_names_the_run(): void {
+		$this->connect_client();
+		$config = $this->service( 'index_config' );
+
+		$config->save(
+			[
+				'post' => array_merge( $config->defaults_for( 'post' ), [ 'enabled' => true ] ),
+				'page' => array_merge( $config->defaults_for( 'page' ), [ 'enabled' => true ] ),
+			]
+		);
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish' ] );
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish', 'post_type' => 'page' ] );
+
+		$references = [];
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$references ): array {
+				if ( str_contains( $url, '/documents' ) ) {
+					$body         = json_decode( (string) ( $args['body'] ?? '{}' ), true );
+					$references[] = $body['run_reference'] ?? null;
+				}
+
+				return $this->http_ok( [ 'ok' => true ] );
+			}
+		);
+
+		$first = (int) $this->sync_service()->start( Sync_Trigger::Manual, 1, true )['run']['id'];
+		$this->drain_ticks();
+		$of_first = $references;
+
+		$this->assertGreaterThanOrEqual( 2, count( $of_first ), 'A batch for each post type.' );
+		$this->assertCount( 1, array_unique( $of_first ), 'One reference for the run.' );
+		$this->assertMatchesRegularExpression( '/^[A-Za-z0-9._:-]{1,64}$/', (string) $of_first[0] );
+		$this->assertSame( $of_first[0], $this->sync_state()->present( $this->sync_state()->find( $first ) )['cursor']['reference'] );
+
+		$references = [];
+		$this->sync_service()->start( Sync_Trigger::Manual, 1, true );
+		$this->drain_ticks();
+
+		$this->assertNotSame( $of_first[0], $references[0], 'The next run is another run.' );
+	}
+
 	public function test_a_second_unforced_run_skips_unchanged_posts(): void {
 		$this->connect_client();
 		$this->enable_indexing( 'post' );

@@ -97,6 +97,9 @@ final class Sync_Service {
 	 */
 	public const STALL_AFTER = 600;
 
+	/** The name the running sync gives its batches to Searcio, set as a tick starts. */
+	private string $run_reference = '';
+
 	public function __construct(
 		private Index_Config $config,
 		private Document_Builder $builder,
@@ -143,6 +146,9 @@ final class Sync_Service {
 			'type_index' => 0,
 			'last_id'    => 0,
 			'retries'    => 0,
+			// The run's name to Searcio, so that its batches are one row of the
+			// sync history there. Kept in the cursor, which a resumed run reads.
+			'reference'  => wp_generate_uuid4(),
 		];
 
 		$id = $this->state->create( $trigger, $user_id, $force, $this->estimate_total( $types ), $cursor );
@@ -192,8 +198,9 @@ final class Sync_Service {
 		 */
 		$this->schedule_tick( self::WATCHDOG_DELAY );
 
-		$cursor   = $this->cursor( $run );
-		$counters = $this->counters( $run );
+		$cursor              = $this->cursor( $run );
+		$this->run_reference = $cursor['reference'];
+		$counters            = $this->counters( $run );
 		$force    = ! empty( $run['is_force'] );
 		$types    = $this->config->indexable_post_types();
 		$cv       = $this->config->config_version();
@@ -617,7 +624,7 @@ final class Sync_Service {
 		}
 
 		if ( [] !== $documents ) {
-			$response = $this->client->bulk_upsert( $documents );
+			$response = $this->client->bulk_upsert( $documents, false, $this->run_reference );
 
 			if ( $response->is_plan_limit() ) {
 				return [
@@ -889,7 +896,7 @@ final class Sync_Service {
 	 * other; a batch the index takes sets it back to 0.
 	 *
 	 * @param  array<string,mixed>  $run
-	 * @return array{phase:string,type_index:int,last_id:int,retries:int}
+	 * @return array{phase:string,type_index:int,last_id:int,retries:int,reference:string}
 	 */
 	private function cursor( array $run ): array {
 		$cursor = json_decode( (string) ( $run['cursor_state'] ?? '' ), true );
@@ -900,6 +907,7 @@ final class Sync_Service {
 			'type_index' => (int) ( $cursor['type_index'] ?? 0 ),
 			'last_id'    => (int) ( $cursor['last_id'] ?? 0 ),
 			'retries'    => max( 0, (int) ( $cursor['retries'] ?? 0 ) ),
+			'reference'  => isset( $cursor['reference'] ) && is_string( $cursor['reference'] ) ? $cursor['reference'] : '',
 		];
 	}
 

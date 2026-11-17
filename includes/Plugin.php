@@ -71,6 +71,7 @@ use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
+use Webhead\WP\SearchCloud\Sync\Field_Label_Sync;
 use Webhead\WP\SearchCloud\Sync\Change_Listener;
 use Webhead\WP\SearchCloud\Sync\Shop_Settings_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
@@ -241,7 +242,7 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'indexing_endpoint',
 			static function () use ( $container ): Indexing_Endpoint {
-				return new Indexing_Endpoint( $container->get( 'index_config' ), $container->get( 'sync_service' ) );
+				return new Indexing_Endpoint( $container->get( 'index_config' ), $container->get( 'sync_service' ), $container->get( 'field_label_sync' ) );
 			}
 		);
 		$container->add(
@@ -254,6 +255,12 @@ final class Plugin extends Base_Plugin {
 		// every service that is handed one has to be handed that same object.
 		$container->addShared( 'sync_runs_table', Sync_Runs_Table::class );
 		$container->addShared( 'change_queue_table', Change_Queue_Table::class );
+		$container->add(
+			'field_label_sync',
+			static function () use ( $container ): Field_Label_Sync {
+				return new Field_Label_Sync( $container->get( 'search_cloud_client' ), $container->get( 'index_config' ) );
+			}
+		);
 		$container->add( 'dirty_tracker', Dirty_Tracker::class );
 		$container->add( 'failed_deletes', Failed_Deletes::class );
 		$container->add(
@@ -323,7 +330,8 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'sync_service' ),
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'connection_state' ),
-					$container->get( 'woo' )
+					$container->get( 'woo' ),
+					$container->get( 'field_label_sync' )
 				);
 			}
 		);
@@ -353,7 +361,8 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'language_config' ),
 					$container->get( 'facet_config' ),
 					$container->get( 'woo' ),
-					$container->get( 'sync_service' )
+					$container->get( 'sync_service' ),
+					$container->get( 'field_label_sync' )
 				);
 			}
 		);

@@ -78,6 +78,31 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'en-US', 'de-DE' ], $languages );
 	}
 
+	/**
+	 * Searcio's sync history made a row of every request, a post type and 200
+	 * documents at a time. Requests that name the same run are one row.
+	 */
+	public function test_batches_of_one_run_name_it(): void {
+		$this->connect_client();
+		$sent = [];
+
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$sent ): array {
+				$sent[] = json_decode( (string) ( $args['body'] ?? '' ), true );
+
+				return $this->http_ok( [ 'status' => 'queued' ], 202 );
+			}
+		);
+
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-1' ] ], false, '0b6c5a52-6f0b-4c9e-8d84-3d1f2f2c9a11' );
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-2' ] ], false, 'a reference with spaces and more than sixty-four characters is no reference at all' );
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-3' ] ] );
+
+		$this->assertSame( '0b6c5a52-6f0b-4c9e-8d84-3d1f2f2c9a11', $sent[0]['run_reference'] );
+		$this->assertArrayNotHasKey( 'run_reference', $sent[1], 'A reference Searcio would refuse is not sent: it refuses the batch with it.' );
+		$this->assertArrayNotHasKey( 'run_reference', $sent[2], 'A request without one is a run of its own, as before.' );
+	}
+
 	public function test_the_quizzes_are_read_once_until_one_is_made_changed_or_deleted(): void {
 		$this->connect_client();
 		$calls = $this->count_requests( [ 'quizzes' => [] ] );
