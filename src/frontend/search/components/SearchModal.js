@@ -1467,8 +1467,11 @@ const SearchModal = ({
 	// parameter - so there is nothing more to load for one.
 	const hasMore = !visualActive && hasMorePages(results, resultsHits.length, exactTotal);
 	// Without an exact total there is only one number that is true: how many
-	// are on screen.
+	// are on screen. Once there are more matches than that, the count of the
+	// window Searcio retrieved is still worth saying, as "about": a heading that
+	// read "20 results" over 173 made a shopper think there were only 20.
 	const shownTotal = exactTotal ? totalResults : resultsHits.length;
+	const windowTotal = !exactTotal && totalResults > resultsHits.length;
 
 	// A pick keeps the results it narrows on screen while the new ones load,
 	// so they change behind an open popover instead of turning into a skeleton.
@@ -1556,6 +1559,13 @@ const SearchModal = ({
 				? sprintf(
 					/* translators: 1: number of results loaded so far. 2: total number of results. */
 					__('%1$d of %2$d results', 'searcio'),
+					resultsHits.length,
+					totalResults
+				)
+				: hasMore && windowTotal
+				? sprintf(
+					/* translators: 1: number of results loaded so far. 2: about how many results there are; Searcio counts the best matches of a search by meaning, not every one. */
+					__('%1$d of about %2$d results', 'searcio'),
 					resultsHits.length,
 					totalResults
 				)
@@ -1944,10 +1954,11 @@ const SearchModal = ({
 							onType={onTypeFacetClick}
 							typeLabels={typeLabels}
 							allTypesLabel={i18n.allTypes}
-							// The type counts come from the same window as `total`: when the
-							// heading cannot give an exact number, neither can they, and two
-							// numbers that disagree ("20 results", "Products 21") help no one.
-							showCount={showCount && exactTotal}
+							// The type counts come from the same window as `total`: they are
+							// shown where the heading gives a number of that window, exact or
+							// "about", so that the two agree. With none ("20 results" over a
+							// button that says "Products 21") they would not.
+							showCount={showCount && (exactTotal || windowTotal)}
 							groups={bar.order}
 							buttonLabel={(field) => filterButtonLabel(labelOf(field), valuesOf(field), activeRanges[field], formatBound(field))}
 							isActive={isGroupActive}

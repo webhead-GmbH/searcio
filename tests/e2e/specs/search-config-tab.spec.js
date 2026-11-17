@@ -373,6 +373,32 @@ test.describe( 'Search Config tab', () => {
 	} );
 
 	/**
+	 * A content type renamed on the Indexing tab ("post" to "artikel") left its
+	 * old boost in Searcio's list, and the tab listed it as a row of its own that
+	 * moved no result. A neutral one is not kept; another is marked, and can go.
+	 */
+	test( 'marks the boost of a type no content has any more, and lets it go', async ( { page } ) => {
+		const sent = [];
+
+		await mockSearchConfig( page, sent, { ...CONFIG, type_boosts: [ { type: 'product', boost: 3 }, { type: 'post', boost: 5 }, { type: 'ratgeber', boost: 1 } ] } );
+		await mockCatalog( page );
+		await page.goto( SETTINGS_URL );
+
+		const boosts = card( page, 'Type boosts' );
+
+		await expect( boosts.getByRole( 'slider', { name: 'Products', exact: true } ) ).toBeVisible( LOADED );
+		await expect( boosts.getByRole( 'slider', { name: 'post', exact: true } ) ).toBeVisible();
+		await expect( boosts.getByRole( 'slider', { name: 'ratgeber', exact: true } ) ).toHaveCount( 0 );
+		await expect( boosts.getByText( /no content of this site has any more/ ) ).toBeVisible();
+
+		await boosts.getByRole( 'button', { name: 'Remove the boost of post' } ).click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.type_boosts ).toEqual( [ { type: 'product', boost: 3 } ] );
+	} );
+
+	/**
 	 * The half-written cases are the ones worth proving, because the API drops
 	 * them silently rather than rejecting them - so a form that sent one would
 	 * show a row that vanished on the next read.
@@ -536,6 +562,45 @@ test.describe( 'Search Config tab', () => {
 		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
 
 		expect( sent[ sent.length - 1 ].body.profit_ranking.rules ).toEqual( [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ] );
+	} );
+
+	/**
+	 * Searcio can order a listing without a search term (a category page, the
+	 * highlights) by the lift alone, which is stronger than in a search. Where it
+	 * reports the switch the card offers it, and says the least profit is counted
+	 * without tax; the key goes back as it is when the card saves.
+	 */
+	test( 'offers the switch for listings where Searcio has it, and sends it back', async ( { page } ) => {
+		const sent = [];
+
+		await mockCatalog( page );
+		await mockSearchConfig( page, sent, { ...CONFIG, profit_ranking: { ...PROFIT_RANKING, listings: true } } );
+		await page.goto( SETTINGS_URL );
+
+		const profit = page.locator( '.whsc-profit-ranking' );
+		const listings = profit.getByRole( 'checkbox', { name: 'Also order listings without a search term' } );
+
+		await expect( profit ).toBeVisible( LOADED );
+		await expect( listings ).toBeChecked();
+		await expect( profit.getByText( 'Optional, without tax.' ) ).toBeVisible();
+
+		await listings.click();
+		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
+		await expect.poll( () => sent.length ).toBeGreaterThan( 0 );
+
+		expect( sent[ sent.length - 1 ].body.profit_ranking ).toMatchObject( { enabled: true, listings: false } );
+	} );
+
+	test( 'offers no switch for listings to a Searcio without it', async ( { page } ) => {
+		await mockCatalog( page );
+		await mockSearchConfig( page, [], { ...CONFIG, profit_ranking: PROFIT_RANKING } );
+		await page.goto( SETTINGS_URL );
+
+		const profit = page.locator( '.whsc-profit-ranking' );
+
+		await expect( profit ).toBeVisible( LOADED );
+		await expect( profit.getByRole( 'checkbox', { name: /listings/ } ) ).toHaveCount( 0 );
+		await expect( profit.getByText( 'Optional, without tax.' ) ).toHaveCount( 0 );
 	} );
 
 	test( 'warns about a target for a field no product has, until it is mended', async ( { page } ) => {

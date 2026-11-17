@@ -47,6 +47,31 @@ final class Multilingual_Support {
 		};
 	}
 
+	/**
+	 * The language an admin is working in: the one the language switcher of
+	 * the admin bar is on, or the site's default while it shows every
+	 * language. Null without a multilingual plugin.
+	 */
+	public function admin_language(): ?string {
+		// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filters, asked as WPML documents them.
+		$code = match ( $this->provider() ) {
+			'wpml'     => apply_filters( 'wpml_current_language', null ),
+			'polylang' => function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : null,
+			default    => null,
+		};
+
+		if ( ! is_string( $code ) || '' === $code || 'all' === $code ) {
+			$code = match ( $this->provider() ) {
+				'wpml'     => apply_filters( 'wpml_default_language', null ),
+				'polylang' => function_exists( 'pll_default_language' ) ? pll_default_language( 'slug' ) : null,
+				default    => null,
+			};
+		}
+		// phpcs:enable
+
+		return is_string( $code ) && '' !== $code ? $code : null;
+	}
+
 	/** Null when it can't be resolved (neither plugin active, or the post has no language assigned). */
 	public function post_language( int $post_id ): ?string {
 		return match ( $this->provider() ) {

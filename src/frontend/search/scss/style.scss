@@ -3038,6 +3038,13 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	color: var(--whsc-price-color, #6b7177);
 }
 
+/* Said under the table when more products were found than it holds. */
+.whsc-compare__note {
+	margin: 8px 14px 0;
+	font-size: 12px;
+	color: var(--whsc-price-color, #6b7177);
+}
+
 
 /* --------------------------------------------------------------------------
  * Markdown inside an assistant answer. The reply is prose, so these stay tight

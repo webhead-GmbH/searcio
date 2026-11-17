@@ -276,7 +276,9 @@ final class Woo_Test extends Integration_Test_Case {
 
 		$unlisted = array_diff( array_keys( $document ), [ 'id' ], $this->service( 'index_config' )->indexed_fields() );
 
-		$this->assertEqualsCanonicalizing( array_merge( Document_Builder::SORT_FIELDS, Woo::PRIVATE_FIELDS ), array_values( $unlisted ) );
+		// The price without tax is carried only by a taxable product in a shop that shows prices with tax: Woo_Price_Tax_Test.
+		$this->assertEqualsCanonicalizing( array_merge( Document_Builder::SORT_FIELDS, [ 'cost_price' ] ), array_values( $unlisted ) );
+		$this->assertSame( [ 'cost_price', 'price_excluding_tax' ], Woo::PRIVATE_FIELDS );
 	}
 
 	public function test_is_active_and_meets_minimum(): void {
@@ -858,7 +860,8 @@ final class Woo_Test extends Integration_Test_Case {
 	 */
 	public function test_the_purchase_price_is_written_but_never_offered_as_a_field(): void {
 		$this->assertNotContains( 'cost_price', $this->woo->field_names( [ 'cost_price' => true, 'price' => true ] ) );
-		$this->assertSame( [ 'cost_price' ], Woo::PRIVATE_FIELDS );
+		$this->assertNotContains( 'price_excluding_tax', $this->woo->field_names( [ 'cost_price' => true, 'price' => true ] ) );
+		$this->assertSame( [ 'cost_price', 'price_excluding_tax' ], Woo::PRIVATE_FIELDS );
 	}
 
 	/**

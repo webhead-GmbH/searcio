@@ -87,7 +87,7 @@ final class Search_Config_Endpoint extends Rest_API {
 
 		if ( $response->ok() && ! $this->same_languages( $before, $this->language_config->enabled_languages() ) ) {
 			$user_id = get_current_user_id();
-			$started = $this->sync->start( Sync_Trigger::Manual, $user_id > 0 ? $user_id : null, false );
+			$started = $this->sync->start( Sync_Trigger::SettingsChange, $user_id > 0 ? $user_id : null, false );
 			$body    = $answer->get_data();
 
 			if ( is_array( $body ) ) {

@@ -228,6 +228,28 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 1000, $data['documents']['limit'] );
 	}
 
+	/**
+	 * `used` is the account's counter as of the last sync, so a site whose
+	 * index had been emptied read "526 indexed". `indexed` is what the index
+	 * holds: 0 is empty, null a Searcio that cannot say (or does not yet).
+	 */
+	public function test_test_connection_reports_what_the_index_holds(): void {
+		$this->login_admin();
+		$run = function ( array $documents ): array {
+			$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 4821 ], 'usage' => [ 'documents' => $documents ] ] ) );
+
+			$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/test' );
+			$request->set_param( 'fresh', true );
+
+			return $this->server->dispatch( $request )->get_data()['documents'];
+		};
+
+		$this->assertSame( 0, $run( [ 'used' => 526, 'limit' => 20000, 'indexed' => 0 ] )['indexed'] );
+		$this->assertSame( 526, $run( [ 'used' => 526, 'limit' => 20000, 'indexed' => 526 ] )['indexed'] );
+		$this->assertNull( $run( [ 'used' => 526, 'limit' => 20000, 'indexed' => null ] )['indexed'] );
+		$this->assertNull( $run( [ 'used' => 526, 'limit' => 20000 ] )['indexed'], 'A Searcio without the count.' );
+	}
+
 	public function test_test_connection_defaults_plan_to_not_free_when_absent(): void {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok(

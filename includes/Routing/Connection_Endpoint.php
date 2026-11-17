@@ -249,6 +249,10 @@ final class Connection_Endpoint extends Rest_API {
 				'limit'      => isset( $documents['limit'] ) ? ( null === $documents['limit'] ? null : (int) $documents['limit'] ) : null,
 				'percent'    => isset( $documents['percent'] ) ? (int) $documents['percent'] : null,
 				'near_limit' => (bool) ( $documents['near_limit'] ?? false ),
+				// What the site's index holds right now, which `used` (the
+				// account's counter, as of the last sync) cannot say: 0 is an
+				// empty or missing index, null that Searcio could not tell.
+				'indexed'    => isset( $documents['indexed'] ) && is_numeric( $documents['indexed'] ) ? (int) $documents['indexed'] : null,
 			],
 			// Every metered allowance, not just documents: a site that has spent
 			// its monthly searches or AI messages has a storefront that is

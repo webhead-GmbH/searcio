@@ -227,7 +227,9 @@ export const typedNumber = ( value ) => {
  * as profitable (`target`), the least profit per sale (`min_profit`), targets
  * of their own for the products carrying a value (`rules`) and the search
  * terms ranked by relevance alone (`excluded_terms`). The same settings as in
- * the Searcio dashboard.
+ * the Searcio dashboard. A service that has the switch for listings without a
+ * search term (`listings`, on unless set) reports it as well; one that has it
+ * also counts the least profit per sale without tax.
  *
  * Null when Searcio leaves the key out, as a service without profit ranking
  * does: the tab then offers nothing the service would not keep.
@@ -252,6 +254,7 @@ export const normalizeProfitRanking = ( raw ) => {
 			exclude: Boolean( rule?.exclude ),
 		} ) ),
 		excluded_terms: ( Array.isArray( raw.excluded_terms ) ? raw.excluded_terms : [] ).filter( ( term ) => 'string' === typeof term ),
+		...( 'boolean' === typeof raw.listings ? { listings: raw.listings } : {} ),
 	};
 };
 
@@ -280,6 +283,9 @@ export const profitRankingPayload = ( ranking ) => ( {
 		};
 	} ),
 	excluded_terms: cleanTerms( ranking.excluded_terms || [] ),
+	// Only where Searcio reports it: the key is kept as it is when left out,
+	// so a plugin that does not know it cannot undo what the panel set.
+	...( 'boolean' === typeof ranking.listings ? { listings: ranking.listings } : {} ),
 } );
 
 /**

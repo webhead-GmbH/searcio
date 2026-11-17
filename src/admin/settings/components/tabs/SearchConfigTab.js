@@ -62,7 +62,9 @@ const TEST_CONNECTION_PATH =
  * untouched. `PUT /search-config` replaces the whole section, so rebuilding the
  * list from local post types alone would delete a boost set in the panel for a
  * type that lives somewhere else - another store on the same index, or a type
- * that was disabled here temporarily.
+ * that was disabled here temporarily. Not one of 1: that boost changes
+ * nothing, and a type a content type was renamed from ("post" once the type
+ * is called "artikel") only added a row that moved no result.
  */
 const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 	const existing = new Map( typeBoosts.map( ( row ) => [ row.type, row.boost ] ) );
@@ -71,7 +73,7 @@ const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 		boost: existing.has( type ) ? existing.get( type ) : 1,
 	} ) );
 
-	const foreign = typeBoosts.filter( ( row ) => ! enabledTypes.includes( row.type ) );
+	const foreign = typeBoosts.filter( ( row ) => ! enabledTypes.includes( row.type ) && 1 !== Number( row.boost ) );
 
 	return [ ...local, ...foreign ];
 };
@@ -547,6 +549,10 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pric
 	const sent = profitRulesSent( rules );
 	const rowMessage = ( index, column ) => ( -1 === sent.indexOf( index ) ? undefined : rowError( errors, 'profit_ranking.rules', sent.indexOf( index ), column ) );
 	const unindexed = unindexedFields( rules.map( ( rule ) => rule.field ), indexed );
+	// A Searcio that has the switch for listings also counts the least profit
+	// per sale in the price without tax, which the plugin sends beside the
+	// purchase price where the shop shows prices with tax.
+	const hasListings = 'boolean' === typeof ranking.listings;
 
 	// The terms as Searcio stored them, once a save has trimmed them; what is
 	// being typed is left alone.
@@ -560,7 +566,7 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pric
 		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide whsc-profit-ranking">
 			<CardHeading
 				title={ __( 'Profitable products first', 'searcio' ) }
-				description={ __( 'Lifts products with a good margin among the results that match a search about equally well, and orders listings without a search term, such as a category page, the same way. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
+				description={ __( 'Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
 			/>
 			<Card.Content className="whsc-settings-card-content">
 				<Stack direction="column" gap="lg">
@@ -610,13 +616,24 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pric
 							min={ 0 }
 							step={ 0.01 }
 							label={ __( 'Least profit per sale', 'searcio' ) }
-							description={ error( 'min_profit' ) || ( pricesWithTax
-								? __( 'Optional. A product that earns less per sale is not lifted, however high its margin. Counted in the prices the shop displays, which include tax, so the tax on the profit counts too.', 'searcio' )
-								: __( 'Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin.', 'searcio' ) ) }
+							description={ error( 'min_profit' ) || ( hasListings
+								? __( 'Optional, without tax. A product that earns less per sale is not lifted, however high its margin.', 'searcio' )
+								: pricesWithTax
+									? __( 'Optional. A product that earns less per sale is not lifted, however high its margin. Counted in the prices the shop displays, which include tax, so the tax on the profit counts too.', 'searcio' )
+									: __( 'Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin.', 'searcio' ) ) }
 							value={ String( ranking.min_profit ?? '' ) }
 							onValueChange={ ( value ) => set( 'min_profit', typed( value ) ) }
 						/>
 					</Grid>
+
+					{ hasListings && (
+						<CheckboxControl
+							label={ __( 'Also order listings without a search term', 'searcio' ) }
+							description={ __( 'Without a term every product matches equally well, so the lift alone puts a category page or the highlights in order, which is stronger than in a search. Off, such a listing keeps its usual order.', 'searcio' ) }
+							checked={ Boolean( ranking.listings ) }
+							onCheckedChange={ ( listings ) => set( 'listings', Boolean( listings ) ) }
+						/>
+					) }
 
 					<Fieldset.Root className="whsc-profit-rules">
 						<Fieldset.Legend>{ __( 'Targets of their own', 'searcio' ) }</Fieldset.Legend>
@@ -1056,6 +1073,8 @@ const SearchConfigTab = () => {
 			'type_boosts',
 			config.type_boosts.map( ( row, i ) => ( i === index ? { ...row, boost } : row ) )
 		);
+	const removeTypeBoost = ( index ) =>
+		set( 'type_boosts', config.type_boosts.filter( ( _, i ) => i !== index ) );
 
 	// `?.` guards against the connection-test promise resolving languageLimit
 	// before (or without) the config fetch ever completing.
@@ -1317,20 +1336,54 @@ const SearchConfigTab = () => {
 								     these are boosts. A "Type" column beside a "Boost"
 								     slider stood out of line with it, its caption level with
 								     nothing and its name below the slider's middle. */ }
-								{ config.type_boosts.map( ( row, index ) => (
-									<RangeControl
-										key={ row.type }
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										label={ typeLabels[ row.type ] || row.type }
-										min={ 0.1 }
-										max={ 100 }
-										step={ 0.1 }
-										value={ row.boost }
-										help={ rowError( fieldErrors, 'type_boosts', index, 'boost' ) }
-										onChange={ ( boost ) => updateTypeBoost( index, boost ) }
-									/>
-								) ) }
+								{ config.type_boosts.map( ( row, index ) => {
+									// A type no content of this site carries: it moves nothing here.
+									const foreign = ! ( row.type in typeLabels );
+									const slider = (
+										<RangeControl
+											key={ row.type }
+											__next40pxDefaultSize
+											__nextHasNoMarginBottom
+											label={ typeLabels[ row.type ] || row.type }
+											min={ 0.1 }
+											max={ 100 }
+											step={ 0.1 }
+											value={ row.boost }
+											help={ rowError( fieldErrors, 'type_boosts', index, 'boost' ) }
+											onChange={ ( boost ) => updateTypeBoost( index, boost ) }
+										/>
+									);
+
+									return foreign ? (
+										<div className="whsc-search-config-row whsc-type-boost--foreign" key={ row.type }>
+											{ slider }
+											<Button
+												__next40pxDefaultSize
+												icon={ trash }
+												isDestructive
+												variant="tertiary"
+												label={ sprintf(
+													/* translators: %s: the name of a content type. */
+													__( 'Remove the boost of %s', 'searcio' ),
+													row.type
+												) }
+												onClick={ () => removeTypeBoost( index ) }
+											/>
+										</div>
+									) : (
+										slider
+									);
+								} ) }
+								{ config.type_boosts.some( ( row ) => ! ( row.type in typeLabels ) ) && (
+									<Notice.Root intent="warning">
+										<Notice.Description>
+											{ __(
+												'A boost with a remove button is for a type that no content of this site has any more, for example one you renamed on the Indexing tab. It moves no result here: remove it, unless another source sends that type to the same index.',
+												'searcio'
+											) }
+										</Notice.Description>
+									</Notice.Root>
+								) }
 							</Stack>
 						) : (
 							<Notice.Root intent="info">

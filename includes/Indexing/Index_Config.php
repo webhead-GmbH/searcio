@@ -413,6 +413,8 @@ final class Index_Config {
 			'languages'     => [
 				'active'    => $this->multilingual->is_active(),
 				'available' => $this->multilingual->active_languages(),
+				// The one the admin works in: a new quiz starts in it.
+				'current'   => $this->multilingual->admin_language(),
 			],
 			'indexed_fields' => $this->indexed_fields(),
 			'config_version' => $this->config_version(),

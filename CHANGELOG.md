@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - A merchandising rule can fire only when the search term is exactly its trigger.
 - On multilingual sites, a search redirect can be limited to one language.
 - Card templates designed in Searcio are requested in the language of the page.
+- The Search Config tab offers the profit ranking's switch for listings without a search term (a category page, the highlights) once Searcio reports it, and Searcio then counts the least profit per sale without tax: where the shop shows prices with tax, the price without tax is sent beside the purchase price.
+- The Connection tab warns when Searcio says the search index of the site is empty although documents were sent.
+- The Sync tab says when a running sync has not moved for ten minutes because WP-Cron does not run it, and runs its next step on a click. Site Health lists a task of the plugin that is overdue.
+- A new quiz starts in the language the admin works in, where it started in "Every language".
 - Developers: the `searcio_is_indexable` filter keeps individual posts out of the index.
 
 ### Changed
@@ -39,6 +43,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Products are sent with WooCommerce's own product type, so grouped and external products are no longer reported as simple products.
 - Searcio's sync history now tells incremental updates apart from full syncs.
 - The "Only index published, visible products" setting is now called "Respect catalog visibility", which describes what it does.
+- With a search by meaning, the results heading reads "20 of about 173 results" and the type buttons show their counts, where it read "20 results" over 173.
+- The comparison table is of the first four products, and leaves out the publication timestamp and a field that stands beside its own plural ("Category" and "Categories").
+- The placeholder image of a card made from a Searcio template is smaller and lighter, like the plugin's own.
+- The German word for a product on backorder is WooCommerce's own, "Lieferrückstand".
+- A setting of the Placement tab that takes one of a few values, such as the animation, refuses another with a message instead of saving the value it already had.
+- The Sync history's search also finds a run by its status or by what started it, and a run started by a settings change is named so.
 - The Search Config tab asks to wait a few minutes before changing the fields that hold numbers, or the attributes one variation must match, again, because each change rebuilds the search index.
 - On tablets in portrait orientation, results are shown as a grid. The floating search button stays clear of bars fixed to the bottom of the screen, and the "All" filter is available on phones again.
 
@@ -46,6 +56,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - A change to a variation's price, stock or purchase price, to the purchase price field of a cost of goods plugin, or a variation that is added or removed, reaches the search index with the next incremental sync. Before, only a change to the product itself did, so a variable product kept its old purchase price and price.
 - The profit ranking card words its own errors, in the language of the screen, instead of repeating the key names and messages Searcio returns. A message appears under the target it belongs to even when an empty row sits above it, and values outside their range are caught before the card is saved.
+- The highlights show the newest products when Searcio refuses the featured filter, as it does when the plugin's copy of the filters is older than the dashboard's, where the row stayed empty.
+- The boost of a type no content has any more, such as the old name of a type renamed on the Indexing tab, is marked and can be removed, where it stayed as a row that moved no result.
+- The time a sync run was last updated is in UTC like its other times, where it was an hour ahead in a shop in Vienna.
+- A negative number of days to keep the sync history for is refused with a message that says what to enter, and a search key that is not one is said so as it is typed.
 - A content type renamed on the Indexing tab works in blocks, shortcodes, widgets, placements and type boosts, and its result cards show their text.
 - The category filter modes work for post categories, and a post filed under a subcategory is found when filtering by its parent category.
 - Filters set to "All (AND)" update their counts after every selection.

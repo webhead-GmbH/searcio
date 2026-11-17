@@ -54,15 +54,17 @@ final class Woo {
 		'rating'       => [ 'rating' ],
 		'review_count' => [ 'review_count' ],
 		'custom_attributes' => [ 'custom_attributes' ],
-		'cost_price'   => [ 'cost_price' ],
+		'cost_price'   => [ 'cost_price', 'price_excluding_tax' ],
 	];
 
 	/**
 	 * Fields written for Searcio alone: it never returns them and refuses them
 	 * as searchable, facet or suggest fields, so they are not offered as one.
-	 * The purchase price is what its profit ranking works the margin out from.
+	 * The purchase price is what its profit ranking works the margin out from,
+	 * and the price without tax, sent where the shop shows prices with tax,
+	 * what it counts the least profit per sale in, so that tax is not profit.
 	 */
-	public const PRIVATE_FIELDS = [ 'cost_price' ];
+	public const PRIVATE_FIELDS = [ 'cost_price', 'price_excluding_tax' ];
 
 	/**
 	 * A variable product's variations, one object each with the attributes it
@@ -357,6 +359,13 @@ final class Woo {
 
 			if ( null !== $cost ) {
 				$fields['cost_price'] = $cost;
+
+				// Where `price` carries tax: the same price without it.
+				$net = $this->without_customer( fn () => $this->price_without_tax( $product, $is_variable ) );
+
+				if ( null !== $net && isset( $fields['price'] ) && $net <= (float) $fields['price'] ) {
+					$fields['price_excluding_tax'] = $net;
+				}
 			}
 		}
 
@@ -602,22 +611,10 @@ final class Woo {
 	 * between two amounts on one basis. Null for a product with none.
 	 */
 	private function cost_price( $product, bool $is_variable, string $meta_key ): ?float {
-		$source = $product;
+		$source = $this->priced_product( $product, $is_variable );
 
-		if ( $is_variable && method_exists( $product, 'get_variation_prices' ) ) {
-			$active = array_map( 'floatval', (array) ( $product->get_variation_prices( true )['price'] ?? [] ) );
-
-			if ( [] === $active ) {
-				return null;
-			}
-
-			$variation = wc_get_product( (int) array_search( min( $active ), $active, true ) );
-
-			if ( ! $variation instanceof \WC_Product ) {
-				return null;
-			}
-
-			$source = $variation;
+		if ( null === $source ) {
+			return null;
 		}
 
 		$cost = $this->cogs_value( $source );
@@ -639,6 +636,56 @@ final class Woo {
 		}
 
 		return (float) wc_format_decimal( $cost, wc_get_price_decimals() );
+	}
+
+	/**
+	 * The product whose price is the one sent as `price`: the product itself,
+	 * or the cheapest variation of a variable one. Null where there is none.
+	 */
+	private function priced_product( $product, bool $is_variable ): ?\WC_Product {
+		if ( ! $is_variable || ! method_exists( $product, 'get_variation_prices' ) ) {
+			return $product instanceof \WC_Product ? $product : null;
+		}
+
+		$active = array_map( 'floatval', (array) ( $product->get_variation_prices( true )['price'] ?? [] ) );
+
+		if ( [] === $active ) {
+			return null;
+		}
+
+		$variation = wc_get_product( (int) array_search( min( $active ), $active, true ) );
+
+		return $variation instanceof \WC_Product ? $variation : null;
+	}
+
+	/**
+	 * The price a product is sent with, without tax, for a shop that shows its
+	 * prices with it: the active price (a sale price included) of the product,
+	 * or of its cheapest variation, as WooCommerce takes the tax out of it. Null
+	 * where `price` carries no tax, which is the price without tax then, and
+	 * for a product that is not taxable.
+	 */
+	private function price_without_tax( $product, bool $is_variable ): ?float {
+		if ( ! $this->shows_prices_with_tax() ) {
+			return null;
+		}
+
+		$source = $this->priced_product( $product, $is_variable );
+
+		if ( null === $source || ! $source->is_taxable() ) {
+			return null;
+		}
+
+		$price = $source->get_price();
+
+		if ( '' === $price || null === $price ) {
+			return null;
+		}
+
+		return (float) wc_format_decimal(
+			wc_get_price_excluding_tax( $source, [ 'price' => $price ] ),
+			wc_get_price_decimals()
+		);
 	}
 
 	/** WooCommerce's "Cost of goods" of a product or variation, null where the feature is off or the value is not set. */

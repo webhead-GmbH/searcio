@@ -5358,6 +5358,7 @@ msgid "Searcio does not know the search key, so the site searches with WordPress
 msgstr "Searcio no conoce la clave de búsqueda, así que el sitio busca con WordPress en lugar de Searcio. Cópiala de nuevo desde el panel de Searcio, o conéctalo de nuevo."
 
 #: includes/Routing/Settings_Endpoint.php:82
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:131
 msgid "That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard."
 msgstr "Eso no es una clave de búsqueda: una empieza por sk_ y no tiene espacios. Cópiala de nuevo desde el panel de Searcio."
 
@@ -5541,10 +5542,6 @@ msgstr "Introduce el valor que tienen los productos en ese campo."
 msgid "Enter a target margin from 0.1 to 100, or tick Never lift."
 msgstr "Introduce un margen objetivo de 0,1 a 100, o marca No destacar nunca."
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:563
-msgid "Lifts products with a good margin among the results that match a search about equally well, and orders listings without a search term, such as a category page, the same way. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
-msgstr "Destaca los productos con buen margen entre los resultados que coinciden con una búsqueda más o menos igual de bien, y ordena del mismo modo los listados sin término de búsqueda, como una página de categoría. Una coincidencia mucho mejor conserva su puesto, los productos fijados siguen arriba y los productos agotados siguen al final. Los mismos ajustes que en el panel de Searcio."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:569
 msgid "Margins are worked out without tax: enter purchase prices without tax, and where the shop shows prices with tax it is added to them, so the margin comes out the same either way. Purchase prices are never shown."
 msgstr "Los márgenes se calculan sin impuestos: introduce los precios de compra sin impuestos, y si la tienda muestra los precios con impuestos, se les añaden, así que el margen sale igual en ambos casos. Los precios de compra nunca se muestran."
@@ -5580,3 +5577,99 @@ msgstr "Tus propios campos cuyos valores son números, como un peso o una longit
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1430
 msgid "Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background: give it a few minutes before changing it again."
 msgstr "Los atributos en los que se diferencian las variantes de un producto, como el color y la talla. Los filtros sobre ellos solo encuentran un producto si una variante en stock tiene cada valor elegido: rojo y XL ya no encuentran una chaqueta cuya roja XL está agotada. Definir el primero reconstruye el índice de búsqueda en segundo plano: dale unos minutos antes de volver a cambiarlo."
+
+#: includes/Health/Health_Tests.php:98
+msgid "Searcio background tasks"
+msgstr "Tareas en segundo plano de Searcio"
+
+#: includes/Health/Health_Tests.php:258
+msgid "Searcio background tasks run on time"
+msgstr "Las tareas en segundo plano de Searcio se ejecutan a tiempo"
+
+#: includes/Health/Health_Tests.php:260
+msgid "Nothing the plugin schedules, such as the sync of your changes, is overdue."
+msgstr "Nada de lo que programa el plugin, como la sincronización de tus cambios, está atrasado."
+
+#: includes/Health/Health_Tests.php:266
+msgid "Searcio background tasks are overdue"
+msgstr "Las tareas en segundo plano de Searcio están atrasadas"
+
+#. translators: %d: how many minutes the longest overdue task is late.
+#: includes/Health/Health_Tests.php:271
+#, php-format
+msgid "A task of the plugin, such as the sync of your changes, has been due for %d minutes. WordPress starts such tasks through WP-Cron, which only runs while the site is visited, and not at all where the host blocks the request WordPress makes to itself or WP-Cron is switched off."
+msgstr "Una tarea del plugin, como la sincronización de tus cambios, debió empezar hace %d minutos. WordPress inicia esas tareas mediante WP-Cron, que solo se ejecuta mientras se visita el sitio, y no se ejecuta en absoluto si el hosting bloquea la petición que WordPress se hace a sí mismo o si WP-Cron está desactivado."
+
+#: includes/Health/Health_Tests.php:274
+msgid "Ask your host to call WP-Cron from the server every minute, for example with this command, and turn off the one WordPress starts itself with DISABLE_WP_CRON if it is not off already:"
+msgstr "Pide a tu hosting que llame a WP-Cron desde el servidor cada minuto, por ejemplo con este comando, y desactiva con DISABLE_WP_CRON el que WordPress inicia por sí mismo, si no lo está ya:"
+
+#. translators: 1: the value that was sent. 2: the name of the setting. 3: the values it can take, separated by commas.
+#: includes/Routing/Placement_Endpoint.php:93
+#, php-format
+msgid "\"%1$s\" is not a value for %2$s. Use one of: %3$s."
+msgstr "\"%1$s\" no es un valor de %2$s. Usa uno de estos: %3$s."
+
+#: includes/Routing/Settings_Endpoint.php:94
+msgid "Enter 0 or more days to keep the sync history for. 0 keeps it forever."
+msgstr "Introduce 0 o más días durante los que se conserva el historial de sincronización. 0 lo conserva para siempre."
+
+#: includes/Routing/Sync_Endpoint.php:90
+msgid "There is no sync running to move on."
+msgstr "No hay ninguna sincronización en curso que hacer avanzar."
+
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:115
+msgid "The search index of this site is empty, so every search finds nothing. Run a full sync on the Sync tab to fill it again."
+msgstr "El índice de búsqueda de este sitio está vacío, así que cualquier búsqueda no encuentra nada. Inicia una sincronización completa en la pestaña Sincronización para llenarlo de nuevo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:569
+msgid "Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
+msgstr "Destaca los productos con buen margen entre los resultados que coinciden con una búsqueda más o menos igual de bien. Una coincidencia mucho mejor conserva su puesto, los productos fijados siguen arriba y los productos agotados siguen al final. Los mismos ajustes que en el panel de Searcio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:620
+msgid "Optional, without tax. A product that earns less per sale is not lifted, however high its margin."
+msgstr "Opcional, sin impuestos. Un producto que gana menos por venta no se destaca, por alto que sea su margen."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:631
+msgid "Also order listings without a search term"
+msgstr "Ordenar también los listados sin término de búsqueda"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:632
+msgid "Without a term every product matches equally well, so the lift alone puts a category page or the highlights in order, which is stronger than in a search. Off, such a listing keeps its usual order."
+msgstr "Sin término, todos los productos coinciden igual de bien, así que solo el impulso ordena una página de categoría o los destacados, y con más fuerza que en una búsqueda. Desactivado, ese listado conserva su orden habitual."
+
+#. translators: %s: the name of a content type.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1367
+#, js-format
+msgid "Remove the boost of %s"
+msgstr "Quitar el impulso de %s"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1380
+msgid "A boost with a remove button is for a type that no content of this site has any more, for example one you renamed on the Indexing tab. It moves no result here: remove it, unless another source sends that type to the same index."
+msgstr "Un impulso con un botón para quitarlo es de un tipo que ningún contenido de este sitio tiene ya, por ejemplo uno que renombraste en la pestaña Indexación. No mueve ningún resultado aquí: quítalo, salvo que otra fuente envíe ese tipo al mismo índice."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:48
+msgid "Settings change"
+msgstr "Cambio de ajustes"
+
+#. translators: %d: how many minutes the sync has not moved.
+#: src/admin/settings/components/tabs/SyncTab.js:283
+#, js-format
+msgid "This sync has not moved for %d minutes. WordPress runs it through WP-Cron, which only works while the site is visited, or when the server calls it. Run the next step here, or ask your host to call \"wp cron event run --due-now\" from the server every minute."
+msgstr "Esta sincronización no ha avanzado en %d minutos. WordPress la ejecuta mediante WP-Cron, que solo funciona mientras se visita el sitio o cuando el servidor lo llama. Ejecuta aquí el siguiente paso, o pide a tu hosting que llame a \"wp cron event run --due-now\" desde el servidor cada minuto."
+
+#: src/admin/settings/components/tabs/SyncTab.js:293
+msgid "Run the next step now"
+msgstr "Ejecutar el siguiente paso ahora"
+
+#. translators: 1: how many products are compared. 2: how many were found.
+#: src/frontend/search/components/CompareTable.js:229
+#, js-format
+msgid "The first %1$d of the %2$d products are compared."
+msgstr "Se comparan los primeros %1$d de los %2$d productos."
+
+#. translators: 1: number of results loaded so far. 2: about how many results there are; Searcio counts the best matches of a search by meaning, not every one.
+#: src/frontend/search/components/SearchModal.js:1568
+#, js-format
+msgid "%1$d of about %2$d results"
+msgstr "%1$d de unos %2$d resultados"

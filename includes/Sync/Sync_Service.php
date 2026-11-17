@@ -90,6 +90,13 @@ final class Sync_Service {
 	 */
 	private const STALE_TICK_GRACE = 120;
 
+	/**
+	 * How long a running sync may stand still, its worker overdue, before the
+	 * screen says so: 0 of 539 for twenty minutes on a site whose WP-Cron has
+	 * no visitor to start it, with nothing said.
+	 */
+	public const STALL_AFTER = 600;
+
 	public function __construct(
 		private Index_Config $config,
 		private Document_Builder $builder,
@@ -495,12 +502,55 @@ final class Sync_Service {
 	 */
 	public function status(): array {
 		$active = $this->state->active();
+		$idle   = $this->stalled();
 
 		return [
 			'configured' => $this->client->is_configured(),
 			'indexable'  => $this->config->indexable_post_types(),
 			'active'     => null === $active ? null : $this->state->present( $active ),
+			// Set while the running sync has not moved for a while and its
+			// worker is overdue: WP-Cron is not firing, or a fatal killed it.
+			'stalled'    => null === $idle ? null : [
+				'seconds'       => $idle,
+				'cron_disabled' => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
+			],
 		];
+	}
+
+	/**
+	 * Seconds the running sync has stood still, when it is stalled: its worker
+	 * is overdue (not firing, or killed) and nothing has been recorded for
+	 * {@see self::STALL_AFTER} seconds. Null for a run that moves, one that
+	 * waits to send a batch again, a paused one, or none.
+	 */
+	public function stalled(): ?int {
+		$run = $this->state->active();
+
+		if ( null === $run || Sync_Status::Running->value !== (string) $run['status'] || $this->awaits_retry( $run ) || $this->worker_alive() ) {
+			return null;
+		}
+
+		$updated = strtotime( (string) ( $run['updated_at'] ?? $run['created_at'] ?? '' ) . ' UTC' );
+		$idle    = false === $updated ? 0 : time() - $updated;
+
+		return $idle >= self::STALL_AFTER ? $idle : null;
+	}
+
+	/**
+	 * Runs the next step of the running sync now, in the request of the person
+	 * who asked, where WP-Cron does not fire it. Through the job's own hook, so
+	 * the lock a worker holds is still honoured.
+	 */
+	public function nudge(): bool {
+		$run = $this->state->active();
+
+		if ( null === $run || Sync_Status::Running->value !== (string) $run['status'] ) {
+			return false;
+		}
+
+		do_action( Sync_Keys::HOOK_TICK ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- The plugin's own hook, in its own prefix.
+
+		return true;
 	}
 
 	/* --------------------------------------------------------------------- */

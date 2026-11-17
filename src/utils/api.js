@@ -136,7 +136,10 @@ const fetchJson = async ( url, path, signal ) => {
 	const response = await fetch( url, { method: 'GET', credentials: 'omit', signal } );
 
 	if ( ! response.ok ) {
-		throw new Error( `searcio: ${ path } responded ${ response.status }` );
+		const error = new Error( `searcio: ${ path } responded ${ response.status }` );
+		error.status = response.status;
+
+		throw error;
 	}
 
 	return response.json();
@@ -248,6 +251,9 @@ export const preconnect = () => {
 
 let warmed = false;
 
+/** Set once Searcio refused the featured filter: the page then asks for the newest products. */
+let featuredRefused = false;
+
 /**
  * The type the shop's products carry in the index (the Indexing tab can name
  * it), or '' on a site that indexes none. What is about products - the
@@ -278,7 +284,10 @@ export const productType = () => {
  * Without a type of its own it shows the shop's products ({@see productType}).
  *
  * The featured ones only where `featured` is one of the site's filters:
- * Searcio refused the filter otherwise (422), and the row stayed empty.
+ * Searcio refused the filter otherwise (422), and the row stayed empty. The
+ * plugin keeps a copy of the filters that goes stale when they are changed
+ * in the Searcio dashboard, so a refusal is taken as the answer: the row
+ * shows the newest products instead, and the page does not ask again.
  *
  * The newest are asked for with `sort=newest`, by the date each document
  * carries (`published_at`): without it they came in the index's order, the
@@ -286,19 +295,34 @@ export const productType = () => {
  *
  * @param {{type?: string, source?: string, facets?: Object, ranges?: Object, signal?: AbortSignal}} [options]
  */
-export const fetchHighlights = ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
-	const featured = 'featured' === source && false !== config.hasFeatured;
-	const forced = { ...currentLangFilter(), ...( featured ? { featured: 'true' } : {} ) };
+export const fetchHighlights = async ( { type = '', source = 'newest', facets = {}, ranges = {}, signal } = {} ) => {
+	const ask = ( featured ) =>
+		search( '', {
+			type: type || productType(),
+			filters: buildFilterParams( facets, { ...currentLangFilter(), ...( featured ? { featured: 'true' } : {} ) } ),
+			ranges: buildRangeParams( ranges ),
+			perPage: 12,
+			surface: 'highlights',
+			sort: featured ? undefined : 'newest',
+			signal,
+		} );
+	const featured = 'featured' === source && false !== config.hasFeatured && ! featuredRefused;
 
-	return search( '', {
-		type: type || productType(),
-		filters: buildFilterParams( facets, forced ),
-		ranges: buildRangeParams( ranges ),
-		perPage: 12,
-		surface: 'highlights',
-		sort: featured ? undefined : 'newest',
-		signal,
-	} );
+	if ( ! featured ) {
+		return ask( false );
+	}
+
+	try {
+		return await ask( true );
+	} catch ( error ) {
+		if ( 422 !== error?.status ) {
+			throw error;
+		}
+
+		featuredRefused = true;
+
+		return ask( false );
+	}
 };
 
 /**

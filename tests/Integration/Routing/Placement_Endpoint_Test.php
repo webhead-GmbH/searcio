@@ -86,7 +86,7 @@ final class Placement_Endpoint_Test extends Integration_Test_Case {
 					'openers'   => true,
 					'selectors' => [ ' #menu-item-search > a ', '', '.x{}' ],
 					'floating'  => [ 'enabled' => true, 'offset' => 9999 ],
-					'search'    => [ 'mode' => 'banner', 'placeholder' => '<i>Find</i>' ],
+					'search'    => [ 'placeholder' => '<i>Find</i>' ],
 				],
 			]
 		);
@@ -101,6 +101,24 @@ final class Placement_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 'icon', $saved['search']['mode'] );
 		$this->assertSame( 'Find', $saved['search']['placeholder'] );
 		$this->assertTrue( $this->service( 'placement_config' )->options()->takeover );
+	}
+
+	/**
+	 * `animation: "slide"` was answered with 200 and stored as the animation the
+	 * site already had: the caller believed it had been saved.
+	 */
+	public function test_a_value_a_setting_does_not_take_is_refused_and_nothing_is_saved(): void {
+		$this->acting_as();
+		$this->service( 'placement_config' )->save( [ 'search' => [ 'animation' => 'zoom' ] ] );
+
+		$response = $this->dispatch( 'POST', [ 'placement' => [ 'takeover' => true, 'search' => [ 'animation' => 'slide' ] ] ] );
+
+		$this->assertSame( 422, $response->get_status() );
+		$this->assertSame( '"slide" is not a value for animation. Use one of: none, fade, slide-down, slide-up, zoom.', $response->get_data()['message'] );
+		$this->assertFalse( $this->service( 'placement_config' )->options()->takeover, 'Nothing of a refused request is saved.' );
+		$this->assertSame( 'zoom', $this->service( 'placement_config' )->options()->search->animation );
+
+		$this->assertSame( 200, $this->dispatch( 'POST', [ 'placement' => [ 'search' => [ 'animation' => 'slide-up', 'align' => '' ] ] ] )->get_status() );
 	}
 
 	public function test_saving_without_settings_is_refused_with_a_reason(): void {

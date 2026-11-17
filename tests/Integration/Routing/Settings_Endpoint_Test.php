@@ -203,6 +203,7 @@ final class Settings_Endpoint_Test extends Integration_Test_Case {
 		$response = $this->save( [ Plugin_Settings::SYNC_RETENTION_DAYS => -5 ] );
 
 		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+		$this->assertSame( 'Enter 0 or more days to keep the sync history for. 0 keeps it forever.', $response->get_data()['message'], 'The message says what to enter, not which setting refused it.' );
 		$this->assertSame( 30, (int) $this->settings()->get( Plugin_Settings::SYNC_RETENTION_DAYS ) );
 
 		$this->save( [ Plugin_Settings::SYNC_RETENTION_DAYS => 0 ] );

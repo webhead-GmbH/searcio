@@ -50,6 +50,34 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertSame( 2, $calls->get );
 	}
 
+	/**
+	 * Searcio answers in the language of `Accept-Language`, and in German
+	 * without it: an English screen was answered in German. Every request, the
+	 * save of the search configuration included, says the language of the
+	 * screen.
+	 */
+	public function test_every_request_says_the_language_of_the_screen(): void {
+		$this->connect_client();
+		$languages = [];
+
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$languages ): array {
+				$languages[] = $args['headers']['Accept-Language'] ?? null;
+
+				return $this->http_ok( [ 'ok' => true ] );
+			}
+		);
+
+		$locale = static fn (): string => 'de_DE';
+
+		$this->client()->update_search_config( [ 'weights' => [ 'title' => 8 ] ] );
+		add_filter( 'locale', $locale );
+		$this->client()->update_search_config( [ 'weights' => [ 'title' => 9 ] ] );
+		remove_filter( 'locale', $locale );
+
+		$this->assertSame( [ 'en-US', 'de-DE' ], $languages );
+	}
+
 	public function test_the_quizzes_are_read_once_until_one_is_made_changed_or_deleted(): void {
 		$this->connect_client();
 		$calls = $this->count_requests( [ 'quizzes' => [] ] );

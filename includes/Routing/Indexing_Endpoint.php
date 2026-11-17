@@ -69,7 +69,7 @@ final class Indexing_Endpoint extends Rest_API {
 
 		if ( $version !== $previous ) {
 			$user_id = get_current_user_id();
-			$started = $this->sync->start( Sync_Trigger::Manual, $user_id > 0 ? $user_id : null, false );
+			$started = $this->sync->start( Sync_Trigger::SettingsChange, $user_id > 0 ? $user_id : null, false );
 
 			// Not started: no credentials yet, nothing indexed, or a sync
 			// already running, which does not see the change for the posts it

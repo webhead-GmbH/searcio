@@ -4018,7 +4018,7 @@ msgstr "Zu Seite %d"
 #: src/frontend/search/components/CompareTable.js:64
 #: src/frontend/search/components/templates.js:120
 msgid "On backorder"
-msgstr "Im Rückstand"
+msgstr "Lieferrückstand"
 
 #: src/frontend/search/components/CompareTable.js:77
 #: src/frontend/search/components/CompareTable.js:92
@@ -5358,6 +5358,7 @@ msgid "Searcio does not know the search key, so the site searches with WordPress
 msgstr "Searcio kennt den Search Key nicht, daher sucht die Website mit WordPress statt mit Searcio. Kopieren Sie ihn erneut aus dem Searcio-Dashboard oder verbinden Sie die Website erneut."
 
 #: includes/Routing/Settings_Endpoint.php:82
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:131
 msgid "That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard."
 msgstr "Das ist kein Search Key: Er beginnt mit sk_ und enthält keine Leerzeichen. Kopieren Sie ihn erneut aus dem Searcio-Dashboard."
 
@@ -5541,10 +5542,6 @@ msgstr "Geben Sie den Wert ein, den die Produkte in diesem Feld haben."
 msgid "Enter a target margin from 0.1 to 100, or tick Never lift."
 msgstr "Geben Sie eine Zielmarge von 0.1 bis 100 ein oder setzen Sie den Haken bei Nie hervorheben."
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:563
-msgid "Lifts products with a good margin among the results that match a search about equally well, and orders listings without a search term, such as a category page, the same way. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
-msgstr "Hebt Produkte mit guter Marge unter den Ergebnissen hervor, die etwa gleich gut zu einer Suche passen, und ordnet Listen ohne Suchbegriff, etwa eine Kategorieseite, genauso. Ein deutlich besserer Treffer behält seinen Platz, angeheftete Produkte bleiben oben, und nicht vorrätige Produkte bleiben hinten. Dieselben Einstellungen wie im Searcio-Dashboard."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:569
 msgid "Margins are worked out without tax: enter purchase prices without tax, and where the shop shows prices with tax it is added to them, so the margin comes out the same either way. Purchase prices are never shown."
 msgstr "Margen werden ohne Steuer berechnet: Geben Sie Einkaufspreise ohne Steuer ein, und zeigt der Shop Preise mit Steuer an, wird sie hinzugerechnet, sodass die Marge in beiden Fällen gleich ausfällt. Einkaufspreise werden nie angezeigt."
@@ -5580,3 +5577,99 @@ msgstr "Ihre eigenen Felder, deren Werte Zahlen sind, etwa ein Gewicht oder eine
 #: src/admin/settings/components/tabs/SearchConfigTab.js:1430
 msgid "Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background: give it a few minutes before changing it again."
 msgstr "Attribute, in denen sich die Varianten eines Produkts unterscheiden, etwa Farbe und Grösse. Filter darauf finden ein Produkt nur, wenn eine vorrätige Variante jeden gewählten Wert hat: Rot und XL finden keine Jacke mehr, deren rote XL ausverkauft ist. Das erste Attribut baut den Suchindex im Hintergrund neu auf: Geben Sie ihm ein paar Minuten, bevor Sie es erneut ändern."
+
+#: includes/Health/Health_Tests.php:98
+msgid "Searcio background tasks"
+msgstr "Hintergrundaufgaben von Searcio"
+
+#: includes/Health/Health_Tests.php:258
+msgid "Searcio background tasks run on time"
+msgstr "Die Hintergrundaufgaben von Searcio laufen pünktlich"
+
+#: includes/Health/Health_Tests.php:260
+msgid "Nothing the plugin schedules, such as the sync of your changes, is overdue."
+msgstr "Nichts, was das Plugin plant, etwa die Synchronisierung Ihrer Änderungen, ist überfällig."
+
+#: includes/Health/Health_Tests.php:266
+msgid "Searcio background tasks are overdue"
+msgstr "Die Hintergrundaufgaben von Searcio sind überfällig"
+
+#. translators: %d: how many minutes the longest overdue task is late.
+#: includes/Health/Health_Tests.php:271
+#, php-format
+msgid "A task of the plugin, such as the sync of your changes, has been due for %d minutes. WordPress starts such tasks through WP-Cron, which only runs while the site is visited, and not at all where the host blocks the request WordPress makes to itself or WP-Cron is switched off."
+msgstr "Eine Aufgabe des Plugins, etwa die Synchronisierung Ihrer Änderungen, ist seit %d Minuten fällig. WordPress startet solche Aufgaben über WP-Cron, das nur läuft, solange die Website besucht wird, und gar nicht, wenn der Host die Anfrage blockiert, die WordPress an sich selbst stellt, oder WP-Cron abgeschaltet ist."
+
+#: includes/Health/Health_Tests.php:274
+msgid "Ask your host to call WP-Cron from the server every minute, for example with this command, and turn off the one WordPress starts itself with DISABLE_WP_CRON if it is not off already:"
+msgstr "Bitten Sie Ihren Host, WP-Cron jede Minute vom Server aus aufzurufen, zum Beispiel mit diesem Befehl, und schalten Sie mit DISABLE_WP_CRON das von WordPress selbst gestartete ab, falls es nicht schon aus ist:"
+
+#. translators: 1: the value that was sent. 2: the name of the setting. 3: the values it can take, separated by commas.
+#: includes/Routing/Placement_Endpoint.php:93
+#, php-format
+msgid "\"%1$s\" is not a value for %2$s. Use one of: %3$s."
+msgstr "\"%1$s\" ist kein Wert für %2$s. Verwenden Sie einen von: %3$s."
+
+#: includes/Routing/Settings_Endpoint.php:94
+msgid "Enter 0 or more days to keep the sync history for. 0 keeps it forever."
+msgstr "Geben Sie 0 oder mehr Tage ein, für die der Sync-Verlauf aufbewahrt wird. Bei 0 bleibt er für immer erhalten."
+
+#: includes/Routing/Sync_Endpoint.php:90
+msgid "There is no sync running to move on."
+msgstr "Es läuft keine Synchronisierung, die weitergeführt werden könnte."
+
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:115
+msgid "The search index of this site is empty, so every search finds nothing. Run a full sync on the Sync tab to fill it again."
+msgstr "Der Suchindex dieser Website ist leer, daher findet jede Suche nichts. Starten Sie im Tab Synchronisierung eine vollständige Synchronisierung, um ihn wieder zu füllen."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:569
+msgid "Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
+msgstr "Hebt Produkte mit guter Marge unter den Ergebnissen hervor, die etwa gleich gut zu einer Suche passen. Ein deutlich besserer Treffer behält seinen Platz, angeheftete Produkte bleiben oben, und nicht vorrätige Produkte bleiben hinten. Dieselben Einstellungen wie im Searcio-Dashboard."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:620
+msgid "Optional, without tax. A product that earns less per sale is not lifted, however high its margin."
+msgstr "Optional, ohne Steuer. Ein Produkt, das pro Verkauf weniger verdient, wird nicht hervorgehoben, wie hoch seine Marge auch ist."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:631
+msgid "Also order listings without a search term"
+msgstr "Auch Listen ohne Suchbegriff ordnen"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:632
+msgid "Without a term every product matches equally well, so the lift alone puts a category page or the highlights in order, which is stronger than in a search. Off, such a listing keeps its usual order."
+msgstr "Ohne Suchbegriff passt jedes Produkt gleich gut, daher bringt allein die Hervorhebung eine Kategorieseite oder die Highlights in eine Reihenfolge, stärker als in einer Suche. Aus behält eine solche Liste ihre übliche Reihenfolge."
+
+#. translators: %s: the name of a content type.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1367
+#, js-format
+msgid "Remove the boost of %s"
+msgstr "Boost von %s entfernen"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1380
+msgid "A boost with a remove button is for a type that no content of this site has any more, for example one you renamed on the Indexing tab. It moves no result here: remove it, unless another source sends that type to the same index."
+msgstr "Ein Boost mit einem Entfernen-Button gehört zu einem Typ, den kein Inhalt dieser Website mehr hat, zum Beispiel einen, den Sie im Tab Indexierung umbenannt haben. Er bewegt hier kein Ergebnis: Entfernen Sie ihn, ausser eine andere Quelle sendet diesen Typ an denselben Index."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:48
+msgid "Settings change"
+msgstr "Einstellungsänderung"
+
+#. translators: %d: how many minutes the sync has not moved.
+#: src/admin/settings/components/tabs/SyncTab.js:283
+#, js-format
+msgid "This sync has not moved for %d minutes. WordPress runs it through WP-Cron, which only works while the site is visited, or when the server calls it. Run the next step here, or ask your host to call \"wp cron event run --due-now\" from the server every minute."
+msgstr "Diese Synchronisierung hat sich seit %d Minuten nicht bewegt. WordPress führt sie über WP-Cron aus, das nur läuft, solange die Website besucht wird, oder wenn der Server es aufruft. Führen Sie den nächsten Schritt hier aus oder bitten Sie Ihren Host, jede Minute \"wp cron event run --due-now\" auf dem Server aufzurufen."
+
+#: src/admin/settings/components/tabs/SyncTab.js:293
+msgid "Run the next step now"
+msgstr "Nächsten Schritt jetzt ausführen"
+
+#. translators: 1: how many products are compared. 2: how many were found.
+#: src/frontend/search/components/CompareTable.js:229
+#, js-format
+msgid "The first %1$d of the %2$d products are compared."
+msgstr "Die ersten %1$d der %2$d Produkte werden verglichen."
+
+#. translators: 1: number of results loaded so far. 2: about how many results there are; Searcio counts the best matches of a search by meaning, not every one.
+#: src/frontend/search/components/SearchModal.js:1568
+#, js-format
+msgid "%1$d of about %2$d results"
+msgstr "%1$d von etwa %2$d Ergebnissen"

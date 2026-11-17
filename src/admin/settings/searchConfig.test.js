@@ -517,6 +517,21 @@ describe( 'profit ranking', () => {
 		expect( normalizeProfitRanking( { enabled: 1, strength: 'x' } ) ).toEqual( { enabled: true, strength: 15, target: 25, min_profit: null, rules: [], excluded_terms: [] } );
 	} );
 
+	// A Searcio that has the switch for listings without a search term reports
+	// it, and keeps what the panel set when a plugin leaves it out.
+	it( 'carries the switch for listings only where Searcio has it', () => {
+		const withListings = { ...RANKING, listings: false };
+		const read = normalizeConfig( { profit_ranking: withListings } );
+
+		expect( read.profit_ranking.listings ).toBe( false );
+		expect( normalizeProfitRanking( { ...RANKING, listings: 'yes' } ) ).not.toHaveProperty( 'listings' );
+		expect( profitRankingPayload( read.profit_ranking ) ).toHaveProperty( 'listings', false );
+		expect( profitRankingPayload( normalizeProfitRanking( RANKING ) ) ).not.toHaveProperty( 'listings' );
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, listings: true } }, read ) ).toEqual( {
+			profit_ranking: { ...RANKING, listings: true },
+		} );
+	} );
+
 	// Searcio takes it whole; a save that changes something else leaves it out.
 	it( 'is sent whole when it changed, and not at all otherwise', () => {
 		const read = normalizeConfig( { profit_ranking: RANKING, synonyms: [] } );

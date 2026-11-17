@@ -89,6 +89,25 @@ describe( 'ConnectionResultNotice', () => {
 		expect( container.textContent ).not.toContain( 'search key' );
 	} );
 
+	// "526 indexed" was the plan's counter, and the index held nothing.
+	it( 'warns that the index is empty when Searcio says so, and says nothing when it cannot tell', async () => {
+		await render( null );
+		await render( { ...SERVED, documents: { used: 526, limit: 20000, indexed: 0 } } );
+
+		expect( container.textContent ).toContain( 'Connected - 526 / 20,000 documents indexed. (site #21) The search index of this site is empty' );
+		expect( speak ).toHaveBeenCalledWith( expect.stringContaining( 'The search index of this site is empty' ), 'assertive' );
+
+		await render( { ...SERVED, documents: { used: 526, limit: 20000, indexed: null } } );
+		expect( container.textContent ).not.toContain( 'index of this site is empty' );
+
+		await render( { ...SERVED, documents: { used: 526, limit: 20000, indexed: 526 } } );
+		expect( container.textContent ).not.toContain( 'index of this site is empty' );
+
+		// Nothing sent yet: an index that holds nothing is as it should be.
+		await render( { ...SERVED, documents: { used: 0, limit: 20000, indexed: 0 } } );
+		expect( container.textContent ).not.toContain( 'index of this site is empty' );
+	} );
+
 	it( 'says why an account without a plan is refused, and links to choosing one', async () => {
 		await render( refused( 'no_active_plan' ) );
 
