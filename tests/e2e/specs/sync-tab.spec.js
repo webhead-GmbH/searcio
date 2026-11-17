@@ -42,15 +42,16 @@ const RUN = {
 /**
  * @param {import('@playwright/test').Page} page
  * @param {Object}                          run  What differs from {@see RUN}.
+ * @param {?Object}                         stalled The status's `stalled`, set when its worker is overdue.
  */
-async function mockActiveRun( page, run ) {
+async function mockActiveRun( page, run, stalled = null ) {
 	await page.route(
 		( url ) => decodeURIComponent( url.href ).includes( '/searcio/v1/sync/status' ),
 		( route ) =>
 			route.fulfill( {
 				status: 200,
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify( { configured: true, indexable: [ 'product' ], active: { ...RUN, ...run } } ),
+				body: JSON.stringify( { configured: true, indexable: [ 'product' ], active: { ...RUN, ...run }, stalled } ),
 			} )
 	);
 }
@@ -110,6 +111,50 @@ test.describe( 'Sync tab', () => {
 		await expect( run.getByText( /While a sync is paused/ ) ).toHaveCount( 0 );
 
 		expect( await touchingInShell( page ) ).toEqual( [] );
+	} );
+
+	/**
+	 * A scheduled run stood at "0 of 539" for twenty minutes on a site whose
+	 * WP-Cron had no visitor to start it, and the screen said nothing. Ten
+	 * minutes without a step, with the worker overdue, it says so and offers
+	 * the step.
+	 */
+	test( 'says when a sync has stood still because WP-Cron does not run it, and runs the next step', async ( { page } ) => {
+		let nudged = 0;
+
+		await mockActiveRun( page, { processed: 0, pushed: 0, skipped: 0 }, { seconds: 1260, cron_disabled: false } );
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/searcio/v1/sync/nudge' ),
+			( route ) => {
+				nudged++;
+
+				return route.fulfill( { status: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify( { ok: true, run: RUN } ) } );
+			}
+		);
+		await page.goto( SETTINGS_URL );
+
+		const run = page.locator( RUN_CARD );
+		const stalled = notice( run, /This sync has not moved for 21 minutes/ );
+
+		await expect( stalled ).toBeVisible();
+		await expect( stalled ).toHaveClass( /is-warning/ );
+		await expect( stalled ).toContainText( 'wp cron event run --due-now' );
+
+		await run.getByRole( 'button', { name: 'Run the next step now' } ).click();
+		await expect.poll( () => nudged ).toBe( 1 );
+
+		expect( await touchingInShell( page ) ).toEqual( [] );
+	} );
+
+	test( 'says nothing of WP-Cron for a run that moves', async ( { page } ) => {
+		await mockActiveRun( page, {} );
+		await page.goto( SETTINGS_URL );
+
+		const run = page.locator( RUN_CARD );
+
+		await expect( run.getByText( 'Running', { exact: true } ) ).toBeVisible();
+		await expect( run.getByText( /has not moved/ ) ).toHaveCount( 0 );
+		await expect( run.getByRole( 'button', { name: 'Run the next step now' } ) ).toHaveCount( 0 );
 	} );
 
 	test( 'says what a pause costs and when it ends', async ( { page } ) => {

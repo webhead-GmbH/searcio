@@ -250,7 +250,7 @@ $lift: ':is(*, #whsc#whsc#whsc)';
  */
 /*
  * Under WordPress's toolbar, which a theme may lift above anything a window
- * can be (fisch-gruber.at gives it `z-index: 2147483647`): the overlays start
+ * can be (some give it `z-index: 2147483647`): the overlays start
  * where the toolbar ends, `--whsc-admin-bar`, which the search window measures
  * as it opens and is 0 for a visitor. What fills them, the "All filters"
  * drawer and a phone's sheet, takes its height from them; the window says so
@@ -1838,10 +1838,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		flex-direction: column;
 	}
 
-	// The canvas writes a space between the parts of a price, the markup
-	// none: "from249,90".
-	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"]) {
-		margin-inline-end: 0.25em;
+	// The canvas writes a space between the parts of a price: "from249,90"
+	// without it. Written on the part's `::after`, as the stylesheet Searcio
+	// compiles writes it, so a template that has it still
+	// shows one space, and a hidden part takes its space along.
+	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"])::after {
+		content: "\a0";
 	}
 
 	:is(h1, h2, h3, h4, h5, h6) {
@@ -3033,6 +3035,13 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 .whsc-compare__price {
 	font-weight: 600;
+	color: var(--whsc-price-color, #6b7177);
+}
+
+/* Said under the table when more products were found than it holds. */
+.whsc-compare__note {
+	margin: 8px 14px 0;
+	font-size: 12px;
 	color: var(--whsc-price-color, #6b7177);
 }
 

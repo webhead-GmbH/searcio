@@ -65,6 +65,16 @@ describe( 'comparisonRows', () => {
 		).toEqual( [ 'brand', 'virtual' ] );
 	} );
 
+	// The raw timestamp of the "newest" sort, and "Kategorie" beside "Kategorien".
+	it( 'leaves out the publication timestamp, and a field beside its own plural', () => {
+		expect(
+			comparisonRows( [
+				product( 'a', { published_at: '2026-11-11T11:34:17Z', category: 'Bags', categories: [ 'Bags', 'Shop' ], material: 'Leather' } ),
+				product( 'b', { published_at: '2026-11-12T08:00:00Z', category: 'Totes', categories: [ 'Totes', 'Shop' ], material: 'Canvas' } ),
+			] )
+		).toEqual( [ 'categories', 'material' ] );
+	} );
+
 	it( 'includes a field only some of the products have', () => {
 		expect(
 			comparisonRows( [
@@ -133,5 +143,27 @@ describe( 'comparison rows with the site\'s own field names', () => {
 		expect( html ).toContain( '<th scope="row" class="whsc-compare__label">Farbe</th>' );
 		expect( html ).toContain( '<th scope="row" class="whsc-compare__label">Marke</th>' );
 		expect( html ).not.toContain( '>Color<' );
+	} );
+} );
+
+/**
+ * Twelve products were twelve columns: 1692px of table in a 343px window.
+ */
+describe( 'a comparison of many products', () => {
+	const many = Array.from( { length: 7 }, ( _, index ) => product( `p${ index + 1 }`, { brand: `Brand ${ index + 1 }` } ) );
+
+	it( 'compares the first four, and says so', () => {
+		const html = renderToString( <CompareTable products={ many } /> );
+
+		expect( ( html.match( /<th scope="col">/g ) || [] ).length ).toBe( 4 );
+		expect( html ).toContain( 'Brand 4' );
+		expect( html ).not.toContain( 'Brand 5' );
+		expect( html ).toContain( 'The first 4 of the 7 products are compared.' );
+	} );
+
+	it( 'says nothing when all of them fit', () => {
+		const html = renderToString( <CompareTable products={ many.slice( 0, 3 ) } /> );
+
+		expect( html ).not.toContain( 'whsc-compare__note' );
 	} );
 } );

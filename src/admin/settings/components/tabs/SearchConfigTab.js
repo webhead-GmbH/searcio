@@ -6,10 +6,11 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { Card, CheckboxControl, Fieldset, InputControl, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
+import { Card, CheckboxControl, Fieldset, InputControl, Link, Notice, SelectControl, Stack, Text, TextareaControl } from '@wordpress/ui';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 import SettingsContext from '../../../../settings/store/context';
 import {
@@ -17,14 +18,25 @@ import {
 	enabledTypeLabels,
 	repeatsRedirect,
 	errorsUnder,
+	FIELD_LIST_MAX,
 	idsToText,
 	listError,
 	normalizeConfig,
+	numberFieldChoices,
+	PROFIT_RULES_MAX,
+	PROFIT_STRENGTH_MAX,
+	PROFIT_TERMS_MAX,
+	profitRankingProblems,
+	profitRulesSent,
+	sendsPurchasePrice,
 	termsToText,
 	textToIds,
 	textToTerms,
 	toPayload,
+	typedNumber,
+	variantFieldChoices,
 } from '../../searchConfig';
+import { useStatisticsUrl } from '../../plan';
 import { indexedFields, unindexedFields } from '../../indexedFields';
 import { selectProps } from '../../../../utils/select';
 import { Grid } from '../../../../components/Layout';
@@ -50,7 +62,9 @@ const TEST_CONNECTION_PATH =
  * untouched. `PUT /search-config` replaces the whole section, so rebuilding the
  * list from local post types alone would delete a boost set in the panel for a
  * type that lives somewhere else - another store on the same index, or a type
- * that was disabled here temporarily.
+ * that was disabled here temporarily. Not one of 1: that boost changes
+ * nothing, and a type a content type was renamed from ("post" once the type
+ * is called "artikel") only added a row that moved no result.
  */
 const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 	const existing = new Map( typeBoosts.map( ( row ) => [ row.type, row.boost ] ) );
@@ -59,7 +73,7 @@ const syncTypeBoosts = ( typeBoosts, enabledTypes ) => {
 		boost: existing.has( type ) ? existing.get( type ) : 1,
 	} ) );
 
-	const foreign = typeBoosts.filter( ( row ) => ! enabledTypes.includes( row.type ) );
+	const foreign = typeBoosts.filter( ( row ) => ! enabledTypes.includes( row.type ) && 1 !== Number( row.boost ) );
 
 	return [ ...local, ...foreign ];
 };
@@ -147,6 +161,13 @@ const OWN_ERRORS = () => ( {
 	'redirects.url': __( 'Enter a full address that starts with https://, or a path on this site that starts with /.', 'searcio' ),
 	'searchable_fields.weight': __( 'Enter a weight from 1 to 100.', 'searcio' ),
 	'type_boosts.boost': __( 'Enter a boost from 0.1 to 100.', 'searcio' ),
+	'profit_ranking.strength': __( 'Enter a strength from 1 to 50.', 'searcio' ),
+	'profit_ranking.target': __( 'Enter a target margin from 0.1 to 100.', 'searcio' ),
+	'profit_ranking.min_profit': __( 'Enter an amount of 0 or more, or leave it empty.', 'searcio' ),
+	'profit_ranking.excluded_terms': __( 'Enter up to 200 terms, one per line.', 'searcio' ),
+	'profit_ranking.rules.field': __( 'Enter the field the products have, such as categories.', 'searcio' ),
+	'profit_ranking.rules.value': __( 'Enter the value the products have in that field.', 'searcio' ),
+	'profit_ranking.rules.target': __( 'Enter a target margin from 0.1 to 100, or tick Never lift.', 'searcio' ),
 } );
 
 /** Errors use `searchable_fields.0.field` style keys; map back to a row + column. */
@@ -159,6 +180,13 @@ const rowError = ( errors, section, index, column ) => {
 	}
 
 	return OWN_ERRORS()[ `${ section }.${ column }` ] || messages.join( ' ' );
+};
+
+/** The plugin's words for what Searcio reported under one key, or Searcio's own where it has none. */
+const fieldError = ( errors, key ) => {
+	const messages = errors?.[ key ];
+
+	return Array.isArray( messages ) ? OWN_ERRORS()[ key ] || messages.join( ' ' ) : undefined;
 };
 
 /**
@@ -490,11 +518,218 @@ const FeaturesCard = ( { features, errors, onChange } ) => {
 };
 
 /**
+ * "Profitable products first": Searcio lifts products with a good margin
+ * among the results that match a search about equally well. The same
+ * settings as in the Searcio dashboard, which also shows their effect and
+ * imports rules. It works the margin out from the purchase price each
+ * product is indexed with, which the Indexing tab sends once its "Purchase
+ * price, for profit ranking" is on: without it the ranking lifts nothing, and
+ * the card says so.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.ranking            `profit_ranking`, normalized.
+ * @param {Object}   props.errors
+ * @param {boolean}  props.sendsPurchasePrice Whether the products are indexed with a purchase price.
+ * @param {?Array}   props.indexed            The fields the documents carry, or null when unknown.
+ * @param {boolean}  props.pricesWithTax      Whether the shop shows its prices with tax.
+ * @param {Function} props.onChange           Called with the whole replacement.
+ */
+const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pricesWithTax, onChange } ) => {
+	const statisticsUrl = useStatisticsUrl();
+	const [ termsText, setTermsText ] = useState( () => termsToText( ranking.excluded_terms ) );
+	const set = ( key, value ) => onChange( { ...ranking, [ key ]: value } );
+	// A number while the field holds one, so that a value typed as it was
+	// read is no change; what is being typed otherwise, for Searcio to judge.
+	const typed = ( value ) => typedNumber( value ) ?? value;
+	const rules = ranking.rules || [];
+	const update = ( index, next ) => set( 'rules', rules.map( ( rule, i ) => ( i === index ? next : rule ) ) );
+	const error = ( key ) => fieldError( errors, `profit_ranking.${ key }` );
+	// Searcio counts a target's errors in the list it was sent, which has no
+	// untouched row in it.
+	const sent = profitRulesSent( rules );
+	const rowMessage = ( index, column ) => ( -1 === sent.indexOf( index ) ? undefined : rowError( errors, 'profit_ranking.rules', sent.indexOf( index ), column ) );
+	const unindexed = unindexedFields( rules.map( ( rule ) => rule.field ), indexed );
+	// A Searcio that has the switch for listings also counts the least profit
+	// per sale in the price without tax, which the plugin sends beside the
+	// purchase price where the shop shows prices with tax.
+	const hasListings = 'boolean' === typeof ranking.listings;
+
+	// The terms as Searcio stored them, once a save has trimmed them; what is
+	// being typed is left alone.
+	useEffect( () => {
+		if ( JSON.stringify( textToTerms( termsText ) ) !== JSON.stringify( ranking.excluded_terms || [] ) ) {
+			setTermsText( termsToText( ranking.excluded_terms ) );
+		}
+	}, [ ranking.excluded_terms ] ); // eslint-disable-line react-hooks/exhaustive-deps
+
+	return (
+		<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted whsc-settings-card--wide whsc-profit-ranking">
+			<CardHeading
+				title={ __( 'Profitable products first', 'searcio' ) }
+				description={ __( 'Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
+			/>
+			<Card.Content className="whsc-settings-card-content">
+				<Stack direction="column" gap="lg">
+					<CheckboxControl
+						label={ __( 'Lift profitable products', 'searcio' ) }
+						description={ error( 'enabled' ) || __( 'Margins are worked out without tax: enter purchase prices without tax, and where the shop shows prices with tax it is added to them, so the margin comes out the same either way. Purchase prices are never shown.', 'searcio' ) }
+						checked={ Boolean( ranking.enabled ) }
+						onCheckedChange={ ( enabled ) => set( 'enabled', Boolean( enabled ) ) }
+					/>
+
+					{ ranking.enabled && ! sendsPurchasePrice && (
+						<Notice.Root intent="warning">
+							<Notice.Description>
+								{ __( 'Nothing is lifted yet: the products are indexed without a purchase price. Turn on "Purchase price, for profit ranking" under Product details on the Indexing tab, save it, and let the sync it starts finish.', 'searcio' ) }
+							</Notice.Description>
+							<Notice.Actions>
+								<Notice.ActionLink href={ addQueryArgs( window.location.href, { tab: 'indexing' } ) } openInNewTab>
+									{ __( 'Open the Indexing tab', 'searcio' ) }
+								</Notice.ActionLink>
+							</Notice.Actions>
+						</Notice.Root>
+					) }
+
+					<Grid auto={ 220 } gap="var(--wpds-dimension-gap-md)" align="start">
+						<InputControl
+							type="number"
+							min={ 1 }
+							max={ PROFIT_STRENGTH_MAX }
+							step={ 1 }
+							label={ __( 'Strength (%)', 'searcio' ) }
+							description={ error( 'strength' ) || __( 'How far a product with a good margin may rise, from 1 to 50: at 15 it overtakes only results that match at most 15 percent better.', 'searcio' ) }
+							value={ String( ranking.strength ?? '' ) }
+							onValueChange={ ( value ) => set( 'strength', typed( value ) ) }
+						/>
+						<InputControl
+							type="number"
+							min={ 0.1 }
+							max={ 100 }
+							step={ 0.1 }
+							label={ __( 'Target margin (%)', 'searcio' ) }
+							description={ error( 'target' ) || __( 'The margin, without tax, from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift: with a target of 25, a margin of 25 gets half of it and 50 or more all of it.', 'searcio' ) }
+							value={ String( ranking.target ?? '' ) }
+							onValueChange={ ( value ) => set( 'target', typed( value ) ) }
+						/>
+						<InputControl
+							type="number"
+							min={ 0 }
+							step={ 0.01 }
+							label={ __( 'Least profit per sale', 'searcio' ) }
+							description={ error( 'min_profit' ) || ( hasListings
+								? __( 'Optional, without tax. A product that earns less per sale is not lifted, however high its margin.', 'searcio' )
+								: pricesWithTax
+									? __( 'Optional. A product that earns less per sale is not lifted, however high its margin. Counted in the prices the shop displays, which include tax, so the tax on the profit counts too.', 'searcio' )
+									: __( 'Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin.', 'searcio' ) ) }
+							value={ String( ranking.min_profit ?? '' ) }
+							onValueChange={ ( value ) => set( 'min_profit', typed( value ) ) }
+						/>
+					</Grid>
+
+					{ hasListings && (
+						<CheckboxControl
+							label={ __( 'Also order listings without a search term', 'searcio' ) }
+							description={ __( 'Without a term every product matches equally well, so the lift alone puts a category page or the highlights in order, which is stronger than in a search. Off, such a listing keeps its usual order.', 'searcio' ) }
+							checked={ Boolean( ranking.listings ) }
+							onCheckedChange={ ( listings ) => set( 'listings', Boolean( listings ) ) }
+						/>
+					) }
+
+					<Fieldset.Root className="whsc-profit-rules">
+						<Fieldset.Legend>{ __( 'Targets of their own', 'searcio' ) }</Fieldset.Legend>
+						<Stack direction="column" gap="md">
+							<Text render={ <p /> } variant="body-sm">
+								{ __( 'A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies, and saved targets are listed in that order.', 'searcio' ) }
+							</Text>
+							{ rules.map( ( rule, index ) => (
+								<div className="whsc-profit-rule" key={ index }>
+									<InputControl
+										label={ __( 'Field', 'searcio' ) }
+										list="whsc-field-suggestions"
+										description={ rowMessage( index, 'field' ) || ( unindexed.includes( String( rule.field ).trim() )
+											? __( 'No product on this site has this field, so the target never applies. Choose a field from the list, or start indexing it in the Indexing tab.', 'searcio' )
+											: undefined ) }
+										value={ rule.field }
+										onValueChange={ ( field ) => update( index, { ...rule, field } ) }
+									/>
+									<InputControl
+										label={ __( 'Value', 'searcio' ) }
+										description={ rowMessage( index, 'value' ) || __( 'Write it as it is in your products, for example Navy.', 'searcio' ) }
+										value={ rule.value }
+										onValueChange={ ( value ) => update( index, { ...rule, value } ) }
+									/>
+									<InputControl
+										type="number"
+										min={ 0.1 }
+										max={ 100 }
+										step={ 0.1 }
+										label={ __( 'Target (%)', 'searcio' ) }
+										description={ rowMessage( index, 'target' ) }
+										value={ rule.exclude ? '' : String( rule.target ?? '' ) }
+										disabled={ rule.exclude }
+										onValueChange={ ( target ) => update( index, { ...rule, target: typed( target ) } ) }
+									/>
+									<div className="whsc-profit-rule__exclude">
+										<CheckboxControl
+											label={ __( 'Never lift', 'searcio' ) }
+											checked={ Boolean( rule.exclude ) }
+											onCheckedChange={ ( exclude ) => update( index, { ...rule, exclude: Boolean( exclude ) } ) }
+										/>
+									</div>
+									<div className="whsc-row-remove">
+										<Button
+											__next40pxDefaultSize
+											icon={ trash }
+											isDestructive
+											variant="tertiary"
+											label={ __( 'Remove target', 'searcio' ) }
+											onClick={ () => set( 'rules', rules.filter( ( _, i ) => i !== index ) ) }
+										/>
+									</div>
+								</div>
+							) ) }
+							<Stack direction="row" gap="sm">
+								<Button
+									__next40pxDefaultSize
+									variant="secondary"
+									disabled={ rules.length >= PROFIT_RULES_MAX }
+									onClick={ () => set( 'rules', [ ...rules, { field: '', value: '', target: null, exclude: false } ] ) }
+								>
+									{ __( 'Add a target', 'searcio' ) }
+								</Button>
+							</Stack>
+						</Stack>
+					</Fieldset.Root>
+
+					<TextareaControl
+						label={ __( 'Search terms ranked by relevance alone', 'searcio' ) }
+						description={ error( 'excluded_terms' ) || __( 'One per line, up to 200, matched whole and whatever their capitals: brand names or service terms, for example.', 'searcio' ) }
+						value={ termsText }
+						onValueChange={ ( value ) => {
+							setTermsText( value );
+							set( 'excluded_terms', textToTerms( value ).slice( 0, PROFIT_TERMS_MAX ) );
+						} }
+					/>
+
+					{ statisticsUrl && (
+						<Text render={ <p /> } variant="body-sm">
+							<Link href={ statisticsUrl } openInNewTab>
+								{ __( 'See what profit ranking changes, and import targets, in the Searcio dashboard', 'searcio' ) }
+							</Link>
+						</Text>
+					) }
+				</Stack>
+			</Card.Content>
+		</Card.Root>
+	);
+};
+
+/**
  * Per-search curation: pin products to the top, keep products out, and show a
- * banner. Searcio applies the first rule that matches a search and no other,
- * so an empty trigger, which matches every search, keeps the rules below it
- * from ever applying, and a product it hides shows wherever a rule above it
- * matches.
+ * banner. Searcio applies every rule that matches a search, in the order of
+ * the list: what any of them hides is hidden, an earlier
+ * rule's pins come first, and the banner is the first one a matching rule
+ * has. A rule with an empty trigger matches every search.
  *
  * On a multilingual site each rule also names the language it fires in:
  * without one, a German rule "jacke" fired on the English search "jacket" too.
@@ -528,7 +763,7 @@ const MerchandisingCard = ( { rules, errors, languages, onChange } ) => {
 			<CardHeading
 				title={ __( 'Merchandising rules', 'searcio' ) }
 				description={ __(
-					'Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches.',
+					'Curate the results of chosen searches. Every rule that matches a search applies, in order from the top: what any of them hides is hidden, the products an earlier rule pins come first, and the banner is the first one a matching rule has. A rule with an empty trigger matches every search.',
 					'searcio'
 				) }
 			/>
@@ -838,6 +1073,8 @@ const SearchConfigTab = () => {
 			'type_boosts',
 			config.type_boosts.map( ( row, i ) => ( i === index ? { ...row, boost } : row ) )
 		);
+	const removeTypeBoost = ( index ) =>
+		set( 'type_boosts', config.type_boosts.filter( ( _, i ) => i !== index ) );
 
 	// `?.` guards against the connection-test promise resolving languageLimit
 	// before (or without) the config fetch ever completing.
@@ -872,6 +1109,18 @@ const SearchConfigTab = () => {
 
 		if ( hasSearchConfigChanges ) {
 			const payload = toPayload( config, persistedConfig );
+
+			// Searcio names a field by its key and answers in its own language,
+			// so what is plainly out of range is said here, under the field.
+			const problems = payload.profit_ranking ? profitRankingProblems( config.profit_ranking ) : {};
+
+			if ( Object.keys( problems ).length > 0 ) {
+				setIsSaving( false );
+				setFieldErrors( problems );
+				setSaveError( __( 'Some fields need a change: see the messages under them.', 'searcio' ) );
+
+				return;
+			}
 
 			// What Searcio has now, against what the tab read: a section changed
 			// in the Searcio dashboard meanwhile would be written back as it was.
@@ -1009,6 +1258,18 @@ const SearchConfigTab = () => {
 					}
 				/>
 
+				{ /* Offered once Searcio reports it, on a site with products. */ }
+				{ config.profit_ranking && catalog?.woo?.active && (
+					<ProfitRankingCard
+						ranking={ config.profit_ranking }
+						errors={ fieldErrors }
+						sendsPurchasePrice={ sendsPurchasePrice( catalog ) }
+						indexed={ indexed }
+						pricesWithTax={ Boolean( catalog?.woo?.prices_with_tax ) }
+						onChange={ ( ranking ) => set( 'profit_ranking', ranking ) }
+					/>
+				) }
+
 				<Card.Root className="whsc-settings-card whsc-card whsc-card--dotted">
 					<CardHeading
 						title={ __( 'Searchable fields & weights', 'searcio' ) }
@@ -1075,20 +1336,54 @@ const SearchConfigTab = () => {
 								     these are boosts. A "Type" column beside a "Boost"
 								     slider stood out of line with it, its caption level with
 								     nothing and its name below the slider's middle. */ }
-								{ config.type_boosts.map( ( row, index ) => (
-									<RangeControl
-										key={ row.type }
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										label={ typeLabels[ row.type ] || row.type }
-										min={ 0.1 }
-										max={ 100 }
-										step={ 0.1 }
-										value={ row.boost }
-										help={ rowError( fieldErrors, 'type_boosts', index, 'boost' ) }
-										onChange={ ( boost ) => updateTypeBoost( index, boost ) }
-									/>
-								) ) }
+								{ config.type_boosts.map( ( row, index ) => {
+									// A type no content of this site carries: it moves nothing here.
+									const foreign = ! ( row.type in typeLabels );
+									const slider = (
+										<RangeControl
+											key={ row.type }
+											__next40pxDefaultSize
+											__nextHasNoMarginBottom
+											label={ typeLabels[ row.type ] || row.type }
+											min={ 0.1 }
+											max={ 100 }
+											step={ 0.1 }
+											value={ row.boost }
+											help={ rowError( fieldErrors, 'type_boosts', index, 'boost' ) }
+											onChange={ ( boost ) => updateTypeBoost( index, boost ) }
+										/>
+									);
+
+									return foreign ? (
+										<div className="whsc-search-config-row whsc-type-boost--foreign" key={ row.type }>
+											{ slider }
+											<Button
+												__next40pxDefaultSize
+												icon={ trash }
+												isDestructive
+												variant="tertiary"
+												label={ sprintf(
+													/* translators: %s: the name of a content type. */
+													__( 'Remove the boost of %s', 'searcio' ),
+													row.type
+												) }
+												onClick={ () => removeTypeBoost( index ) }
+											/>
+										</div>
+									) : (
+										slider
+									);
+								} ) }
+								{ config.type_boosts.some( ( row ) => ! ( row.type in typeLabels ) ) && (
+									<Notice.Root intent="warning">
+										<Notice.Description>
+											{ __(
+												'A boost with a remove button is for a type that no content of this site has any more, for example one you renamed on the Indexing tab. It moves no result here: remove it, unless another source sends that type to the same index.',
+												'searcio'
+											) }
+										</Notice.Description>
+									</Notice.Root>
+								) }
 							</Stack>
 						) : (
 							<Notice.Root intent="info">
@@ -1152,6 +1447,42 @@ const SearchConfigTab = () => {
 										) ) }
 									</Stack>
 								</Fieldset.Root>
+							) }
+							{ /* Offered once Searcio reports them. Each change rebuilds
+							     the site's index there, which the descriptions say. */ }
+							{ Array.isArray( config.numeric_fields ) && (
+								<Stack direction="column" gap="xs">
+									<FormTokenField
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										__experimentalExpandOnFocus
+										label={ __( 'Fields that hold numbers', 'searcio' ) }
+										value={ config.numeric_fields }
+										suggestions={ numberFieldChoices( pool ) }
+										maxLength={ FIELD_LIST_MAX }
+										onChange={ ( value ) => set( 'numeric_fields', value ) }
+									/>
+									<Text render={ <p /> } variant="body-sm" className="whsc-field-list__description">
+										{ errorsUnder( fieldErrors, 'numeric_fields' ) || __( 'Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background: give it a few minutes before changing it again.', 'searcio' ) }
+									</Text>
+								</Stack>
+							) }
+							{ Array.isArray( config.variant_fields ) && (
+								<Stack direction="column" gap="xs">
+									<FormTokenField
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										__experimentalExpandOnFocus
+										label={ __( 'Attributes one variation must match', 'searcio' ) }
+										value={ config.variant_fields }
+										suggestions={ variantFieldChoices( pool ) }
+										maxLength={ FIELD_LIST_MAX }
+										onChange={ ( value ) => set( 'variant_fields', value ) }
+									/>
+									<Text render={ <p /> } variant="body-sm" className="whsc-field-list__description">
+										{ errorsUnder( fieldErrors, 'variant_fields' ) || __( 'Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background: give it a few minutes before changing it again.', 'searcio' ) }
+									</Text>
+								</Stack>
 							) }
 						</Stack>
 					</Card.Content>

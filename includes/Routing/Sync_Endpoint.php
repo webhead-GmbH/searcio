@@ -79,6 +79,29 @@ final class Sync_Endpoint extends Rest_API {
 		return new WP_REST_Response( $result, $result['ok'] ? 200 : 409 );
 	}
 
+	/**
+	 * The next step of the running sync, run now: for a site whose WP-Cron does
+	 * not fire the worker, which the screen says after ten minutes.
+	 */
+	#[Route( '/sync/nudge', methods: 'POST', permission_callback: 'can_run_sync' )]
+	public function nudge(): WP_REST_Response {
+		if ( ! $this->service->nudge() ) {
+			return new WP_REST_Response(
+				[ 'message' => __( 'There is no sync running to move on.', 'searcio' ) ],
+				409
+			);
+		}
+
+		$active = $this->state->active();
+
+		return new WP_REST_Response(
+			[
+				'ok'  => true,
+				'run' => null === $active ? null : $this->state->present( $active ),
+			]
+		);
+	}
+
 	#[Route( '/sync/pause', methods: 'POST', permission_callback: 'can_run_sync', args: self::RUN_ARGS )]
 	public function pause( WP_REST_Request $request ): WP_REST_Response {
 		return $this->control( $request, 'pause' );

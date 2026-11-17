@@ -20,6 +20,7 @@ use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Enums\Account_Refusal;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
 use Webhead\WP\SearchCloud\Routing\Connection_Endpoint;
+use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Filter;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Health\Health_Result;
@@ -31,6 +32,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.1.0
  */
 final class Health_Tests {
+	/** How late a task may be before Site Health calls it overdue: WP-Cron is allowed its minute or two. */
+	private const TASK_OVERDUE_AFTER = 900;
+
 	public function __construct(
 		private Site_Health_Manager $site_health_manager,
 		private Search_Cloud_Client $client,
@@ -61,6 +65,14 @@ final class Health_Tests {
 			$this->indexing_configured( ... )
 		);
 
+		// The syncs run through WP-Cron, which runs only while the site is
+		// visited, or from a cron job of the server.
+		$this->site_health_manager->register_direct_test(
+			'searcio_background_tasks',
+			'Searcio background tasks',
+			$this->background_tasks( ... )
+		);
+
 		// Surface content left out of the index by language restriction instead
 		// of letting it go silently missing.
 		$this->site_health_manager->register_direct_test(
@@ -83,6 +95,7 @@ final class Health_Tests {
 			'searcio_connection_reachable'  => __( 'Searcio reachability', 'searcio' ),
 			'searcio_indexing_configured'   => __( 'Searcio indexing', 'searcio' ),
 			'searcio_language_coverage'     => __( 'Searcio language coverage', 'searcio' ),
+			'searcio_background_tasks'      => __( 'Searcio background tasks', 'searcio' ),
 		];
 
 		foreach ( $tests as $type => $of_type ) {
@@ -215,6 +228,50 @@ final class Health_Tests {
 				'<p>' . esc_html__( '%d content type(s) are enabled for indexing.', 'searcio' ) . '</p>',
 				count( $indexable )
 			)
+		)->to_wordpress_result();
+	}
+
+	/**
+	 * Whether WP-Cron starts the plugin's tasks when they are due: the
+	 * scheduled sync, the sync's next step and the changes waiting to be sent.
+	 * A site nobody visits, or one whose host blocks the request WordPress
+	 * makes to itself, runs none of them: a sync stood at 0 of 539 for twenty
+	 * minutes, and the nightly one did not run, with nothing said.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function background_tasks(): array {
+		$now     = time();
+		$overdue = [];
+
+		foreach ( [ Sync_Keys::HOOK_TICK, Sync_Keys::HOOK_DRAIN, Sync_Keys::HOOK_SCHEDULED ] as $hook ) {
+			$next = wp_next_scheduled( $hook );
+
+			if ( false !== $next && $next < $now - self::TASK_OVERDUE_AFTER ) {
+				$overdue[] = $now - (int) $next;
+			}
+		}
+
+		if ( [] === $overdue ) {
+			return Health_Result::good(
+				test: 'searcio_background_tasks',
+				label: __( 'Searcio background tasks run on time', 'searcio' ),
+				badge_label: 'Searcio',
+				description: '<p>' . esc_html__( 'Nothing the plugin schedules, such as the sync of your changes, is overdue.', 'searcio' ) . '</p>'
+			)->to_wordpress_result();
+		}
+
+		return Health_Result::recommended(
+			test: 'searcio_background_tasks',
+			label: __( 'Searcio background tasks are overdue', 'searcio' ),
+			badge_label: 'Searcio',
+			description: '<p>' . esc_html(
+				sprintf(
+					/* translators: %d: how many minutes the longest overdue task is late. */
+					__( 'A task of the plugin, such as the sync of your changes, has been due for %d minutes. WordPress starts such tasks through WP-Cron, which only runs while the site is visited, and not at all where the host blocks the request WordPress makes to itself or WP-Cron is switched off.', 'searcio' ),
+					(int) floor( max( $overdue ) / MINUTE_IN_SECONDS )
+				)
+			) . '</p><p>' . esc_html__( 'Ask your host to call WP-Cron from the server every minute, for example with this command, and turn off the one WordPress starts itself with DISABLE_WP_CRON if it is not off already:', 'searcio' ) . '</p><p><code>wp cron event run --due-now</code></p>'
 		)->to_wordpress_result();
 	}
 

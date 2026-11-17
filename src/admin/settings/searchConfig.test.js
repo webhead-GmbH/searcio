@@ -18,11 +18,18 @@ import {
 	normalizeFacetMatch,
 	normalizeFeatures,
 	normalizeMerchandising,
+	normalizeProfitRanking,
 	normalizeRedirects,
+	numberFieldChoices,
+	profitRankingPayload,
+	profitRankingProblems,
+	profitRulesSent,
+	sendsPurchasePrice,
 	termsToText,
 	textToIds,
 	textToTerms,
 	toPayload,
+	variantFieldChoices,
 } from './searchConfig';
 
 describe( 'normalizeFeatures', () => {
@@ -475,8 +482,8 @@ describe( 'document id lists', () => {
 
 /**
  * A boost is matched against the type the documents carry. Keyed by the post
- * type, the tester's boost of 100 for posts asked for "post" while posts were
- * "artikel", and moved nothing.
+ * type, a boost for posts renamed "artikel" asked for "post" and had no
+ * effect.
  */
 describe( 'enabledTypeLabels', () => {
 	it( 'names each indexed content type by the type its documents carry', () => {
@@ -491,6 +498,155 @@ describe( 'enabledTypeLabels', () => {
 
 		expect( enabledTypeLabels( catalog ) ).toEqual( { artikel: 'Beiträge', page: 'Seiten', ratgeber: 'Ratgeber' } );
 		expect( enabledTypeLabels( null ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'profit ranking', () => {
+	const RANKING = {
+		enabled: true,
+		strength: 15,
+		target: 25,
+		min_profit: null,
+		rules: [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ],
+		excluded_terms: [ 'acme' ],
+	};
+
+	it( 'is offered only once Searcio reports it, and read as it reports it', () => {
+		expect( normalizeConfig( {} ).profit_ranking ).toBeNull();
+		expect( normalizeProfitRanking( RANKING ) ).toEqual( RANKING );
+		expect( normalizeProfitRanking( { enabled: 1, strength: 'x' } ) ).toEqual( { enabled: true, strength: 15, target: 25, min_profit: null, rules: [], excluded_terms: [] } );
+	} );
+
+	// A Searcio that has the switch for listings without a search term reports
+	// it, and keeps what the panel set when a plugin leaves it out.
+	it( 'carries the switch for listings only where Searcio has it', () => {
+		const withListings = { ...RANKING, listings: false };
+		const read = normalizeConfig( { profit_ranking: withListings } );
+
+		expect( read.profit_ranking.listings ).toBe( false );
+		expect( normalizeProfitRanking( { ...RANKING, listings: 'yes' } ) ).not.toHaveProperty( 'listings' );
+		expect( profitRankingPayload( read.profit_ranking ) ).toHaveProperty( 'listings', false );
+		expect( profitRankingPayload( normalizeProfitRanking( RANKING ) ) ).not.toHaveProperty( 'listings' );
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, listings: true } }, read ) ).toEqual( {
+			profit_ranking: { ...RANKING, listings: true },
+		} );
+	} );
+
+	// Searcio takes it whole; a save that changes something else leaves it out.
+	it( 'is sent whole when it changed, and not at all otherwise', () => {
+		const read = normalizeConfig( { profit_ranking: RANKING, synonyms: [] } );
+
+		expect( toPayload( { ...read, synonyms: [ 'a, b' ] }, read ) ).toEqual( { synonyms: [ 'a, b' ] } );
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, target: 30 } }, read ) ).toEqual( {
+			profit_ranking: { ...RANKING, target: 30 },
+		} );
+		// A value typed as it was read is no change.
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, strength: '15' } }, read ) ).toEqual( {} );
+	} );
+
+	it( 'sends numbers for what the fields hold, no target for a rule that never lifts, and no untouched row', () => {
+		expect( profitRankingPayload( {
+			enabled: true,
+			strength: '20',
+			target: '12,5',
+			min_profit: '',
+			rules: [
+				{ field: ' brands ', value: 'Our own', target: '45', exclude: false },
+				{ field: 'categories', value: 'Clearance', target: 30, exclude: true },
+				{ field: '', value: '', target: null, exclude: false },
+				{ field: 'categories', value: '', target: '10', exclude: false },
+			],
+			excluded_terms: [ ' Acme ', 'acme', '' ],
+		} ) ).toEqual( {
+			enabled: true,
+			strength: 20,
+			target: 12.5,
+			min_profit: null,
+			rules: [
+				{ field: 'brands', value: 'Our own', target: 45, exclude: false },
+				{ field: 'categories', value: 'Clearance', target: null, exclude: true },
+				// Half a rule goes, for Searcio to say what is missing under it.
+				{ field: 'categories', value: '', target: 10, exclude: false },
+			],
+			excluded_terms: [ 'Acme' ],
+		} );
+	} );
+
+	// Searcio counts an error by the position in the list it was sent: a blank
+	// row above a target would have put its message under the wrong row.
+	it( 'knows which targets are sent, so an error is shown under its own row', () => {
+		const rules = [
+			{ field: 'categories', value: 'Shoes', target: 20, exclude: false },
+			{ field: '', value: '', target: null, exclude: false },
+			{ field: ' ', value: 'Navy', target: null, exclude: false },
+		];
+
+		expect( profitRulesSent( rules ) ).toEqual( [ 0, 2 ] );
+		expect( profitRulesSent( undefined ) ).toEqual( [] );
+	} );
+
+	// Searcio's messages name a field by its key ("profit_ranking.rules.2.target") and come in its own language.
+	it( 'finds what Searcio would refuse, under the keys it would use', () => {
+		const valid = { ...RANKING, strength: '20', target: '12,5', min_profit: '' };
+
+		expect( profitRankingProblems( valid ) ).toEqual( {} );
+		expect( profitRankingProblems( { ...valid, strength: 60, target: 0, min_profit: -1 } ) ).toEqual( {
+			'profit_ranking.strength': [ 'invalid' ],
+			'profit_ranking.target': [ 'invalid' ],
+			'profit_ranking.min_profit': [ 'invalid' ],
+		} );
+		expect( profitRankingProblems( { ...valid, strength: '', target: 'abc' } ) ).toHaveProperty( [ 'profit_ranking.strength' ] );
+		expect( profitRankingProblems( { ...valid, min_profit: 'abc' } ) ).toHaveProperty( [ 'profit_ranking.min_profit' ] );
+	} );
+
+	it( 'names a target by its position in what is sent, and lets a target that never lifts have none', () => {
+		const rules = [
+			{ field: 'categories', value: 'Shoes', target: 20, exclude: false },
+			{ field: '', value: '', target: null, exclude: false },
+			{ field: 'categories', value: 'Clearance', target: null, exclude: false },
+			{ field: 'brands', value: 'Own', target: null, exclude: true },
+			{ field: '', value: 'Navy', target: 30, exclude: false },
+		];
+
+		expect( profitRankingProblems( { ...RANKING, rules } ) ).toEqual( {
+			// The blank row is not counted: "Clearance" is the second target sent.
+			'profit_ranking.rules.1.target': [ 'invalid' ],
+			'profit_ranking.rules.3.field': [ 'invalid' ],
+		} );
+	} );
+
+	// Turned on in the dashboard without purchase prices, it lifted nothing and nothing said why.
+	it( 'knows whether the products are indexed with a purchase price', () => {
+		const catalog = ( config ) => ( { post_types: [ { slug: 'post', is_product: false, config: { enabled: true } }, { slug: 'product', is_product: true, config } ] } );
+
+		expect( sendsPurchasePrice( catalog( { enabled: true, woo: { cost_price: true } } ) ) ).toBe( true );
+		expect( sendsPurchasePrice( catalog( { enabled: true, woo: { cost_price: false } } ) ) ).toBe( false );
+		expect( sendsPurchasePrice( catalog( { enabled: false, woo: { cost_price: true } } ) ) ).toBe( false );
+		expect( sendsPurchasePrice( null ) ).toBe( false );
+	} );
+} );
+
+describe( 'number and variant fields', () => {
+	// Each change rebuilds the site's index on Searcio.
+	it( 'offers them only once Searcio reports them, and sends them only when changed', () => {
+		expect( normalizeConfig( {} ).numeric_fields ).toBeNull();
+		expect( normalizeConfig( {} ).variant_fields ).toBeNull();
+
+		const read = normalizeConfig( { numeric_fields: [ 'gewicht', 7 ], variant_fields: [ 'attr_farbe' ], synonyms: [] } );
+
+		expect( read.numeric_fields ).toEqual( [ 'gewicht' ] );
+		expect( toPayload( { ...read, synonyms: [ 'a, b' ] }, read ) ).toEqual( { synonyms: [ 'a, b' ] } );
+		expect( toPayload( { ...read, numeric_fields: [ 'gewicht', 'laenge', 'gewicht' ] }, read ) ).toEqual( { numeric_fields: [ 'gewicht', 'laenge' ] } );
+		expect( toPayload( { ...read, variant_fields: [ 'attr_farbe', 'attr_groesse' ] }, read ) ).toEqual( { variant_fields: [ 'attr_farbe', 'attr_groesse' ] } );
+		expect( toPayload( normalizeConfig( {} ), normalizeConfig( {} ) ) ).toEqual( {} );
+	} );
+
+	// Searcio refuses the fields it maps itself (422), and maps the prices and the rating as numbers already.
+	it( 'offers as number fields only the site\'s own, and as variant fields the attributes', () => {
+		const indexed = [ 'title', 'type', 'price', 'rating', 'gewicht', 'attr_farbe', 'categories', 'published_at' ];
+
+		expect( numberFieldChoices( indexed ) ).toEqual( [ 'gewicht', 'attr_farbe', 'categories' ] );
+		expect( variantFieldChoices( indexed ) ).toEqual( [ 'attr_farbe' ] );
 	} );
 } );
 

@@ -22,6 +22,7 @@ namespace Webhead\WP\SearchCloud\Jobs;
 use Webhead\WP\SearchCloud\Connection\Connection_State;
 use Webhead\WP\SearchCloud\Connection\Search_Cloud_Client;
 use Webhead\WP\SearchCloud\Indexing\Woo;
+use Webhead\WP\SearchCloud\Sync\Field_Label_Sync;
 use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Cron_Event;
@@ -39,7 +40,8 @@ final class Scheduled_Sync_Job implements Job {
 		private Sync_Service $service,
 		private Search_Cloud_Client $client,
 		private Connection_State $connection_state,
-		private Woo $woo
+		private Woo $woo,
+		private Field_Label_Sync $field_labels
 	) {}
 
 	public function __invoke( mixed ...$args ): void {
@@ -56,6 +58,10 @@ final class Scheduled_Sync_Job implements Job {
 			if ( null !== $currency ) {
 				$this->client->update_search_config( [ 'currency' => $currency ] );
 			}
+
+			// The names the shop gives its fields, for the dashboard's menus:
+			// an attribute renamed since is told within a day.
+			$this->field_labels->push();
 		}
 
 		$this->service->run_scheduled();

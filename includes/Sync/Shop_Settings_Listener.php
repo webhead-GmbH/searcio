@@ -49,6 +49,6 @@ final class Shop_Settings_Listener {
 
 		// Not started without credentials, or while a sync runs; a running one
 		// reads the setting for each product it has yet to reach.
-		$this->sync->start( Sync_Trigger::Manual, $user_id > 0 ? $user_id : null, false );
+		$this->sync->start( Sync_Trigger::SettingsChange, $user_id > 0 ? $user_id : null, false );
 	}
 }

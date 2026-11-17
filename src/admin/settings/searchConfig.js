@@ -126,6 +126,49 @@ export const normalizeExcludedTerms = ( raw ) => ( Array.isArray( raw )
 	: null );
 
 /**
+ * The most fields Searcio takes in `numeric_fields` and in `variant_fields`.
+ */
+export const FIELD_LIST_MAX = 20;
+
+/**
+ * Fields Searcio maps itself, which it refuses as number or variant fields,
+ * and those it maps as numbers already.
+ */
+const MAPPED_FIELDS = [ 'type', 'title', 'content', 'url', 'image', 'indexed_at', 'published_at', 'lang', 'ai_tags', 'variants' ];
+const NUMBER_FIELDS = [ 'price', 'price_min', 'price_max', 'regular_price', 'sale_price', 'rating' ];
+
+/**
+ * A list of field names Searcio keeps (`numeric_fields`, `variant_fields`),
+ * or null when it leaves the key out, as a service without the setting does:
+ * the tab then offers no list the service would not keep.
+ *
+ * @param {*} raw The list from `GET /search-config`.
+ * @return {string[]|null} The fields, or null.
+ */
+export const normalizeFieldList = ( raw ) => ( Array.isArray( raw )
+	? raw.filter( ( field ) => 'string' === typeof field && '' !== field.trim() )
+	: null );
+
+/**
+ * The indexed fields that can be number fields: the site's own, not one
+ * Searcio maps or reads as a number already.
+ *
+ * @param {string[]} fields The indexed fields.
+ * @return {string[]}
+ */
+export const numberFieldChoices = ( fields ) => ( fields || [] ).filter(
+	( field ) => ! MAPPED_FIELDS.includes( field ) && ! NUMBER_FIELDS.includes( field )
+);
+
+/**
+ * The indexed fields a variation can differ in: the shop's attributes.
+ *
+ * @param {string[]} fields The indexed fields.
+ * @return {string[]}
+ */
+export const variantFieldChoices = ( fields ) => ( fields || [] ).filter( ( field ) => field.startsWith( 'attr_' ) );
+
+/**
  * The terms as Searcio keeps them: trimmed, without empty lines, and each
  * once whatever its capitals, in the spelling first typed. Searcio does the
  * same on save; doing it here as well sends what the tab will read back.
@@ -159,6 +202,167 @@ export const textToTerms = ( text ) => String( text )
 	.map( ( line ) => line.trim() )
 	.filter( ( line ) => '' !== line );
 
+/** The limits Searcio sets on its profit ranking. */
+export const PROFIT_STRENGTH_MAX = 50;
+export const PROFIT_RULES_MAX = 100;
+export const PROFIT_TERMS_MAX = 200;
+
+/**
+ * A number typed into a field, with a comma or a point; null for an empty
+ * field or anything that is not a number.
+ *
+ * @param {*} value
+ * @return {number|null}
+ */
+export const typedNumber = ( value ) => {
+	const text = String( value ?? '' ).trim().replace( ',', '.' );
+
+	return '' !== text && Number.isFinite( Number( text ) ) ? Number( text ) : null;
+};
+
+/**
+ * Searcio's profit ranking ("Profitable products first"), as it reports it
+ * in `profit_ranking`: whether it is on, how far a product with a good margin
+ * may rise (`strength`, in percent), the margin from which a product counts
+ * as profitable (`target`), the least profit per sale (`min_profit`), targets
+ * of their own for the products carrying a value (`rules`) and the search
+ * terms ranked by relevance alone (`excluded_terms`). The same settings as in
+ * the Searcio dashboard. A service that has the switch for listings without a
+ * search term (`listings`, on unless set) reports it as well; one that has it
+ * also counts the least profit per sale without tax.
+ *
+ * Null when Searcio leaves the key out, as a service without profit ranking
+ * does: the tab then offers nothing the service would not keep.
+ *
+ * @param {*} raw `profit_ranking` from `GET /search-config`.
+ * @return {Object|null}
+ */
+export const normalizeProfitRanking = ( raw ) => {
+	if ( ! raw || 'object' !== typeof raw || Array.isArray( raw ) ) {
+		return null;
+	}
+
+	return {
+		enabled: Boolean( raw.enabled ),
+		strength: typedNumber( raw.strength ) ?? 15,
+		target: typedNumber( raw.target ) ?? 25,
+		min_profit: typedNumber( raw.min_profit ),
+		rules: ( Array.isArray( raw.rules ) ? raw.rules : [] ).map( ( rule ) => ( {
+			field: 'string' === typeof rule?.field ? rule.field : '',
+			value: 'string' === typeof rule?.value ? rule.value : '',
+			target: typedNumber( rule?.target ),
+			exclude: Boolean( rule?.exclude ),
+		} ) ),
+		excluded_terms: ( Array.isArray( raw.excluded_terms ) ? raw.excluded_terms : [] ).filter( ( term ) => 'string' === typeof term ),
+		...( 'boolean' === typeof raw.listings ? { listings: raw.listings } : {} ),
+	};
+};
+
+/**
+ * The profit ranking as `PUT /search-config` takes it: whole, with numbers
+ * where the fields hold text. A rule with neither a field nor a value is an
+ * untouched row and is left out; one with only half of them is sent, so
+ * Searcio says what is missing under it. An excluding rule has no target.
+ *
+ * @param {Object} ranking The tab's working copy.
+ * @return {Object}
+ */
+export const profitRankingPayload = ( ranking ) => ( {
+	enabled: Boolean( ranking.enabled ),
+	strength: typedNumber( ranking.strength ),
+	target: typedNumber( ranking.target ),
+	min_profit: typedNumber( ranking.min_profit ),
+	rules: profitRulesSent( ranking.rules ).map( ( index ) => {
+		const rule = ranking.rules[ index ];
+
+		return {
+			field: String( rule.field ?? '' ).trim(),
+			value: String( rule.value ?? '' ).trim(),
+			target: rule.exclude ? null : typedNumber( rule.target ),
+			exclude: Boolean( rule.exclude ),
+		};
+	} ),
+	excluded_terms: cleanTerms( ranking.excluded_terms || [] ),
+	// Only where Searcio reports it: the key is kept as it is when left out,
+	// so a plugin that does not know it cannot undo what the panel set.
+	...( 'boolean' === typeof ranking.listings ? { listings: ranking.listings } : {} ),
+} );
+
+/**
+ * Where, in the list of targets the tab shows, each one that is sent stands:
+ * an untouched row (neither a field nor a value) is not sent. Searcio names
+ * an error by the position in the list it was sent (`rules.2.target`), so a
+ * blank row above would put its message under the wrong row.
+ *
+ * @param {Array} rules The tab's targets.
+ * @return {number[]} The index in `rules` of each target that is sent, in order.
+ */
+export const profitRulesSent = ( rules ) => ( Array.isArray( rules ) ? rules : [] ).flatMap( ( rule, index ) => (
+	'' === String( rule?.field ?? '' ).trim() && '' === String( rule?.value ?? '' ).trim() ? [] : [ index ]
+) );
+
+/**
+ * What Searcio would refuse in the profit ranking, found before it is asked:
+ * the same keys as its `errors` (`profit_ranking.strength`,
+ * `profit_ranking.rules.0.target`, counted in the list that is sent), so the
+ * card words them the same way. Searcio's own messages name fields by their
+ * keys and come in its language.
+ *
+ * @param {Object} ranking The tab's working copy.
+ * @return {Object<string,string[]>} Empty when nothing is wrong.
+ */
+export const profitRankingProblems = ( ranking ) => {
+	const problems = {};
+	const flag = ( key ) => {
+		problems[ `profit_ranking.${ key }` ] = [ 'invalid' ];
+	};
+	const inRange = ( value, min, max ) => 'number' === typeof value && value >= min && value <= max;
+	const filled = ( value ) => '' !== String( value ?? '' ).trim();
+
+	if ( ! inRange( typedNumber( ranking.strength ), 1, PROFIT_STRENGTH_MAX ) ) {
+		flag( 'strength' );
+	}
+
+	if ( ! inRange( typedNumber( ranking.target ), 0.1, 100 ) ) {
+		flag( 'target' );
+	}
+
+	if ( filled( ranking.min_profit ) && ! inRange( typedNumber( ranking.min_profit ), 0, 1000000 ) ) {
+		flag( 'min_profit' );
+	}
+
+	profitRulesSent( ranking.rules ).forEach( ( index, position ) => {
+		const rule = ranking.rules[ index ];
+
+		if ( ! filled( rule.field ) ) {
+			flag( `rules.${ position }.field` );
+		}
+
+		if ( ! filled( rule.value ) ) {
+			flag( `rules.${ position }.value` );
+		}
+
+		if ( ! rule.exclude && ! inRange( typedNumber( rule.target ), 0.1, 100 ) ) {
+			flag( `rules.${ position }.target` );
+		}
+	} );
+
+	return problems;
+};
+
+/**
+ * Whether the site sends its products' purchase prices, which profit ranking
+ * works the margin out from: the product mapping is on, with its "Purchase
+ * price, for profit ranking". Turned on in the Searcio dashboard without
+ * them, the ranking lifted nothing and nothing said why.
+ *
+ * @param {?Object} catalog `GET /indexing/config`.
+ * @return {boolean}
+ */
+export const sendsPurchasePrice = ( catalog ) => ( catalog?.post_types || [] ).some(
+	( type ) => Boolean( type?.is_product && type?.config?.enabled && type?.config?.woo?.cost_price )
+);
+
 export const normalizeConfig = ( raw ) => ( {
 	searchable_fields: Array.isArray( raw?.searchable_fields )
 		? raw.searchable_fields.map( ( row ) => ( {
@@ -176,6 +380,9 @@ export const normalizeConfig = ( raw ) => ( {
 	facet_match: normalizeFacetMatch( raw?.facet_match ),
 	suggest_fields: Array.isArray( raw?.suggest_fields ) ? raw.suggest_fields : [],
 	excluded_popular_terms: normalizeExcludedTerms( raw?.excluded_popular_terms ),
+	numeric_fields: normalizeFieldList( raw?.numeric_fields ),
+	variant_fields: normalizeFieldList( raw?.variant_fields ),
+	profit_ranking: normalizeProfitRanking( raw?.profit_ranking ),
 	synonyms: Array.isArray( raw?.synonyms ) ? raw.synonyms : [],
 	languages: Array.isArray( raw?.languages ) ? raw.languages : [],
 	merchandising: normalizeMerchandising( raw?.merchandising ),
@@ -224,6 +431,12 @@ const fullPayload = ( config ) => ( {
 	excluded_popular_terms: Array.isArray( config.excluded_popular_terms )
 		? cleanTerms( config.excluded_popular_terms )
 		: undefined,
+	// Each change of these rebuilds the site's index on Searcio, so they are
+	// sent only by a service that reports them, and only when changed.
+	numeric_fields: Array.isArray( config.numeric_fields ) ? [ ...new Set( config.numeric_fields ) ].slice( 0, FIELD_LIST_MAX ) : undefined,
+	// Searcio takes it whole, and keeps it as it is when the key is left out.
+	profit_ranking: config.profit_ranking ? profitRankingPayload( config.profit_ranking ) : undefined,
+	variant_fields: Array.isArray( config.variant_fields ) ? [ ...new Set( config.variant_fields ) ].slice( 0, FIELD_LIST_MAX ) : undefined,
 	/*
 	 * Only switches this plan can actually carry. Enabling a feature the plan
 	 * does not include is a 422 on `features.<name>.enabled` - and because the

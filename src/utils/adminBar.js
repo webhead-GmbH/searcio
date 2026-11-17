@@ -2,7 +2,7 @@
  * How far WordPress's toolbar reaches down the screen, in pixels.
  *
  * The toolbar a logged-in user sees is drawn over the page, and a theme may
- * lift it above everything: fisch-gruber.at gives it `z-index: 2147483647`,
+ * lift it above everything: some give it `z-index: 2147483647`,
  * the highest there is, so no window can be drawn over it and the search
  * window has to start under it instead. From 601px up it is fixed (32px, and
  * 46px up to 782px); on a phone it scrolls away with the page, so what it

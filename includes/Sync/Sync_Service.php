@@ -90,6 +90,16 @@ final class Sync_Service {
 	 */
 	private const STALE_TICK_GRACE = 120;
 
+	/**
+	 * How long a running sync may stand still, its worker overdue, before the
+	 * screen says so: 0 of 539 for twenty minutes on a site whose WP-Cron has
+	 * no visitor to start it, with nothing said.
+	 */
+	public const STALL_AFTER = 600;
+
+	/** The name the running sync gives its batches to Searcio, set as a tick starts. */
+	private string $run_reference = '';
+
 	public function __construct(
 		private Index_Config $config,
 		private Document_Builder $builder,
@@ -136,6 +146,9 @@ final class Sync_Service {
 			'type_index' => 0,
 			'last_id'    => 0,
 			'retries'    => 0,
+			// The run's name to Searcio, so that its batches are one row of the
+			// sync history there. Kept in the cursor, which a resumed run reads.
+			'reference'  => wp_generate_uuid4(),
 		];
 
 		$id = $this->state->create( $trigger, $user_id, $force, $this->estimate_total( $types ), $cursor );
@@ -185,8 +198,9 @@ final class Sync_Service {
 		 */
 		$this->schedule_tick( self::WATCHDOG_DELAY );
 
-		$cursor   = $this->cursor( $run );
-		$counters = $this->counters( $run );
+		$cursor              = $this->cursor( $run );
+		$this->run_reference = $cursor['reference'];
+		$counters            = $this->counters( $run );
 		$force    = ! empty( $run['is_force'] );
 		$types    = $this->config->indexable_post_types();
 		$cv       = $this->config->config_version();
@@ -495,12 +509,56 @@ final class Sync_Service {
 	 */
 	public function status(): array {
 		$active = $this->state->active();
+		$idle   = $this->stalled();
 
 		return [
 			'configured' => $this->client->is_configured(),
 			'indexable'  => $this->config->indexable_post_types(),
 			'active'     => null === $active ? null : $this->state->present( $active ),
+			// Set while the running sync has not moved for a while and its
+			// worker is overdue: WP-Cron is not firing, or a fatal killed it.
+			'stalled'    => null === $idle ? null : [
+				'seconds'       => $idle,
+				'cron_disabled' => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
+			],
 		];
+	}
+
+	/**
+	 * Seconds the running sync has stood still, when it is stalled: its worker
+	 * is overdue (not firing, or killed) and nothing has been recorded for
+	 * {@see self::STALL_AFTER} seconds. Null for a run that moves, one that
+	 * waits to send a batch again, a paused one, or none.
+	 */
+	public function stalled(): ?int {
+		$run = $this->state->active();
+
+		if ( null === $run || Sync_Status::Running->value !== (string) $run['status'] || $this->awaits_retry( $run ) || $this->worker_alive() ) {
+			return null;
+		}
+
+		$updated = strtotime( (string) ( $run['updated_at'] ?? $run['created_at'] ?? '' ) . ' UTC' );
+		$idle    = false === $updated ? 0 : time() - $updated;
+
+		return $idle >= self::STALL_AFTER ? $idle : null;
+	}
+
+	/**
+	 * Runs the next step of the running sync now, in the request of the person
+	 * who asked, where WP-Cron does not fire it. Through the job manager, so
+	 * the lock a worker holds is still honoured: a step another worker is on is
+	 * not run twice, and the run is moving then all the same.
+	 */
+	public function nudge(): bool {
+		$run = $this->state->active();
+
+		if ( null === $run || Sync_Status::Running->value !== (string) $run['status'] ) {
+			return false;
+		}
+
+		$this->jobs->run_now( Sync_Keys::HOOK_TICK );
+
+		return true;
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -566,7 +624,7 @@ final class Sync_Service {
 		}
 
 		if ( [] !== $documents ) {
-			$response = $this->client->bulk_upsert( $documents );
+			$response = $this->client->bulk_upsert( $documents, false, $this->run_reference );
 
 			if ( $response->is_plan_limit() ) {
 				return [
@@ -838,7 +896,7 @@ final class Sync_Service {
 	 * other; a batch the index takes sets it back to 0.
 	 *
 	 * @param  array<string,mixed>  $run
-	 * @return array{phase:string,type_index:int,last_id:int,retries:int}
+	 * @return array{phase:string,type_index:int,last_id:int,retries:int,reference:string}
 	 */
 	private function cursor( array $run ): array {
 		$cursor = json_decode( (string) ( $run['cursor_state'] ?? '' ), true );
@@ -849,6 +907,7 @@ final class Sync_Service {
 			'type_index' => (int) ( $cursor['type_index'] ?? 0 ),
 			'last_id'    => (int) ( $cursor['last_id'] ?? 0 ),
 			'retries'    => max( 0, (int) ( $cursor['retries'] ?? 0 ) ),
+			'reference'  => isset( $cursor['reference'] ) && is_string( $cursor['reference'] ) ? $cursor['reference'] : '',
 		];
 	}
 

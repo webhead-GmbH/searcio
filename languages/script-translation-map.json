@@ -166,5 +166,8 @@
     ],
     "src/utils/facets.js": [
         "public/bundle.search.js"
+    ],
+    "src/admin/settings/searchKeyCheck.js": [
+        "public/bundle.settings.js"
     ]
 }

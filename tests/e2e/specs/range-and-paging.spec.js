@@ -229,6 +229,29 @@ test.describe( 'result paging', () => {
 		await expect( widget.loadMore ).toHaveCount( 0 );
 	} );
 
+	/**
+	 * Searcio counts the best matches of a search by meaning, not every
+	 * product: `total_exact` is false. The heading said "20 results" over 173,
+	 * and the type buttons had no numbers, so a shopper took 20 for all of it.
+	 */
+	test( 'says "about" for the window of a search by meaning, and counts the types the same way', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			semanticSearch: true,
+			hits: ( url ) => pricedHits( 20, 20 * ( Number( url.searchParams.get( 'page' ) || 1 ) - 1 ) ),
+			total: 173,
+			facets: { types: [ { value: 'product', count: 161 }, { value: 'post', count: 12 } ] },
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'coffee' );
+
+		await expect( widget.cards ).toHaveCount( 20 );
+		await expect( widget.resultsHeading ).toHaveText( '20 of about 173 results' );
+		await expect( widget.typeSwitch.locator( '.whsc-facet__count' ) ).toHaveText( [ '161', '12' ] );
+	} );
+
 	test( 'lets go of the load-more button when a new search overtakes it', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			hits: ( url ) => pricedHits( 20, ( Number( url.searchParams.get( 'page' ) || 1 ) - 1 ) * 20 ),

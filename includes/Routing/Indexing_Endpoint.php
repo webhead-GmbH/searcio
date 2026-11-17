@@ -25,6 +25,7 @@ use WP_REST_Response;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Indexing\Index_Config;
+use Webhead\WP\SearchCloud\Sync\Field_Label_Sync;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -37,7 +38,8 @@ defined( 'ABSPATH' ) || exit;
 final class Indexing_Endpoint extends Rest_API {
 	public function __construct(
 		private Index_Config $config,
-		private Sync_Service $sync
+		private Sync_Service $sync,
+		private Field_Label_Sync $field_labels
 	) {}
 
 	protected function get_rest_namespace(): string {
@@ -68,8 +70,11 @@ final class Indexing_Endpoint extends Rest_API {
 		$payload['config_version'] = $version;
 
 		if ( $version !== $previous ) {
+			// What the fields are called may have changed with the mapping.
+			$this->field_labels->push();
+
 			$user_id = get_current_user_id();
-			$started = $this->sync->start( Sync_Trigger::Manual, $user_id > 0 ? $user_id : null, false );
+			$started = $this->sync->start( Sync_Trigger::SettingsChange, $user_id > 0 ? $user_id : null, false );
 
 			// Not started: no credentials yet, nothing indexed, or a sync
 			// already running, which does not see the change for the posts it
