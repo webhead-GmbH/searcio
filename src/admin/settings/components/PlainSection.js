@@ -8,11 +8,12 @@ import { Stack, Text } from '@wordpress/ui';
  * @param {Object}                    props
  * @param {import('react').ReactNode} props.title
  * @param {import('react').ReactNode} [props.description]
+ * @param {string}                    [props.className] Added to the section's own class.
  * @param {import('react').ReactNode} props.children
  */
-export default function PlainSection( { title, description, children } ) {
+export default function PlainSection( { title, description, className = '', children } ) {
 	return (
-		<section className="whsc-placement-section">
+		<section className={ `whsc-placement-section ${ className }`.trim() }>
 			<Stack direction="column" gap="xs" className="whsc-placement-section__header">
 				<Text render={ <h3 /> } variant="heading-md" className="whsc-placement-section__title">
 					{ title }

@@ -13,6 +13,12 @@ import { test, expect, setCategoryFilter, setConnected, touchingInShell } from '
 
 const SETTINGS_URL = '/wp-admin/admin.php?page=searcio&tab=search-config';
 
+/** The tab lists its sections down the side, and draws the one the address names. */
+const at = ( section ) => `${ SETTINGS_URL }&section=${ section }`;
+
+/** Opens another section from the list, as a click would. */
+const openSection = ( page, name ) => page.getByRole( 'tab', { name: new RegExp( name ) } ).click();
+
 // A notice is also read out, through a live region that holds the same words
 // outside the screen. What is asserted is what is drawn on it.
 const SCREEN = '#searcio-root';
@@ -116,10 +122,10 @@ async function mockCatalog( page, indexedFields = INDEXED_FIELDS, languages = []
  * The Search Config card whose title is `title`.
  *
  * @param {import('@playwright/test').Page} page
- * @param {string}                          title The card's heading.
+ * @param {string}                          title The section's heading.
  */
 const card = ( page, title ) =>
-	page.locator( '.whsc-settings-card' ).filter( { has: page.getByRole( 'heading', { name: title, exact: true } ) } );
+	page.locator( '.whsc-placement-section' ).filter( { has: page.getByRole( 'heading', { name: title, exact: true } ) } );
 
 /**
  * Intercept the plugin's own REST proxy, capturing anything it PUTs back.
@@ -189,7 +195,7 @@ test.describe( 'Search Config tab', () => {
 				await route.continue();
 			}
 		);
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		const order = card( page, 'Category filter' ).getByRole( 'combobox', { name: 'Order of the categories' } );
 
@@ -209,12 +215,22 @@ test.describe( 'Search Config tab', () => {
 	test( 'leaves a gap between everything it stacks', async ( { page } ) => {
 		await mockSearchConfig( page, [], { ...CONFIG, facet_fields: [ 'categories', 'category' ] } );
 		await mockCatalog( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		// With a warning under a token field, which is a second child of a card.
 		await expect( page.locator( '.whsc-unindexed-fields' ).first() ).toBeVisible( LOADED );
 
 		expect( await touchingInShell( page ) ).toEqual( [] );
+
+		// And in every other section of the list: each is drawn on its own.
+		for ( const name of [ 'AI & ranking', 'Searchable fields', 'Type boosts', 'Suggestions', 'Synonyms', 'Languages', 'Merchandising rules', 'Search redirects' ] ) {
+			const tab = page.getByRole( 'tab', { name: new RegExp( name ) } );
+
+			await tab.click();
+			await expect( tab ).toHaveAttribute( 'aria-selected', 'true' );
+
+			expect( await touchingInShell( page ), name ).toEqual( [] );
+		}
 	} );
 
 	/**
@@ -240,7 +256,7 @@ test.describe( 'Search Config tab', () => {
 				} );
 			}
 		);
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		await expect(
 			page.locator( SCREEN ).getByText( 'The search configuration could not be loaded: Searcio did not answer.' )
@@ -272,7 +288,7 @@ test.describe( 'Search Config tab', () => {
 				} );
 			}
 		);
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		const rule = page.locator( '.whsc-redirect-rule' ).first();
 
@@ -296,7 +312,7 @@ test.describe( 'Search Config tab', () => {
 		test.skip( page.viewportSize().width <= 782, 'A redirect is stacked on a narrow screen.' );
 
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		const rule = page.locator( '.whsc-redirect-rule' ).first();
 
@@ -310,7 +326,7 @@ test.describe( 'Search Config tab', () => {
 
 	test( 'shows the redirect rules the site has configured', async ( { page } ) => {
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		const rule = page.locator( '.whsc-redirect-rule' ).first();
 		await expect( rule ).toBeVisible( LOADED );
@@ -320,7 +336,7 @@ test.describe( 'Search Config tab', () => {
 
 	test( 'shows a merchandising rule\'s category trigger', async ( { page } ) => {
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'merchandising' ) );
 
 		const rule = page.locator( '.whsc-merchandising-rule' ).first();
 		await expect( rule ).toBeVisible( LOADED );
@@ -330,7 +346,7 @@ test.describe( 'Search Config tab', () => {
 
 	test( 'offers the photo-search switch beside the other AI switches', async ( { page } ) => {
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'ai' ) );
 
 		const toggle = page.getByRole( 'checkbox', { name: 'Search by photo', exact: true } );
 		await expect( toggle ).toBeVisible( LOADED );
@@ -344,7 +360,7 @@ test.describe( 'Search Config tab', () => {
 	 */
 	test( 'lines up the index status with the AI search switch\'s description', async ( { page } ) => {
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'ai' ) );
 
 		const status = page.locator( SCREEN ).getByText( 'Index status: Ready', { exact: true } );
 		await expect( status ).toBeVisible( LOADED );
@@ -364,7 +380,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'names each type boost by its content type', async ( { page } ) => {
 		await mockSearchConfig( page );
 		await mockCatalog( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'boosts' ) );
 
 		const boosts = card( page, 'Type boosts' );
 		await expect( boosts.getByRole( 'slider', { name: 'Products', exact: true } ) ).toBeVisible( LOADED );
@@ -382,7 +398,7 @@ test.describe( 'Search Config tab', () => {
 
 		await mockSearchConfig( page, sent, { ...CONFIG, type_boosts: [ { type: 'product', boost: 3 }, { type: 'post', boost: 5 }, { type: 'ratgeber', boost: 1 } ] } );
 		await mockCatalog( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'boosts' ) );
 
 		const boosts = card( page, 'Type boosts' );
 
@@ -407,12 +423,13 @@ test.describe( 'Search Config tab', () => {
 		const sent = [];
 
 		await mockSearchConfig( page, sent );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
 
 		// Add an empty redirect row, and half a category trigger.
 		await page.getByRole( 'button', { name: 'Add a redirect' } ).click();
+		await openSection( page, 'Merchandising rules' );
 		await page
 			.locator( '.whsc-merchandising-rule' )
 			.first()
@@ -440,7 +457,7 @@ test.describe( 'Search Config tab', () => {
 
 		await mockCatalog( page, INDEXED_FIELDS, [ { code: 'de', name: 'Deutsch' }, { code: 'en', name: 'English' } ] );
 		await mockSearchConfig( page, sent, config );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		const rule = page.locator( '.whsc-redirect-rule' ).first();
 		const language = rule.getByRole( 'combobox', { name: 'Language' } );
@@ -472,7 +489,7 @@ test.describe( 'Search Config tab', () => {
 
 		await mockCatalog( page );
 		await mockSearchConfig( page, sent, config );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		const numbers = page.getByRole( 'combobox', { name: 'Fields that hold numbers' } );
 		const variants = page.getByRole( 'combobox', { name: 'Attributes one variation must match' } );
@@ -502,7 +519,7 @@ test.describe( 'Search Config tab', () => {
 
 		await mockCatalog( page );
 		await mockSearchConfig( page, sent, { ...CONFIG, profit_ranking: ranking } );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'profit' ) );
 
 		const profit = page.locator( '.whsc-profit-ranking' );
 
@@ -534,7 +551,7 @@ test.describe( 'Search Config tab', () => {
 
 		await mockCatalog( page );
 		await mockSearchConfig( page, sent, { ...CONFIG, profit_ranking: PROFIT_RANKING } );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'profit' ) );
 
 		const profit = page.locator( '.whsc-profit-ranking' );
 		const rows = profit.locator( '.whsc-profit-rule' );
@@ -575,7 +592,7 @@ test.describe( 'Search Config tab', () => {
 
 		await mockCatalog( page );
 		await mockSearchConfig( page, sent, { ...CONFIG, profit_ranking: { ...PROFIT_RANKING, listings: true } } );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'profit' ) );
 
 		const profit = page.locator( '.whsc-profit-ranking' );
 		const listings = profit.getByRole( 'checkbox', { name: 'Also order listings without a search term' } );
@@ -594,7 +611,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'offers no switch for listings to a Searcio without it', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page, [], { ...CONFIG, profit_ranking: PROFIT_RANKING } );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'profit' ) );
 
 		const profit = page.locator( '.whsc-profit-ranking' );
 
@@ -606,7 +623,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'warns about a target for a field no product has, until it is mended', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page, [], { ...CONFIG, profit_ranking: PROFIT_RANKING } );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'profit' ) );
 
 		const profit = page.locator( '.whsc-profit-ranking' );
 
@@ -625,7 +642,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'sends the shop owner to the Indexing tab, and words the least profit by the shop\'s tax display', async ( { page } ) => {
 		await mockCatalog( page, INDEXED_FIELDS, [], { prices_with_tax: true } );
 		await mockSearchConfig( page, [], { ...CONFIG, profit_ranking: PROFIT_RANKING } );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'profit' ) );
 
 		const profit = page.locator( '.whsc-profit-ranking' );
 
@@ -637,7 +654,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'offers no profit ranking to a service that does not report it', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
 		await expect( page.locator( '.whsc-profit-ranking' ) ).toHaveCount( 0 );
@@ -646,7 +663,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'offers no number or variant fields to a service that does not report them', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
 		await expect( page.getByRole( 'combobox', { name: 'Fields that hold numbers' } ) ).toHaveCount( 0 );
@@ -656,7 +673,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'offers no language for a redirect on a site with one language', async ( { page } ) => {
 		await mockCatalog( page );
 		await mockSearchConfig( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'redirects' ) );
 
 		const rule = page.locator( '.whsc-redirect-rule' ).first();
 
@@ -673,7 +690,7 @@ test.describe( 'Search Config tab', () => {
 		const config = { ...CONFIG, merchandising: [ { ...CONFIG.merchandising[ 0 ], match: 'exact' } ] };
 
 		await mockSearchConfig( page, sent, config );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'merchandising' ) );
 
 		const rule = page.locator( '.whsc-merchandising-rule' ).first();
 		const match = rule.getByRole( 'combobox', { name: 'Fires when the search term' } );
@@ -703,8 +720,8 @@ test.describe( 'Search Config tab', () => {
 		const sent = [];
 
 		await mockSearchConfig( page, sent );
-		await page.goto( SETTINGS_URL );
-		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+		await page.goto( at( 'ai' ) );
+		await expect( page.getByRole( 'checkbox', { name: 'Search by photo', exact: true } ) ).toBeVisible( LOADED );
 
 		await page.getByRole( 'checkbox', { name: 'Search by photo', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Save search configuration' } ).click();
@@ -721,8 +738,8 @@ test.describe( 'Search Config tab', () => {
 		const sent = [];
 
 		await mockSearchConfig( page, sent );
-		await page.goto( SETTINGS_URL );
-		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+		await page.goto( at( 'filters' ) );
+		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
 		await expect( page.getByRole( 'group', { name: 'When a shopper picks several values of one filter' } ) ).toHaveCount( 0 );
 
 		await page.unrouteAll( { behavior: 'ignoreErrors' } );
@@ -750,8 +767,8 @@ test.describe( 'Search Config tab', () => {
 		const sent = [];
 
 		await mockSearchConfig( page, sent );
-		await page.goto( SETTINGS_URL );
-		await expect( page.locator( '.whsc-redirect-rule' ).first() ).toBeVisible( LOADED );
+		await page.goto( at( 'suggest' ) );
+		await expect( page.getByRole( 'textbox', { name: 'Popular searches' } ) ).toBeVisible( LOADED );
 		await expect( page.getByRole( 'textbox', { name: 'Never show as a popular search' } ) ).toHaveCount( 0 );
 
 		await page.unrouteAll( { behavior: 'ignoreErrors' } );
@@ -778,7 +795,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'suggests exactly the fields the site indexes', async ( { page } ) => {
 		await mockSearchConfig( page );
 		await mockCatalog( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		const facets = page.getByRole( 'combobox', { name: 'Facet fields' } );
 		await expect( facets ).toBeVisible( LOADED );
@@ -797,7 +814,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'warns about a facet field no document has, until it is removed', async ( { page } ) => {
 		await mockSearchConfig( page, [], { ...CONFIG, facet_fields: [ 'categories', 'category' ] } );
 		await mockCatalog( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		const facetCard = card( page, 'Facet fields' );
 		const warning = facetCard.locator( '.whsc-unindexed-fields' );
@@ -806,8 +823,10 @@ test.describe( 'Search Config tab', () => {
 		await expect( warning ).toContainText( 'No document on this site has a "category" field' );
 		await expect( warning ).not.toContainText( '"categories"' );
 
-		// The suggest fields (`title`) are all indexed, so that card stays quiet.
+		// The suggest fields (`title`) are all indexed, so that section stays quiet.
+		await openSection( page, 'Suggestions' );
 		await expect( card( page, 'Suggest fields' ).locator( '.whsc-unindexed-fields' ) ).toHaveCount( 0 );
+		await openSection( page, 'Filters' );
 
 		// Backspace in an empty token input removes the last token.
 		await facetCard.getByRole( 'combobox', { name: 'Facet fields' } ).click();
@@ -819,7 +838,7 @@ test.describe( 'Search Config tab', () => {
 	test( 'warns about every unindexed suggest field at once', async ( { page } ) => {
 		await mockSearchConfig( page, [], { ...CONFIG, suggest_fields: [ 'title', 'tags', 'brand' ] } );
 		await mockCatalog( page );
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'suggest' ) );
 
 		const warning = card( page, 'Suggest fields' ).locator( '.whsc-unindexed-fields' );
 
@@ -845,7 +864,7 @@ test.describe( 'Search Config tab', () => {
 				await route.fulfill( { response } );
 			}
 		);
-		await page.goto( SETTINGS_URL );
+		await page.goto( at( 'filters' ) );
 
 		await expect( page.getByRole( 'combobox', { name: 'Facet fields' } ) ).toBeVisible( LOADED );
 		expect( Array.isArray( reported ) ).toBe( true );

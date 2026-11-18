@@ -543,6 +543,7 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pric
 
 	return (
 		<PlainSection
+			className="whsc-profit-ranking"
 			title={ __( 'Profitable products first', 'searcio' ) }
 			description={ __( 'Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard.', 'searcio' ) }
 		>
