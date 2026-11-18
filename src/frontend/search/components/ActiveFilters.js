@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import Icon from '../ui/Icon';
 import { closeSmall } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 

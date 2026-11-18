@@ -56,6 +56,20 @@ export const searchKeyProblem = (result) => (
 );
 
 /**
+ * Whether the site's search index is empty although documents were sent: the
+ * counter of the plan says 526 while every search finds nothing. Searcio
+ * reports what the index holds (`documents.indexed`); 0 with nothing sent yet
+ * is a site that has not synced, which is no fault, and null is a check that
+ * could not tell.
+ *
+ * @param {?Object} result
+ * @return {boolean}
+ */
+export const indexIsEmpty = (result) => (
+	Boolean(result?.ok) && 0 === result?.documents?.indexed && Number(result?.documents?.used) > 0
+);
+
+/**
  * What a result says, in the words its notice prints.
  *
  * @param {?Object} result
@@ -97,8 +111,12 @@ const resultMessage = (result) => {
 		: '';
 
 	const keyProblem = searchKeyProblem(result);
+	const emptyIndex = indexIsEmpty(result)
+		? __('The search index of this site is empty, so every search finds nothing. Run a full sync on the Sync tab to fill it again.', 'searcio')
+		: '';
+	const said = detail + siteIdSuffix;
 
-	return keyProblem ? `${detail + siteIdSuffix} ${keyProblem}` : detail + siteIdSuffix;
+	return [said, keyProblem, emptyIndex].filter(Boolean).join(' ');
 };
 
 const ConnectionResultNotice = ({result}) => {
@@ -109,7 +127,7 @@ const ConnectionResultNotice = ({result}) => {
 	// at once, a success when the screen reader is free.
 	const keyProblem = searchKeyProblem(result);
 
-	useAnnounce(message, result?.ok && !refusal && !keyProblem ? 'polite' : 'assertive');
+	useAnnounce(message, result?.ok && !refusal && !keyProblem && !indexIsEmpty(result) ? 'polite' : 'assertive');
 
 	if (!result) {
 		return null;
@@ -136,7 +154,7 @@ const ConnectionResultNotice = ({result}) => {
 	}
 
 	return (
-		<Notice.Root intent={result.ok && !keyProblem ? 'success' : 'error'}>
+		<Notice.Root intent={!result.ok || keyProblem ? 'error' : indexIsEmpty(result) ? 'warning' : 'success'}>
 			<Notice.Description>{message}</Notice.Description>
 		</Notice.Root>
 	);

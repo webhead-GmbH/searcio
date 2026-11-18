@@ -54,15 +54,26 @@ final class Woo {
 		'rating'       => [ 'rating' ],
 		'review_count' => [ 'review_count' ],
 		'custom_attributes' => [ 'custom_attributes' ],
-		'cost_price'   => [ 'cost_price' ],
+		'cost_price'   => [ 'cost_price', 'price_excluding_tax' ],
 	];
 
 	/**
 	 * Fields written for Searcio alone: it never returns them and refuses them
 	 * as searchable, facet or suggest fields, so they are not offered as one.
-	 * The purchase price is what its profit ranking works the margin out from.
+	 * The purchase price is what its profit ranking works the margin out from,
+	 * and the price without tax, sent where the shop shows prices with tax,
+	 * what it counts the least profit per sale in, so that tax is not profit.
 	 */
-	public const PRIVATE_FIELDS = [ 'cost_price' ];
+	public const PRIVATE_FIELDS = [ 'cost_price', 'price_excluding_tax' ];
+
+	/**
+	 * A variable product's variations, one object each with the attributes it
+	 * differs in and whether it is in stock. Searcio
+	 * filters on them so that red and XL find a jacket only when one of its
+	 * variations is both and in stock. Not a field to search or filter on by
+	 * itself, so not offered as one.
+	 */
+	public const VARIANTS_FIELD = 'variants';
 
 	/**
 	 * The pages WooCommerce makes for itself, by the name `wc_get_page_id()`
@@ -129,6 +140,17 @@ final class Woo {
 		$code = strtoupper( (string) get_woocommerce_currency() );
 
 		return 1 === preg_match( '/^[A-Z]{3}$/', $code ) ? $code : null;
+	}
+
+	/**
+	 * Whether the shop shows its prices with tax, which is the price Searcio is
+	 * sent: with tax when WooCommerce says so under Tax > Display prices in the
+	 * shop, whichever way they were entered. A purchase price is entered
+	 * without tax and is taxed to match, so a margin is the same on either
+	 * basis, and a profit in the shop's prices counts the tax on it.
+	 */
+	public function shows_prices_with_tax(): bool {
+		return $this->is_active() && wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' );
 	}
 
 	public function version(): string {
@@ -337,6 +359,13 @@ final class Woo {
 
 			if ( null !== $cost ) {
 				$fields['cost_price'] = $cost;
+
+				// Where `price` carries tax: the same price without it.
+				$net = $this->without_customer( fn () => $this->price_without_tax( $product, $is_variable ) );
+
+				if ( null !== $net && isset( $fields['price'] ) && $net <= (float) $fields['price'] ) {
+					$fields['price_excluding_tax'] = $net;
+				}
 			}
 		}
 
@@ -348,7 +377,77 @@ final class Woo {
 			}
 		}
 
+		if ( $is_variable ) {
+			$variants = $this->variants( $product, $post, $woo );
+
+			if ( [] !== $variants ) {
+				$fields[ self::VARIANTS_FIELD ] = $variants;
+			}
+		}
+
 		return $fields;
+	}
+
+	/**
+	 * One object per variation a shopper can buy (a disabled one is private),
+	 * with the selected attributes it is made of, under the names the product
+	 * sends them (`attr_color`: "Red"), and `in_stock`. A variation set to
+	 * "any" value of an attribute is every value the product has of it. Only
+	 * the attributes the shop's variations are made of, and none when the
+	 * mapping sends none of those.
+	 *
+	 * @param  array<string,mixed>  $woo
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function variants( $product, WP_Post $post, array $woo ): array {
+		if ( ! method_exists( $product, 'get_variation_attributes' ) ) {
+			return [];
+		}
+
+		$taxonomies = array_values(
+			array_filter(
+				array_intersect( $this->selected_attributes( $woo ), array_keys( $product->get_variation_attributes() ) ),
+				'taxonomy_exists'
+			)
+		);
+
+		if ( [] === $taxonomies ) {
+			return [];
+		}
+
+		$own      = [];
+		$variants = [];
+
+		foreach ( $taxonomies as $taxonomy ) {
+			$own[ $taxonomy ] = Term_Names::for_post( $post, $taxonomy );
+		}
+
+		foreach ( $product->get_children() as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+
+			if ( ! $variation instanceof \WC_Product_Variation || 'publish' !== $variation->get_status() ) {
+				continue;
+			}
+
+			$chosen  = $variation->get_attributes();
+			$variant = [];
+
+			foreach ( $taxonomies as $taxonomy ) {
+				$slug  = is_string( $chosen[ $taxonomy ] ?? null ) ? $chosen[ $taxonomy ] : '';
+				$term  = '' === $slug ? null : get_term_by( 'slug', $slug, $taxonomy );
+				$value = $term instanceof \WP_Term ? Term_Names::decode( $term->name ) : $own[ $taxonomy ];
+
+				if ( '' !== $value && [] !== $value ) {
+					$variant[ $this->attribute_field( $taxonomy ) ] = $value;
+				}
+			}
+
+			if ( [] !== $variant ) {
+				$variants[] = $variant + [ 'in_stock' => $variation->is_in_stock() ];
+			}
+		}
+
+		return $variants;
 	}
 
 	/**
@@ -357,7 +456,8 @@ final class Woo {
 	 * variable product carries it. Empty when WooCommerce is inactive, because
 	 * then no product field is written at all. The {@see self::PRIVATE_FIELDS}
 	 * are left out: they are for Searcio alone, which refuses them as fields to
-	 * search or filter.
+	 * search or filter. So are the {@see self::VARIANTS_FIELD}, which are the
+	 * attributes again, one variation at a time.
 	 *
 	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
 	 * @return array<int,string>
@@ -511,22 +611,10 @@ final class Woo {
 	 * between two amounts on one basis. Null for a product with none.
 	 */
 	private function cost_price( $product, bool $is_variable, string $meta_key ): ?float {
-		$source = $product;
+		$source = $this->priced_product( $product, $is_variable );
 
-		if ( $is_variable && method_exists( $product, 'get_variation_prices' ) ) {
-			$active = array_map( 'floatval', (array) ( $product->get_variation_prices( true )['price'] ?? [] ) );
-
-			if ( [] === $active ) {
-				return null;
-			}
-
-			$variation = wc_get_product( (int) array_search( min( $active ), $active, true ) );
-
-			if ( ! $variation instanceof \WC_Product ) {
-				return null;
-			}
-
-			$source = $variation;
+		if ( null === $source ) {
+			return null;
 		}
 
 		$cost = $this->cogs_value( $source );
@@ -543,11 +631,61 @@ final class Woo {
 			return null;
 		}
 
-		if ( wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' ) && $source->is_taxable() ) {
+		if ( $this->shows_prices_with_tax() && $source->is_taxable() ) {
 			$cost += array_sum( \WC_Tax::calc_tax( $cost, \WC_Tax::get_rates( $source->get_tax_class() ), false ) );
 		}
 
 		return (float) wc_format_decimal( $cost, wc_get_price_decimals() );
+	}
+
+	/**
+	 * The product whose price is the one sent as `price`: the product itself,
+	 * or the cheapest variation of a variable one. Null where there is none.
+	 */
+	private function priced_product( $product, bool $is_variable ): ?\WC_Product {
+		if ( ! $is_variable || ! method_exists( $product, 'get_variation_prices' ) ) {
+			return $product instanceof \WC_Product ? $product : null;
+		}
+
+		$active = array_map( 'floatval', (array) ( $product->get_variation_prices( true )['price'] ?? [] ) );
+
+		if ( [] === $active ) {
+			return null;
+		}
+
+		$variation = wc_get_product( (int) array_search( min( $active ), $active, true ) );
+
+		return $variation instanceof \WC_Product ? $variation : null;
+	}
+
+	/**
+	 * The price a product is sent with, without tax, for a shop that shows its
+	 * prices with it: the active price (a sale price included) of the product,
+	 * or of its cheapest variation, as WooCommerce takes the tax out of it. Null
+	 * where `price` carries no tax, which is the price without tax then, and
+	 * for a product that is not taxable.
+	 */
+	private function price_without_tax( $product, bool $is_variable ): ?float {
+		if ( ! $this->shows_prices_with_tax() ) {
+			return null;
+		}
+
+		$source = $this->priced_product( $product, $is_variable );
+
+		if ( null === $source || ! $source->is_taxable() ) {
+			return null;
+		}
+
+		$price = $source->get_price();
+
+		if ( '' === $price || null === $price ) {
+			return null;
+		}
+
+		return (float) wc_format_decimal(
+			wc_get_price_excluding_tax( $source, [ 'price' => $price ] ),
+			wc_get_price_decimals()
+		);
 	}
 
 	/** WooCommerce's "Cost of goods" of a product or variation, null where the feature is off or the value is not set. */

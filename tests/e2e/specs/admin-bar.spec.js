@@ -1,6 +1,6 @@
 /**
  * A logged-in user sees WordPress's toolbar over the page, and a theme may
- * lift it above anything a window can be: fisch-gruber.at gives it
+ * lift it above anything a window can be: some give it
  * `z-index: 2147483647`, the highest there is. The search window starts where
  * the toolbar ends, so its search field is not under it.
  *

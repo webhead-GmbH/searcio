@@ -8,8 +8,8 @@ import { documentType } from '../../../utils/documentType';
 import { liftAboveBottomBars } from '../../../utils/bottomBars';
 
 /**
- * Portals each server-rendered trigger placeholder to a real
- * `@wordpress/components` control, and owns one shared full-screen modal so
+ * Portals each server-rendered trigger placeholder to a real React
+ * control, and owns one shared full-screen modal so
  * multiple triggers on a page never spawn multiple overlays.
  *
  * @param {Object}    props

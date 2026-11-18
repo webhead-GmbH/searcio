@@ -16,6 +16,7 @@ import UsageCard from './UsageCard';
 import ManualConnectionEntry from './ManualConnectionEntry';
 import {useAnnounce} from '../../../../utils/announce';
 import {forgetAll, readOnce} from '../../remote';
+import {checkSearchKey} from '../../searchKeyCheck';
 
 const pluginData = window.searcioData || {};
 const CONNECT_PATH = pluginData?.api?.connectPath || '/searcio/v1/connection/connect';
@@ -72,7 +73,7 @@ const ConnectionTab = () => {
 
 		(async () => {
 			try {
-				const response = await readOnce({path: TEST_CONNECTION_PATH, method: 'POST'});
+				const response = await checkSearchKey(await readOnce({path: TEST_CONNECTION_PATH, method: 'POST'}));
 
 				if (!cancelled) {
 					setConnectedResult(response);
@@ -99,7 +100,7 @@ const ConnectionTab = () => {
 		forgetAll();
 
 		try {
-			setConnectedResult(await apiFetch({path: TEST_CONNECTION_PATH, method: 'POST', data: {fresh: true}}));
+			setConnectedResult(await checkSearchKey(await apiFetch({path: TEST_CONNECTION_PATH, method: 'POST', data: {fresh: true}})));
 		} catch (error) {
 			setConnectedResult({
 				ok: false,

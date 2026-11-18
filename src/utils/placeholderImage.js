@@ -7,6 +7,9 @@
  * keeping it a real `<img>` means that styling still applies to the
  * placeholder instead of silently doing nothing once the tag changes.
  */
-const PLACEHOLDER_IMAGE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" fill="#f0f1f3"/><path fill="#9aa0a6" d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/></svg>';
+// The glyph is a fifth of the picture, light on a light ground, as the plugin's
+// own card draws it: it filled the whole picture, grey and heavy, in a card
+// built from a server template.
+const PLACEHOLDER_IMAGE_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#f1f2f4"/><path fill="#c2c6cb" transform="translate(40 40) scale(.8333)" d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/></svg>';
 
 export const PLACEHOLDER_IMAGE_DATA_URI = `data:image/svg+xml,${ encodeURIComponent( PLACEHOLDER_IMAGE_SVG ) }`;

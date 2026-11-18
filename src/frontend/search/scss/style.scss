@@ -1,9 +1,11 @@
 /*
  * Front-end search modal styles.
  *
- * Modal chrome and controls come from `@wordpress/components` (`Modal`,
- * `Button`) with their base styles loaded via the `wp-components` handle
- * enqueued alongside this stylesheet (`Frontend_Assets::register()`).
+ * The modal, its sheets, the tooltips and the box trigger are drawn by the
+ * components of `../ui` in the elements and class names of
+ * `@wordpress/components`, whose base styles load via the `wp-components`
+ * handle enqueued alongside this stylesheet (`Frontend_Assets::register()`).
+ * The package's JavaScript is not loaded on a storefront.
  * Everything visual below is driven by a comprehensive CSS custom property
  * set so each placement can be themed independently - set per-placement by
  * the Gutenberg block (`render.php`) or the Elementor Style tab
@@ -28,10 +30,10 @@
  * `Frontend_Assets` picked.
  */
 @use '../../../components/Default/frontend-reset' with (
-	// The families of `@wordpress/components` the window draws, and what they
-	// draw inside them: a Modal draws a Button, a Tooltip a Popover, the
-	// trigger's SearchControl an InputControl. A family left out is a control
-	// the reset no longer holds against the theme.
+	// The families of `@wordpress/components` whose class names the window
+	// carries: a modal holds a button, a tooltip is a popover, the trigger's box
+	// is an input control. A family left out is a control the reset no longer
+	// holds against the theme.
 	$components: ( modal, button, popover, tooltip, input-control ),
 	// The modal, the sheets and the tooltips are drawn at the end of `body`;
 	// `frontend-overlays.js`, imported by the entry, marks them.
@@ -250,7 +252,7 @@ $lift: ':is(*, #whsc#whsc#whsc)';
  */
 /*
  * Under WordPress's toolbar, which a theme may lift above anything a window
- * can be (fisch-gruber.at gives it `z-index: 2147483647`): the overlays start
+ * can be (some give it `z-index: 2147483647`): the overlays start
  * where the toolbar ends, `--whsc-admin-bar`, which the search window measures
  * as it opens and is 0 for a visitor. What fills them, the "All filters"
  * drawer and a phone's sheet, takes its height from them; the window says so
@@ -487,11 +489,117 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
  * overwrites the other's default instead of layering as two independent
  * overrides of a shared baseline.
  */
+/*
+ * The box of a trigger is drawn by `ui/SearchBox.js` in the elements and the
+ * class names of the package's search control, whose layout the package
+ * writes as it runs. What it wrote is written here, for the elements this one
+ * draws, so that the storefront loads none of the package: the package's type
+ * for the field, a column that holds the field, a container laid out in a row
+ * with the icon before the input, a backdrop over it that draws the line, and
+ * a label a screen reader reads and nobody sees.
+ */
+.whsc-trigger-box.components-search-control {
+	font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-size: 13px;
+	line-height: 1.4;
+
+	.components-input-base {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		justify-content: left;
+		position: relative;
+		border-radius: 2px;
+	}
+
+	.components-input-control__container {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		position: relative;
+		box-sizing: border-box;
+	}
+
+	.components-input-control__prefix {
+		display: block;
+		box-sizing: border-box;
+	}
+
+	.components-input-control-prefix-wrapper {
+		display: flex;
+		padding-inline-start: 8px;
+	}
+
+	.components-input-control__suffix {
+		display: flex;
+		align-items: center;
+		align-self: stretch;
+		box-sizing: border-box;
+	}
+
+	.components-input-control__input {
+		display: block;
+		box-sizing: border-box;
+		width: 100%;
+		height: 40px;
+		min-height: 40px;
+		border: 0;
+		box-shadow: none;
+		font-family: inherit;
+		margin: 0;
+		outline: none;
+		// The package's search field: no decoration of its own on a search input.
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
+	}
+
+	.components-input-control__backdrop {
+		position: absolute;
+		inset: 0;
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		border-style: solid;
+		border-width: 1px;
+		border-radius: inherit;
+		pointer-events: none;
+	}
+
+	// The package turns the magnifier round where the text runs from the left.
+	// Doubled, since the reset says `fill: none` for an `svg` of the surface.
+	&.components-search-control svg {
+		display: block;
+		fill: currentColor;
+		stroke: none;
+
+		&:dir(ltr) {
+			transform: scaleX(-1);
+		}
+	}
+
+	.components-visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		border: 0;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		word-wrap: normal;
+	}
+}
+
 .whsc-trigger-box.components-search-control {
 	width: 100%;
 
 	/*
-	 * `@wordpress/components`' `SearchControl` wraps the icon and the
+	 * The box (`ui/SearchBox`, in the markup of the package's `SearchControl`) wraps the icon and the
 	 * `<input>` in a shared `.components-input-control__container` - that
 	 * container, not the `<input>` itself, is the actual visual "box" (it
 	 * draws the border/radius around both the icon and the field). Styling
@@ -1838,10 +1946,12 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 		flex-direction: column;
 	}
 
-	// The canvas writes a space between the parts of a price, the markup
-	// none: "from249,90".
-	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"]) {
-		margin-inline-end: 0.25em;
+	// The canvas writes a space between the parts of a price: "from249,90"
+	// without it. Written on the part's `::after`, as the stylesheet Searcio
+	// compiles writes it, so a template that has it still
+	// shows one space, and a hidden part takes its space along.
+	:is([data-sc-price-part="prefix"], [data-sc-price-part="regular"])::after {
+		content: "\a0";
 	}
 
 	:is(h1, h2, h3, h4, h5, h6) {
@@ -2206,7 +2316,7 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 }
 
 /*
- * Outside the wrappers too: `@wordpress/components` portals the overlay
+ * Outside the wrappers too: the modal portals the overlay
  * straight to `body`, so it sits under no `[data-webhead-frontend-root]` and a
  * rule scoped by one never reached it - not its fade-in, not a colour. At one
  * class it still outranks the package's own `.components-modal__screen-overlay`,
@@ -2757,6 +2867,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 .whsc-assistant__input {
 	flex: 1 1 auto;
+	/* The whole height of the bar is the field: a press anywhere in it types. */
+	align-self: stretch;
 	min-width: 0;
 	border: 0;
 	background: none;
@@ -3033,6 +3145,13 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 .whsc-compare__price {
 	font-weight: 600;
+	color: var(--whsc-price-color, #6b7177);
+}
+
+/* Said under the table when more products were found than it holds. */
+.whsc-compare__note {
+	margin: 8px 14px 0;
+	font-size: 12px;
 	color: var(--whsc-price-color, #6b7177);
 }
 
@@ -3701,7 +3820,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	height: 20px;
 	padding-inline: 6px;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.22);
+	/* Darker than the button, not lighter: the white text on the accent keeps its contrast. */
+	background: rgba(0, 0, 0, 0.22);
 	font-size: 12px;
 	font-weight: 700;
 	line-height: 1;

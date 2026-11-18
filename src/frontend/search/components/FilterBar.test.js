@@ -1,17 +1,13 @@
 /**
- * The type switch of the filter bar: a type the filters leave empty keeps its
- * place but is off, and the counts go where the total they come from is not
- * an exact number.
+ * The filter bar: the type switch, where a type the filters leave empty keeps
+ * its place but is off and the counts go where the total they come from is not
+ * an exact number, and the name of a group's button.
  */
 // eslint-disable-next-line import/no-extraneous-dependencies -- `@wordpress/element` wraps this React and does not pass `act` on.
 import { act } from 'react';
 import { createRoot } from '@wordpress/element';
 
 import FilterBar from './FilterBar';
-
-// `@wordpress/components` loads packages that ship as ES modules only, which
-// this suite does not run through Babel. The bar takes only an icon from it.
-jest.mock( '@wordpress/components', () => ( { Icon: () => null } ) );
 
 let container;
 let root;
@@ -86,3 +82,30 @@ describe( 'FilterBar type switch', () => {
 		expect( typeButton( 'Beiträge' ).disabled ).toBe( true );
 	} );
 } );
+
+describe( 'FilterBar group buttons', () => {
+	const button = () => container.querySelector( '.whsc-filter-btn[data-field="attr_color"]' );
+	const label = ( more ) => () => ( {
+		text: 'Color: Black',
+		name: 'Color',
+		value: 'Black',
+		more,
+		hidden: more > 0 ? ', Olive' : '',
+	} );
+
+	it( 'is named by what it shows, "+1" included, and then by the values behind it', () => {
+		render( { groups: [ 'attr_color' ], buttonLabel: label( 1 ), isActive: () => true } );
+
+		expect( button().querySelector( '.whsc-filter-btn__more' ).textContent ).toBe( '+1' );
+		// A name that leaves out what the button shows fails "Label in Name".
+		expect( button().getAttribute( 'aria-label' ) ).toBe( 'Color: Black +1, Olive' );
+	} );
+
+	it( 'needs no name of its own while it shows everything it stands for', () => {
+		render( { groups: [ 'attr_color' ], buttonLabel: label( 0 ), isActive: () => true } );
+
+		expect( button().querySelector( '.whsc-filter-btn__more' ) ).toBeNull();
+		expect( button().hasAttribute( 'aria-label' ) ).toBe( false );
+	} );
+} );
+

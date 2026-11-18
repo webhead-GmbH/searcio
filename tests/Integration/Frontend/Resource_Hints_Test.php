@@ -1,7 +1,7 @@
 <?php
 /**
- * The head of a page that will search opens the connection to Searcio
- * (search-cloud #164), and that of a page without search does not.
+ * The head of a page that will search opens the connection to Searcio,
+ * and that of a page without search does not.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH

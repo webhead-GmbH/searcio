@@ -3,7 +3,7 @@
  * The connection to Searcio, opened in the head of a page that will search.
  *
  * The first search of a page view pays for DNS, TCP and TLS before its
- * request leaves (search-cloud #164). A `preconnect` in the head lets the
+ * request leaves. A `preconnect` in the head lets the
  * browser open the connection while it reads the page. It is added when the
  * storefront script is already enqueued as WordPress prints its resource
  * hints: a placement on every page (the theme's search, the shortcut, the

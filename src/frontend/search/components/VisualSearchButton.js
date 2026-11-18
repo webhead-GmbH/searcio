@@ -53,6 +53,7 @@ const VisualSearchButton = ( { onSelect, busy } ) => {
 				capture="environment"
 				tabIndex={ -1 }
 				aria-hidden="true"
+				aria-label={ __( 'Search by photo', 'searcio' ) }
 				onChange={ onChange }
 			/>
 		</>

@@ -1,5 +1,5 @@
 import { useId, useLayoutEffect, useRef } from '@wordpress/element';
-import { Modal } from '@wordpress/components';
+import Modal from '../ui/Modal';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import Button from './Button';
@@ -11,8 +11,8 @@ import { tabbables } from './FilterPopover';
  * drawer at the inline end of the window when the modal is 640px wide or
  * more, a sheet from the bottom below that.
  *
- * It is a `Modal` of `@wordpress/components` nested in the search modal, which
- * the package supports through its context: it brings the focus trap, Escape
+ * It is a `Modal` (`../ui/Modal`) nested in the search modal, which that
+ * component supports through its context: it brings the focus trap, Escape
  * that closes this dialog and not the one under it, focus back to what opened
  * it, and the page and the search modal taken out of reach while it is open.
  * Closing it keeps every pick; they have applied already.
@@ -47,7 +47,6 @@ const FilterSheet = ( { variant, title, selection, single = false, instanceClass
 
 	return (
 		<Modal
-			__experimentalHideHeader
 			focusOnMount={ false }
 			onRequestClose={ onClose }
 			className={ `whsc-sheet whsc-sheet--${ variant }${ single ? ' whsc-sheet--single' : '' }${ instanceClass ? ` ${ instanceClass }` : '' }` }

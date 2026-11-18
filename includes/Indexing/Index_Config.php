@@ -57,6 +57,23 @@ final class Index_Config {
 	}
 
 	/**
+	 * The meta key the product mapping reads the purchase price from, or ''
+	 * when no purchase price is sent from a field. Read from what is stored,
+	 * without normalizing every block as {@see self::all()} does: the change
+	 * listener asks it on every meta write of the site.
+	 */
+	public function cost_meta_key(): string {
+		$stored = $this->settings->get( Plugin_Settings::INDEX_CONFIG );
+		$block  = is_array( $stored ) ? ( $stored[ Woo::POST_TYPE ] ?? null ) : null;
+
+		if ( ! is_array( $block ) || empty( $block['enabled'] ) || ! is_array( $block['woo'] ?? null ) || empty( $block['woo']['cost_price'] ) ) {
+			return '';
+		}
+
+		return is_string( $block['woo']['cost_meta'] ?? null ) ? $block['woo']['cost_meta'] : '';
+	}
+
+	/**
 	 * @return array<string,mixed>|null
 	 */
 	public function block_for( string $post_type ): ?array {
@@ -389,12 +406,15 @@ final class Index_Config {
 				'minimum'        => Woo::MIN_VERSION,
 				'attributes'     => $this->woo->attributes(),
 				'toggles'        => $this->woo->toggles(),
+				'prices_with_tax' => $this->woo->shows_prices_with_tax(),
 			],
 			// Which languages WPML/Polylang has configured locally, not the plan
 			// entitlement (that comes from `/health` via Connection_Endpoint).
 			'languages'     => [
 				'active'    => $this->multilingual->is_active(),
 				'available' => $this->multilingual->active_languages(),
+				// The one the admin works in: a new quiz starts in it.
+				'current'   => $this->multilingual->admin_language(),
 			],
 			'indexed_fields' => $this->indexed_fields(),
 			'config_version' => $this->config_version(),
@@ -685,9 +705,8 @@ final class Index_Config {
 		}
 
 		foreach ( $block['fields'] as $field ) {
-			// A protected key is never sent, so no document has the field: the
-			// tester's "interne_notiz" was offered as a filter and flagged as
-			// nothing.
+			// A protected key is never sent, so no document has the field;
+			// listed, it was offered as a filter that could never match.
 			if ( ! $this->is_protected_meta_source( (string) $field['source'] ) ) {
 				$fields[] = (string) $field['as'];
 			}

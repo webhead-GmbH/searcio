@@ -193,226 +193,28 @@ Legal notice: https://searcio.com/impressum
 == Changelog ==
 
 = 1.4.1 =
-- Security: password-protected posts and pages are no longer indexed, unless "Also index private & password-protected items" is on. Their text could be read in the search window, and the AI shopping assistant answered from it. The update takes the ones already indexed out right away.
-- Saving the Indexing tab starts a sync that sends only what the change altered, instead of waiting for a sync and then sending everything again.
-- A content type you renamed on the Indexing tab is found by blocks, shortcodes, widgets and placements restricted to it, and its type boost works.
-- Result cards of pages and custom content types show their text, not only the title.
-- The category filter's modes work for post categories too, and a post filed under a subcategory is found by a filter on its main category.
-- A filter set to "All (AND)" updates its counts after every pick, so it no longer offers combinations that find nothing.
-- The title, body text, result link and image can come from a custom field, such as an ACF field.
-- The synonyms field takes a new line for each group again.
-- On a site without a shop, the highlights no longer ask for featured products, and the window and the settings no longer speak of a shop.
-- Smaller fixes: clearer error messages on the Search Config tab, a warning for a redirect entered twice and for a field no content carries, the Sync history search works, a negative number of days is refused, Elementor no longer lists the Searcio widgets twice, "Clear cache" no longer clears the opcode cache of other sites on the server, and on a phone the search field has room for what you type.
-- The category filter tells apart categories of the same name under different parents: each is under its own parent with its own number of products, and picking one filters only that one. After the next sync, add "category_paths" to the facet fields on the Search Config tab, and keep "categories" there for your quizzes and merchandising rules.
-- The category filter lists your categories in the order you sorted them in WooCommerce, or by name or by number of products: see Order of the categories on the Search Config tab.
-- WooCommerce brands can be indexed (Indexing tab, Brands) and offered as a filter of their own by adding "brands" to the facet fields.
-- The highlights, product rows (similar products included), product finder and photo search show products only, where posts and pages came among them.
-- Featured highlights: the Placement tab says when the "featured" field still has to be added to the facet fields, and until then the window shows the newest products instead of nothing.
-- On a multilingual site with no language ticked, each page searches its own language. A page in a language you do not index searches WordPress in that language, and the search window no longer shows the other languages' highlights and popular searches there.
-- WooCommerce's cart, checkout, account and shop pages are no longer indexed; the update takes them out of search. A developer filter keeps out any other page.
-- Changing "Hide out of stock items" in WooCommerce, or the languages on the Search Config tab, starts a sync.
-- A variable product on sale shows its regular price struck through, and grouped and external products are sent with their own product type.
-- Attributes a product defines for itself can be indexed (Indexing tab, Product-specific attributes).
-- The Search Config tab always shows the settings as Searcio has them, and no longer undoes a change made in the Searcio dashboard.
-- A quiz published in the Product finder tab shows on the shop's next page, not some minutes later.
-- Product rows set to Searcio templates draw them, and a card designed in Searcio looks on the site as it does in the Searcio panel.
-- The comparison table leaves out internal fields, a product on backorder says so, and a wrong search key is refused and reported by Test connection.
-- Keys entered by hand on the Connection tab are checked again as soon as they are saved, where an earlier "wrong keys" stayed until the page was reloaded.
-- A product row accepts the product's ID as WordPress shows it, and the Elementor editor says why a row is empty.
-- The product finder names each answer by its question, and its editor marks a question no answer leads to.
-- On phones and tablets: the floating button stays clear of a bar at the bottom of the screen, a tablet held upright shows the results as a grid, and the "All" filter is back on phones.
-- The purchase price of your products can be sent for Searcio's profit ranking (Indexing tab, Purchase price): from WooCommerce's Cost of goods, or from the field of a cost of goods plugin. It is never shown to shoppers.
-- A merchandising rule can fire only on a search for its trigger itself, not on every search that contains it, and a rule set that way in the Searcio dashboard keeps it when the Search Config tab saves.
-- The newest highlights are really the newest, once the next sync has sent each item's date.
-- On a multilingual site a search redirect can be kept to one language, and keeps the language set in the Searcio dashboard when the Search Config tab saves.
+- Security: password-protected posts and pages are no longer indexed unless "Also index private & password-protected items" is on, and the update takes the ones already indexed out.
+- Profit ranking: send your products' purchase price (Indexing tab, from WooCommerce's Cost of goods or a plugin's field, entered without tax) and set "Profitable products first" on the Search Config tab, which checks its numbers and warns when nothing can be lifted yet. A change to a variation's price, stock or purchase price now reaches the search index.
+- Category filter: categories of the same name under different parents are told apart and listed in WooCommerce's order, by name or by number of products (add "category_paths" to the facet fields after the next sync). WooCommerce brands can be indexed and filtered.
+- Your own number fields can be filtered as a range, colour and size filters can match one variation in stock, every merchandising rule that matches applies, and a redirect can be kept to one language.
+- In the search window: "20 of about 173 results" and counts on the type buttons for a search by meaning, highlights that show the newest products when the featured ones cannot be asked for, and a comparison of up to four products.
+- On a multilingual site each page searches its own language, card templates can be made per language, and a new quiz starts in the language you work in.
+- Saving the Indexing tab sends only what the change altered. The Sync tab says when WP-Cron does not run a sync and offers to run its next step, Site Health lists overdue tasks, and the Connection tab warns when the index is empty.
+- Pages with a search button load about 1.2 MB less JavaScript, so they are ready sooner on phones.
+- The Search Config tab lists its sections down the side instead of on one long page, and its repeated rows are easier to read and delete on a phone.
+- WooCommerce's cart, checkout, account and shop pages are no longer indexed. Tested up to WooCommerce 11.3.
+- Many smaller fixes to phones and tablets, error messages, the product finder, product rows and the German texts: see CHANGELOG.md.
 
 = 1.4.0 =
-- Sites set to "Deutsch (Sie)", to Swiss German either way, or to a regional variant of French, Spanish, Italian or Polish (Canadian French, Mexican Spanish and the like) showed the plugin in English. German now comes in every version WordPress has, each speaking to shoppers and shop owners as WordPress does there ("Sie" in "Deutsch (Sie)" and Swiss German, "du" in "Deutsch (Schweiz, Du)"), and the other variants get the plugin in their language.
-- New Product finder tab: make, edit, publish and delete the product finder's quizzes in WordPress instead of the Searcio panel. A question's picture comes from the Media Library, answers offer the values your filters really have, and before a quiz is published every way through it is checked for how many products it shows.
-- The product finder follows quiz answers that ask for words the products must contain, or for a price range, so a quiz can tell a door lock from a padlock in the same category, or keep to a budget.
-- For a logged-in user, the search window opens under WordPress's toolbar instead of behind it, also where a theme draws the toolbar above everything else.
-- The AI shopping assistant shows its reply as it is written, and the products as soon as it has found them, and writes prices in your shop's currency.
-- On a multilingual shop, the product finder offers the quizzes in the language of the page, popular searches are those searched in it, and photo search, similar products and the products the AI shopping assistant shows keep to it. A merchandising rule can be kept to one language.
-- The AI shopping assistant types its reply out as it arrives, with a blinking cursor while more is coming, instead of showing it a sentence at a time.
-- A filter value with a comma in it, such as a category named "Jackets, Coats & Knitwear", finds its products; it found none.
-- Search as you type answers sooner after a pause in typing.
-- The settings tabs open at once: what they read from Searcio is kept for a few minutes and read again after every change you save, and a tab opened again does not ask the server a second time. "Test connection" always asks Searcio.
-- Ctrl+K and Cmd+K open the search with a keyboard layout that has no Latin letters, such as Persian or Russian, where they opened the browser's own search.
-- The AI shopping assistant numbers the products it suggests 1, 2, 3, where a reply with a blank line between them showed "1." for each.
-- Searches are faster and the search window opens faster: Searcio skips work the window never shows, the connection to Searcio is made as the page loads, what the window shows before typing is asked for as the pointer reaches the search and kept for the next pages of the visit, so there it opens full at once, and result cards load an image of half the weight (sent with the next sync).
-- Text in neighbouring paragraphs, headings and list items is indexed as separate words: a list of "Wool" and "Silk" was found only as "WoolSilk". The daily sync updates content that is already indexed.
-- Updated the webhead plugin framework to 1.10.0, which is licensed under the GPL like the plugin.
-- The search window's stylesheet is a third of its size: it carries only the WordPress components the window draws (updated the webhead plugin framework to 1.11.0).
-- Messages on the settings screen, such as "Placement saved.", appear as WordPress's own notices at the bottom of the window.
-- The previews on the Placement tab and in the look editor show a placeholder while their page loads, instead of an empty white frame, and caching plugins are told never to keep a preview, so a visitor never gets one with settings you have not saved.
-- When your Searcio account has no active plan, has an overdue payment or is suspended, the Connection tab and Site Health say so, with a link to choose a plan, to pay on the billing page or to contact support. Syncing stops at once instead of trying again for an hour, and picks up again once your account is active. Meanwhile a search your shoppers submit goes to WordPress's own search.
-- Support Searcio, the small logo in the search window, is off unless you turn it on, on every plan. If you had turned it on, it stays on.
-- Security: when you connect, the address Searcio calls to confirm that the site is yours answers only to the one-time code that connect sent, and only once.
-- The styles of the search block, the shortcode, the widgets, the floating button and the look editor are added through WordPress's stylesheet queue instead of being printed into the page.
-- Updated the webhead plugin framework to 1.8.0.
-- The plugin's settings page, blocks, widgets, hooks and everything it stores are named "searcio"; the settings page is at `admin.php?page=searcio`.
-- New: a Search statistics button in the settings header, and a link on the Connection tab, open your search statistics on the Searcio dashboard.
-- New Placement tab: Searcio works with any theme and any builder. Let it take over your theme's search forms, open it from your theme's own search icon (with suggested selectors for popular themes), add a floating search button or the keyboard shortcut, or place it with the `[searcio]` and `[searcio_products]` shortcodes, the classic widgets, a menu item or a link to #searcio. Every way is off until you turn it on.
-- The search window's filters are one bar under the search field: each filter opens its values in a popover, or in a sheet on a phone, and "All filters" shows them all. Picks apply at once.
-- Search Config: a filter can show products that have every value picked (AND) instead of any of them (OR).
-- Search Config: list the searches that must never be offered as popular searches, the same list as in the Searcio panel.
-- Saving the Search Config tab sends only what you changed there, so a change made in the Searcio panel in the meantime is kept.
-- On a multilingual site the search suggestions are in the language of the page, as the results are.
-- Names with an "&" (post types, attributes, custom fields, price separators, popular searches) show as typed instead of as "&amp;".
-- New on the Placement tab: a look editor for the shortcode, the classic widgets, a search form Searcio takes over and the floating button, with every style setting of the Elementor widget (colours, sizes, spacing, borders and fonts, Google Fonts included) for each part of the search, set apart for desktops, tablets and phones, with a large preview that shows each change as you make it.
-- On phones the search window fills the screen and its results scroll down in a grid; recent and popular searches take one row each, so products are in sight at once.
-- No Search button beside the search field any more: Enter searches, and the phone keyboard shows a Search key.
-- On phones the AI assistant fills the screen with its message field at the bottom, and the tabs no longer jump in as the window opens.
-- A theme that styles WooCommerce's block buttons no longer turns the search window's icons white: the colours set in the widget or the block now reach them, with no custom CSS.
-- New on the Search Config tab: the category filter can show all categories, the main categories only, or the main categories with their subcategories under them, to the number of levels you choose.
-- The filters show what your swatches plugin or theme set up: images, two-colour pills and short labels as well as colours, from Variation Swatches by GetWooPlugins (and its Pro), RadiusTheme, CartFlows and Woosuite, WCBoost, WPC, Variation Swatches and Photos, Kadence Shop Kit, Choosly, ThemeHigh, the free YITH Color, Image & Label Variation Swatches, Flatsome, Porto and WoodMart. A value you have not given a swatch yet no longer turns the filter into a plain list.
-- Filters whose values are numbers are easier to read: the count is smaller and in brackets, and a value like "256 GB" is no longer cut.
-- Popular searches have a trending arrow.
-- The microphone, the assistant's icon and the words of the filter buttons stand in the middle of their buttons.
+- German in every version WordPress has, and French, Spanish, Italian and Polish for their regional variants.
+- New Product finder tab: make, edit and publish quizzes in WordPress, with answers that ask for words or a price range.
+- The AI shopping assistant types its reply as it arrives and writes prices in your shop's currency. On a multilingual shop the product finder, popular searches, photo search and similar products keep to the page's language.
+- Searches, the opening of the search window and the settings tabs are faster.
+- Security: the address Searcio calls to confirm the site is yours answers only to the one-time code of the connect.
+- The settings page is at admin.php?page=searcio, and the blocks, widgets, hooks and everything the plugin stores are named "searcio".
 
 = 1.3.1 =
-- **After updating from 1.3.0, activate the plugin again** under Plugins. Its main file is now `searcio.php`, the name wordpress.org gives it, and WordPress finds a plugin by its main file, so it switches the plugin off once. The settings, the sync history and the connection stay; nothing has to be synced again.
-- The plugin calls itself Searcio everywhere: the admin menu, the settings screen, "Connect to Searcio", the "Searcio Search" and "Searcio Products" blocks and Elementor widgets, Site Health and all seven translations.
-- The plugin's link in the plugin list goes to its page on wordpress.org.
-- A post's excerpt on a search result ends at a whole word, with "…" when it was shortened, instead of stopping in the middle of a word.
-- The product finder counts only the questions on the visitor's own path, so a quiz with branches no longer says "Question 1 of 3" when two questions are all there is.
-- In the block editor, the size sliders of the search block's Styles tab have space between them; on the Search Config tab, the AI search index status lines up with its description, and each type boost is named by its content type.
-- The camera button for search by photo lines up with the icons beside it.
+- After updating from 1.3.0, activate the plugin again under Plugins: its main file is now searcio.php.
+- The plugin calls itself Searcio everywhere, and a post's excerpt on a result ends at a whole word.
 
-= 1.3.0 =
-- **The plugin is now "searcio - Fast AI Product Search for WooCommerce"**, and its slug and text domain are `searcio`, its name on wordpress.org. The release is `searcio-1.3.0.zip` and installs in a `searcio/` folder. **A site that installed an earlier release** has the plugin in another folder, which WordPress takes for another plugin: check that "Delete plugin data on uninstall" under Search Cloud > General is off, deactivate and delete the old copy, then install and activate this one. The settings, the sync history and the connection stay; nothing has to be synced again.
-- New: Support Searcio. A small searcio logo, linked to searcio.com, ends the search window, faded until it is pointed at. It is always shown on the Free plan; on a paid plan it can be turned off under Search Cloud > General.
-- New: French, Spanish, Italian and Polish translations, and the German one is complete. German also ships for Austria and Switzerland, whose sites WordPress did not give the German of Germany.
-- The General tab of the settings screen is named in the language of the screen.
-- The admin menu and the settings header show the searcio mark.
-- The compare table marks a missing value with "-", and the price filter separates its two fields with "-".
-- The readme describes the plugin for its page on wordpress.org.
-
-= 1.2.2 =
-- Fixed simple products showing their price without tax in the search while variable products showed it with tax, in a shop that enters prices without tax and shows them with tax (and the other way round). Every price in the search is now the price your shop displays, with or without tax as set under WooCommerce > Settings > Tax > Display prices in the shop, and the price filter compares like with like. After updating, run a sync from the Sync tab, or wait for the daily one: it sends only the products whose price changes.
-- Grouped products show the range of their children's prices, each child with its own tax class, as your shop shows it.
-- The search prices are the same whoever runs the sync. A sync run with WP-CLI could price products for the address of the user it ran as.
-
-= 1.2.1 =
-- Fixed the words in the header of the settings screen flickering as they appear.
-- The confirmation before disconnecting says what disconnecting does: Search Cloud removes the site and permanently deletes its search index, your shop uses WordPress's own search until you connect again and run a sync, and nothing in WordPress is deleted. It said that only the saved credentials are removed. The button that goes ahead now reads "Disconnect and delete the index".
-- Numbers and dates on the settings screen follow the language of your WordPress profile instead of the language of your browser. A date in the sync history is shown in your site's date format and time zone.
-- "How connecting works" names the link for another email address by its label, "Not this email?".
-- The Terms of Service, Privacy Policy and Data Processing Agreement links on the Connection tab lead to the documents at searcio.com when Search Cloud cannot be reached. They led to an address that asks for a password.
-- This readme says what connecting sends to Search Cloud, and what saving the Search Config tab sends.
-- The plugin package no longer carries a `vendor` folder and a `composer.json`. The plugin loads its own files, and nothing changes in how it works.
-- Updated the webhead plugin framework to 1.5.0.
-
-= 1.2.0 =
-- Requires WordPress 6.8 or newer, up from 6.0. A site on an older WordPress keeps the version it has.
-- Fixed a sync that met an error staying paused until somebody resumed it by hand. Until then no scheduled sync ran and no change made in the shop was sent, so a price or a stock level could be wrong in the search for days. A sync that cannot reach Search Cloud now stays running, says when it tries again, and sends the same batch after 1, 2, 5, 10, 15 and 30 minutes. If that fails too it ends as failed, which lets the changes through again.
-- The daily scheduled sync continues a paused sync. A sync an earlier version left paused comes back within a day of updating (or at once with Resume), and a pause made by hand now lasts until the next scheduled sync at the latest. The Sync tab says so while a sync is paused.
-- A batch that is sent again is counted once in a sync's Processed and Failed numbers.
-- The WP-CLI command `sync run` waits and tries again as the background sync does, and exits with an error when the sync did not complete. It used to report a failed sync as completed.
-- Fixed result cards designed in Search Cloud showing an empty search modal, since 1.0.2. They are drawn again, and as the panel draws them: without the plugin's own card frame round them, and without the site's styles for headings, links and images reaching into them.
-- The search looks the same on a site that styles every element. A customized Elementor kit, or a theme's rules for buttons, fields, links and headings, no longer changes the modal's chips, filters, fields and cards. The site's own font, text size and text colour are still followed.
-- Theming through the `--whsc-*` properties is unchanged. A rule of your own that restyles a `.whsc-*` element directly now needs `!important` to win.
-- New: the arrow keys move through the search suggestions, and Enter searches for the one they are on.
-- A link in an AI assistant reply is shown as a link instead of as brackets and an address. Only an http(s) address or a path on your site becomes one.
-- Fixed the results carousel in right-to-left languages: its arrows, its page dots and the arrow keys work there now.
-- Keyboard focus rings are drawn whole on filter chips, carousel cards, the Compare switch and the compare table, and at the same width on every screen.
-- The message shown when a search or a photo search fails matches the rest of the modal, and the search box's placeholder follows the colour of the box's text.
-- A page without a search trigger no longer costs a database query and the loading of translations.
-- The settings screen is redrawn with WordPress's current components: one title, a tab strip that scrolls on a phone, and the same cards, fields and notices throughout.
-- A settings screen that could not load says why and offers to try again, and a save that fails is reported beside its button with the reason.
-- Clearing the sync history, deleting a run from it and disconnecting from Search Cloud ask for confirmation first.
-- The Elementor widgets are listed under the plugin's own category in the editor panel instead of "General". Widgets already on a page are unaffected.
-- REST routes describe their parameters, so a value of the wrong shape is refused with a 400.
-- Updated the webhead plugin framework to 1.4.0. The package no longer carries the framework's updater or its command runner.
-
-= 1.1.0 =
-- New: search by photo. Shoppers can upload a photo instead of typing, and see the tags the vision model read.
-- New: a guided quiz tab that turns a few questions into a filtered search.
-- New: a "you may also like" row of similar products for your product pages.
-- New: a curated category listing, so your merchandising rules for a category actually apply on that page.
-- Products are indexed under their parent categories too, so filtering on "Shoes" - or a quiz answer or merchandising rule naming it - finds products filed under "Sneakers".
-- Category, tag and attribute names no longer show HTML entities such as "&amp;" in filters and the compare table.
-- Renaming, moving or deleting a category now updates the products in it without a manual sync.
-- New: search-term redirects - send a search straight to a page instead of showing results.
-- Security: the domain-verification endpoint no longer returns the site's write key to unauthenticated callers; it now answers only while a connection attempt is in progress.
-- Fixed the AI assistant breaking permanently after a long reply.
-- Fixed a failed search-as-you-type keystroke navigating the shopper away mid-word.
-- Fixed saving Search Config deleting ranking boosts for content types this site does not index.
-- Fixed a switch left on after a plan downgrade blocking every other Search Config save.
-- Fixed WooCommerce products set to "Search results only" being left out of the search index while "Shop only" products were included. Private products are now indexed when the private option is on. The next sync corrects the index; no forced re-sync is needed.
-- New: filter results by price (and any other numeric field you use as a facet) with a minimum and a maximum.
-- New: a Load more button. Results were locked to the first page of twenty, with no way to reach the rest.
-- New: the Connection tab shows what your plan has used this month - searches, documents, AI messages, photo searches - and marks anything near or past its limit.
-- Merchandising rules can now curate a category listing page, not just a typed search.
-- A merchandising banner now appears above the results; the setting existed but nothing ever rendered it.
-- The photo button and the quiz are themeable in the block editor and Elementor like the rest of the widget.
-- The search service moved to a new address, https://searcio.com. Nothing to do on your side; your existing keys keep working.
-- Security: the write key and secret are no longer sent to the browser, even encrypted - including to users who can only view the settings.
-- Fixed clearing the write key field erasing the saved key; leaving it blank now keeps it, as the field says.
-- The admin cards have their shadow back, the Indexing tab's sections are collapsible with headings in order, and the admin's animations respect the reduced-motion setting.
-- The storefront search shows a clearly visible keyboard focus ring, and disabled buttons there look disabled.
-- The search icon is announced as "Search" to screen readers even when no placeholder text is set.
-- A link to the General settings tab now opens it instead of the Sync tab, and each setting there shows its name and description once.
-- A photo search shows the photo it is searching with while it works, and keeps it beside the tags it produced.
-- The quiz moves keyboard and screen-reader focus to each new question, and its Back and Start over links sit next to the results they belong to.
-- On a phone, search results now appear above the recent and popular searches instead of below them.
-- The default accent colour now passes contrast wherever it is used as text (text in the accent uses a darker shade of it), and a placement's own accent reaches every part of its modal.
-- Every control in the search modal shows a visible keyboard focus outline, including the mode tabs, which had none.
-- Escape closes the search suggestions without clearing what you typed.
-- Better on small and touch screens: the mode tabs scroll instead of being cut off, the carousel's page dots are easier to tap, and the assistant and price fields no longer make iOS zoom in.
-- The results carousel respects the reduced-motion setting.
-- The "In stock" / "Out of stock" colours on the search modal's product cards can be set in the search block and the Elementor search widget.
-- The AI assistant on a phone: the message field follows the products and stays in view, Compare only appears when there is something to compare, and field names like "Categories" are translated.
-- On a phone the search field shows its whole placeholder, and the photo-search row lines up with its tags.
-- Photo search and typed search no longer get mixed up on screen, and a failed photo search restores the filters.
-- Product-row carousels show their page dots.
-- The Elementor widget can keep its search modal open while you edit it, optionally with a search already run, so style changes show as you make them.
-- The Elementor widget's settings are regrouped by the part they style, with new ones for the overlay colour, the modal's font and content width, the card image, the sale badge, the carousel's card width and arrows, filter group names, and the trigger's alignment and width. The modal can also be a centred, floating dialog.
-- The modal overlay fades in as intended, and the carousel's page dots stay right after its width changes.
-- Fixed a full sync leaving content in search that should no longer be there, when an edit had indexed it after the last full sync and it later dropped out without being saved again (for example after hiding out-of-stock products or changing the product mapping).
-- Fixed a permanently deleted post staying in search for good when the first attempt to remove it from the index failed. Full syncs now retry the removal until it succeeds.
-- Fixed content staying in search for good when a full sync's attempt to remove it failed, for example after turning a content type off and then permanently deleting its posts. Later full syncs now keep retrying the removal until it succeeds.
-- Tested up to WordPress 7.1.
-
-= 1.0.4 =
-- The AI assistant's answers now render properly instead of showing raw Markdown.
-- The comparison table no longer shows internal indexing fields, duplicate rows or raw values, and reads better on a phone.
-- Turning on the AI assistant no longer restyles the Search tab.
-
-= 1.0.3 =
-
-- Smaller download and a faster front end: removed ~2.4 MB of bundled developer tooling that was never used at runtime, and stopped scanning the plugins directory on front-end requests.
-- Added a border-radius control for the AI assistant's message field.
-- The AI assistant tab is now themeable in the block editor and Elementor; block-editor hover colours moved into Default/Hover tabs; long filter lists scroll instead of stretching the modal.
-- Fixed the search modal and AI assistant showing English on translated sites.
-- The AI assistant now shows an animated "Thinking" state, keeps the conversation next to the input, offers Try again when an answer fails, and has a properly centred send button.
-- Removed leftover sync/onboarding options that nothing reads any more and that could be mistaken for live state.
-- Search Config now also manages merchandising rules and the AI search, visual tagging and click-ranking switches.
-- Fixed click-through tracking never recording anything: the analytics beacon was blocked by the browser before it was sent.
-- Fixed a sync that could stop dead with no way back: a worker tick killed part-way through left the run on "Running" with nothing to advance it, which also blocked every later scheduled sync. Ticks now arm their successor up front, and the scheduled sync revives a run whose worker has died.
-- Sync ticks are now time-boxed as well as batch-bounded, so a large clean-up against a slow index can no longer run past PHP's execution limit.
-- Documents the index refuses to delete are counted and reported on the run instead of being dropped in silence.
-- Incremental syncs now record why they failed instead of showing an unexplained failure (or none at all) in the sync history.
-- Removed a leftover site-id option that nothing reads any more and that could go stale after reconnecting to a different site.
-- Fixed sync history retention never deleting anything, so the runs table no longer grows without bound.
-
-= 1.0.2 =
-
-- Security: hardened the server-designed result card renderer so an indexed field value can no longer break out of an HTML attribute or inject a `javascript:`/`data:` link. Values are fully escaped and unsafe URL schemes are stripped before rendering.
-- Security: the public domain-ownership verification endpoint now requires the token the Search Cloud ping always sends before returning the write key.
-- Security: WordPress protected meta (keys starting with an underscore) is no longer indexed through a custom-field mapping by default, preventing accidental exposure of internal data in public search. A new filter lets you opt a specific key back in.
-
-= 1.0.1 =
-
-- Fixed a sync that could stay stuck on "Running" when its background worker stopped (WP-Cron disabled, no site traffic, or a tick killed mid-run). Pause, resume, and cancel now recover the run directly instead of waiting on a worker that will never respond, so a new sync can be started again.
-
-= 1.0.0 =
-
-Initial release.
-
-- Connect WordPress/WooCommerce content to Searcio, with configurable per-post-type field mapping and a resumable, batched sync engine (full, scheduled, and incremental).
-- Full-screen search modal (Gutenberg block + Elementor widget) with search-as-you-type, autocomplete, faceted filtering, multi-type scope, recent/popular searches, and a highlights carousel.
-- Server-designed card templates as an alternative to the plugin's built-in result cards.
-- Search relevance configuration (searchable fields & weights, type boosts, facets, suggestions, synonyms) editable from the plugin's admin screen.
-- Optional WPML/Polylang-aware language restriction for indexing and search.
-- WP-CLI commands for running and monitoring syncs.
+The changelog of every release is CHANGELOG.md in the plugin's repository: https://github.com/webhead-GmbH/searcio/blob/master/CHANGELOG.md

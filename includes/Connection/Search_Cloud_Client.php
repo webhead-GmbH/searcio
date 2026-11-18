@@ -83,35 +83,6 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * Whether Searcio takes the search key the storefront sends, from this
-	 * site's address: `GET /storefront-config` with it, as a visitor's browser
-	 * asks, with the site's own origin, since a key restricted to its domains
-	 * refuses any other. The health check asks with the write key, which said
-	 * "Connected" while a wrong search key kept every visitor's search on
-	 * WordPress's own. Kept as long as the health check.
-	 */
-	public function search_key_check( string $key, bool $fresh = false ): Api_Response {
-		return $this->kept(
-			'search_key_' . substr( wp_hash( $key ), 0, 12 ),
-			self::HEALTH_TTL,
-			fn (): Api_Response => $this->request( 'GET', '/storefront-config?' . http_build_query( [ 'key' => $key ] ), authenticated: false, headers: [ 'Origin' => $this->site_origin() ] ),
-			$fresh
-		);
-	}
-
-	/** The site's own origin, `https://shop.example` (with a port when it has one). */
-	private function site_origin(): string {
-		$parts = wp_parse_url( home_url() );
-		$host  = is_array( $parts ) ? (string) ( $parts['host'] ?? '' ) : '';
-
-		if ( '' === $host ) {
-			return '';
-		}
-
-		return ( $parts['scheme'] ?? 'https' ) . '://' . $host . ( isset( $parts['port'] ) ? ':' . (int) $parts['port'] : '' );
-	}
-
-	/**
 	 * `POST /connect` - the only endpoint with no key at all (see
 	 * docs/api/authentication-and-security.md "Connect credentials"). Uses the
 	 * same retry/backoff policy as every other call, just without the
@@ -191,18 +162,26 @@ final class Search_Cloud_Client {
 	 * `sync_type` names the run in Searcio's sync history: `incremental` for
 	 * the drain's few changed documents, which it called a "Full sync".
 	 *
-	 * @param  array<int,array<string,mixed>>  $documents    1-1000 documents.
-	 * @param  bool                            $incremental  Sent by the incremental drain.
+	 * `run_reference` joins the requests of one run into one row of that
+	 * history, instead of a row for each batch (a post type at a time, 200 at
+	 * most): the same reference, within a day, is the same run. Without one the
+	 * request is a run of its own.
+	 *
+	 * @param  array<int,array<string,mixed>>  $documents      1-1000 documents.
+	 * @param  bool                            $incremental    Sent by the incremental drain.
+	 * @param  string                          $run_reference  Up to 64 letters, digits and `.`, `_`, `:`, `-`; none for a request that is a run of its own.
 	 */
-	public function bulk_upsert( array $documents, bool $incremental = false ): Api_Response {
-		return $this->request(
-			'POST',
-			'/documents',
-			[
-				'documents' => array_values( $documents ),
-				'sync_type' => $incremental ? 'incremental' : 'full',
-			]
-		);
+	public function bulk_upsert( array $documents, bool $incremental = false, string $run_reference = '' ): Api_Response {
+		$body = [
+			'documents' => array_values( $documents ),
+			'sync_type' => $incremental ? 'incremental' : 'full',
+		];
+
+		if ( 1 === preg_match( '/^[A-Za-z0-9._:-]{1,64}$/', $run_reference ) ) {
+			$body['run_reference'] = $run_reference;
+		}
+
+		return $this->request( 'POST', '/documents', $body );
 	}
 
 	/**
@@ -377,21 +356,26 @@ final class Search_Cloud_Client {
 	 * The Searcio host comes from a single hard-coded constant, overridable
 	 * per environment in wp-config.php. Key-relative - no site id in the path;
 	 * the API resolves the site from the write key + secret sent in the request
-	 * headers below (see docs/api/README.md "Key-relative endpoints").
+	 * headers below (see docs/api/README.md "Key-relative endpoints"), and the
+	 * storefront's requests from the search key.
 	 */
-	private function base(): string {
+	public function endpoint(): string {
 		$host = defined( 'Webhead\WP\SearchCloud\SERVICE_URL' ) ? \Webhead\WP\SearchCloud\SERVICE_URL : '';
 
 		return rtrim( (string) $host, '/' ) . '/api/v1';
 	}
 
 	/**
+	 * Only the endpoints of the write key, and `POST /connect`, which takes no
+	 * key: Searcio refuses a search-key request that does not come from a
+	 * visitor's browser on the site, so the storefront's are the browser's.
+	 *
 	 * @param  array<string,mixed>|null  $body
-	 * @param  bool                      $retry    Whether a failure that may pass is asked again.
-	 * @param  array<string,string>      $headers  Sent besides the plugin's own.
+	 * @param  bool                      $retry  Whether a failure that may pass is asked again. Not in a request somebody waits for, see {@see self::is_waited_for()}.
 	 */
-	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true, array $headers = [] ): Api_Response {
-		$url = $this->base() . $path;
+	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true ): Api_Response {
+		$url   = $this->endpoint() . $path;
+		$retry = $retry && ! $this->is_waited_for();
 
 		// The language of the screen, or of the site, so that what Searcio says
 		// back - a field it refuses, for one - can be in it: it answered an
@@ -399,7 +383,7 @@ final class Search_Cloud_Client {
 		$headers = [
 			'Accept'          => 'application/json',
 			'Accept-Language' => str_replace( '_', '-', determine_locale() ),
-		] + array_filter( $headers, static fn ( string $value ): bool => '' !== $value );
+		];
 
 		if ( $authenticated ) {
 			[ $write_key, $write_secret ] = $this->credentials();
@@ -444,6 +428,19 @@ final class Search_Cloud_Client {
 		} while ( $attempt < self::MAX_ATTEMPTS );
 
 		return $result;
+	}
+
+	/**
+	 * Whether somebody is waiting for the answer, in wp-admin: a screen of the
+	 * plugin asks through the REST API, and Searcio that does not answer would
+	 * hold the request for three tries of fifteen seconds and the waits between
+	 * them, longer than the time limit many hosts give a request. The screen
+	 * then shows a server error where it could say that Searcio did not answer.
+	 * Such a request asks once. What runs in the background asks again, and the
+	 * sync and the drain have their own way of sending a batch later.
+	 */
+	private function is_waited_for(): bool {
+		return wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
 	}
 
 	private function sleep( int $attempt, ?int $retry_after = null ): void {

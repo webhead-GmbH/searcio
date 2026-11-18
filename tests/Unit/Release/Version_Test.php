@@ -43,14 +43,16 @@ final class Version_Test extends TestCase {
 	}
 
 	/**
-	 * Between two releases the changelog opens with an Unreleased section and
-	 * the version stays that of the last release, so the first numbered
-	 * heading is the version either way.
+	 * CHANGELOG.md follows Keep a Changelog: `## [1.4.1] - 2026-11-20`, or
+	 * `- Unreleased` until the release. Between two releases an
+	 * `## [Unreleased]` section may come first and the version stays that of
+	 * the last release, so the first numbered heading is the version either
+	 * way.
 	 */
 	public function test_both_changelogs_have_the_version_as_their_newest_entry(): void {
 		$version = $this->header( 'Version' );
 
-		$this->assertSame( $version, $this->find( '/^## (\d+\.\d+\.\d+)\s*$/m', 'CHANGELOG.md' ) );
+		$this->assertSame( $version, $this->find( '/^## \[(\d+\.\d+\.\d+)\] - (?:\d{4}-\d{2}-\d{2}|Unreleased)\s*$/m', 'CHANGELOG.md' ) );
 		$this->assertSame( $version, $this->find( '/^= (\d+\.\d+\.\d+) =\s*$/m', 'readme.txt' ) );
 	}
 
@@ -80,16 +82,44 @@ final class Version_Test extends TestCase {
 		$readme = $this->read( 'README.md' );
 
 		foreach ( [ 'v', 'required-php', 'tested', 'stars' ] as $badge ) {
-			$this->assertStringContainsString( '"https://img.shields.io/wordpress/plugin/' . $badge . '/searcio"', $readme );
+			$this->assertStringContainsString( '"https://img.shields.io/wordpress/plugin/' . $badge . '/searcio?style=for-the-badge"', $readme );
 		}
+	}
 
-		$this->assertDoesNotMatchRegularExpression( '/img\.shields\.io\/badge\//', $readme, 'A badge with its number written in is not updated by a release.' );
+	/**
+	 * wordpress.org knows nothing of WooCommerce, so the WooCommerce the plugin
+	 * was tested with is the one badge whose number is written in. It is the
+	 * header's `WC tested up to`, and the only number written into a badge.
+	 */
+	public function test_the_woocommerce_badge_names_the_woocommerce_it_was_tested_with(): void {
+		$readme = $this->read( 'README.md' );
+
+		$this->assertSame( 1, preg_match_all( '/img\.shields\.io\/badge\//', $readme ), 'A badge with its number written in is not updated by a release; the WooCommerce one is the exception.' );
+		$this->assertSame(
+			$this->header( 'WC tested up to' ),
+			$this->find( '/img\.shields\.io\/badge\/woocommerce-v(\d+\.\d+)(?:\.\d+)?_tested-brightgreen\?style=for-the-badge/', 'README.md' ),
+			'The WooCommerce badge names another version than the header\'s "WC tested up to".'
+		);
 	}
 
 	public function test_the_documents_name_the_woocommerce_the_plugin_asks_for(): void {
+		$this->assertSame( Woo::MIN_VERSION, $this->header( 'WC requires at least' ) );
 		$this->assertSame( Woo::MIN_VERSION, $this->find( '/^- WooCommerce ([0-9.]+)\+/m', 'README.md' ) );
 		$this->assertSame( Woo::MIN_VERSION, $this->find( '/^- WooCommerce ([0-9.]+) or later/m', 'docs/installation.md' ) );
 		$this->assertSame( Woo::MIN_VERSION, $this->find( '/minimum supported version \(([0-9.]+)\)/', 'docs/faq.md' ) );
+	}
+
+	/**
+	 * WooCommerce reads `WC tested up to` from the header to say whether a
+	 * plugin was tested with the version a site runs; the documents name the
+	 * same version.
+	 */
+	public function test_the_woocommerce_it_was_tested_with_is_the_same_wherever_it_is_written(): void {
+		$tested = $this->header( 'WC tested up to' );
+
+		$this->assertMatchesRegularExpression( '/^\d+\.\d+$/', $tested, 'Major and minor, as WooCommerce compares them.' );
+		$this->assertSame( $tested, $this->find( '/^- WooCommerce [0-9.]+\+ .*tested up to ([0-9.]+)\s*$/m', 'README.md' ) );
+		$this->assertSame( $tested, $this->find( '/^- WooCommerce [0-9.]+ or later .*tested up to WooCommerce ([0-9.]+)\s*$/m', 'docs/installation.md' ) );
 	}
 
 	/**

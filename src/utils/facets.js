@@ -210,15 +210,38 @@ export const mergeFieldFacets = ( current, incoming, activeFacets, matchAll = []
  * min/max, which the API does not expose. It is offered as a hint, never as a
  * limit on what can be typed.
  *
+ * A field of the site's own that Searcio maps as a number (`numeric_fields`)
+ * is drawn as a range by the site's settings (`ranged`). Its facet values do
+ * come back, as text ("5", "12.5"), and so may its values in the hits: its
+ * span is taken from both, read as numbers.
+ *
  * @param {Object} facets
  * @param {Array<{source?: Object}>} hits
+ * @param {Array<string>} [ranged] The fields the site draws as a range.
  * @return {Object<string,{min: number, max: number}>}
  */
-export const extractRangeFields = ( facets, hits ) => {
+export const extractRangeFields = ( facets, hits, ranged = [] ) => {
 	const out = {};
 
 	Object.keys( facets || {} ).forEach( ( field ) => {
 		if ( 'types' === field ) {
+			return;
+		}
+
+		if ( ranged.includes( field ) ) {
+			const numbers = [
+				...( Array.isArray( facets[ field ] ) ? facets[ field ] : [] ).map( ( entry ) => entry?.value ),
+				...( hits || [] ).map( ( hit ) => hit?.source?.[ field ] ),
+			]
+				.filter( ( value ) => ( 'number' === typeof value || 'string' === typeof value ) && '' !== String( value ).trim() )
+				.map( Number )
+				.filter( Number.isFinite );
+			const distinct = new Set( numbers );
+
+			if ( distinct.size > 1 ) {
+				out[ field ] = { min: Math.floor( Math.min( ...distinct ) ), max: Math.ceil( Math.max( ...distinct ) ) };
+			}
+
 			return;
 		}
 
@@ -856,8 +879,9 @@ export const rangeLabel = ( range, format = ( value ) => value ) => {
 /**
  * What a group's button says. With nothing selected, its name. With values,
  * the name and the first value, and how many more there are: the button
- * reads "Colour: Olive +1", and is named "Colour: Olive, Black", which starts
- * with what it shows. With a bound, the name and the bound.
+ * reads "Colour: Olive +1", and is named "Colour: Olive +1, Black", which
+ * holds what it shows (a name that leaves out the "+1" fails WCAG 2.5.3) and
+ * runs on to the values behind it. With a bound, the name and the bound.
  *
  * @param {string} label
  * @param {string[]} [values]

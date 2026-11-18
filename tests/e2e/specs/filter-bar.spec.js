@@ -127,8 +127,8 @@ test.describe( 'the filter bar', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect( page.locator( '.whsc-pop, .whsc-sheet' ) ).toHaveCount( 0 );
 
-		// Read out whole, shown as "Color: Black +1".
-		await expect( widget.groupButton( 'Color' ) ).toHaveAccessibleName( 'Color: Black, Olive' );
+		// Read out whole, shown as "Color: Black +1": the name holds what the button shows and runs on to the values behind "+1".
+		await expect( widget.groupButton( 'Color' ) ).toHaveAccessibleName( 'Color: Black +1, Olive' );
 		await expect( widget.groupButton( 'Color' ).locator( '.whsc-filter-btn__more' ) ).toHaveText( '+1' );
 		await expect( widget.allFilters.locator( '.whsc-badge' ) ).toHaveText( '2' );
 		await expect( widget.allFilters ).toHaveAccessibleName( /, 2 active$/ );

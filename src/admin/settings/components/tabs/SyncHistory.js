@@ -45,6 +45,7 @@ const TRIGGER_ELEMENTS = [
 	{value: 'manual', label: __('Manual', 'searcio')},
 	{value: 'scheduled', label: __('Scheduled', 'searcio')},
 	{value: 'incremental', label: __('Incremental', 'searcio')},
+	{value: 'settings_change', label: __('Settings change', 'searcio')},
 ];
 
 // DataViews sort fields → sync_runs columns the REST endpoint accepts.

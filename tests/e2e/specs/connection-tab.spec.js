@@ -229,6 +229,27 @@ test.describe( 'Connection tab allowances', () => {
 	} );
 
 	/**
+	 * A search key with a space in it ("xx ") was saved without a word and the
+	 * site's search fell back to WordPress's own. The field says so as it is
+	 * typed, and the save waits for a key that is one.
+	 */
+	test( 'says as it is typed that a search key is not one, and does not save it', async ( { page } ) => {
+		await mockHealth( page );
+		await page.goto( CONNECTION_URL );
+		await page.getByRole( 'button', { name: /manual key entry/i } ).click();
+
+		const save = page.getByRole( 'button', { name: 'Save connection' } );
+
+		await page.getByLabel( 'Search key' ).fill( 'xx ' );
+		await expect( page.getByText( 'That is not a search key: one starts with sk_ and has no spaces.' ) ).toBeVisible( LOADED );
+		await expect( save ).toBeDisabled();
+
+		await page.getByLabel( 'Search key' ).fill( 'sk_e2eright' );
+		await expect( page.getByText( 'That is not a search key' ) ).toHaveCount( 0 );
+		await expect( save ).toBeEnabled();
+	} );
+
+	/**
 	 * wp-admin is written in the language of the user's profile, and a browser
 	 * is often set to another one. A number then has to follow the screen: a
 	 * Persian browser used to put "۲۷۰٬۰۰۰ of ۳۰۰٬۰۰۰" into the English sentence.

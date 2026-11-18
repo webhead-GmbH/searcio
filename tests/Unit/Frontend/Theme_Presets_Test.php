@@ -24,7 +24,7 @@ final class Theme_Presets_Test extends TestCase {
 	 * A child theme's folder is its own; the parent's is the template.
 	 */
 	public function test_a_child_theme_takes_its_parents_preset(): void {
-		$this->assertSame( 'enfold', Theme_Presets::for_theme( 'enfold', 'enfold-fisch-gruber' )['key'] );
+		$this->assertSame( 'enfold', Theme_Presets::for_theme( 'enfold', 'enfold-child' )['key'] );
 	}
 
 	public function test_a_folder_named_in_capitals_is_found(): void {

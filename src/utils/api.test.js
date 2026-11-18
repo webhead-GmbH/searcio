@@ -178,6 +178,27 @@ describe( 'suggest / fetchCardTemplates / fetchPopularSearches', () => {
 		expect( urls[ 2 ] ).toContain( '/search/popular?' );
 	} );
 
+	// A template has a language: "Ansehen" showed on the English pages.
+	it( 'asks for the card templates of the page\'s language on a multilingual site', async () => {
+		setConfig( { enabledLanguages: [ 'de', 'en' ], currentLang: 'en' } );
+		const api = loadApi();
+
+		await api.fetchCardTemplates( 'product' );
+
+		const params = new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams;
+
+		expect( params.get( 'type' ) ).toBe( 'product' );
+		expect( params.get( 'filter[lang]' ) ).toBe( 'en' );
+	} );
+
+	it( 'asks for every card template on a site with one language', async () => {
+		const api = loadApi();
+
+		await api.fetchCardTemplates( 'product' );
+
+		expect( new URL( global.fetch.mock.calls[ 0 ][ 0 ] ).searchParams.has( 'filter[lang]' ) ).toBe( false );
+	} );
+
 	// A German page suggested the English titles too: suggestions are filtered
 	// by the page's language, as a search is.
 	it( 'suggests in the language of the page on a multilingual site', async () => {
@@ -987,6 +1008,36 @@ describe( 'what is about products', () => {
 		expect( newest.get( 'sort' ) ).toBe( 'newest' );
 		expect( featured.get( 'filter[featured]' ) ).toBe( 'true' );
 		expect( featured.has( 'sort' ) ).toBe( false );
+	} );
+
+	// The plugin's copy of the filters can be older than the dashboard's: a refusal left the row empty.
+	it( 'shows the newest products when Searcio refuses the featured filter, and does not ask again', async () => {
+		shop( { hasFeatured: true } );
+		global.fetch
+			.mockResolvedValueOnce( jsonResponse( { message: 'The field featured is not configured as a facet.' }, false, 422 ) )
+			.mockResolvedValue( jsonResponse( { hits: [ { id: 'product-1' } ] } ) );
+		const api = loadApi();
+
+		const response = await api.fetchHighlights( { source: 'featured' } );
+		const [ refused, instead ] = global.fetch.mock.calls.map( ( [ url ] ) => new URL( url ).searchParams );
+
+		expect( response.hits ).toHaveLength( 1 );
+		expect( refused.get( 'filter[featured]' ) ).toBe( 'true' );
+		expect( instead.has( 'filter[featured]' ) ).toBe( false );
+		expect( instead.get( 'sort' ) ).toBe( 'newest' );
+
+		await api.fetchHighlights( { source: 'featured', facets: { color: [ 'red' ] } } );
+
+		expect( global.fetch ).toHaveBeenCalledTimes( 3 );
+		expect( new URL( global.fetch.mock.calls[ 2 ][ 0 ] ).searchParams.has( 'filter[featured]' ) ).toBe( false );
+	} );
+
+	it( 'passes on any other failure of the featured row', async () => {
+		shop( { hasFeatured: true } );
+		global.fetch.mockResolvedValue( jsonResponse( {}, false, 500 ) );
+
+		await expect( loadApi().fetchHighlights( { source: 'featured' } ) ).rejects.toMatchObject( { status: 500 } );
+		expect( global.fetch ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'sorts a search only when asked to', async () => {

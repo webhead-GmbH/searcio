@@ -10,6 +10,8 @@
  * Domain Path: /languages
  * Requires at least: 6.8
  * Requires PHP: 8.3
+ * WC requires at least: 8.0
+ * WC tested up to: 11.3
 
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html

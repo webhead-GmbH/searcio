@@ -1,5 +1,5 @@
 import { ToggleControl } from '@wordpress/components';
-import { Card, Stack, Text } from '@wordpress/ui';
+import { Card, Text } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
 const KEY = 'support_searcio';
@@ -32,17 +32,19 @@ const SupportSearcioCard = ( { settings, updateSetting } ) => {
 						) }
 					</Text>
 				</div>
-			</Card.Header>
-			<Card.Content className="whsc-settings-card-content">
-				<Stack direction="column" gap="md">
+				{ /* A switch is the answer to the question its title asks, so it sits on
+				   that row, as it does on the card beside this one. The title and the
+				   sentence say what it does; the switch keeps its name for a screen reader. */ }
+				<div className="whsc-settings-card-switch">
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show the Searcio logo in the search window', 'searcio' ) }
+						hideLabelFromVision
 						checked={ true === settings?.[ KEY ] }
 						onChange={ ( value ) => updateSetting( KEY, value ) }
 					/>
-				</Stack>
-			</Card.Content>
+				</div>
+			</Card.Header>
 		</Card.Root>
 	);
 };

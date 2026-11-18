@@ -204,9 +204,9 @@ final class Index_Config_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The tester's "interne_notiz", read from a protected key that is never
-	 * sent, was offered as a facet and a searchable field and flagged as
-	 * nothing, since the list named every mapped field.
+	 * A field read from a protected key, which is never sent, was offered as a
+	 * facet and a searchable field without a warning, since the list named
+	 * every mapped field.
 	 */
 	public function test_a_field_read_from_a_protected_key_is_not_listed(): void {
 		$this->config()->save(
