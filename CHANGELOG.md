@@ -53,6 +53,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The batches of a full sync name their run, so that Searcio's sync history shows one row for the run, not one for each post type and batch.
 - The Sync history's search also finds a run by its status or by what started it, and a run started by a settings change is named so.
 - The Search Config tab asks to wait a few minutes before changing the fields that hold numbers, or the attributes one variation must match, again, because each change rebuilds the search index.
+- The Search Config tab lists its sections down the side, as the Placement tab does, each with a line of its state (and across the top on a phone), where they stood one below the other on a page of several screens.
+- On the General tab, the switch for the Searcio logo in the search window sits on the title of its card, like the switch beside it.
+- On a phone, the fields of a repeated row (an extra field, a searchable field, a redirect, a profit target) stand one below the other, and each row is drawn as a group with its delete button at the top, so it is clear which row the button removes.
 - On tablets in portrait orientation, results are shown as a grid. The floating search button stays clear of bars fixed to the bottom of the screen, and the "All" filter is available on phones again.
 
 ### Fixed

@@ -274,15 +274,17 @@ msgstr "Activer la recherche vocale"
 
 #: includes/Elementor/Widgets/Search_Widget.php:181
 #: includes/Elementor/Widgets/Search_Widget.php:314
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1236
 msgid "On"
 msgstr "Activé"
 
 #: includes/Elementor/Widgets/Search_Widget.php:182
 #: includes/Elementor/Widgets/Search_Widget.php:315
-#: src/admin/settings/components/tabs/PlacementTab.js:444
-#: src/admin/settings/components/tabs/PlacementTab.js:474
-#: src/admin/settings/components/tabs/PlacementTab.js:563
-#: src/admin/settings/components/tabs/PlacementTab.js:587
+#: src/admin/settings/components/tabs/PlacementTab.js:440
+#: src/admin/settings/components/tabs/PlacementTab.js:470
+#: src/admin/settings/components/tabs/PlacementTab.js:559
+#: src/admin/settings/components/tabs/PlacementTab.js:583
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1236
 msgid "Off"
 msgstr "Désactivé"
 
@@ -875,6 +877,7 @@ msgstr "Bouton d’effacement"
 
 #: includes/Elementor/Widgets/Search_Widget.php:876
 #: includes/Frontend/Look_Schema.php:193
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1506
 #: src/blocks/search/edit.js:278
 msgid "Suggestions"
 msgstr "Suggestions"
@@ -984,10 +987,11 @@ msgstr "Typographie des populaires"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1008
 #: includes/Frontend/Look_Schema.php:246
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1403
 #: src/blocks/search/edit.js:316
 #: src/frontend/search/components/FilterBar.js:204
 #: src/frontend/search/components/FilterBar.js:228
-#: src/frontend/search/components/SearchModal.js:2025
+#: src/frontend/search/components/SearchModal.js:2090
 msgid "Filters"
 msgstr "Filtres"
 
@@ -5678,3 +5682,45 @@ msgstr "%1$d résultats sur environ %2$d"
 #: src/frontend/search/ui/Modal.js:310
 msgid "Scrollable section"
 msgstr "Section défilante"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1257
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1407
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1510
+#, js-format
+msgid "%d field"
+msgid_plural "%d fields"
+msgstr[0] "%d champ"
+msgstr[1] "%d champs"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1319
+#, js-format
+msgid "%d type"
+msgid_plural "%d types"
+msgstr[0] "%d type"
+msgstr[1] "%d types"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1555
+#, js-format
+msgid "%d group"
+msgid_plural "%d groups"
+msgstr[0] "%d groupe"
+msgstr[1] "%d groupes"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1639
+#, js-format
+msgid "%d rule"
+msgid_plural "%d rules"
+msgstr[0] "%d règle"
+msgstr[1] "%d règles"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1660
+#, js-format
+msgid "%d redirect"
+msgid_plural "%d redirects"
+msgstr[0] "%d redirection"
+msgstr[1] "%d redirections"

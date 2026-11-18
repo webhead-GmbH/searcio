@@ -201,6 +201,7 @@ Legal notice: https://searcio.com/impressum
 - On a multilingual site each page searches its own language, card templates can be made per language, and a new quiz starts in the language you work in.
 - Saving the Indexing tab sends only what the change altered. The Sync tab says when WP-Cron does not run a sync and offers to run its next step, Site Health lists overdue tasks, and the Connection tab warns when the index is empty.
 - Pages with a search button load about 1.2 MB less JavaScript, so they are ready sooner on phones.
+- The Search Config tab lists its sections down the side instead of on one long page, and its repeated rows are easier to read and delete on a phone.
 - WooCommerce's cart, checkout, account and shop pages are no longer indexed. Tested up to WooCommerce 11.3.
 - Many smaller fixes to phones and tablets, error messages, the product finder, product rows and the German texts: see CHANGELOG.md.
 
