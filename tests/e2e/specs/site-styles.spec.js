@@ -160,8 +160,13 @@ const CONTENT = [
  * pointer on something, a focus or a key.
  */
 const read = ( page, popovers = false ) => page.evaluate( ( [ props, withPopovers ] ) => {
-	// A class that is not the same from one page load to the next.
-	const passing = /^(css-|e[0-9a-z]{5,}\d+$|whsc-instance-|is-busy$)/;
+	// A class that is not the same from one page load to the next, or that says
+	// how far the modal's content has scrolled or whether it can: a resize
+	// observer sets those once the content is as tall as it will be, and on a
+	// slow runner the two walks are not at the same point of that, which read
+	// as every element under the content being "not drawn". They change what a
+	// focused content area looks like, which no state of this walk is.
+	const passing = /^(css-|e[0-9a-z]{5,}\d+$|whsc-instance-|is-busy$|is-scrollable$|has-scrolled-content$)/;
 	const label = ( node ) => {
 		const classes = [ ...node.classList ].filter( ( name ) => ! passing.test( name ) ).sort().join( '.' );
 		const twins = node.parentElement ? [ ...node.parentElement.children ].filter( ( sibling ) => sibling.tagName === node.tagName ) : [ node ];
