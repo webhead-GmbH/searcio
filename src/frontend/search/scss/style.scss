@@ -2867,6 +2867,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 
 .whsc-assistant__input {
 	flex: 1 1 auto;
+	/* The whole height of the bar is the field: a press anywhere in it types. */
+	align-self: stretch;
 	min-width: 0;
 	border: 0;
 	background: none;
@@ -3818,7 +3820,8 @@ $unlisted: ':where(b, del, em, form, i, ins, s, small, strong, sub, sup, u, svg,
 	height: 20px;
 	padding-inline: 6px;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.22);
+	/* Darker than the button, not lighter: the white text on the accent keeps its contrast. */
+	background: rgba(0, 0, 0, 0.22);
 	font-size: 12px;
 	font-weight: 700;
 	line-height: 1;

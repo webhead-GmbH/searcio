@@ -879,8 +879,9 @@ export const rangeLabel = ( range, format = ( value ) => value ) => {
 /**
  * What a group's button says. With nothing selected, its name. With values,
  * the name and the first value, and how many more there are: the button
- * reads "Colour: Olive +1", and is named "Colour: Olive, Black", which starts
- * with what it shows. With a bound, the name and the bound.
+ * reads "Colour: Olive +1", and is named "Colour: Olive +1, Black", which
+ * holds what it shows (a name that leaves out the "+1" fails WCAG 2.5.3) and
+ * runs on to the values behind it. With a bound, the name and the bound.
  *
  * @param {string} label
  * @param {string[]} [values]
