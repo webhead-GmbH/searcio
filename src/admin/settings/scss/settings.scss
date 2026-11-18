@@ -227,10 +227,11 @@
 // stack, a line round it says they belong together, and its delete stands on
 // the line of the first field's label, at the end of it, so nobody reads that
 // delete as the next row's. The delete is the compact button there (32px,
-// `RowRemove` picks it), centred on the label's line: its top is the group's
-// padding plus half of what the label's line has over the button, which
-// reaches down to the top of the field and no further. The icon, in the
-// middle of the button, ends where the fields end.
+// `RowRemove` picks it). The first label's line is as tall as the button, with
+// the label in the middle of it, so the button is level with the label and a
+// gap clear of the field under it, where a press that slips down does not
+// land in the input. The icon, in the middle of the button, ends where the
+// fields end.
 @mixin phone-group {
   @media screen and (max-width: 600px) {
     position: relative;
@@ -238,9 +239,15 @@
     border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
     border-radius: var(--wpds-border-radius-md);
 
+    > :first-child label:first-of-type {
+      display: flex;
+      align-items: center;
+      min-height: var(--wpds-dimension-size-md);
+    }
+
     > .whsc-row-remove {
       position: absolute;
-      inset-block-start: calc(var(--wpds-dimension-padding-md) + (var(--wpds-typography-line-height-xs) - var(--wpds-dimension-size-md)) / 2);
+      inset-block-start: var(--wpds-dimension-padding-md);
       inset-inline-end: calc(var(--wpds-dimension-padding-md) - (var(--wpds-dimension-size-md) - var(--wpds-dimension-size-sm)) / 2);
       padding: 0;
     }
