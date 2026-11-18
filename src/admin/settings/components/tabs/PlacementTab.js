@@ -28,6 +28,7 @@ import SectionList from '../../../../components/SectionList';
 import { showToast } from '../../../../toast';
 import { useAnnounce } from '../../../../utils/announce';
 import TabIntro from '../TabIntro';
+import PlainSection from '../PlainSection';
 import IndexingSkeleton from './IndexingSkeleton';
 import { forget, readOnce } from '../../remote';
 
@@ -58,27 +59,6 @@ const CardHeading = ( { title, description } ) => (
 			</Text>
 		</div>
 	</Card.Header>
-);
-
-/**
- * A section with nothing beside it: the same title and sentence a card has,
- * straight on the panel. A card separates one region from another, and a box
- * round the only one says a second is coming that never does.
- */
-const PlainSection = ( { title, description, children } ) => (
-	<section className="whsc-placement-section">
-		<Stack direction="column" gap="xs" className="whsc-placement-section__header">
-			<Text render={ <h3 /> } variant="heading-md" className="whsc-placement-section__title">
-				{ title }
-			</Text>
-			{ description ? (
-				<Text render={ <p /> } variant="body-sm" className="whsc-placement-section__description">
-					{ description }
-				</Text>
-			) : null }
-		</Stack>
-		{ children }
-	</section>
 );
 
 /**

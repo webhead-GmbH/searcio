@@ -223,14 +223,32 @@
 /* -------------------------------------------------------------------------
  * Indexing tab
  * ---------------------------------------------------------------------- */
+// A row that repeats - a field, a rule - is one group on a phone: its fields
+// stack, a line round it says they belong together, and its delete stands at
+// the end of it, so nobody reads that delete as the next row's.
+@mixin phone-group {
+  @media screen and (max-width: 600px) {
+    padding: var(--wpds-dimension-padding-md);
+    border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+    border-radius: var(--wpds-border-radius-md);
+  }
+}
+
 .whsc-custom-field-row {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
   grid-template-columns: 1fr 1fr 1fr auto;
   align-items: end;
 
+  @include phone-group;
+
+  // Three fields do not fit side by side on a phone, nor two: one under another.
   @media screen and (max-width: 600px) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+
+    > :last-child {
+      justify-self: end;
+    }
   }
 }
 
@@ -247,8 +265,14 @@
   grid-template-columns: 2fr 1fr auto;
   align-items: end;
 
+  @include phone-group;
+
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
+
+    > :last-child {
+      justify-self: end;
+    }
   }
 }
 
@@ -280,6 +304,8 @@
     grid-template-columns: 1fr 1fr minmax(10rem, 0.7fr) auto;
   }
 
+  @include phone-group;
+
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
 
@@ -299,6 +325,8 @@
   gap: var(--wpds-dimension-gap-md);
   grid-template-columns: 1fr 1fr minmax(7rem, 0.6fr) auto auto;
   align-items: start;
+
+  @include phone-group;
 
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr auto;
