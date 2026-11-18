@@ -224,13 +224,26 @@
  * Indexing tab
  * ---------------------------------------------------------------------- */
 // A row that repeats - a field, a rule - is one group on a phone: its fields
-// stack, a line round it says they belong together, and its delete stands at
-// the top of it, so nobody reads that delete as the next row's.
+// stack, a line round it says they belong together, and its delete stands on
+// the line of the first field's label, at the end of it, so nobody reads that
+// delete as the next row's. The delete is the compact button there (32px,
+// `RowRemove` picks it), centred on the label's line: its top is the group's
+// padding plus half of what the label's line has over the button, which
+// reaches down to the top of the field and no further. The icon, in the
+// middle of the button, ends where the fields end.
 @mixin phone-group {
   @media screen and (max-width: 600px) {
+    position: relative;
     padding: var(--wpds-dimension-padding-md);
     border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
     border-radius: var(--wpds-border-radius-md);
+
+    > .whsc-row-remove {
+      position: absolute;
+      inset-block-start: calc(var(--wpds-dimension-padding-md) + (var(--wpds-typography-line-height-xs) - var(--wpds-dimension-size-md)) / 2);
+      inset-inline-end: calc(var(--wpds-dimension-padding-md) - (var(--wpds-dimension-size-md) - var(--wpds-dimension-size-sm)) / 2);
+      padding: 0;
+    }
   }
 }
 
@@ -245,11 +258,6 @@
   // Three fields do not fit side by side on a phone, nor two: one under another.
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
-
-    > :last-child {
-      grid-row: 1;
-      justify-self: end;
-    }
   }
 }
 
@@ -270,11 +278,6 @@
 
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
-
-    > :last-child {
-      grid-row: 1;
-      justify-self: end;
-    }
   }
 }
 
@@ -294,7 +297,7 @@
 }
 
 // A redirect is two fields and a delete, on one row. On a phone the row has no
-// room for two fields: they stack, with the delete at the top of the group.
+// room for two fields: they stack, with the delete on the first one's label.
 .whsc-redirect-rule {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
@@ -310,18 +313,12 @@
 
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
-
-    .whsc-row-remove {
-      grid-row: 1;
-      justify-self: end;
-      padding-block-start: 0;
-    }
   }
 }
 
 // A margin target of profit ranking: a field, its value, the target, "never
-// lift" and a delete, on one row. On a phone the delete is at the top of the
-// group, the fields stack under it and "never lift" ends the group.
+// lift" and a delete, on one row. On a phone the fields stack, the delete is
+// on the first one's label and "never lift" ends the group.
 .whsc-profit-rule {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
@@ -331,17 +328,7 @@
   @include phone-group;
 
   @media screen and (max-width: 600px) {
-    grid-template-columns: 1fr auto;
-
-    > :not(.whsc-row-remove) {
-      grid-column: 1 / -1;
-    }
-
-    .whsc-row-remove {
-      grid-row: 1;
-      justify-self: end;
-      padding-block-start: 0;
-    }
+    grid-template-columns: 1fr;
 
     .whsc-profit-rule__exclude {
       padding-block-start: 0;

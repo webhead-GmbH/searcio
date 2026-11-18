@@ -44,6 +44,7 @@ import SectionList from '../../../../components/SectionList';
 import { showToast } from '../../../../toast';
 import TabIntro from '../TabIntro';
 import PlainSection from '../PlainSection';
+import RowRemove from '../RowRemove';
 import IndexingSkeleton from './IndexingSkeleton';
 import { useAnnounce } from '../../../../utils/announce';
 import { forget, readOnce } from '../../remote';
@@ -654,16 +655,10 @@ const ProfitRankingCard = ( { ranking, errors, sendsPurchasePrice, indexed, pric
 										onCheckedChange={ ( exclude ) => update( index, { ...rule, exclude: Boolean( exclude ) } ) }
 									/>
 								</div>
-								<div className="whsc-row-remove">
-									<Button
-										__next40pxDefaultSize
-										icon={ trash }
-										isDestructive
-										variant="tertiary"
-										label={ __( 'Remove target', 'searcio' ) }
-										onClick={ () => set( 'rules', rules.filter( ( _, i ) => i !== index ) ) }
-									/>
-								</div>
+								<RowRemove
+									label={ __( 'Remove target', 'searcio' ) }
+									onClick={ () => set( 'rules', rules.filter( ( _, i ) => i !== index ) ) }
+								/>
 							</div>
 						) ) }
 						<Stack direction="row" gap="sm">
@@ -910,16 +905,7 @@ const RedirectsCard = ( { rules, errors, languages, onChange } ) => {
 								{ ...selectProps( languageItems, rule.lang ?? null, ( lang ) => update( index, { ...rule, lang } ) ) }
 							/>
 						) }
-						<div className="whsc-row-remove">
-							<Button
-								__next40pxDefaultSize
-								icon={ trash }
-								isDestructive
-								variant="tertiary"
-								label={ __( 'Remove redirect', 'searcio' ) }
-								onClick={ () => remove( index ) }
-							/>
-						</div>
+						<RowRemove label={ __( 'Remove redirect', 'searcio' ) } onClick={ () => remove( index ) } />
 					</div>
 				) ) }
 				<Stack direction="row" gap="sm">
@@ -1286,14 +1272,7 @@ const SearchConfigTab = () => {
 										value={ row.weight }
 										onChange={ ( weight ) => updateSearchableField( index, { ...row, weight } ) }
 									/>
-									<Button
-										__next40pxDefaultSize
-										icon={ trash }
-										isDestructive
-										variant="tertiary"
-										label={ __( 'Remove field', 'searcio' ) }
-										onClick={ () => removeSearchableField( index ) }
-									/>
+									<RowRemove label={ __( 'Remove field', 'searcio' ) } onClick={ () => removeSearchableField( index ) } />
 								</div>
 							) ) }
 							<UnindexedFieldsNotice
@@ -1356,11 +1335,7 @@ const SearchConfigTab = () => {
 									return foreign ? (
 										<div className="whsc-search-config-row whsc-type-boost--foreign" key={ row.type }>
 											{ slider }
-											<Button
-												__next40pxDefaultSize
-												icon={ trash }
-												isDestructive
-												variant="tertiary"
+											<RowRemove
 												label={ sprintf(
 													/* translators: %s: the name of a content type. */
 													__( 'Remove the boost of %s', 'searcio' ),
