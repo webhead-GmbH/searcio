@@ -225,7 +225,7 @@
  * ---------------------------------------------------------------------- */
 // A row that repeats - a field, a rule - is one group on a phone: its fields
 // stack, a line round it says they belong together, and its delete stands at
-// the end of it, so nobody reads that delete as the next row's.
+// the top of it, so nobody reads that delete as the next row's.
 @mixin phone-group {
   @media screen and (max-width: 600px) {
     padding: var(--wpds-dimension-padding-md);
@@ -247,6 +247,7 @@
     grid-template-columns: 1fr;
 
     > :last-child {
+      grid-row: 1;
       justify-self: end;
     }
   }
@@ -271,6 +272,7 @@
     grid-template-columns: 1fr;
 
     > :last-child {
+      grid-row: 1;
       justify-self: end;
     }
   }
@@ -292,7 +294,7 @@
 }
 
 // A redirect is two fields and a delete, on one row. On a phone the row has no
-// room for two fields: they stack, with the delete under them at the end.
+// room for two fields: they stack, with the delete at the top of the group.
 .whsc-redirect-rule {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
@@ -310,6 +312,7 @@
     grid-template-columns: 1fr;
 
     .whsc-row-remove {
+      grid-row: 1;
       justify-self: end;
       padding-block-start: 0;
     }
@@ -317,9 +320,8 @@
 }
 
 // A margin target of profit ranking: a field, its value, the target, "never
-// lift" and a delete, on one row. On a phone the fields stack, with "never
-// lift" and the delete on one row under them, so a target ends where it
-// visibly ends.
+// lift" and a delete, on one row. On a phone the delete is at the top of the
+// group, the fields stack under it and "never lift" ends the group.
 .whsc-profit-rule {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
@@ -331,11 +333,16 @@
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr auto;
 
-    > :not(.whsc-row-remove, .whsc-profit-rule__exclude) {
+    > :not(.whsc-row-remove) {
       grid-column: 1 / -1;
     }
 
-    .whsc-row-remove,
+    .whsc-row-remove {
+      grid-row: 1;
+      justify-self: end;
+      padding-block-start: 0;
+    }
+
     .whsc-profit-rule__exclude {
       padding-block-start: 0;
       align-self: center;
