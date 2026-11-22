@@ -13,6 +13,7 @@ import {
 	pictureUrl,
 	removeQuestion,
 	savedForm,
+	unreachableQuestions,
 	valueStatus,
 } from './quizEditor';
 
@@ -169,5 +170,24 @@ describe( 'a picture from the Media Library', () => {
 		expect( isSecurePicture( 'https://shop.test/a.jpg' ) ).toBe( true );
 		expect( isSecurePicture( 'http://shop.test/a.jpg' ) ).toBe( false );
 		expect( isSecurePicture( '' ) ).toBe( false );
+	} );
+} );
+
+describe( 'unreachableQuestions', () => {
+	// A second question added while every answer of the first still showed
+	// the products was never asked, and nothing said so.
+	it( 'names a question no answer leads to', () => {
+		expect( [ ...unreachableQuestions( [ question( 'q1', null, null ), question( 'q2', null ) ] ) ] ).toEqual( [ 'q2' ] );
+	} );
+
+	it( 'follows every path from the first question, the longer ones too', () => {
+		const questions = [ question( 'q1', 'q2', null ), question( 'q2', 'q3' ), question( 'q3', null ), question( 'q4', 'q3' ) ];
+
+		expect( [ ...unreachableQuestions( questions ) ] ).toEqual( [ 'q4' ] );
+	} );
+
+	it( 'names none in a quiz of one question, or of none', () => {
+		expect( unreachableQuestions( [ question( 'q1', null ) ] ).size ).toBe( 0 );
+		expect( unreachableQuestions( [] ).size ).toBe( 0 );
 	} );
 } );

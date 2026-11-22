@@ -8,11 +8,14 @@ import { createRoot } from '@wordpress/element';
 
 import Button from './Button';
 
-// `@wordpress/components` loads packages that ship as ES modules only, which
-// this suite does not run through Babel.
-jest.mock( '@wordpress/components', () => ( {
-	Icon: ( { icon } ) => <i data-icon={ icon } />,
-	Tooltip: ( { text, children } ) => <span data-tooltip={ text }>{ children }</span>,
+// What the icon and the tooltip draw is theirs to test; this is about the button.
+jest.mock( '../ui/Icon', () => ( {
+	__esModule: true,
+	default: ( { icon } ) => <i data-icon={ icon } />,
+} ) );
+jest.mock( '../ui/Tooltip', () => ( {
+	__esModule: true,
+	default: ( { text, children } ) => <span data-tooltip={ text }>{ children }</span>,
 } ) );
 
 let container;

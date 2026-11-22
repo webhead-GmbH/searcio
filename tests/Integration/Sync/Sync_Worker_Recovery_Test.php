@@ -79,6 +79,26 @@ final class Sync_Worker_Recovery_Test extends Integration_Test_Case {
 		);
 	}
 
+	/**
+	 * Every time of a run is UTC. `created_at` was the column's
+	 * `CURRENT_TIMESTAMP`, the database server's local time, an hour ahead of
+	 * `started_at` in Vienna and presented as UTC all the same.
+	 */
+	public function test_a_run_is_created_in_utc_whatever_the_database_servers_time_zone(): void {
+		global $wpdb;
+
+		$zone = (string) $wpdb->get_var( 'SELECT @@session.time_zone' );
+		$wpdb->query( "SET time_zone = '+05:00'" );
+
+		try {
+			$run = $this->sync_state()->find( $this->make_running_run() );
+		} finally {
+			$wpdb->query( $wpdb->prepare( 'SET time_zone = %s', $zone ) );
+		}
+
+		$this->assertSame( $run['started_at'], $run['created_at'] );
+	}
+
 	/** The scheduled sync revives a run whose worker died instead of no-opping. */
 	public function test_the_scheduled_sync_revives_a_run_with_a_dead_worker(): void {
 		$this->connect_client();

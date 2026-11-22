@@ -192,7 +192,7 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 		$this->assertSame( 10.7, $grouped['price'] );
 		$this->assertSame( 10.7, $grouped['price_min'] );
 		$this->assertSame( 178.5, $grouped['price_max'] );
-		$this->assertSame( 'simple', $grouped['product_type'] );
+		$this->assertSame( 'grouped', $grouped['product_type'] );
 		$this->assertFalse( $grouped['on_sale'] );
 	}
 
@@ -311,6 +311,110 @@ final class Woo_Price_Tax_Test extends Integration_Test_Case {
 
 		$this->assertSame( 119.0, $simple['price'] );
 		$this->assertSame( 119.0, $variable['price'] );
+	}
+
+	/**
+	 * The settings screen words the profit ranking's "least profit per sale"
+	 * by it: a profit in the shop's own prices includes the tax on it where
+	 * they include tax.
+	 */
+	public function test_the_catalog_says_whether_the_shop_shows_prices_with_tax(): void {
+		$catalog = fn (): bool => $this->service( 'index_config' )->catalog()['woo']['prices_with_tax'];
+
+		$this->tax_shop( false, 'incl' );
+		$this->assertTrue( $catalog() );
+
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+		$this->assertFalse( $catalog() );
+
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		update_option( 'woocommerce_calc_taxes', 'no' );
+		$this->assertFalse( $catalog(), 'Taxes switched off: no price carries tax.' );
+	}
+
+	/**
+	 * A purchase price is entered without tax. Profit ranking works the
+	 * margin out between it and the price sent, so where that price carries
+	 * tax the purchase price is taxed as it is: 50 net beside 119 gross read
+	 * as a margin of 58% where it is 50%.
+	 */
+	public function test_the_purchase_price_is_sent_on_the_basis_of_the_price(): void {
+		update_option( 'woocommerce_feature_cost_of_goods_sold_enabled', 'no' );
+
+		$woo = [ 'price' => true, 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ];
+
+		$this->tax_shop( false, 'incl' );
+
+		$taxed  = $this->simple( '100' );
+		$exempt = $this->simple( '100', '', 'none' );
+		update_post_meta( $taxed, '_wc_cog_cost', '50' );
+		update_post_meta( $exempt, '_wc_cog_cost', '50' );
+
+		$this->assertSame( 59.5, $this->woo->product_fields( get_post( $taxed ), $woo )['cost_price'] );
+		$this->assertSame( 50.0, $this->woo->product_fields( get_post( $exempt ), $woo )['cost_price'], 'A product that is not taxable.' );
+
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+
+		$this->assertSame( 50.0, $this->woo->product_fields( get_post( $taxed ), $woo )['cost_price'], 'Prices shown without tax.' );
+
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		update_option( 'woocommerce_calc_taxes', 'no' );
+
+		$this->assertSame( 50.0, $this->woo->product_fields( get_post( $taxed ), $woo )['cost_price'], 'Taxes switched off.' );
+	}
+
+	/**
+	 * Where `price` carries tax, the least profit per sale is worked out in the
+	 * price without it, so the tax on the profit is not counted as profit:
+	 * the price without tax goes with the purchase price, a sale price
+	 * included, and for a variable product the cheapest variation's.
+	 */
+	public function test_the_price_without_tax_is_sent_where_the_price_carries_tax(): void {
+		update_option( 'woocommerce_feature_cost_of_goods_sold_enabled', 'no' );
+
+		$woo = [ 'price' => true, 'regular_sale' => true, 'cost_price' => true, 'cost_meta' => '_wc_cog_cost' ];
+
+		$this->tax_shop( false, 'incl' );
+
+		$regular  = $this->simple( '100' );
+		$on_sale  = $this->simple( '100', '50' );
+		$exempt   = $this->simple( '100', '', 'none' );
+		$no_cost  = $this->simple( '100' );
+		$variable = $this->variable( [ '100', '40' ] );
+
+		foreach ( [ $regular, $on_sale, $exempt ] as $id ) {
+			update_post_meta( $id, '_wc_cog_cost', '20' );
+		}
+
+		$cheapest = array_values( get_children( [ 'post_parent' => $variable, 'post_type' => 'product_variation', 'orderby' => 'ID', 'order' => 'ASC' ] ) );
+		update_post_meta( $cheapest[0]->ID, '_wc_cog_cost', '10' );
+		update_post_meta( $cheapest[1]->ID, '_wc_cog_cost', '15' );
+
+		$fields = fn ( int $id ): array => $this->woo->product_fields( get_post( $id ), $woo );
+
+		$this->assertSame( 119.0, $fields( $regular )['price'] );
+		$this->assertSame( 100.0, $fields( $regular )['price_excluding_tax'] );
+		$this->assertSame( 59.5, $fields( $on_sale )['price'] );
+		$this->assertSame( 50.0, $fields( $on_sale )['price_excluding_tax'], 'The sale price, without tax.' );
+		$this->assertSame( 47.6, $fields( $variable )['price'], 'The cheapest variation is the price sent.' );
+		$this->assertSame( 40.0, $fields( $variable )['price_excluding_tax'], 'And the same variation, without tax.' );
+		$this->assertArrayNotHasKey( 'price_excluding_tax', $fields( $exempt ), 'A product that is not taxable: its price has no tax in it.' );
+		$this->assertArrayNotHasKey( 'price_excluding_tax', $fields( $no_cost ), 'Without a purchase price there is no margin to count.' );
+
+		update_option( 'woocommerce_tax_display_shop', 'excl' );
+
+		$this->assertArrayNotHasKey( 'price_excluding_tax', $fields( $regular ), 'Prices shown without tax: `price` is it.' );
+
+		update_option( 'woocommerce_tax_display_shop', 'incl' );
+		update_option( 'woocommerce_calc_taxes', 'no' );
+
+		$this->assertArrayNotHasKey( 'price_excluding_tax', $fields( $regular ), 'Taxes switched off.' );
+	}
+
+	/** Not offered as a field to search, filter or suggest: Searcio refuses it, as it does the purchase price. */
+	public function test_the_price_without_tax_is_not_offered_as_a_field(): void {
+		$this->assertContains( 'price_excluding_tax', Woo::PRIVATE_FIELDS );
+		$this->assertNotContains( 'price_excluding_tax', $this->woo->field_names( [ 'price' => true, 'cost_price' => true ] ) );
 	}
 
 	/**

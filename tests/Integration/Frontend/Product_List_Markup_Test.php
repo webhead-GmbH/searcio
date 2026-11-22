@@ -47,6 +47,32 @@ final class Product_List_Markup_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * The ID an admin has is the one WordPress shows: "119" drew an empty box,
+	 * where "product-119" worked.
+	 */
+	public function test_a_product_is_found_by_the_id_wordpress_shows(): void {
+		$page_id = self::factory()->post->create( [ 'post_type' => 'page' ] );
+
+		$this->go_to( home_url( '/' ) );
+
+		$this->assertStringContainsString( 'data-doc-id="page-' . $page_id . '"', Product_List_Markup::render( [ 'source' => 'similar', 'documentId' => (string) $page_id ] ) );
+		$this->assertSame( '', Product_List_Markup::render( [ 'source' => 'similar', 'documentId' => '999999' ] ) );
+	}
+
+	/**
+	 * An empty row says why in an editor: an ID no post has, or a page that
+	 * has no product or category to work from.
+	 */
+	public function test_an_empty_row_says_why(): void {
+		$this->go_to( home_url( '/' ) );
+
+		$this->assertStringContainsString( 'No product has this ID', Product_List_Markup::why_empty( [ 'source' => 'similar', 'documentId' => '999999' ] ) );
+		$this->assertStringContainsString( 'not a product', Product_List_Markup::why_empty( [ 'source' => 'similar' ] ) );
+		$this->assertStringContainsString( 'not a category', Product_List_Markup::why_empty( [ 'source' => 'category' ] ) );
+		$this->assertSame( '', Product_List_Markup::why_empty( [ 'source' => 'similar', 'documentId' => 'product-99' ] ) );
+	}
+
+	/**
 	 * Nothing to ask the API about: rendering an empty placeholder would still
 	 * cost the visitor a mount and a request that can only come back empty.
 	 */

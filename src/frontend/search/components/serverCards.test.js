@@ -1,11 +1,13 @@
 let mockCurrency = {};
+let mockI18n = {};
 
 jest.mock( '../../../utils/api', () => ( {
-	getConfig: () => ( { currency: mockCurrency } ),
+	getConfig: () => ( { currency: mockCurrency, i18n: mockI18n } ),
 } ) );
 
 // eslint-disable-next-line import/first -- must follow the jest.mock() call above.
 import {
+	unnestLinks,
 	postProcessMarkup,
 	ensureTemplateCss,
 	escapeHtml,
@@ -377,6 +379,20 @@ describe( 'postProcessMarkup - price components (data-sc-price)', () => {
 		expect( result ).toMatch( /data-sc-price-part="regular"[^>]*style="display: none;"/ );
 	} );
 
+	// The panel's own "from", in English on a German shop: "Gipfelfrom249,90".
+	it( "Range: says the panel's default prefix in the page's language, and keeps one the author wrote", () => {
+		const hit = { source: { price_min: 10, price_max: 30 } };
+
+		mockI18n = { priceFrom: 'ab' };
+
+		try {
+			expect( postProcessMarkup( priceComponent, hit ) ).toMatch( /data-sc-price-part="prefix"[^>]*>ab</ );
+			expect( postProcessMarkup( priceComponent.replace( '>from<', '>schon ab<' ), hit ) ).toMatch( /data-sc-price-part="prefix"[^>]*>schon ab</ );
+		} finally {
+			mockI18n = {};
+		}
+	} );
+
 	it( 'is Plain (not Range) when min and max are equal', () => {
 		const hit = { source: { price: 20, price_min: 20, price_max: 20 } };
 
@@ -394,5 +410,23 @@ describe( 'postProcessMarkup - price components (data-sc-price)', () => {
 
 		expect( result ).toContain( '1.234,50 €' );
 		expect( result ).not.toContain( '$' );
+	} );
+} );
+
+describe( 'unnestLinks', () => {
+	// The live "Test Produktkarte": the card links to the product and holds an
+	// "Ansehen" button link; the browser closed the card at the button.
+	it( 'turns a link inside a card that is a link into a span', () => {
+		const html = '<a class="sct-3 sct-3-root" href="{{url}}"><span class="sct-3-title">{{title}}</span><a class="sct-3-button" href="{{url}}">Ansehen</a></a>';
+
+		expect( unnestLinks( html ) ).toBe( '<a class="sct-3 sct-3-root" href="{{url}}"><span class="sct-3-title">{{title}}</span><span class="sct-3-button" href="{{url}}">Ansehen</span></a>' );
+	} );
+
+	it( 'leaves a card that is not a link, and one with no link inside, as it is', () => {
+		const box = '<div class="sct-4"><a class="sct-4-button" href="{{url}}">View</a></div>';
+		const link = '<a class="sct-5" href="{{url}}"><span>{{title}}</span></a>';
+
+		expect( unnestLinks( box ) ).toBe( box );
+		expect( unnestLinks( link ) ).toBe( link );
 	} );
 } );

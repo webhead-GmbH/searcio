@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { getConfig } from '../../../utils/api';
 import { formatPrice, PRICE_FIELDS } from '../../../utils/currency';
@@ -14,9 +14,19 @@ const HEADER_OR_INTERNAL = new Set( [
 	// Every variation's SKU, next to the product's own `sku` row: the same
 	// thing again, as a list only a warehouse reads.
 	'skus',
+	// The categories again, as paths for the filter's tree; the tags Searcio's
+	// photo tagging writes, in English on a German shop; and the flag that
+	// picks the "featured" highlights. None says anything to a shopper
+	// choosing between two products.
+	'category_paths', 'ai_tags', 'featured',
+	// The price without tax a shop sends Searcio for its profit ranking, which
+	// does not return it: still listed by a service that keeps unknown fields.
+	'price_excluding_tax',
 	// Bookkeeping the indexer writes. `indexed_at` in particular was showing up
 	// as a comparison row, which tells a shopper nothing about the product.
-	'indexed_at', 'synced_at', 'updated_at', 'created_at', 'modified', 'date',
+	// `published_at` is the date the "newest" highlights are sorted by, as a
+	// timestamp ("2026-11-11T11:34:17Z") in no language.
+	'indexed_at', 'synced_at', 'updated_at', 'created_at', 'published_at', 'modified', 'date',
 	'permalink', 'slug', 'thumbnail', 'images', 'menu_order', 'post_id', 'object_id',
 	...PRICE_FIELDS,
 ] );
@@ -51,6 +61,29 @@ const dedupeByLabel = ( keys, labels ) => {
 		return true;
 	} );
 };
+
+/**
+ * A field beside its own plural ("category" and "categories") is the same
+ * thing twice, which dedupeByLabel() cannot tell: "Kategorie" and "Kategorien"
+ * are two labels. The plural, which carries every category, stays.
+ *
+ * @param {string[]} keys
+ */
+const dropSingulars = ( keys ) =>
+	keys.filter( ( key ) => ! keys.includes( `${ key }s` ) && ! ( key.endsWith( 'y' ) && keys.includes( `${ key.slice( 0, -1 ) }ies` ) ) );
+
+/**
+ * More products than this side by side are a table nobody can read, and on a
+ * phone a page-wide scroll: twelve columns were 1692px in a 343px window.
+ */
+export const MAX_COMPARED = 4;
+
+/**
+ * The products a comparison is of: the first few, which are the best matches.
+ *
+ * @param {Array<Object>} products Assistant hits.
+ */
+export const comparedProducts = ( products ) => products.slice( 0, MAX_COMPARED );
 
 // Machine values WooCommerce stores that a shopper should never be shown raw.
 const KNOWN_VALUES = () => ( {
@@ -125,7 +158,7 @@ export const comparisonRows = ( products, labels = getConfig().fieldLabels ) => 
 		return values.some( ( value ) => value !== values[ 0 ] );
 	};
 
-	return dedupeByLabel( candidates, labels ).sort( ( a, b ) => {
+	return dedupeByLabel( dropSingulars( candidates ), labels ).sort( ( a, b ) => {
 		const diff = Number( differs( b ) ) - Number( differs( a ) );
 
 		return 0 !== diff ? diff : humanizeFieldLabel( a, labels ).localeCompare( humanizeFieldLabel( b, labels ) );
@@ -141,8 +174,9 @@ export const comparisonRows = ( products, labels = getConfig().fieldLabels ) => 
  * @param {Array<Object>} props.products Assistant hits ({ id, source }).
  * @param {Function}      [props.onOpen] Called with a product and its index when its link is opened.
  */
-const CompareTable = ( { products, onOpen } ) => {
+const CompareTable = ( { products: found, onOpen } ) => {
 	const labels = getConfig().fieldLabels;
+	const products = comparedProducts( found );
 	const rows = comparisonRows( products, labels );
 
 	return (
@@ -188,6 +222,16 @@ const CompareTable = ( { products, onOpen } ) => {
 					) ) }
 				</tbody>
 			</table>
+			{ found.length > products.length && (
+				<p className="whsc-compare__note">
+					{ sprintf(
+						/* translators: 1: how many products are compared. 2: how many were found. */
+						__( 'The first %1$d of the %2$d products are compared.', 'searcio' ),
+						products.length,
+						found.length
+					) }
+				</p>
+			) }
 		</div>
 	);
 };

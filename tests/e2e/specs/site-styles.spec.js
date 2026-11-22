@@ -148,10 +148,25 @@ const CONTENT = [
 	'<!-- wp:searcio/products {"source":"similar","heading":"You may also like","layout":"carousel"} /-->',
 ].join( '\n' );
 
-/** The computed style of every element the plugin draws, keyed by where it is. */
-const read = ( page ) => page.evaluate( ( props ) => {
-	// A class that is not the same from one page load to the next.
-	const passing = /^(css-|e[0-9a-z]{5,}\d+$|whsc-instance-|is-busy$)/;
+/**
+ * The computed style of every element the plugin draws, keyed by where it is.
+ *
+ * A root is named by its kind and its place among those of its kind (the
+ * trigger, the product row, the modal, a popover). Numbered among them all,
+ * a tooltip WordPress happened to show at the end of the page in one walk,
+ * and not yet in the other, moved the modal's number, and every element of
+ * the modal read as "not drawn" (168 differences on a slow CI runner). The
+ * popovers and tooltips are read only in the states that are about them: a
+ * pointer on something, a focus or a key.
+ */
+const read = ( page, popovers = false ) => page.evaluate( ( [ props, withPopovers ] ) => {
+	// A class that is not the same from one page load to the next, or that says
+	// how far the modal's content has scrolled or whether it can: a resize
+	// observer sets those once the content is as tall as it will be, and on a
+	// slow runner the two walks are not at the same point of that, which read
+	// as every element under the content being "not drawn". They change what a
+	// focused content area looks like, which no state of this walk is.
+	const passing = /^(css-|e[0-9a-z]{5,}\d+$|whsc-instance-|is-busy$|is-scrollable$|has-scrolled-content$)/;
 	const label = ( node ) => {
 		const classes = [ ...node.classList ].filter( ( name ) => ! passing.test( name ) ).sort().join( '.' );
 		const twins = node.parentElement ? [ ...node.parentElement.children ].filter( ( sibling ) => sibling.tagName === node.tagName ) : [ node ];
@@ -163,12 +178,29 @@ const read = ( page ) => page.evaluate( ( props ) => {
 
 		return Object.fromEntries( props.map( ( prop ) => [ prop, style.getPropertyValue( prop ) ] ) );
 	};
+	const kindOf = ( root ) => {
+		if ( root.matches( '.whsc-modal-overlay' ) ) {
+			return 'modal';
+		}
+
+		if ( root.matches( '[data-whsc-trigger]' ) ) {
+			return 'trigger';
+		}
+
+		return root.matches( '[data-whsc-list]' ) ? 'list' : 'popover';
+	};
 	const roots = [
-		...document.querySelectorAll( '[data-whsc-trigger], [data-whsc-list], .whsc-modal-overlay, .components-tooltip, .components-popover' ),
+		...document.querySelectorAll( `[data-whsc-trigger], [data-whsc-list], .whsc-modal-overlay${ withPopovers ? ', .components-tooltip, .components-popover' : '' }` ),
 	];
+	const counted = {};
 	const found = {};
 
-	roots.forEach( ( root, index ) => {
+	roots.forEach( ( root ) => {
+		const kind = kindOf( root );
+		const index = counted[ kind ] || 0;
+
+		counted[ kind ] = index + 1;
+
 		const walk = ( node, trail ) => {
 			// Text that is there to be read out and is clipped to nothing: how it
 			// is set is not something a visitor sees.
@@ -195,11 +227,11 @@ const read = ( page ) => page.evaluate( ( props ) => {
 			[ ...node.children ].forEach( ( child ) => walk( child, key ) );
 		};
 
-		walk( root, `#${ index }` );
+		walk( root, `#${ kindOf( root ) }${ index }` );
 	} );
 
 	return found;
-}, PROPS );
+}, [ PROPS, popovers ] );
 
 /**
  * Every state the storefront is read in, by name.
@@ -214,7 +246,7 @@ async function walk( page, url ) {
 	const triggers = page.locator( '[data-whsc-trigger]' );
 	const away = () => page.mouse.move( 1, 1 );
 	const keep = async ( name ) => {
-		seen[ name ] = await read( page );
+		seen[ name ] = await read( page, /pointer|focus|key/.test( name ) );
 	};
 	// From the keyboard, which is what draws a ring round the control.
 	const reach = async ( locator ) => {

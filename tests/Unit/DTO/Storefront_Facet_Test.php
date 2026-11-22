@@ -10,6 +10,7 @@ namespace Webhead\WP\SearchCloud\Tests\Unit\DTO;
 
 use PHPUnit\Framework\TestCase;
 use Webhead\WP\SearchCloud\DTO\Storefront_Facet;
+use Webhead\WP\SearchCloud\Enums\Category_Order;
 use Webhead\WP\SearchCloud\Enums\Facet_Display;
 
 final class Storefront_Facet_Test extends TestCase {
@@ -81,5 +82,22 @@ final class Storefront_Facet_Test extends TestCase {
 
 		$this->assertSame( $tree, $facet->to_array()['tree'] );
 		$this->assertArrayNotHasKey( 'tree', ( new Storefront_Facet( 'categories', 0 ) )->to_array() );
+	}
+
+	public function test_the_category_filter_carries_its_order_and_whether_it_is_drawn(): void {
+		$facet = new Storefront_Facet( 'categories', 0, hidden: true, sort: Category_Order::Shop, values_order: [ 2 => 'Felgen', 5 => 'Fahrwerke' ] );
+		$out   = $facet->to_array();
+
+		$this->assertTrue( $out['hidden'] );
+		$this->assertSame( 'shop', $out['sort'] );
+		$this->assertSame( [ 'Felgen', 'Fahrwerke' ], $out['valuesOrder'], 'A list, never an object.' );
+	}
+
+	public function test_any_other_filter_carries_none_of_it(): void {
+		$out = ( new Storefront_Facet( 'brand', 1 ) )->to_array();
+
+		$this->assertArrayNotHasKey( 'hidden', $out );
+		$this->assertArrayNotHasKey( 'sort', $out );
+		$this->assertArrayNotHasKey( 'valuesOrder', $out );
 	}
 }

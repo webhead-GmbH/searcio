@@ -39,8 +39,8 @@ test.describe( 'AI Assistant tab', () => {
 			assistant: true,
 			assistantReply: 'Here are a few under €100.',
 			assistantProducts: [
-				postHit( { title: 'Pure Snow Shell', brand: 'PeakNord', color: 'Alpine White' }, 'p-1' ),
-				postHit( { title: 'Jet Black Padded', brand: 'FrostGuard', color: 'Onyx Black' }, 'p-2' ),
+				postHit( { type: 'product', title: 'Pure Snow Shell', brand: 'PeakNord', color: 'Alpine White' }, 'product-1' ),
+				postHit( { type: 'product', title: 'Jet Black Padded', brand: 'FrostGuard', color: 'Onyx Black' }, 'product-2' ),
 			],
 		} );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
@@ -158,7 +158,7 @@ test.describe( 'AI Assistant tab', () => {
 	test( 'offers Compare only when the products have something to compare', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			assistant: true,
-			assistantProducts: [ postHit( { title: 'Plain one' }, 'p-1' ), postHit( { title: 'Plain two' }, 'p-2' ) ],
+			assistantProducts: [ postHit( { type: 'product', title: 'Plain one' }, 'product-1' ), postHit( { type: 'product', title: 'Plain two' }, 'product-2' ) ],
 		} );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
 
@@ -168,6 +168,26 @@ test.describe( 'AI Assistant tab', () => {
 
 		const input = page.locator( '.whsc-assistant__input' );
 		await input.fill( 'anything' );
+		await input.press( 'Enter' );
+
+		await expect( page.locator( '.whsc-assistant__grid .whsc-card' ) ).toHaveCount( 2 );
+		await expect( page.getByRole( 'button', { name: /^compare$/i } ) ).toHaveCount( 0 );
+	} );
+
+	/** Two posts or pages side by side compare nothing a reader chooses between. */
+	test( 'does not offer Compare for posts and pages', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantProducts: [ postHit( { title: 'Wolle waschen', author: 'Anna' }, 'post-1' ), postHit( { type: 'page', title: 'Pflege', author: 'Ben' }, 'page-2' ) ],
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.openTab( /assistant/i );
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'wolle' );
 		await input.press( 'Enter' );
 
 		await expect( page.locator( '.whsc-assistant__grid .whsc-card' ) ).toHaveCount( 2 );

@@ -109,6 +109,33 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 	}
 
 	/** A service from before the refusal says nothing about the account, and serves it. */
+	/**
+	 * "falscher-key 123" was saved and the test said "Connected": it asks with
+	 * the write key, while every visitor's search went to WordPress. The
+	 * screen asks for the search key from the browser, since Searcio refuses
+	 * a search-key request from the site's server; the test hands it the key
+	 * and where to ask, and asks nothing with the key itself.
+	 */
+	public function test_test_connection_hands_the_screen_the_search_key_to_check_from_the_browser(): void {
+		$this->login_admin();
+		$this->settings()->set( Plugin_Settings::SEARCH_KEY, 'sk_live' );
+		$asked = [];
+		$this->fake_http(
+			function ( string $url ) use ( &$asked ): array {
+				$asked[] = (string) wp_parse_url( $url, PHP_URL_PATH );
+
+				return $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected' ] ] );
+			}
+		);
+
+		$data = $this->server->dispatch( new WP_REST_Request( 'POST', '/searcio/v1/connection/test' ) )->get_data();
+
+		$this->assertTrue( $data['ok'] );
+		$this->assertSame( 'sk_live', $data['search_key']['key'] );
+		$this->assertSame( untrailingslashit( \Webhead\WP\SearchCloud\SERVICE_URL ) . '/api/v1', $data['search_key']['endpoint'] );
+		$this->assertSame( [ '/api/v1/health' ], array_values( array_unique( array_map( static fn ( string $path ): string => (string) preg_replace( '#^.*(/api/v1/.*)$#', '$1', $path ), $asked ) ) ) );
+	}
+
 	public function test_test_connection_reads_an_answer_without_account_as_served(): void {
 		$this->login_admin();
 		$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 7, 'status' => 'connected' ] ] ) );
@@ -199,6 +226,28 @@ final class Connection_Endpoint_Test extends Integration_Test_Case {
 		$this->assertArrayHasKey( 'sites', $data['usage'] );
 		// The documents figure the sync screens already relied on is unchanged.
 		$this->assertSame( 1000, $data['documents']['limit'] );
+	}
+
+	/**
+	 * `used` is the account's counter as of the last sync, so a site whose
+	 * index had been emptied read "526 indexed". `indexed` is what the index
+	 * holds: 0 is empty, null a Searcio that cannot say (or does not yet).
+	 */
+	public function test_test_connection_reports_what_the_index_holds(): void {
+		$this->login_admin();
+		$run = function ( array $documents ): array {
+			$this->fake_http( fn (): array => $this->http_ok( [ 'site' => [ 'id' => 4821 ], 'usage' => [ 'documents' => $documents ] ] ) );
+
+			$request = new WP_REST_Request( 'POST', '/searcio/v1/connection/test' );
+			$request->set_param( 'fresh', true );
+
+			return $this->server->dispatch( $request )->get_data()['documents'];
+		};
+
+		$this->assertSame( 0, $run( [ 'used' => 526, 'limit' => 20000, 'indexed' => 0 ] )['indexed'] );
+		$this->assertSame( 526, $run( [ 'used' => 526, 'limit' => 20000, 'indexed' => 526 ] )['indexed'] );
+		$this->assertNull( $run( [ 'used' => 526, 'limit' => 20000, 'indexed' => null ] )['indexed'] );
+		$this->assertNull( $run( [ 'used' => 526, 'limit' => 20000 ] )['indexed'], 'A Searcio without the count.' );
 	}
 
 	public function test_test_connection_defaults_plan_to_not_free_when_absent(): void {

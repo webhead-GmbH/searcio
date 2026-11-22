@@ -223,14 +223,48 @@
 /* -------------------------------------------------------------------------
  * Indexing tab
  * ---------------------------------------------------------------------- */
+// A row that repeats - a field, a rule - is one group on a phone: its fields
+// stack, a line round it says they belong together, and its delete stands on
+// the line of the first field's label, at the end of it, so nobody reads that
+// delete as the next row's. The delete is the compact button there (32px,
+// `RowRemove` picks it). The first label's line is as tall as the button, with
+// the label in the middle of it, so the button is level with the label and a
+// gap clear of the field under it, where a press that slips down does not
+// land in the input. The icon, in the middle of the button, ends where the
+// fields end.
+@mixin phone-group {
+  @media screen and (max-width: 600px) {
+    position: relative;
+    padding: var(--wpds-dimension-padding-md);
+    border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+    border-radius: var(--wpds-border-radius-md);
+
+    > :first-child label:first-of-type {
+      display: flex;
+      align-items: center;
+      min-height: var(--wpds-dimension-size-md);
+    }
+
+    > .whsc-row-remove {
+      position: absolute;
+      inset-block-start: var(--wpds-dimension-padding-md);
+      inset-inline-end: calc(var(--wpds-dimension-padding-md) - (var(--wpds-dimension-size-md) - var(--wpds-dimension-size-sm)) / 2);
+      padding: 0;
+    }
+  }
+}
+
 .whsc-custom-field-row {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
   grid-template-columns: 1fr 1fr 1fr auto;
   align-items: end;
 
+  @include phone-group;
+
+  // Three fields do not fit side by side on a phone, nor two: one under another.
   @media screen and (max-width: 600px) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -246,6 +280,8 @@
   gap: var(--wpds-dimension-gap-md);
   grid-template-columns: 2fr 1fr auto;
   align-items: end;
+
+  @include phone-group;
 
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
@@ -268,21 +304,50 @@
 }
 
 // A redirect is two fields and a delete, on one row. On a phone the row has no
-// room for two fields: they stack, with the delete under them at the end.
+// room for two fields: they stack, with the delete on the first one's label.
 .whsc-redirect-rule {
   display: grid;
   gap: var(--wpds-dimension-gap-md);
   grid-template-columns: 1fr 1fr auto;
   align-items: start;
 
+  // The language a redirect is followed in, on a multilingual site.
+  &--lang {
+    grid-template-columns: 1fr 1fr minmax(10rem, 0.7fr) auto;
+  }
+
+  @include phone-group;
+
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// A margin target of profit ranking: a field, its value, the target, "never
+// lift" and a delete, on one row. On a phone the fields stack, the delete is
+// on the first one's label and "never lift" ends the group.
+.whsc-profit-rule {
+  display: grid;
+  gap: var(--wpds-dimension-gap-md);
+  grid-template-columns: 1fr 1fr minmax(7rem, 0.6fr) auto auto;
+  align-items: start;
+
+  @include phone-group;
+
   @media screen and (max-width: 600px) {
     grid-template-columns: 1fr;
 
-    .whsc-row-remove {
-      justify-self: end;
+    .whsc-profit-rule__exclude {
       padding-block-start: 0;
+      align-self: center;
     }
   }
+}
+
+// The checkbox's middle is level with the fields' middle, under their label:
+// measured, the field's middle is a gap lower than the delete's top.
+.whsc-profit-rule__exclude {
+  padding-block-start: calc(var(--wpds-typography-line-height-xs) + var(--wpds-dimension-gap-sm) + var(--wpds-dimension-gap-md));
 }
 
 // The delete stands level with the fields, which begin one label below the

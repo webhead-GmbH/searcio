@@ -29,6 +29,9 @@ final class Woo {
 	public const POST_TYPE         = 'product';
 	public const CATEGORY_TAXONOMY = 'product_cat';
 
+	/** WooCommerce's own brands, since WooCommerce 9.6. */
+	public const BRAND_TAXONOMY = 'product_brand';
+
 	/**
 	 * Each product-mapping toggle and the document fields `product_fields()`
 	 * writes when it is on. The toggle list itself is derived from these keys,
@@ -44,12 +47,41 @@ final class Woo {
 		'sku'          => [ 'sku' ],
 		'skus'         => [ 'skus' ],
 		'stock_status' => [ 'stock_status', 'in_stock' ],
-		'categories'   => [ 'categories' ],
+		'categories'   => [ 'categories', 'category_paths' ],
 		'tags'         => [ 'product_tags' ],
+		'brands'       => [ 'brands' ],
 		'featured'     => [ 'featured' ],
 		'rating'       => [ 'rating' ],
 		'review_count' => [ 'review_count' ],
+		'custom_attributes' => [ 'custom_attributes' ],
+		'cost_price'   => [ 'cost_price', 'price_excluding_tax' ],
 	];
+
+	/**
+	 * Fields written for Searcio alone: it never returns them and refuses them
+	 * as searchable, facet or suggest fields, so they are not offered as one.
+	 * The purchase price is what its profit ranking works the margin out from,
+	 * and the price without tax, sent where the shop shows prices with tax,
+	 * what it counts the least profit per sale in, so that tax is not profit.
+	 */
+	public const PRIVATE_FIELDS = [ 'cost_price', 'price_excluding_tax' ];
+
+	/**
+	 * A variable product's variations, one object each with the attributes it
+	 * differs in and whether it is in stock. Searcio
+	 * filters on them so that red and XL find a jacket only when one of its
+	 * variations is both and in stock. Not a field to search or filter on by
+	 * itself, so not offered as one.
+	 */
+	public const VARIANTS_FIELD = 'variants';
+
+	/**
+	 * The pages WooCommerce makes for itself, by the name `wc_get_page_id()`
+	 * knows them by. They hold a shortcode or a block and nothing to search
+	 * for, and the shop page is the product archive the search window already
+	 * is.
+	 */
+	private const SYSTEM_PAGES = [ 'cart', 'checkout', 'myaccount', 'shop' ];
 
 	/**
 	 * "Shop and search results" and "Search results only". "Shop only" and
@@ -59,6 +91,40 @@ final class Woo {
 
 	public function is_active(): bool {
 		return class_exists( 'WooCommerce' ) && function_exists( 'wc_get_product' );
+	}
+
+	/**
+	 * The ids of the cart, checkout, account and shop pages, as WooCommerce is
+	 * set up; none without WooCommerce.
+	 *
+	 * @return array<int,int>
+	 */
+	public function system_page_ids(): array {
+		if ( ! $this->is_active() || ! function_exists( 'wc_get_page_id' ) ) {
+			return [];
+		}
+
+		return array_values(
+			array_filter(
+				array_map( static fn ( string $page ): int => (int) wc_get_page_id( $page ), self::SYSTEM_PAGES ),
+				static fn ( int $id ): bool => $id > 0
+			)
+		);
+	}
+
+	/**
+	 * The product-mapping toggles the Indexing tab offers: brands only where
+	 * WooCommerce has them.
+	 *
+	 * @return array<int,string>
+	 */
+	public function toggles(): array {
+		return array_values(
+			array_filter(
+				array_keys( self::TOGGLE_FIELDS ),
+				static fn ( string $toggle ): bool => 'brands' !== $toggle || taxonomy_exists( self::BRAND_TAXONOMY )
+			)
+		);
 	}
 
 	/**
@@ -74,6 +140,17 @@ final class Woo {
 		$code = strtoupper( (string) get_woocommerce_currency() );
 
 		return 1 === preg_match( '/^[A-Z]{3}$/', $code ) ? $code : null;
+	}
+
+	/**
+	 * Whether the shop shows its prices with tax, which is the price Searcio is
+	 * sent: with tax when WooCommerce says so under Tax > Display prices in the
+	 * shop, whichever way they were entered. A purchase price is entered
+	 * without tax and is taxed to match, so a margin is the same on either
+	 * basis, and a profit in the shop's prices counts the tax on it.
+	 */
+	public function shows_prices_with_tax(): bool {
+		return $this->is_active() && wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' );
 	}
 
 	public function version(): string {
@@ -224,12 +301,19 @@ final class Woo {
 		// A product is usually filed under the most specific category only, so
 		// its ancestors are sent with it: without them a filter, a quiz answer
 		// or a merchandising rule naming "Shoes" matches nothing filed under
-		// "Sneakers", while WooCommerce's own "Shoes" archive lists it.
+		// "Sneakers", while WooCommerce's own "Shoes" archive lists it. The
+		// paths are the same categories told apart where two share a name,
+		// for the category filter's tree.
 		if ( ! empty( $woo['categories'] ) ) {
 			$categories = Term_Names::for_post( $post, self::CATEGORY_TAXONOMY, true );
+			$paths      = Term_Paths::for_post( $post, self::CATEGORY_TAXONOMY );
 
 			if ( [] !== $categories ) {
 				$fields['categories'] = $categories;
+			}
+
+			if ( [] !== $paths ) {
+				$fields['category_paths'] = $paths;
 			}
 		}
 
@@ -238,6 +322,14 @@ final class Woo {
 
 			if ( [] !== $tags ) {
 				$fields['product_tags'] = $tags;
+			}
+		}
+
+		if ( ! empty( $woo['brands'] ) ) {
+			$brands = Term_Names::for_post( $post, self::BRAND_TAXONOMY );
+
+			if ( [] !== $brands ) {
+				$fields['brands'] = $brands;
 			}
 		}
 
@@ -253,6 +345,30 @@ final class Woo {
 			$fields['review_count'] = (int) $product->get_review_count();
 		}
 
+		if ( ! empty( $woo['custom_attributes'] ) ) {
+			$custom = $this->custom_attributes( $product );
+
+			if ( [] !== $custom ) {
+				$fields['custom_attributes'] = $custom;
+			}
+		}
+
+		if ( ! empty( $woo['cost_price'] ) ) {
+			$meta_key = is_string( $woo['cost_meta'] ?? null ) ? $woo['cost_meta'] : '';
+			$cost     = $this->without_customer( fn () => $this->cost_price( $product, $is_variable, $meta_key ) );
+
+			if ( null !== $cost ) {
+				$fields['cost_price'] = $cost;
+
+				// Where `price` carries tax: the same price without it.
+				$net = $this->without_customer( fn () => $this->price_without_tax( $product, $is_variable ) );
+
+				if ( null !== $net && isset( $fields['price'] ) && $net <= (float) $fields['price'] ) {
+					$fields['price_excluding_tax'] = $net;
+				}
+			}
+		}
+
 		foreach ( $this->selected_attributes( $woo ) as $taxonomy ) {
 			$values = Term_Names::for_post( $post, $taxonomy );
 
@@ -261,14 +377,87 @@ final class Woo {
 			}
 		}
 
+		if ( $is_variable ) {
+			$variants = $this->variants( $product, $post, $woo );
+
+			if ( [] !== $variants ) {
+				$fields[ self::VARIANTS_FIELD ] = $variants;
+			}
+		}
+
 		return $fields;
+	}
+
+	/**
+	 * One object per variation a shopper can buy (a disabled one is private),
+	 * with the selected attributes it is made of, under the names the product
+	 * sends them (`attr_color`: "Red"), and `in_stock`. A variation set to
+	 * "any" value of an attribute is every value the product has of it. Only
+	 * the attributes the shop's variations are made of, and none when the
+	 * mapping sends none of those.
+	 *
+	 * @param  array<string,mixed>  $woo
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function variants( $product, WP_Post $post, array $woo ): array {
+		if ( ! method_exists( $product, 'get_variation_attributes' ) ) {
+			return [];
+		}
+
+		$taxonomies = array_values(
+			array_filter(
+				array_intersect( $this->selected_attributes( $woo ), array_keys( $product->get_variation_attributes() ) ),
+				'taxonomy_exists'
+			)
+		);
+
+		if ( [] === $taxonomies ) {
+			return [];
+		}
+
+		$own      = [];
+		$variants = [];
+
+		foreach ( $taxonomies as $taxonomy ) {
+			$own[ $taxonomy ] = Term_Names::for_post( $post, $taxonomy );
+		}
+
+		foreach ( $product->get_children() as $variation_id ) {
+			$variation = wc_get_product( $variation_id );
+
+			if ( ! $variation instanceof \WC_Product_Variation || 'publish' !== $variation->get_status() ) {
+				continue;
+			}
+
+			$chosen  = $variation->get_attributes();
+			$variant = [];
+
+			foreach ( $taxonomies as $taxonomy ) {
+				$slug  = is_string( $chosen[ $taxonomy ] ?? null ) ? $chosen[ $taxonomy ] : '';
+				$term  = '' === $slug ? null : get_term_by( 'slug', $slug, $taxonomy );
+				$value = $term instanceof \WP_Term ? Term_Names::decode( $term->name ) : $own[ $taxonomy ];
+
+				if ( '' !== $value && [] !== $value ) {
+					$variant[ $this->attribute_field( $taxonomy ) ] = $value;
+				}
+			}
+
+			if ( [] !== $variant ) {
+				$variants[] = $variant + [ 'in_stock' => $variation->is_in_stock() ];
+			}
+		}
+
+		return $variants;
 	}
 
 	/**
 	 * Every field `product_fields()` can write for this mapping - the union
 	 * across product kinds, so `price_min` is listed even though only a
 	 * variable product carries it. Empty when WooCommerce is inactive, because
-	 * then no product field is written at all.
+	 * then no product field is written at all. The {@see self::PRIVATE_FIELDS}
+	 * are left out: they are for Searcio alone, which refuses them as fields to
+	 * search or filter. So are the {@see self::VARIANTS_FIELD}, which are the
+	 * attributes again, one variation at a time.
 	 *
 	 * @param  array<string,mixed>  $woo  The `woo` block of the product mapping.
 	 * @return array<int,string>
@@ -291,6 +480,11 @@ final class Woo {
 				continue;
 			}
 
+			// A shop on a WooCommerce without brands has none to write.
+			if ( 'brands' === $toggle && ! taxonomy_exists( self::BRAND_TAXONOMY ) ) {
+				continue;
+			}
+
 			array_push( $names, ...$fields );
 		}
 
@@ -301,7 +495,7 @@ final class Woo {
 			}
 		}
 
-		return array_values( array_unique( $names ) );
+		return array_values( array_diff( array_unique( $names ), self::PRIVATE_FIELDS ) );
 	}
 
 	/**
@@ -369,6 +563,154 @@ final class Woo {
 	}
 
 	/**
+	 * The attributes a product defines for itself instead of taking one of the
+	 * shop's, each value as "Name: value": the name is the product's own, so
+	 * there is no field of the shop's to give it. Those the product page shows
+	 * - as a row of its additional information, or as the choice of a
+	 * variation - and no others, which are a merchant's notes.
+	 *
+	 * @return array<int,string>
+	 */
+	private function custom_attributes( $product ): array {
+		$values = [];
+
+		foreach ( $product->get_attributes() as $attribute ) {
+			if ( ! $attribute instanceof \WC_Product_Attribute || $attribute->is_taxonomy() ) {
+				continue;
+			}
+
+			if ( ! $attribute->get_visible() && ! $attribute->get_variation() ) {
+				continue;
+			}
+
+			// Saved through wc_clean(), which writes some characters as entities.
+			$name = trim( Term_Names::decode( (string) $attribute->get_name() ) );
+
+			foreach ( $attribute->get_options() as $option ) {
+				$option = trim( Term_Names::decode( (string) $option ) );
+
+				if ( '' !== $name && '' !== $option ) {
+					$values[] = $name . ': ' . $option;
+				}
+			}
+		}
+
+		return array_values( array_unique( $values ) );
+	}
+
+	/**
+	 * What the product costs the shop, for Searcio's profit ranking: from
+	 * WooCommerce's own "Cost of goods" (9.5 and later, with the feature on),
+	 * else from the meta key the mapping names, which a cost of goods plugin
+	 * keeps it in (`_wc_cog_cost`, `_alg_wc_cog_cost`). A variable product's is
+	 * its cheapest variation's, whose price is the one sent; a variation
+	 * without a meta value of its own takes the product's.
+	 *
+	 * A purchase price is entered without tax. Where the shop shows prices
+	 * with tax, it is taxed as the price is, so the margin is worked out
+	 * between two amounts on one basis. Null for a product with none.
+	 */
+	private function cost_price( $product, bool $is_variable, string $meta_key ): ?float {
+		$source = $this->priced_product( $product, $is_variable );
+
+		if ( null === $source ) {
+			return null;
+		}
+
+		$cost = $this->cogs_value( $source );
+
+		if ( null === $cost && '' !== $meta_key ) {
+			$cost = $this->number( get_post_meta( $source->get_id(), $meta_key, true ) );
+
+			if ( null === $cost && $source !== $product ) {
+				$cost = $this->number( get_post_meta( $product->get_id(), $meta_key, true ) );
+			}
+		}
+
+		if ( null === $cost || $cost <= 0 ) {
+			return null;
+		}
+
+		if ( $this->shows_prices_with_tax() && $source->is_taxable() ) {
+			$cost += array_sum( \WC_Tax::calc_tax( $cost, \WC_Tax::get_rates( $source->get_tax_class() ), false ) );
+		}
+
+		return (float) wc_format_decimal( $cost, wc_get_price_decimals() );
+	}
+
+	/**
+	 * The product whose price is the one sent as `price`: the product itself,
+	 * or the cheapest variation of a variable one. Null where there is none.
+	 */
+	private function priced_product( $product, bool $is_variable ): ?\WC_Product {
+		if ( ! $is_variable || ! method_exists( $product, 'get_variation_prices' ) ) {
+			return $product instanceof \WC_Product ? $product : null;
+		}
+
+		$active = array_map( 'floatval', (array) ( $product->get_variation_prices( true )['price'] ?? [] ) );
+
+		if ( [] === $active ) {
+			return null;
+		}
+
+		$variation = wc_get_product( (int) array_search( min( $active ), $active, true ) );
+
+		return $variation instanceof \WC_Product ? $variation : null;
+	}
+
+	/**
+	 * The price a product is sent with, without tax, for a shop that shows its
+	 * prices with it: the active price (a sale price included) of the product,
+	 * or of its cheapest variation, as WooCommerce takes the tax out of it. Null
+	 * where `price` carries no tax, which is the price without tax then, and
+	 * for a product that is not taxable.
+	 */
+	private function price_without_tax( $product, bool $is_variable ): ?float {
+		if ( ! $this->shows_prices_with_tax() ) {
+			return null;
+		}
+
+		$source = $this->priced_product( $product, $is_variable );
+
+		if ( null === $source || ! $source->is_taxable() ) {
+			return null;
+		}
+
+		$price = $source->get_price();
+
+		if ( '' === $price || null === $price ) {
+			return null;
+		}
+
+		return (float) wc_format_decimal(
+			wc_get_price_excluding_tax( $source, [ 'price' => $price ] ),
+			wc_get_price_decimals()
+		);
+	}
+
+	/** WooCommerce's "Cost of goods" of a product or variation, null where the feature is off or the value is not set. */
+	private function cogs_value( $product ): ?float {
+		if ( ! method_exists( $product, 'get_cogs_total_value' ) || ! class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			return null;
+		}
+
+		if ( ! \Automattic\WooCommerce\Utilities\FeaturesUtil::feature_is_enabled( 'cost_of_goods_sold' ) ) {
+			return null;
+		}
+
+		$value = (float) $product->get_cogs_total_value();
+
+		return $value > 0 ? $value : null;
+	}
+
+	/** A number kept as text, with a comma or a point; null for anything else. */
+	private function number( mixed $value ): ?float {
+		$text = is_scalar( $value ) ? str_replace( ',', '.', trim( (string) $value ) ) : '';
+
+		return is_numeric( $text ) ? (float) $text : null;
+	}
+
+	/**
 	 * @param  array<string,mixed>  $woo
 	 * @return array<int,string>
 	 */
@@ -385,6 +727,13 @@ final class Woo {
 	 * carries the shop's own display price, and a variable product's range and
 	 * a simple product's price are on the same basis.
 	 *
+	 * `product_type` is WooCommerce's: `simple`, `variable`, `grouped`,
+	 * `external`, or an extension's own.
+	 *
+	 * A variable product on sale carries the regular and the sale price of its
+	 * cheapest variation, the one its "from" price is, so a card can strike
+	 * that variation's regular price through.
+	 *
 	 * @return array<string,mixed>
 	 */
 	private function price_fields( $product, bool $is_variable, bool $with_regular_sale ): array {
@@ -398,7 +747,7 @@ final class Woo {
 				return [];
 			}
 
-			return [
+			$fields = [
 				'price'        => min( $active ),
 				'price_min'    => min( $active ),
 				'price_max'    => max( $active ),
@@ -406,6 +755,18 @@ final class Woo {
 				// A variable product is "on sale" if any variation is.
 				'on_sale'      => $product->is_on_sale(),
 			];
+
+			if ( $with_regular_sale && $fields['on_sale'] ) {
+				$regular  = is_array( $prices['regular_price'] ?? null ) ? array_map( 'floatval', $prices['regular_price'] ) : [];
+				$cheapest = array_search( $fields['price_min'], $active, true );
+
+				if ( false !== $cheapest && isset( $regular[ $cheapest ] ) && $regular[ $cheapest ] > $active[ $cheapest ] ) {
+					$fields['regular_price'] = $regular[ $cheapest ];
+					$fields['sale_price']    = $active[ $cheapest ];
+				}
+			}
+
+			return $fields;
 		}
 
 		if ( $product->is_type( 'grouped' ) ) {
@@ -420,7 +781,7 @@ final class Woo {
 
 		$fields = [
 			'price'        => $this->display_price( $product, $price ),
-			'product_type' => 'simple',
+			'product_type' => (string) $product->get_type(),
 			'on_sale'      => $product->is_on_sale(),
 		];
 
@@ -482,7 +843,7 @@ final class Woo {
 			'price'        => min( $prices ),
 			'price_min'    => min( $prices ),
 			'price_max'    => max( $prices ),
-			'product_type' => 'simple',
+			'product_type' => 'grouped',
 			// A grouped product is "on sale" if a child is.
 			'on_sale'      => (bool) apply_filters( 'woocommerce_product_is_on_sale', $on_sale, $product ),
 		];

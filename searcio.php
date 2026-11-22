@@ -3,13 +3,15 @@
  * Plugin Name: Searcio - Fast AI Product Search for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/searcio/
  * Description: Connect WordPress and WooCommerce to Searcio.
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: webhead GmbH
  * Author URI: https://webhead.at
  * Text Domain: searcio
  * Domain Path: /languages
  * Requires at least: 6.8
  * Requires PHP: 8.3
+ * WC requires at least: 8.0
+ * WC tested up to: 11.3
 
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,7 +31,7 @@ require_once __DIR__ . '/includes/autoload.php';
 
 defined( 'Webhead\WP\SearchCloud\VERSION' ) || define(
 	'Webhead\WP\SearchCloud\VERSION',
-	'1.4.0'
+	'1.4.1'
 );
 defined( 'Webhead\WP\SearchCloud\PLUGIN_FILE' ) || define(
 	'Webhead\WP\SearchCloud\PLUGIN_FILE',

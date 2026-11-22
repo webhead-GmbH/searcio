@@ -21,9 +21,9 @@ export const isLanguageSupported = ( enabledLanguages, currentLang ) => {
 /**
  * The hits that belong on a page in `lang`: those in that language, and those
  * the index holds without one. Photo search, similar products and the
- * assistant's products take no language filter, so on a multilingual shop they
- * come back in every language, a product's own translation first among its
- * similar products.
+ * assistant's products are asked for in the page's language, but a service
+ * from before that filter answers them in every language, a product's own
+ * translation first among its similar products.
  *
  * @param {Array<Object>} hits
  * @param {string}        [lang] The page's language, or none to keep every hit.
@@ -45,15 +45,20 @@ export const inLanguage = ( hits, lang ) => {
 
 /**
  * `{lang: '<code>'}` merge-in for `search()`'s `filters` option, or `{}` when
- * there's nothing to scope by.
+ * there's nothing to scope by: a site with no language (`currentLang` is set
+ * on a multilingual site alone), or a page in a language the site does not
+ * index, which searches WordPress instead.
+ *
+ * A site that restricts no language indexes every one, and each document
+ * still carries its own, so a page searches its own language then too. Left
+ * unscoped, the English page of a site whose admin had not ticked a language
+ * listed its German products beside the English ones.
  *
  * @param {string[]} enabledLanguages
  * @param {string}   currentLang
  */
 export const currentLangFilter = ( enabledLanguages, currentLang ) => {
-	const enabled = enabledLanguages || [];
-
-	if ( 0 === enabled.length || ! currentLang || ! enabled.includes( currentLang ) ) {
+	if ( ! currentLang || ! isLanguageSupported( enabledLanguages, currentLang ) ) {
 		return {};
 	}
 

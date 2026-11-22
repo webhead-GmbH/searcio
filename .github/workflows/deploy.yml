@@ -1,26 +1,98 @@
-name: deploy-to-releases
+# A published release goes to the WordPress.org plugin directory, and the
+# package WordPress.org now serves is attached to the release.
+#
+# Setup required once per repository, besides COMPOSER_AUTH (see
+# run-tests.yml): the secrets SVN_USERNAME and SVN_PASSWORD, the
+# WordPress.org account that commits to plugins.svn.wordpress.org/searcio and
+# the SVN password made for it under Account & Security on its profile.
+#
+# Run by hand from a tag (Actions > deploy-to-wordpress-org > Run workflow,
+# "Use workflow from" the tag, or `gh workflow run deploy.yml --ref 1.4.1`):
+# a dry run, the default, builds and checks the package and keeps it as a
+# workflow artifact, committing and uploading nothing; without it, it deploys
+# a release whose run failed.
+name: deploy-to-wordpress-org
 
 on:
   release:
     types: [ published ]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Build and check only: commit nothing to WordPress.org and upload nothing to the release.'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
 
+# Two runs for one version would race each other into SVN.
+concurrency:
+  group: deploy-wordpress-org-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   test:
     name: Run Tests
+    # A release and a run by hand both start from the tag.
+    if: startsWith( github.ref, 'refs/tags/' )
     uses: ./.github/workflows/run-tests.yml
     # Pass COMPOSER_AUTH (and any other secrets) down to the reusable workflow;
     # called workflows do not inherit the caller's secrets automatically.
     secrets: inherit
 
-  release:
-    name: Build and upload production package
+  deploy:
+    name: Deploy to WordPress.org and attach the package
+    needs: test
     runs-on: ubuntu-latest
+    env:
+      PLUGIN_SLUG: searcio
+      VERSION: ${{ github.ref_name }}
+      DRY_RUN: ${{ ( github.event_name == 'workflow_dispatch' && inputs.dry-run ) && 'true' || 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The whole history, to tell whether the tag is on master.
+          fetch-depth: 0
+
+      # WordPress.org reads the version from readme.txt's Stable tag, the SVN
+      # tag is named after the release tag, and the site runs what the plugin
+      # header says: the three must agree, or the directory offers a version
+      # it has no files for. A release is made from master, which only takes
+      # releases, and a version is published once.
+      - name: Check the version and where the tag is
+        run: |
+          header="$( sed -n 's/^ \* Version:[[:space:]]*\([^[:space:]]*\).*/\1/p' "${PLUGIN_SLUG}.php" | head -1 )"
+          stable="$( sed -n 's/^Stable tag:[[:space:]]*\([^[:space:]]*\).*/\1/p' readme.txt | head -1 | tr -d '\r' )"
+
+          echo "tag ${VERSION}, plugin header ${header}, Stable tag ${stable}"
+
+          if [ "${VERSION}" != "${header}" ] || [ "${VERSION}" != "${stable}" ]; then
+            echo "::error::The tag (${VERSION}), the plugin header (${header}) and the Stable tag of readme.txt (${stable}) must be the same version."
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor HEAD origin/master; then
+            echo "::error::Tag ${VERSION} is not on master. A release is made from the merge of the version branch into master."
+            exit 1
+          fi
+
+          if curl -sfI "https://plugins.svn.wordpress.org/${PLUGIN_SLUG}/tags/${VERSION}/" > /dev/null; then
+            echo "::error::Version ${VERSION} is already on WordPress.org. Raise the version to publish again."
+            exit 1
+          fi
+
+      - name: Check the SVN credentials
+        if: env.DRY_RUN != 'true'
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        run: |
+          if [ -z "${SVN_USERNAME}" ] || [ -z "${SVN_PASSWORD}" ]; then
+            echo "::error::Add the SVN_USERNAME and SVN_PASSWORD secrets to the repository, then run this workflow by hand from tag ${VERSION} with dry run off."
+            exit 1
+          fi
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -54,38 +126,99 @@ jobs:
       # .distignore is the one list of what stays out of a package, vendor and
       # composer.json among it. The names after it are repository files that
       # have no place in an installed plugin and that .distignore, a
-      # framework-managed file, does not name.
+      # framework-managed file, does not name. The translation sources stay
+      # out too: WordPress reads the compiled .mo and .json files.
       - name: Prepare production package directory
-        env:
-          PLUGIN_SLUG: searcio
         run: |
           PACKAGE_DIR="${RUNNER_TEMP}/${PLUGIN_SLUG}"
           mkdir -p "${PACKAGE_DIR}"
 
-          rsync -av ./ "${PACKAGE_DIR}/" \
+          rsync -a ./ "${PACKAGE_DIR}/" \
             --exclude-from=".distignore" \
             --exclude "/README.md" \
             --exclude "/CHANGELOG.md" \
             --exclude "/jest.config.cjs"
 
-      - name: Cleanup non-runtime translation source files
-        env:
-          PLUGIN_SLUG: searcio
-        run: |
-          PACKAGE_DIR="${RUNNER_TEMP}/${PLUGIN_SLUG}"
           if [ -d "${PACKAGE_DIR}/languages" ]; then
             find "${PACKAGE_DIR}/languages" -type f \( -name "*.pot" -o -name "*.po" \) -delete
           fi
 
-      - name: Zip production package
-        env:
-          PLUGIN_SLUG: searcio
-          TAG_NAME: ${{ github.event.release.tag_name }}
-        run: |
-          cd "${RUNNER_TEMP}"
-          zip -r "${PLUGIN_SLUG}-${TAG_NAME}.zip" "${PLUGIN_SLUG}"
+          echo "PACKAGE_DIR=${PACKAGE_DIR}" >> "${GITHUB_ENV}"
 
-      - name: Upload release asset
-        uses: softprops/action-gh-release@v2
+      # What a site needs to load the plugin, and nothing it must not get.
+      - name: Check the package
+        run: |
+          cd "${PACKAGE_DIR}"
+
+          for file in "${PLUGIN_SLUG}.php" readme.txt uninstall.php includes/autoload.php includes/Dependencies public; do
+            if [ ! -e "${file}" ]; then
+              echo "::error::The package has no ${file}."
+              exit 1
+            fi
+          done
+
+          for name in vendor composer.json node_modules src tests .github .wordpress-org; do
+            if [ -e "${name}" ]; then
+              echo "::error::The package holds ${name}, which .distignore leaves out."
+              exit 1
+            fi
+          done
+
+          echo "Package: $( find . -type f | wc -l ) files, $( du -sh . | cut -f1 )"
+
+      # The build directory is what goes to SVN trunk and is copied to the
+      # version's tag in one commit; .wordpress-org is the plugin page's
+      # icon, banners and screenshots, with their mime types set. The zip is
+      # made from trunk after the commit, so it holds exactly the files
+      # WordPress.org serves.
+      #
+      # 2.3.0, pinned to its commit. It refuses to start without credentials
+      # even for a dry run, which commits nothing, so a dry run without the
+      # secrets is given placeholders.
+      - name: Deploy to WordPress.org
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2
         with:
-          files: ${{ runner.temp }}/searcio-${{ github.event.release.tag_name }}.zip
+          generate-zip: true
+          dry-run: ${{ env.DRY_RUN }}
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME || ( env.DRY_RUN == 'true' && 'dry-run' || '' ) }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD || ( env.DRY_RUN == 'true' && 'dry-run' || '' ) }}
+          SLUG: ${{ env.PLUGIN_SLUG }}
+          VERSION: ${{ env.VERSION }}
+          BUILD_DIR: ${{ env.PACKAGE_DIR }}
+          ASSETS_DIR: .wordpress-org
+
+      - name: Name the package after its version
+        run: |
+          ZIP="${RUNNER_TEMP}/${PLUGIN_SLUG}-${VERSION}.zip"
+          mv "${{ steps.deploy.outputs.zip-path }}" "${ZIP}"
+
+          echo "ZIP=${ZIP}" >> "${GITHUB_ENV}"
+          {
+            echo "### ${PLUGIN_SLUG} ${VERSION}"
+            echo
+            if [ "${DRY_RUN}" = 'true' ]; then
+              echo "Dry run: nothing was committed to WordPress.org and nothing was attached to a release."
+            else
+              echo "Deployed to https://wordpress.org/plugins/${PLUGIN_SLUG}/ (SVN trunk and tags/${VERSION})."
+            fi
+            echo
+            echo "| Package | Files | Size | SHA-256 |"
+            echo "| --- | --- | --- | --- |"
+            echo "| \`$( basename "${ZIP}" )\` | $( unzip -Z1 "${ZIP}" | grep -vc '/$' ) | $( stat -c %s "${ZIP}" ) bytes | \`$( sha256sum "${ZIP}" | cut -d' ' -f1 )\` |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Attach the package to the release
+        if: env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${VERSION}" "${ZIP}" --clobber
+
+      - name: Keep the package of a dry run
+        if: env.DRY_RUN == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PLUGIN_SLUG }}-${{ env.VERSION }}
+          path: ${{ env.ZIP }}
+          retention-days: 7

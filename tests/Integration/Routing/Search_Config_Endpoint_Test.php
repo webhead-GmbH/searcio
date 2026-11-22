@@ -118,7 +118,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -155,7 +156,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$sent = null;
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -178,7 +180,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$sent = null;
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -253,6 +256,77 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$this->server->dispatch( $request );
 
 		$this->assertSame( [ 'brand', 'categories' ], $this->service( 'facet_config' )->fields() );
+	}
+
+	/**
+	 * And the fields Searcio maps as numbers, which the window draws as a
+	 * range; a service that does not report them has none.
+	 */
+	public function test_a_successful_read_mirrors_the_number_fields(): void {
+		$this->as_admin();
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'gewicht' ], 'numeric_fields' => [ 'gewicht' ] ] ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertTrue( $this->service( 'facet_config' )->is_numeric( 'gewicht' ) );
+
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'gewicht' ] ] ) );
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertFalse( $this->service( 'facet_config' )->is_numeric( 'gewicht' ) );
+	}
+
+	/**
+	 * Which posts are indexed depends on the languages, and so does the
+	 * language each is searched in: a language ticked or unticked stayed out of
+	 * the index until somebody started a sync. A save that leaves them as they
+	 * were starts none.
+	 */
+	public function test_a_save_that_changes_the_languages_starts_a_sync(): void {
+		$this->as_admin();
+		$this->enable_indexing( 'post' );
+		$this->fake_http( fn ( string $url, array $args ) => $this->http_ok( [ 'languages' => json_decode( (string) ( $args['body'] ?? '' ), true )['languages'] ?? [] ] ) );
+
+		$save = function ( array $languages ): array {
+			$request = new WP_REST_Request( 'PUT', self::ROUTE );
+			$request->set_header( 'Content-Type', 'application/json' );
+			$request->set_body( (string) wp_json_encode( [ 'languages' => $languages ] ) );
+
+			return $this->server->dispatch( $request )->get_data();
+		};
+
+		$changed = $save( [ 'de' ] );
+
+		$this->assertSame( [ 'de' ], $changed['languages'] );
+		$this->assertTrue( $changed['sync']['started'], (string) $changed['sync']['message'] );
+		$this->assertNotNull( $this->sync_state()->active() );
+
+		$this->assertArrayNotHasKey( 'sync', $save( [ 'de' ] ), 'The languages did not change.' );
+
+		// A sync that is running already is said so, not started twice.
+		$again = $save( [ 'en', 'de' ] );
+
+		$this->assertFalse( $again['sync']['started'] );
+		$this->assertNotSame( '', $again['sync']['message'] );
+	}
+
+	/**
+	 * The same settings are edited in the Searcio dashboard. Kept ten minutes,
+	 * the tab showed a boost changed there as it had been, and wrote that back
+	 * over it: the tab reads them from Searcio each time.
+	 */
+	public function test_the_tab_reads_the_configuration_from_searcio_each_time(): void {
+		$this->as_admin();
+		$boost = 1;
+		$this->fake_http( function () use ( &$boost ) {
+			return $this->http_ok( [ 'type_boosts' => [ [ 'type' => 'ratgeber', 'boost' => $boost ] ] ] );
+		} );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+		$boost = 3;
+		$data  = $this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) )->get_data();
+
+		$this->assertSame( 3, $data['type_boosts'][0]['boost'] );
 	}
 
 	public function test_a_failed_read_keeps_the_facet_fields_it_had(): void {

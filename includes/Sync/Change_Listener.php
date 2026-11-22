@@ -70,6 +70,14 @@ final class Change_Listener implements Actions {
 			'wp_trash_post'           => [ 'on_trash', 20, 1 ],
 			'before_delete_post'      => [ 'on_delete', 20, 1 ],
 			'woocommerce_update_product' => [ 'on_product', 20, 1 ],
+			// A variation whose price, stock or custom field changed is written
+			// without its post row, so `save_post` does not fire for it.
+			'woocommerce_update_product_variation' => [ 'on_product', 20, 1 ],
+			'woocommerce_new_product_variation'    => [ 'on_product', 20, 1 ],
+			'added_post_meta'         => [ 'on_meta', 20, 3 ],
+			'updated_post_meta'       => [ 'on_meta', 20, 3 ],
+			'deleted_post_meta'       => [ 'on_meta', 20, 3 ],
+			'set_object_terms'        => [ 'on_object_terms', 20, 4 ],
 			'edit_terms'              => [ 'before_term_edit', 20, 2 ],
 			'edited_term'             => [ 'on_term_edited', 20, 3 ],
 			'pre_delete_term'         => [ 'on_term_delete', 20, 2 ],
@@ -98,6 +106,56 @@ final class Change_Listener implements Actions {
 
 	public function on_product( int $product_id ): void {
 		$this->sync_post( get_post( $product_id ) );
+	}
+
+	/**
+	 * Polylang keeps a post's language, and the group of its translations, as
+	 * terms of two taxonomies of their own, and assigns them without saving the
+	 * post: a bulk change of language, the wizard that gives the content a
+	 * site had before Polylang its first language, linking two posts as
+	 * translations. A document carries its language, so the post is refreshed.
+	 * WPML keeps its own tables and is heard through the save of the post.
+	 *
+	 * @param  int     $object_id  The post.
+	 * @param  mixed   $terms      Unused.
+	 * @param  mixed   $tt_ids     Unused.
+	 * @param  string  $taxonomy
+	 */
+	public function on_object_terms( int $object_id, mixed $terms, mixed $tt_ids, string $taxonomy ): void {
+		if ( ! in_array( $taxonomy, [ 'language', 'post_translations' ], true ) ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( $post instanceof WP_Post && ! wp_is_post_revision( $post ) && ! wp_is_post_autosave( $post ) ) {
+			$this->sync_post( $post );
+		}
+	}
+
+	/**
+	 * The purchase price kept in a field of its own (`_wc_cog_cost` of a cost of
+	 * goods plugin, or the key the mapping names) can be written by an import
+	 * or a script without a save of the product, and a document carries it.
+	 * Only that key of a product or a variation counts; a product's own
+	 * save, which writes every other field, is heard through its hooks.
+	 *
+	 * @param  mixed  $meta_id    The meta row, or the rows of a deletion.
+	 * @param  int    $object_id  The post.
+	 * @param  mixed  $meta_key   The key written.
+	 */
+	public function on_meta( mixed $meta_id, int $object_id, mixed $meta_key ): void {
+		$key = $this->config->cost_meta_key();
+
+		if ( '' === $key || $meta_key !== $key ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( $post instanceof WP_Post && in_array( $post->post_type, [ 'product', 'product_variation' ], true ) && ! wp_is_post_revision( $post ) ) {
+			$this->sync_post( $post );
+		}
 	}
 
 	/**
@@ -202,6 +260,63 @@ final class Change_Listener implements Actions {
 		foreach ( $post_ids as $post_id ) {
 			$this->sync_post( get_post( $post_id ) );
 		}
+	}
+
+	/**
+	 * Queue every password-protected post of an indexed type, so the drain
+	 * takes out of the index each one that may no longer be in it (see
+	 * {@see Document_Builder::is_indexable()}). Each is queued as an edit
+	 * would queue it, so one whose mapping indexes protected posts stays.
+	 *
+	 * @return int How many posts were queued.
+	 */
+	public function queue_password_protected_posts(): int {
+		// The posts in the index, in every language: a query for posts would
+		// see the current language alone on a multilingual site.
+		$post_ids = array_map(
+			static fn ( string $document_id ): int => (int) substr( $document_id, (int) strrpos( $document_id, '-' ) + 1 ),
+			$this->dirty->indexed_document_ids()
+		);
+		$queued   = 0;
+
+		_prime_post_caches( $post_ids );
+
+		foreach ( $post_ids as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( $post instanceof WP_Post && 'publish' === $post->post_status && $this->builder->is_password_protected( $post ) ) {
+				$this->sync_post( $post );
+				$queued++;
+			}
+		}
+
+		return $queued;
+	}
+
+	/**
+	 * Queue WooCommerce's cart, checkout, account and shop pages and their
+	 * translations, so the drain takes out of the index each one that is in
+	 * it (see {@see Document_Builder::is_shop_page()}).
+	 *
+	 * @return int How many pages were queued.
+	 */
+	public function queue_shop_pages(): int {
+		$queued = 0;
+
+		foreach ( $this->dirty->indexed_document_ids() as $document_id ) {
+			if ( ! str_starts_with( $document_id, 'page-' ) ) {
+				continue;
+			}
+
+			$post = get_post( (int) substr( $document_id, 5 ) );
+
+			if ( $post instanceof WP_Post && $this->builder->is_shop_page( $post ) ) {
+				$this->sync_post( $post );
+				$queued++;
+			}
+		}
+
+		return $queued;
 	}
 
 	private function maybe_delete( int $post_id ): void {

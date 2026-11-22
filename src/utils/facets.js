@@ -17,8 +17,16 @@ export const toggleSelection = ( list, value ) =>
 export const buildTypeParam = ( scopeType, activeTypes ) =>
 	scopeType || ( ( activeTypes || [] ).length > 0 ? activeTypes.join( ',' ) : '' );
 
-/** Every facet key in a `/search` response other than the built-in `types`, which type-filter chips already render separately. */
-export const extractFieldFacets = ( facets ) => {
+/**
+ * Every facet key in a `/search` response other than the built-in `types`,
+ * which type-filter chips already render separately, and the fields the
+ * storefront config marks `hidden`.
+ *
+ * @param {Object}   facets
+ * @param {string[]} [hidden] Fields not to draw: the category field the category filter is not drawn from.
+ * @return {Object<string,Array<Object>>}
+ */
+export const extractFieldFacets = ( facets, hidden = [] ) => {
 	const out = {};
 
 	Object.entries( facets || {} ).forEach( ( [ field, values ] ) => {
@@ -26,7 +34,7 @@ export const extractFieldFacets = ( facets ) => {
 		// numeric field, which has no `.keyword` to bucket on. Keeping it here
 		// would render a group heading with no chips beneath it; those fields
 		// are picked up as range controls instead.
-		if ( 'types' !== field && Array.isArray( values ) && values.length > 0 ) {
+		if ( 'types' !== field && ! hidden.includes( field ) && Array.isArray( values ) && values.length > 0 ) {
 			out[ field ] = values;
 		}
 	} );
@@ -77,11 +85,18 @@ export const buildFilterParams = ( activeFacets, extra = {} ) => {
  */
 const KNOWN_FIELD_LABELS = () => ( {
 	categories: __( 'Categories', 'searcio' ),
+	// The same categories as a tree: on the storefront it is the category filter.
+	category_paths: __( 'Categories', 'searcio' ),
 	product_tags: __( 'Tags', 'searcio' ),
+	brands: __( 'Brands', 'searcio' ),
 	stock_status: __( 'Stock status', 'searcio' ),
 	in_stock: __( 'In stock', 'searcio' ),
 	on_sale: __( 'On sale', 'searcio' ),
 	featured: __( 'Featured', 'searcio' ),
+	rating: __( 'Rating', 'searcio' ),
+	review_count: __( 'Reviews', 'searcio' ),
+	// The attributes a product defines for itself, each "Name: value".
+	custom_attributes: __( 'Attributes', 'searcio' ),
 	sku: __( 'SKU', 'searcio' ),
 	skus: __( 'SKUs', 'searcio' ),
 	price: __( 'Price', 'searcio' ),
@@ -151,14 +166,24 @@ export const humanizeFieldLabel = ( field, labels ) => {
  * it last showed (frozen from the last response where that field was
  * unfiltered); every other field always takes the fresh list, since it's
  * only being narrowed by *other* filters, which is normal, desired faceting.
+ *
+ * A field whose picks a result must all have (`all`, AND) is the exception:
+ * there each pick narrows what the next one can find, so its own counts are
+ * the fresh ones. Kept, they offered combinations that found nothing.
+ *
+ * @param {Object}   current
+ * @param {Object}   incoming
+ * @param {Object}   activeFacets
+ * @param {string[]} [matchAll] The fields whose picks must all match.
+ * @return {Object}
  */
-export const mergeFieldFacets = ( current, incoming, activeFacets ) => {
+export const mergeFieldFacets = ( current, incoming, activeFacets, matchAll = [] ) => {
 	const merged = { ...incoming };
 
 	Object.keys( current || {} ).forEach( ( field ) => {
 		const hasOwnFilter = ( activeFacets?.[ field ] || [] ).length > 0;
 
-		if ( hasOwnFilter ) {
+		if ( hasOwnFilter && ! ( matchAll.includes( field ) && Array.isArray( incoming?.[ field ] ) ) ) {
 			merged[ field ] = current[ field ];
 		}
 	} );
@@ -185,15 +210,38 @@ export const mergeFieldFacets = ( current, incoming, activeFacets ) => {
  * min/max, which the API does not expose. It is offered as a hint, never as a
  * limit on what can be typed.
  *
+ * A field of the site's own that Searcio maps as a number (`numeric_fields`)
+ * is drawn as a range by the site's settings (`ranged`). Its facet values do
+ * come back, as text ("5", "12.5"), and so may its values in the hits: its
+ * span is taken from both, read as numbers.
+ *
  * @param {Object} facets
  * @param {Array<{source?: Object}>} hits
+ * @param {Array<string>} [ranged] The fields the site draws as a range.
  * @return {Object<string,{min: number, max: number}>}
  */
-export const extractRangeFields = ( facets, hits ) => {
+export const extractRangeFields = ( facets, hits, ranged = [] ) => {
 	const out = {};
 
 	Object.keys( facets || {} ).forEach( ( field ) => {
 		if ( 'types' === field ) {
+			return;
+		}
+
+		if ( ranged.includes( field ) ) {
+			const numbers = [
+				...( Array.isArray( facets[ field ] ) ? facets[ field ] : [] ).map( ( entry ) => entry?.value ),
+				...( hits || [] ).map( ( hit ) => hit?.source?.[ field ] ),
+			]
+				.filter( ( value ) => ( 'number' === typeof value || 'string' === typeof value ) && '' !== String( value ).trim() )
+				.map( Number )
+				.filter( Number.isFinite );
+			const distinct = new Set( numbers );
+
+			if ( distinct.size > 1 ) {
+				out[ field ] = { min: Math.floor( Math.min( ...distinct ) ), max: Math.ceil( Math.max( ...distinct ) ) };
+			}
+
 			return;
 		}
 
@@ -626,6 +674,81 @@ export const detectFacetDisplay = ( field, values, config = {} ) => {
 	return 'list';
 };
 
+/** What joins two levels of a category path: "Fahrwerke > Gewindefahrwerke". */
+export const PATH_SEPARATOR = ' > ';
+
+/**
+ * The last level of a category path, the category's own name.
+ *
+ * @param {string} value "Fahrwerke > Gewindefahrwerke > MTS Technik"
+ * @return {string} "MTS Technik"
+ */
+export const pathLabel = ( value ) => {
+	const text = String( value ?? '' );
+	const at = text.lastIndexOf( PATH_SEPARATOR );
+
+	return at < 0 ? text : text.slice( at + PATH_SEPARATOR.length );
+};
+
+/**
+ * The path one level up, or undefined for a main category.
+ *
+ * @param {string} value
+ * @return {string|undefined}
+ */
+const pathParent = ( value ) => {
+	const text = String( value ?? '' );
+	const at = text.lastIndexOf( PATH_SEPARATOR );
+
+	return at < 0 ? undefined : text.slice( 0, at );
+};
+
+/**
+ * How a value of a filter reads where it is shown: a category drawn from its
+ * path by its own name, any other value as it is.
+ *
+ * @param {string} value
+ * @param {{tree?: {paths?: boolean}}} [facet] The field's entry in the storefront config's `facets`.
+ * @return {string}
+ */
+export const facetValueLabel = ( value, facet ) => ( facet?.tree?.paths ? pathLabel( value ) : String( value ?? '' ) );
+
+/**
+ * The values of the category filter in the order the shop asked for: as it
+ * sorted them in WooCommerce (`valuesOrder`, with a value missing from it after
+ * the ones it lists, in the order given), by name, or in the order given,
+ * which is by count. In a tree, siblings keep this order.
+ *
+ * @param {Array<{value: string}>} entries
+ * @param {{sort?: string, valuesOrder?: string[], tree?: Object}} [facet]
+ * @param {string} [locale]
+ * @return {Array<{value: string}>}
+ */
+export const sortCategoryValues = ( entries, facet, locale ) => {
+	const list = [ ...( entries || [] ) ];
+
+	if ( 'name' === facet?.sort ) {
+		return list.sort( ( a, b ) => facetValueLabel( a.value, facet ).localeCompare(
+			facetValueLabel( b.value, facet ),
+			locale || undefined,
+			{ numeric: true, sensitivity: 'base' }
+		) );
+	}
+
+	if ( 'shop' === facet?.sort && Array.isArray( facet.valuesOrder ) && facet.valuesOrder.length > 0 ) {
+		const rank = new Map( facet.valuesOrder.map( ( value, index ) => [ value, index ] ) );
+		const at = ( entry ) => ( rank.has( entry.value ) ? rank.get( entry.value ) : Infinity );
+
+		// Two values the order does not list stay as they came.
+		return list
+			.map( ( entry, index ) => [ entry, index ] )
+			.sort( ( [ a, i ], [ b, j ] ) => ( at( a ) - at( b ) ) || i - j )
+			.map( ( [ entry ] ) => entry );
+	}
+
+	return list;
+};
+
 /**
  * The entries of a filter as the shop's tree: each under its parent, the
  * levels past `depth` left out. An entry that is selected stays whatever its
@@ -633,8 +756,11 @@ export const detectFacetDisplay = ( field, values, config = {} ) => {
  * is not among the entries goes under its nearest ancestor that is, or starts
  * the list: a search answers with the values it has, not with the shop's tree.
  *
+ * The parents are `tree.parents`, value => parent, or, with `tree.paths`, the
+ * values themselves: each is a path that holds its parent.
+ *
  * @param {Array<{value: string, selected?: boolean}>} entries In the order siblings are to keep.
- * @param {{depth: number, parents: Object<string,string>}} [tree]
+ * @param {{depth: number, parents?: Object<string,string>, paths?: boolean}} [tree]
  * @return {Array<Object>} The entries, each with its `level`, 0 for a main one.
  */
 export const arrangeTree = ( entries, tree ) => {
@@ -645,7 +771,9 @@ export const arrangeTree = ( entries, tree ) => {
 	}
 
 	const parents = tree.parents || {};
-	const parentOf = ( value ) => ( Object.prototype.hasOwnProperty.call( parents, value ) ? parents[ value ] : undefined );
+	const parentOf = tree.paths
+		? pathParent
+		: ( value ) => ( Object.prototype.hasOwnProperty.call( parents, value ) ? parents[ value ] : undefined );
 
 	// Every ancestor of a value, nearest first. A loop ends the walk.
 	const ancestors = ( value ) => {
@@ -751,8 +879,9 @@ export const rangeLabel = ( range, format = ( value ) => value ) => {
 /**
  * What a group's button says. With nothing selected, its name. With values,
  * the name and the first value, and how many more there are: the button
- * reads "Colour: Olive +1", and is named "Colour: Olive, Black", which starts
- * with what it shows. With a bound, the name and the bound.
+ * reads "Colour: Olive +1", and is named "Colour: Olive +1, Black", which
+ * holds what it shows (a name that leaves out the "+1" fails WCAG 2.5.3) and
+ * runs on to the values behind it. With a bound, the name and the bound.
  *
  * @param {string} label
  * @param {string[]} [values]

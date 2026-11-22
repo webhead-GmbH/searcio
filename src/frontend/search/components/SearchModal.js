@@ -1,12 +1,13 @@
 import {useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState} from '@wordpress/element';
-import {Icon, Modal} from '@wordpress/components';
+import Icon from '../ui/Icon';
+import Modal from '../ui/Modal';
 import {chevronDown, closeSmall} from '@wordpress/icons';
 import {__, _n, sprintf} from '@wordpress/i18n';
 import Button from './Button';
 
 import {currentLangFilter, fetchCardTemplates, fetchHighlights, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
-import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, facetValueLabel, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
 import {redirectTarget} from '../../../utils/redirect';
 import {trackScrollEnd} from '../../../utils/scrollEnd';
@@ -93,7 +94,32 @@ const useModalWidth = (ref) => {
 	return width;
 };
 
+/** The fields the storefront config says not to draw (see `hidden` of its `facets`). */
+const hiddenFacets = () => (Array.isArray(getConfig().facets) ? getConfig().facets : [])
+	.filter((facet) => facet?.hidden)
+	.map((facet) => facet.field);
+
+/** The fields the site draws as a range: Searcio's number fields among them. */
+const rangedFacets = () => (Array.isArray(getConfig().facets) ? getConfig().facets : [])
+	.filter((facet) => 'range' === facet?.display)
+	.map((facet) => facet.field);
+
+/** The fields whose picks a result must all have (`match: 'all'`). */
+const matchAllFacets = () => (Array.isArray(getConfig().facets) ? getConfig().facets : [])
+	.filter((facet) => 'all' === facet?.match)
+	.map((facet) => facet.field);
+
 const supportsVoice = () => 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+
+/**
+ * Whether Searcio searches this page: it is set up, and the page is in a
+ * language the site indexes. A page in another language searches WordPress,
+ * and before that the window shows nothing of Searcio's: its highlights,
+ * popular searches and suggestions were the other languages'.
+ *
+ * @return {boolean} Whether Searcio searches this page.
+ */
+const servesThisPage = () => isConfigured() && isLanguageSupported();
 
 const nativeSearchUrl = (query) => {
 	const config = getConfig();
@@ -246,7 +272,9 @@ const SearchModal = ({
 	// with no code change and nothing here ever offers a control the API would
 	// only answer 403 to. Until the site answers, what this visit saw last
 	// (capabilities.js), so the tabs are where they will be as the window opens.
-	const [remembered] = useState(() => rememberedCapabilities(getConfig().searchKey || ''));
+	// None on a page Searcio does not search, which would otherwise bring back
+	// the tabs the visitor saw on a page in another language.
+	const [remembered] = useState(() => (servesThisPage() ? rememberedCapabilities(getConfig().searchKey || '') : {}));
 	const [assistantEnabled, setAssistantEnabled] = useState(Boolean(remembered.assistant));
 	const [quizEnabled, setQuizEnabled] = useState(Boolean(remembered.quiz));
 	const [visualEnabled, setVisualEnabled] = useState(Boolean(remembered.visual_search));
@@ -345,7 +373,7 @@ const SearchModal = ({
 	// visitors are actually searching for right now. The curated admin list
 	// is only a fallback, used when the live fetch hasn't returned anything
 	// yet, comes back empty, or errors out.
-	const popularSearches = livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches;
+	const popularSearches = !servesThisPage() ? [] : (livePopularSearches.length > 0 ? livePopularSearches : curatedPopularSearches);
 	const trimmedQuery = query.trim();
 	const queryRef = useRef(query);
 
@@ -372,7 +400,7 @@ const SearchModal = ({
 		}
 	}, [editorPreview]);
 
-	// `Modal` (`@wordpress/components`) always portals its frame straight to
+	// `Modal` (`../ui/Modal`) always portals its frame straight to
 	// `document.body` and doesn't forward unrecognized props to it, so
 	// `data-webhead-frontend-root` can't be passed in as a prop like
 	// `className` above - it has to be set on the real DOM node once it
@@ -448,7 +476,7 @@ const SearchModal = ({
 	// only appears when the account can actually use it; a failure leaves them
 	// all off, which degrades to plain search rather than to a broken control.
 	useEffect(() => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return undefined;
 		}
 
@@ -477,7 +505,7 @@ const SearchModal = ({
 	// fetch returns nothing or fails - `popularSearches` above starts on the
 	// curated list and only stays there if the live list ends up empty.
 	useEffect(() => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return;
 		}
 
@@ -504,7 +532,7 @@ const SearchModal = ({
 	// straight through instead of reading `activeFacets` state, which hasn't
 	// re-rendered yet at the point the click handler fires the request.
 	const loadHighlights = useCallback(async (type, facetsOverride, rangesOverride) => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			setIsLoadingHighlights(false);
 
 			return;
@@ -553,8 +581,8 @@ const SearchModal = ({
 			if ('' === type) {
 				setFacets(response.facets?.types || []);
 			}
-			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
-			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), appliedFacets, matchAllFacets()));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits, rangedFacets()), appliedRanges));
 			groupsSource.current = {key: `|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
 			setGroupsVersion((version) => version + 1);
 		} catch (e) {
@@ -592,13 +620,13 @@ const SearchModal = ({
 			return;
 		}
 
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return;
 		}
 
 		suggestTimer.current = window.setTimeout(async () => {
 			try {
-				const response = await suggest(trimmedQuery);
+				const response = await suggest(trimmedQuery, {type: scopeType});
 
 				setSuggestions(response.suggestions || []);
 			} catch (e) {
@@ -607,7 +635,7 @@ const SearchModal = ({
 		}, SUGGEST_DEBOUNCE);
 
 		return () => window.clearTimeout(suggestTimer.current);
-	}, [trimmedQuery]);
+	}, [trimmedQuery, scopeType]);
 
 	/**
 	 * Search for `q` with the filters given, or the ones on screen.
@@ -758,8 +786,8 @@ const SearchModal = ({
 				setFacets(response.facets?.types || []);
 			}
 
-			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), appliedFacets));
-			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits), appliedRanges));
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), appliedFacets, matchAllFacets()));
+			setRangeFields((current) => mergeRangeFields(current, extractRangeFields(response.facets, response.hits, rangedFacets()), appliedRanges));
 			groupsSource.current = {key: `${trimmed}|${type}`, hits: response.hits || [], total: Number(response.total) || 0};
 			setGroupsVersion((version) => version + 1);
 
@@ -811,7 +839,7 @@ const SearchModal = ({
 	}, [visualPreview]);
 
 	const runVisualSearch = useCallback(async (file) => {
-		if (!isConfigured()) {
+		if (!servesThisPage()) {
 			return;
 		}
 
@@ -862,7 +890,7 @@ const SearchModal = ({
 
 			setVisualTags(Array.isArray(response?.tags) ? response.tags : []);
 			setResults(response);
-			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets), {}));
+			setFacetGroups((current) => mergeFieldFacets(current, extractFieldFacets(response.facets, hiddenFacets()), {}));
 		} catch (e) {
 			if ('AbortError' === e.name || !isLatest()) {
 				return;
@@ -1090,6 +1118,7 @@ const SearchModal = ({
 	}, []);
 
 	const labelOf = (field) => humanizeFieldLabel(field, fieldLabels);
+	const valuesOf = (field) => (activeFacets[field] || []).map((value) => facetValueLabel(value, facetSettings[field]));
 	const displayOf = (field) => bar.displays[field]
 		|| (rangeFields[field] && !facetGroups[field] ? 'range' : detectFacetDisplay(field, (facetGroups[field] || []).map((entry) => entry.value), facetSettings[field]));
 	const isGroupActive = (field) => (activeFacets[field] || []).length > 0 || hasBound(activeRanges[field]);
@@ -1430,15 +1459,20 @@ const SearchModal = ({
 	const resultsHits = results?.hits || [];
 	// `total` is only a count of matches on the lexical path; a semantic query
 	// reports the size of the window it retrieved. Say "of 137" only when that
-	// number means what it looks like it means.
-	const exactTotal = totalIsExact(semanticEnabled, trimmedQuery);
+	// number means what it looks like it means. An answer that says whether it
+	// counted (`total_exact`) is taken at its word: a live search the service
+	// answered lexically is exact, which the window cannot tell otherwise.
+	const exactTotal = 'boolean' === typeof results?.total_exact ? results.total_exact : totalIsExact(semanticEnabled, trimmedQuery);
 	const totalResults = Number.isFinite(Number(results?.total)) ? Number(results.total) : resultsHits.length;
 	// A photo search is a single fixed page server-side - it takes no `page`
 	// parameter - so there is nothing more to load for one.
 	const hasMore = !visualActive && hasMorePages(results, resultsHits.length, exactTotal);
 	// Without an exact total there is only one number that is true: how many
-	// are on screen.
+	// are on screen. Once there are more matches than that, the count of the
+	// window Searcio retrieved is still worth saying, as "about": a heading that
+	// read "20 results" over 173 made a shopper think there were only 20.
 	const shownTotal = exactTotal ? totalResults : resultsHits.length;
+	const windowTotal = !exactTotal && totalResults > resultsHits.length;
 
 	// A pick keeps the results it narrows on screen while the new ones load,
 	// so they change behind an open popover instead of turning into a skeleton.
@@ -1489,8 +1523,11 @@ const SearchModal = ({
 	// skeleton, which looked like a search loading that never finished.
 	if (showEmptyState || (!isSearching && !results)) {
 		helpers = 'all';
-		mainTitle = __('Current highlights', 'searcio');
-		mainContent = isLoadingHighlights ? (
+		// No highlights is no row: a heading over nothing read as broken.
+		const noHighlights = !isLoadingHighlights && 0 === highlights.length;
+
+		mainTitle = noHighlights ? '' : __('Current highlights', 'searcio');
+		mainContent = noHighlights ? null : isLoadingHighlights ? (
 			<SearchResultsSkeleton/>
 		) : (
 			<Carousel
@@ -1523,6 +1560,13 @@ const SearchModal = ({
 				? sprintf(
 					/* translators: 1: number of results loaded so far. 2: total number of results. */
 					__('%1$d of %2$d results', 'searcio'),
+					resultsHits.length,
+					totalResults
+				)
+				: hasMore && windowTotal
+				? sprintf(
+					/* translators: 1: number of results loaded so far. 2: about how many results there are; Searcio counts the best matches of a search by meaning, not every one. */
+					__('%1$d of about %2$d results', 'searcio'),
 					resultsHits.length,
 					totalResults
 				)
@@ -1619,7 +1663,7 @@ const SearchModal = ({
 		}
 
 		(activeFacets[field] || []).forEach((value) => {
-			chips.push({key: `${field}:${value}`, field, value, name: labelOf(field), label: value});
+			chips.push({key: `${field}:${value}`, field, value, name: labelOf(field), label: facetValueLabel(value, facetSettings[field])});
 		});
 	});
 
@@ -1648,6 +1692,8 @@ const SearchModal = ({
 			images={facetSettings[field]?.images || {}}
 			labels={facetSettings[field]?.labels || {}}
 			tree={facetSettings[field]?.tree}
+			sort={facetSettings[field]?.sort}
+			valuesOrder={facetSettings[field]?.valuesOrder}
 			showCount={showCount}
 			locale={locale}
 			onToggle={onFieldFacetClick}
@@ -1707,7 +1753,7 @@ const SearchModal = ({
 
 	const sections = bar.order.map((field, index) => {
 		const open = Boolean(expanded[field]);
-		const summary = summarizeSelection(activeFacets[field], activeRanges[field], formatBound(field));
+		const summary = summarizeSelection(valuesOf(field), activeRanges[field], formatBound(field));
 		const sectionId = `${popoverId}-section-${index}`;
 
 		return (
@@ -1744,7 +1790,6 @@ const SearchModal = ({
 
 	return (
 		<Modal
-			__experimentalHideHeader
 			focusOnMount={editorPreview ? false : undefined}
 			onRequestClose={onRequestClose}
 			className={`whsc-modal whsc-anim-${animation || 'fade'}${instanceClass ? ` ${instanceClass}` : ''}`}
@@ -1839,7 +1884,7 @@ const SearchModal = ({
 					<>
 				<div className="whsc-modal-header" ref={headerRef}>
 					<div className="whsc-modal-search">
-					<div className="whsc-input-row">
+					<div className={`whsc-input-row${'' !== query ? ' has-query' : ''}`}>
 						<SearchInput
 							ref={inputRef}
 							value={query}
@@ -1909,12 +1954,13 @@ const SearchModal = ({
 							onType={onTypeFacetClick}
 							typeLabels={typeLabels}
 							allTypesLabel={i18n.allTypes}
-							// The type counts come from the same window as `total`: when the
-							// heading cannot give an exact number, neither can they, and two
-							// numbers that disagree ("20 results", "Products 21") help no one.
-							showCount={showCount && exactTotal}
+							// The type counts come from the same window as `total`: they are
+							// shown where the heading gives a number of that window, exact or
+							// "about", so that the two agree. With none ("20 results" over a
+							// button that says "Products 21") they would not.
+							showCount={showCount && (exactTotal || windowTotal)}
 							groups={bar.order}
-							buttonLabel={(field) => filterButtonLabel(labelOf(field), activeFacets[field], activeRanges[field], formatBound(field))}
+							buttonLabel={(field) => filterButtonLabel(labelOf(field), valuesOf(field), activeRanges[field], formatBound(field))}
 							isActive={isGroupActive}
 							openField={openFilter?.field || ''}
 							allOpen={'all' === openFilter?.kind}

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import Icon from '../ui/Icon';
 import { chevronDown, funnel } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -147,8 +147,8 @@ const FilterBar = ( {
 		// A group of independent toggle buttons, not a tablist: more than one
 		// type can be pressed at once.
 		<div className="whsc-types" role="group" aria-label={ __( 'Filter by type', 'searcio' ) }>
-			{ /* On a phone "All" is the state with no type pressed. */ }
-			{ ! narrow && typeButton( '', allTypesLabel || __( 'All', 'searcio' ) ) }
+			{ /* On a phone too: without it, the way back to every result was to press the pressed type again, which nothing said. */ }
+			{ typeButton( '', allTypesLabel || __( 'All', 'searcio' ) ) }
 			{ types.map( ( facet ) => typeButton( facet.value, typeLabels[ facet.value ] || facet.value, facet.count ) ) }
 		</div>
 	);
@@ -168,9 +168,9 @@ const FilterBar = ( {
 				aria-haspopup="dialog"
 				aria-expanded={ open }
 				aria-controls={ open && ! narrow ? popoverId : undefined }
-				// The values the "+1" stands for are read out too, so the name
-				// runs on from what the button shows: "Colour: Olive, Black".
-				aria-label={ label.more > 0 ? `${ label.text }${ label.hidden }` : undefined }
+				// The name starts with what the button shows, "+1" included, and
+				// runs on to the values it stands for: "Colour: Olive +1, Black".
+				aria-label={ label.more > 0 ? `${ label.text } +${ label.more }${ label.hidden }` : undefined }
 				onClick={ ( event ) => onGroup( field, event.currentTarget ) }
 			>
 				<span className="whsc-facet__label">

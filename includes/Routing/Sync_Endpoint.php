@@ -54,6 +54,7 @@ final class Sync_Endpoint extends Rest_API {
 		'trigger'     => [ 'type' => 'string' ],
 		'date_after'  => [ 'type' => 'string' ],
 		'date_before' => [ 'type' => 'string' ],
+		'search'      => [ 'type' => 'string' ],
 	];
 
 	public function __construct(
@@ -76,6 +77,29 @@ final class Sync_Endpoint extends Rest_API {
 		$result = $this->service->start( Sync_Trigger::Manual, get_current_user_id() ?: null, $force );
 
 		return new WP_REST_Response( $result, $result['ok'] ? 200 : 409 );
+	}
+
+	/**
+	 * The next step of the running sync, run now: for a site whose WP-Cron does
+	 * not fire the worker, which the screen says after ten minutes.
+	 */
+	#[Route( '/sync/nudge', methods: 'POST', permission_callback: 'can_run_sync' )]
+	public function nudge(): WP_REST_Response {
+		if ( ! $this->service->nudge() ) {
+			return new WP_REST_Response(
+				[ 'message' => __( 'There is no sync running to move on.', 'searcio' ) ],
+				409
+			);
+		}
+
+		$active = $this->state->active();
+
+		return new WP_REST_Response(
+			[
+				'ok'  => true,
+				'run' => null === $active ? null : $this->state->present( $active ),
+			]
+		);
 	}
 
 	#[Route( '/sync/pause', methods: 'POST', permission_callback: 'can_run_sync', args: self::RUN_ARGS )]
@@ -105,6 +129,7 @@ final class Sync_Endpoint extends Rest_API {
 				'trigger'     => (string) ( $request->get_param( 'trigger' ) ?? '' ),
 				'date_after'  => (string) ( $request->get_param( 'date_after' ) ?? '' ),
 				'date_before' => (string) ( $request->get_param( 'date_before' ) ?? '' ),
+				'search'      => (string) ( $request->get_param( 'search' ) ?? '' ),
 			]
 		);
 

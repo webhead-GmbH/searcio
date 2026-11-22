@@ -9,6 +9,7 @@ import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
 import {useAnnounce} from '../../../../utils/announce';
 import {forgetAll} from '../../remote';
+import {checkSearchKey} from '../../searchKeyCheck';
 
 const pluginData = window.searcioData || {};
 const SECRET_PLACEHOLDER = '••••••••••••';
@@ -20,7 +21,7 @@ const SECRET_PLACEHOLDER = '••••••••••••';
  * copies the resulting keys back here) and for key rotation. Collapsed by
  * default; the parent expands it automatically on `pending_claim` or a `409`.
  */
-const ManualConnectionEntry = ({pendingClaim}) => {
+const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 	const {settings, updateSetting, saveSettings, saveError, clearSaveError, isSaving, isLoading, hasUnsavedChanges} =
 		useContext(SettingsContext);
 
@@ -42,8 +43,19 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 
 		setWriteKey('');
 		setWriteSecret('');
+		// The answer of a test before the save is of the keys it replaced:
+		// "The keys are wrong" stayed under the right ones until a reload.
+		setResult(null);
+		forgetAll();
+		onSaved?.();
 
 		showToast(__('Connection settings saved.', 'searcio'), 'success');
+	};
+
+	// A key being typed is not the one the last test was of.
+	const changeKey = (key, value) => {
+		setResult(null);
+		updateSetting(key, value);
 	};
 
 	const onTest = async () => {
@@ -51,7 +63,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 		setResult(null);
 
 		try {
-			const response = await apiFetch({
+			const response = await checkSearchKey(await apiFetch({
 				path:
 					pluginData?.api?.testConnectionPath ||
 					'/searcio/v1/connection/test',
@@ -59,7 +71,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				// "Test connection" asks Searcio now, past what the server keeps,
 				// and the rest of the screen reads anew what new keys may change.
 				data: {fresh: true},
-			});
+			}));
 
 			forgetAll();
 			setResult(response);
@@ -84,7 +96,13 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 		}
 	};
 
-	const connectionSaveDisabled = isSaving || isLoading || !hasUnsavedChanges;
+	// A search key is `sk_` and letters and digits, which the server checks as
+	// well. Said as it is typed: a key with a space in it was saved without a
+	// word, and the site's search fell back to WordPress's own.
+	const searchKey = String(settings.search_key ?? '').trim();
+	const keyProblem = '' !== searchKey && !/^sk_\w+$/.test(searchKey);
+
+	const connectionSaveDisabled = isSaving || isLoading || !hasUnsavedChanges || keyProblem;
 	const connectionSaveLabel = isSaving
 		? __('Saving…', 'searcio')
 		: __('Save connection', 'searcio');
@@ -109,9 +127,11 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 			</Text>
 			<InputControl
 				label={__('Search key', 'searcio')}
-				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'searcio')}
+				description={keyProblem
+					? __('That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard.', 'searcio')
+					: __('Public key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains.', 'searcio')}
 				value={settings.search_key ?? ''}
-				onValueChange={(value) => updateSetting('search_key', value)}
+				onValueChange={(value) => changeKey('search_key', value)}
 			/>
 			<InputControl
 				type="password"
@@ -126,7 +146,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				value={writeKey}
 				onValueChange={(value) => {
 					setWriteKey(value);
-					updateSetting('write_key', value);
+					changeKey('write_key', value);
 				}}
 			/>
 			<InputControl
@@ -142,7 +162,7 @@ const ManualConnectionEntry = ({pendingClaim}) => {
 				value={writeSecret}
 				onValueChange={(value) => {
 					setWriteSecret(value);
-					updateSetting('write_secret', value);
+					changeKey('write_secret', value);
 				}}
 			/>
 

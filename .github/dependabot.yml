@@ -1,0 +1,19 @@
+# Dependabot keeps the actions of the workflows current, the deploy action
+# that is handed the SVN password among them, in one pull request a month
+# against the branch pull requests go to.
+#
+# npm and Composer are left out on purpose: the framework sets the
+# @wordpress/* and webhead/* versions (composer framework:update), and a
+# @wordpress/* release is taken deliberately, after reading its breaking
+# changes. Security alerts for them still come from Dependabot alerts.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: "1.x"
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns:
+          - "*"

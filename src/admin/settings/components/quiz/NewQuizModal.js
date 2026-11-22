@@ -18,10 +18,14 @@ import { forget } from '../../remote';
  * @param {Function}      props.onClose
  * @param {Function}      props.onCreated Called with the new quiz's id.
  * @param {Array<Object>} props.languages The site's languages, `{ code, name }`.
+ * @param {?string}       props.defaultLanguage The language the admin works in, which a new quiz starts in.
+ *                                              "Every language" is a choice to make, not the start: a German
+ *                                              quiz was shown on the English pages too.
  */
-const NewQuizModal = ( { isOpen, onClose, onCreated, languages } ) => {
+const NewQuizModal = ( { isOpen, onClose, onCreated, languages, defaultLanguage = null } ) => {
+	const start = languages.some( ( language ) => language.code === defaultLanguage ) ? defaultLanguage : null;
 	const [ name, setName ] = useState( '' );
-	const [ lang, setLang ] = useState( null );
+	const [ lang, setLang ] = useState( start );
 	const [ isCreating, setIsCreating ] = useState( false );
 	const [ error, setError ] = useState( '' );
 
@@ -30,9 +34,10 @@ const NewQuizModal = ( { isOpen, onClose, onCreated, languages } ) => {
 	useEffect( () => {
 		if ( isOpen ) {
 			setName( '' );
-			setLang( null );
+			setLang( start );
 			setError( '' );
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isOpen ] );
 
 	const create = async () => {
@@ -85,13 +90,29 @@ const NewQuizModal = ( { isOpen, onClose, onCreated, languages } ) => {
 					event.preventDefault();
 					void create();
 				} }
+				// The form has no button of its own (the modal's are outside it),
+				// so with the language select beside the name, Enter in the name
+				// submitted nothing.
+				onKeyDown={ ( event ) => {
+					if ( 'Enter' === event.key && 'INPUT' === event.target?.tagName && ! event.nativeEvent?.isComposing && ! isCreating ) {
+						event.preventDefault();
+						void create();
+					}
+				} }
 			>
 				<Stack direction="column" gap="lg">
 					<InputControl
 						label={ __( 'Name', 'searcio' ) }
 						description={ __( 'Shoppers see it when a site has more than one quiz to choose from.', 'searcio' ) }
 						value={ name }
-						onValueChange={ setName }
+						onValueChange={ ( value ) => {
+							setName( value );
+
+							// "Give the quiz a name" stayed under the name typed since.
+							if ( '' !== value.trim() ) {
+								setError( '' );
+							}
+						} }
 					/>
 					{ languages.length > 1 && (
 						<SelectControl

@@ -28,17 +28,17 @@ final class Field_Source_Resolver_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * Ancestors are a WooCommerce category rule. A mapped taxonomy sends exactly
-	 * the terms the post carries.
+	 * A hierarchical taxonomy sends the parents too, as a product's categories
+	 * do: a post under "News › Local" sent as "Local" alone was not found by a
+	 * filter on "News". Tags have no parents to send.
 	 */
-	public function test_a_taxonomy_source_sends_only_the_assigned_terms(): void {
+	public function test_a_hierarchical_taxonomy_source_sends_the_parents_of_the_assigned_terms(): void {
 		$parent  = self::factory()->category->create( [ 'name' => 'News' ] );
 		$child   = self::factory()->category->create( [ 'name' => 'Local', 'parent' => $parent ] );
-		$post_id = self::factory()->post->create( [ 'post_category' => [ $child ] ] );
+		$post_id = self::factory()->post->create( [ 'post_category' => [ $child ], 'tags_input' => [ 'Wetter' ] ] );
 
-		$names = ( new Field_Source_Resolver() )->resolve( 'taxonomy:category', get_post( $post_id ) );
-
-		$this->assertSame( [ 'Local' ], $names );
+		$this->assertSame( [ 'Local', 'News' ], ( new Field_Source_Resolver() )->resolve( 'taxonomy:category', get_post( $post_id ) ) );
+		$this->assertSame( [ 'Wetter' ], ( new Field_Source_Resolver() )->resolve( 'taxonomy:post_tag', get_post( $post_id ) ) );
 	}
 
 	public function test_a_taxonomy_source_with_no_terms_resolves_to_null(): void {

@@ -17,6 +17,7 @@ namespace Webhead\WP\SearchCloud\Tests\Integration\Routing;
 use WP_REST_Request;
 use WP_REST_Server;
 use Webhead\WP\SearchCloud\Enums\Sync_Status;
+use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Sync_Endpoint_Test extends Integration_Test_Case {
@@ -181,6 +182,62 @@ final class Sync_Endpoint_Test extends Integration_Test_Case {
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayHasKey( 'items', $response->get_data() );
 		$this->assertArrayHasKey( 'total', $response->get_data() );
+	}
+
+	/**
+	 * "zzzz" left all eight rows on screen: the table's search reached nothing.
+	 * A number finds that run, any other text what went wrong in one.
+	 */
+	public function test_the_history_search_finds_a_run_by_its_number_or_its_error(): void {
+		$this->login_operator();
+
+		$state  = $this->service( 'sync_state' );
+		$failed = $state->create( Sync_Trigger::Manual, null, false, 0, [] );
+		$other  = $state->create( Sync_Trigger::Manual, null, false, 0, [] );
+
+		$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'searcio_sync_runs', [ 'status' => 'failed', 'last_error' => 'Could not reach Searcio.' ], [ 'id' => $failed ] );
+		$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'searcio_sync_runs', [ 'status' => 'completed' ], [ 'id' => $other ] );
+
+		$ids = function ( string $search ): array {
+			$request = new WP_REST_Request( 'GET', '/searcio/v1/sync/history' );
+			$request->set_query_params( [ 'search' => $search ] );
+
+			return array_map( 'intval', array_column( $this->server->dispatch( $request )->get_data()['items'], 'id' ) );
+		};
+
+		$this->assertSame( [], $ids( 'zzzz' ) );
+		$this->assertSame( [ $failed ], $ids( 'reach searcio' ) );
+		$this->assertSame( [ $other ], $ids( '#' . $other ) );
+	}
+
+	/**
+	 * The words the table shows in its own columns found nothing: "Completed"
+	 * over rows that all said so, "manual" over rows started by hand.
+	 */
+	public function test_the_history_search_finds_a_run_by_its_status_or_what_started_it(): void {
+		$this->login_operator();
+
+		$state    = $this->service( 'sync_state' );
+		$manual   = $state->create( Sync_Trigger::Manual, null, false, 0, [] );
+		$settings = $state->create( Sync_Trigger::SettingsChange, null, false, 0, [] );
+
+		$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'searcio_sync_runs', [ 'status' => 'completed' ], [ 'id' => $manual ] );
+		$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->prefix . 'searcio_sync_runs', [ 'status' => 'failed' ], [ 'id' => $settings ] );
+
+		$ids = function ( string $search ): array {
+			$request = new WP_REST_Request( 'GET', '/searcio/v1/sync/history' );
+			$request->set_query_params( [ 'search' => $search ] );
+
+			$found = array_map( 'intval', array_column( $this->server->dispatch( $request )->get_data()['items'], 'id' ) );
+			sort( $found );
+
+			return $found;
+		};
+
+		$this->assertSame( [ $manual ], $ids( 'Completed' ) );
+		$this->assertSame( [ $manual ], $ids( 'manual' ) );
+		$this->assertSame( [ $settings ], $ids( 'settings change' ) );
+		$this->assertSame( [ $settings ], $ids( 'FAIL' ) );
 	}
 
 	private function login_operator(): void {

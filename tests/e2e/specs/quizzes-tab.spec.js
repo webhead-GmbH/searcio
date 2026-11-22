@@ -111,7 +111,7 @@ async function mockQuizzes( page, { quizzes = [ QUIZ ], endings = [ { answers: [
 	// The site's languages, as the Indexing tab's catalogue reports them.
 	await page.route(
 		( url ) => decodeURIComponent( url.href ).includes( '/indexing/config' ),
-		( route ) => json( route, { post_types: [], sources: [], languages: { active: true, available: [ { code: 'de', name: 'Deutsch' }, { code: 'en', name: 'English' } ] } } )
+		( route ) => json( route, { post_types: [], sources: [], languages: { active: true, available: [ { code: 'de', name: 'Deutsch' }, { code: 'en', name: 'English' } ], current: 'de' } } )
 	);
 
 	return sent;
@@ -161,6 +161,23 @@ test.describe( 'Product finder tab', () => {
 		await expect.poll( () => sent.find( ( write ) => '/quizzes' === write.path )?.body ).toEqual( { quiz: { name: 'Shoe finder', lang: 'en' } } );
 		await expect( screen.getByRole( 'tablist', { name: 'Quiz sections' } ) ).toBeVisible( LOADED );
 		expect( new URL( page.url() ).searchParams.get( 'quiz' ) ).toBe( '8' );
+	} );
+
+	// "Every language" was where a new quiz started: a German quiz showed on the English pages too.
+	test( 'starts a new quiz in the language the admin works in', async ( { page } ) => {
+		const sent = await mockQuizzes( page, { quizzes: [] } );
+		await page.goto( TAB_URL );
+
+		const screen = page.locator( SCREEN );
+		await expect( screen.getByText( 'No quizzes yet' ) ).toBeVisible( LOADED );
+		await screen.getByRole( 'button', { name: 'Add a quiz' } ).first().click();
+
+		const dialog = page.getByRole( 'dialog', { name: 'Add a quiz' } );
+		await expect( dialog.getByRole( 'combobox', { name: 'Language' } ) ).toContainText( 'Deutsch (de)' );
+		await dialog.getByLabel( 'Name' ).fill( 'Gift finder' );
+		await dialog.getByRole( 'button', { name: 'Add the quiz' } ).click();
+
+		await expect.poll( () => sent.find( ( write ) => '/quizzes' === write.path )?.body ).toEqual( { quiz: { name: 'Gift finder', lang: 'de' } } );
 	} );
 
 	test( 'saves an edited answer, with a value that holds a comma kept whole', async ( { page } ) => {
@@ -254,6 +271,9 @@ test.describe( 'Product finder tab', () => {
 		await page.goto( `${ TAB_URL }&quiz=7` );
 
 		const screen = page.locator( SCREEN );
+		// As long as the other tests give the screen to load: the connection
+		// check it starts with can take several seconds.
+		await expect( screen.getByLabel( 'Name' ) ).toBeVisible( LOADED );
 		await screen.getByLabel( 'Name' ).fill( 'Gift finder 2' );
 		await screen.getByRole( 'button', { name: 'Save changes' } ).click();
 

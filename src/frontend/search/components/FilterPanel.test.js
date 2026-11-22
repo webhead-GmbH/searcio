@@ -217,6 +217,51 @@ describe( 'FilterPanel', () => {
 		expect( items[ 1 ].style.getPropertyValue( '--whsc-level' ) ).toBe( '1' );
 	} );
 
+	it( 'draws a tree of paths in the shop\'s order, each category by its own name', () => {
+		render( {
+			field: 'category_paths',
+			values: [
+				{ value: 'Fahrwerke', count: 4685 },
+				{ value: 'Fahrwerke > Gewindefahrwerke', count: 3723 },
+				{ value: 'Fahrwerke > Luftfahrwerke', count: 582 },
+				{ value: 'Fahrwerke > Gewindefahrwerke > MTS Technik', count: 3723 },
+				{ value: 'Fahrwerke > Luftfahrwerke > MTS Technik', count: 109 },
+			],
+			tree: { depth: 3, paths: true },
+			sort: 'shop',
+			valuesOrder: [ 'Fahrwerke', 'Fahrwerke > Luftfahrwerke', 'Fahrwerke > Luftfahrwerke > MTS Technik', 'Fahrwerke > Gewindefahrwerke' ],
+		} );
+
+		expect( labels() ).toEqual( [ 'Fahrwerke', 'Luftfahrwerke', 'MTS Technik', 'Gewindefahrwerke', 'MTS Technik' ] );
+		expect( [ ...container.querySelectorAll( 'input' ) ].map( ( input ) => input.value ) ).toEqual( [
+			'Fahrwerke',
+			'Fahrwerke > Luftfahrwerke',
+			'Fahrwerke > Luftfahrwerke > MTS Technik',
+			'Fahrwerke > Gewindefahrwerke',
+			'Fahrwerke > Gewindefahrwerke > MTS Technik',
+		] );
+	} );
+
+	it( 'shows the whole path of a category found by a search within the list, which tells two of one name apart', () => {
+		const many = Array.from( { length: 14 }, ( _, index ) => ( { value: `Teile > Gruppe ${ index }`, count: 10 } ) );
+
+		render( {
+			field: 'category_paths',
+			values: [ ...many, { value: 'Fahrwerke > MTS Technik', count: 3 }, { value: 'Federn > MTS Technik', count: 2 }, { value: 'Federn', count: 2 } ],
+			tree: { depth: 2, paths: true },
+		} );
+
+		const input = container.querySelector( '.whsc-within__input' );
+		const setValue = Object.getOwnPropertyDescriptor( window.HTMLInputElement.prototype, 'value' ).set;
+
+		act( () => {
+			setValue.call( input, 'mts' );
+			input.dispatchEvent( new window.Event( 'input', { bubbles: true } ) );
+		} );
+
+		expect( labels() ).toEqual( [ 'Fahrwerke > MTS Technik', 'Federn > MTS Technik' ] );
+	} );
+
 	it( 'does not take the tree of a list for anything else', () => {
 		render( {
 			display: 'tiles',

@@ -6,6 +6,7 @@ import './scss/style.scss';
 import App from './components/App';
 import { attachOpeners } from './openers';
 import { preconnect, warmUp } from '../../utils/api';
+import { documentType } from '../../utils/documentType';
 
 const hydrated = new WeakSet();
 
@@ -98,7 +99,7 @@ const onIntent = ( event ) => {
 		// source, or the site's trigger's for a link that opens the search.
 		const trigger = control.closest( '[data-whsc-trigger]' ) || document.querySelector( '[data-whsc-trigger][data-whsc-site]' );
 
-		warmUp( { type: trigger?.dataset.type || '', source: trigger?.dataset.highlightsSource || 'newest' } );
+		warmUp( { type: documentType( trigger?.dataset.type ), source: trigger?.dataset.highlightsSource || 'newest' } );
 		INTENT_EVENTS.forEach( ( type ) => document.removeEventListener( type, onIntent, true ) );
 	}
 };

@@ -199,6 +199,57 @@ test.describe( 'Connection tab allowances', () => {
 	} );
 
 	/**
+	 * Wrong keys saved by hand were answered "wrong" once, and that answer
+	 * stayed: the right keys saved after them still read "wrong" until the
+	 * page was loaded again. A save checks the connection anew.
+	 */
+	test( 'checks the connection again once keys are saved by hand', async ( { page } ) => {
+		let answer = { ok: false, status: 401, message: 'Searcio does not know these keys.' };
+		let checks = 0;
+
+		await page.route(
+			( url ) => decodeURIComponent( url.href ).includes( '/connection/test' ),
+			( route ) => {
+				checks++;
+
+				return route.fulfill( { status: 200, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify( answer ) } );
+			}
+		);
+		await page.goto( CONNECTION_URL );
+		await expect( page.getByText( 'Searcio does not know these keys.' ).first() ).toBeVisible( LOADED );
+
+		answer = HEALTH;
+		await page.getByRole( 'button', { name: /manual key entry/i } ).click();
+		await page.getByLabel( 'Search key' ).fill( 'sk_e2erecheck' );
+		await page.getByRole( 'button', { name: 'Save connection' } ).click();
+
+		await expect( page.getByText( 'Connected - 96 / 300,000 documents indexed.', { exact: false } ).first() ).toBeVisible( LOADED );
+		await expect( page.getByText( 'Searcio does not know these keys.' ) ).toHaveCount( 0 );
+		expect( checks ).toBeGreaterThan( 1 );
+	} );
+
+	/**
+	 * A search key with a space in it ("xx ") was saved without a word and the
+	 * site's search fell back to WordPress's own. The field says so as it is
+	 * typed, and the save waits for a key that is one.
+	 */
+	test( 'says as it is typed that a search key is not one, and does not save it', async ( { page } ) => {
+		await mockHealth( page );
+		await page.goto( CONNECTION_URL );
+		await page.getByRole( 'button', { name: /manual key entry/i } ).click();
+
+		const save = page.getByRole( 'button', { name: 'Save connection' } );
+
+		await page.getByLabel( 'Search key' ).fill( 'xx ' );
+		await expect( page.getByText( 'That is not a search key: one starts with sk_ and has no spaces.' ) ).toBeVisible( LOADED );
+		await expect( save ).toBeDisabled();
+
+		await page.getByLabel( 'Search key' ).fill( 'sk_e2eright' );
+		await expect( page.getByText( 'That is not a search key' ) ).toHaveCount( 0 );
+		await expect( save ).toBeEnabled();
+	} );
+
+	/**
 	 * wp-admin is written in the language of the user's profile, and a browser
 	 * is often set to another one. A number then has to follow the screen: a
 	 * Persian browser used to put "۲۷۰٬۰۰۰ of ۳۰۰٬۰۰۰" into the English sentence.

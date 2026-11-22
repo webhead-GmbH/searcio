@@ -47,6 +47,31 @@ final class Multilingual_Support {
 		};
 	}
 
+	/**
+	 * The language an admin is working in: the one the language switcher of
+	 * the admin bar is on, or the site's default while it shows every
+	 * language. Null without a multilingual plugin.
+	 */
+	public function admin_language(): ?string {
+		// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filters, asked as WPML documents them.
+		$code = match ( $this->provider() ) {
+			'wpml'     => apply_filters( 'wpml_current_language', null ),
+			'polylang' => function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : null,
+			default    => null,
+		};
+
+		if ( ! is_string( $code ) || '' === $code || 'all' === $code ) {
+			$code = match ( $this->provider() ) {
+				'wpml'     => apply_filters( 'wpml_default_language', null ),
+				'polylang' => function_exists( 'pll_default_language' ) ? pll_default_language( 'slug' ) : null,
+				default    => null,
+			};
+		}
+		// phpcs:enable
+
+		return is_string( $code ) && '' !== $code ? $code : null;
+	}
+
 	/** Null when it can't be resolved (neither plugin active, or the post has no language assigned). */
 	public function post_language( int $post_id ): ?string {
 		return match ( $this->provider() ) {
@@ -54,6 +79,39 @@ final class Multilingual_Support {
 			'polylang' => $this->polylang_post_language( $post_id ),
 			default    => null,
 		};
+	}
+
+	/**
+	 * The post and each of its translations; the post alone without a
+	 * multilingual plugin, or when it has none.
+	 *
+	 * @return array<int,int>
+	 */
+	public function post_translations( int $post_id ): array {
+		$ids = match ( $this->provider() ) {
+			'wpml'     => $this->wpml_post_translations( $post_id ),
+			'polylang' => function_exists( 'pll_get_post_translations' ) ? (array) pll_get_post_translations( $post_id ) : [],
+			default    => [],
+		};
+
+		return array_values( array_unique( array_filter( array_map( 'intval', [ $post_id, ...array_values( $ids ) ] ), static fn ( int $id ): bool => $id > 0 ) ) );
+	}
+
+	/**
+	 * The front page of the language the request is in, as the multilingual
+	 * plugin links it (`/en/`, or `?lang=en`), so a search handed to WordPress
+	 * stays in that language; the site's own without a multilingual plugin.
+	 */
+	public function home_url(): string {
+		$home = home_url( '/' );
+		$url  = match ( $this->provider() ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filter, asked as WPML documents it.
+			'wpml'     => apply_filters( 'wpml_home_url', $home ),
+			'polylang' => function_exists( 'pll_home_url' ) ? pll_home_url() : $home,
+			default    => $home,
+		};
+
+		return is_string( $url ) && '' !== $url ? $url : $home;
 	}
 
 	/** Polylang first - see the class docblock for why this can't be `Compatibility_Manager::get_multilingual_provider()`. */
@@ -89,6 +147,29 @@ final class Multilingual_Support {
 				array_filter( $languages, 'is_array' )
 			)
 		);
+	}
+
+	/**
+	 * @return array<int,int>
+	 */
+	private function wpml_post_translations( int $post_id ): array {
+		$post_type = get_post_type( $post_id );
+		$ids       = [];
+
+		if ( false === $post_type ) {
+			return [];
+		}
+
+		foreach ( $this->wpml_active_languages() as $language ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML's own filter, asked as WPML documents it.
+			$id = apply_filters( 'wpml_object_id', $post_id, $post_type, false, $language['code'] );
+
+			if ( is_numeric( $id ) ) {
+				$ids[] = (int) $id;
+			}
+		}
+
+		return $ids;
 	}
 
 	private function wpml_post_language( int $post_id ): ?string {

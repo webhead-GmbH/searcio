@@ -44,6 +44,32 @@ const refusalAction = (result, refusal) => {
 };
 
 /**
+ * Why the storefront's search key does not work from this site, or '' when
+ * it does: the write key can be connected while the search key is wrong, and
+ * then every visitor's search is WordPress's own.
+ *
+ * @param {?Object} result
+ * @return {string} The reason, or ''.
+ */
+export const searchKeyProblem = (result) => (
+	result?.ok && false === result?.search_key?.ok ? String(result.search_key.message || '') : ''
+);
+
+/**
+ * Whether the site's search index is empty although documents were sent: the
+ * counter of the plan says 526 while every search finds nothing. Searcio
+ * reports what the index holds (`documents.indexed`); 0 with nothing sent yet
+ * is a site that has not synced, which is no fault, and null is a check that
+ * could not tell.
+ *
+ * @param {?Object} result
+ * @return {boolean}
+ */
+export const indexIsEmpty = (result) => (
+	Boolean(result?.ok) && 0 === result?.documents?.indexed && Number(result?.documents?.used) > 0
+);
+
+/**
  * What a result says, in the words its notice prints.
  *
  * @param {?Object} result
@@ -84,7 +110,13 @@ const resultMessage = (result) => {
 		)
 		: '';
 
-	return detail + siteIdSuffix;
+	const keyProblem = searchKeyProblem(result);
+	const emptyIndex = indexIsEmpty(result)
+		? __('The search index of this site is empty, so every search finds nothing. Run a full sync on the Sync tab to fill it again.', 'searcio')
+		: '';
+	const said = detail + siteIdSuffix;
+
+	return [said, keyProblem, emptyIndex].filter(Boolean).join(' ');
 };
 
 const ConnectionResultNotice = ({result}) => {
@@ -93,7 +125,9 @@ const ConnectionResultNotice = ({result}) => {
 
 	// The answer of a test or a connect is read out as it arrives: a failure
 	// at once, a success when the screen reader is free.
-	useAnnounce(message, result?.ok && !refusal ? 'polite' : 'assertive');
+	const keyProblem = searchKeyProblem(result);
+
+	useAnnounce(message, result?.ok && !refusal && !keyProblem && !indexIsEmpty(result) ? 'polite' : 'assertive');
 
 	if (!result) {
 		return null;
@@ -120,7 +154,7 @@ const ConnectionResultNotice = ({result}) => {
 	}
 
 	return (
-		<Notice.Root intent={result.ok ? 'success' : 'error'}>
+		<Notice.Root intent={!result.ok || keyProblem ? 'error' : indexIsEmpty(result) ? 'warning' : 'success'}>
 			<Notice.Description>{message}</Notice.Description>
 		</Notice.Root>
 	);

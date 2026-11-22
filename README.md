@@ -16,10 +16,11 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/webhead-GmbH/searcio/releases/latest"><img alt="Plugin version" src="https://img.shields.io/badge/plugin-v1.4.0-blue?style=for-the-badge"></a>
-    <img alt="Required WordPress version" src="https://img.shields.io/badge/wordpress-%3E%3D6.8-blue?style=for-the-badge&logo=wordpress&logoColor=white">
-    <img alt="Tested up to WordPress version" src="https://img.shields.io/badge/tested_up_to-wordpress_7.1-green?style=for-the-badge&logo=wordpress&logoColor=white">
-    <img alt="Required PHP version" src="https://img.shields.io/badge/php-%3E%3D8.3-blue?style=for-the-badge&logo=php&logoColor=white">
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/v/searcio?style=for-the-badge" alt="WordPress Plugin Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/required-php/searcio?style=for-the-badge" alt="WordPress Plugin Required PHP Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/tested/searcio?style=for-the-badge" alt="WordPress Plugin: Tested WP Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/badge/woocommerce-v11.3.0_tested-brightgreen?style=for-the-badge" alt="WordPress Plugin: Tested WC Version"></a>
+    <a href="https://wordpress.org/plugins/searcio/"><img src="https://img.shields.io/wordpress/plugin/stars/searcio?style=for-the-badge" alt="WordPress Plugin Rating"></a>
 </p>
 
 <p align="center">
@@ -35,7 +36,8 @@
   and so on), with a minimum/maximum for numeric fields such as price or rating. The filters sit in one bar under the
   search field and apply as they are picked, in a popover, a side drawer or, on a phone, a sheet. Categories can be listed
   in one list, as main categories only, or as the shop's tree; an attribute's swatches from a swatches plugin or theme
-  show as color, image or label pills; and a field can need every picked value (AND) instead of any (OR).
+  show as color, image or label pills; a field can need every picked value (AND) instead of any (OR); your own number
+  fields filter as a range; and a color and a size can be matched on one variation that is in stock.
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, themeable with no code: colors, sizes, radius
@@ -49,7 +51,10 @@
 - **Configurable indexing** - choose which post types and WooCommerce products to index, and map custom fields,
   taxonomies, and built-in properties to searchable data.
 - **Search relevance control** - tune searchable fields and weights, per-type ranking boosts, facet and suggestion
-  fields, and synonyms - all from Searcio's own configuration, editable from the plugin's admin screen.
+  fields, and synonyms - all from Searcio's own configuration, editable from the plugin's admin screen in sections you
+  open one at a time.
+- **Profitable products first** - send what each product costs (never shown to shoppers) and the ones with a good margin
+  come first, with a target margin per category or brand and search terms it leaves alone.
 - **AI Assistant** - a chat tab that answers in prose and shows the products it is talking about, with a table to
   compare them.
 - **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
@@ -75,7 +80,7 @@ The AI Assistant, search by photo and the quiz appear when your Searcio plan and
 - PHP 8.3 or later
 - A [Searcio](https://searcio.com) account - one is created for you when you connect, if your email does
   not have one yet
-- WooCommerce 8.0+ (optional - only needed to index and search products)
+- WooCommerce 8.0+ (optional - only needed to index and search products), tested up to 11.3
 - WPML or Polylang (optional - only needed for multilingual search scoping)
 
 ## Works with
@@ -116,6 +121,7 @@ The user documentation is on searcio.com: https://searcio.com/en/docs/wordpress/
 
 ## Contributing and security
 
+- Open pull requests against the `1.x` branch, where the next 1.* release is made; `master` only takes releases. The [developer guide](docs/developers.md#branches) has the details.
 - Report a bug or suggest a feature with the [issue forms](https://github.com/webhead-GmbH/searcio/issues/new/choose).
 - Report a security vulnerability privately, as the [security policy](.github/SECURITY.md) explains: email support@searcio.com, never a public issue.
 - Everyone taking part follows the [code of conduct](.github/CODE_OF_CONDUCT.md).

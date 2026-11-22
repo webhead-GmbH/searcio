@@ -117,6 +117,41 @@ final class Change_Listener_Test extends Integration_Test_Case {
 		$this->assertSame( [], $this->queued_ids() );
 	}
 
+	/**
+	 * Polylang gives a post its language as a term of its own taxonomy, with
+	 * no save of the post, so a site that installs it after the catalogue was
+	 * indexed would keep documents without a language until the daily sync.
+	 */
+	public function test_a_language_given_to_a_post_without_saving_it_queues_the_post(): void {
+		register_taxonomy( 'language', 'post', [ 'public' => false ] );
+		register_taxonomy( 'post_translations', 'post', [ 'public' => false ] );
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$other   = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->empty_queue();
+
+		wp_set_object_terms( $post_id, 'de', 'language' );
+
+		$this->assertSame( [ $post_id ], $this->queued_ids() );
+
+		$this->empty_queue();
+		wp_set_object_terms( $post_id, 'pll_1', 'post_translations' );
+		wp_set_object_terms( $other, 'pll_1', 'post_translations' );
+
+		$this->assertEqualsCanonicalizing( [ $post_id, $other ], $this->queued_ids() );
+	}
+
+	public function test_a_taxonomy_that_is_not_a_language_does_not_queue_on_its_own(): void {
+		register_taxonomy( 'material', 'post', [ 'public' => false ] );
+
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+		$this->empty_queue();
+
+		wp_set_object_terms( $post_id, 'wool', 'material' );
+
+		$this->assertSame( [], $this->queued_ids(), 'The save of the post carries the terms; only the two taxonomies Polylang writes without one are heard.' );
+	}
+
 	private function post_in( int $term_id, string $status = 'publish' ): int {
 		return self::factory()->post->create( [ 'post_status' => $status, 'post_category' => [ $term_id ] ] );
 	}

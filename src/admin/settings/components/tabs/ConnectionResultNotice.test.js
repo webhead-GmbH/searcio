@@ -72,6 +72,42 @@ describe( 'ConnectionResultNotice', () => {
 		expect( links() ).toEqual( [] );
 	} );
 
+	// "falscher-key 123" was saved and the test said "Connected": it asks with
+	// the write key, and every visitor's search was WordPress's own.
+	it( 'says, as an error, that the search key does not work, after the connection', async () => {
+		await render( null );
+		await render( { ...SERVED, search_key: { ok: false, message: 'Searcio does not know the search key.' } } );
+
+		expect( container.textContent ).toContain( 'Connected - 96 / 300,000 documents indexed. (site #21) Searcio does not know the search key.' );
+		expect( speak ).toHaveBeenCalledWith( expect.stringContaining( 'does not know the search key' ), 'assertive' );
+	} );
+
+	it( 'says nothing of a search key that works', async () => {
+		await render( { ...SERVED, search_key: { ok: true, message: '' } } );
+
+		expect( container.textContent ).toContain( 'Connected - 96 / 300,000 documents indexed. (site #21)' );
+		expect( container.textContent ).not.toContain( 'search key' );
+	} );
+
+	// "526 indexed" was the plan's counter, and the index held nothing.
+	it( 'warns that the index is empty when Searcio says so, and says nothing when it cannot tell', async () => {
+		await render( null );
+		await render( { ...SERVED, documents: { used: 526, limit: 20000, indexed: 0 } } );
+
+		expect( container.textContent ).toContain( 'Connected - 526 / 20,000 documents indexed. (site #21) The search index of this site is empty' );
+		expect( speak ).toHaveBeenCalledWith( expect.stringContaining( 'The search index of this site is empty' ), 'assertive' );
+
+		await render( { ...SERVED, documents: { used: 526, limit: 20000, indexed: null } } );
+		expect( container.textContent ).not.toContain( 'index of this site is empty' );
+
+		await render( { ...SERVED, documents: { used: 526, limit: 20000, indexed: 526 } } );
+		expect( container.textContent ).not.toContain( 'index of this site is empty' );
+
+		// Nothing sent yet: an index that holds nothing is as it should be.
+		await render( { ...SERVED, documents: { used: 0, limit: 20000, indexed: 0 } } );
+		expect( container.textContent ).not.toContain( 'index of this site is empty' );
+	} );
+
 	it( 'says why an account without a plan is refused, and links to choosing one', async () => {
 		await render( refused( 'no_active_plan' ) );
 

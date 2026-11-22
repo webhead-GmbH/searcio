@@ -58,6 +58,11 @@ final class Search_Cloud_Client {
 		return '' !== $write_key && '' !== $write_secret;
 	}
 
+	/** The public search key the storefront sends, as saved. */
+	public function search_key(): string {
+		return trim( (string) $this->settings->get( Plugin_Settings::SEARCH_KEY ) );
+	}
+
 	/**
 	 * The write key alone, decrypted, for contexts that must never see the
 	 * secret half (e.g. the public domain-ownership {@see \Webhead\WP\SearchCloud\Routing\Verify_Endpoint}).
@@ -154,10 +159,29 @@ final class Search_Cloud_Client {
 	}
 
 	/**
-	 * @param  array<int,array<string,mixed>>  $documents  1-1000 documents.
+	 * `sync_type` names the run in Searcio's sync history: `incremental` for
+	 * the drain's few changed documents, which it called a "Full sync".
+	 *
+	 * `run_reference` joins the requests of one run into one row of that
+	 * history, instead of a row for each batch (a post type at a time, 200 at
+	 * most): the same reference, within a day, is the same run. Without one the
+	 * request is a run of its own.
+	 *
+	 * @param  array<int,array<string,mixed>>  $documents      1-1000 documents.
+	 * @param  bool                            $incremental    Sent by the incremental drain.
+	 * @param  string                          $run_reference  Up to 64 letters, digits and `.`, `_`, `:`, `-`; none for a request that is a run of its own.
 	 */
-	public function bulk_upsert( array $documents ): Api_Response {
-		return $this->request( 'POST', '/documents', [ 'documents' => array_values( $documents ) ] );
+	public function bulk_upsert( array $documents, bool $incremental = false, string $run_reference = '' ): Api_Response {
+		$body = [
+			'documents' => array_values( $documents ),
+			'sync_type' => $incremental ? 'incremental' : 'full',
+		];
+
+		if ( 1 === preg_match( '/^[A-Za-z0-9._:-]{1,64}$/', $run_reference ) ) {
+			$body['run_reference'] = $run_reference;
+		}
+
+		return $this->request( 'POST', '/documents', $body );
 	}
 
 	/**
@@ -183,6 +207,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'PUT', '/search-config', $payload );
 
 		$this->forget( 'search_config' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -205,6 +230,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'POST', '/quiz-templates', $quiz, true, false );
 
 		$this->forget( 'quizzes' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -220,6 +246,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'PUT', '/quiz-templates/' . $id, $changes );
 
 		$this->forget( 'quizzes' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -228,6 +255,7 @@ final class Search_Cloud_Client {
 		$response = $this->request( 'DELETE', '/quiz-templates/' . $id );
 
 		$this->forget( 'quizzes' );
+		$this->storefront_changed( $response );
 
 		return $response;
 	}
@@ -275,24 +303,43 @@ final class Search_Cloud_Client {
 		return $response;
 	}
 
+	/**
+	 * A change the storefront keeps a copy of for a visit: the search
+	 * settings decide its tabs and the quizzes fill one. The copies are keyed
+	 * by {@see Plugin_Settings::STOREFRONT_VERSION}, so a new one makes them
+	 * stale on the next page.
+	 */
+	private function storefront_changed( Api_Response $response ): void {
+		if ( $response->ok() ) {
+			$this->settings->set( Plugin_Settings::STOREFRONT_VERSION, time() );
+		}
+	}
+
 	private function forget( string $name ): void {
 		$this->cache_manager->transients()->delete( $this->read_key( $name ) );
 	}
 
 	/**
-	 * Named after the write key as well: keys entered anew read afresh.
+	 * Named after the write key and the secret as well: keys entered anew read
+	 * afresh. After the write key alone, a secret corrected under the same key
+	 * read what the right pair had answered earlier, and a wrong one too.
 	 */
 	private function read_key( string $name ): Cache_Key {
-		return $this->cache_manager->key( $name . '_' . substr( wp_hash( $this->write_key() ), 0, 12 ), self::READS );
+		[ $write_key, $write_secret ] = $this->credentials();
+
+		return $this->cache_manager->key( $name . '_' . substr( wp_hash( $write_key . '|' . $write_secret ), 0, 12 ), self::READS );
 	}
 
 	/**
 	 * Every way a question graph can end, saved or not, with its product count.
+	 * A quiz in one language is offered on that language's pages alone, so its
+	 * products are counted in that language (`lang`, which a service before it
+	 * ignores).
 	 *
 	 * @param  array<int,array<string,mixed>>  $questions
 	 */
-	public function quiz_endings( array $questions ): Api_Response {
-		return $this->request( 'POST', '/quiz-templates/endings', [ 'questions' => $questions ] );
+	public function quiz_endings( array $questions, ?string $lang = null ): Api_Response {
+		return $this->request( 'POST', '/quiz-templates/endings', [ 'questions' => $questions ] + ( null !== $lang && '' !== $lang ? [ 'lang' => $lang ] : [] ) );
 	}
 
 	/**
@@ -309,22 +356,34 @@ final class Search_Cloud_Client {
 	 * The Searcio host comes from a single hard-coded constant, overridable
 	 * per environment in wp-config.php. Key-relative - no site id in the path;
 	 * the API resolves the site from the write key + secret sent in the request
-	 * headers below (see docs/api/README.md "Key-relative endpoints").
+	 * headers below (see docs/api/README.md "Key-relative endpoints"), and the
+	 * storefront's requests from the search key.
 	 */
-	private function base(): string {
+	public function endpoint(): string {
 		$host = defined( 'Webhead\WP\SearchCloud\SERVICE_URL' ) ? \Webhead\WP\SearchCloud\SERVICE_URL : '';
 
 		return rtrim( (string) $host, '/' ) . '/api/v1';
 	}
 
 	/**
+	 * Only the endpoints of the write key, and `POST /connect`, which takes no
+	 * key: Searcio refuses a search-key request that does not come from a
+	 * visitor's browser on the site, so the storefront's are the browser's.
+	 *
 	 * @param  array<string,mixed>|null  $body
-	 * @param  bool                      $retry  Whether a failure that may pass is asked again.
+	 * @param  bool                      $retry  Whether a failure that may pass is asked again. Not in a request somebody waits for, see {@see self::is_waited_for()}.
 	 */
 	private function request( string $method, string $path, ?array $body = null, bool $authenticated = true, bool $retry = true ): Api_Response {
-		$url = $this->base() . $path;
+		$url   = $this->endpoint() . $path;
+		$retry = $retry && ! $this->is_waited_for();
 
-		$headers = [ 'Accept' => 'application/json' ];
+		// The language of the screen, or of the site, so that what Searcio says
+		// back - a field it refuses, for one - can be in it: it answered an
+		// English screen in German.
+		$headers = [
+			'Accept'          => 'application/json',
+			'Accept-Language' => str_replace( '_', '-', determine_locale() ),
+		];
 
 		if ( $authenticated ) {
 			[ $write_key, $write_secret ] = $this->credentials();
@@ -369,6 +428,19 @@ final class Search_Cloud_Client {
 		} while ( $attempt < self::MAX_ATTEMPTS );
 
 		return $result;
+	}
+
+	/**
+	 * Whether somebody is waiting for the answer, in wp-admin: a screen of the
+	 * plugin asks through the REST API, and Searcio that does not answer would
+	 * hold the request for three tries of fifteen seconds and the waits between
+	 * them, longer than the time limit many hosts give a request. The screen
+	 * then shows a server error where it could say that Searcio did not answer.
+	 * Such a request asks once. What runs in the background asks again, and the
+	 * sync and the drain have their own way of sending a batch later.
+	 */
+	private function is_waited_for(): bool {
+		return wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST );
 	}
 
 	private function sleep( int $attempt, ?int $retry_after = null ): void {

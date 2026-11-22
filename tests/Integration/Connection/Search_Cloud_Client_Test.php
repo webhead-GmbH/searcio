@@ -50,6 +50,59 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertSame( 2, $calls->get );
 	}
 
+	/**
+	 * Searcio answers in the language of `Accept-Language`, and in German
+	 * without it: an English screen was answered in German. Every request, the
+	 * save of the search configuration included, says the language of the
+	 * screen.
+	 */
+	public function test_every_request_says_the_language_of_the_screen(): void {
+		$this->connect_client();
+		$languages = [];
+
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$languages ): array {
+				$languages[] = $args['headers']['Accept-Language'] ?? null;
+
+				return $this->http_ok( [ 'ok' => true ] );
+			}
+		);
+
+		$locale = static fn (): string => 'de_DE';
+
+		$this->client()->update_search_config( [ 'weights' => [ 'title' => 8 ] ] );
+		add_filter( 'locale', $locale );
+		$this->client()->update_search_config( [ 'weights' => [ 'title' => 9 ] ] );
+		remove_filter( 'locale', $locale );
+
+		$this->assertSame( [ 'en-US', 'de-DE' ], $languages );
+	}
+
+	/**
+	 * Searcio's sync history made a row of every request, a post type and 200
+	 * documents at a time. Requests that name the same run are one row.
+	 */
+	public function test_batches_of_one_run_name_it(): void {
+		$this->connect_client();
+		$sent = [];
+
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$sent ): array {
+				$sent[] = json_decode( (string) ( $args['body'] ?? '' ), true );
+
+				return $this->http_ok( [ 'status' => 'queued' ], 202 );
+			}
+		);
+
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-1' ] ], false, '0b6c5a52-6f0b-4c9e-8d84-3d1f2f2c9a11' );
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-2' ] ], false, 'a reference with spaces and more than sixty-four characters is no reference at all' );
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-3' ] ] );
+
+		$this->assertSame( '0b6c5a52-6f0b-4c9e-8d84-3d1f2f2c9a11', $sent[0]['run_reference'] );
+		$this->assertArrayNotHasKey( 'run_reference', $sent[1], 'A reference Searcio would refuse is not sent: it refuses the batch with it.' );
+		$this->assertArrayNotHasKey( 'run_reference', $sent[2], 'A request without one is a run of its own, as before.' );
+	}
+
 	public function test_the_quizzes_are_read_once_until_one_is_made_changed_or_deleted(): void {
 		$this->connect_client();
 		$calls = $this->count_requests( [ 'quizzes' => [] ] );
@@ -96,6 +149,34 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->assertGreaterThan( $after_first, $calls );
 	}
 
+	/**
+	 * Searcio that does not answer used to hold a screen of the plugin for three
+	 * tries and the waits between them, longer than the time limit of many
+	 * hosts, so the screen showed a server error. Somebody waiting asks once;
+	 * a task in the background asks again.
+	 */
+	public function test_a_request_somebody_waits_for_asks_once_and_a_background_task_asks_again(): void {
+		$this->connect_client();
+		$calls = 0;
+		$this->fake_http( function () use ( &$calls ): array {
+			++$calls;
+
+			// An answer that says to ask again at once, so that the tries do not wait.
+			return array_merge( $this->http_ok( [ 'message' => 'Unavailable' ], 503 ), [ 'headers' => [ 'retry-after' => '0' ] ] );
+		} );
+
+		$this->client()->get_search_config( true );
+		$background = $calls;
+
+		$calls = 0;
+		add_filter( 'wp_doing_ajax', '__return_true' );
+		$this->client()->get_search_config( true );
+		remove_filter( 'wp_doing_ajax', '__return_true' );
+
+		$this->assertGreaterThan( 1, $background, 'A task in the background asks again.' );
+		$this->assertSame( 1, $calls, 'A request somebody waits for asks once.' );
+	}
+
 	public function test_keys_entered_anew_read_afresh(): void {
 		$this->connect_client();
 		$calls = $this->count_requests( [ 'weights' => [] ] );
@@ -103,6 +184,22 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		$this->client()->get_search_config();
 		$this->settings()->set( \Webhead\WP\SearchCloud\Settings\Plugin_Settings::WRITE_KEY, \Webhead\WP\SearchCloud\Settings\Plugin_Settings::encrypt_secret( 'another-write-key' ) );
 		$this->client()->get_search_config();
+
+		$this->assertSame( 2, $calls->get );
+	}
+
+	/**
+	 * A secret corrected under the same write key read what the right pair
+	 * had answered before, as a wrong one did: the kept answers are named
+	 * after the pair.
+	 */
+	public function test_a_secret_entered_anew_reads_afresh(): void {
+		$this->connect_client();
+		$calls = $this->count_requests( [ 'site' => [ 'id' => 7 ] ] );
+
+		$this->client()->health();
+		$this->settings()->set( \Webhead\WP\SearchCloud\Settings\Plugin_Settings::WRITE_SECRET, \Webhead\WP\SearchCloud\Settings\Plugin_Settings::encrypt_secret( 'another-write-secret' ) );
+		$this->client()->health();
 
 		$this->assertSame( 2, $calls->get );
 	}
@@ -124,6 +221,28 @@ final class Search_Cloud_Client_Test extends Integration_Test_Case {
 		} );
 
 		return $calls;
+	}
+
+	/**
+	 * Searcio's sync history called every batch a "Full sync", the drain's
+	 * three changed documents too.
+	 */
+	public function test_a_batch_says_whether_it_is_part_of_a_full_or_an_incremental_sync(): void {
+		$this->connect_client();
+
+		$sent = [];
+		$this->fake_http( function ( string $url, array $args ) use ( &$sent ): array {
+			$sent[] = json_decode( (string) ( $args['body'] ?? '' ), true );
+
+			return $this->http_ok( [ 'status' => 'queued' ], 202 );
+		} );
+
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-1', 'title' => 'A' ] ] );
+		$this->client()->bulk_upsert( [ [ 'id' => 'post-2', 'title' => 'B' ] ], true );
+
+		$this->assertSame( 'full', $sent[0]['sync_type'] );
+		$this->assertSame( [ [ 'id' => 'post-1', 'title' => 'A' ] ], $sent[0]['documents'] );
+		$this->assertSame( 'incremental', $sent[1]['sync_type'] );
 	}
 
 	public function test_disconnect_sends_a_delete_request_with_the_write_credentials(): void {

@@ -40,7 +40,7 @@ const CacheClearCard = () => {
 					</Card.Title>
 					<Text render={ <p /> } variant="body-sm">
 						{ __(
-							"Clears this plugin's own cached data and PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own.",
+							"Clears this plugin's own cached data and its files in PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own. Other sites on the same server are not touched.",
 							'searcio'
 						) }
 					</Text>

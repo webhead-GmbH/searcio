@@ -5,7 +5,10 @@
  */
 
 import {
+	changedSince,
 	cleanTerms,
+	enabledTypeLabels,
+	repeatsRedirect,
 	errorsUnder,
 	FEATURE_KEYS,
 	idsToText,
@@ -15,11 +18,18 @@ import {
 	normalizeFacetMatch,
 	normalizeFeatures,
 	normalizeMerchandising,
+	normalizeProfitRanking,
 	normalizeRedirects,
+	numberFieldChoices,
+	profitRankingPayload,
+	profitRankingProblems,
+	profitRulesSent,
+	sendsPurchasePrice,
 	termsToText,
 	textToIds,
 	textToTerms,
 	toPayload,
+	variantFieldChoices,
 } from './searchConfig';
 
 describe( 'normalizeFeatures', () => {
@@ -61,7 +71,23 @@ describe( 'normalizeMerchandising', () => {
 			hidden: [ 'p-9' ],
 			banner: 'Sale',
 			lang: null,
+			match: null,
 		} ] );
+	} );
+
+	// A rule set to "exact" in the Searcio dashboard came back as "contains"
+	// once the tab saved its rules: the tab did not keep the option.
+	it( 'keeps whether a rule fires on the exact term, and sends it back', () => {
+		const config = normalizeConfig( { merchandising: [ { query: 'kopfhörer', match: 'exact' }, { query: 'jacke', match: 'contains' }, { query: 'sale' } ] } );
+
+		expect( config.merchandising.map( ( rule ) => rule.match ) ).toEqual( [ 'exact', null, null ] );
+
+		const payload = toPayload( config );
+
+		expect( payload.merchandising[ 0 ].match ).toBe( 'exact' );
+		// "Contains" is the default and goes unsaid, for a service from before the option.
+		expect( payload.merchandising[ 1 ] ).not.toHaveProperty( 'match' );
+		expect( payload.merchandising[ 2 ] ).not.toHaveProperty( 'match' );
 	} );
 
 	it( 'keeps the language a rule fires in, and reads none as every language', () => {
@@ -92,6 +118,7 @@ describe( 'normalizeMerchandising', () => {
 			hidden: [],
 			banner: '',
 			lang: null,
+			match: null,
 		} );
 	} );
 
@@ -120,7 +147,7 @@ describe( 'normalizeMerchandising', () => {
 describe( 'normalizeRedirects', () => {
 	it( 'keeps a rule whole', () => {
 		expect( normalizeRedirects( [ { query: 'black friday', url: 'https://example.com/bf' } ] ) ).toEqual( [
-			{ query: 'black friday', url: 'https://example.com/bf' },
+			{ query: 'black friday', url: 'https://example.com/bf', lang: null },
 		] );
 	} );
 
@@ -129,7 +156,7 @@ describe( 'normalizeRedirects', () => {
 	} );
 
 	it( 'fills in a half-written rule so both inputs stay editable', () => {
-		expect( normalizeRedirects( [ { query: 'bf' } ] ) ).toEqual( [ { query: 'bf', url: '' } ] );
+		expect( normalizeRedirects( [ { query: 'bf' } ] ) ).toEqual( [ { query: 'bf', url: '', lang: null } ] );
 	} );
 
 	/**
@@ -162,7 +189,7 @@ describe( 'normalizeConfig', () => {
 
 		expect( config.searchable_fields ).toEqual( [ { field: 'title', weight: 5 } ] );
 		expect( config.merchandising ).toHaveLength( 1 );
-		expect( config.redirects ).toEqual( [ { query: 'black friday', url: '/bf' } ] );
+		expect( config.redirects ).toEqual( [ { query: 'black friday', url: '/bf', lang: null } ] );
 		expect( config.features.ai_search.status ).toBe( 'indexing' );
 		expect( config.features.visual_tagging.available ).toBe( false );
 		expect( config.features.visual_search.available ).toBe( false );
@@ -450,5 +477,255 @@ describe( 'document id lists', () => {
 
 	it( 'reads an empty field as no ids', () => {
 		expect( textToIds( '' ) ).toEqual( [] );
+	} );
+} );
+
+/**
+ * A boost is matched against the type the documents carry. Keyed by the post
+ * type, a boost for posts renamed "artikel" asked for "post" and had no
+ * effect.
+ */
+describe( 'enabledTypeLabels', () => {
+	it( 'names each indexed content type by the type its documents carry', () => {
+		const catalog = {
+			post_types: [
+				{ slug: 'post', label: 'Beiträge', config: { enabled: true, type: 'artikel' } },
+				{ slug: 'page', label: 'Seiten', config: { enabled: true, type: 'page' } },
+				{ slug: 'ratgeber', label: 'Ratgeber', config: { enabled: true } },
+				{ slug: 'faq', label: 'FAQ', config: { enabled: false, type: 'faq' } },
+			],
+		};
+
+		expect( enabledTypeLabels( catalog ) ).toEqual( { artikel: 'Beiträge', page: 'Seiten', ratgeber: 'Ratgeber' } );
+		expect( enabledTypeLabels( null ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'profit ranking', () => {
+	const RANKING = {
+		enabled: true,
+		strength: 15,
+		target: 25,
+		min_profit: null,
+		rules: [ { field: 'categories', value: 'Clearance', target: null, exclude: true } ],
+		excluded_terms: [ 'acme' ],
+	};
+
+	it( 'is offered only once Searcio reports it, and read as it reports it', () => {
+		expect( normalizeConfig( {} ).profit_ranking ).toBeNull();
+		expect( normalizeProfitRanking( RANKING ) ).toEqual( RANKING );
+		expect( normalizeProfitRanking( { enabled: 1, strength: 'x' } ) ).toEqual( { enabled: true, strength: 15, target: 25, min_profit: null, rules: [], excluded_terms: [] } );
+	} );
+
+	// A Searcio that has the switch for listings without a search term reports
+	// it, and keeps what the panel set when a plugin leaves it out.
+	it( 'carries the switch for listings only where Searcio has it', () => {
+		const withListings = { ...RANKING, listings: false };
+		const read = normalizeConfig( { profit_ranking: withListings } );
+
+		expect( read.profit_ranking.listings ).toBe( false );
+		expect( normalizeProfitRanking( { ...RANKING, listings: 'yes' } ) ).not.toHaveProperty( 'listings' );
+		expect( profitRankingPayload( read.profit_ranking ) ).toHaveProperty( 'listings', false );
+		expect( profitRankingPayload( normalizeProfitRanking( RANKING ) ) ).not.toHaveProperty( 'listings' );
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, listings: true } }, read ) ).toEqual( {
+			profit_ranking: { ...RANKING, listings: true },
+		} );
+	} );
+
+	// Searcio takes it whole; a save that changes something else leaves it out.
+	it( 'is sent whole when it changed, and not at all otherwise', () => {
+		const read = normalizeConfig( { profit_ranking: RANKING, synonyms: [] } );
+
+		expect( toPayload( { ...read, synonyms: [ 'a, b' ] }, read ) ).toEqual( { synonyms: [ 'a, b' ] } );
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, target: 30 } }, read ) ).toEqual( {
+			profit_ranking: { ...RANKING, target: 30 },
+		} );
+		// A value typed as it was read is no change.
+		expect( toPayload( { ...read, profit_ranking: { ...read.profit_ranking, strength: '15' } }, read ) ).toEqual( {} );
+	} );
+
+	it( 'sends numbers for what the fields hold, no target for a rule that never lifts, and no untouched row', () => {
+		expect( profitRankingPayload( {
+			enabled: true,
+			strength: '20',
+			target: '12,5',
+			min_profit: '',
+			rules: [
+				{ field: ' brands ', value: 'Our own', target: '45', exclude: false },
+				{ field: 'categories', value: 'Clearance', target: 30, exclude: true },
+				{ field: '', value: '', target: null, exclude: false },
+				{ field: 'categories', value: '', target: '10', exclude: false },
+			],
+			excluded_terms: [ ' Acme ', 'acme', '' ],
+		} ) ).toEqual( {
+			enabled: true,
+			strength: 20,
+			target: 12.5,
+			min_profit: null,
+			rules: [
+				{ field: 'brands', value: 'Our own', target: 45, exclude: false },
+				{ field: 'categories', value: 'Clearance', target: null, exclude: true },
+				// Half a rule goes, for Searcio to say what is missing under it.
+				{ field: 'categories', value: '', target: 10, exclude: false },
+			],
+			excluded_terms: [ 'Acme' ],
+		} );
+	} );
+
+	// Searcio counts an error by the position in the list it was sent: a blank
+	// row above a target would have put its message under the wrong row.
+	it( 'knows which targets are sent, so an error is shown under its own row', () => {
+		const rules = [
+			{ field: 'categories', value: 'Shoes', target: 20, exclude: false },
+			{ field: '', value: '', target: null, exclude: false },
+			{ field: ' ', value: 'Navy', target: null, exclude: false },
+		];
+
+		expect( profitRulesSent( rules ) ).toEqual( [ 0, 2 ] );
+		expect( profitRulesSent( undefined ) ).toEqual( [] );
+	} );
+
+	// Searcio's messages name a field by its key ("profit_ranking.rules.2.target") and come in its own language.
+	it( 'finds what Searcio would refuse, under the keys it would use', () => {
+		const valid = { ...RANKING, strength: '20', target: '12,5', min_profit: '' };
+
+		expect( profitRankingProblems( valid ) ).toEqual( {} );
+		expect( profitRankingProblems( { ...valid, strength: 60, target: 0, min_profit: -1 } ) ).toEqual( {
+			'profit_ranking.strength': [ 'invalid' ],
+			'profit_ranking.target': [ 'invalid' ],
+			'profit_ranking.min_profit': [ 'invalid' ],
+		} );
+		expect( profitRankingProblems( { ...valid, strength: '', target: 'abc' } ) ).toHaveProperty( [ 'profit_ranking.strength' ] );
+		expect( profitRankingProblems( { ...valid, min_profit: 'abc' } ) ).toHaveProperty( [ 'profit_ranking.min_profit' ] );
+	} );
+
+	it( 'names a target by its position in what is sent, and lets a target that never lifts have none', () => {
+		const rules = [
+			{ field: 'categories', value: 'Shoes', target: 20, exclude: false },
+			{ field: '', value: '', target: null, exclude: false },
+			{ field: 'categories', value: 'Clearance', target: null, exclude: false },
+			{ field: 'brands', value: 'Own', target: null, exclude: true },
+			{ field: '', value: 'Navy', target: 30, exclude: false },
+		];
+
+		expect( profitRankingProblems( { ...RANKING, rules } ) ).toEqual( {
+			// The blank row is not counted: "Clearance" is the second target sent.
+			'profit_ranking.rules.1.target': [ 'invalid' ],
+			'profit_ranking.rules.3.field': [ 'invalid' ],
+		} );
+	} );
+
+	// Turned on in the dashboard without purchase prices, it lifted nothing and nothing said why.
+	it( 'knows whether the products are indexed with a purchase price', () => {
+		const catalog = ( config ) => ( { post_types: [ { slug: 'post', is_product: false, config: { enabled: true } }, { slug: 'product', is_product: true, config } ] } );
+
+		expect( sendsPurchasePrice( catalog( { enabled: true, woo: { cost_price: true } } ) ) ).toBe( true );
+		expect( sendsPurchasePrice( catalog( { enabled: true, woo: { cost_price: false } } ) ) ).toBe( false );
+		expect( sendsPurchasePrice( catalog( { enabled: false, woo: { cost_price: true } } ) ) ).toBe( false );
+		expect( sendsPurchasePrice( null ) ).toBe( false );
+	} );
+} );
+
+describe( 'number and variant fields', () => {
+	// Each change rebuilds the site's index on Searcio.
+	it( 'offers them only once Searcio reports them, and sends them only when changed', () => {
+		expect( normalizeConfig( {} ).numeric_fields ).toBeNull();
+		expect( normalizeConfig( {} ).variant_fields ).toBeNull();
+
+		const read = normalizeConfig( { numeric_fields: [ 'gewicht', 7 ], variant_fields: [ 'attr_farbe' ], synonyms: [] } );
+
+		expect( read.numeric_fields ).toEqual( [ 'gewicht' ] );
+		expect( toPayload( { ...read, synonyms: [ 'a, b' ] }, read ) ).toEqual( { synonyms: [ 'a, b' ] } );
+		expect( toPayload( { ...read, numeric_fields: [ 'gewicht', 'laenge', 'gewicht' ] }, read ) ).toEqual( { numeric_fields: [ 'gewicht', 'laenge' ] } );
+		expect( toPayload( { ...read, variant_fields: [ 'attr_farbe', 'attr_groesse' ] }, read ) ).toEqual( { variant_fields: [ 'attr_farbe', 'attr_groesse' ] } );
+		expect( toPayload( normalizeConfig( {} ), normalizeConfig( {} ) ) ).toEqual( {} );
+	} );
+
+	// Searcio refuses the fields it maps itself (422), and maps the prices and the rating as numbers already.
+	it( 'offers as number fields only the site\'s own, and as variant fields the attributes', () => {
+		const indexed = [ 'title', 'type', 'price', 'rating', 'gewicht', 'attr_farbe', 'categories', 'published_at' ];
+
+		expect( numberFieldChoices( indexed ) ).toEqual( [ 'gewicht', 'attr_farbe', 'categories' ] );
+		expect( variantFieldChoices( indexed ) ).toEqual( [ 'attr_farbe' ] );
+	} );
+} );
+
+describe( 'repeatsRedirect', () => {
+	it( 'flags a later redirect whose term an earlier one has, whatever its capitals and spaces', () => {
+		const rules = [ { query: 'versand' }, { query: 'Retoure' }, { query: 'VERSAND ' }, { query: '' }, { query: '' } ];
+
+		expect( repeatsRedirect( rules, 0 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 4 ) ).toBe( false );
+	} );
+
+	// Searcio follows the first redirect that matches the term and the page's language.
+	it( 'flags it only where an earlier one is followed in its language too', () => {
+		const rules = [
+			{ query: 'versand', lang: 'de' },
+			{ query: 'versand', lang: 'en' },
+			{ query: 'versand', lang: 'de' },
+			{ query: 'retoure', lang: null },
+			{ query: 'retoure', lang: 'en' },
+			{ query: 'agb', lang: 'de' },
+			{ query: 'agb', lang: null },
+		];
+
+		expect( repeatsRedirect( rules, 1 ) ).toBe( false );
+		expect( repeatsRedirect( rules, 2 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 4 ) ).toBe( true );
+		expect( repeatsRedirect( rules, 6 ) ).toBe( false );
+	} );
+} );
+
+describe( 'a redirect\'s language', () => {
+	// A save from the tab took the language off every redirect given one in the dashboard.
+	it( 'keeps the language Searcio returns, and sends it only for one language', () => {
+		const read = normalizeConfig( {
+			redirects: [
+				{ query: 'versand', url: '/de/versand', lang: 'de' },
+				{ query: 'shipping', url: '/en/shipping', lang: null },
+				{ query: 'agb', url: '/agb' },
+			],
+		} );
+
+		expect( read.redirects.map( ( rule ) => rule.lang ) ).toEqual( [ 'de', null, null ] );
+		expect( toPayload( { ...read, redirects: [ ...read.redirects, { query: 'faq', url: '/faq', lang: 'en' } ] }, read ).redirects ).toEqual( [
+			{ query: 'versand', url: '/de/versand', lang: 'de' },
+			{ query: 'shipping', url: '/en/shipping' },
+			{ query: 'agb', url: '/agb' },
+			{ query: 'faq', url: '/faq', lang: 'en' },
+		] );
+	} );
+} );
+
+describe( 'changedSince', () => {
+	const persisted = {
+		type_boosts: [ { type: 'product', boost: 1 }, { type: 'ratgeber', boost: 1 } ],
+		searchable_fields: [ { field: 'title', weight: 5 }, { field: 'content', weight: 1 } ],
+		synonyms: [],
+		features: { visual_search: { enabled: false }, assistant: { enabled: true } },
+	};
+
+	// A boost changed in the Searcio dashboard went back to 1 when the tab
+	// saved its boosts, read ten minutes before.
+	it( 'names a section the save would write that changed since the tab read it', () => {
+		const live = { ...persisted, type_boosts: [ { type: 'product', boost: 1 }, { type: 'ratgeber', boost: 3 } ] };
+
+		expect( changedSince( { type_boosts: persisted.type_boosts }, live, persisted ) ).toEqual( [ 'type_boosts' ] );
+	} );
+
+	it( 'lets through a save of sections nobody changed meanwhile', () => {
+		const live = { ...persisted, searchable_fields: [ { field: 'title', weight: 5 }, { field: 'content', weight: 2 } ] };
+
+		expect( changedSince( { synonyms: [ [ 'hoodie', 'sweater' ] ] }, live, persisted ) ).toEqual( [] );
+	} );
+
+	it( 'looks only at the feature switches the save sends', () => {
+		const live = { ...persisted, features: { visual_search: { enabled: false }, assistant: { enabled: false } } };
+
+		expect( changedSince( { features: { visual_search: { enabled: true } } }, live, persisted ) ).toEqual( [] );
+		expect( changedSince( { features: { assistant: { enabled: true } } }, live, persisted ) ).toEqual( [ 'features' ] );
 	} );
 } );

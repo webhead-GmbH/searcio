@@ -4,8 +4,10 @@
 name: Run Tests
 
 on:
+  # Work is merged into the major version's branch (1.x), and that branch
+  # into master for a release: both get the tests.
   pull_request:
-    branches: [ master ]
+    branches: [ master, '*.x' ]
   workflow_call:
 
 jobs:

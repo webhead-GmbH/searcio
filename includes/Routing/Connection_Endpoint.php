@@ -52,13 +52,27 @@ final class Connection_Endpoint extends Rest_API {
 	 */
 	#[Route( '/connection/test', methods: 'POST', permission_callback: 'can_view', args: [ 'fresh' => [ 'type' => 'boolean', 'default' => false ] ] )]
 	public function test_connection( WP_REST_Request $request ): WP_REST_Response {
-		$response = $this->client->health( (bool) $request->get_param( 'fresh' ) );
+		$fresh    = (bool) $request->get_param( 'fresh' );
+		$response = $this->client->health( $fresh );
 
 		// The storefront decides on the Searcio logo from the tier, and asks
 		// nobody: it is kept whenever an admin screen checks the connection.
 		$this->connection_state->remember_plan( $response );
 
-		return new WP_REST_Response( $this->present( $response ) );
+		$presented = $this->present( $response );
+
+		// Whether Searcio takes the storefront's search key is asked by the
+		// screen, from the browser (`searchKeyCheck.js`), as a visitor's page
+		// asks: a key works only on the site it was connected from, and
+		// Searcio refuses a search-key request from the site's server.
+		if ( ! empty( $presented['ok'] ) ) {
+			$presented['search_key'] = [
+				'key'      => $this->client->search_key(),
+				'endpoint' => $this->client->endpoint(),
+			];
+		}
+
+		return new WP_REST_Response( $presented );
 	}
 
 	/**
@@ -235,6 +249,10 @@ final class Connection_Endpoint extends Rest_API {
 				'limit'      => isset( $documents['limit'] ) ? ( null === $documents['limit'] ? null : (int) $documents['limit'] ) : null,
 				'percent'    => isset( $documents['percent'] ) ? (int) $documents['percent'] : null,
 				'near_limit' => (bool) ( $documents['near_limit'] ?? false ),
+				// What the site's index holds right now, which `used` (the
+				// account's counter, as of the last sync) cannot say: 0 is an
+				// empty or missing index, null that Searcio could not tell.
+				'indexed'    => isset( $documents['indexed'] ) && is_numeric( $documents['indexed'] ) ? (int) $documents['indexed'] : null,
 			],
 			// Every metered allowance, not just documents: a site that has spent
 			// its monthly searches or AI messages has a storefront that is

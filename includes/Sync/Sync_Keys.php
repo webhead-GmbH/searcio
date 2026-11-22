@@ -37,6 +37,14 @@ final class Sync_Keys {
 	public const OPTION_SNAPSHOT = 'searcio_index_snapshot';
 	public const OPTION_SEEN     = 'searcio_sync_seen';
 
+	/**
+	 * A fingerprint of the account whose index the last completed full run left
+	 * the documents of: the write key names the site at Searcio. The skip of a
+	 * document that has not changed is only right for the index it was sent
+	 * to, so keys of another account have the next run send everything.
+	 */
+	public const OPTION_INDEX_OWNER = 'searcio_index_owner';
+
 	/** Document ids still pending deletion in the prune phase (resumable). */
 	public const OPTION_PRUNE = 'searcio_sync_prune';
 

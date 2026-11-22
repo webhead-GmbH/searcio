@@ -203,8 +203,8 @@ test.describe( 'Placement tab', () => {
 		await page.reload();
 		await expect( sectionTab( page, 'Look' ) ).toHaveAttribute( 'aria-selected', 'true', LOADED );
 
-		// Another tab of the screen has no sections; the address forgets it.
-		await page.locator( SCREEN ).getByRole( 'tab', { name: 'Search Config' } ).click();
+		// A tab of the screen that lists no sections; the address forgets it.
+		await page.locator( SCREEN ).getByRole( 'tab', { name: 'Sync' } ).click();
 		await expect.poll( () => new URL( page.url() ).searchParams.get( 'section' ) ).toBeNull();
 	} );
 

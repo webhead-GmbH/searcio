@@ -85,7 +85,7 @@ class Products_Widget extends Widget {
 			[
 				'label'       => __( 'Product', 'searcio' ),
 				'type'        => Controls_Manager::TEXT,
-				'description' => __( 'Leave empty to use whichever product the visitor is viewing.', 'searcio' ),
+				'description' => __( 'The ID WordPress shows for the product, such as 119. Leave empty to use whichever product the visitor is viewing.', 'searcio' ),
 				'condition'   => [ 'source' => 'similar' ],
 			]
 		);
@@ -166,20 +166,27 @@ class Products_Widget extends Widget {
 	protected function render(): void {
 		$settings = $this->get_settings_for_display();
 
-		$markup = Product_List_Markup::render(
-			[
-				'source'        => (string) ( $settings['source'] ?? 'similar' ),
-				'documentId'    => (string) ( $settings['document_id'] ?? '' ),
-				'filterField'   => (string) ( $settings['filter_field'] ?? '' ),
-				'filterValue'   => (string) ( $settings['filter_value'] ?? '' ),
-				'heading'       => (string) ( $settings['heading'] ?? '' ),
-				'limit'         => $settings['limit'] ?? null,
-				'layout'        => (string) ( $settings['layout'] ?? 'carousel' ),
-				'showBanner'    => 'yes' === ( $settings['show_banner'] ?? 'yes' ),
-				'cardSource'    => (string) ( $settings['card_source'] ?? 'plugin' ),
-				'instanceClass' => 'whsc-instance-' . $this->get_id(),
-			]
-		);
+		$attributes = [
+			'source'        => (string) ( $settings['source'] ?? 'similar' ),
+			'documentId'    => (string) ( $settings['document_id'] ?? '' ),
+			'filterField'   => (string) ( $settings['filter_field'] ?? '' ),
+			'filterValue'   => (string) ( $settings['filter_value'] ?? '' ),
+			'heading'       => (string) ( $settings['heading'] ?? '' ),
+			'limit'         => $settings['limit'] ?? null,
+			'layout'        => (string) ( $settings['layout'] ?? 'carousel' ),
+			'showBanner'    => 'yes' === ( $settings['show_banner'] ?? 'yes' ),
+			'cardSource'    => (string) ( $settings['card_source'] ?? 'plugin' ),
+			'instanceClass' => 'whsc-instance-' . $this->get_id(),
+		];
+		$markup = Product_List_Markup::render( $attributes );
+
+		// In the editor a row that draws nothing says why: an empty box with
+		// no word was what an ID it could not find left.
+		if ( '' === $markup && $this->is_editing() ) {
+			printf( '<p class="searcio-products-notice">%s</p>', esc_html( Product_List_Markup::why_empty( $attributes ) ) );
+
+			return;
+		}
 
 		// The row is an empty `div` with `data-*` attributes, which the
 		// framework's list of a shortcode's markup keeps.

@@ -4,7 +4,7 @@
 
 ## Reporting a vulnerability
 
-Email **[support@searcio.com](mailto:support@searcio.com)** with "Security" in the subject line. Please include:
+Report it privately on GitHub, with **[Report a vulnerability](https://github.com/webhead-GmbH/searcio/security/advisories/new)** on this repository's Security tab, or email **[support@searcio.com](mailto:support@searcio.com)** with "Security" in the subject line. Please include:
 
 - what is affected: the plugin version, and the screen, REST route, shortcode or block involved;
 - the steps to reproduce it, or a proof of concept;

@@ -11,9 +11,14 @@
  */
 import { useLayoutEffect } from '@wordpress/element';
 
+import { getConfig } from '../../../utils/api';
 import { formatPrice, PRICE_FIELDS } from '../../../utils/currency';
 import { PLACEHOLDER_IMAGE_DATA_URI } from '../../../utils/placeholderImage';
 import { openHandlers } from '../../../utils/clicks';
+
+// What the panel writes before a range's lowest price when the template's
+// author writes nothing (`range_prefix ?? 'from'` in its canvas).
+const PANEL_RANGE_PREFIX = 'from';
 
 const PLACEHOLDER_RE = /\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g;
 
@@ -273,9 +278,11 @@ const applyPriceComponents = ( root, hit ) => {
 
 		if ( isVariable ) {
 			// Range: only "current" (the min value) and "prefix" (its
-			// already-compiled text, e.g. "from" - never overwritten) show.
+			// already-compiled text) show. The panel's own default, the English
+			// "from", is said in the page's language, and read "from" on a
+			// German shop; a prefix the template's author wrote is kept.
 			showPart( parts.current, formatPrice( min, currency ) );
-			showPart( parts.prefix );
+			showPart( parts.prefix, PANEL_RANGE_PREFIX === parts.prefix?.textContent.trim() ? ( getConfig().i18n?.priceFrom || undefined ) : undefined );
 			hidePart( parts.regular );
 		} else if ( isOnSale ) {
 			// Sale: "regular" (struck through by the template's own CSS) then
@@ -371,8 +378,34 @@ export const postProcessMarkup = ( html, hit ) => {
  * @param {Object} hit
  * @return {string}
  */
+/**
+ * A card drawn as a link with a link inside it, the panel's "card links to"
+ * with a button: the browser does not nest links, closes the card at the
+ * button, and the button and everything after it fell out of the card. Inside
+ * a card that is a link, a link is a `span` with the link's class: the card's
+ * own link takes the click, to the same product.
+ *
+ * @param {string} html The template's markup.
+ * @return {string} The markup with no link inside the card's link.
+ */
+export const unnestLinks = ( html ) => {
+	const markup = String( html ?? '' );
+
+	if ( ! /^\s*<a[\s>]/i.test( markup ) ) {
+		return markup;
+	}
+
+	let opened = 0;
+	const spans = markup.replace( /<a(?=[\s>])/gi, ( tag ) => ( 0 === opened++ ? tag : '<span' ) );
+	const closings = ( spans.match( /<\/a>/gi ) || [] ).length;
+	let closed = 0;
+
+	// Every closing tag but the last, which is the card's own.
+	return spans.replace( /<\/a>/gi, ( tag ) => ( ++closed < closings ? '</span>' : tag ) );
+};
+
 export const buildServerCardHtml = ( template, hit ) =>
-	postProcessMarkup( substitutePlaceholders( template.html, hit ), hit );
+	postProcessMarkup( substitutePlaceholders( unnestLinks( template.html ), hit ), hit );
 
 // Matches every element and weighs four ids, of an id no element has. The
 // storefront's stylesheet weighs three (`$lift` in `scss/style.scss`), the

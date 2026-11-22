@@ -40,7 +40,7 @@ final class Plugin_Settings {
 		option_key: 'searcio_search_key',
 		show_in_rest: true,
 		label: 'Search key',
-		description: 'Public search key (sk_...) used by the browser. Restricted by your domain allowlist.',
+		description: 'Public search key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains.',
 		schema: [ 'format' => 'text-field' ]
 	)]
 	public const SEARCH_KEY = 'search_key';
@@ -181,6 +181,22 @@ final class Plugin_Settings {
 	public const CONFIG_VERSION = 'config_version';
 
 	/**
+	 * When the plugin last changed something the storefront keeps for a visit
+	 * (`sessionStorage` in `src/utils/api.js`): the search settings, or a quiz.
+	 * The storefront keys what it keeps by it, so a quiz published in the
+	 * Product finder tab shows on the next page, not ten minutes later.
+	 */
+	#[Setting(
+		type: 'integer',
+		default: 0,
+		option_key: 'searcio_storefront_version',
+		show_in_rest: false,
+		label: 'Storefront version',
+		description: 'When the plugin last changed what the storefront keeps for a visit.'
+	)]
+	public const STOREFRONT_VERSION = 'storefront_version';
+
+	/**
 	 * Sync-history retention in days. `0` keeps history forever. REST-exposed
 	 * so it renders on the generic schema-driven "General" settings tab;
 	 * applied by {@see \Webhead\WP\SearchCloud\Sync\Sync_Service::run_scheduled()}
@@ -192,7 +208,8 @@ final class Plugin_Settings {
 		option_key: 'searcio_sync_retention_days',
 		show_in_rest: true,
 		label: 'Keep history for (days)',
-		description: 'How long finished sync runs are kept. Use 0 to keep them forever.'
+		description: 'How long finished sync runs are kept. Use 0 to keep them forever.',
+		schema: [ 'minimum' => 0 ]
 	)]
 	public const SYNC_RETENTION_DAYS = 'sync_retention_days';
 
@@ -233,6 +250,37 @@ final class Plugin_Settings {
 		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
 	)]
 	public const FACET_FIELDS = 'facet_fields';
+
+	/**
+	 * Local mirror of Searcio's `facet_match`: the facet fields whose picks a
+	 * result must all have (`all`). Kept with the facet fields above, since the
+	 * search window counts such a filter's values differently.
+	 */
+	#[Setting(
+		type: 'object',
+		default: [],
+		option_key: 'searcio_facet_match',
+		show_in_rest: false,
+		label: 'Facet match',
+		description: "Local mirror of Searcio's facet fields whose values must all match."
+	)]
+	public const FACET_MATCH = 'facet_match';
+
+	/**
+	 * Local mirror of Searcio's `numeric_fields`: the site's own fields it
+	 * maps as numbers. The search window draws such a filter as a range, from
+	 * and to, since its values are numbers rather than words to tick.
+	 */
+	#[Setting(
+		type: 'array',
+		default: [],
+		option_key: 'searcio_numeric_fields',
+		show_in_rest: false,
+		label: 'Number fields',
+		description: "Local mirror of Searcio's fields that hold numbers.",
+		schema: [ 'items' => [ 'type' => 'string', 'format' => 'text-field' ] ]
+	)]
+	public const NUMERIC_FIELDS = 'numeric_fields';
 
 	/**
 	 * Curated fallback queries shown in the modal's empty-query state until the
@@ -279,6 +327,22 @@ final class Plugin_Settings {
 		description: 'How many levels of categories the filter shows.'
 	)]
 	public const CATEGORY_FILTER_DEPTH = 'category_filter_depth';
+
+	/**
+	 * The order the category filter lists the categories in, one of
+	 * {@see \Webhead\WP\SearchCloud\Enums\Category_Order}. Drawn on the Search
+	 * Config tab with the other two.
+	 */
+	#[Setting(
+		type: 'string',
+		default: 'shop',
+		option_key: 'searcio_category_filter_order',
+		show_in_rest: true,
+		label: 'Category order',
+		description: 'The order of the categories in the filter: as sorted in WooCommerce, by name, or by number of products.',
+		schema: [ 'enum' => [ 'shop', 'name', 'count' ] ]
+	)]
+	public const CATEGORY_FILTER_ORDER = 'category_filter_order';
 
 	/**
 	 * Where the search is placed without a block or a widget, and how a

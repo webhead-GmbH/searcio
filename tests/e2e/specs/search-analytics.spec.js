@@ -101,7 +101,9 @@ test.describe( 'search analytics', () => {
 		searches.slice( 1 ).forEach( ( url ) => expect( hint( url, 'surface' ) ).toBe( 'overlay' ) );
 		searches.forEach( ( url ) => expect( hint( url, 'preview' ) ).toBeNull() );
 
-		expect( await page.evaluate( ( key ) => JSON.parse( localStorage.getItem( key ) ), RECENT_KEY ) ).toEqual( [ 'jacket' ] );
+		// Remembered once its answer is in, which can be a moment after the
+		// request went out: read at once, it was empty on a slow runner.
+		await expect.poll( () => page.evaluate( ( key ) => JSON.parse( localStorage.getItem( key ) ), RECENT_KEY ) ).toEqual( [ 'jacket' ] );
 	} );
 
 	test( 'a recent search, a popular search and a suggestion each say how the search started', async ( { page, requestUtils } ) => {
@@ -263,9 +265,9 @@ test.describe( 'search analytics', () => {
 		await mockSearchCloud( page, {
 			assistant: true,
 			assistantProducts: [
-				{ ...postHit( { title: 'Shell', brand: 'PeakNord' }, 'p-1' ), search_id: 's-a' },
-				{ ...postHit( { title: 'Padded', brand: 'FrostGuard' }, 'p-2' ), search_id: 's-b' },
-				{ ...postHit( { title: 'Parka', brand: 'PeakNord' }, 'p-3' ), search_id: 's-a' },
+				{ ...postHit( { type: 'product', title: 'Shell', brand: 'PeakNord' }, 'p-1' ), search_id: 's-a' },
+				{ ...postHit( { type: 'product', title: 'Padded', brand: 'FrostGuard' }, 'p-2' ), search_id: 's-b' },
+				{ ...postHit( { type: 'product', title: 'Parka', brand: 'PeakNord' }, 'p-3' ), search_id: 's-a' },
 			],
 		} );
 		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );

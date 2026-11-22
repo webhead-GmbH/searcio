@@ -27,16 +27,16 @@ final class Dirty_Tracker_Test extends TestCase {
 	public function test_a_never_synced_post_is_not_fresh_and_was_not_indexed(): void {
 		$post = new WP_Post( [ 'ID' => 1 ] );
 
-		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-a', 1 ) );
+		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-a' ) );
 		$this->assertFalse( $this->tracker->was_indexed( 1 ) );
 	}
 
-	public function test_mark_synced_then_is_fresh_with_the_same_hash_and_version_is_true(): void {
+	public function test_mark_synced_then_is_fresh_with_the_same_hash_is_true(): void {
 		$post = new WP_Post( [ 'ID' => 5 ] );
 
 		$this->tracker->mark_synced( 5, 'hash-a', 2 );
 
-		$this->assertTrue( $this->tracker->is_fresh( $post, 'hash-a', 2 ) );
+		$this->assertTrue( $this->tracker->is_fresh( $post, 'hash-a' ) );
 		$this->assertTrue( $this->tracker->was_indexed( 5 ) );
 	}
 
@@ -45,16 +45,19 @@ final class Dirty_Tracker_Test extends TestCase {
 
 		$this->tracker->mark_synced( 5, 'hash-a', 2 );
 
-		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-b', 2 ) );
+		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-b' ) );
 	}
 
-	public function test_is_fresh_is_false_when_the_mapping_config_version_moved(): void {
+	/**
+	 * A mapping change the document does not show is not a reason to send it
+	 * again: every save of the Indexing tab sent the whole site.
+	 */
+	public function test_a_document_the_mapping_change_left_as_it_was_is_still_fresh(): void {
 		$post = new WP_Post( [ 'ID' => 5 ] );
 
 		$this->tracker->mark_synced( 5, 'hash-a', 2 );
 
-		// Same hash, but the mapping changed since - must re-push regardless.
-		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-a', 3 ) );
+		$this->assertTrue( $this->tracker->is_fresh( $post, 'hash-a' ) );
 	}
 
 	public function test_clear_removes_all_three_meta_keys_so_the_post_is_no_longer_fresh_or_indexed(): void {
@@ -63,7 +66,7 @@ final class Dirty_Tracker_Test extends TestCase {
 		$this->tracker->mark_synced( 9, 'hash-a', 1 );
 		$this->tracker->clear( 9 );
 
-		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-a', 1 ) );
+		$this->assertFalse( $this->tracker->is_fresh( $post, 'hash-a' ) );
 		$this->assertFalse( $this->tracker->was_indexed( 9 ) );
 	}
 

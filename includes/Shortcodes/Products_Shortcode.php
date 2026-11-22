@@ -6,9 +6,10 @@
  *     [searcio_products]                              similar to the product on the page
  *     [searcio_products source="category" layout="grid" limit="8"]
  *     [searcio_products source="category" field="categories" value="Jackets"]
- *     [searcio_products id="product-123" heading="You may also like"]
+ *     [searcio_products id="123" heading="You may also like"]
  *
- * source (similar|category), id (a document id; empty is the page's product),
+ * source (similar|category), id (the product's ID, 123, or its document id,
+ * product-123; empty is the page's product),
  * field and value (the category's field and value; empty is the page's
  * category), heading, limit (1-24), layout (carousel|grid), banner (yes|no),
  * cards (plugin|server), class. An attribute that is left out takes the

@@ -9,6 +9,7 @@ import { getConfig } from '../../../utils/api';
 import { formatPrice } from '../../../utils/currency';
 import { matchTemplate, ServerCard } from './serverCards';
 import { openHandlers } from '../../../utils/clicks';
+import { postTypeOf } from '../../../utils/documentType';
 
 /**
  * The price line for a product card: strikethrough regular + sale price when
@@ -37,9 +38,20 @@ const PriceLine = ( { source } ) => {
 			return null;
 		}
 
+		// On sale, the index carries the cheapest variation's regular price:
+		// "from" alone left the shopper to guess what was taken off.
+		const regular = onSale && Number( source.regular_price ) > Number( source.price_min ?? source.price )
+			? formatPrice( source.regular_price )
+			: '';
+
 		body = (
 			<>
 				<span className="whsc-card__price-from">{ i18n.priceFrom || __( 'from', 'searcio' ) }</span>{ ' ' }
+				{ '' !== regular && (
+					<>
+						<del className="whsc-card__price-regular">{ regular }</del>{ ' ' }
+					</>
+				) }
 				<span className="whsc-card__price-current">{ min }</span>
 			</>
 		);
@@ -92,9 +104,20 @@ const CardImage = ( { src } ) => {
 	);
 };
 
-const StockStatus = ( { inStock } ) => {
+/**
+ * @param {Object}  props
+ * @param {boolean} [props.inStock] Whether WooCommerce counts the product in stock.
+ * @param {string}  [props.status]  WooCommerce's stock status.
+ */
+const StockStatus = ( { inStock, status } ) => {
 	if ( undefined === inStock ) {
 		return null;
+	}
+
+	// WooCommerce counts a product on backorder in stock, since it can be
+	// bought: "In stock" told the shopper it was ready to ship.
+	if ( 'onbackorder' === status ) {
+		return <span className="whsc-card__stock is-on-backorder">{ __( 'On backorder', 'searcio' ) }</span>;
 	}
 
 	return (
@@ -119,7 +142,7 @@ const ProductCard = ( { hit, onClick } ) => {
 			<span className="whsc-card__body">
 				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
 				<PriceLine source={ source } />
-				<StockStatus inStock={ source.in_stock } />
+				<StockStatus inStock={ source.in_stock } status={ source.stock_status } />
 			</span>
 		</a>
 	);
@@ -206,19 +229,6 @@ const PostCard = ( { hit, onClick } ) => {
 	);
 };
 
-const GenericCard = ( { hit, onClick } ) => {
-	const source = hit.source || {};
-
-	return (
-		<a className="whsc-card whsc-card--generic" href={ source.url || '#' } { ...openHandlers( onClick ) }>
-			<CardImage src={ source.image } />
-			<span className="whsc-card__body">
-				<span className="whsc-card__title" title={ source.title }>{ source.title }</span>
-			</span>
-		</a>
-	);
-};
-
 const templates = {
 	product: ProductCard,
 	post: PostCard,
@@ -250,8 +260,11 @@ export const ResultCard = ( { hit, cardSource, serverTemplates, onClick } ) => {
 		}
 	}
 
-	const type = hit?.source?.type;
-	const Template = ( type && templates[ type ] ) || GenericCard;
+	// By the type the hit was indexed under, then by its post type, so a
+	// renamed type keeps its card; any other hit is drawn as a post, with its
+	// text: a page or a custom type showed its title alone.
+	const own = ( key ) => ( key && Object.prototype.hasOwnProperty.call( templates, key ) ? templates[ key ] : null );
+	const Template = own( hit?.source?.type ) || own( postTypeOf( hit ) ) || PostCard;
 
 	return <Template hit={ hit } onClick={ onClick } />;
 };

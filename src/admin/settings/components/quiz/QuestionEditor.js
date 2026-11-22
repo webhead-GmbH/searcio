@@ -1,5 +1,5 @@
 import { Button } from '@wordpress/components';
-import { InputControl, Stack, Text } from '@wordpress/ui';
+import { InputControl, Notice, Stack, Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { Grid } from '../../../../components/Layout';
@@ -21,8 +21,9 @@ import QuestionPicture from './QuestionPicture';
  * @param {Function}      props.onChange    Called with the changed question.
  * @param {Function}      props.onRemove
  * @param {boolean}       props.canRemove   A quiz keeps at least one question.
+ * @param {boolean}       [props.unreachable] No answer leads to it, so it is never asked.
  */
-const QuestionEditor = ( { question, index, questions, facetValues, listPrefix, onChange, onRemove, canRemove } ) => {
+const QuestionEditor = ( { question, index, questions, facetValues, listPrefix, onChange, onRemove, canRemove, unreachable = false } ) => {
 	const setOption = ( at, option ) => onChange( { ...question, options: question.options.map( ( item, i ) => ( i === at ? option : item ) ) } );
 
 	return (
@@ -59,6 +60,14 @@ const QuestionEditor = ( { question, index, questions, facetValues, listPrefix, 
 					<QuestionPicture value={ question.image } onChange={ ( image ) => onChange( { ...question, image } ) } />
 				</Grid>
 			</section>
+
+			{ unreachable && (
+				<Notice.Root intent="warning">
+					<Notice.Description>
+						{ __( 'No answer leads to this question, so shoppers never see it. Choose it under "Then" for an answer of an earlier question.', 'searcio' ) }
+					</Notice.Description>
+				</Notice.Root>
+			) }
 
 			{ question.options.map( ( option, at ) => (
 				<AnswerEditor

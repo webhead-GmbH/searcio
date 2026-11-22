@@ -5,7 +5,7 @@
 - WordPress 6.8 or later
 - PHP 8.3 or later
 - A [Searcio](https://searcio.com) account - one is created for you when you connect, if your email does not have one yet
-- WooCommerce 8.0 or later (optional, only needed to index and search products)
+- WooCommerce 8.0 or later (optional, only needed to index and search products), tested up to WooCommerce 11.3
 - WPML or Polylang (optional, only needed for multilingual search scoping - see [`multilingual.md`](multilingual.md))
 
 ## 1. Install the plugin
@@ -45,7 +45,7 @@ Sending a field here makes its data available to Searcio. To let visitors actual
 
 Go to **Searcio → Sync** and click **Start sync**. This sends your currently-enabled content to Searcio. The sync runs in the background in resumable batches; you can pause, resume, or cancel it, and watch live progress on the same screen.
 
-After the first sync, a scheduled sync runs daily and an incremental sync pushes edits shortly after you save, trash, or delete content - you don't need to manually re-sync for day-to-day edits. See [`developers.md`](developers.md#wp-cli) if you're running WordPress on a real system cron and want to trigger syncs directly.
+After the first sync, a scheduled sync runs daily and an incremental sync pushes edits shortly after you save, trash, or delete content - you don't need to manually re-sync for day-to-day edits. "Shortly" is the next run of WordPress's own scheduler (WP-Cron), which a visit to the site starts: on a quiet site, or one that has WP-Cron turned off, run a real system cron every minute (`wp cron event run --due-now`) and the edit is sent within moments. See [`developers.md`](developers.md#wp-cli) if you're running WordPress on a real system cron and want to trigger syncs directly.
 
 ## 5. Add the search experience to your site
 
@@ -82,7 +82,7 @@ The other ways, which the tab also lists:
   | `width`, `align` | the field's width in px (0 fills), and `start`, `center` or `end` |
   | `voice`, `count` | `yes` or `no`: voice input, and the number of results on each filter |
   | `trigger` | `submit` (search on Enter) or `type` (search as the visitor types) |
-  | `highlights` | `newest` or `featured`: what the window shows before a search |
+  | `highlights` | `newest` (by date) or `featured`: what the window shows before a search |
   | `filters` | 0 to 8 filter buttons in the bar |
   | `animation` | `none`, `fade`, `slide-down`, `slide-up` or `zoom` |
   | `cards` | `plugin` or `server` (a template designed in Searcio) |
@@ -92,7 +92,7 @@ The other ways, which the tab also lists:
   | `[searcio_products]` attribute | Values |
   | --- | --- |
   | `source` | `similar` (to the product on the page) or `category` (the category on the page) |
-  | `id`, `field`, `value` | a product's document id, or a category's field and value, for a row placed elsewhere |
+  | `id`, `field`, `value` | a product's ID (`119`) or document id (`product-119`), or a category's field and value, for a row placed elsewhere |
   | `layout`, `limit` | `carousel` or `grid`, and 1 to 24 products |
   | `heading`, `banner` | the row's title, and `yes` or `no` for a merchandising banner |
   | `cards`, `class` | as above |

@@ -76,6 +76,39 @@ export const removeQuestion = ( questions, index ) => {
 		} ) );
 };
 
+/**
+ * The questions no answer leads to, by id: a shopper starts at the first and
+ * goes where each answer's "Then" points, so another question that nothing
+ * points to is never asked. A second question added with every answer of the
+ * first still showing the products was never seen, and nothing said why.
+ *
+ * @param {Array<Object>} questions
+ * @return {Set<string>} The ids of the questions nobody reaches.
+ */
+export const unreachableQuestions = ( questions ) => {
+	const list = Array.isArray( questions ) ? questions : [];
+	const byId = new Map( list.map( ( question ) => [ String( question.id ), question ] ) );
+	const reached = new Set();
+	const queue = list.length > 0 ? [ String( list[ 0 ].id ) ] : [];
+
+	while ( queue.length > 0 ) {
+		const id = queue.shift();
+
+		if ( reached.has( id ) || ! byId.has( id ) ) {
+			continue;
+		}
+
+		reached.add( id );
+		( byId.get( id ).options || [] ).forEach( ( option ) => {
+			if ( null !== option?.next_question_id && undefined !== option?.next_question_id ) {
+				queue.push( String( option.next_question_id ) );
+			}
+		} );
+	}
+
+	return new Set( list.map( ( question ) => String( question.id ) ).filter( ( id ) => ! reached.has( id ) ) );
+};
+
 const text = ( value ) => ( 'string' === typeof value || 'number' === typeof value ? String( value ) : '' );
 
 const bound = ( value ) => {

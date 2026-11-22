@@ -26,6 +26,9 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 final class Index_Config {
+	/** Where Elementor keeps its templates, floating elements, code snippets, fonts and icon sets. */
+	private const BUILDER_POST_TYPES = [ 'elementor_library', 'e-floating-buttons', 'elementor_snippet', 'elementor_font', 'elementor_icons' ];
+
 	public function __construct(
 		private Settings_Manager $settings,
 		private Woo $woo,
@@ -51,6 +54,23 @@ final class Index_Config {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * The meta key the product mapping reads the purchase price from, or ''
+	 * when no purchase price is sent from a field. Read from what is stored,
+	 * without normalizing every block as {@see self::all()} does: the change
+	 * listener asks it on every meta write of the site.
+	 */
+	public function cost_meta_key(): string {
+		$stored = $this->settings->get( Plugin_Settings::INDEX_CONFIG );
+		$block  = is_array( $stored ) ? ( $stored[ Woo::POST_TYPE ] ?? null ) : null;
+
+		if ( ! is_array( $block ) || empty( $block['enabled'] ) || ! is_array( $block['woo'] ?? null ) || empty( $block['woo']['cost_price'] ) ) {
+			return '';
+		}
+
+		return is_string( $block['woo']['cost_meta'] ?? null ) ? $block['woo']['cost_meta'] : '';
 	}
 
 	/**
@@ -82,9 +102,8 @@ final class Index_Config {
 	}
 
 	/**
-	 * Slug => plural label, so front-ends (the search modal's type filters) can
-	 * show a human-readable name instead of the raw slug the Searcio API's
-	 * facets return.
+	 * Slug => plural label, for the places an admin picks a post type: the
+	 * Placement tab's "Content to search".
 	 *
 	 * @return array<string,string>
 	 */
@@ -96,6 +115,46 @@ final class Index_Config {
 			if ( in_array( $object->name, $enabled, true ) ) {
 				$labels[ $object->name ] = $this->post_type_label( $object );
 			}
+		}
+
+		return $labels;
+	}
+
+	/**
+	 * Post type => the type its documents carry, which the Indexing tab lets an
+	 * admin name: "artikel" for posts. A block, a shortcode, a widget and a
+	 * placement name a post type, and the index knows only this, so a search
+	 * restricted to posts asked for `type=post` and found nothing once posts
+	 * were "artikel".
+	 *
+	 * @return array<string,string>
+	 */
+	public function document_types(): array {
+		$types = [];
+
+		foreach ( $this->all() as $post_type => $block ) {
+			if ( ! empty( $block['enabled'] ) ) {
+				$type                         = trim( (string) ( $block['type'] ?? '' ) );
+				$types[ (string) $post_type ] = '' !== $type ? $type : (string) $post_type;
+			}
+		}
+
+		return $types;
+	}
+
+	/**
+	 * Document type => the plural label of its post type, so the search
+	 * window's type buttons name what the Searcio API's facets return: a
+	 * renamed type showed as "artikel" beside "Seiten".
+	 *
+	 * @return array<string,string>
+	 */
+	public function document_type_labels(): array {
+		$types  = $this->document_types();
+		$labels = [];
+
+		foreach ( $this->indexable_post_type_labels() as $post_type => $label ) {
+			$labels[ $types[ $post_type ] ?? $post_type ] ??= $label;
 		}
 
 		return $labels;
@@ -161,6 +220,81 @@ final class Index_Config {
 		}
 
 		return null === $woo ? $labels : array_merge( $labels, $this->woo->attribute_labels( $woo ) );
+	}
+
+	private function is_protected_meta_source( string $source ): bool {
+		$source = trim( $source );
+
+		if ( ! str_starts_with( strtolower( $source ), 'meta:' ) ) {
+			return false;
+		}
+
+		$key = trim( substr( $source, strlen( 'meta:' ) ) );
+
+		return '' !== $key && Field_Source_Resolver::is_protected_meta_key( $key );
+	}
+
+	/**
+	 * The hierarchical taxonomy a block maps to the `categories` field, or ''
+	 * when it maps none. A post's categories share that field with the
+	 * products' (see {@see self::field_labels()}), so a post written with them
+	 * carries their paths for the category filter's tree, as a product does
+	 * (see {@see Term_Paths}).
+	 *
+	 * @param  array<string,mixed>  $block  A normalized block.
+	 */
+	public function category_paths_taxonomy( array $block ): string {
+		foreach ( is_array( $block['fields'] ?? null ) ? $block['fields'] : [] as $field ) {
+			$source = trim( (string) ( $field['source'] ?? '' ) );
+
+			if ( Facet_Config::CATEGORY_FIELD !== (string) ( $field['as'] ?? '' ) || ! str_starts_with( strtolower( $source ), 'taxonomy:' ) ) {
+				continue;
+			}
+
+			$taxonomy = trim( substr( $source, strlen( 'taxonomy:' ) ) );
+
+			if ( '' !== $taxonomy && taxonomy_exists( $taxonomy ) && is_taxonomy_hierarchical( $taxonomy ) ) {
+				return $taxonomy;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Field => category taxonomies, for the fields the category filter is: the
+	 * plugin's own `categories` and any field an enabled mapping writes from
+	 * the product or the post categories. A site that maps its post
+	 * categories as "kategorien" set "Main categories only" and still saw
+	 * every subcategory: only the field named `categories` got a tree.
+	 *
+	 * @return array<string,array<int,string>>
+	 */
+	public function category_fields(): array {
+		$fields = [ Facet_Config::CATEGORY_FIELD => [ Woo::CATEGORY_TAXONOMY, 'category' ] ];
+
+		foreach ( $this->all() as $block ) {
+			if ( empty( $block['enabled'] ) ) {
+				continue;
+			}
+
+			foreach ( $block['fields'] as $field ) {
+				$source = trim( (string) $field['source'] );
+				$as     = (string) $field['as'];
+
+				if ( ! str_starts_with( strtolower( $source ), 'taxonomy:' ) || isset( $fields[ $as ] ) ) {
+					continue;
+				}
+
+				$taxonomy = trim( substr( $source, strlen( 'taxonomy:' ) ) );
+
+				if ( in_array( $taxonomy, [ Woo::CATEGORY_TAXONOMY, 'category' ], true ) ) {
+					$fields[ $as ] = [ $taxonomy ];
+				}
+			}
+		}
+
+		return $fields;
 	}
 
 	/**
@@ -271,13 +405,16 @@ final class Index_Config {
 				'version'        => $this->woo->version(),
 				'minimum'        => Woo::MIN_VERSION,
 				'attributes'     => $this->woo->attributes(),
-				'toggles'        => array_keys( Woo::TOGGLE_FIELDS ),
+				'toggles'        => $this->woo->toggles(),
+				'prices_with_tax' => $this->woo->shows_prices_with_tax(),
 			],
 			// Which languages WPML/Polylang has configured locally, not the plan
 			// entitlement (that comes from `/health` via Connection_Endpoint).
 			'languages'     => [
 				'active'    => $this->multilingual->is_active(),
 				'available' => $this->multilingual->active_languages(),
+				// The one the admin works in: a new quiz starts in it.
+				'current'   => $this->multilingual->admin_language(),
 			],
 			'indexed_fields' => $this->indexed_fields(),
 			'config_version' => $this->config_version(),
@@ -289,8 +426,21 @@ final class Index_Config {
 	 */
 	private function candidate_post_types(): array {
 		$objects = get_post_types( [ 'public' => true ], 'objects' );
+		$config  = $this->all();
 
 		unset( $objects['attachment'] );
+
+		// A page builder's parts are public, so WordPress lists them, but no
+		// visitor reads one: Elementor's templates and floating elements were
+		// offered as content to search. So is a type the site keeps out of its
+		// own search. One that is indexed already stays.
+		foreach ( $objects as $name => $object ) {
+			$builder = in_array( $name, self::BUILDER_POST_TYPES, true );
+
+			if ( ( $builder || ! empty( $object->exclude_from_search ) ) && empty( $config[ $name ]['enabled'] ) ) {
+				unset( $objects[ $name ] );
+			}
+		}
 
 		// Products are public only when WooCommerce is active; surface the section
 		// regardless so the UI can explain the soft dependency.
@@ -555,7 +705,15 @@ final class Index_Config {
 		}
 
 		foreach ( $block['fields'] as $field ) {
-			$fields[] = (string) $field['as'];
+			// A protected key is never sent, so no document has the field;
+			// listed, it was offered as a filter that could never match.
+			if ( ! $this->is_protected_meta_source( (string) $field['source'] ) ) {
+				$fields[] = (string) $field['as'];
+			}
+		}
+
+		if ( '' !== $this->category_paths_taxonomy( $block ) ) {
+			$fields[] = Facet_Config::CATEGORY_PATHS_FIELD;
 		}
 
 		if ( Woo::POST_TYPE === $post_type ) {
@@ -572,10 +730,11 @@ final class Index_Config {
 		$woo = [ 'only_visible' => true ];
 
 		foreach ( array_keys( Woo::TOGGLE_FIELDS ) as $toggle ) {
-			$woo[ $toggle ] = in_array( $toggle, [ 'price', 'sku', 'stock_status', 'categories' ], true );
+			$woo[ $toggle ] = in_array( $toggle, [ 'price', 'sku', 'stock_status', 'categories', 'brands' ], true );
 		}
 
 		$woo['attributes'] = [];
+		$woo['cost_meta']  = '';
 
 		return $woo;
 	}
@@ -591,6 +750,10 @@ final class Index_Config {
 		foreach ( array_keys( Woo::TOGGLE_FIELDS ) as $toggle ) {
 			$normalized[ $toggle ] = ! empty( $woo[ $toggle ] );
 		}
+
+		// The meta key a cost of goods plugin keeps the purchase price in, read
+		// where WooCommerce's own "Cost of goods" has none (Woo::cost_price()).
+		$normalized['cost_meta'] = is_string( $woo['cost_meta'] ?? null ) ? (string) preg_replace( '/[^A-Za-z0-9_\-]/', '', $woo['cost_meta'] ) : '';
 
 		$attributes = isset( $woo['attributes'] ) && is_array( $woo['attributes'] ) ? $woo['attributes'] : [];
 		$normalized['attributes'] = array_values(

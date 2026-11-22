@@ -119,6 +119,33 @@ final class Index_Config_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * The field the purchase price is read from is a meta key and is kept as
+	 * one; a mapping saved before the field existed has none.
+	 */
+	public function test_the_purchase_price_field_is_kept_as_a_meta_key(): void {
+		if ( ! post_type_exists( 'product' ) ) {
+			$this->markTestSkipped( 'WooCommerce is not loaded in this environment.' );
+		}
+
+		$this->assertFalse( $this->config()->defaults_for( 'product' )['woo']['cost_price'], 'Off until the shop turns it on.' );
+		$this->assertSame( '', $this->config()->defaults_for( 'product' )['woo']['cost_meta'] );
+
+		$block = $this->block( 'product' );
+
+		$block['woo']['cost_price'] = true;
+		$block['woo']['cost_meta']  = " _wc_cog_cost' OR 1";
+		$this->config()->save( [ 'product' => $block ] );
+
+		$this->assertTrue( $this->config()->all()['product']['woo']['cost_price'] );
+		$this->assertSame( '_wc_cog_costOR1', $this->config()->all()['product']['woo']['cost_meta'] );
+
+		unset( $block['woo']['cost_meta'] );
+		$this->config()->save( [ 'product' => $block ] );
+
+		$this->assertSame( '', $this->config()->all()['product']['woo']['cost_meta'] );
+	}
+
+	/**
 	 * The Search Config tab reads the list from `GET /indexing/config`, which
 	 * returns the catalog verbatim.
 	 */
@@ -133,7 +160,8 @@ final class Index_Config_Test extends Integration_Test_Case {
 
 	/**
 	 * The drift guard: a field the builder starts writing without being listed
-	 * here fails this test instead of going unsuggested.
+	 * here fails this test instead of going unsuggested. The fields written to
+	 * sort by are the one exception.
 	 */
 	public function test_every_field_a_built_post_document_carries_is_listed(): void {
 		$this->config()->save(
@@ -171,6 +199,107 @@ final class Index_Config_Test extends Integration_Test_Case {
 
 		$written = array_diff( array_keys( $document ), [ 'id' ] );
 
-		$this->assertEqualsCanonicalizing( $written, $this->config()->indexed_fields() );
+		$this->assertContains( 'published_at', $written );
+		$this->assertEqualsCanonicalizing( array_values( array_diff( $written, Document_Builder::SORT_FIELDS ) ), $this->config()->indexed_fields() );
+	}
+
+	/**
+	 * A field read from a protected key, which is never sent, was offered as a
+	 * facet and a searchable field without a warning, since the list named
+	 * every mapped field.
+	 */
+	public function test_a_field_read_from_a_protected_key_is_not_listed(): void {
+		$this->config()->save(
+			[
+				'post' => $this->block(
+					'post',
+					[
+						'fields' => [
+							[ 'as' => 'interne_notiz', 'source' => 'meta:_interne_notiz' ],
+							[ 'as' => 'lesezeit', 'source' => 'meta:lesezeit' ],
+						],
+					]
+				),
+			]
+		);
+
+		$this->assertNotContains( 'interne_notiz', $this->config()->indexed_fields() );
+		$this->assertContains( 'lesezeit', $this->config()->indexed_fields() );
+
+		add_filter( 'searcio_index_allow_protected_meta', static fn ( bool $allow, string $key ): bool => '_interne_notiz' === $key, 10, 2 );
+
+		$this->assertContains( 'interne_notiz', $this->config()->indexed_fields(), 'A key the site allows is sent, and listed.' );
+
+		remove_all_filters( 'searcio_index_allow_protected_meta' );
+	}
+
+	/**
+	 * A renamed type: the documents of posts carry "artikel", and the search
+	 * window, which is told "post", asks for that.
+	 */
+	public function test_each_post_type_is_named_by_the_type_its_documents_carry(): void {
+		$this->config()->save(
+			[
+				'post' => $this->block( 'post', [ 'type' => 'Artikel' ] ),
+				'page' => $this->block( 'page' ),
+			]
+		);
+
+		$this->assertSame( [ 'post' => 'artikel', 'page' => 'page' ], $this->config()->document_types() );
+		$this->assertArrayHasKey( 'artikel', $this->config()->document_type_labels() );
+		$this->assertArrayNotHasKey( 'post', $this->config()->document_type_labels() );
+		$this->assertArrayHasKey( 'post', $this->config()->indexable_post_type_labels(), 'The Placement tab still picks a post type.' );
+	}
+
+	/**
+	 * Elementor's templates and floating elements, and a type the site keeps
+	 * out of its own search, were offered as content to search. One that is
+	 * indexed already stays.
+	 */
+	public function test_builder_parts_and_types_kept_out_of_search_are_not_offered(): void {
+		register_post_type( 'elementor_library', [ 'public' => true, 'label' => 'My Templates' ] );
+		register_post_type( 'whsc_faq', [ 'public' => true, 'exclude_from_search' => true, 'label' => 'FAQ' ] );
+
+		try {
+			$offered = static fn ( Index_Config $config ): array => array_column( $config->catalog()['post_types'], 'slug' );
+
+			$this->assertNotContains( 'elementor_library', $offered( $this->config() ) );
+			$this->assertNotContains( 'whsc_faq', $offered( $this->config() ) );
+			$this->assertContains( 'post', $offered( $this->config() ) );
+
+			$this->config()->save( [ 'whsc_faq' => $this->block( 'whsc_faq' ) ] );
+
+			$this->assertContains( 'whsc_faq', $offered( $this->config() ) );
+		} finally {
+			unregister_post_type( 'elementor_library' );
+			unregister_post_type( 'whsc_faq' );
+		}
+	}
+
+	/**
+	 * A site that maps its post categories as "kategorien" saw every
+	 * subcategory under "Main categories only": only `categories` was the
+	 * category filter.
+	 */
+	public function test_a_field_mapped_from_the_categories_is_a_category_field(): void {
+		$this->config()->save(
+			[
+				'post' => $this->block(
+					'post',
+					[
+						'fields' => [
+							[ 'as' => 'kategorien', 'source' => 'taxonomy:category' ],
+							[ 'as' => 'schlagworte', 'source' => 'taxonomy:post_tag' ],
+						],
+					]
+				),
+			]
+		);
+
+		$fields = $this->config()->category_fields();
+
+		$this->assertSame( [ 'category' ], $fields['kategorien'] );
+		$this->assertArrayHasKey( 'categories', $fields );
+		$this->assertArrayNotHasKey( 'schlagworte', $fields );
 	}
 }
