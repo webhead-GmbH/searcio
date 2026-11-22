@@ -4,7 +4,7 @@ All notable changes to Searcio are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The plugin's page on WordPress.org carries the same release notes in shorter form.
 
-## [1.4.1] - Unreleased
+## [1.4.1] - 2026-11-22
 
 ### Security
 
@@ -296,7 +296,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Language restriction for indexing and search with WPML and Polylang.
 - WP-CLI commands for running and monitoring syncs.
 
-[1.4.1]: https://github.com/webhead-GmbH/searcio/compare/1.4.0...1.x
+[1.4.1]: https://github.com/webhead-GmbH/searcio/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/webhead-GmbH/searcio/compare/1.3.1...1.4.0
 [1.3.1]: https://github.com/webhead-GmbH/searcio/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/webhead-GmbH/searcio/compare/1.2.2...1.3.0

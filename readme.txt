@@ -33,11 +33,11 @@ Shoppers who know exactly what they want find it in a keystroke. Shoppers who do
 = Built for WooCommerce =
 
 * **Product cards that sell** - images, prices as your shop shows them (with or without tax), sale badges, stock status and price ranges for variable and grouped products.
-* **Smart filters** - one bar under the search field narrows results by content type, category (all categories, the main ones, or a tree to the depth you choose), tags, attributes such as color or size, and a price range. Colors, images and labels come from your swatches plugin or theme.
+* **Smart filters** - one bar under the search field narrows results by content type, category (all categories, the main ones, or a tree to the depth you choose), tags, brands, attributes such as color or size, your own number fields (a weight, a length) and a price range, the numbers as a range from and to. A color and a size can be matched on one variation that is in stock, so a sold-out red XL does not find the jacket. Colors, images and labels come from your swatches plugin or theme.
 * **Product finder** - a short guided quiz that turns a few answers into a list of matching products. Make and edit the quizzes right in WordPress, on the Product finder tab, with a check of every way through a quiz before it goes live.
-* **Merchandising** - pin products to the top of a search or a category page, keep products out, and show a promotional banner.
+* **Merchandising** - pin products to the top of a search or a category page, keep products out, and show a promotional banner. A rule fires on part of a search or only on its exact words, and can keep to one language.
 * **Search redirects** - send searches like "shipping" or "returns" straight to the right page.
-* **Relevance you control** - field weights, per-type boosts, synonyms and suggestion fields, all from your WordPress admin. Results that visitors click most can rise for everyone, without cookies.
+* **Relevance you control** - field weights, per-type boosts, synonyms and suggestion fields, all from your WordPress admin, in sections you open one at a time. Results that visitors click most can rise for everyone, without cookies. Send what your products cost and turn on Profitable products first, and the ones with a good margin come first; shoppers never see the price you paid.
 
 = Smarter answers with AI =
 
@@ -160,7 +160,7 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 9. Similar products on a product page, matched by meaning.
 10. On a phone, the search window fills the screen.
 11. The look editor: colors, fonts, sizes and spacing of every part of the search, for desktops, tablets and phones, with a live preview.
-12. Search Config: AI search, visual tagging, search by photo, click ranking and the weight of each field.
+12. Search Config: its sections down the side, each with its state, here AI search, visual tagging, search by photo and click ranking.
 13. Indexing: choose which content and which WooCommerce details are searchable.
 14. Sync: start a sync and see the history of past ones.
 

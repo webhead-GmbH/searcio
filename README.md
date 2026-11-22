@@ -36,7 +36,8 @@
   and so on), with a minimum/maximum for numeric fields such as price or rating. The filters sit in one bar under the
   search field and apply as they are picked, in a popover, a side drawer or, on a phone, a sheet. Categories can be listed
   in one list, as main categories only, or as the shop's tree; an attribute's swatches from a swatches plugin or theme
-  show as color, image or label pills; and a field can need every picked value (AND) instead of any (OR).
+  show as color, image or label pills; a field can need every picked value (AND) instead of any (OR); your own number
+  fields filter as a range; and a color and a size can be matched on one variation that is in stock.
 - **WooCommerce support** - indexes products with price, stock status, categories, tags, ratings, and variations; result
   cards show formatted prices, sale badges, and stock status.
 - **Gutenberg block and Elementor widget** - the same search experience, themeable with no code: colors, sizes, radius
@@ -50,7 +51,10 @@
 - **Configurable indexing** - choose which post types and WooCommerce products to index, and map custom fields,
   taxonomies, and built-in properties to searchable data.
 - **Search relevance control** - tune searchable fields and weights, per-type ranking boosts, facet and suggestion
-  fields, and synonyms - all from Searcio's own configuration, editable from the plugin's admin screen.
+  fields, and synonyms - all from Searcio's own configuration, editable from the plugin's admin screen in sections you
+  open one at a time.
+- **Profitable products first** - send what each product costs (never shown to shoppers) and the ones with a good margin
+  come first, with a target margin per category or brand and search terms it leaves alone.
 - **AI Assistant** - a chat tab that answers in prose and shows the products it is talking about, with a table to
   compare them.
 - **Search by photo** - shoppers upload a photo instead of typing; a vision model describes it and searches for that.
