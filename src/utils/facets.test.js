@@ -137,9 +137,9 @@ describe( 'mergeFieldFacets', () => {
 	} );
 
 	/**
-	 * The tester's "Schlagwort" in AND mode: after "Pflege" and "Anleitung" the
-	 * others still said "Winter (2)" and "Kaufberatung (1)", and picking
-	 * Kaufberatung found nothing. There each pick narrows the next.
+	 * A tag filter in AND mode: after two picks the other values kept the
+	 * counts they had before, and picking one of them found nothing. There
+	 * each pick narrows the next.
 	 */
 	it( 'takes the fresh counts of a field whose picks must all match, its own pick included', () => {
 		const current = { tags: [ { value: 'Pflege', count: 4 }, { value: 'Winter', count: 2 }, { value: 'Kaufberatung', count: 1 } ] };
@@ -256,6 +256,16 @@ describe( 'humanizeFieldLabel prefixes', () => {
 
 describe( 'extractRangeFields', () => {
 	const facets = { types: [ { value: 'product', count: 3 } ], price: [], brand: [ { value: 'Acme', count: 2 } ] };
+
+	// A numeric custom field could not be a range: Searcio answers its facet
+	// values as text once it maps the field as a number (`numeric_fields`).
+	it( 'reads a number field the site draws as a range from its facet values and hits, as numbers', () => {
+		const numeric = { weight: [ { value: '5', count: 3 }, { value: '12.5', count: 1 } ], size: [ { value: '38', count: 2 }, { value: '42', count: 2 } ] };
+		const hits = [ { source: { weight: '20', size: '38' } }, { source: { weight: 'n/a' } } ];
+
+		expect( extractRangeFields( numeric, hits, [ 'weight' ] ) ).toEqual( { weight: { min: 5, max: 20 } } );
+		expect( extractRangeFields( { weight: [ { value: '5', count: 3 } ] }, [], [ 'weight' ] ) ).toEqual( {} );
+	} );
 
 	it( 'reads the span from the hits, since a numeric field aggregates to nothing', () => {
 		const hits = [
@@ -710,8 +720,8 @@ describe( 'arrangeTree', () => {
 	} );
 
 	/**
-	 * lowrider.at has three "MTS Technik" under three parents. As names they
-	 * were one value, placed under whichever parent came first.
+	 * A shop with three categories of one name under three parents: as names
+	 * they were one value, placed under whichever parent came first.
 	 */
 	it( 'reads the parent of a path from the path itself', () => {
 		const entries = [

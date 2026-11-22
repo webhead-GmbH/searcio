@@ -39,7 +39,7 @@ final class Sync_Runs_Table extends Table {
 	 * | --------------- | ------------ |
 	 * | id              | BIGINT(20)   |
 	 * | status          | VARCHAR(20)  | queued|running|paused|completed|failed|cancelled
-	 * | trigger_type    | VARCHAR(20)  | manual|scheduled|incremental
+	 * | trigger_type    | VARCHAR(20)  | manual|scheduled|incremental|settings_change
 	 * | triggered_by    | BIGINT(20)   | user id, null for scheduled/incremental
 	 * | is_force        | TINYINT(1)   | ignore dirty hashes when set
 	 * | phase           | VARCHAR(40)  | current post type / "prune" / "done"
@@ -102,6 +102,10 @@ final class Sync_Runs_Table extends Table {
 	 * @param  array<string,mixed>  $data
 	 */
 	public function insert_row( array $data ): int {
+		// In UTC like every other time of a run: left to the column's own
+		// default it is the database server's local time, presented as UTC.
+		$data['updated_at'] ??= gmdate( 'Y-m-d H:i:s' );
+
 		// Not `$wpdb->insert_id` after insert(): the write invalidates the
 		// table's cache group, which can insert an option row of its own, and
 		// `insert_id` is then that row's.
@@ -114,6 +118,10 @@ final class Sync_Runs_Table extends Table {
 	 * @param  array<string,mixed>  $data
 	 */
 	public function update_row( int $id, array $data ): void {
+		// See insert_row(): the column's `ON UPDATE CURRENT_TIMESTAMP` is the
+		// server's local time, an hour ahead of `finished_at` in Vienna.
+		$data['updated_at'] ??= gmdate( 'Y-m-d H:i:s' );
+
 		$this->update( $data, [ 'id' => $id ] );
 	}
 
@@ -250,8 +258,10 @@ final class Sync_Runs_Table extends Table {
 			$query->where( 'created_at', '<=', (string) $args['date_before'] );
 		}
 
-		// The table's search: a number is a run, anything else is looked for
-		// in what went wrong. The box searched nothing at all.
+		// The table's search: a number is a run, anything else is looked for in
+		// what the table shows (the status and what started the run) and in what
+		// went wrong. It found only a run's number, and "Completed" or "manual",
+		// typed over rows that say so, found nothing.
 		$search = trim( (string) ( $args['search'] ?? '' ) );
 
 		if ( '' !== $search ) {
@@ -260,7 +270,16 @@ final class Sync_Runs_Table extends Table {
 			} else {
 				global $wpdb;
 
-				$query->where( 'last_error', 'like', '%' . $wpdb->esc_like( $search ) . '%' );
+				$like = '%' . $wpdb->esc_like( str_replace( ' ', '_', $search ) ) . '%';
+				$text = '%' . $wpdb->esc_like( $search ) . '%';
+
+				$query->where(
+					static function ( $group ) use ( $like, $text ): void {
+						$group->where( 'last_error', 'like', $text )
+							->or_where( 'status', 'like', $like )
+							->or_where( 'trigger_type', 'like', $like );
+					}
+				);
 			}
 		}
 

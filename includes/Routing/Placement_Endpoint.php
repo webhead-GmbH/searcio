@@ -21,6 +21,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use Webhead\WP\SearchCloud\Capabilities\Plugin_Capabilities;
 use Webhead\WP\SearchCloud\DTO\Look;
+use Webhead\WP\SearchCloud\DTO\Search_Placement;
 use Webhead\WP\SearchCloud\Frontend\Google_Fonts;
 use Webhead\WP\SearchCloud\Frontend\Look_Styles;
 use Webhead\WP\SearchCloud\Frontend\Placement_Preview;
@@ -34,6 +35,20 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.4.0
  */
 final class Placement_Endpoint extends Rest_API {
+	/**
+	 * The settings of the search that take one of a few values, and the values.
+	 *
+	 * @var array<string,array<int,string>>
+	 */
+	private const CHOICES = [
+		'mode'       => Search_Placement::MODES,
+		'trigger'    => Search_Placement::TRIGGERS,
+		'highlights' => Search_Placement::HIGHLIGHTS,
+		'animation'  => Search_Placement::ANIMATIONS,
+		'cards'      => Search_Placement::CARDS,
+		'align'      => Search_Placement::ALIGNMENTS,
+	];
+
 	public function __construct(
 		private Placement_Config $config
 	) {}
@@ -56,6 +71,34 @@ final class Placement_Endpoint extends Rest_API {
 				[ 'message' => __( 'The placement settings were missing from the request.', 'searcio' ) ],
 				400
 			);
+		}
+
+		// A value that is not one of a setting's choices ("slide" for the
+		// animation) was taken for the one the setting already had, and answered
+		// with success: the caller believed it had been saved.
+		$search = $incoming['search'] ?? null;
+
+		if ( is_array( $search ) ) {
+			foreach ( self::CHOICES as $key => $choices ) {
+				$value = $search[ $key ] ?? null;
+
+				if ( null === $value || '' === $value || ( is_string( $value ) && in_array( $value, $choices, true ) ) ) {
+					continue;
+				}
+
+				return new WP_REST_Response(
+					[
+						'message' => sprintf(
+							/* translators: 1: the value that was sent. 2: the name of the setting. 3: the values it can take, separated by commas. */
+							__( '"%1$s" is not a value for %2$s. Use one of: %3$s.', 'searcio' ),
+							is_scalar( $value ) ? (string) $value : gettype( $value ),
+							$key,
+							implode( ', ', $choices )
+						),
+					],
+					422
+				);
+			}
 		}
 
 		$this->config->save( $incoming );

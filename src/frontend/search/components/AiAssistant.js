@@ -5,7 +5,7 @@ import Button from './Button';
 import { getConfig, streamAssistant, trackClick } from '../../../utils/api';
 import { positionInSearch } from '../../../utils/clicks';
 import { NARROW, useMediaQuery } from '../../../utils/mediaQuery';
-import CompareTable, { comparisonRows } from './CompareTable';
+import CompareTable, { comparedProducts, comparisonRows } from './CompareTable';
 import { postTypeOf } from '../../../utils/documentType';
 import Markdown from './markdown';
 import { useTypewriter } from '../../../utils/typewriter';
@@ -142,7 +142,7 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 	// And only for products: two posts or pages side by side compare nothing
 	// a reader chooses between.
 	const allProducts = products.every( ( product ) => 'product' === postTypeOf( product ) || 'product' === product?.source?.type || 'number' === typeof product?.source?.price );
-	const canCompare = products.length >= 2 && allProducts && comparisonRows( products ).length > 0;
+	const canCompare = products.length >= 2 && allProducts && comparisonRows( comparedProducts( products ) ).length > 0;
 	// A new product set can have nothing to compare while the toggle was on.
 	const comparing = compare && canCompare;
 

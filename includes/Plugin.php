@@ -71,6 +71,7 @@ use Webhead\WP\SearchCloud\Sync\Sync_State;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
+use Webhead\WP\SearchCloud\Sync\Field_Label_Sync;
 use Webhead\WP\SearchCloud\Sync\Change_Listener;
 use Webhead\WP\SearchCloud\Sync\Shop_Settings_Listener;
 use Webhead\WP\SearchCloud\Sync\Incremental_Service;
@@ -84,6 +85,8 @@ use Webhead\WP\SearchCloud\Frontend\Search_Surface;
 use Webhead\WP\SearchCloud\Frontend\Site_Placement;
 use Webhead\WP\SearchCloud\Shortcodes\Products_Shortcode;
 use Webhead\WP\SearchCloud\Shortcodes\Search_Shortcode;
+use Webhead\WP\SearchCloud\Widgets\Classic_Products_Widget;
+use Webhead\WP\SearchCloud\Widgets\Classic_Search_Widget;
 use Webhead\WP\SearchCloud\Widgets\Widget_Registrar;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Products_Widget;
 use Webhead\WP\SearchCloud\Elementor\Widgets\Search_Widget;
@@ -241,7 +244,7 @@ final class Plugin extends Base_Plugin {
 		$container->add(
 			'indexing_endpoint',
 			static function () use ( $container ): Indexing_Endpoint {
-				return new Indexing_Endpoint( $container->get( 'index_config' ), $container->get( 'sync_service' ) );
+				return new Indexing_Endpoint( $container->get( 'index_config' ), $container->get( 'sync_service' ), $container->get( 'field_label_sync' ) );
 			}
 		);
 		$container->add(
@@ -254,6 +257,12 @@ final class Plugin extends Base_Plugin {
 		// every service that is handed one has to be handed that same object.
 		$container->addShared( 'sync_runs_table', Sync_Runs_Table::class );
 		$container->addShared( 'change_queue_table', Change_Queue_Table::class );
+		$container->add(
+			'field_label_sync',
+			static function () use ( $container ): Field_Label_Sync {
+				return new Field_Label_Sync( $container->get( 'search_cloud_client' ), $container->get( 'index_config' ) );
+			}
+		);
 		$container->add( 'dirty_tracker', Dirty_Tracker::class );
 		$container->add( 'failed_deletes', Failed_Deletes::class );
 		$container->add(
@@ -323,7 +332,8 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'sync_service' ),
 					$container->get( 'search_cloud_client' ),
 					$container->get( 'connection_state' ),
-					$container->get( 'woo' )
+					$container->get( 'woo' ),
+					$container->get( 'field_label_sync' )
 				);
 			}
 		);
@@ -353,7 +363,8 @@ final class Plugin extends Base_Plugin {
 					$container->get( 'language_config' ),
 					$container->get( 'facet_config' ),
 					$container->get( 'woo' ),
-					$container->get( 'sync_service' )
+					$container->get( 'sync_service' ),
+					$container->get( 'field_label_sync' )
 				);
 			}
 		);
@@ -548,6 +559,7 @@ final class Plugin extends Base_Plugin {
 			'searcio_sync_options',
 			static function (): void {
 				delete_option( Sync_Keys::OPTION_SNAPSHOT );
+				delete_option( Sync_Keys::OPTION_INDEX_OWNER );
 				delete_option( Sync_Keys::OPTION_SEEN );
 				delete_option( Sync_Keys::OPTION_PRUNE );
 				delete_option( Sync_Keys::OPTION_FAILED_DELETES );
@@ -576,6 +588,17 @@ final class Plugin extends Base_Plugin {
 			Uninstall_Manager::GROUP_DATA
 		);
 
+		// WordPress keeps the settings of a widget's instances in an option of
+		// its own, which the plugin's two classic widgets leave behind.
+		$uninstall_manager->register_cleanup(
+			'searcio_widget_options',
+			static function (): void {
+				delete_option( 'widget_' . Classic_Search_Widget::ID_BASE );
+				delete_option( 'widget_' . Classic_Products_Widget::ID_BASE );
+			},
+			Uninstall_Manager::GROUP_DATA
+		);
+
 		$uninstall_manager->register_metadata_cleanup(
 			$this->get_database_manager(),
 			'post',
@@ -597,6 +620,20 @@ final class Plugin extends Base_Plugin {
 		$this->get_uninstall_manager()->set_policy( $this->uninstall_policy() );
 
 		parent::uninstall_current_site();
+	}
+
+	/**
+	 * The WooCommerce features the plugin works with. The header's `WC tested
+	 * up to` makes WooCommerce check them: a feature left undeclared is one it
+	 * is "uncertain" about, and the Cart and Checkout blocks name such a plugin
+	 * as a possibly incompatible extension. The plugin indexes products only:
+	 * it reads no order, adds nothing to the cart or the checkout, and reads a
+	 * product's Cost of goods through WooCommerce's own API.
+	 *
+	 * @return array<int|string, string|bool>
+	 */
+	protected function get_woocommerce_feature_compatibility(): array {
+		return [ 'custom_order_tables', 'cart_checkout_blocks', 'cost_of_goods_sold' ];
 	}
 
 	/**

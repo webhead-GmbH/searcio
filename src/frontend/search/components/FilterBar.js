@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import Icon from '../ui/Icon';
 import { chevronDown, funnel } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -168,9 +168,9 @@ const FilterBar = ( {
 				aria-haspopup="dialog"
 				aria-expanded={ open }
 				aria-controls={ open && ! narrow ? popoverId : undefined }
-				// The values the "+1" stands for are read out too, so the name
-				// runs on from what the button shows: "Colour: Olive, Black".
-				aria-label={ label.more > 0 ? `${ label.text }${ label.hidden }` : undefined }
+				// The name starts with what the button shows, "+1" included, and
+				// runs on to the values it stands for: "Colour: Olive +1, Black".
+				aria-label={ label.more > 0 ? `${ label.text } +${ label.more }${ label.hidden }` : undefined }
 				onClick={ ( event ) => onGroup( field, event.currentTarget ) }
 			>
 				<span className="whsc-facet__label">

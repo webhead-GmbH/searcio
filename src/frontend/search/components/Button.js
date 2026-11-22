@@ -1,4 +1,5 @@
-import { Icon, Tooltip } from '@wordpress/components';
+import Icon from '../ui/Icon';
+import Tooltip from '../ui/Tooltip';
 
 /**
  * A button of the storefront, drawn by this plugin's stylesheet alone.

@@ -84,8 +84,19 @@ final class Settings_Endpoint extends Rest_API {
 			);
 		}
 
-		// A value its schema refuses, such as a negative number of days to keep
-		// the history for, is answered as a refusal, not a server error.
+		// The number of days to keep the history for: the schema's own message
+		// named the setting by its key ("sync_retention_days must be greater
+		// than or equal to 0"), which a shop owner cannot read as an instruction.
+		$days = $incoming[ Plugin_Settings::SYNC_RETENTION_DAYS ] ?? null;
+
+		if ( null !== $days && '' !== $days && ( ! is_numeric( $days ) || (float) $days < 0 ) ) {
+			return new WP_REST_Response(
+				[ 'message' => __( 'Enter 0 or more days to keep the sync history for. 0 keeps it forever.', 'searcio' ) ],
+				400
+			);
+		}
+
+		// A value its schema refuses is answered as a refusal, not a server error.
 		try {
 			$this->settings->partial_update( self::without_unchanged_credentials( $incoming ), rest_only: true );
 		} catch ( Invalid_Setting_Value $error ) {

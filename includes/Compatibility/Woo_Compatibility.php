@@ -2,11 +2,11 @@
 /**
  * WooCommerce compatibility wiring.
  *
- * WooCommerce is a soft dependency. This hookable declares HPOS (custom order
- * tables) compatibility - best practice even though the plugin only indexes
- * products, never orders - and surfaces an admin notice when WooCommerce is
- * active but below the supported minimum, in which case the product indexing
- * section is disabled while WP-content indexing keeps working.
+ * WooCommerce is a soft dependency. This hookable surfaces an admin notice
+ * when WooCommerce is active but below the supported minimum, in which case
+ * the product indexing section is disabled while WP-content indexing keeps
+ * working. The features the plugin works with are declared by the framework
+ * from {@see \Webhead\WP\SearchCloud\Plugin::get_woocommerce_feature_compatibility()}.
  *
  * @author    Mir Mohammad Hosseini <mh@webhead.dev>
  * @copyright 2026 webhead GmbH
@@ -26,19 +26,6 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Woo_Compatibility {
 	public function __construct( private Woo $woo ) {}
-
-	#[Action( 'before_woocommerce_init' )]
-	public function declare_compatibility(): void {
-		if ( ! class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-			return;
-		}
-
-		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility(
-			'custom_order_tables',
-			\Webhead\WP\SearchCloud\PLUGIN_FILE,
-			true
-		);
-	}
 
 	#[Action( 'admin_notices' )]
 	public function maybe_render_minimum_notice(): void {

@@ -61,50 +61,18 @@ final class Connection_Endpoint extends Rest_API {
 
 		$presented = $this->present( $response );
 
+		// Whether Searcio takes the storefront's search key is asked by the
+		// screen, from the browser (`searchKeyCheck.js`), as a visitor's page
+		// asks: a key works only on the site it was connected from, and
+		// Searcio refuses a search-key request from the site's server.
 		if ( ! empty( $presented['ok'] ) ) {
-			$presented['search_key'] = $this->search_key_status( $fresh );
+			$presented['search_key'] = [
+				'key'      => $this->client->search_key(),
+				'endpoint' => $this->client->endpoint(),
+			];
 		}
 
 		return new WP_REST_Response( $presented );
-	}
-
-	/**
-	 * Whether the storefront's search key works from this site, besides the
-	 * write key the health check asks with: `{ ok, message }`. A check that
-	 * cannot reach Searcio says nothing against the key.
-	 *
-	 * @return array{ok:bool,message:string}
-	 */
-	private function search_key_status( bool $fresh ): array {
-		$key = $this->client->search_key();
-
-		if ( '' === $key ) {
-			return [
-				'ok'      => false,
-				'message' => __( 'No search key is saved, so the site searches with WordPress instead of Searcio. Connect again, or paste the search key under the manual key entry.', 'searcio' ),
-			];
-		}
-
-		$check = $this->client->search_key_check( $key, $fresh );
-
-		if ( 401 === $check->status ) {
-			return [
-				'ok'      => false,
-				'message' => __( 'Searcio does not know the search key, so the site searches with WordPress instead of Searcio. Copy it again from the Searcio dashboard, or connect again.', 'searcio' ),
-			];
-		}
-
-		if ( 403 === $check->status ) {
-			return [
-				'ok'      => false,
-				'message' => __( 'Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. Add the address to the domains of the key in the Searcio dashboard.', 'searcio' ),
-			];
-		}
-
-		return [
-			'ok'      => true,
-			'message' => '',
-		];
 	}
 
 	/**
@@ -281,6 +249,10 @@ final class Connection_Endpoint extends Rest_API {
 				'limit'      => isset( $documents['limit'] ) ? ( null === $documents['limit'] ? null : (int) $documents['limit'] ) : null,
 				'percent'    => isset( $documents['percent'] ) ? (int) $documents['percent'] : null,
 				'near_limit' => (bool) ( $documents['near_limit'] ?? false ),
+				// What the site's index holds right now, which `used` (the
+				// account's counter, as of the last sync) cannot say: 0 is an
+				// empty or missing index, null that Searcio could not tell.
+				'indexed'    => isset( $documents['indexed'] ) && is_numeric( $documents['indexed'] ) ? (int) $documents['indexed'] : null,
 			],
 			// Every metered allowance, not just documents: a site that has spent
 			// its monthly searches or AI messages has a storefront that is

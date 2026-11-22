@@ -9,6 +9,7 @@ import {showToast} from '../../../../toast';
 import ConnectionResultNotice from './ConnectionResultNotice';
 import {useAnnounce} from '../../../../utils/announce';
 import {forgetAll} from '../../remote';
+import {checkSearchKey} from '../../searchKeyCheck';
 
 const pluginData = window.searcioData || {};
 const SECRET_PLACEHOLDER = '••••••••••••';
@@ -62,7 +63,7 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 		setResult(null);
 
 		try {
-			const response = await apiFetch({
+			const response = await checkSearchKey(await apiFetch({
 				path:
 					pluginData?.api?.testConnectionPath ||
 					'/searcio/v1/connection/test',
@@ -70,7 +71,7 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 				// "Test connection" asks Searcio now, past what the server keeps,
 				// and the rest of the screen reads anew what new keys may change.
 				data: {fresh: true},
-			});
+			}));
 
 			forgetAll();
 			setResult(response);
@@ -95,7 +96,13 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 		}
 	};
 
-	const connectionSaveDisabled = isSaving || isLoading || !hasUnsavedChanges;
+	// A search key is `sk_` and letters and digits, which the server checks as
+	// well. Said as it is typed: a key with a space in it was saved without a
+	// word, and the site's search fell back to WordPress's own.
+	const searchKey = String(settings.search_key ?? '').trim();
+	const keyProblem = '' !== searchKey && !/^sk_\w+$/.test(searchKey);
+
+	const connectionSaveDisabled = isSaving || isLoading || !hasUnsavedChanges || keyProblem;
 	const connectionSaveLabel = isSaving
 		? __('Saving…', 'searcio')
 		: __('Save connection', 'searcio');
@@ -120,7 +127,9 @@ const ManualConnectionEntry = ({pendingClaim, onSaved}) => {
 			</Text>
 			<InputControl
 				label={__('Search key', 'searcio')}
-				description={__('Public key (sk_...) used by the browser, restricted by your domain allowlist.', 'searcio')}
+				description={keyProblem
+					? __('That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard.', 'searcio')
+					: __('Public key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains.', 'searcio')}
 				value={settings.search_key ?? ''}
 				onValueChange={(value) => changeKey('search_key', value)}
 			/>

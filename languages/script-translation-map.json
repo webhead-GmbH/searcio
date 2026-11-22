@@ -161,10 +161,19 @@
     "src/frontend/search/components/templates.js": [
         "public/bundle.search.js"
     ],
+    "src/frontend/search/ui/Modal.js": [
+        "public/bundle.search.js"
+    ],
+    "src/frontend/search/ui/SearchBox.js": [
+        "public/bundle.search.js"
+    ],
     "src/settings/store/provider.js": [
         "public/bundle.settings.js"
     ],
     "src/utils/facets.js": [
         "public/bundle.search.js"
+    ],
+    "src/admin/settings/searchKeyCheck.js": [
+        "public/bundle.settings.js"
     ]
 }

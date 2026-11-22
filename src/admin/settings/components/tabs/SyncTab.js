@@ -274,7 +274,25 @@ const SyncTab = () => {
 									</Notice.Root>
 								)}
 
+								{/* WP-Cron only runs while the site is visited, or when the server calls it: a run stood at 0 of 539 for twenty minutes and said nothing. */}
+								{'running' === active.status && status.stalled && (
+									<Notice.Root intent="warning" className="whsc-sync-stalled">
+										<Notice.Description>
+											{sprintf(
+												/* translators: %d: how many minutes the sync has not moved. */
+												__('This sync has not moved for %d minutes. WordPress runs it through WP-Cron, which only works while the site is visited, or when the server calls it. Run the next step here, or ask your host to call "wp cron event run --due-now" from the server every minute.', 'searcio'),
+												Math.floor(Number(status.stalled.seconds) / 60)
+											)}
+										</Notice.Description>
+									</Notice.Root>
+								)}
+
 								<Stack direction="row" gap="sm" align="center" wrap="wrap">
+									{'running' === active.status && status.stalled && (
+										<Button __next40pxDefaultSize variant="primary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/nudge', {}, null)}>
+											{__('Run the next step now', 'searcio')}
+										</Button>
+									)}
 									{active.status === 'running' && (
 										<Button __next40pxDefaultSize variant="secondary" isBusy={busy} disabled={busy || !CAN_RUN_SYNC} onClick={() => post('/pause', {}, null)}>
 											{__('Pause', 'searcio')}

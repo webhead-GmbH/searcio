@@ -22,6 +22,12 @@ export const FULL_SCREEN = '(max-width: 782px), (max-height: 500px)';
  */
 export const GRID_RESULTS = `${ FULL_SCREEN }, (hover: none) and (pointer: coarse), (max-width: 1024px) and (orientation: portrait)`;
 
+/**
+ * Where the admin screens stack what stands side by side: a phone. The
+ * stylesheet's query is the same 600px.
+ */
+export const PHONE = '(max-width: 600px)';
+
 const matches = ( query ) =>
 	'undefined' !== typeof window && 'function' === typeof window.matchMedia && window.matchMedia( query ).matches;
 

@@ -160,4 +160,30 @@ test.describe( 'Server-designed cards', () => {
 			.toEqual( [ 'none', '0px', '0px' ] );
 		expect( await styleOf( card.locator( '.sct-12-img' ), 'display', 'max-width' ) ).toEqual( [ 'block', '100%' ] );
 	} );
+
+	/**
+	 * "from249,90": the canvas puts a space after the prefix, the markup none.
+	 * It is the part's `::after`, as Searcio's compiled stylesheet writes it,
+	 * so a template that writes it too still shows one space, not two.
+	 */
+	test( 'keeps one space after the "from" of a price range', async ( { page, requestUtils } ) => {
+		const spaced = { ...TEMPLATE, css: `${ TEMPLATE.css }\n.sct-12-price-prefix::after, .sct-12-price-regular::after { content: "\\a0"; }` };
+
+		for ( const template of [ TEMPLATE, spaced ] ) {
+			await page.unrouteAll( { behavior: 'ignoreErrors' } );
+			await mockSearchCloud( page, { hits: PRODUCTS, templates: [ template ] } );
+			await page.goto( await createBlockPost( requestUtils, { cardSource: 'server' } ) );
+
+			const widget = new SearchWidget( page );
+
+			await widget.openModal();
+			await widget.search( 'layer' );
+
+			const prefix = widget.modal.locator( '.whsc-card--server' ).nth( 1 ).locator( '[data-sc-price-part="prefix"]' );
+
+			await expect( prefix ).toBeVisible();
+			expect( await prefix.evaluate( ( el ) => [ window.getComputedStyle( el, '::after' ).content, window.getComputedStyle( el ).marginInlineEnd ] ) )
+				.toEqual( [ '" "', '0px' ] );
+		}
+	} );
 } );

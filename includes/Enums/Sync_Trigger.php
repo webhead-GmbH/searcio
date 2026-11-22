@@ -16,9 +16,12 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 enum Sync_Trigger: string {
-	case Manual      = 'manual';
-	case Scheduled   = 'scheduled';
-	case Incremental = 'incremental';
+	case Manual         = 'manual';
+	case Scheduled      = 'scheduled';
+	case Incremental    = 'incremental';
+	// A save on the Indexing or Search Config tab, or a change of a shop setting
+	// that alters what is indexed: started by the plugin, not by a click on Start.
+	case SettingsChange = 'settings_change';
 
 	/**
 	 * Stored string values (for validating REST filter input).

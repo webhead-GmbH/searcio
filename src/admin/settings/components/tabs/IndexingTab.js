@@ -2,12 +2,12 @@ import {useEffect, useState} from '@wordpress/element';
 import {Button, ToggleControl} from '@wordpress/components';
 import {CheckboxControl, CollapsibleCard, InputControl, Notice, SelectControl, Stack, Text} from '@wordpress/ui';
 import {__, _n, sprintf} from '@wordpress/i18n';
-import {trash} from '@wordpress/icons';
 import apiFetch from '@wordpress/api-fetch';
 
 import {Grid} from '../../../../components/Layout';
 import {showToast} from '../../../../toast';
 import {selectProps} from '../../../../utils/select';
+import RowRemove from '../RowRemove';
 import TabIntro from '../TabIntro';
 import IndexingSkeleton from './IndexingSkeleton';
 import {useAnnounce} from '../../../../utils/announce';
@@ -233,14 +233,7 @@ export const CustomFieldRow = ({field, taxonomies, onChange, onRemove}) => {
 				{...selectProps(KIND_OPTIONS, kind, setKind)}
 			/>
 			{renderValue()}
-			<Button
-				__next40pxDefaultSize
-				icon={trash}
-				isDestructive
-				variant="tertiary"
-				label={__('Remove field', 'searcio')}
-				onClick={onRemove}
-			/>
+			<RowRemove label={__('Remove field', 'searcio')} onClick={onRemove} />
 		</div>
 	);
 };
@@ -335,7 +328,7 @@ export const WooSection = ({woo, block, onChange}) => {
 				{wooConfig.cost_price && (
 					<InputControl
 						label={__('Purchase price from field', 'searcio')}
-						description={__('The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Searcio lifts products with a good margin once profit ranking is on in the Searcio dashboard, and never shows the price or sends it back.', 'searcio')}
+						description={__('The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Enter purchase prices without tax: where the shop shows prices with tax, Searcio adds it, so the margin comes out the same. A variable product uses the purchase price of its cheapest variation. Searcio lifts products with a good margin once profit ranking is on (Search Config tab), and never shows the price or sends it back.', 'searcio')}
 						placeholder="_wc_cog_cost"
 						value={wooConfig.cost_meta || ''}
 						onValueChange={(value) => setWoo('cost_meta', value)}

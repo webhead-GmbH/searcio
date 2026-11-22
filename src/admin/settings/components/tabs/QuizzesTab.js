@@ -24,13 +24,17 @@ const QuizzesTab = () => {
 	const [ quizId, setQuizId ] = useState( quizInAddress );
 	const [ isAdding, setIsAdding ] = useState( false );
 	const [ languages, setLanguages ] = useState( [] );
+	const [ currentLanguage, setCurrentLanguage ] = useState( null );
 	const [ reload, setReload ] = useState( 0 );
 
 	// The site's languages, as the Search Config tab lists them; none on a
 	// single-language site, which then has no language to choose.
 	useEffect( () => {
 		readOnce( { path: INDEXING_CONFIG_PATH } )
-			.then( ( catalog ) => setLanguages( catalog?.languages?.active && Array.isArray( catalog.languages.available ) ? catalog.languages.available : [] ) )
+			.then( ( catalog ) => {
+				setLanguages( catalog?.languages?.active && Array.isArray( catalog.languages.available ) ? catalog.languages.available : [] );
+				setCurrentLanguage( catalog?.languages?.current || null );
+			} )
 			.catch( () => setLanguages( [] ) );
 	}, [] );
 
@@ -74,6 +78,7 @@ const QuizzesTab = () => {
 				isOpen={ isAdding }
 				onClose={ closeAdding }
 				languages={ languages }
+				defaultLanguage={ currentLanguage }
 				onCreated={ ( id ) => {
 					setIsAdding( false );
 					open( id );

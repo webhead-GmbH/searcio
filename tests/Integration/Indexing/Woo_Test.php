@@ -33,6 +33,9 @@ final class Woo_Test extends Integration_Test_Case {
 
 	private Woo $woo;
 
+	/** @var array<int,int> The global attributes a test made. */
+	private array $attribute_ids = [];
+
 	public function set_up(): void {
 		parent::set_up();
 
@@ -46,6 +49,18 @@ final class Woo_Test extends Integration_Test_Case {
 	public function tear_down(): void {
 		if ( taxonomy_exists( self::ATTRIBUTE ) ) {
 			unregister_taxonomy( self::ATTRIBUTE );
+		}
+
+		foreach ( $this->attribute_ids as $id ) {
+			$taxonomy = wc_attribute_taxonomy_name_by_id( $id );
+
+			wc_delete_attribute( $id );
+
+			if ( taxonomy_exists( $taxonomy ) ) {
+				unregister_taxonomy( $taxonomy );
+			}
+
+			unset( $GLOBALS['wc_product_attributes'][ $taxonomy ] );
 		}
 
 		parent::tear_down();
@@ -261,7 +276,9 @@ final class Woo_Test extends Integration_Test_Case {
 
 		$unlisted = array_diff( array_keys( $document ), [ 'id' ], $this->service( 'index_config' )->indexed_fields() );
 
-		$this->assertEqualsCanonicalizing( array_merge( Document_Builder::SORT_FIELDS, Woo::PRIVATE_FIELDS ), array_values( $unlisted ) );
+		// The price without tax is carried only by a taxable product in a shop that shows prices with tax: Woo_Price_Tax_Test.
+		$this->assertEqualsCanonicalizing( array_merge( Document_Builder::SORT_FIELDS, [ 'cost_price' ] ), array_values( $unlisted ) );
+		$this->assertSame( [ 'cost_price', 'price_excluding_tax' ], Woo::PRIVATE_FIELDS );
 	}
 
 	public function test_is_active_and_meets_minimum(): void {
@@ -325,9 +342,9 @@ final class Woo_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * lowrider.at has three "MTS Technik", under three parents. By name they
-	 * are one filter value; as paths each is its own, and a product carries
-	 * every level of its own, so a filter on a parent's path finds it.
+	 * Three categories of one name under three parents are one filter value
+	 * by name; as paths each is its own, and a product carries every level of
+	 * its own, so a filter on a parent's path finds it.
 	 */
 	public function test_categories_carry_their_paths_from_the_top(): void {
 		$chassis  = wp_insert_term( 'Fahrwerke', 'product_cat' );
@@ -775,12 +792,133 @@ final class Woo_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * Colour and size matched the product, not one variation: red and XL
+	 * found a jacket whose only red was M. Searcio filters on
+	 * the variations when they are sent as `variants`, each with the
+	 * attributes it is made of and whether it is in stock.
+	 */
+	public function test_a_variable_product_sends_its_variations_with_their_attributes_and_stock(): void {
+		$colour = $this->global_attribute( 'whsc_farbe', [ 'Rot', 'Blau' ] );
+		$size   = $this->global_attribute( 'whsc_groesse', [ 'M', 'XL' ] );
+
+		$variable = new WC_Product_Variable();
+		$variable->set_name( 'Daunenjacke' );
+		$variable->set_attributes(
+			[
+				$this->taxonomy_attribute( $colour, [ 'Rot', 'Blau' ] ),
+				$this->taxonomy_attribute( $size, [ 'M', 'XL' ] ),
+			]
+		);
+		$variable->save();
+
+		$rows = [
+			[ 'rot', 'm', 'instock', 'publish' ],
+			[ 'rot', 'xl', 'outofstock', 'publish' ],
+			[ 'blau', '', 'instock', 'publish' ],
+			[ 'blau', 'm', 'instock', 'private' ],
+		];
+
+		foreach ( $rows as [ $farbe, $groesse, $stock, $status ] ) {
+			$variation = new WC_Product_Variation();
+			$variation->set_parent_id( $variable->get_id() );
+			$variation->set_attributes( [ $colour => $farbe, $size => $groesse ] );
+			$variation->set_regular_price( '100' );
+			$variation->set_stock_status( $stock );
+			$variation->set_status( $status );
+			$variation->save();
+		}
+
+		wc_get_product( $variable->get_id() )->save();
+
+		$woo    = [ 'attributes' => [ $colour, $size ] ];
+		$fields = $this->woo->product_fields( get_post( $variable->get_id() ), $woo );
+
+		$this->assertEqualsCanonicalizing( [ 'Rot', 'Blau' ], $fields[ 'attr_whsc_farbe' ] );
+		$this->assertSame(
+			[
+				[ 'attr_whsc_farbe' => 'Rot', 'attr_whsc_groesse' => 'M', 'in_stock' => true ],
+				[ 'attr_whsc_farbe' => 'Rot', 'attr_whsc_groesse' => 'XL', 'in_stock' => false ],
+				// "Any size" is every size the product has.
+				[ 'attr_whsc_farbe' => 'Blau', 'attr_whsc_groesse' => [ 'M', 'XL' ], 'in_stock' => true ],
+			],
+			$this->canonical_sizes( $fields[ Woo::VARIANTS_FIELD ] )
+		);
+
+		$this->assertSame(
+			[ [ 'attr_whsc_farbe' => 'Rot', 'in_stock' => true ], [ 'attr_whsc_farbe' => 'Rot', 'in_stock' => false ], [ 'attr_whsc_farbe' => 'Blau', 'in_stock' => true ] ],
+			$this->woo->product_fields( get_post( $variable->get_id() ), [ 'attributes' => [ $colour ] ] )[ Woo::VARIANTS_FIELD ],
+			'Only the attributes the mapping sends.'
+		);
+		$this->assertArrayNotHasKey( Woo::VARIANTS_FIELD, $this->woo->product_fields( get_post( $variable->get_id() ), [] ), 'No attribute sent, no variations.' );
+		$this->assertArrayNotHasKey( Woo::VARIANTS_FIELD, $this->woo->product_fields( get_post( $this->make_variable_product() ), $woo ), 'Variations made of no sent attribute.' );
+		$this->assertNotContains( Woo::VARIANTS_FIELD, $this->woo->field_names( $woo ) );
+	}
+
+	/**
 	 * Searcio never returns the purchase price and refuses it as a field to
 	 * search, filter or suggest, so Search Config is not offered it.
 	 */
 	public function test_the_purchase_price_is_written_but_never_offered_as_a_field(): void {
 		$this->assertNotContains( 'cost_price', $this->woo->field_names( [ 'cost_price' => true, 'price' => true ] ) );
-		$this->assertSame( [ 'cost_price' ], Woo::PRIVATE_FIELDS );
+		$this->assertNotContains( 'price_excluding_tax', $this->woo->field_names( [ 'cost_price' => true, 'price' => true ] ) );
+		$this->assertSame( [ 'cost_price', 'price_excluding_tax' ], Woo::PRIVATE_FIELDS );
+	}
+
+	/**
+	 * A global attribute with its terms, registered for this test.
+	 *
+	 * @param  array<int,string>  $terms
+	 * @return string The taxonomy.
+	 */
+	private function global_attribute( string $slug, array $terms ): string {
+		$id = wc_create_attribute( [ 'name' => ucfirst( $slug ), 'slug' => $slug ] );
+
+		$this->assertIsInt( $id );
+
+		$taxonomy = wc_attribute_taxonomy_name( $slug );
+
+		register_taxonomy( $taxonomy, 'product' );
+		$GLOBALS['wc_product_attributes'][ $taxonomy ] = wc_get_attribute( $id );
+		$this->attribute_ids[]                         = $id;
+
+		foreach ( $terms as $term ) {
+			$this->assertIsArray( wp_insert_term( $term, $taxonomy ) );
+		}
+
+		return $taxonomy;
+	}
+
+	/**
+	 * @param  array<int,string>  $names
+	 */
+	private function taxonomy_attribute( string $taxonomy, array $names ): \WC_Product_Attribute {
+		$attribute = new \WC_Product_Attribute();
+		$attribute->set_id( wc_attribute_taxonomy_id_by_name( $taxonomy ) );
+		$attribute->set_name( $taxonomy );
+		$attribute->set_options( array_map( static fn ( string $name ): int => (int) get_term_by( 'name', $name, $taxonomy )->term_id, $names ) );
+		$attribute->set_visible( true );
+		$attribute->set_variation( true );
+
+		return $attribute;
+	}
+
+	/**
+	 * The variants with the values of an "any" attribute in a fixed order.
+	 *
+	 * @param  array<int,array<string,mixed>>  $variants
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function canonical_sizes( array $variants ): array {
+		return array_map(
+			static function ( array $variant ): array {
+				if ( is_array( $variant['attr_whsc_groesse'] ?? null ) ) {
+					sort( $variant['attr_whsc_groesse'] );
+				}
+
+				return $variant;
+			},
+			$variants
+		);
 	}
 
 	private function cost_of_goods( bool $on ): void {

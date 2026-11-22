@@ -31,6 +31,7 @@ use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Indexing\Facet_Config;
 use Webhead\WP\SearchCloud\Indexing\Language_Config;
 use Webhead\WP\SearchCloud\Indexing\Woo;
+use Webhead\WP\SearchCloud\Sync\Field_Label_Sync;
 use Webhead\WP\SearchCloud\Sync\Sync_Service;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Attributes\Route;
 use Webhead\WP\SearchCloud\Dependencies\Webhead\WP\Framework\Routing\Rest_API;
@@ -46,7 +47,8 @@ final class Search_Config_Endpoint extends Rest_API {
 		private Language_Config $language_config,
 		private Facet_Config $facet_config,
 		private Woo $woo,
-		private Sync_Service $sync
+		private Sync_Service $sync,
+		private Field_Label_Sync $field_labels
 	) {}
 
 	protected function get_rest_namespace(): string {
@@ -85,9 +87,15 @@ final class Search_Config_Endpoint extends Rest_API {
 		$response = $this->client->update_search_config( $payload );
 		$answer   = $this->respond( $response );
 
+		// Beside the save, not in it: a label Searcio refuses is no reason to
+		// refuse the settings the person changed.
+		if ( $response->ok() ) {
+			$this->field_labels->push();
+		}
+
 		if ( $response->ok() && ! $this->same_languages( $before, $this->language_config->enabled_languages() ) ) {
 			$user_id = get_current_user_id();
-			$started = $this->sync->start( Sync_Trigger::Manual, $user_id > 0 ? $user_id : null, false );
+			$started = $this->sync->start( Sync_Trigger::SettingsChange, $user_id > 0 ? $user_id : null, false );
 			$body    = $answer->get_data();
 
 			if ( is_array( $body ) ) {
@@ -140,6 +148,7 @@ final class Search_Config_Endpoint extends Rest_API {
 			$this->language_config->set_enabled_languages( $response->body()['languages'] ?? [] );
 			$this->facet_config->set_fields( $response->body()['facet_fields'] ?? [] );
 			$this->facet_config->set_match( $response->body()['facet_match'] ?? [] );
+			$this->facet_config->set_numeric( $response->body()['numeric_fields'] ?? [] );
 		}
 
 		return new WP_REST_Response( $response->body(), $response->status );

@@ -118,7 +118,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -155,7 +156,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$sent = null;
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -178,7 +180,8 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$sent = null;
 		$this->fake_http(
 			function ( string $url, array $args ) use ( &$sent ) {
-				$sent = json_decode( (string) ( $args['body'] ?? '' ), true );
+				// What is written: the read that follows a save, to see whether labels differ, has no body.
+				$sent = 'PUT' === ( $args['method'] ?? '' ) ? json_decode( (string) ( $args['body'] ?? '' ), true ) : $sent;
 
 				return $this->http_ok( [ 'languages' => [] ] );
 			}
@@ -253,6 +256,24 @@ final class Search_Config_Endpoint_Test extends Integration_Test_Case {
 		$this->server->dispatch( $request );
 
 		$this->assertSame( [ 'brand', 'categories' ], $this->service( 'facet_config' )->fields() );
+	}
+
+	/**
+	 * And the fields Searcio maps as numbers, which the window draws as a
+	 * range; a service that does not report them has none.
+	 */
+	public function test_a_successful_read_mirrors_the_number_fields(): void {
+		$this->as_admin();
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'gewicht' ], 'numeric_fields' => [ 'gewicht' ] ] ) );
+
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertTrue( $this->service( 'facet_config' )->is_numeric( 'gewicht' ) );
+
+		$this->fake_http( fn () => $this->http_ok( [ 'facet_fields' => [ 'gewicht' ] ] ) );
+		$this->server->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+
+		$this->assertFalse( $this->service( 'facet_config' )->is_numeric( 'gewicht' ) );
 	}
 
 	/**

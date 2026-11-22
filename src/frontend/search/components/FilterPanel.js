@@ -1,5 +1,5 @@
 import { useState } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import Icon from '../ui/Icon';
 import { chevronDown, search as searchIcon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 

@@ -24,8 +24,10 @@ use Webhead\WP\SearchCloud\Enums\Sync_Status;
 use Webhead\WP\SearchCloud\Enums\Sync_Trigger;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Password_Protected_Posts;
 use Webhead\WP\SearchCloud\Lifecycle\Upgrade_Steps\Unindex_Shop_Pages;
+use Webhead\WP\SearchCloud\Settings\Plugin_Settings;
 use Webhead\WP\SearchCloud\Sync\Dirty_Tracker;
 use Webhead\WP\SearchCloud\Sync\Failed_Deletes;
+use Webhead\WP\SearchCloud\Sync\Sync_Keys;
 use Webhead\WP\SearchCloud\Tests\Integration\Integration_Test_Case;
 
 final class Sync_Workflow_Test extends Integration_Test_Case {
@@ -108,6 +110,53 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertSame( [ 'full' ], array_values( array_unique( $types ) ) );
 	}
 
+	/**
+	 * A full run sends a batch for each post type, and Searcio's sync history
+	 * showed each as a run. They name the run: one reference, made as it
+	 * starts and kept in its cursor, on every batch, and a new one for the
+	 * next run.
+	 */
+	public function test_every_batch_of_a_run_names_the_run(): void {
+		$this->connect_client();
+		$config = $this->service( 'index_config' );
+
+		$config->save(
+			[
+				'post' => array_merge( $config->defaults_for( 'post' ), [ 'enabled' => true ] ),
+				'page' => array_merge( $config->defaults_for( 'page' ), [ 'enabled' => true ] ),
+			]
+		);
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish' ] );
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish', 'post_type' => 'page' ] );
+
+		$references = [];
+		$this->fake_http(
+			function ( string $url, array $args ) use ( &$references ): array {
+				if ( str_contains( $url, '/documents' ) ) {
+					$body         = json_decode( (string) ( $args['body'] ?? '{}' ), true );
+					$references[] = $body['run_reference'] ?? null;
+				}
+
+				return $this->http_ok( [ 'ok' => true ] );
+			}
+		);
+
+		$first = (int) $this->sync_service()->start( Sync_Trigger::Manual, 1, true )['run']['id'];
+		$this->drain_ticks();
+		$of_first = $references;
+
+		$this->assertGreaterThanOrEqual( 2, count( $of_first ), 'A batch for each post type.' );
+		$this->assertCount( 1, array_unique( $of_first ), 'One reference for the run.' );
+		$this->assertMatchesRegularExpression( '/^[A-Za-z0-9._:-]{1,64}$/', (string) $of_first[0] );
+		$this->assertSame( $of_first[0], $this->sync_state()->present( $this->sync_state()->find( $first ) )['cursor']['reference'] );
+
+		$references = [];
+		$this->sync_service()->start( Sync_Trigger::Manual, 1, true );
+		$this->drain_ticks();
+
+		$this->assertNotSame( $of_first[0], $references[0], 'The next run is another run.' );
+	}
+
 	public function test_a_second_unforced_run_skips_unchanged_posts(): void {
 		$this->connect_client();
 		$this->enable_indexing( 'post' );
@@ -125,6 +174,51 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 		$this->assertSame( Sync_Status::Completed->value, $second_run['status'] );
 		$this->assertSame( 0, (int) $second_run['pushed'], 'Unchanged posts must be skipped via the dirty tracker.' );
 		$this->assertSame( 2, (int) $second_run['skipped'] );
+	}
+
+	/**
+	 * Disconnecting deletes the site and its index at Searcio, and a new
+	 * connection starts an empty one. The documents the shop holds as sent are
+	 * not in it, so skipping them as unchanged would end a "completed" run
+	 * over an empty index.
+	 */
+	public function test_a_run_after_keys_of_another_account_sends_every_document_again(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish' ] );
+		$this->fake_http( fn(): array => $this->http_ok( [ 'ok' => true ] ) );
+
+		$first = $this->run_full_sync();
+		$this->assertSame( 2, (int) $first['pushed'] );
+
+		$same = $this->run_full_sync();
+		$this->assertSame( 0, (int) $same['pushed'], 'The same keys: nothing has changed, nothing is sent.' );
+
+		$this->settings()->set( Plugin_Settings::WRITE_KEY, Plugin_Settings::encrypt_secret( 'the-next-accounts-write-key' ) );
+
+		$next = $this->run_full_sync();
+
+		$this->assertSame( 2, (int) $next['pushed'], 'Keys of another account: its index has none of the documents.' );
+		$this->assertSame( 0, (int) $next['skipped'] );
+
+		$after = $this->run_full_sync();
+		$this->assertSame( 0, (int) $after['pushed'], 'Once the run has completed under the new keys, unchanged documents are skipped again.' );
+	}
+
+	public function test_a_site_that_has_not_completed_a_run_yet_keeps_skipping_what_has_not_changed(): void {
+		$this->connect_client();
+		$this->enable_indexing( 'post' );
+		self::factory()->post->create_many( 2, [ 'post_status' => 'publish' ] );
+		$this->fake_http( fn(): array => $this->http_ok( [ 'ok' => true ] ) );
+
+		$this->run_full_sync();
+		// What a site that updated from a release before this one holds.
+		delete_option( Sync_Keys::OPTION_INDEX_OWNER );
+		$this->settings()->set( Plugin_Settings::WRITE_KEY, Plugin_Settings::encrypt_secret( 'another-write-key' ) );
+
+		$run = $this->run_full_sync();
+
+		$this->assertSame( 0, (int) $run['pushed'], 'Nothing says whose index the documents were sent to, so a run does not resend them all.' );
 	}
 
 	public function test_a_running_tick_honours_a_cancel_signal(): void {
@@ -208,9 +302,9 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * The tester's post-59 and page-17: published with a password, indexed with
-	 * their text although "Also index private & password-protected items" was
-	 * off. A protected post goes with the private ones.
+	 * A post and a page published with a password were indexed with their
+	 * text although "Also index private & password-protected items" was off.
+	 * A protected post goes with the private ones.
 	 */
 	public function test_a_password_protected_post_is_indexed_only_with_the_private_ones(): void {
 		$this->enable_indexing( 'post', [ 'include_private' => false ] );
@@ -289,7 +383,7 @@ final class Sync_Workflow_Test extends Integration_Test_Case {
 	/**
 	 * Saving the Indexing tab bumps the mapping's version. The documents a
 	 * change does not alter are the same, so the sync after it sends only the
-	 * one that changed: the tester's site sent all 58 to take one out.
+	 * one that changed, where a site sent all its documents to take one out.
 	 */
 	public function test_a_mapping_change_sends_only_the_documents_it_changed(): void {
 		$this->connect_client();

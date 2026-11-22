@@ -46,13 +46,14 @@ msgstr "Searcio"
 
 #: includes/Admin/Menu_Item.php:44
 #: includes/Elementor/Widgets/Search_Widget.php:162
-#: includes/Frontend/Frontend_Config.php:183
-#: src/admin/settings/components/tabs/PlacementTab.js:910
+#: includes/Frontend/Frontend_Config.php:202
+#: src/admin/settings/components/tabs/PlacementTab.js:926
 #: src/frontend/search/components/SearchInput.js:33
-#: src/frontend/search/components/SearchModal.js:1736
-#: src/frontend/search/components/SearchModal.js:1768
+#: src/frontend/search/components/SearchModal.js:1800
+#: src/frontend/search/components/SearchModal.js:1832
 #: src/frontend/search/components/Trigger.js:27
 #: src/frontend/search/components/Trigger.js:44
+#: src/frontend/search/ui/SearchBox.js:47
 msgid "Search"
 msgstr "Buscar"
 
@@ -220,7 +221,8 @@ msgstr "Búsqueda Searcio"
 #: includes/Elementor/Widgets/Search_Widget.php:122
 #: includes/Elementor/Widgets/Search_Widget.php:376
 #: includes/Frontend/Look_Schema.php:103
-#: src/admin/settings/components/tabs/SyncHistory.js:219
+#: src/admin/settings/components/tabs/SearchConfigTab.js:567
+#: src/admin/settings/components/tabs/SyncHistory.js:224
 #: src/blocks/search/edit.js:198
 msgid "Trigger"
 msgstr "Activador"
@@ -272,15 +274,17 @@ msgstr "Activar la búsqueda por voz"
 
 #: includes/Elementor/Widgets/Search_Widget.php:181
 #: includes/Elementor/Widgets/Search_Widget.php:314
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1236
 msgid "On"
 msgstr "Sí"
 
 #: includes/Elementor/Widgets/Search_Widget.php:182
 #: includes/Elementor/Widgets/Search_Widget.php:315
-#: src/admin/settings/components/tabs/PlacementTab.js:444
-#: src/admin/settings/components/tabs/PlacementTab.js:474
-#: src/admin/settings/components/tabs/PlacementTab.js:563
-#: src/admin/settings/components/tabs/PlacementTab.js:587
+#: src/admin/settings/components/tabs/PlacementTab.js:440
+#: src/admin/settings/components/tabs/PlacementTab.js:470
+#: src/admin/settings/components/tabs/PlacementTab.js:559
+#: src/admin/settings/components/tabs/PlacementTab.js:583
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1236
 msgid "Off"
 msgstr "No"
 
@@ -873,6 +877,7 @@ msgstr "Botón de borrar"
 
 #: includes/Elementor/Widgets/Search_Widget.php:876
 #: includes/Frontend/Look_Schema.php:193
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1506
 #: src/blocks/search/edit.js:278
 msgid "Suggestions"
 msgstr "Sugerencias"
@@ -982,10 +987,11 @@ msgstr "Tipografía de populares"
 
 #: includes/Elementor/Widgets/Search_Widget.php:1008
 #: includes/Frontend/Look_Schema.php:246
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1403
 #: src/blocks/search/edit.js:316
 #: src/frontend/search/components/FilterBar.js:204
 #: src/frontend/search/components/FilterBar.js:228
-#: src/frontend/search/components/SearchModal.js:2025
+#: src/frontend/search/components/SearchModal.js:2090
 msgid "Filters"
 msgstr "Filtros"
 
@@ -2175,7 +2181,8 @@ msgid "- Do not send -"
 msgstr "- No enviar -"
 
 #: src/admin/settings/components/quiz/AnswerEditor.js:143
-#: src/admin/settings/components/tabs/IndexingTab.js:100
+#: src/admin/settings/components/tabs/IndexingTab.js:178
+#: src/admin/settings/components/tabs/SearchConfigTab.js:606
 msgid "Value"
 msgstr "Valor"
 
@@ -2441,10 +2448,6 @@ msgstr "Introduce las credenciales de la página de tu sitio en la aplicación d
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:106
 msgid "Search key"
 msgstr "Clave de búsqueda"
-
-#: src/admin/settings/components/tabs/ManualConnectionEntry.js:107
-msgid "Public key (sk_...) used by the browser, restricted by your domain allowlist."
-msgstr "Clave pública (sk_...) que usa el navegador, restringida por tu lista de dominios permitidos."
 
 #: src/admin/settings/components/tabs/ManualConnectionEntry.js:114
 msgid "Write key"
@@ -4017,7 +4020,8 @@ msgstr "Páginas"
 msgid "Go to page %d"
 msgstr "Ir a la página %d"
 
-#: src/frontend/search/components/CompareTable.js:59
+#: src/frontend/search/components/CompareTable.js:64
+#: src/frontend/search/components/templates.js:120
 msgid "On backorder"
 msgstr "Se puede reservar"
 
@@ -5246,10 +5250,6 @@ msgstr "Cualquiera: se muestra un resultado que tenga uno de ellos. Todos: solo 
 msgid "Clears this plugin's own cached data and its files in PHP's opcode cache, so a just-changed setting or a recently updated card template/popular-search result shows up immediately instead of waiting for it to expire on its own. Other sites on the same server are not touched."
 msgstr "Vacía los datos en caché propios de este plugin y sus archivos en la caché de opcode de PHP, para que un ajuste recién cambiado o una plantilla de tarjeta o un resultado de búsquedas populares actualizados hace poco aparezcan al instante, en lugar de esperar a que caduquen solos. Los demás sitios del mismo servidor no se ven afectados."
 
-#: src/admin/settings/components/tabs/SearchConfigTab.js:525
-msgid "Curate the results of chosen searches. A search takes the first rule from the top that matches it, and no other: a rule with an empty trigger matches every search, so the rules below it never apply, and a product it hides still shows where a rule above it matches."
-msgstr "Selecciona a mano los resultados de búsquedas concretas. Una búsqueda toma la primera regla, empezando por arriba, que coincide con ella, y ninguna otra: una regla con el activador vacío coincide con todas las búsquedas, así que las reglas de debajo nunca se aplican, y un producto que oculta sigue apareciendo donde coincide una regla de arriba."
-
 #: src/frontend/search/components/AiAssistant.js:310
 msgid "Describe what you're looking for and I'll find it on this site."
 msgstr "Describe lo que buscas y lo encontraré en este sitio."
@@ -5354,19 +5354,16 @@ msgstr "Ningún producto tiene este ID. Introduce el ID que WordPress muestra pa
 msgid "This row shows the products like the product being viewed, and this page is not a product. Enter a product ID, or place the row on a product template."
 msgstr "Esta fila muestra productos como el que se está viendo, y esta página no es un producto. Introduce un ID de producto, o coloca la fila en una plantilla de producto."
 
-#: includes/Routing/Connection_Endpoint.php:84
+#: src/admin/settings/searchKeyCheck.js:33
 msgid "No search key is saved, so the site searches with WordPress instead of Searcio. Connect again, or paste the search key under the manual key entry."
 msgstr "No hay ninguna clave de búsqueda guardada, así que el sitio busca con WordPress en lugar de Searcio. Conéctalo de nuevo, o pega la clave de búsqueda en «Avanzado: introducción manual de claves»."
 
-#: includes/Routing/Connection_Endpoint.php:93
+#: src/admin/settings/searchKeyCheck.js:49
 msgid "Searcio does not know the search key, so the site searches with WordPress instead of Searcio. Copy it again from the Searcio dashboard, or connect again."
 msgstr "Searcio no conoce la clave de búsqueda, así que el sitio busca con WordPress en lugar de Searcio. Cópiala de nuevo desde el panel de Searcio, o conéctalo de nuevo."
 
-#: includes/Routing/Connection_Endpoint.php:100
-msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. Add the address to the domains of the key in the Searcio dashboard."
-msgstr "Searcio rechaza la clave de búsqueda desde la dirección de este sitio, así que el sitio busca con WordPress en lugar de Searcio. Añade la dirección a los dominios de la clave en el panel de Searcio."
-
 #: includes/Routing/Settings_Endpoint.php:82
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:131
 msgid "That is not a search key: one starts with sk_ and has no spaces. Copy it again from the Searcio dashboard."
 msgstr "Eso no es una clave de búsqueda: una empieza por sk_ y no tiene espacios. Cópiala de nuevo desde el panel de Searcio."
 
@@ -5414,10 +5411,6 @@ msgstr "Precio de compra, para el ranking por margen"
 msgid "Purchase price from field"
 msgstr "Precio de compra desde el campo"
 
-#: src/admin/settings/components/tabs/IndexingTab.js:338
-msgid "The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Searcio lifts products with a good margin once profit ranking is on in the Searcio dashboard, and never shows the price or sends it back."
-msgstr "El precio de compra se lee primero del coste de los productos de WooCommerce (Cost of goods). Para una tienda que lo guarda en el campo de un plugin de coste de productos, introduce la clave meta de ese campo, por ejemplo _wc_cog_cost. Searcio destaca los productos con buen margen una vez que el ranking por margen está activado en el panel de Searcio, y nunca muestra el precio ni lo devuelve."
-
 #: src/admin/settings/components/tabs/SearchConfigTab.js:522
 msgid "Contains the trigger"
 msgstr "Contiene el activador"
@@ -5437,3 +5430,297 @@ msgstr "«Contiene» se activa con «chaqueta de lluvia» para el activador «ch
 #: src/admin/settings/components/tabs/SearchConfigTab.js:702
 msgid "Followed only for searches on pages in this language."
 msgstr "La redirección solo se aplica a las búsquedas en páginas en este idioma."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:533
+msgid "Curate the results of chosen searches. Every rule that matches a search applies, in order from the top: what any of them hides is hidden, the products an earlier rule pins come first, and the banner is the first one a matching rule has. A rule with an empty trigger matches every search."
+msgstr "Selecciona a mano los resultados de búsquedas concretas. Cada regla que coincide con una búsqueda se aplica, en orden desde arriba: lo que cualquiera de ellas oculta queda oculto, los productos que fija una regla anterior van primero, y el banner es el primero que tiene una regla que coincide. Una regla con el activador vacío coincide con todas las búsquedas."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1167
+msgid "Fields that hold numbers"
+msgstr "Campos con números"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1184
+msgid "Attributes one variation must match"
+msgstr "Atributos que debe cumplir una variante"
+
+#: src/admin/settings/searchKeyCheck.js:53
+msgid "Searcio refuses the search key from the address of this site, so the site searches with WordPress instead of Searcio. A search key works only on the domain it was connected with and its subdomains: on a copy of the site under another address this is expected; otherwise connect this site again."
+msgstr "Searcio rechaza la clave de búsqueda desde la dirección de este sitio, así que el sitio busca con WordPress en lugar de Searcio. Una clave de búsqueda solo funciona en el dominio con el que se conectó y sus subdominios: en una copia del sitio con otra dirección es lo esperado; si no, vuelve a conectar este sitio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:538
+msgid "Profitable products first"
+msgstr "Productos rentables primero"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:544
+msgid "Lift profitable products"
+msgstr "Destacar los productos rentables"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:553
+msgid "Nothing is lifted yet: the products are indexed without a purchase price. Turn on \"Purchase price, for profit ranking\" under Product details on the Indexing tab, save it, and let the sync it starts finish."
+msgstr "Aún no se destaca nada: los productos están indexados sin precio de compra. Activa «Precio de compra, para el ranking por margen» en Detalles del producto de la pestaña Indexación, guárdalo y deja que termine la sincronización que inicia."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:564
+msgid "Strength (%)"
+msgstr "Intensidad (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:565
+msgid "How far a product with a good margin may rise, from 1 to 50: at 15 it overtakes only results that match at most 15 percent better."
+msgstr "Cuánto puede subir un producto con buen margen, de 1 a 50: con 15 solo adelanta a resultados que coinciden como mucho un 15 por ciento mejor."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:574
+msgid "Target margin (%)"
+msgstr "Margen objetivo (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:583
+msgid "Least profit per sale"
+msgstr "Beneficio mínimo por venta"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:584
+msgid "Optional, in the prices the shop displays. A product that earns less per sale is not lifted, however high its margin."
+msgstr "Opcional, en los precios que muestra la tienda. Un producto que gana menos por venta no se destaca, por alto que sea su margen."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:591
+msgid "Targets of their own"
+msgstr "Objetivos propios"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:616
+msgid "Target (%)"
+msgstr "Objetivo (%)"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:624
+msgid "Never lift"
+msgstr "No destacar nunca"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:635
+msgid "Remove target"
+msgstr "Quitar objetivo"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:648
+msgid "Add a target"
+msgstr "Añadir un objetivo"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:655
+msgid "Search terms ranked by relevance alone"
+msgstr "Términos de búsqueda solo por relevancia"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:656
+msgid "One per line, up to 200, matched whole and whatever their capitals: brand names or service terms, for example."
+msgstr "Uno por línea, hasta 200, comparados enteros y sin importar mayúsculas: nombres de marca o términos de servicio, por ejemplo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:667
+msgid "See what profit ranking changes, and import targets, in the Searcio dashboard"
+msgstr "Mira en el panel de Searcio qué cambia el ranking por margen, e importa objetivos"
+
+#: src/admin/settings/components/tabs/IndexingTab.js:338
+msgid "The purchase price is read from WooCommerce Cost of goods first. For a shop that keeps it in the field of a cost of goods plugin, enter the meta key of that field, such as _wc_cog_cost. Enter purchase prices without tax: where the shop shows prices with tax, Searcio adds it, so the margin comes out the same. A variable product uses the purchase price of its cheapest variation. Searcio lifts products with a good margin once profit ranking is on (Search Config tab), and never shows the price or sends it back."
+msgstr "El precio de compra se lee primero del coste de los productos de WooCommerce (Cost of goods). Para una tienda que lo guarda en el campo de un plugin de coste de productos, introduce la clave meta de ese campo, por ejemplo _wc_cog_cost. Introduce los precios de compra sin impuestos: si la tienda muestra los precios con impuestos, Searcio los añade, así que el margen sale igual. Un producto variable usa el precio de compra de su variante más barata. Searcio destaca los productos con buen margen una vez que el ranking por margen está activado (pestaña Configuración de búsqueda), y nunca muestra el precio ni lo devuelve."
+
+#: src/admin/settings/components/tabs/ManualConnectionEntry.js:124
+msgid "Public key (sk_...) used by the browser. It works on the domain the site was connected with and its subdomains."
+msgstr "Clave pública (sk_...) que usa el navegador. Funciona en el dominio con el que se conectó el sitio y en sus subdominios."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:162
+msgid "Enter a strength from 1 to 50."
+msgstr "Introduce una intensidad de 1 a 50."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:163
+msgid "Enter a target margin from 0.1 to 100."
+msgstr "Introduce un margen objetivo de 0,1 a 100."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:164
+msgid "Enter an amount of 0 or more, or leave it empty."
+msgstr "Introduce un importe de 0 o más, o deja el campo vacío."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:165
+msgid "Enter up to 200 terms, one per line."
+msgstr "Introduce hasta 200 términos, uno por línea."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:166
+msgid "Enter the field the products have, such as categories."
+msgstr "Introduce el campo que tienen los productos, por ejemplo categories."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:167
+msgid "Enter the value the products have in that field."
+msgstr "Introduce el valor que tienen los productos en ese campo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:168
+msgid "Enter a target margin from 0.1 to 100, or tick Never lift."
+msgstr "Introduce un margen objetivo de 0,1 a 100, o marca No destacar nunca."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:569
+msgid "Margins are worked out without tax: enter purchase prices without tax, and where the shop shows prices with tax it is added to them, so the margin comes out the same either way. Purchase prices are never shown."
+msgstr "Los márgenes se calculan sin impuestos: introduce los precios de compra sin impuestos, y si la tienda muestra los precios con impuestos, se les añaden, así que el margen sale igual en ambos casos. Los precios de compra nunca se muestran."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:581
+msgid "Open the Indexing tab"
+msgstr "Abrir la pestaña Indexación"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:604
+msgid "The margin, without tax, from which a product counts as profitable. At the target it gets half the lift, at twice the target the full lift: with a target of 25, a margin of 25 gets half of it and 50 or more all of it."
+msgstr "El margen, sin impuestos, a partir del cual un producto cuenta como rentable. En el objetivo recibe la mitad del impulso; al doble del objetivo, el impulso completo: con un objetivo de 25, un margen de 25 recibe la mitad y uno de 50 o más, todo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:614
+msgid "Optional. A product that earns less per sale is not lifted, however high its margin. Counted in the prices the shop displays, which include tax, so the tax on the profit counts too."
+msgstr "Opcional. Un producto que gana menos por venta no se destaca, por alto que sea su margen. Se cuenta en los precios que muestra la tienda, que incluyen impuestos, así que también cuentan los impuestos del beneficio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:625
+msgid "A margin target for the products of a category, a brand or another field, or none at all for products never to lift, such as a clearance category. Where several match a product, the one fewer products share applies, and saved targets are listed in that order."
+msgstr "Un margen objetivo para los productos de una categoría, una marca u otro campo, o ninguno para productos que nunca se destacan, como una categoría de liquidación. Si varios coinciden con un producto, se aplica el que comparten menos productos, y los objetivos guardados se listan en ese orden."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:633
+msgid "No product on this site has this field, so the target never applies. Choose a field from the list, or start indexing it in the Indexing tab."
+msgstr "Ningún producto de este sitio tiene este campo, así que el objetivo nunca se aplica. Elige un campo de la lista o empieza a indexarlo en la pestaña Indexación."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:640
+msgid "Write it as it is in your products, for example Navy."
+msgstr "Escríbelo tal como está en tus productos, por ejemplo Navy."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1413
+msgid "Your own fields whose values are numbers, such as a weight or a length, up to 20: their filter becomes a range from and to, and they compare as numbers. A value that is not a number is left out. Changing the list rebuilds the search index in the background: give it a few minutes before changing it again."
+msgstr "Tus propios campos cuyos valores son números, como un peso o una longitud, hasta 20: su filtro pasa a ser un rango desde y hasta, y se comparan como números. Un valor que no es un número se deja fuera. Cambiar la lista reconstruye el índice de búsqueda en segundo plano: dale unos minutos antes de volver a cambiarla."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1430
+msgid "Attributes the variations of a product differ in, such as colour and size. Filters on them find a product only when one variation in stock has every value picked: red and XL no longer find a jacket whose red XL is sold out. Setting the first one rebuilds the search index in the background: give it a few minutes before changing it again."
+msgstr "Los atributos en los que se diferencian las variantes de un producto, como el color y la talla. Los filtros sobre ellos solo encuentran un producto si una variante en stock tiene cada valor elegido: rojo y XL ya no encuentran una chaqueta cuya roja XL está agotada. Definir el primero reconstruye el índice de búsqueda en segundo plano: dale unos minutos antes de volver a cambiarlo."
+
+#: includes/Health/Health_Tests.php:98
+msgid "Searcio background tasks"
+msgstr "Tareas en segundo plano de Searcio"
+
+#: includes/Health/Health_Tests.php:258
+msgid "Searcio background tasks run on time"
+msgstr "Las tareas en segundo plano de Searcio se ejecutan a tiempo"
+
+#: includes/Health/Health_Tests.php:260
+msgid "Nothing the plugin schedules, such as the sync of your changes, is overdue."
+msgstr "Nada de lo que programa el plugin, como la sincronización de tus cambios, está atrasado."
+
+#: includes/Health/Health_Tests.php:266
+msgid "Searcio background tasks are overdue"
+msgstr "Las tareas en segundo plano de Searcio están atrasadas"
+
+#. translators: %d: how many minutes the longest overdue task is late.
+#: includes/Health/Health_Tests.php:271
+#, php-format
+msgid "A task of the plugin, such as the sync of your changes, has been due for %d minutes. WordPress starts such tasks through WP-Cron, which only runs while the site is visited, and not at all where the host blocks the request WordPress makes to itself or WP-Cron is switched off."
+msgstr "Una tarea del plugin, como la sincronización de tus cambios, debió empezar hace %d minutos. WordPress inicia esas tareas mediante WP-Cron, que solo se ejecuta mientras se visita el sitio, y no se ejecuta en absoluto si el hosting bloquea la petición que WordPress se hace a sí mismo o si WP-Cron está desactivado."
+
+#: includes/Health/Health_Tests.php:274
+msgid "Ask your host to call WP-Cron from the server every minute, for example with this command, and turn off the one WordPress starts itself with DISABLE_WP_CRON if it is not off already:"
+msgstr "Pide a tu hosting que llame a WP-Cron desde el servidor cada minuto, por ejemplo con este comando, y desactiva con DISABLE_WP_CRON el que WordPress inicia por sí mismo, si no lo está ya:"
+
+#. translators: 1: the value that was sent. 2: the name of the setting. 3: the values it can take, separated by commas.
+#: includes/Routing/Placement_Endpoint.php:93
+#, php-format
+msgid "\"%1$s\" is not a value for %2$s. Use one of: %3$s."
+msgstr "\"%1$s\" no es un valor de %2$s. Usa uno de estos: %3$s."
+
+#: includes/Routing/Settings_Endpoint.php:94
+msgid "Enter 0 or more days to keep the sync history for. 0 keeps it forever."
+msgstr "Introduce 0 o más días durante los que se conserva el historial de sincronización. 0 lo conserva para siempre."
+
+#: includes/Routing/Sync_Endpoint.php:90
+msgid "There is no sync running to move on."
+msgstr "No hay ninguna sincronización en curso que hacer avanzar."
+
+#: src/admin/settings/components/tabs/ConnectionResultNotice.js:115
+msgid "The search index of this site is empty, so every search finds nothing. Run a full sync on the Sync tab to fill it again."
+msgstr "El índice de búsqueda de este sitio está vacío, así que cualquier búsqueda no encuentra nada. Inicia una sincronización completa en la pestaña Sincronización para llenarlo de nuevo."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:569
+msgid "Lifts products with a good margin among the results that match a search about equally well. A much better match keeps its place, pinned products keep the top, and products out of stock stay last. The same settings as in the Searcio dashboard."
+msgstr "Destaca los productos con buen margen entre los resultados que coinciden con una búsqueda más o menos igual de bien. Una coincidencia mucho mejor conserva su puesto, los productos fijados siguen arriba y los productos agotados siguen al final. Los mismos ajustes que en el panel de Searcio."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:620
+msgid "Optional, without tax. A product that earns less per sale is not lifted, however high its margin."
+msgstr "Opcional, sin impuestos. Un producto que gana menos por venta no se destaca, por alto que sea su margen."
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:631
+msgid "Also order listings without a search term"
+msgstr "Ordenar también los listados sin término de búsqueda"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:632
+msgid "Without a term every product matches equally well, so the lift alone puts a category page or the highlights in order, which is stronger than in a search. Off, such a listing keeps its usual order."
+msgstr "Sin término, todos los productos coinciden igual de bien, así que solo el impulso ordena una página de categoría o los destacados, y con más fuerza que en una búsqueda. Desactivado, ese listado conserva su orden habitual."
+
+#. translators: %s: the name of a content type.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1367
+#, js-format
+msgid "Remove the boost of %s"
+msgstr "Quitar el impulso de %s"
+
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1380
+msgid "A boost with a remove button is for a type that no content of this site has any more, for example one you renamed on the Indexing tab. It moves no result here: remove it, unless another source sends that type to the same index."
+msgstr "Un impulso con un botón para quitarlo es de un tipo que ningún contenido de este sitio tiene ya, por ejemplo uno que renombraste en la pestaña Indexación. No mueve ningún resultado aquí: quítalo, salvo que otra fuente envíe ese tipo al mismo índice."
+
+#: src/admin/settings/components/tabs/SyncHistory.js:48
+msgid "Settings change"
+msgstr "Cambio de ajustes"
+
+#. translators: %d: how many minutes the sync has not moved.
+#: src/admin/settings/components/tabs/SyncTab.js:283
+#, js-format
+msgid "This sync has not moved for %d minutes. WordPress runs it through WP-Cron, which only works while the site is visited, or when the server calls it. Run the next step here, or ask your host to call \"wp cron event run --due-now\" from the server every minute."
+msgstr "Esta sincronización no ha avanzado en %d minutos. WordPress la ejecuta mediante WP-Cron, que solo funciona mientras se visita el sitio o cuando el servidor lo llama. Ejecuta aquí el siguiente paso, o pide a tu hosting que llame a \"wp cron event run --due-now\" desde el servidor cada minuto."
+
+#: src/admin/settings/components/tabs/SyncTab.js:293
+msgid "Run the next step now"
+msgstr "Ejecutar el siguiente paso ahora"
+
+#. translators: 1: how many products are compared. 2: how many were found.
+#: src/frontend/search/components/CompareTable.js:229
+#, js-format
+msgid "The first %1$d of the %2$d products are compared."
+msgstr "Se comparan los primeros %1$d de los %2$d productos."
+
+#. translators: 1: number of results loaded so far. 2: about how many results there are; Searcio counts the best matches of a search by meaning, not every one.
+#: src/frontend/search/components/SearchModal.js:1568
+#, js-format
+msgid "%1$d of about %2$d results"
+msgstr "%1$d de unos %2$d resultados"
+
+#: src/frontend/search/ui/Modal.js:310
+msgid "Scrollable section"
+msgstr "Sección desplazable"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1257
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1407
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1510
+#, js-format
+msgid "%d field"
+msgid_plural "%d fields"
+msgstr[0] "%d campo"
+msgstr[1] "%d campos"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1319
+#, js-format
+msgid "%d type"
+msgid_plural "%d types"
+msgstr[0] "%d tipo"
+msgstr[1] "%d tipos"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1555
+#, js-format
+msgid "%d group"
+msgid_plural "%d groups"
+msgstr[0] "%d grupo"
+msgstr[1] "%d grupos"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1639
+#, js-format
+msgid "%d rule"
+msgid_plural "%d rules"
+msgstr[0] "%d regla"
+msgstr[1] "%d reglas"
+
+#. translators: %d: how many.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:1660
+#, js-format
+msgid "%d redirect"
+msgid_plural "%d redirects"
+msgstr[0] "%d redirección"
+msgstr[1] "%d redirecciones"
