@@ -163,6 +163,7 @@ By default your settings and sync history stay in WordPress. Turn on **Delete pl
 12. Search Config: its sections down the side, each with its state, here AI search, visual tagging, search by photo and click ranking.
 13. Indexing: choose which content and which WooCommerce details are searchable.
 14. Sync: start a sync and see the history of past ones.
+15. Profitable products first: the price you paid in WooCommerce, the margin you want on the Search Config tab, and the search in the shop, which lifts the products that earn more among results that match about equally well.
 
 == External services ==
 
