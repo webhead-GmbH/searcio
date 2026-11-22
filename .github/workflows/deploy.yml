@@ -51,7 +51,7 @@ jobs:
       DRY_RUN: ${{ ( github.event_name == 'workflow_dispatch' && inputs.dry-run ) && 'true' || 'false' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # The whole history, to tell whether the tag is on master.
           fetch-depth: 0
@@ -112,7 +112,7 @@ jobs:
         run: composer install
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '22'
           cache: 'npm'
@@ -217,7 +217,7 @@ jobs:
 
       - name: Keep the package of a dry run
         if: env.DRY_RUN == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.PLUGIN_SLUG }}-${{ env.VERSION }}
           path: ${{ env.ZIP }}

@@ -30,14 +30,14 @@ jobs:
 
     steps:
       -   name: Checkout repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
           with:
             path: searcio
 
       # package.json asks for Node 22: the webpack configuration loads the
       # design system's token plugin, an ES module, with require().
       -   name: Setup Node.js
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v7
           with:
             node-version: '22'
 
@@ -162,12 +162,12 @@ jobs:
 
     steps:
       -   name: Checkout repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
           with:
             path: searcio
 
       -   name: Setup Node.js
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v7
           with:
             node-version: '22'
 
@@ -243,7 +243,7 @@ jobs:
 
       -   name: Upload Playwright artifacts
           if: ${{ failure() }}
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: playwright-artifacts
             path: searcio/artifacts/
