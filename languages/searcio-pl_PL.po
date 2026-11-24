@@ -5756,3 +5756,12 @@ msgid_plural "%d redirects"
 msgstr[0] "%d przekierowanie"
 msgstr[1] "%d przekierowania"
 msgstr[2] "%d przekierowań"
+
+#. translators: %s: one or more synonym groups, each in quotation marks.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:319
+#, js-format
+msgid "The group %s is listed twice, with the same words. The second one changes nothing: remove it."
+msgid_plural "These groups are listed twice, with the same words: %s. The second of each changes nothing: remove it."
+msgstr[0] "Grupa %s występuje dwa razy, z tymi samymi słowami. Druga niczego nie zmienia: usuń ją."
+msgstr[1] "Te grupy występują dwa razy, z tymi samymi słowami: %s. Druga z każdej niczego nie zmienia: usuń duplikaty."
+msgstr[2] "Te grupy występują dwa razy, z tymi samymi słowami: %s. Druga z każdej niczego nie zmienia: usuń duplikaty."
