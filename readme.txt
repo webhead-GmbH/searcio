@@ -131,6 +131,10 @@ Yes. The block and the Elementor widget let you style the search box, the window
 
 Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You choose which languages are indexed, as many as your plan allows.
 
+= Can the search window say "Sie" instead of "du"? =
+
+Yes. The plugin speaks German the way your site's language does, as WordPress itself does: "Deutsch" and "Deutsch (Österreich)" say "du", "Deutsch (Sie)" and "Deutsch (Schweiz)" say "Sie". WordPress has no formal Austrian language, so a shop in Austria or Germany that wants "Sie" picks "Deutsch (Sie)" under Settings > General > Site Language. On a multilingual site, give the German language the locale `de_DE_formal` in Polylang or WPML. Each administrator can still read the dashboard in the language of their own profile.
+
 = When do changes in my shop show up in the search? =
 
 An edit is sent shortly after you save it, and a scheduled sync runs every day. Changes on the Indexing tab take effect with the next sync; changes on the Search Config tab apply to the very next search.

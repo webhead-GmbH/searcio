@@ -12,6 +12,12 @@ The plugin works with either **WPML** or **Polylang** to scope indexing and sear
 - Leaving the enabled-languages list empty means the site is unrestricted - every language is indexed, and each page still searches its own language, since every document carries its language either way.
 - Saving the **Languages** section with a language ticked or unticked starts a sync, which sends the posts of a language that was added and takes out those of one that was removed. A post whose language is changed in the editor is synced when it is saved. Assigning a language to existing content in bulk (Polylang's setup wizard, or its "assign the default language to content without one" tool) saves no post, so start a sync on the Sync tab afterwards; the daily sync catches it up otherwise.
 
+## The form of address in German
+
+The plugin speaks German the way the site's language does, and ships each form WordPress has: *Deutsch* (`de_DE`), *Deutsch (Österreich)* (`de_AT`) and *Deutsch (Schweiz, Du)* (`de_CH_informal`) say "du", as WordPress's own translation of each does; *Deutsch (Sie)* (`de_DE_formal`) and *Deutsch (Schweiz)* (`de_CH`) say "Sie". WordPress has no formal form of Austrian German, so a shop in Austria that wants "Sie" in the search window sets its language to *Deutsch (Sie)* under **Settings > General > Site Language**; it is the same German, with the same spelling.
+
+On a multilingual site the German language takes the locale `de_DE_formal` in Polylang or WPML, and the search window then reads "Sie" on its German pages only. Each administrator still reads the dashboard in the language of their own profile, so a team can keep "du" there.
+
 ## WPML and Polylang together
 
 If a site somehow has both plugins present, Polylang is treated as the active provider. This is deliberate: Polylang registers compatibility filters that make WPML-only detection code think WPML is active even when it isn't actually installed, so checking Polylang first avoids silently calling the wrong plugin's API.
