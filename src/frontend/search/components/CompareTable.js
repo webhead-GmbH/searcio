@@ -19,6 +19,10 @@ const HEADER_OR_INTERNAL = new Set( [
 	// picks the "featured" highlights. None says anything to a shopper
 	// choosing between two products.
 	'category_paths', 'ai_tags', 'featured',
+	// Each variation's attributes and stock as objects, which the variation filters
+	// read: the colour and the size are rows of their own already, and the list
+	// itself was "[object Object], [object Object]".
+	'variants',
 	// The price without tax a shop sends Searcio for its profit ranking, which
 	// does not return it: still listed by a service that keeps unknown fields.
 	'price_excluding_tax',
@@ -85,6 +89,21 @@ export const MAX_COMPARED = 4;
  */
 export const comparedProducts = ( products ) => products.slice( 0, MAX_COMPARED );
 
+/** What a row shows for a product that has no value in it. */
+const EMPTY = ' - ';
+
+// WooCommerce stores 0 for a product nobody has reviewed: a rating of 0 reads as a bad one.
+const RATING_FIELDS = new Set( [ 'rating', 'average_rating' ] );
+
+/**
+ * Whether a value can be shown as text: not a structure of objects, which
+ * would read "[object Object]".
+ *
+ * @param {*} value
+ */
+const isText = ( value ) =>
+	null === value || 'object' !== typeof value || ( Array.isArray( value ) && value.every( ( entry ) => null === entry || 'object' !== typeof entry ) );
+
 // Machine values WooCommerce stores that a shopper should never be shown raw.
 const KNOWN_VALUES = () => ( {
 	instock: __( 'In stock', 'searcio' ),
@@ -102,7 +121,11 @@ const BOOLEAN_FIELDS = new Set( [ 'featured', 'virtual', 'downloadable', 'backor
  */
 const formatValue = ( value, field ) => {
 	if ( null === value || undefined === value || '' === value ) {
-		return ' - ';
+		return EMPTY;
+	}
+
+	if ( field && RATING_FIELDS.has( field ) && 0 === Number( value ) ) {
+		return EMPTY;
 	}
 
 	if ( field && BOOLEAN_FIELDS.has( field ) ) {
@@ -118,7 +141,7 @@ const formatValue = ( value, field ) => {
 	}
 
 	if ( Array.isArray( value ) ) {
-		return value.length > 0 ? value.join( ', ' ) : ' - ';
+		return value.length > 0 ? value.join( ', ' ) : EMPTY;
 	}
 
 	if ( 'boolean' === typeof value ) {
@@ -158,10 +181,39 @@ export const comparisonRows = ( products, labels = getConfig().fieldLabels ) => 
 		return values.some( ( value ) => value !== values[ 0 ] );
 	};
 
-	return dedupeByLabel( dropSingulars( candidates ), labels ).sort( ( a, b ) => {
+	const sorted = dedupeByLabel( dropSingulars( candidates.filter( ( key ) => products.every( ( product ) => isText( product.source?.[ key ] ) ) ) ), labels ).sort( ( a, b ) => {
 		const diff = Number( differs( b ) ) - Number( differs( a ) );
 
 		return 0 !== diff ? diff : humanizeFieldLabel( a, labels ).localeCompare( humanizeFieldLabel( b, labels ) );
+	} );
+
+	// Two keys can carry the same data under two names, which no rule about the
+	// names catches. A row that differs between the products and says exactly
+	// what an earlier one said is that twice; a row nobody has a value in says
+	// nothing. A row that is the same for every product is left alone: two flags
+	// that are both "No" are two facts.
+	const seen = new Set();
+
+	return sorted.filter( ( key ) => {
+		const values = products.map( ( product ) => formatValue( product.source?.[ key ], key ) );
+
+		if ( values.every( ( value ) => EMPTY === value ) ) {
+			return false;
+		}
+
+		if ( ! differs( key ) ) {
+			return true;
+		}
+
+		const signature = JSON.stringify( values );
+
+		if ( seen.has( signature ) ) {
+			return false;
+		}
+
+		seen.add( signature );
+
+		return true;
 	} );
 };
 

@@ -392,8 +392,8 @@ const AiAssistant = ( { cardSource, serverTemplates } ) => {
 							{ comparing
 								? sprintf(
 									/* translators: %d: number of products being compared. */
-									_n( 'Comparing %d product', 'Comparing %d products', products.length, 'searcio' ),
-									products.length
+									_n( 'Comparing %d product', 'Comparing %d products', comparedProducts( products ).length, 'searcio' ),
+									comparedProducts( products ).length
 								)
 								: sprintf(
 									/* translators: %d: number of products. */

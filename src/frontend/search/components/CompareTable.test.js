@@ -167,3 +167,64 @@ describe( 'a comparison of many products', () => {
 		expect( html ).not.toContain( 'whsc-compare__note' );
 	} );
 } );
+
+/**
+ * What a comparison of the demo shop's products showed: a row of
+ * "[object Object], [object Object]" for the variations, "Rating: 0" for a
+ * product nobody has reviewed, and one fact under two names.
+ */
+describe( 'rows that read', () => {
+	it( 'has no row for a list of objects, such as the variations', () => {
+		const variants = [ { in_stock: true, attr_color: 'Red' }, { in_stock: false, attr_color: 'Blue' } ];
+		const products = [
+			product( 'a', { variants, material: 'Cotton', layers: [ { name: 'Shell' } ] } ),
+			product( 'b', { variants, material: 'Wool', layers: [ { name: 'Fleece' } ] } ),
+		];
+
+		// `variants` is named as bookkeeping, and `layers` is a structure no rule has met: neither is a row.
+		expect( comparisonRows( products ) ).toEqual( [ 'material' ] );
+		expect( renderToString( <CompareTable products={ products } /> ) ).not.toContain( '[object Object]' );
+	} );
+
+	it( 'shows a rating of 0 as no rating', () => {
+		const html = renderToString(
+			<CompareTable products={ [ product( 'a', { rating: 4.5 } ), product( 'b', { rating: 0 } ), product( 'c', { average_rating: '0.00' } ) ] } />
+		);
+
+		expect( html ).toContain( '4.5' );
+		expect( html ).not.toMatch( /<td>0<\/td>/ );
+		expect( html ).toContain( '<td> - </td>' );
+	} );
+
+	it( 'has no row that nobody has a value in', () => {
+		expect( comparisonRows( [ product( 'a', { rating: 0, material: 'Cotton' } ), product( 'b', { rating: 0, material: 'Wool' } ) ] ) ).toEqual( [ 'material' ] );
+	} );
+
+	it( 'draws one row for two fields that say the same thing under two names', () => {
+		expect(
+			comparisonRows( [
+				product( 'a', { maker: 'Acme', manufacturer: 'Acme', material: 'Cotton' } ),
+				product( 'b', { maker: 'Bolt', manufacturer: 'Bolt', material: 'Wool' } ),
+			] )
+		).toEqual( [ 'maker', 'material' ] );
+	} );
+
+	it( 'keeps two fields that differ, even when one product says the same in both', () => {
+		expect(
+			comparisonRows( [
+				product( 'a', { maker: 'Acme', manufacturer: 'Acme' } ),
+				product( 'b', { maker: 'Bolt', manufacturer: 'Bolt Ltd' } ),
+			] )
+		).toEqual( [ 'maker', 'manufacturer' ] );
+	} );
+
+	it( 'keeps two flags that are both the same for every product', () => {
+		expect(
+			comparisonRows( [
+				product( 'a', { virtual: false, downloadable: false, material: 'Cotton' } ),
+				product( 'b', { virtual: false, downloadable: false, material: 'Wool' } ),
+			] )
+		).toEqual( [ 'material', 'downloadable', 'virtual' ] );
+	} );
+} );
+

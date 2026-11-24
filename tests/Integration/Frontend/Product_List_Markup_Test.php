@@ -60,6 +60,23 @@ final class Product_List_Markup_Test extends Integration_Test_Case {
 	}
 
 	/**
+	 * A row given an ID that no post has shows nothing, on a page of its own as
+	 * anywhere: it used to fall back to the page, and show the products like
+	 * whatever page the row was placed on.
+	 */
+	public function test_an_id_that_no_post_has_is_not_replaced_by_the_page(): void {
+		$post_id = self::factory()->post->create();
+
+		$this->go_to( (string) get_permalink( $post_id ) );
+
+		$this->assertSame( '', Product_List_Markup::render( [ 'source' => 'similar', 'documentId' => '999999' ] ) );
+		$this->assertStringContainsString( 'No product has this ID', Product_List_Markup::why_empty( [ 'source' => 'similar', 'documentId' => '999999' ] ) );
+
+		// An ID left blank still takes the page, as before.
+		$this->assertStringContainsString( 'data-doc-id="post-' . $post_id . '"', Product_List_Markup::render( [ 'source' => 'similar', 'documentId' => '  ' ] ) );
+	}
+
+	/**
 	 * An empty row says why in an editor: an ID no post has, or a page that
 	 * has no product or category to work from.
 	 */
