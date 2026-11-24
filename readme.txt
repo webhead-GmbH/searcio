@@ -4,7 +4,7 @@ Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -192,6 +192,11 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 Legal notice: https://searcio.com/impressum
 
 == Changelog ==
+
+= 1.4.2 =
+- AI assistant: the comparison counts the products it shows, leaves out rows that read as nothing (the list of variations, a rating of 0, a row nobody has a value in) and shows two fields that say the same as one row.
+- A product row given a product ID that does not exist shows nothing, and the editor says why, where it showed the products like the page it was on.
+- Search Config: a synonym group listed twice is pointed out.
 
 = 1.4.1 =
 - Security: password-protected posts and pages are no longer indexed unless "Also index private & password-protected items" is on, and the update takes the ones already indexed out.
