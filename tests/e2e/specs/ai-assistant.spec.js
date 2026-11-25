@@ -66,6 +66,49 @@ test.describe( 'AI Assistant tab', () => {
 	} );
 
 	/**
+	 * Seven products are four columns: the header says "Comparing 4 products",
+	 * as the table has, and the rows are only the ones that read - no list of
+	 * objects (the variations), no rating for a product nobody has reviewed, and
+	 * one row for two fields that say the same.
+	 */
+	test( 'compares the first four, and draws only rows that read', async ( { page, requestUtils } ) => {
+		await mockSearchCloud( page, {
+			assistant: true,
+			assistantReply: 'Seven jackets.',
+			assistantProducts: Array.from( { length: 7 }, ( _, index ) =>
+				postHit(
+					{
+						type: 'product',
+						title: `Jacket ${ index + 1 }`,
+						maker: `Maker ${ index + 1 }`,
+						manufacturer: `Maker ${ index + 1 }`,
+						rating: 0 === index ? 4.5 : 0,
+						variants: [ { in_stock: true, attr_color: 'Red' } ],
+					},
+					`product-${ index + 1 }`
+				)
+			),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await page.getByRole( 'tab', { name: /assistant/i } ).click();
+
+		const input = page.locator( '.whsc-assistant__input' );
+		await input.fill( 'a jacket' );
+		await input.press( 'Enter' );
+		await expect( page.locator( '.whsc-assistant__grid .whsc-card' ).first() ).toBeVisible();
+		await page.getByRole( 'button', { name: /^compare$/i } ).click();
+
+		await expect( page.locator( '.whsc-assistant__results-count' ) ).toHaveText( 'Comparing 4 products' );
+		await expect( page.locator( '.whsc-compare__table thead th[scope="col"]' ) ).toHaveCount( 4 );
+		await expect( page.locator( '.whsc-compare__label' ) ).toHaveText( [ 'Maker', 'Rating' ] );
+		await expect( page.locator( '.whsc-compare' ) ).not.toContainText( '[object Object]' );
+		await expect( page.locator( '.whsc-compare tbody tr' ).nth( 1 ).locator( 'td' ) ).toHaveText( [ '4.5', '-', '-', '-' ] );
+	} );
+
+	/**
 	 * The reply shows as it is written, from `/assistant/stream`; a service
 	 * without the stream answers 404 and the turn above asks `/assistant`.
 	 */

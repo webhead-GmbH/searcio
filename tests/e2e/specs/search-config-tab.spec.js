@@ -788,6 +788,27 @@ test.describe( 'Search Config tab', () => {
 	} );
 
 	/**
+	 * "Rucksack, Ranzen" listed twice was kept twice, and nothing said that the
+	 * second group changed nothing.
+	 */
+	test( 'says when a synonym group is listed twice, and stops saying it once it is not', async ( { page } ) => {
+		await mockSearchConfig( page );
+		await page.goto( at( 'synonyms' ) );
+
+		const field = page.getByRole( 'textbox', { name: 'Synonyms' } );
+		const warning = page.locator( '.whsc-repeated-synonyms' );
+
+		await expect( field ).toBeVisible( LOADED );
+		await expect( warning ).toHaveCount( 0 );
+
+		await field.fill( 'Rucksack, Ranzen\nsneaker, trainer\nranzen, rucksack' );
+		await expect( warning ).toContainText( 'The group "ranzen, rucksack" is listed twice' );
+
+		await field.fill( 'Rucksack, Ranzen\nsneaker, trainer' );
+		await expect( warning ).toHaveCount( 0 );
+	} );
+
+	/**
 	 * The suggestions used to be a hand-kept list in the tab that offered
 	 * `tags` (never written - the field is `product_tags`) and left out
 	 * `in_stock`, `on_sale`, the price range and every attribute.

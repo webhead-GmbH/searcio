@@ -5724,3 +5724,11 @@ msgid "%d redirect"
 msgid_plural "%d redirects"
 msgstr[0] "%d Weiterleitung"
 msgstr[1] "%d Weiterleitungen"
+
+#. translators: %s: one or more synonym groups, each in quotation marks.
+#: src/admin/settings/components/tabs/SearchConfigTab.js:319
+#, js-format
+msgid "The group %s is listed twice, with the same words. The second one changes nothing: remove it."
+msgid_plural "These groups are listed twice, with the same words: %s. The second of each changes nothing: remove it."
+msgstr[0] "Die Gruppe %s steht zweimal in der Liste, mit denselben Wörtern. Die zweite ändert nichts: Entfernen Sie sie."
+msgstr[1] "Diese Gruppen stehen zweimal in der Liste, mit denselben Wörtern: %s. Die jeweils zweite ändert nichts: Entfernen Sie sie."
