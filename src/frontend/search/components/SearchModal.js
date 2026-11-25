@@ -7,7 +7,8 @@ import Button from './Button';
 
 import {currentLangFilter, fetchCardTemplates, fetchHighlights, fetchPopularSearches, fetchStorefrontConfig, getConfig, isConfigured, isLanguageSupported, isPreview, search, suggest, trackClick, visualSearch} from '../../../utils/api';
 import {addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch} from '../../../utils/storage';
-import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, facetValueLabel, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {activeFilterCount, appendHits, buildFilterParams, buildRangeParams, buildTypeParam, detectFacetDisplay, extractFieldFacets, extractRangeFields, facetCoverage, facetValueLabel, filterButtonLabel, freezeValueOrder, hasBound, hasMorePages, humanizeFieldLabel, mergeFieldFacets, mergeRangeFields, orderFacetGroups, rangeLabel, selectType, summarizeSelection, toggleSelection, totalIsExact} from '../../../utils/facets';
+import {buildShareHash, restoreShareHash, writeShareHash} from '../../../utils/shareLink';
 import {formatPrice, PRICE_FIELDS} from '../../../utils/currency';
 import {redirectTarget} from '../../../utils/redirect';
 import {trackScrollEnd} from '../../../utils/scrollEnd';
@@ -38,6 +39,9 @@ const LIVE_SEARCH_DEBOUNCE = 150;
 const LIVE_SEARCH_MIN_LENGTH = 3;
 // Picks made in quick succession share one request.
 const FILTER_DEBOUNCE = 250;
+// What a search or a pick changed reaches the address after this pause, so that
+// a word on its way ("jack" before "jacket") is not written on the way.
+const SHARE_DEBOUNCE = 400;
 // Under this width of the modal, the phone's layout: one scrolling row of
 // filters, and sheets from the bottom instead of popovers and a drawer. The
 // stylesheet's container queries use the same width.
@@ -185,6 +189,8 @@ const revealTab = (list, tab) => {
  * @param {boolean}  [props.editorPreview] Opened by the Elementor editor for styling rather than by a visitor:
  *                                        it takes no focus and runs its search term once.
  * @param {string}   props.initialQuery   Seed value when opened from a box trigger the user was already typing in.
+ * @param {{types: string[], facets: Object, ranges: Object}} [props.initialShare] The search a link brought (with `initialQuery`
+ *                                        its words): the window opens on it, see `utils/shareLink.js`.
  * @param {(query: string) => void} [props.onQueryChange] Keeps a box trigger's own input in sync while the modal is open.
  * @param {Function} props.onRequestClose
  */
@@ -202,6 +208,7 @@ const SearchModal = ({
 											 facetBarLimit = DEFAULT_BAR_LIMIT,
 											 editorPreview = false,
 											 initialQuery,
+											 initialShare = null,
 											 onQueryChange,
 											 onRequestClose,
 										 }) => {
@@ -213,6 +220,10 @@ const SearchModal = ({
 	const statusId = useId();
 
 	const [query, setQuery] = useState(initialQuery || '');
+	// The words a link brought. The autocomplete and the "while typing" search
+	// start on them as they do on any words in the field, unless told that a
+	// search for them runs already (`skipSuggestRef`, `skipLiveSearchRef`).
+	const sharedWords = initialShare ? (initialQuery || '').trim() : '';
 	// A scope-locked instance never touches this - `buildTypeParam()` always
 	// prefers `scopeType` when it's set.
 	const [activeTypes, setActiveTypes] = useState([]);
@@ -259,7 +270,7 @@ const SearchModal = ({
 	const narrow = modalWidth > 0 && modalWidth < NARROW_WIDTH;
 	const tight = modalWidth > 0 && modalWidth < TIGHT_WIDTH;
 	const [suggestions, setSuggestions] = useState([]);
-	const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
+	const [suggestionsDismissed, setSuggestionsDismissed] = useState('' !== sharedWords);
 	// The suggestion the arrow keys are on, or -1 while they are on none.
 	const [activeSuggestion, setActiveSuggestion] = useState(-1);
 	const [results, setResults] = useState(null);
@@ -330,12 +341,12 @@ const SearchModal = ({
 	// It holds the query rather than a yes: a committed search for what the
 	// field already holds (Enter) changes nothing, so the effect does not run
 	// for it, and a yes stayed set and swallowed the visitor's next keystroke.
-	const skipSuggestRef = useRef(null);
+	const skipSuggestRef = useRef('' !== sharedWords ? sharedWords : null);
 	// Like `skipSuggestRef`, but stops the "while typing" live-search effect
 	// from firing a second, redundant request right after a committed search
 	// (clicking a recent/popular/suggestion item sets the query, which would
 	// otherwise trigger the live effect too).
-	const skipLiveSearchRef = useRef(null);
+	const skipLiveSearchRef = useRef('' !== sharedWords ? sharedWords : null);
 	// Aborts the previous in-flight search when a newer one starts, and a
 	// monotonic id so only the latest search may update state (rapid clicks no
 	// longer race stale responses onto the screen).
@@ -598,8 +609,12 @@ const SearchModal = ({
 		}
 	}, [activeFacets, activeRanges, highlightsSource]);
 
+	// What a link's filters are put on top of, when the link has no words: the
+	// highlights, whose response holds the types and the values of every filter.
+	const baselineRef = useRef(null);
+
 	useEffect(() => {
-		void loadHighlights(scopeType || '');
+		baselineRef.current = loadHighlights(scopeType || '');
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- only on mount; facet/type changes reload explicitly.
 	}, []);
 
@@ -976,9 +991,10 @@ const SearchModal = ({
 	 * and to the groups of the whole catalogue for the bar's panels.
 	 *
 	 * @param {{types: string[], facets: Object, ranges: Object}} next
-	 * @param {{immediate?: boolean}} [options]
+	 * @param {{immediate?: boolean, live?: boolean}} [options] `live`: the search the filters start is
+	 *        not one the visitor settled on (a link brought them), see {@see runSearch}.
 	 */
-	const applyFilters = (next, {immediate = false} = {}) => {
+	const applyFilters = (next, {immediate = false, live = false} = {}) => {
 		filtersRef.current = next;
 		setActiveTypes(next.types);
 		setActiveFacets(next.facets);
@@ -1007,7 +1023,7 @@ const SearchModal = ({
 
 			// A pick narrows the search on screen: with words in the field it is
 			// a settled search of its own, started by the filter.
-			void runSearch(q, {...latest, commit: false, keep: true, origin: 'filter'});
+			void runSearch(q, {...latest, commit: false, keep: true, live, origin: live ? undefined : 'filter'});
 		};
 
 		if (immediate) {
@@ -1019,12 +1035,91 @@ const SearchModal = ({
 
 	useEffect(() => () => window.clearTimeout(filterTimer.current), []);
 
-	// Clicking "All" (empty type) clears the selection; clicking a type
-	// toggles it in/out.
+	// Whether a link's search is still being put on screen.
+	const [replaying, setReplaying] = useState(null !== initialShare);
+
+	// A link brings a search with it (see `utils/shareLink.js`). The window gets
+	// there as a visitor would have: the words first, then the type and the
+	// filters the link names. Searching with the filters from the start would
+	// answer with what only the filtered results know, and the bar and the
+	// panels would offer nothing to change a pick to: a filter's own values and
+	// the other types collapse to the pick. Neither search is the visitor's own:
+	// `live` keeps them out of the recent searches and of the statistics until a
+	// result is clicked, and `commit: false` keeps a redirect rule from taking
+	// the visitor off the page the link opened.
+	useEffect(() => {
+		if (null === initialShare || editorPreview) {
+			setReplaying(false);
+
+			return undefined;
+		}
+
+		let open = true;
+
+		const replay = async () => {
+			if ('' !== sharedWords) {
+				await runSearch(initialQuery, {commit: false, live: true});
+			} else {
+				await baselineRef.current;
+			}
+
+			const picked = filtersRef.current;
+			const wanted = {types: initialShare.types || [], facets: initialShare.facets || {}, ranges: initialShare.ranges || {}};
+			// Whatever the visitor typed or picked meanwhile is theirs.
+			const untouched = queryRef.current.trim() === sharedWords && 0 === picked.types.length && 0 === activeFilterCount(picked.facets, picked.ranges);
+
+			if (open && untouched && (wanted.types.length > 0 || activeFilterCount(wanted.facets, wanted.ranges) > 0)) {
+				applyFilters(wanted, {immediate: true, live: true});
+			}
+
+			if (open) {
+				setReplaying(false);
+			}
+		};
+
+		void replay();
+
+		return () => {
+			open = false;
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the window opens on a link.
+	}, []);
+
+	// The address shows the search on screen, so that copying it shares the
+	// search: the words that were searched for, with the type and the filters
+	// picked, once they have settled. Nothing is written for what is no search
+	// to share (the assistant, the product finder, a search by photo), nor in a
+	// page builder's editor, whose address is the editor's.
+	const sharedType = scopeType || activeTypes[0] || '';
+	const shareHash = 'search' === activeTab && !visualActive && null !== results
+		? buildShareHash({query: results.searchedQuery || '', types: sharedType ? [sharedType] : [], facets: activeFacets, ranges: activeRanges})
+		: '';
+
+	useEffect(() => {
+		if (editorPreview || isPreview() || isSearching || replaying) {
+			return undefined;
+		}
+
+		const timer = window.setTimeout(() => writeShareHash(shareHash), SHARE_DEBOUNCE);
+
+		return () => window.clearTimeout(timer);
+	}, [shareHash, isSearching, replaying]);
+
+	// The address is the page's own again when the window closes. One the
+	// visitor has moved on from (an anchor they followed) is left as it is.
+	useEffect(() => () => restoreShareHash(), []);
+
+	// One type at a time, or all: a type replaces the one pressed before it
+	// (it used to be added to it, and the way to "posts only" was to press
+	// "products" off first), "All" (empty type) clears the pick, and pressing
+	// the type that is pressed changes nothing.
 	const onTypeFacetClick = (type) => {
 		const current = filtersRef.current;
+		const types = selectType(current.types, type);
 
-		applyFilters({...current, types: '' === type ? [] : toggleSelection(current.types, type)});
+		if (types !== current.types) {
+			applyFilters({...current, types});
+		}
 	};
 
 	// Multi-select per field, OR'ed together for that field's

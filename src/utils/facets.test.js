@@ -24,6 +24,7 @@ import {
 	parseAmount,
 	pathLabel,
 	rangeLabel,
+	selectType,
 	sortCategoryValues,
 	summarizeSelection,
 	toggleSelection,
@@ -46,6 +47,37 @@ describe( 'toggleSelection', () => {
 		toggleSelection( list, 'blue' );
 
 		expect( list ).toEqual( [ 'red' ] );
+	} );
+} );
+
+describe( 'selectType', () => {
+	it( 'picks the one type pressed', () => {
+		expect( selectType( [], 'product' ) ).toEqual( [ 'product' ] );
+	} );
+
+	it( 'replaces the type pressed before, so there is never more than one', () => {
+		expect( selectType( [ 'product' ], 'post' ) ).toEqual( [ 'post' ] );
+		expect( selectType( [ 'product', 'page' ], 'post' ) ).toEqual( [ 'post' ] );
+	} );
+
+	it( 'clears the pick for "All"', () => {
+		expect( selectType( [ 'post' ], '' ) ).toEqual( [] );
+	} );
+
+	it( 'keeps the type already pressed, and "All" when it is pressed, and says so by returning the list it was given', () => {
+		const pressed = [ 'post' ];
+		const none = [];
+
+		expect( selectType( pressed, 'post' ) ).toBe( pressed );
+		expect( selectType( none, '' ) ).toBe( none );
+	} );
+
+	it( 'does not mutate the input list', () => {
+		const list = [ 'product' ];
+
+		selectType( list, 'post' );
+
+		expect( list ).toEqual( [ 'product' ] );
 	} );
 } );
 

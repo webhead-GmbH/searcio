@@ -51,6 +51,52 @@ test.describe( 'Type facets', () => {
 			.toBeTruthy();
 	} );
 
+	test( 'presses one type at a time, and "All" is the way back', async ( { page, requestUtils } ) => {
+		const searches = [];
+		await mockSearchCloud( page, {
+			hits: [ postHit() ],
+			facets: { types: [ { value: 'post', count: 3 }, { value: 'page', count: 1 } ] },
+			onSearch: ( url ) => searches.push( url ),
+		} );
+		await page.goto( await createBlockPost( requestUtils, { mode: 'icon' } ) );
+
+		const widget = new SearchWidget( page );
+		await widget.openModal();
+		await widget.search( 'guide' );
+
+		const all = widget.typeSwitch.getByRole( 'button', { name: /^All/ } );
+		const post = widget.typeSwitch.getByRole( 'button', { name: /^post/ } );
+		const pages = widget.typeSwitch.getByRole( 'button', { name: /^page/ } );
+
+		await expect( all ).toHaveAttribute( 'aria-pressed', 'true' );
+
+		await post.click();
+		await expect( post ).toHaveAttribute( 'aria-pressed', 'true' );
+
+		// Another type takes the place of the first: it used to be added to it,
+		// and "pages only" was reached by pressing "posts" off first.
+		await pages.click();
+		await expect( pages ).toHaveAttribute( 'aria-pressed', 'true' );
+		await expect( post ).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect( all ).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect.poll( () => searches.some( ( url ) => 'page' === url.searchParams.get( 'type' ) ) ).toBe( true );
+		expect( searches.some( ( url ) => ( url.searchParams.get( 'type' ) || '' ).includes( ',' ) ) ).toBe( false );
+
+		// Pressing the type that is pressed asks for nothing again.
+		const asked = searches.length;
+
+		await pages.click();
+		await expect( pages ).toHaveAttribute( 'aria-pressed', 'true' );
+		await page.waitForTimeout( 600 );
+		expect( searches.length ).toBe( asked );
+
+		await all.click();
+		await expect( all ).toHaveAttribute( 'aria-pressed', 'true' );
+		await expect( pages ).toHaveAttribute( 'aria-pressed', 'false' );
+		await expect.poll( () => searches.length ).toBeGreaterThan( asked );
+		expect( searches[ searches.length - 1 ].searchParams.get( 'type' ) ).toBeNull();
+	} );
+
 	test( 'shows no switch when the results have one type and none is pressed', async ( { page, requestUtils } ) => {
 		await mockSearchCloud( page, {
 			hits: [ postHit( { type: 'product', brand: 'Acme' } ) ],
