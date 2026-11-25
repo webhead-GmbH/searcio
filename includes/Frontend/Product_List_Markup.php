@@ -66,11 +66,15 @@ final class Product_List_Markup {
 			? (string) $attributes['source']
 			: 'similar';
 
-		$document_id  = self::document_id( self::text( $attributes['documentId'] ?? '' ) );
+		$given        = self::text( $attributes['documentId'] ?? '' );
+		$document_id  = self::document_id( $given );
 		$filter_field = self::text( $attributes['filterField'] ?? '' );
 		$filter_value = self::text( $attributes['filterValue'] ?? '' );
 
-		if ( 'similar' === $source && '' === $document_id ) {
+		// The page's own product stands in only for an ID that was not given. An ID
+		// that no post has is a mistake to show, not a blank to fill: the row then
+		// showed the products like whatever page it was placed on.
+		if ( 'similar' === $source && '' === $given ) {
 			$document_id = self::current_document_id();
 		}
 

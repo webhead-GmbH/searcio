@@ -43,8 +43,9 @@ final class Translation_Fallback_Test extends Integration_Test_Case {
 	}
 
 	/**
-	 * WordPress's de_DE and de_CH_informal say "du", its de_DE_formal and
-	 * de_CH "Sie"; Swiss German writes ss for ß.
+	 * WordPress's de_DE, de_AT (there is no formal form of Austrian German,
+	 * and WordPress's own de_AT says "du") and de_CH_informal say "du", its
+	 * de_DE_formal and de_CH "Sie"; Swiss German writes ss for ß.
 	 */
 	public function test_each_german_locale_speaks_in_its_own_form(): void {
 		$this->assertSame( 'Deine Treffer', $this->translated( 'de_DE', self::MATCHES ) );

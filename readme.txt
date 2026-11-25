@@ -4,7 +4,7 @@ Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -131,6 +131,10 @@ Yes. The block and the Elementor widget let you style the search box, the window
 
 Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You choose which languages are indexed, as many as your plan allows.
 
+= Can the search window say "Sie" instead of "du"? =
+
+Yes. The plugin speaks German the way your site's language does, as WordPress itself does: "Deutsch" and "Deutsch (Österreich)" say "du", "Deutsch (Sie)" and "Deutsch (Schweiz)" say "Sie". WordPress has no formal Austrian language, so a shop in Austria or Germany that wants "Sie" picks "Deutsch (Sie)" under Settings > General > Site Language. On a multilingual site, give the German language the locale `de_DE_formal` in Polylang or WPML. Each administrator can still read the dashboard in the language of their own profile.
+
 = When do changes in my shop show up in the search? =
 
 An edit is sent shortly after you save it, and a scheduled sync runs every day. Changes on the Indexing tab take effect with the next sync; changes on the Search Config tab apply to the very next search.
@@ -192,6 +196,11 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 Legal notice: https://searcio.com/impressum
 
 == Changelog ==
+
+= 1.4.2 =
+- AI assistant: the comparison counts the products it shows, leaves out rows that read as nothing (the list of variations, a rating of 0, a row nobody has a value in) and shows two fields that say the same as one row.
+- A product row given a product ID that does not exist shows nothing, and the editor says why, where it showed the products like the page it was on.
+- Search Config: a synonym group listed twice is pointed out.
 
 = 1.4.1 =
 - Security: password-protected posts and pages are no longer indexed unless "Also index private & password-protected items" is on, and the update takes the ones already indexed out.

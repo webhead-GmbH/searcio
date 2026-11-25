@@ -202,6 +202,35 @@ export const textToTerms = ( text ) => String( text )
 	.map( ( line ) => line.trim() )
 	.filter( ( line ) => '' !== line );
 
+/**
+ * The synonym groups that repeat an earlier one: the same words, whatever
+ * their capitals and their order ("Rucksack, Ranzen" and "ranzen, rucksack").
+ * Searcio keeps both, and the second changes nothing.
+ *
+ * @param {string[]} groups One comma-separated group each.
+ * @return {string[]} The groups that repeat, as typed.
+ */
+export const repeatedSynonymGroups = ( groups ) => {
+	const words = ( group ) => [ ...new Set( String( group ).split( ',' ).map( ( word ) => word.trim().toLocaleLowerCase() ).filter( Boolean ) ) ].sort().join( ',' );
+	const seen = new Set();
+
+	return ( Array.isArray( groups ) ? groups : [] ).filter( ( group ) => {
+		const key = words( group );
+
+		if ( '' === key ) {
+			return false;
+		}
+
+		if ( seen.has( key ) ) {
+			return true;
+		}
+
+		seen.add( key );
+
+		return false;
+	} );
+};
+
 /** The limits Searcio sets on its profit ranking. */
 export const PROFIT_STRENGTH_MAX = 50;
 export const PROFIT_RULES_MAX = 100;

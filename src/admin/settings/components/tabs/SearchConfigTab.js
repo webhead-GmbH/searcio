@@ -17,6 +17,7 @@ import {
 	changedSince,
 	enabledTypeLabels,
 	repeatsRedirect,
+	repeatedSynonymGroups,
 	errorsUnder,
 	FIELD_LIST_MAX,
 	idsToText,
@@ -294,17 +295,39 @@ const SynonymsField = ( { synonyms, onChange } ) => {
 		}
 	}, [ synonyms ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
+	// A group listed twice is kept twice and changes nothing: said, not merged, since
+	// what is typed is the merchant's to keep.
+	const repeated = repeatedSynonymGroups( textToTerms( text ) );
+
 	return (
-		<TextareaControl
-			label={ __( 'Synonyms', 'searcio' ) }
-			hideLabelFromVision
-			description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'searcio' ) }
-			value={ text }
-			onValueChange={ ( value ) => {
-				setText( value );
-				onChange( textToTerms( value ) );
-			} }
-		/>
+		<Stack direction="column" gap="sm">
+			<TextareaControl
+				label={ __( 'Synonyms', 'searcio' ) }
+				hideLabelFromVision
+				description={ __( 'One comma-separated group of interchangeable words per line, e.g. "sneaker, trainer".', 'searcio' ) }
+				value={ text }
+				onValueChange={ ( value ) => {
+					setText( value );
+					onChange( textToTerms( value ) );
+				} }
+			/>
+			{ repeated.length > 0 && (
+				<Notice.Root intent="warning" className="whsc-repeated-synonyms">
+					<Notice.Description>
+						{ sprintf(
+							/* translators: %s: one or more synonym groups, each in quotation marks. */
+							_n(
+								'The group %s is listed twice, with the same words. The second one changes nothing: remove it.',
+								'These groups are listed twice, with the same words: %s. The second of each changes nothing: remove it.',
+								repeated.length,
+								'searcio'
+							),
+							repeated.map( ( group ) => `"${ group }"` ).join( ', ' )
+						) }
+					</Notice.Description>
+				</Notice.Root>
+			) }
+		</Stack>
 	);
 };
 

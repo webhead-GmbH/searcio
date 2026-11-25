@@ -9,6 +9,7 @@ import {
 	cleanTerms,
 	enabledTypeLabels,
 	repeatsRedirect,
+	repeatedSynonymGroups,
 	errorsUnder,
 	FEATURE_KEYS,
 	idsToText,
@@ -729,3 +730,32 @@ describe( 'changedSince', () => {
 		expect( changedSince( { features: { assistant: { enabled: true } } }, live, persisted ) ).toEqual( [ 'features' ] );
 	} );
 } );
+
+/**
+ * "Rucksack, Ranzen" was saved twice, and nothing said that the second group
+ * changed nothing.
+ */
+describe( 'repeatedSynonymGroups', () => {
+	it( 'finds a group that repeats an earlier one, whatever the capitals and the order', () => {
+		expect( repeatedSynonymGroups( [ 'Rucksack, Ranzen', 'sneaker, trainer', 'ranzen,  rucksack' ] ) ).toEqual( [ 'ranzen,  rucksack' ] );
+	} );
+
+	it( 'counts a word typed twice in a group once', () => {
+		expect( repeatedSynonymGroups( [ 'a, b', 'b, a, b' ] ) ).toEqual( [ 'b, a, b' ] );
+	} );
+
+	it( 'does not take a group that shares only some words for a repeat', () => {
+		expect( repeatedSynonymGroups( [ 'a, b', 'a, b, c', 'a' ] ) ).toEqual( [] );
+	} );
+
+	it( 'says nothing for no groups, or for lines without a word', () => {
+		expect( repeatedSynonymGroups( [] ) ).toEqual( [] );
+		expect( repeatedSynonymGroups( undefined ) ).toEqual( [] );
+		expect( repeatedSynonymGroups( [ ' , ', ',' ] ) ).toEqual( [] );
+	} );
+
+	it( 'names each repeat once per extra copy', () => {
+		expect( repeatedSynonymGroups( [ 'x, y', 'y, x', 'X, Y' ] ) ).toEqual( [ 'y, x', 'X, Y' ] );
+	} );
+} );
+
