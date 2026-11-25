@@ -4,6 +4,16 @@ All notable changes to Searcio are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The plugin's page on WordPress.org carries the same release notes in shorter form.
 
+## [1.5.0] - Unreleased
+
+### Added
+
+- **A search as a link.** While the search window shows a search, the address of the page holds it behind a `#` (`#searcio?q=steppjacke&type=product&f.farbe=rot&r.price=20,100`: the words, the type of result, the filters picked and the bounds of a number filter), so copying the address shares the search, and a page opened on such an address opens the window on that search, also when the link is pasted into the address of a page that is open. The address is changed in place, with no entry in the browser's history: a Back from an opened result lands on the search again, and closing the window gives the address back as the page had it. The part behind the `#` never reaches the server, so it is in no log, no page cache key and no `Referer`. A link is read as the input it is: only known keys, only the filters the site has set up, numbers for bounds, fixed limits on every part, and what does not pass is left out. It never starts the AI assistant, the product finder or a search by photo, never sends the visitor away through a redirect rule or to WordPress's own search, and its searches are not saved among the visitor's recent searches and stay out of the search statistics until a result is clicked.
+
+### Changed
+
+- The type buttons of the search window pick one type at a time, or all of them. A type replaces the one pressed before it, where it was added to it and "posts only" took pressing "products" off first; "All" is the way back.
+
 ## [1.4.2] - 2026-11-25
 
 ### Fixed
@@ -304,6 +314,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Language restriction for indexing and search with WPML and Polylang.
 - WP-CLI commands for running and monitoring syncs.
 
+[1.5.0]: https://github.com/webhead-GmbH/searcio/compare/1.4.2...1.x
 [1.4.2]: https://github.com/webhead-GmbH/searcio/compare/1.4.1...1.4.2
 [1.4.1]: https://github.com/webhead-GmbH/searcio/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/webhead-GmbH/searcio/compare/1.3.1...1.4.0

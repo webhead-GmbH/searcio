@@ -6,6 +6,21 @@ import ProductList from './ProductList';
 import SearchModal from './SearchModal';
 import { documentType } from '../../../utils/documentType';
 import { liftAboveBottomBars } from '../../../utils/bottomBars';
+import { getConfig, isConfigured, isLanguageSupported } from '../../../utils/api';
+import { isShareHash, isWrittenShareHash, parseShareHash, shareFields } from '../../../utils/shareLink';
+
+/**
+ * The trigger whose window a request to open the search opens: the site's own,
+ * or the first one on a page the site printed none on.
+ *
+ * @param {Element[]} triggerElements
+ * @return {number} Its index.
+ */
+const ownTriggerIndex = ( triggerElements ) => {
+	const site = triggerElements.findIndex( ( el ) => undefined !== el.dataset.whscSite );
+
+	return site >= 0 ? site : 0;
+};
 
 /**
  * Portals each server-rendered trigger placeholder to a real React
@@ -20,13 +35,20 @@ import { liftAboveBottomBars } from '../../../utils/bottomBars';
 const App = ( { triggerElements, listElements = [] } ) => {
 	const [ activeIndex, setActiveIndex ] = useState( null );
 	const [ query, setQuery ] = useState( '' );
+	// The type, the filters and the bounds of the link the window was opened with
+	// (its words are `query`), and how many links have opened it: a link pasted
+	// into a page that is open opens the window afresh.
+	const [ share, setShare ] = useState( null );
+	const [ shareRun, setShareRun ] = useState( 0 );
 
 	const openFresh = ( index ) => {
+		setShare( null );
 		setQuery( '' );
 		setActiveIndex( index );
 	};
 
 	const openWithValue = ( index, value ) => {
+		setShare( null );
 		setQuery( value );
 		setActiveIndex( index );
 	};
@@ -37,13 +59,13 @@ const App = ( { triggerElements, listElements = [] } ) => {
 	// printed none.
 	useEffect( () => {
 		const onOpenRequest = ( event ) => {
-			const site = triggerElements.findIndex( ( el ) => undefined !== el.dataset.whscSite );
-			const index = site >= 0 ? site : 0;
+			const index = ownTriggerIndex( triggerElements );
 
 			if ( ! triggerElements[ index ] ) {
 				return;
 			}
 
+			setShare( null );
 			setQuery( event.detail?.query || '' );
 			setActiveIndex( index );
 		};
@@ -51,6 +73,39 @@ const App = ( { triggerElements, listElements = [] } ) => {
 		window.addEventListener( OPEN_EVENT, onOpenRequest );
 
 		return () => window.removeEventListener( OPEN_EVENT, onOpenRequest );
+	}, [ triggerElements ] );
+
+	// A link to a search (`#searcio?q=...`, see `utils/shareLink.js`) opens the
+	// window of the site's own trigger on that search: when the page loads, and
+	// when a link is pasted into the address of a page that is open. What the
+	// window wrote into the address itself is no news. Where Searcio does not
+	// search the page the link is left alone: opening it would hand the visitor
+	// to WordPress's own search, away from the page the link names.
+	useEffect( () => {
+		const openShared = () => {
+			const { hash } = window.location;
+
+			if ( ! isShareHash( hash ) || isWrittenShareHash( hash ) || ! isConfigured() || ! isLanguageSupported() ) {
+				return;
+			}
+
+			const shared = parseShareHash( hash, shareFields( getConfig() ) );
+			const index = ownTriggerIndex( triggerElements );
+
+			if ( ! shared || ! triggerElements[ index ] ) {
+				return;
+			}
+
+			setQuery( shared.query );
+			setShare( { types: shared.types, facets: shared.facets, ranges: shared.ranges } );
+			setShareRun( ( run ) => run + 1 );
+			setActiveIndex( index );
+		};
+
+		openShared();
+		window.addEventListener( 'hashchange', openShared );
+
+		return () => window.removeEventListener( 'hashchange', openShared );
 	}, [ triggerElements ] );
 
 	// The floating button stands on a bar the site fixes to the bottom of the
@@ -67,6 +122,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 		const el = null !== activeIndex ? triggerElements[ activeIndex ] : null;
 
 		setActiveIndex( null );
+		setShare( null );
 
 		// Box triggers are hidden behind the modal while open; restore focus on close.
 		if ( el && 'box' === el.dataset.mode ) {
@@ -128,7 +184,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 			) ) }
 			{ activeEl && (
 				<SearchModal
-					key={ `${ activeIndex }-${ previewRun }` }
+					key={ `${ activeIndex }-${ previewRun }-${ shareRun }` }
 					scopeType={ documentType( activeEl.dataset.type ) }
 					placeholder={ activeEl.dataset.placeholder || '' }
 					enableVoice={ '1' === activeEl.dataset.voice }
@@ -144,6 +200,7 @@ const App = ( { triggerElements, listElements = [] } ) => {
 					facetBarLimit={ /^\d+$/.test( activeEl.dataset.facetBarLimit || '' ) ? Number( activeEl.dataset.facetBarLimit ) : undefined }
 					editorPreview={ '1' === activeEl.dataset.editorPreview }
 					initialQuery={ query }
+					initialShare={ share }
 					onQueryChange={ setQuery }
 					onRequestClose={ closeModal }
 				/>

@@ -65,6 +65,7 @@
 - **Category merchandising** - curate a category listing: pin products to the top, keep products out, show a banner.
 - **Multilingual (WPML / Polylang)** - optionally restrict indexing and search to specific languages; visitors only see
   results in their current language.
+- **Shareable searches** - the address of a search holds its words, its type and its filters behind a `#`, so a link to it opens the search window on the same results, and a Back from a result brings the search back.
 - **In your language** - translated into German (Germany, Austria and Switzerland), French, Spanish, Italian and
   Polish.
 - **Background sync** - a resumable, batched sync engine keeps your index up to date automatically, plus an incremental

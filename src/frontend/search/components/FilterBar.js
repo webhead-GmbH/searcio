@@ -144,8 +144,8 @@ const FilterBar = ( {
 	};
 
 	const typeSwitch = showTypes && (
-		// A group of independent toggle buttons, not a tablist: more than one
-		// type can be pressed at once.
+		// A group of toggle buttons, not a tablist: one type is pressed at a time,
+		// or "All" when none is.
 		<div className="whsc-types" role="group" aria-label={ __( 'Filter by type', 'searcio' ) }>
 			{ /* On a phone too: without it, the way back to every result was to press the pressed type again, which nothing said. */ }
 			{ typeButton( '', allTypesLabel || __( 'All', 'searcio' ) ) }

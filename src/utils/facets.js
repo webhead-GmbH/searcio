@@ -10,9 +10,25 @@ export const toggleSelection = ( list, value ) =>
 	list.includes( value ) ? list.filter( ( item ) => item !== value ) : [ ...list, value ];
 
 /**
+ * The types after a press on one of the type buttons: one type at a time, or
+ * all. A type replaces the one pressed before it, "All" (an empty `value`)
+ * clears the pick, and the type already pressed stays: "All" is the way back.
+ *
+ * @param {string[]} types The types pressed now.
+ * @param {string}   value The button pressed; empty for "All".
+ * @return {string[]} `types` itself when the press changes nothing.
+ */
+export const selectType = ( types, value ) => {
+	const next = '' === value ? [] : [ value ];
+
+	return next.length === types.length && next.every( ( type, index ) => type === types[ index ] ) ? types : next;
+};
+
+/**
  * The `type` query param for `/search`: a scope-locked instance always wins
- * (§3.2 "scope-locked instances are unaffected"); otherwise the active
- * multi-select types are joined for the API's comma-separated OR.
+ * (§3.2 "scope-locked instances are unaffected"); otherwise the active type,
+ * which the type buttons keep to one, joined for the API's comma-separated OR
+ * (a list reaches it from nowhere else).
  */
 export const buildTypeParam = ( scopeType, activeTypes ) =>
 	scopeType || ( ( activeTypes || [] ).length > 0 ? activeTypes.join( ',' ) : '' );
