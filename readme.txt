@@ -4,7 +4,7 @@ Tags: search, woocommerce search, product search, ajax search, ai search
 Requires at least: 6.8
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.4.2
+Stable tag: 1.5.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -54,6 +54,7 @@ AI search and similar products come with every paid plan, and the AI shopping as
 * **Any theme, any builder** - Searcio can take over your theme's own search, open from its search icon, sit in a floating button, or go anywhere as the `[searcio]` shortcode, a classic widget or a menu item.
 * **Your look, no code** - style colors, corners, spacing and every part of the search window from the block editor or Elementor. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, the look editor on the Placement tab does the same, fonts included, set apart for desktops, tablets and phones. Until you pick others, the search follows your site's font and text color.
 * **Not just products** - posts, pages and custom post types, with custom fields and taxonomies.
+* **Shareable searches** - the address of a search holds its words, its type and its filters, so a link to it opens the search window on the same results.
 * **Multilingual** - works with WPML and Polylang, so visitors only see results in their language. How many languages are searched depends on your plan.
 * **In your language** - translated into German (Germany with "du" or "Sie", Austria, and Switzerland with "Sie" or "du"), French, Spanish, Italian and Polish. A site in another variant of these languages, such as Canadian French or Mexican Spanish, gets the plugin in that language too.
 * **Accessible** - full keyboard support, screen-reader labels and right-to-left languages.
@@ -127,6 +128,10 @@ Yes. Under Searcio > Placement, let Searcio take over your theme's search forms 
 
 Yes. The block and the Elementor widget let you style the search box, the window, the filters, the result cards, the AI assistant and more. For the shortcode, the classic widgets, a search form Searcio takes over and the floating button, open the look editor on the Placement tab: it has the Elementor widget's style settings, fonts included, for desktops, tablets and phones, with a large preview. Developers can also theme it with `--whsc-*` CSS custom properties.
 
+= Can I share a search with its filters as a link? =
+
+Yes. While the search window is open, the address of the page holds what it shows - the words, the type of result and the filters - behind a "#". Copy the address, or send it with your browser's share button, and whoever opens it gets the search window on the same search. The part behind the "#" never reaches your server, so nobody's search words land in your logs, and the Back button brings the search back after a visitor has opened a result.
+
 = Does it support multilingual sites? =
 
 Yes. With WPML or Polylang, each post is indexed with its language and visitors only see results in the language they are browsing. You choose which languages are indexed, as many as your plan allows.
@@ -196,6 +201,10 @@ Data Processing Agreement: https://searcio.com/data-processing-agreement
 Legal notice: https://searcio.com/impressum
 
 == Changelog ==
+
+= 1.5.0 =
+- Share a search: the address of the page holds the words, the type and the filters of the search window, so copying it shares the search and a link opens the window on it. Nothing of it reaches your server, and a Back from a result brings the search back.
+- The type buttons of the search window pick one type at a time, or all, where a second type was added to the first.
 
 = 1.4.2 =
 - AI assistant: the comparison counts the products it shows, leaves out rows that read as nothing (the list of variations, a rating of 0, a row nobody has a value in) and shows two fields that say the same as one row.

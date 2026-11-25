@@ -91,6 +91,23 @@ What the search modal offers is decided by Searcio's `/storefront-config`, not b
 
 Every mode is themeable from the same place as the rest of the widget - the block editor's Styles sidebar, Elementor's Style tab, or, for the shortcode, the classic widget, a form Searcio takes over and the floating button, the Placement tab's look editor.
 
+### Sharing a search
+
+While the window shows a search, the address of the page holds it behind a `#`:
+
+```
+https://shop.example/#searcio?q=steppjacke&type=product&f.farbe=rot&f.farbe=blau&r.price=20,100
+```
+
+`q` is the words, `type` the one type of result, `f.<field>` a picked value of a filter (repeated for more of them) and `r.<field>` the bounds of a number filter as `min,max`, either side empty. Copying the address shares the search. A page opened on one opens the window of the site's own trigger on that search, also when the link is pasted into the address of a page that is open.
+
+- The part behind the `#` never reaches the server: it is in no log, no page cache key and no `Referer` of a link followed from the page, which is why a visitor's search words may live there.
+- The address is changed in place, with no entry in the browser's history. A Back from an opened result lands on the page with the search, which opens the window as it was. Closing the window gives the address back as the page had it, an anchor such as `#pricing` included.
+- Only a search of the results is shared. The AI assistant, the product finder and a search by photo are never started by a link: a key such as `tab` is not read.
+- A link is read as the input anybody can write: only the keys above (a key it does not know is ignored, so one can be added later), only the filters Search Config lists (any of a safe name on a site that lists none), numbers for bounds, and fixed limits on its length, its words, its filters and their values. What does not pass is left out, and a link of which nothing passes is no link. The words are only ever shown as text.
+- A link opened is not a search the visitor typed. It is not added to their recent searches, a redirect rule does not fire for it, it does not leave the page for WordPress's own search, and like a search as you type it stays out of the search statistics until a result is clicked. Where Searcio does not search the page (the site is not connected, or the language is not indexed) a link is left alone.
+- A page holds a link only where it loads the search: a page with a search button, the site-wide search or the floating button.
+
 ### Styling the Elementor widget
 
 The modal is closed until a visitor opens it, so turn on **Content → Modal → Keep open while editing** before working through the Style tab: the modal then opens in the editor preview and every change shows as you make it. **Preview search** runs a search there too, so result cards, filters and prices are on screen to style; leave it empty to style the empty state (recent and popular searches, highlights). Visitors never see the modal open by itself, whatever is saved.

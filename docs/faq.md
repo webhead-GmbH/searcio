@@ -40,6 +40,10 @@ The **Languages** section is always on the Search Config tab. With WPML or Polyl
 
 The plugin follows the site's language: *Deutsch*, *Deutsch (Österreich)* and *Deutsch (Schweiz, Du)* say "du", *Deutsch (Sie)* and *Deutsch (Schweiz)* say "Sie". WordPress has no formal Austrian German, so a shop in Austria or Germany that wants "Sie" chooses *Deutsch (Sie)* under **Settings > General > Site Language**, or, with Polylang or WPML, gives its German language the locale `de_DE_formal` (see [`multilingual.md`](multilingual.md)). The texts a shop writes itself, such as a product finder's questions, stay as they were written.
 
+### The address does not show my search, or a link to a search opens nothing
+
+The window writes its search into the address as `#searcio?q=...` (see **Sharing a search** in [`configuration.md`](configuration.md)): copy the address from the browser, or send it with its share button. A link opens the search only on a page that loads Searcio's search (a search button, the site-wide search or the floating button), where Searcio searches the page (connected, and in a language the site indexes), and when what is behind the `#` can be read: a typing mistake, a filter the site has not set up or a very long search is left out. A theme or a plugin that rewrites the address of a page with a script can remove it again.
+
 ### A sync run shows "Failed" or content is being skipped
 
 Open the sync history row for the failed run - the last error message is shown there. Common causes: the Searcio plan's document limit was reached (upgrade your plan or reduce what you index), your Searcio account has no active plan, has an overdue payment or is suspended (the Connection tab says which, with a link to choose a plan, to pay on the billing page or to contact support; such a sync stops at once), or Searcio could not be reached for over an hour. A sync that cannot write stays *Running* and tries again by itself, waiting longer each time; only when the last of those tries fails does it end as *Failed*. Nothing has to be done then: changes made in the shop are sent as soon as Searcio answers again, and the next scheduled sync runs a full one.
